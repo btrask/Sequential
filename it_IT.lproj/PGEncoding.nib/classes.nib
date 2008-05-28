@@ -1,0 +1,43 @@
+{
+    IBClasses =     (
+                {
+            CLASS = NSObject;
+            LANGUAGE = ObjC;
+        },
+                {
+            CLASS = NSTableColumn;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSObject;
+        },
+                {
+            CLASS = NSView;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            CLASS = NSWindow;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSResponder;
+        },
+                {
+            ACTIONS =             {
+                cancel = id;
+                cancelAndDeleteBookmark = id;
+                ok = id;
+            };
+            CLASS = PGEncodingAlert;
+            LANGUAGE = ObjC;
+            OUTLETS =             {
+                cancelAndDeleteBookmarkButton = NSButton;
+                encodingColumn = NSTableColumn;
+                encodingsTable = NSTableView;
+                infoField = NSTextField;
+                messageField = NSTextField;
+                sampleColumn = NSTableColumn;
+                tableScrollView = NSScrollView;
+            };
+            SUPERCLASS = NSWindowController;
+        }
+    );
+    IBVersion = 1;
+}

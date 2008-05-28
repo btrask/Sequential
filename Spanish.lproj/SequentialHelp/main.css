@@ -1,0 +1,14 @@
+﻿* { font-family: Lucida Grande, Arial, sans-serif; }
+a { color: #00f; }
+
+body { font-size: 13px; }
+h2 { margin-bottom: -10px; }
+h3 { font-size: 13px; margin-bottom: 0; }
+ol { padding-left: 2em; }
+ul { list-style-type: square; padding-left: 2em; }
+
+.howto { border: 1px solid #bbb; background: #eee; margin-top: 20px; padding: 0 10px 0 10px; }
+
+#frame { margin-right: auto; margin-left: auto; width: 500px; }
+#left { float: left; padding: 20px; width: 200px; }
+#right { float: left; padding: 20px; width: 200px; border-left: 1px solid #808080; }

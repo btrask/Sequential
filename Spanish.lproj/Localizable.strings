@@ -1,0 +1,119 @@
+﻿/* Screen names in the Use Screen menu. %d is replaced with the screen number. */
+"Main Screen" = "Ventana principal";
+"Screen %d" = "Pantalla %d";
+
+/* Clear the Open Recent menu. Should be the same as the standard text. */
+"Clear Menu" = "Vaciar menú";
+
+/* Label for when no image is being displayed in the window. */
+"No image" = "No image";
+
+/* Enter/exit full screen. Two states of the same item. */
+"Enter Full Screen" = "Enter Full Screen";
+"Exit Full Screen" = "Exit Full Screen";
+
+/* Lets the user toggle the on-screen display. Two states of the same item. */
+"Show Info" = "Mostrar información";
+"Hide Info" = "Ocultar información";
+
+/* Toggle the Exif panel. Two states. */
+"Show Exif Data" = "Show Exif Data";
+"Hide Exif Data" = "Hide Exif Data";
+
+/* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
+"Fit to Screen" = "Ajustar a pantalla";
+"Fit to Window" = "Fit to Window";
+
+/* The title of the bookmarks menu. Two states. */
+"Resume" = "Continuar";
+"Delete..." = "Delete…";
+
+/* Bookmark menu item used when the file named %@ cannot be found. */
+"Missing File %@" = "Archivo no ncontrado “%@”";
+
+/* Folder with no displayable images error. %@ is replaced by the filename. */
+"The folder %@ contains no displayable images." = "La carpeta “%@” no contiene imágenes para mostrar.";
+"If one of this folder's subfolders contains images you wish to view, open that folder directly." = "Si una carpeta dentro de ésta contiene imágenes que quiere ver, ábrala directamente.";
+
+/* Archive with no displayable images error. %@ is replaced by the filename. */
+"The archive %@ contains no displayable images." = "El archivo “%@” no tiene imágenes para mostrar.";
+"If you know it does, try expanding it with another application." = "Si sabe que es posible, intente expandirlo mediante otra aplicación.";
+
+/* Invalid archive type error. %@ is replaced by the filename. */
+"The file %@ does not appear to be in a supported format." = "El archivo “%@” no parece ser un formato soportado.";
+"If this file is an archive, try expanding it with another application." = "Si este archivo es un archivo comprimido, intente expandirlo con otra aplicación.";
+
+/* Archive requires a password prompt. %@ is replaced by the filename. */
+"The archive %@ is encrypted and requires a password in order to be opened." = "El archivo comprimido “%@” está encriptado y requiere un password para ser abierto.";
+
+/* The archive has an unknown encoding prompt. %@ is replaced by the filename. */
+"The correct text encoding for the file %@ could not be automatically determined." = "La codificación de texto correcta para “%@” no se pudo determinar automáticamente.";
+
+/* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
+"The error %u %@ was generated while loading the URL %@." = "El error “%u %@” se generó mientras se cargaba la URL “%@.”";
+"Make sure the URL is correct and the page is available." = "Asegúrese de que la URL es correcta y la página está disponible";
+
+/* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
+"The URL %@ could not be loaded." = "La URL “%@” no pudo cargarse.";
+"Make sure the connection and server are available." = "Asegúrese de que la conexión y el servidor funcionan.";
+
+/* The URL didn't have any images, and was not an image itself. %@ is replaced by the full URL. */
+"The URL %@ did not contain any displayable images." = "La URL “%@” no contiene imágenes que mostrar";
+"Sequential displays images that are linked to by or embedded within the page." = "Sequential muestra imágenes enlazadas o contenidas en la página web.";
+
+/* The URL is being loaded. %@ is replaced by the full URL. */
+"Sequential is loading the URL %@." = "Sequential está cargando la URL “%@.”";
+"Calculating time remaining..." = "Calculando tiempo restante";
+
+/* The URL is being loaded. %@ is replaced by a number with the units below. */
+"Loading URL: About %@ remaining." = "Cargando URL: Acerca de %@ restante.";
+"Scanning Links: About %@ remaining." = "Escaneando enlaces: Acerca de %@ restante.";
+
+/* Units used for time remaining. Only the largest unit is shown. %u is replaced by a non-1 number. */
+"%u hours" = "%u horas";
+"%u minutes" = "%u minutos";
+"%u seconds" = "%u segundos";
+
+/* Units used for time remaining when the amount is 1. */
+"1 hour" = "1 hora";
+"1 minute" = "1 minuto";
+"1 second" = "1 segundo";
+
+/* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+"%@ already exists in %@. Do you want to replace it?" = "“%@” ya existe en “%@.” ¿Desea reemplazarla?";
+
+/* Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name. */
+"%u pages already exist in %@. Do you want to replace them?" = "%u páginas ya existen en “%@.” ¿Desea reemplazarlas?";
+
+/* Informative text for replacement alerts. */
+"Replacing a file overwrites its current contents." = "Reemplazar un archivo sobreescribe su contenido actual.";
+
+/* Extraction window title. */
+"Extract" = "Extraer";
+
+/* Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+"The page %@ could not be extracted to %@." = "La página “%@” no se pudo extraer en “%@.”";
+
+/* Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
+"%u pages could not be extracted to %@." = "%u páginas no pudieron extraerse en “%@.”";
+
+/* Informative text for extraction failure alerts. */
+"Make sure the volume is writable and has enough free space." = "Asegúrese de que se puede escribir en el volumen y hay espacio libre.";
+
+/* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder. */
+"File already exists." = "El archivo ya existe.";
+
+/* Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name. */
+"Are you sure you want to delete the bookmark %@?" = "Are you sure you want to delete the bookmark “%@?”";
+"This operation cannot be undone." = "This operation cannot be undone.";
+
+/* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
+"The file referenced by the bookmark %@ could not be found." = "El archivo referenciado por el marcador “%@” no se encontró.";
+"It may have been moved or deleted." = "Puede haber sido movido o borrado.";
+
+/* Dialog button labels. */
+"OK" = "Aceptar";
+"Cancel" = "Cancelar";
+"Delete Bookmark" = "Borrar marcador";
+"Replace" = "Reemplazar";
+"Choose" = "Elegir";

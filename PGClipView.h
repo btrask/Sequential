@@ -1,0 +1,95 @@
+#import <Cocoa/Cocoa.h>
+
+enum {
+	PGNoEdges       = 0,
+	PGMinXEdgeMask  = 1 << NSMinXEdge,
+	PGMinYEdgeMask  = 1 << NSMinYEdge,
+	PGMaxXEdgeMask  = 1 << NSMaxXEdge,
+	PGMaxYEdgeMask  = 1 << NSMaxYEdge,
+	PGHorzEdgesMask = PGMinXEdgeMask | PGMaxXEdgeMask,
+	PGVertEdgesMask = PGMinYEdgeMask | PGMaxYEdgeMask,
+	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
+	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
+};
+typedef unsigned PGRectEdgeMask;
+
+extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
+extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
+
+enum {
+	PGHomeLocation = 0,
+	PGEndLocation  = 1
+};
+typedef int PGClipViewLocation;
+
+enum {
+	PGScrollByLine = 0,
+	PGScrollByPage = 1
+};
+typedef int PGScrollType;
+
+@interface PGClipView : NSView
+{
+	@private
+	IBOutlet id              delegate;
+	IBOutlet NSView         *documentView;
+	         NSRect         _documentFrame;
+	         NSColor       *_backgroundColor;
+	         NSPoint        _position;
+	         NSTimer       *_scrollTimer;
+	         NSTimeInterval _lastScrollTime;
+	         NSPoint        _immediatePosition;
+	         enum {
+			 	PGNotDragging,
+			 	PGPreliminaryDragging,
+			 	PGDragging
+	         }              _dragMode;
+	         BOOL           _firstMouse;
+}
+
+- (id)delegate;
+- (void)setDelegate:(id)anObject;
+
+- (NSView *)documentView;
+- (void)setDocumentView:(NSView *)aView;
+
+- (NSColor *)backgroundColor;
+- (void)setBackgroundColor:(NSColor *)aColor;
+
+- (NSRect)scrollableRectWithBorder:(BOOL)flag;
+- (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;
+- (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType fromPosition:(NSPoint)position;
+- (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
+
+- (NSPoint)position;
+- (NSPoint)center;
+- (BOOL)scrollTo:(NSPoint)aPoint allowAnimation:(BOOL)flag;
+- (BOOL)scrollToCenterAt:(NSPoint)aPoint allowAnimation:(BOOL)flag;
+- (BOOL)scrollBy:(NSSize)aSize allowAnimation:(BOOL)flag;
+- (BOOL)scrollToEdge:(PGRectEdgeMask)mask allowAnimation:(BOOL)flag;
+- (BOOL)scrollToLocation:(PGClipViewLocation)location allowAnimation:(BOOL)flag;
+- (void)stopAnimatedScrolling;
+
+- (void)mouseDown:(NSEvent *)firstEvent secondaryButton:(BOOL)flag;
+- (void)arrowKeyDown:(NSEvent *)firstEvent;
+- (void)scrollInDirection:(PGRectEdgeMask)direction type:(PGScrollType)scrollType;
+- (void)magicPanForward:(BOOL)forward acrossFirst:(BOOL)across;
+
+- (void)viewFrameDidChange:(NSNotification *)aNotif;
+
+@end
+
+@interface NSObject (PGClipViewDelegate)
+
+- (void)clipViewWasClicked:(PGClipView *)sender event:(NSEvent *)anEvent;
+- (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
+- (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
+- (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGClipViewLocation)pageLocation; // Don't provide contradictory directions.
+
+@end
+
+@interface NSView (PGClipViewDocumentView)
+
+- (BOOL)isSolidForClipView:(PGClipView *)sender;
+
+@end

@@ -1,0 +1,145 @@
+1.3.2 (March 22nd, 2008)
+- Adds a “Move to Trash” command for local images.
+- It is now possible to zoom in and out from the keyboard.
+- The screen-relative scaling modes can now be set to upscale.
+- Online images stop loading when the document is closed.
+- The B and C keys are now equivalent to Option-space and and Option-V, respectively.
+- Antialiasing is once again used while upscaling.
+- Fixes a number of bugs related to aliases.
+- URLs with non-escaped non-ASCII characters now work.
+- Adds French localization.
+- Other minor improvements.
+
+1.3.1 (January 13th, 2008)
+- The number pad can now be used to scroll.
+- Images embedded on webpages are now used if there are no linked images.
+- Simpler keyboard shortcuts for moving between pages.
+- Holding two adjacent arrow keys scrolls diagonally.
+- URLs with hyphens in the domain name are now allowed.
+- Smooth scrolling is now more "crisp."
+- Images are no longer smoothed when scaled up.
+- The Mighty Mouse's scroll ball should now be completely supported.
+- Fixes a bug which caused the current file not to be selected in the open panel.
+- Fixes a bug where bookmarked files that were missing could lead to a crash.
+- Fixes a bug where resuming a document that was already open wouldn't jump to the appropriate page.
+- The Polish localization returns.
+- Other minor improvements.
+
+1.3 (December 1st, 2007)
+- Supports opening URLs to view images online.
+- Images can now be explicitly scaled by a factor from 1/4th to 16x.
+- Enhanced extraction window that allows multiple images to be saved at once.
+- Fixes a bug where folders would remain open even when all images were removed.
+- Fixes an issue where the menu bar could become inaccessible on Leopard.
+- Other minor improvements.
+- Temporary settings have been removed.
+- The Polish localization has been removed.
+
+1.2.2 (November 3rd, 2007)
+- Italian localization by Gabriele Callari.
+- Several sort modes are now available.
+- Pages can now be searched. Choose Edit > Find > Find… or press Command-F to show the search field.
+- More responsive when loading large images.
+- Improves sorting in some languages.
+- Fixes an uncommon crasher when pausing and resuming.
+- Improves monitor hot-swapping support.
+- Fixes a bug where the check-mark next to the current screen could disappear.
+- Other minor improvements.
+- The Polish localization is out of date. If you can help, email me!
+
+1.2.1 (September 28th, 2007)
+- An icon
+- Spanish translation by Carola Clavo.
+- Dragging a document onto the fullscreen display opens it.
+- Edit > Copy is now available for images.
+- Honors image rotation information in JPG files.
+- A checkerboard pattern is now available for the background.
+- Fixes a bug where opening the same document twice could cause a crash.
+- Fixes a bug where the info panel could be shown when it was off.
+- Fixes a few memory leaks in the archive framework.
+- Other minor improvements.
+
+1.2.0 (September 14th, 2007)
+- Sessions can be paused and resumed.
+- Temporary reading directions and image scaling modes that are discarded when the document is closed.
+- Improved archive support, including support for password-protected archives.
+- The cursor is now hidden while dragging.
+- Secondary-click to go to the previous image.
+- The progress indicator in the Info panel is now hidden when there is only one image in the current document.
+- Fixes a bug where Sequential could fail to track a document if it is moved while open or in the Open Recent menu.
+- Fixes a bug that could prevent viewing images at the top level of mounted volumes.
+- Fixes a bug where the boot volume and certain folders could be shown as having the wrong names.
+- Screen configuration changes are now be properly handled.
+- Other minor improvements.
+
+1.1.0 (July 13th, 2007)
+- Info panel.
+- PDF support.
+- Alias support.
+- New File > Reveal in Path Finder item that shows up when PF is running.
+- New Sequential > Switch to Finder menu item (and Switch to Path Finder, which again appears when PF is open).
+- Main window no longer disappears when Sequential is deactivated while an alert is up.
+- Fixes a bug where smooth scrolling could go very slowly on older machines.
+- Fixes a drawing bug when going from a displayable to a corrupted image.
+- Improves navigating between pages with the scroll wheel.
+- Extract As… now has Command-E as a keyboard shortcut.
+- Scaling mode keyboard shortcuts are now A, F, and S.
+- Properly handles folders being changed while open.
+- Faster scrolling for some images.
+- Other minor improvements.
+
+1.0.7 (June 15th, 2007)
+- Scroll-wheel support.
+- Fixes a bug when opening where the previous image would stay on-screen.
+- Fixes a bug where images could be enlarged.
+- Polish translation courtesy of Kosma Appel.
+
+1.0.6 (June 8th, 2007)
+- Auto-pan now works properly again when reading left-to-right.
+- V and Option-V auto-pan in a similar way to space and Option-space, but they scroll vertically first, then horizontally.
+- Faster keyboard scrolling on slow machines.
+- Reading directions now have keyboard equivalents.
+- Other minor improvements.
+
+1.0.5 (June 1st, 2007)
+- Images can now be opened directly.
+- Option-space auto-pans backward.
+- Better indication of the first/last image (a graphical alert instead of a system beep).
+- Arrow keys scroll slightly faster.
+- Slightly better handling of corrupted images.
+- Other minor improvements.
+
+1.0.4 (May 11th, 2007)
+- Animated GIF support.
+- Extract Image… option.
+- Automatic Fit scaling mode, which fits tall pages horizontally and wide pages vertically.
+- Better image scaling quality.
+- Stays visible while inactive (unless hidden).
+- Internal help.
+- Other minor improvements.
+
+1.0.3 (April 16th, 2007)
+- Automatic panning no longer occasionally gets stuck at the edge of the screen.
+- Fixed several bugs with the Open Recent menu.
+- Swapped the Close and Reveal in Finder menu items.
+
+1.0.2 (April 1st, 2007)
+- Press the space bar to automatically pan to the next part of the current image or next image as appropriate.
+- Smooth panning.
+- Able to open folders with periods in their filenames.
+- Rearranged View menu items for better efficiency.
+- Added site link to about box and email link to help dialog.
+
+1.0.1 (February 28th, 2007)
+- NCSA license.
+- Improved interface for configuring image scaling.
+- Minor bug fixes.
+
+1.0.0 (February 27th, 2007)
+- Not listed.
+
+1.0.0b2 (February 26th, 2007)
+- Not listed.
+
+1.0.0b1 (January 27th, 2007)
+- Initial release.

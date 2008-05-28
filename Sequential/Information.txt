@@ -1,0 +1,28 @@
+Sequential 1.4
+Requires 10.3.9 or later.
+
+Sequential is an image viewer for Mac OS X. It was specifically designed for opening a folder of images and displaying them in order. It works well for viewing comics and manga.
+
+Sequential can display folders and archives (ZIP, RAR, CBZ and CBR) of images (including JPEG, PNG, and GIF) and PDF files. It is able to load images on the internet from a page or image URL.
+
+Sequential has mature full screen support and can display images' Exif data.
+
+Email me at sequential@comcast.net. Feedback is especially welcome, as are localizations, icons, patches, etc. (Note: Email is the only way to know I've seen your comment. I'll reply, too.)
+
+Non-Obvious Commands
+- Pressing the space bar or the V key automatically scrolls one screen in the appropriate direction. Space pans across first, if possible, then down; V pans down first.
+- Holding Option reverses the direction of some commands.
+- Choose Help > Sequential Help for details.
+
+New in 1.4
+- Sequential now has a windowed mode.
+- JPEG images' Exif metadata can now be displayed.
+- Sequential now supports any number of simultaneous open documents. In full screen mode, the active document can be chosen from the Tab menu.
+- Images can now be rotated and mirrored.
+- Easier to use image extraction window.
+- Fixes a bug that prevented online image viewing from working on 10.4 or prior.
+- Find page function matches by space separated tokens instead of entire query.
+- Fixes the reading of Exif orientation information.
+- Other minor improvements.
+
+Sequential icon by Carola Clavo (carolaclavo.com) and Daniel G. Portela (Camposancos, Spain; tresdeseos.es).
