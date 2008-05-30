@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGDisplayController.h"
 
 // Models
@@ -24,6 +48,7 @@
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
+#import "NSTextFieldAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 
@@ -176,6 +201,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation];
 }
 
+- (IBAction)skipBeforeFolder:(id)sender
+{
+	[self setActiveNode:[[self activeNode] sortedViewableNodeAfterFolder:NO] initialLocation:PGEndLocation];
+}
+- (IBAction)skipPastFolder:(id)sender
+{
+	[self setActiveNode:[[self activeNode] sortedViewableNodeAfterFolder:YES] initialLocation:PGHomeLocation];
+}
+
 - (IBAction)jumpToPage:(id)sender
 {
 	PGNode *node = [[sender representedObject] nonretainedObjectValue];
@@ -295,16 +329,20 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if(PGSortRepeatMask & o) {
 		if((PGSortOrderMask & o) == PGSortShuffle) {
 			[[[self activeDocument] node] sortOrderDidChange]; // Reshuffle.
-			[[self activeDocument] noteSortedNodesDidChange];
+			[[self activeDocument] noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 		}
 		if([self tryToSetActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l]) {
-			[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic])];
-			[_graphicPanel displayOverWindow:[self window]];
+			if(showAlerts) {
+				[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic])];
+				[_graphicPanel displayOverWindow:[self window]];
+			}
 			return YES;
 		}
 	}
-	[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic])];
-	[_graphicPanel displayOverWindow:[self window]];
+	if(showAlerts) {
+		[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic])];
+		[_graphicPanel displayOverWindow:[self window]];
+	}
 	return NO;
 }
 
@@ -379,19 +417,20 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)nodeReadyForViewing:(NSNotification *)aNotif
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
-	NSString *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
-	if([PGPasswordError isEqualToString:error]) {
-		NSMutableAttributedString *const label = [[[[_activeNode identifier] attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
-		[label addAttributes:[[passwordLabel attributedStringValue] attributesAtIndex:0 effectiveRange:NULL] range:NSMakeRange(0, [label length])];
-		[passwordLabel setAttributedStringValue:label];
+	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
+	if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGGenericError) {
+		[errorLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[errorMessage setStringValue:[error localizedDescription]];
+		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([errorMessage frame]), FLT_MAX)].height)];
+		[clipView setDocumentView:errorView];
+	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
+		[passwordLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[passwordField setStringValue:@""];
 		[clipView setDocumentView:passwordView];
 		[clipView setNextKeyView:passwordField];
 		[passwordField setNextKeyView:clipView];
-	} else if([PGEncodingError isEqualToString:error]) {
-		NSMutableAttributedString *const label = [[[[_activeNode identifier] attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
-		[label addAttributes:[[encodingLabel attributedStringValue] attributesAtIndex:0 effectiveRange:NULL] range:NSMakeRange(0, [label length])];
-		[encodingLabel setAttributedStringValue:label];
+	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGEncodingError) {
+		[encodingLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
@@ -416,12 +455,23 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
 	[(PGOSDView *)[_infoPanel contentView] setCount:[[[self activeDocument] node] viewableNodeCount]];
-	NSArray *const oldNodes = [[aNotif userInfo] objectForKey:PGDocumentOldSortedNodesKey];
-	if(oldNodes) {
-		PGNode *const newActiveNode = [[[self activeDocument] node] nodeEquivalentToNode:[self activeNode]];
-		if([self activeNode] != newActiveNode) return [self setActiveNode:newActiveNode initialLocation:PGHomeLocation];
-	}
 	[self _updateNodeIndex];
+
+	PGNode *const ancestor = [[aNotif userInfo] objectForKey:PGDocumentNodeKey];
+	if([[self activeNode] isRooted]) return;
+	PGNode *removedNode = [[self activeNode] ancestorThatIsChildOfNode:ancestor];
+	if([removedNode isRooted]) return;
+	NSArray *const oldChildren = [[aNotif userInfo] objectForKey:PGDocumentOldSortedChildrenKey];
+	unsigned i = [oldChildren indexOfObjectIdenticalTo:removedNode];
+	if(NSNotFound == i) return;
+	PGNode *newActiveNode = nil;
+	if(0 == i) newActiveNode = [ancestor sortedViewableNodeFirst:YES];
+	while(!newActiveNode && i--) {
+		PGNode *const earlierNode = [oldChildren objectAtIndex:i];
+		if(![earlierNode isRooted]) continue;
+		newActiveNode = [earlierNode sortedViewableNodeNext:YES];
+	}
+	[self setActiveNode:newActiveNode initialLocation:PGHomeLocation];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
 {
@@ -605,6 +655,14 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if([self activeNode] == [[[self activeDocument] node] sortedViewableNodeFirst:NO]) {
 		if(@selector(lastPage:) == action) return NO;
 	}
+	// Actions that require a node before the folder.
+	if(![[self activeNode] sortedViewableNodeAfterFolder:NO]) {
+		if(@selector(skipBeforeFolder:) == action) return NO;
+	}
+	// Actions that require a node after the folder.
+	if(![[self activeNode] sortedViewableNodeAfterFolder:YES]) {
+		if(@selector(skipPastFolder:) == action) return NO;
+	}
 	return [super validateMenuItem:anItem];
 }
 
@@ -679,7 +737,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
         event:(NSEvent *)anEvent
 {
 	BOOL forward = YES;
-	if([anEvent modifierFlags] & NSAlternateKeyMask) forward = NO;
+	if([anEvent modifierFlags] & NSShiftKeyMask) forward = NO;
 	else if([[PGDocumentController sharedDocumentController] usesDirectionalMouseButtonMapping]) forward = ([anEvent type] == NSLeftMouseDown) == ([[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft);
 	else forward = [anEvent type] != NSRightMouseDown;
 	if(forward) [self nextPage:self];
@@ -826,7 +884,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (id)init
 {
-	if((self = [super initWithWindowNibName:@"PGFullscreen"])) {
+	if((self = [super initWithWindowNibName:@"PGWindow"])) {
 		(void)[self window]; // Just load the window so we don't have to worry about it.
 
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];

@@ -1,4 +1,4 @@
-Copyright © 2007-2008 poisonousinsect. All rights reserved.
+Copyright © 2007-2008 Ben Trask. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),

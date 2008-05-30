@@ -79,6 +79,10 @@
 				<string>id</string>
 				<key>revealInPathFinder</key>
 				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
+				<string>id</string>
 				<key>toggleFullscreen</key>
 				<string>id</string>
 				<key>toggleOnScreenDisplay</key>

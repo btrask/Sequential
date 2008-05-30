@@ -540,7 +540,7 @@ struct exiftag tags[] = {
 	{ 0xa001, TIFF_SHORT, 1,  ED_IMG,
 	    "ColorSpace", "Color Space", colorspcs },
 	{ 0xa002, TIFF_UNKN,  1,  ED_IMG,		/* pixels */
-	    "PixelXDimension", "Size", NULL },
+	    "PixelXDimension", "Dimensions", NULL },
 	{ 0xa003, TIFF_UNKN,  1,  ED_OVR,		/* pixels */
 	    "PixelYDimension", "Image Height", NULL },
 	{ 0xa004, TIFF_ASCII, 13, ED_UNK,

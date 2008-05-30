@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 
 // Models
@@ -19,8 +43,7 @@ NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
 NSString *const PGImageKey = @"PGImage";
 NSString *const PGErrorKey = @"PGError";
 
-NSString *const PGPasswordError = @"PGPassword";
-NSString *const PGEncodingError = @"PGEncoding";
+NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 @interface PGNode (Private)
 
@@ -49,7 +72,7 @@ NSString *const PGEncodingError = @"PGEncoding";
 	NSParameterAssert(parent || doc);
 	if((self = [super init])) {
 		_parentAdapter = parent;
-		_document = doc;
+		_document = doc ? doc : [parent document];
 		if([[[self document] node] nodeForIdentifier:ident]) { // It's already open.
 			[self release];
 			return nil;
@@ -74,6 +97,10 @@ NSString *const PGEncodingError = @"PGEncoding";
 - (unsigned)depth
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
+}
+- (BOOL)isRooted
+{
+	return [[self document] node] == self || ([[[self parentAdapter] unsortedChildren] indexOfObjectIdenticalTo:self] != NSNotFound && [[self parentNode] isRooted]);
 }
 - (NSMenuItem *)menuItem
 {
@@ -121,20 +148,41 @@ NSString *const PGEncodingError = @"PGEncoding";
 
 #pragma mark -
 
+- (void)setDateModified:(NSDate *)aDate
+{
+	if(aDate == _dateModified || (aDate && [_dateModified isEqualToDate:aDate])) return;
+	[_dateModified release];
+	_dateModified = [aDate copy];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+}
+- (void)setDateCreated:(NSDate *)aDate
+{
+	if(aDate == _dateCreated || (aDate && [_dateCreated isEqualToDate:aDate])) return;
+	[_dateCreated release];
+	_dateCreated = [aDate copy];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+}
+- (void)setDataLength:(NSNumber *)aNumber
+{
+	if(aNumber == _dataLength || (aNumber && [_dataLength isEqualToNumber:aNumber])) return;
+	[_dataLength release];
+	_dataLength = [aNumber copy];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+}
 - (NSComparisonResult)compare:(PGNode *)node
 {
+	NSParameterAssert(node);
 	NSParameterAssert([self document]);
 	PGSortOrder const o = [[self document] sortOrder];
-	NSParameterAssert(PGUnsorted != o);
 	int const d = PGSortDescendingMask & o ? -1 : 1;
-	PGResourceAdapter *const a1 = [self resourceAdapter], *const a2 = [node resourceAdapter];
 	switch(PGSortOrderMask & o) {
-		case PGSortByDateModified: return [[a1 dateModified:NO] compare:[a2 dateModified:NO]] * d;
-		case PGSortByDateCreated:  return [[a1 dateCreated:NO] compare:[a2 dateCreated:NO]] * d;
-		case PGSortBySize:         return [[a1 size:NO] compare:[a2 size:NO]] * d;
+		case PGUnsorted:           return NSOrderedSame;
+		case PGSortByDateModified: return [[self dateModified] compare:[node dateModified]] * d;
+		case PGSortByDateCreated:  return [[self dateCreated] compare:[node dateCreated]] * d;
+		case PGSortBySize:         return [[self dataLength] compare:[node dataLength]] * d;
 		case PGSortShuffle:        return random() & 1 ? NSOrderedAscending : NSOrderedDescending;
 	}
-	return [[a1 sortName] AE_localizedCaseInsensitiveNumericCompare:[a2 sortName]] * d;
+	return [[[self identifier] displayName] AE_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] * d;
 }
 
 #pragma mark -
@@ -142,6 +190,7 @@ NSString *const PGEncodingError = @"PGEncoding";
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
+	if([PGResourceIdentifierDisplayNameDidChangeNotification isEqualToString:[aNotif name]]) [[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
 	[[self document] noteNodeDisplayNameDidChange:self];
 }
 - (void)fileEventDidOccur:(NSNotification *)aNotif
@@ -158,9 +207,9 @@ NSString *const PGEncodingError = @"PGEncoding";
 	NSDate *date = nil;
 	NSString *info = nil;
 	switch(PGSortOrderMask & o) {
-		case PGSortByDateModified: date = [[self resourceAdapter] dateModified:YES]; break;
-		case PGSortByDateCreated:  date = [[self resourceAdapter] dateCreated:YES]; break;
-		case PGSortBySize: info = [[[self resourceAdapter] size:YES] AE_localizedStringAsBytes]; break;
+		case PGSortByDateModified: date = _dateModified; break;
+		case PGSortByDateCreated:  date = _dateCreated; break;
+		case PGSortBySize: info = [_dataLength AE_localizedStringAsBytes]; break;
 	}
 	if(date && !info) info = [date AE_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
@@ -175,7 +224,7 @@ NSString *const PGEncodingError = @"PGEncoding";
 }
 - (PGDocument *)document
 {
-	return _document ? _document : [_parentAdapter document];
+	return _document;
 }
 - (PGResourceIdentifier *)identifier
 {
@@ -198,7 +247,7 @@ NSString *const PGEncodingError = @"PGEncoding";
 	return _expectsReturnedImage;
 }
 - (void)returnImage:(NSImage *)anImage
-        error:(NSString *)error
+        error:(NSError *)error
 {
 	NSParameterAssert(_expectsReturnedImage);
 	_expectsReturnedImage = NO;
@@ -206,6 +255,18 @@ NSString *const PGEncodingError = @"PGEncoding";
 	if(anImage) [dict setObject:anImage forKey:PGImageKey];
 	if(error) [dict setObject:error forKey:PGErrorKey];
 	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
+}
+- (NSDate *)dateModified
+{
+	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
+}
+- (NSDate *)dateCreated
+{
+	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
+}
+- (NSNumber *)dataLength
+{
+	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
 }
 - (void)sortOrderDidChange
 {
@@ -238,7 +299,21 @@ NSString *const PGEncodingError = @"PGEncoding";
 	[_menuItem release];
 	[_resourceAdapter release];
 	[_lastPassword release];
+	[_dateModified release];
+	[_dateCreated release];
+	[_dataLength release];
 	[super dealloc];
+}
+
+#pragma mark -
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ [[self identifier] hash];
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
 }
 
 #pragma mark -

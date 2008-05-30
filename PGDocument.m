@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGDocument.h"
 
 // Models
@@ -18,11 +42,10 @@ NSString *const PGDocumentNodeIsViewableDidChangeNotification  = @"PGDocumentNod
 NSString *const PGDocumentNodeDisplayNameDidChangeNotification = @"PGDocumentNodeDisplayNameDidChange";
 NSString *const PGDocumentBaseOrientationDidChangeNotification = @"PGDocumentBaseOrientationDidChange";
 
-NSString *const PGDocumentOldSortedNodesKey = @"PGDocumentOldSortedNodes";
-NSString *const PGDocumentNodeKey           = @"PGDocumentNode";
+NSString *const PGDocumentNodeKey              = @"PGDocumentNode";
+NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 
-#define PGPageMenuOtherItemsCount 5
-#define PGDocumentMaxCachedNodes  3
+#define PGDocumentMaxCachedNodes 3
 
 @implementation PGDocument
 
@@ -32,7 +55,7 @@ NSString *const PGDocumentNodeKey           = @"PGDocumentNode";
 {
 	if((self = [self init])) {
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident adapterClass:nil dataSource:nil load:YES];
-		[self noteSortedNodesDidChange];
+		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 	}
 	return self;
 }
@@ -92,7 +115,7 @@ NSString *const PGDocumentNodeKey           = @"PGDocumentNode";
 
 - (PGNode *)initialViewableNode
 {
-	return [self openedBookmark] ? [[self node] nodeForBookmark:[self openedBookmark]] : [[self node] sortedViewableNodeFirst:YES];
+	return [self openedBookmark] ? [[self node] nodeForIdentifier:[[self openedBookmark] fileIdentifier]] : [[self node] sortedViewableNodeFirst:YES];
 }
 - (PGBookmark *)openedBookmark
 {
@@ -179,13 +202,15 @@ NSString *const PGDocumentNodeKey           = @"PGDocumentNode";
 
 #pragma mark -
 
-- (void)noteSortedNodesDidChange
+- (void)noteSortedChildrenOfNodeDidChange:(PGNode *)node
+        oldSortedChildren:(NSArray *)children
 {
-	if([_pageMenu numberOfItems] < PGPageMenuOtherItemsCount) [_pageMenu addItem:[NSMenuItem separatorItem]];
-	while([_pageMenu numberOfItems] > PGPageMenuOtherItemsCount) [_pageMenu removeItemAtIndex:PGPageMenuOtherItemsCount];
+	int const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
+	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
+	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
 	[[self node] addMenuItemsToMenu:_pageMenu];
-	if([_pageMenu numberOfItems] == PGPageMenuOtherItemsCount) [_pageMenu removeItemAtIndex:PGPageMenuOtherItemsCount - 1];
-	[self AE_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
+	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
+	[self AE_postNotificationName:PGDocumentSortedNodesDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:children, PGDocumentOldSortedChildrenKey, node, PGDocumentNodeKey, nil]];
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
 {
@@ -241,7 +266,7 @@ NSString *const PGDocumentNodeKey           = @"PGDocumentNode";
 	if([self sortOrder] != anOrder) {
 		[super setSortOrder:anOrder];
 		[[self node] sortOrderDidChange];
-		[self noteSortedNodesDidChange];
+		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 	}
 	[[PGPrefObject globalPrefObject] setSortOrder:anOrder];
 }

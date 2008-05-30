@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGContainerAdapter.h"
 
 // Models
@@ -28,10 +52,11 @@
 	[_unsortedChildren release];
 	_unsortedChildren = [anArray copy];
 	_unsortedOrder = anOrder;
+	NSArray *const oldSortedChildren = [self sortedChildren];
 	[_sortedChildren release];
 	_sortedChildren = nil;
 	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
-	[[self document] noteSortedNodesDidChange];
+	[[self document] noteSortedChildrenOfNodeDidChange:[self node] oldSortedChildren:oldSortedChildren];
 }
 
 #pragma mark -
@@ -43,13 +68,16 @@
 	while((child = [childEnum nextObject])) if([aURL isEqual:[[child identifier] URLByFollowingAliases:YES]]) return child;
 	return nil;
 }
-- (unsigned)viewableIndexOfNode:(PGNode *)aNode
+- (unsigned)viewableIndexOfChild:(PGNode *)aNode
 {
 	unsigned index = 0;
-	id node;
-	NSEnumerator *const nodeEnum = [[self sortedChildren] objectEnumerator];
-	while((node = [nodeEnum nextObject]) && node != aNode) index += [node viewableNodeCount];
-	return index + [[self parentAdapter] viewableIndexOfNode:[self node]];
+	id child;
+	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
+	while((child = [childEnum nextObject])) {
+		if(child == aNode) return index + [[self parentAdapter] viewableIndexOfChild:[self node]];
+		index += [child viewableNodeCount];
+	}
+	return 0;
 }
 - (PGNode *)next:(BOOL)next
             sortedViewableNodeBeyond:(PGNode *)node
@@ -63,6 +91,15 @@
 		if(node) return node;
 	}
 	return [[self parentAdapter] next:next sortedViewableNodeBeyond:[self node]];
+}
+- (void)noteChild:(PGNode *)child
+        didChangeForSortOrder:(PGSortOrder)order
+{
+	if([_unsortedChildren indexOfObjectIdenticalTo:child] == NSNotFound) return;
+	if((PGSortOrderMask & order) != (PGSortOrderMask & [[self document] sortOrder])) return;
+	[_sortedChildren release];
+	_sortedChildren = nil;
+	[[self document] noteSortedChildrenOfNodeDidChange:[self node] oldSortedChildren:nil];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -117,38 +154,22 @@
 }
 - (PGNode *)sortedViewableNodeNext:(BOOL)next
 {
-	PGNode *const node = [self isViewable] ? nil : [self sortedViewableNodeFirst:YES];
-	return node ? node : [super sortedViewableNodeNext:next];
+	PGNode *const subnode = next ? [self sortedViewableNodeFirst:YES] : nil;
+	return subnode ? subnode : [super sortedViewableNodeNext:next];
 }
-- (PGNode *)nodeEquivalentToNode:(PGNode *)aNode
+- (PGNode *)sortedViewableNodeAfterFolder:(BOOL)after
 {
-	PGNode *child;
-	NSEnumerator *const childEnum = [[self sortedChildren] reverseObjectEnumerator];
-	while((child = [childEnum nextObject])) {
-		PGNode *const node = [child nodeEquivalentToNode:aNode];
-		if(node) return node;
-	}
-	return [super nodeEquivalentToNode:aNode];
+	return [super sortedViewableNodeNext:after];
 }
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
 {
 	PGNode *child;
-	NSEnumerator *const childEnum = [_unsortedChildren reverseObjectEnumerator];
+	NSEnumerator *const childEnum = [_unsortedChildren objectEnumerator];
 	while((child = [childEnum nextObject])) {
 		PGNode *const node = [child nodeForIdentifier:ident];
 		if(node) return node;
 	}
 	return [super nodeForIdentifier:ident];
-}
-- (PGNode *)nodeForBookmark:(PGBookmark *)aBookmark
-{
-	PGNode *child;
-	NSEnumerator *childEnum = [_unsortedChildren objectEnumerator];
-	while((child = [childEnum nextObject])) {
-		PGNode *const target = [child nodeForBookmark:aBookmark];
-		if(target) return target;
-	}
-	return nil;
 }
 - (void)addMenuItemsToMenu:(NSMenu *)aMenu
 {
@@ -182,9 +203,9 @@
 {
 	[self setHasReadContents];
 	if([self needsPassword]) [self readFromData:nil URLResponse:nil];
-	NSString *error = nil;
-	if([self needsPassword]) error = PGPasswordError;
-	else if([self needsEncoding]) error = PGEncodingError;
+	NSError *error = nil;
+	if([self needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
+	else if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
 	[self returnImage:nil error:error];
 }
 

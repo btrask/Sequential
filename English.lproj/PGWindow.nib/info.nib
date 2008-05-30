@@ -7,11 +7,10 @@
 	<key>IBLastKnownRelativeProjectPath</key>
 	<string>../../Sequential.xcodeproj</string>
 	<key>IBOldestOS</key>
-	<integer>3</integer>
+	<integer>5</integer>
 	<key>IBOpenObjects</key>
 	<array>
-		<integer>107</integer>
-		<integer>100</integer>
+		<integer>158</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9C7010</string>

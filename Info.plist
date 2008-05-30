@@ -679,7 +679,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Sequential</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.poisonousinsect.Sequential</string>
+	<string>com.BenTrask.Sequential</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

@@ -57,6 +57,8 @@
 			<dict>
 				<key>changeOrientation</key>
 				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
 				<key>chooseEncoding</key>
 				<string>id</string>
 				<key>copy</key>
@@ -112,6 +114,12 @@
 				<string>NSTextField</string>
 				<key>encodingView</key>
 				<string>NSView</string>
+				<key>errorLabel</key>
+				<string>NSTextField</string>
+				<key>errorMessage</key>
+				<string>NSTextField</string>
+				<key>errorView</key>
+				<string>NSView</string>
 				<key>findView</key>
 				<string>PGFindView</string>
 				<key>imageView</key>
@@ -136,6 +144,8 @@
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
 				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>

@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGArchiveAdapter.h"
 
 // Models
@@ -48,7 +72,7 @@
 		if([path isEqualToString:entryPath]) continue;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
-		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:i];
+		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : @"'fldr'")]];
 		[identifier setDisplayName:[subpath AE_displayName]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier adapterClass:(isFile ? [PGArchiveResourceAdapter class] : [PGContainerAdapter class]) dataSource:self load:YES] autorelease];
@@ -100,20 +124,25 @@
 
 - (NSDate *)dateCreatedForResourceAdapter:(PGResourceAdapter *)sender
 {
-	struct xadFileInfo const *const info = [_archive xadFileInfoForEntry:[[sender identifier] index]];
+	unsigned const i = [[sender identifier] index];
+	if(NSNotFound == i) return nil;
+	struct xadFileInfo const *const info = [_archive xadFileInfoForEntry:i];
 	xadUINT32 timestamp;
-	if(info->xfi_Flags & XADFIF_NODATE || xadConvertDates([_archive xadMasterBase], XAD_DATEXADDATE, &info->xfi_Date, XAD_DATEUNIX, &timestamp, TAG_DONE) != XADERR_OK) return [NSDate distantPast];
+	if(info->xfi_Flags & XADFIF_NODATE || xadConvertDates([_archive xadMasterBase], XAD_DATEXADDATE, &info->xfi_Date, XAD_DATEUNIX, &timestamp, TAG_DONE) != XADERR_OK) return nil;
 	return [NSDate dateWithTimeIntervalSince1970:timestamp];
 }
 - (NSNumber *)dataLengthForResourceAdapter:(PGResourceAdapter *)sender
 {
-	return [NSNumber numberWithUnsignedLongLong:[_archive xadFileInfoForEntry:[[sender identifier] index]]->xfi_Size];
+	unsigned const i = [[sender identifier] index];
+	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive xadFileInfoForEntry:i]->xfi_Size];
 }
 - (NSData *)dataForResourceAdapter:(PGResourceAdapter *)sender
 {
+	unsigned const i = [[sender identifier] index];
+	if(NSNotFound == i) return nil;
 	[_archive clearLastError];
 	if([sender lastPassword]) [_archive setPassword:[sender lastPassword]];
-	NSData *const data = [_archive contentsOfEntry:[[[sender node] identifier] index]];
+	NSData *const data = [_archive contentsOfEntry:i];
 	[sender setNeedsPassword:([_archive lastError] == XADERR_PASSWORD)];
 	return data;
 }

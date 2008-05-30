@@ -1,3 +1,27 @@
+/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal with the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimers.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimers in the
+   documentation and/or other materials provided with the distribution.
+3. The names of its contributors may not be used to endorse or promote
+   products derived from this Software without specific prior written
+   permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceAdapter.h"
 
 // Models
@@ -27,6 +51,9 @@
 	if(aNode == _node) return;
 	_node = aNode;
 	[self noteIsViewableDidChange];
+	[self noteDateModifiedDidChange];
+	[self noteDateCreatedDidChange];
+	[self noteDataLengthDidChange];
 }
 
 #pragma mark -
@@ -49,6 +76,7 @@
 }
 - (void)setIsDeterminingType:(BOOL)flag
 {
+	if(!flag) NSParameterAssert(_determiningTypeCount);
 	_determiningTypeCount += flag ? 1 : -1;
 	[self noteIsViewableDidChange];
 }
@@ -110,8 +138,7 @@
 }
 - (void)replacedWithAdapter:(PGResourceAdapter *)newAdapter
 {
-	[self setIsDeterminingType:NO];
-	[newAdapter setIsDeterminingType:NO];
+	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
 }
 - (BOOL)shouldReadAllDescendants
 {
@@ -143,48 +170,27 @@
 
 #pragma mark -
 
-- (NSString *)sortName
+- (void)noteDateModifiedDidChange
 {
-	return [[self identifier] displayName];
+	[[self node] setDateModified:[self dateModified]];
 }
-- (NSDate *)dateModified:(BOOL)allowNil
+- (void)noteDateCreatedDidChange
 {
-	NSDate *date = [[self dataSource] dateModifiedForResourceAdapter:self];
-	if(!date) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate];
-	}
-	return date || allowNil ? date : [NSDate distantPast];
+	[[self node] setDateCreated:[self dateCreated]];
 }
-- (NSDate *)dateCreated:(BOOL)allowNil
+- (void)noteDataLengthDidChange
 {
-	NSDate *date = [[self dataSource] dateCreatedForResourceAdapter:self];
-	if(!date) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate];
-	}
-	return date || allowNil ? date : [NSDate distantPast];
-}
-- (NSNumber *)size:(BOOL)allowNil
-{
-	NSNumber *size = [[self dataSource] dataLengthForResourceAdapter:self];
-	if(!size) {
-		NSData *data;
-		if([self canGetImageData] && [self getImageData:&data] == PGDataAvailable) size = [NSNumber numberWithUnsignedInt:[data length]];
-	}
-	if(!size) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) {
-			NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
-			if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) size = [attrs objectForKey:NSFileSize]; // File size is meaningless for folders.
-		}
-	}
-	return size || allowNil ? size : [NSNumber numberWithUnsignedInt:0];
+	[[self node] setDataLength:[self dataLength]];
 }
 
 #pragma mark -
 
-- (void)fileResourceDidChange:(unsigned)flags {}
+- (void)fileResourceDidChange:(unsigned)flags
+{
+	[self noteDateModifiedDidChange];
+	[self noteDateCreatedDidChange];
+	[self noteDataLengthDidChange];
+}
 
 #pragma mark PGResourceAdapting Protocol
 
@@ -259,7 +265,7 @@
 	return [[self node] expectsReturnedImage];
 }
 - (void)returnImage:(NSImage *)anImage
-        error:(NSString *)error
+        error:(NSError *)error
 {
 	NSParameterAssert(_hasReadContents);
 	_hasReadContents = NO;
@@ -278,7 +284,7 @@
 }
 - (unsigned)viewableNodeIndex
 {
-	return [[self parentAdapter] viewableIndexOfNode:[self node]];
+	return [[self parentAdapter] viewableIndexOfChild:[self node]];
 }
 - (unsigned)viewableNodeCount
 {
@@ -292,20 +298,55 @@
 {
 	return [[self parentAdapter] next:next sortedViewableNodeBeyond:[self node]];
 }
-- (PGNode *)nodeEquivalentToNode:(PGNode *)aNode
+- (PGNode *)sortedViewableNodeAfterFolder:(BOOL)after
 {
-	return [aNode isEqual:[self node]] ? [self node] : nil;
+	return [[self parentAdapter] sortedViewableNodeAfterFolder:after];
 }
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
 {
 	return [[self identifier] isEqual:ident] ? [self node] : nil;
 }
-- (BOOL)isDescendantOfNode:(PGNode *)aNode
+- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode
 {
 	PGNode *const parent = [self parentNode];
-	if(aNode == parent) return YES;
-	if(!parent) return NO;
-	return [parent isDescendantOfNode:aNode];
+	return aNode == parent ? [self node] : [parent ancestorThatIsChildOfNode:aNode];
+}
+- (BOOL)isDescendantOfNode:(PGNode *)aNode
+{
+	return [self ancestorThatIsChildOfNode:aNode] != nil;
+}
+
+#pragma mark -
+
+- (NSDate *)dateModified
+{
+	NSDate *date = [[self dataSource] dateModifiedForResourceAdapter:self];
+	if(date) return date;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate];
+	return date;
+}
+- (NSDate *)dateCreated
+{
+	NSDate *date = [[self dataSource] dateCreatedForResourceAdapter:self];
+	if(date) return date;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate];
+	return date;
+}
+- (NSNumber *)dataLength
+{
+	NSNumber *dataLength = [[self dataSource] dataLengthForResourceAdapter:self];
+	if(dataLength) return dataLength;
+	NSData *data;
+	if([self canGetImageData] && [self getImageData:&data] == PGDataAvailable) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
+	if(dataLength) return dataLength;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) {
+		NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
+		if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) dataLength = [attrs objectForKey:NSFileSize]; // File size is meaningless for folders.
+	}
+	return dataLength;
 }
 
 #pragma mark -
@@ -338,10 +379,6 @@
 {
 	return [[[PGBookmark alloc] initWithNode:[self node]] autorelease];
 }
-- (PGNode *)nodeForBookmark:(PGBookmark *)aBookmark
-{
-	return [[self identifier] isEqual:[aBookmark fileIdentifier]] ? [self node] : nil;
-}
 
 #pragma mark -
 
@@ -352,7 +389,7 @@
 - (id)init
 {
 	if((self = [super init])) {
-		[self setIsDeterminingType:YES];
+		if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:YES];
 	}
 	return self;
 }
