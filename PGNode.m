@@ -154,6 +154,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_dateModified release];
 	_dateModified = [aDate copy];
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+	[self _updateMenuItem];
 }
 - (void)setDateCreated:(NSDate *)aDate
 {
@@ -161,6 +162,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_dateCreated release];
 	_dateCreated = [aDate copy];
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+	[self _updateMenuItem];
 }
 - (void)setDataLength:(NSNumber *)aNumber
 {
@@ -168,6 +170,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_dataLength release];
 	_dataLength = [aNumber copy];
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+	[self _updateMenuItem];
 }
 - (NSComparisonResult)compare:(PGNode *)node
 {
