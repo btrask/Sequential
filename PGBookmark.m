@@ -35,9 +35,16 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithNode:(PGNode *)aNode
 {
+	return [self initWithDocumentIdentifier:[[aNode document] identifier] fileIdentifier:[aNode identifier] displayName:nil];
+}
+- (id)initWithDocumentIdentifier:(PGResourceIdentifier *)docIdent
+      fileIdentifier:(PGResourceIdentifier *)fileIdent
+      displayName:(NSString *)aString
+{
 	if((self = [super init])) {
-		_documentIdentifier = [[[aNode document] identifier] retain];
-		_fileIdentifier = [[aNode identifier] retain];
+		_documentIdentifier = [docIdent retain];
+		_fileIdentifier = [fileIdent retain];
+		_backupDisplayName = [(aString ? aString : [fileIdent displayName]) copy];
 	}
 	return self;
 }
@@ -62,7 +69,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)isValid
 {
-	return [_documentIdentifier URLByFollowingAliases:YES] && [_fileIdentifier URLByFollowingAliases:YES];
+	return [_documentIdentifier hasTarget] && [_fileIdentifier hasTarget];
 }
 
 #pragma mark NSCoding Protocol
@@ -91,6 +98,17 @@ DEALINGS WITH THE SOFTWARE. */
 	[_fileIdentifier release];
 	[_backupDisplayName release];
 	[super dealloc];
+}
+
+#pragma mark -
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ [_documentIdentifier hash] ^ [_fileIdentifier hash];
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return [anObject isMemberOfClass:[self class]] && [[self documentIdentifier] isEqual:[anObject documentIdentifier]] && [[self fileIdentifier] isEqual:[anObject fileIdentifier]];
 }
 
 @end

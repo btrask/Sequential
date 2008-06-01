@@ -24,6 +24,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSURLAdditions.h"
 
+// Categories
+#import "NSStringAdditions.h"
+
 @implementation NSURL (AEAdditions)
 
 #pragma mark Class Methods
@@ -36,15 +39,16 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *scheme = nil;
 	if(![scanner scanUpToString:@"://" intoString:&scheme]) return nil;
 	if([scanner isAtEnd]) {
-		[URL appendString:@"http://"];
+		[scanner setScanLocation:0];
+		scheme = [scanner scanString:@"/" intoString:NULL] || [scanner scanString:@"~" intoString:NULL] ? @"file" : @"http";
 		[scanner setScanLocation:0];
 	} else {
 		NSMutableCharacterSet *const schemeCharacters = [[[NSCharacterSet letterCharacterSet] mutableCopy] autorelease];
 		[schemeCharacters addCharactersInString:@"+-."];
 		if([scheme rangeOfCharacterFromSet:[schemeCharacters invertedSet]].location != NSNotFound) return nil;
-		[URL appendFormat:@"%@://", scheme];
 		[scanner scanString:@"://" intoString:NULL];
 	}
+	[URL appendFormat:@"%@://", scheme];
 
 	unsigned const schemeEnd = [scanner scanLocation];
 	NSString *login = nil;
@@ -52,9 +56,12 @@ DEALINGS WITH THE SOFTWARE. */
 	if([scanner isAtEnd]) [scanner setScanLocation:schemeEnd];
 	else [URL appendString:login];
 
-	NSString *host = nil;
-	if(![scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@":/"] intoString:&host]) return nil;
-	if(![host isEqual:@"localhost"]) {
+	NSString *host = @"";
+	if(![scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@":/"] intoString:&host]) {
+		if(![@"file" isEqualToString:scheme] || [scanner isAtEnd]) return nil;
+	} else if([@"~" isEqualToString:host]) {
+		host = NSHomeDirectory();
+	} else if(![@"localhost" isEqual:host]) {
 		NSCharacterSet *const subdomainDelimitingCharacters = [NSCharacterSet characterSetWithCharactersInString:@".-"];
 		NSScanner *const hostScanner = [NSScanner scannerWithString:host];
 		do {
@@ -70,6 +77,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[URL appendString:host];
 
 	if([scanner scanString:@":" intoString:NULL]) {
+		if([@"file" isEqualToString:scheme]) return nil;
 		int port;
 		if(![scanner scanInt:&port]) return nil;
 		[URL appendFormat:@":%d", port];

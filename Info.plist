@@ -11,7 +11,6 @@
 			<array>
 				<string>zip</string>
 				<string>ZIP</string>
-				<string></string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-ZIP</string>
@@ -31,7 +30,6 @@
 			<array>
 				<string>cbz</string>
 				<string>CBZ</string>
-				<string></string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-CBZ</string>

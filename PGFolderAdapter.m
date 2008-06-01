@@ -39,16 +39,23 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)readFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {
+	NSParameterAssert([self shouldRead]);
 	NSParameterAssert(!data);
 	NSParameterAssert(!response);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
-	NSString *const path = [[[self identifier] URLByFollowingAliases:YES] path];
+	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
+	LSItemInfoRecord info;
+	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) return; // Don't go into packages.
+	NSString *const path = [URL path];
 	NSString *pathComponent;
 	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
 	while((pathComponent = [pathComponentEnum nextObject])) {
-		NSURL *const pageURL = [[path stringByAppendingPathComponent:pathComponent] AE_fileURL];
-		LSItemInfoRecord info;
+		NSString *const pagePath = [path stringByAppendingPathComponent:pathComponent];
+		static NSArray *ignoredPaths = nil;
+		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", nil];
+		if([ignoredPaths containsObject:pagePath]) continue;
+		NSURL *const pageURL = [pagePath AE_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
 		PGNode *node = [self childForURL:pageURL];
 		if(node) [oldPages removeObjectIdenticalTo:node];
@@ -62,7 +69,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 //	PGNode *const node = [self node];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) NSBeep(); // TODO: Remove the node.
-	else if(flags & NOTE_WRITE) [self readFromData:nil URLResponse:nil];
+	else if(flags & NOTE_WRITE && [self shouldRead]) [self readFromData:nil URLResponse:nil];
 	[super fileResourceDidChange:flags];
 }
 

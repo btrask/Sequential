@@ -29,22 +29,6 @@ BOOL PGIsLeopardOrLater(void)
 	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4;
 }
 
-static unsigned PGDisabledScreenUpdateCount = 0;
-extern void PGDisableScreenUpdates(void)
-{
-	PGDisabledScreenUpdateCount++;
-	NSDisableScreenUpdates();
-}
-extern void PGEnableScreenUpdates(void)
-{
-	NSEnableScreenUpdates();
-	if(PGDisabledScreenUpdateCount) PGDisabledScreenUpdateCount--;
-}
-extern BOOL PGScreenUpdatesEnabled(void)
-{
-	return 0 == PGDisabledScreenUpdateCount;
-}
-
 @implementation NSObject (AEAdditions)
 
 #pragma mark Instance Methods

@@ -27,8 +27,10 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGSubscription.h"
 
+// Other
+#import "PGAttachments.h"
+
 // Categories
-#import "NSAttributedStringAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSURLAdditions.h"
@@ -117,6 +119,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 
 #pragma mark -
 
+- (BOOL)hasTarget
+{
+	return NO;
+}
 - (BOOL)isFileIdentifier
 {
 	return NO;
@@ -160,7 +166,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 }
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag
 {
-	NSMutableAttributedString *const result = [NSMutableAttributedString AE_attributedStringWithFileIcon:[self icon] name:[self displayName]];
+	NSMutableAttributedString *const result = [NSMutableAttributedString PG_attributedStringWithFileIcon:[self icon] name:[self displayName]];
 	if(!flag) return result;
 	NSURL *const URL = [self URL];
 	if(!URL) return result;
@@ -168,7 +174,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	NSString *const parentName = [URL isFileURL] ? [parent lastPathComponent] : parent;
 	if(!parentName || [parentName isEqual:@""]) return result;
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
-	[result appendAttributedString:[NSAttributedString AE_attributedStringWithFileIcon:([URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil) name:parentName]];
+	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:([URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil) name:parentName]];
 	return result;
 }
 
@@ -246,7 +252,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 - (id)initWithAliasData:(const uint8_t *)data
       length:(unsigned)length
 {
-	NSParameterAssert(data && length);
+	if(!data || !length) {
+		[self release];
+		return nil;
+	}
 	if((self = [super init])) {
 		_alias = (AliasHandle)NewHandle(length);
 		memcpy(*_alias, data, length);
@@ -290,6 +299,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(FSResolveAliasWithMountFlags(NULL, _alias, &ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return nil;
 	if(flag && FSResolveAliasFileWithMountFlags(&ref, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) != noErr) return nil;
 	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
+}
+- (BOOL)hasTarget
+{
+	return [self URLByFollowingAliases:YES] != nil;
 }
 - (BOOL)isFileIdentifier
 {
@@ -350,6 +363,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	return [[_URL retain] autorelease];
 }
+- (BOOL)hasTarget
+{
+	return YES;
+}
 - (BOOL)isFileIdentifier
 {
 	return [_URL isFileURL];
@@ -405,6 +422,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 - (int)index
 {
 	return _index;
+}
+- (BOOL)hasTarget
+{
+	return NSNotFound != _index && [_superidentifier hasTarget];
 }
 - (BOOL)isFileIdentifier
 {

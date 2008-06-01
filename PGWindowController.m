@@ -58,14 +58,14 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 #pragma mark PGDisplayController
 
-- (void)setActiveDocument:(PGDocument *)document
+- (BOOL)setActiveDocument:(PGDocument *)document
         closeIfAppropriate:(BOOL)flag
 {
 	[[self activeDocument] storeWindowFrame:[[self window] AE_contentRect]];
-	[super setActiveDocument:document closeIfAppropriate:NO];
-	if(flag && !document && [self activeDocument]) return [[self window] close];
+	if([super setActiveDocument:document closeIfAppropriate:flag]) return YES;
 	NSRect frame;
 	if([[self activeDocument] getStoredWindowFrame:&frame]) [[self window] AE_setContentRect:frame];
+	return NO;
 }
 
 #pragma mark NSWindowController
@@ -73,7 +73,12 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[[self window] setFrameFromString:[[NSUserDefaults standardUserDefaults] objectForKey:PGMainWindowFrameKey]];
+	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGMainWindowFrameKey];
+	if(savedFrame) [[self window] setFrameFromString:savedFrame];
+	else {
+		[[self window] setFrame:NSMakeRect(0, 0, 500, 500) display:NO];
+		[[self window] center];
+	}
 }
 
 @end

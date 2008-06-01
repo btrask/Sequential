@@ -48,6 +48,7 @@ extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
 - (NSURL *)URL; // Equivalent to -URLByFollowingAliases:NO.
 - (int)index;
 
+- (BOOL)hasTarget;
 - (BOOL)isFileIdentifier;
 
 - (NSImage *)icon;

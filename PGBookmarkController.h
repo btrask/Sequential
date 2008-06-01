@@ -29,7 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface PGBookmarkController : NSObject
 {
-	@private
+	@public
 	IBOutlet NSMenuItem      *bookmarkItem;
 	IBOutlet NSMenu          *bookmarkMenu;
 	IBOutlet NSMenuItem      *emptyMenuItem;

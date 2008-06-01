@@ -42,7 +42,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGNode *)childForURL:(NSURL *)aURL;
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)next:(BOOL)next sortedViewableNodeBeyond:(PGNode *)node;
+- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel; // 'sel' may optionally take a single BOOL argument, which is given the value of 'flag'.
 - (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
 
 @end

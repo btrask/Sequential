@@ -42,6 +42,8 @@ typedef int PGDataAvailability;
 @protocol PGResourceAdapting
 
 - (PGContainerAdapter *)parentAdapter;
+- (PGContainerAdapter *)containerAdapter;
+- (PGContainerAdapter *)rootContainerAdapter;
 - (PGDocument *)document;
 - (PGNode *)parentNode;
 
@@ -66,9 +68,13 @@ typedef int PGDataAvailability;
 - (BOOL)hasImageDataNodes; // Nodes that return YES from -canGetImageData.
 - (unsigned)viewableNodeIndex;
 - (unsigned)viewableNodeCount;
-- (PGNode *)sortedViewableNodeFirst:(BOOL)first;
-- (PGNode *)sortedViewableNodeNext:(BOOL)next;
-- (PGNode *)sortedViewableNodeAfterFolder:(BOOL)after;
+
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag;
+- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
+- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
+
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
 - (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
 - (BOOL)isDescendantOfNode:(PGNode *)aNode;

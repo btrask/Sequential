@@ -69,6 +69,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
       dataSource:(id)source
       load:(BOOL)flag;
 {
+	if(!ident) {
+		[self release];
+		return nil;
+	}
 	NSParameterAssert(parent || doc);
 	if((self = [super init])) {
 		_parentAdapter = parent;
@@ -206,10 +210,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)_updateMenuItem
 {
 	NSMutableAttributedString *const label = [[[[self identifier] attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
-	PGSortOrder const o = [[self document] sortOrder];
-	NSDate *date = nil;
 	NSString *info = nil;
-	switch(PGSortOrderMask & o) {
+	NSDate *date = nil;
+	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = _dateModified; break;
 		case PGSortByDateCreated:  date = _dateCreated; break;
 		case PGSortBySize: info = [_dataLength AE_localizedStringAsBytes]; break;
@@ -228,6 +231,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (PGDocument *)document
 {
 	return _document;
+}
+- (PGNode *)parentNode
+{
+	return [_parentAdapter node];
 }
 - (PGResourceIdentifier *)identifier
 {

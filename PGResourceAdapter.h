@@ -55,7 +55,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadFromData:(NSData *)data URLResponse:(NSURLResponse *)response;
 - (Class)classForData:(NSData *)data URLResponse:(NSURLResponse *)response;
 - (void)replacedWithAdapter:(PGResourceAdapter *)newAdapter;
-- (BOOL)shouldReadAllDescendants;
+- (BOOL)shouldReadRegardlessOfDepth;
 - (BOOL)shouldRead;
 - (void)readFromData:(NSData *)data URLResponse:(NSURLResponse *)response; // Abstract method. Perform an initial read. PGContainerAdapters should create any child nodes here if possible. This gets called for every node created when the document is first opened, so defer anything slow to -readContents. -lastPassword won't be set yet.
 

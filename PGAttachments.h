@@ -24,8 +24,27 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSAttributedString (AEAdditions)
+@interface NSAttributedString (PGAdditions)
 
-+ (id)AE_attributedStringWithFileIcon:(NSImage *)anImage name:(NSString *)fileName;
++ (NSMutableAttributedString *)PG_attributedStringWithAttachmentCell:(NSTextAttachmentCell *)cell label:(NSString *)label;
++ (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage name:(NSString *)fileName;
 
+@end
+
+@interface PGRotatedMenuIconCell : NSTextAttachmentCell
+{
+	@private
+	NSMenuItem *_item;
+	float _angle;
+}
+
+- (id)initWithMenuItem:(NSMenuItem *)anItem rotation:(float)angle;
+- (void)drawWithFrame:(NSRect)aRect enabled:(BOOL)enabled highlighted:(BOOL)highlighted;
+- (NSString *)imageNameHighlighted:(BOOL)flag;
+
+@end
+
+@interface PGRotationMenuIconCell : PGRotatedMenuIconCell
+@end
+@interface PGMirrorMenuIconCell : PGRotatedMenuIconCell
 @end

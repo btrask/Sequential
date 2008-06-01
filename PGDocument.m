@@ -26,6 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGNode.h"
+#import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
 
@@ -36,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Categories
 #import "NSObjectAdditions.h"
+#import "NSStringAdditions.h"
 
 NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSortedNodesDidChange";
 NSString *const PGDocumentNodeIsViewableDidChangeNotification  = @"PGDocumentNodeIsViewableDidChange";
@@ -54,7 +56,14 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident
 {
 	if((self = [self init])) {
+		_identifier = [ident retain];
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident adapterClass:nil dataSource:nil load:YES];
+		if([_identifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
+			[_node release];
+			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
+			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:[PGResourceIdentifier resourceIdentifierWithURL:[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL]] adapterClass:nil dataSource:nil load:YES];
+			[self setInitialIdentifier:ident];
+		}
 		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 	}
 	return self;
@@ -66,13 +75,13 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 - (id)initWithBookmark:(PGBookmark *)aBookmark
 {
 	if((self = [self initWithResourceIdentifier:[aBookmark documentIdentifier]])) {
-		[self setOpenedBookmark:aBookmark];
+		[self openBookmark:aBookmark];
 	}
 	return self;
 }
 - (PGResourceIdentifier *)identifier
 {
-	return [[self node] identifier];
+	return [[_identifier retain] autorelease];
 }
 - (PGNode *)node
 {
@@ -113,24 +122,22 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 
 #pragma mark -
 
-- (PGNode *)initialViewableNode
+- (PGNode *)initialNode
 {
-	return [self openedBookmark] ? [[self node] nodeForIdentifier:[[self openedBookmark] fileIdentifier]] : [[self node] sortedViewableNodeFirst:YES];
+	PGNode *const node = [[self node] nodeForIdentifier:_initialIdentifier];
+	return node ? node : [[self node] sortedViewableNodeFirst:YES];
 }
-- (PGBookmark *)openedBookmark
+- (void)setInitialIdentifier:(PGResourceIdentifier *)ident
 {
-	return [[_openedBookmark retain] autorelease];
+	if(ident == _initialIdentifier) return;
+	[_initialIdentifier release];
+	_initialIdentifier = [ident retain];
 }
-- (void)setOpenedBookmark:(PGBookmark *)aBookmark
+- (void)openBookmark:(PGBookmark *)aBookmark
 {
-	if(aBookmark == _openedBookmark) return;
-	[_openedBookmark release];
-	_openedBookmark = [aBookmark retain];
-}
-- (void)deleteOpenedBookmark
-{
-	[[PGBookmarkController sharedBookmarkController] removeBookmark:[self openedBookmark]];
-	[self setOpenedBookmark:nil];
+	[self setInitialIdentifier:[aBookmark fileIdentifier]];
+	if([[[self initialNode] identifier] isEqual:[aBookmark fileIdentifier]]) [[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
+	// TODO: Display the initial node in our open display controller, if we have one.
 }
 
 #pragma mark -
@@ -160,7 +167,6 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
-	[self deleteOpenedBookmark];
 }
 - (void)close
 {
@@ -289,130 +295,13 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 }
 - (void)dealloc
 {
+	[_identifier release];
 	[_node release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
-	[_openedBookmark release];
+	[_initialIdentifier release];
 	[_displayController release];
 	[_pageMenu release];
 	[super dealloc];
 }
 
 @end
-
-/*@implementation PGIndexPage
-
-#pragma mark PGPageSubclassResponsibility Protocol
-
-- (PGBookmark *)bookmark
-{
-	return [[[PGIndexBookmark alloc] initWithDocumentURL:[[self document] dynamicFileURL] pageIndex:[self unsortedIndex] pageName:[self displayName] pageIcon:[self icon]] autorelease];
-}
-
-@end
-
-@implementation PGIndexBookmark
-
-#pragma mark Instance Methods
-
-- (id)initWithDocumentURL:(PG/DynamicURL *)aURL
-      pageIndex:(unsigned)anInt
-      pageName:(NSString *)aString
-      pageIcon:(NSImage *)anImage
-{
-	if((self = [super init])) {
-		_documentURL = [aURL copy];
-		_pageIndex = anInt;
-		_pageName = [aString copy];
-		_pageIcon = [anImage retain];
-		(void)[self isValid]; // Implicitly subscribes.
-	}
-	return self;
-}
-- (unsigned)pageIndex
-{
-	return _pageIndex;
-}
-
-#pragma mark -
-
-- (void)documentEventDidOccur:(NSNotification *)aNotif
-{
-	[self AE_postNotificationName:PGBookmarkDidChangeNotification];
-}
-
-#pragma mark PGBookmarking Protocol
-
-- (NSString *)pageName
-{
-	return [[_pageName retain] autorelease];
-}
-- (BOOL)isValid
-{
-	BOOL const isValid = [[self documentURL] staticURL] != nil;
-	if(isValid && !_documentSubscription) {
-		_documentSubscription = [[self documentURL] subscribe];
-		[_documentSubscription AE_addObserver:self selector:@selector(documentEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-	}
-	return isValid;
-}
-
-- (PG/DynamicURL *)documentURL
-{
-	return _documentURL;
-}
-- (NSURL *)openingURL
-{
-	return [_documentURL staticURL];
-}
-- (NSImage *)pageIcon
-{
-	return [[_pageIcon retain] autorelease];
-}
-
-#pragma mark NSCoding Protocol
-
-- (id)initWithCoder:(NSCoder *)aCoder
-{
-	if((self = [super init])) {
-		_documentURL = [[aCoder decodeObjectForKey:@"DocumentURL"] retain];
-		if(!_documentURL) _documentURL = [[aCoder decodeObjectForKey:@"DocumentAlias"] retain];
-		_pageIndex = [aCoder decodeIntForKey:@"PageIndex"];
-		_pageName = [[aCoder decodeObjectForKey:@"PageName"] retain];
-		_pageIcon = [[aCoder decodeObjectForKey:@"PageIcon"] retain];
-		(void)[self isValid]; // Implicitly subscribes.
-	}
-	return self;
-}
-- (void)encodeWithCoder:(NSCoder *)aCoder
-{
-	[aCoder encodeObject:_documentURL forKey:@"DocumentURL"];
-	[aCoder encodeInt:_pageIndex forKey:@"PageIndex"];
-	[aCoder encodeObject:_pageName forKey:@"PageName"];
-	[aCoder encodeObject:_pageIcon forKey:@"PageIcon"];
-}
-
-#pragma mark NSObject
-
-- (unsigned int)hash
-{
-	return [[self class] hash] ^ _pageIndex;
-}
-- (BOOL)isEqual:(id)anObject
-{
-	if(anObject == self) return YES;
-	if(![anObject isMemberOfClass:[self class]] || [self pageIndex] != [anObject pageIndex]) return NO;
-	PG/DynamicURL *const otherURL = ((PGIndexBookmark *)anObject)->_documentURL;
-	return _documentURL == otherURL || [_documentURL isEqual:otherURL];
-}
-
-- (void)dealloc
-{
-	[self AE_removeObserver];
-	[_documentURL release];
-	[_documentSubscription release];
-	[_pageName release];
-	[_pageIcon release];
-	[super dealloc];
-}
-
-@end*/

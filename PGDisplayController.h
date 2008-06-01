@@ -97,8 +97,14 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (IBAction)nextPage:(id)sender;
 - (IBAction)firstPage:(id)sender;
 - (IBAction)lastPage:(id)sender;
+
 - (IBAction)skipBeforeFolder:(id)sender;
 - (IBAction)skipPastFolder:(id)sender;
+- (IBAction)firstOfPreviousFolder:(id)sender;
+- (IBAction)firstOfNextFolder:(id)sender;
+- (IBAction)firstOfFolder:(id)sender;
+- (IBAction)lastOfFolder:(id)sender;
+
 - (IBAction)jumpToPage:(id)sender;
 
 - (IBAction)pauseDocument:(id)sender;
@@ -108,12 +114,13 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (IBAction)chooseEncoding:(id)sender;
 
 - (PGDocument *)activeDocument;
-- (void)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag;
+- (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag; // Returns YES if the window was closed.
 
 - (PGNode *)activeNode;
 - (void)setActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)showAlerts;
+- (BOOL)tryToGoForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGClipViewLocation)location allowAlerts:(BOOL)showAlerts;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;

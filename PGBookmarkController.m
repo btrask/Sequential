@@ -37,8 +37,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSMenuItemAdditions.h"
 
 static NSString *const PGPausedDocumentsKey            = @"PGPausedDocuments3";
-static NSString *const PGPausedDocumentsDeprecatedKey  = @"PGPausedDocuments";
-static NSString *const PGPausedDocumentsDeprecated2Key = @"PGPausedDocuments2";
+static NSString *const PGPausedDocumentsDeprecated2Key = @"PGPausedDocuments2"; // Deprecated after 1.3.2.
+static NSString *const PGPausedDocumentsDeprecatedKey  = @"PGPausedDocuments"; // Deprecated after 1.2.2.
 
 static PGBookmarkController *sharedBookmarkController = nil;
 
@@ -51,7 +51,8 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 @interface PGBookmarkController (Private)
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark;
-- (void)_removeBookmark:(PGBookmark *)aBookmark; // Removes without updating.
+- (void)_removeBookmarkAtIndex:(unsigned)index; // Removes without updating.
+- (void)_saveBookmarks;
 
 @end
 
@@ -93,18 +94,17 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (void)addBookmark:(PGBookmark *)aBookmark
 {
-	PGBookmark *bookmark;
-	NSEnumerator *const bookmarkEnum = [[[_bookmarks copy] autorelease] objectEnumerator];
-	while((bookmark = [bookmarkEnum nextObject])) if([bookmark isEqual:aBookmark]) [self _removeBookmark:bookmark];;
+	unsigned i;
+	while((i = [_bookmarks indexOfObject:aBookmark]) != NSNotFound) [self _removeBookmarkAtIndex:i];
 	[_bookmarks addObject:aBookmark];
 	[self addMenuItemForBookmark:aBookmark];
-//	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_bookmarks] forKey:PGPausedDocumentsKey];
+	[self _saveBookmarks];
 }
 - (void)removeBookmark:(PGBookmark *)aBookmark
 {
 	if(!aBookmark) return;
-	[self _removeBookmark:aBookmark];
-//	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_bookmarks] forKey:PGPausedDocumentsKey];
+	[self _removeBookmarkAtIndex:[_bookmarks indexOfObject:aBookmark]];
+	[self _saveBookmarks];
 }
 
 - (void)addMenuItemForBookmark:(PGBookmark *)aBookmark
@@ -152,23 +152,23 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 		return;
 	}
 	NSMutableAttributedString *const title = [[[NSMutableAttributedString alloc] init] autorelease];
-	PGResourceIdentifier *const identifier = [aBookmark documentIdentifier];
-	if(identifier) {
-		[title appendAttributedString:[identifier attributedStringWithWithAncestory:NO]];
+	[title appendAttributedString:[[aBookmark documentIdentifier] attributedStringWithWithAncestory:NO]];
+	if(![[aBookmark documentIdentifier] isEqual:[aBookmark fileIdentifier]]) {
 		[[title mutableString] appendFormat:@" %C ", 0x25B9];
+		[title appendAttributedString:[[aBookmark fileIdentifier] attributedStringWithWithAncestory:NO]];
 	}
-	[title appendAttributedString:[[aBookmark fileIdentifier] attributedStringWithWithAncestory:NO]];
 	[item setAttributedTitle:title];
 }
-- (void)_removeBookmark:(PGBookmark *)aBookmark
+- (void)_removeBookmarkAtIndex:(unsigned)index
 {
-	NSParameterAssert(aBookmark);
-	[aBookmark retain]; // Regular retain-autorelease was giving a user problems. I honestly don't understand it but he said it's working after this change.
-//	[aBookmark AE_removeObserver:self name:PGBookmarkDidChangeNotification];
-	[_bookmarks removeObjectIdenticalTo:aBookmark];
-	[bookmarkMenu removeItemAtIndex:[bookmarkMenu indexOfItemWithRepresentedObject:aBookmark]];
+//	[[_bookmarks objectAtIndex:index] AE_removeObserver:self name:PGBookmarkDidChangeNotification];
+	[_bookmarks removeObjectAtIndex:index];
+	[bookmarkMenu removeItemAtIndex:[bookmarkMenu numberOfItems] - index - 1];
 	if(![_bookmarks count]) [bookmarkMenu addItem:emptyMenuItem];
-	[aBookmark release];
+}
+- (void)_saveBookmarks
+{
+	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_bookmarks] forKey:PGPausedDocumentsKey];
 }
 
 #pragma mark NSNibAwaking Protocol
@@ -191,15 +191,18 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 			EventTypeSpec const list[] = {{kEventClassKeyboard, kEventRawKeyModifiersChanged}, {kEventClassMenu, kEventMenuOpening}};
 			InstallEventHandler(GetUserFocusEventTarget(), PGBookmarkControllerFlagsChanged, 2, list, self, NULL);
 		}
-/*		NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
+		NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
 		NSData *bookmarksData = [defaults objectForKey:PGPausedDocumentsKey];
 		if(!bookmarksData) {
-			bookmarksData = [defaults objectForKey:PGPausedDocumentsOldKey];
-			[defaults removeObjectForKey:PGPausedDocumentsOldKey];
+			bookmarksData = [defaults objectForKey:PGPausedDocumentsDeprecated2Key];
+			[defaults removeObjectForKey:PGPausedDocumentsDeprecated2Key];
 		}
-		// load from PGPausedDocumentsDeprecated2Key too.
+		if(!bookmarksData) {
+			bookmarksData = [defaults objectForKey:PGPausedDocumentsDeprecatedKey];
+			[defaults removeObjectForKey:PGPausedDocumentsDeprecatedKey];
+		}
 		_bookmarks = bookmarksData ? [[NSKeyedUnarchiver unarchiveObjectWithData:bookmarksData] retain] : [[NSMutableArray alloc] init];
-		[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_bookmarks] forKey:PGPausedDocumentsKey];*/
+		[self _saveBookmarks];
 	}
 	return self;
 }

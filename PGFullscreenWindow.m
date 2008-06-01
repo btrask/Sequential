@@ -50,13 +50,6 @@ DEALINGS WITH THE SOFTWARE. */
 	return [anItem action] == @selector(performClose:) ? YES : [super validateMenuItem:anItem]; // NSWindow doesn't like -performClose: for borderless windows.
 }
 
-#pragma mark NSWindow AEAdditions Protocol
-
-- (IBAction)performWindowClose:(id)sender
-{
-	[self close];
-}
-
 #pragma mark NSWindow
 
 - (IBAction)performClose:(id)sender

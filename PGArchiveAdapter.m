@@ -149,7 +149,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (BOOL)shouldReadAllDescendants
+- (BOOL)shouldReadRegardlessOfDepth
 {
 	return YES;
 }
@@ -203,10 +203,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (BOOL)canBookmark
-{
-	return [super canBookmark] && [[self identifier] index] != NSNotFound;
-}
 - (void)loadFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {

@@ -32,10 +32,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSWindow (AEAdditions)
 
-- (IBAction)performWindowClose:(id)sender
-{
-	[self performClose:sender];
-}
 - (BOOL)AE_isVisible
 {
 	return [NSApp isActive] || ![self hidesOnDeactivate];

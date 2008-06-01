@@ -71,11 +71,11 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	IBOutlet NSMenuItem              *toggleInfo;
 	IBOutlet NSMenuItem              *toggleExif;
 
-	IBOutlet NSMenuItem              *rotateRight;
-	IBOutlet NSMenuItem              *rotateLeft;
+	IBOutlet NSMenuItem              *rotate90CC;
+	IBOutlet NSMenuItem              *rotate270CC;
 	IBOutlet NSMenuItem              *rotate180;
-	IBOutlet NSMenuItem              *flipHorz;
-	IBOutlet NSMenuItem              *flipVert;
+	IBOutlet NSMenuItem              *mirrorHorz;
+	IBOutlet NSMenuItem              *mirrorVert;
 
 	IBOutlet NSMenuItem              *fitToView;
 	IBOutlet NSMenuItem              *zoomIn;
@@ -117,6 +117,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)useScreen:(id)sender;
 - (IBAction)provideFeedback:(id)sender;
 
+- (IBAction)closeAll:(id)sender;
+
 - (IBAction)switchToPathFinder:(id)sender;
 - (IBAction)switchToFinder:(id)sender;
 
@@ -135,6 +137,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)changeSortDirection:(id)sender; // PGSortDescendingMask from [sender tag].
 - (IBAction)changeSortRepeat:(id)sender; // PGSortOrder from [sender tag].
 - (IBAction)changeReadingDirection:(id)sender; // PGReadingDirection from [sender tag].
+
+- (IBAction)showKeyboardShortcuts:(id)sender;
 
 - (NSArray *)recentDocumentIdentifiers;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray;

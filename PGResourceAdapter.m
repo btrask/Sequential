@@ -130,7 +130,8 @@ DEALINGS WITH THE SOFTWARE. */
 	Class class = Nil;
 	if(data || [URL isFileURL]) {
 		NSData *const realData = data ? data : [NSData dataWithContentsOfMappedFile:[URL path]];
-		if([realData length] >= 4) class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
+		if([realData length] < 4) return Nil;
+		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
 	}
 	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
@@ -140,9 +141,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
 }
-- (BOOL)shouldReadAllDescendants
+- (BOOL)shouldReadRegardlessOfDepth
 {
-	return [[self parentAdapter] shouldReadAllDescendants];
+	return [[self parentAdapter] shouldReadRegardlessOfDepth];
 }
 - (BOOL)shouldRead
 {
@@ -197,6 +198,14 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGContainerAdapter *)parentAdapter
 {
 	return [_node parentAdapter];
+}
+- (PGContainerAdapter *)containerAdapter
+{
+	return [self parentAdapter];
+}
+- (PGContainerAdapter *)rootContainerAdapter
+{
+	return [[self parentAdapter] rootContainerAdapter];
 }
 - (PGDocument *)document
 {
@@ -290,21 +299,39 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [self isViewable] ? 1 : 0;
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)first
+
+#pragma mark -
+
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
 {
-	return [self isViewable] ? [self node] : nil;
+	return [self sortedViewableNodeFirst:flag stopAtNode:nil];
 }
-- (PGNode *)sortedViewableNodeNext:(BOOL)next
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+	    stopAtNode:(PGNode *)descendent
 {
-	return [[self parentAdapter] next:next sortedViewableNodeBeyond:[self node]];
+	return [self isViewable] && [self node] != descendent ? [self node] : nil;
 }
-- (PGNode *)sortedViewableNodeAfterFolder:(BOOL)after
+
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
 {
-	return [[self parentAdapter] sortedViewableNodeAfterFolder:after];
+	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:)];
 }
+- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
+{
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:)];
+	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node]];
+}
+
+- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
+{
+	return nil;
+}
+
+#pragma mark -
+
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
 {
-	return [[self identifier] isEqual:ident] ? [self node] : nil;
+	return ident && [[self identifier] isEqual:ident] ? [self node] : nil;
 }
 - (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode
 {
@@ -373,7 +400,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)canBookmark
 {
-	return [self isViewable];
+	return [self isViewable] && [[self identifier] hasTarget];
 }
 - (PGBookmark *)bookmark
 {

@@ -26,6 +26,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGResourceIdentifier.h"
+#import "PGBookmark.h"
+
+// Categories
+#import "NSStringAdditions.h"
 
 @implementation PGDynamicURL
 
@@ -53,8 +57,37 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self release];
 	unsigned length;
-	uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
+	uint8_t const *data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
+	if(!data) data = [aCoder decodeBytesForKey:@"HandleData" returnedLength:&length];
 	return [[PGResourceIdentifier resourceIdentifierWithAliasData:data length:length] retain];
+}
+
+@end
+
+@implementation PGIndexBookmark
+
+- (id)initWithCoder:(NSCoder *)aCoder
+{
+	[self release];
+	PGResourceIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
+	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
+	PGResourceIdentifier *const fileIdent = [docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]];
+	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"]];
+	[fileIdent setDisplayName:[aCoder decodeObjectForKey:@"PageName"]];
+	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
+}
+
+@end
+
+@implementation PGFileBookmark
+
+- (id)initWithCoder:(NSCoder *)aCoder
+{
+	[self release];
+	PGResourceIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
+	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
+	PGResourceIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [PGResourceIdentifier resourceIdentifierWithURL:[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL]];
+	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
 }
 
 @end

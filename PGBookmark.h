@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 - (id)initWithNode:(PGNode *)aNode;
+- (id)initWithDocumentIdentifier:(PGResourceIdentifier *)docIdent fileIdentifier:(PGResourceIdentifier *)fileIdent displayName:(NSString *)aString; // For backward compatibility.
 
 - (PGResourceIdentifier *)documentIdentifier;
 - (PGResourceIdentifier *)fileIdentifier;

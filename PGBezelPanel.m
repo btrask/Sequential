@@ -82,10 +82,10 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 - (void)changeFrameAnimate:(BOOL)flag
 {
-	if(!flag) PGDisableScreenUpdates();
+	if(!flag) NSDisableScreenUpdates();
 	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:[_parentWindow AE_contentRect] scale:[self AE_userSpaceScaleFactor]] display:YES animate:flag];
 	[self display];
-	if(!flag) PGEnableScreenUpdates();
+	if(!flag) NSEnableScreenUpdates();
 }
 
 #pragma mark -

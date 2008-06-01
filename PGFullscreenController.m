@@ -174,15 +174,16 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGDisplayController
 
-- (void)setActiveDocument:(PGDocument *)document
+- (BOOL)setActiveDocument:(PGDocument *)document
         closeIfAppropriate:(BOOL)flag
 {
 	if(document || _isExitingFullscreen) return [super setActiveDocument:document closeIfAppropriate:NO];
-	if(![self activeDocument]) return;
+	if(![self activeDocument]) return NO;
 	NSMutableArray *const docs = [[[[PGDocumentController sharedDocumentController] documents] mutableCopy] autorelease];
 	[docs removeObjectIdenticalTo:[self activeDocument]];
 	if([docs count]) [self nextTab:self];
 	else [super setActiveDocument:nil closeIfAppropriate:NO]; // PGDocumentController knows when to close us, so don't close ourselves.
+	return NO;
 }
 
 #pragma mark NSWindowController

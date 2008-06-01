@@ -30,6 +30,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSMenuItem</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -37,12 +45,23 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>changeEncoding</key>
+				<string>id</string>
+				<key>closeWindowContent</key>
+				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
+			</dict>
 			<key>CLASS</key>
-			<string>NSApplication</string>
+			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -53,7 +72,15 @@
 				<string>id</string>
 				<key>extractImages</key>
 				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
+				<string>id</string>
 				<key>firstPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
 				<string>id</string>
 				<key>lastPage</key>
 				<string>id</string>
@@ -66,8 +93,6 @@
 				<key>pauseAndCloseDocument</key>
 				<string>id</string>
 				<key>pauseDocument</key>
-				<string>id</string>
-				<key>performWindowClose</key>
 				<string>id</string>
 				<key>previousPage</key>
 				<string>id</string>
@@ -104,25 +129,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>changeEncoding</key>
-				<string>id</string>
-				<key>closeWindowContent</key>
-				<string>PGFullscreenWindow</string>
-				<key>connectionDidClose</key>
-				<string>PGURLConnection</string>
-				<key>connectionDidReceiveResponse</key>
-				<string>PGURLConnection</string>
-				<key>connectionLoadingDidProgress</key>
-				<string>PGURLConnection</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -190,6 +196,8 @@
 				<string>id</string>
 				<key>clearRecentDocuments</key>
 				<string>id</string>
+				<key>closeAll</key>
+				<string>id</string>
 				<key>openDocument</key>
 				<string>id</string>
 				<key>openRecentDocument</key>
@@ -199,6 +207,8 @@
 				<key>orderFrontColorPanel</key>
 				<string>id</string>
 				<key>provideFeedback</key>
+				<string>id</string>
+				<key>showKeyboardShortcuts</key>
 				<string>id</string>
 				<key>switchToFinder</key>
 				<string>id</string>
@@ -221,17 +231,15 @@
 				<string>NSView</string>
 				<key>defaultPageMenu</key>
 				<string>NSMenu</string>
-				<key>fallbackEncodingItem</key>
-				<string>NSMenuItem</string>
 				<key>firstPage</key>
 				<string>NSMenuItem</string>
 				<key>fitToView</key>
 				<string>NSMenuItem</string>
-				<key>flipHorz</key>
-				<string>NSMenuItem</string>
-				<key>flipVert</key>
-				<string>NSMenuItem</string>
 				<key>lastPage</key>
+				<string>NSMenuItem</string>
+				<key>mirrorHorz</key>
+				<string>NSMenuItem</string>
+				<key>mirrorVert</key>
 				<string>NSMenuItem</string>
 				<key>nextPage</key>
 				<string>NSMenuItem</string>
@@ -253,9 +261,9 @@
 				<string>NSMenuItem</string>
 				<key>rotate180</key>
 				<string>NSMenuItem</string>
-				<key>rotateLeft</key>
+				<key>rotate270CC</key>
 				<string>NSMenuItem</string>
-				<key>rotateRight</key>
+				<key>rotate90CC</key>
 				<string>NSMenuItem</string>
 				<key>screenMenu</key>
 				<string>NSMenu</string>

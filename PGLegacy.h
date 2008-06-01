@@ -26,10 +26,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 // These classes were once loved by all. Now all that remains is their -initWithCoder:.
 
-@interface PGDynamicURL : NSObject // Valid through 1.3.2.
-
+@interface PGDynamicURL : NSObject // Deprecated after 1.3.2.
 @end
 
-@interface PGAlias : NSObject // Valid through ???
+@interface PGAlias : NSObject // Deprecated after 1.2.2.
+@end
 
+@interface PGIndexBookmark : NSObject // Deprecated after 1.3.2.
+@end
+
+@interface PGFileBookmark : NSObject // Deprecated after 1.3.2.
 @end

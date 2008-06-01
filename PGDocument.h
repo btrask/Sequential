@@ -45,15 +45,16 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 @interface PGDocument : PGPrefObject
 {
 	@private
-	PGNode              *_node;
-	NSMutableArray      *_cachedNodes;
-	PGNode              *_storedNode;
-	NSPoint              _storedCenter;
-	NSRect               _storedFrame;
-	PGBookmark          *_openedBookmark;
-	PGDisplayController *_displayController;
-	NSMenu              *_pageMenu;
-	PGOrientation        _baseOrientation;
+	PGResourceIdentifier *_identifier;
+	PGNode               *_node;
+	NSMutableArray       *_cachedNodes;
+	PGNode               *_storedNode;
+	NSPoint               _storedCenter;
+	NSRect                _storedFrame;
+	PGResourceIdentifier *_initialIdentifier;
+	PGDisplayController  *_displayController;
+	NSMenu               *_pageMenu;
+	PGOrientation         _baseOrientation;
 }
 
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident;
@@ -67,10 +68,9 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame;
 - (void)storeWindowFrame:(NSRect)frame;
 
-- (PGNode *)initialViewableNode;
-- (PGBookmark *)openedBookmark;
-- (void)setOpenedBookmark:(PGBookmark *)aBookmark;
-- (void)deleteOpenedBookmark;
+- (PGNode *)initialNode;
+- (void)setInitialIdentifier:(PGResourceIdentifier *)ident;
+- (void)openBookmark:(PGBookmark *)aBookmark;
 
 - (PGDisplayController *)displayController;
 - (void)setDisplayController:(PGDisplayController *)controller;

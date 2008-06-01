@@ -50,6 +50,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
+- (BOOL)shouldReadRegardlessOfDepth
+{
+	return YES;
+}
 - (void)readFromData:(NSData *)inData
         URLResponse:(NSURLResponse *)response
 {

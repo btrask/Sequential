@@ -201,14 +201,34 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation];
 }
 
+#pragma mark -
+
 - (IBAction)skipBeforeFolder:(id)sender
 {
-	[self setActiveNode:[[self activeNode] sortedViewableNodeAfterFolder:NO] initialLocation:PGEndLocation];
+	[self tryToGoForward:NO toNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO] initialLocation:PGEndLocation allowAlerts:YES];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
-	[self setActiveNode:[[self activeNode] sortedViewableNodeAfterFolder:YES] initialLocation:PGHomeLocation];
+	[self tryToGoForward:YES toNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
+- (IBAction)firstOfPreviousFolder:(id)sender
+{
+	[self tryToGoForward:NO toNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation allowAlerts:YES];
+}
+- (IBAction)firstOfNextFolder:(id)sender
+{
+	[self tryToGoForward:YES toNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+}
+- (IBAction)firstOfFolder:(id)sender
+{
+	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+}
+- (IBAction)lastOfFolder:(id)sender
+{
+	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation];
+}
+
+#pragma mark -
 
 - (IBAction)jumpToPage:(id)sender
 {
@@ -250,11 +270,16 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	return _activeDocument;
 }
-- (void)setActiveDocument:(PGDocument *)document
+- (BOOL)setActiveDocument:(PGDocument *)document
         closeIfAppropriate:(BOOL)flag
 {
-	if(document == _activeDocument) return;
+	if(document == _activeDocument) return NO;
 	[_activeDocument storeNode:[self activeNode] center:[clipView center]];
+	if(flag && !document && _activeDocument) {
+		_activeDocument = nil;
+		[[self window] close];
+		return YES;
+	}
 	[self setActiveNode:nil initialLocation:PGHomeLocation];
 	[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
@@ -276,7 +301,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
 	[self documentSortedNodesDidChange:nil];
 	[self documentAnimatesImagesDidChange:nil];
-	PGDisableScreenUpdates();
+	NSDisableScreenUpdates();
 	[self _updateInfoPanelLocationAnimate:NO];
 	if([[self activeDocument] showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
 	else [_infoPanel close];
@@ -285,9 +310,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if([_activeDocument getStoredNode:&node center:&center]) {
 		[self setActiveNode:node initialLocation:PGHomeLocation];
 		[clipView scrollToCenterAt:center allowAnimation:NO];
-	} else [self setActiveNode:[[self activeDocument] initialViewableNode] initialLocation:PGHomeLocation];
+	} else [self setActiveNode:[[self activeDocument] initialNode] initialLocation:PGHomeLocation];
+	NSEnableScreenUpdates();
 	[self setTimerInterval:0];
-	PGEnableScreenUpdates();
+	return NO;
 }
 
 #pragma mark -
@@ -323,15 +349,21 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (BOOL)tryToGoForward:(BOOL)forward
         allowAlerts:(BOOL)showAlerts
 {
-	PGClipViewLocation const l = forward ? PGHomeLocation : PGEndLocation;
-	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
+	return [self tryToGoForward:forward toNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:(forward ? PGHomeLocation : PGEndLocation) allowAlerts:showAlerts];
+}
+- (BOOL)tryToGoForward:(BOOL)forward
+        toNode:(PGNode *)node
+        initialLocation:(PGClipViewLocation)location
+        allowAlerts:(BOOL)showAlerts
+{
+	if([self tryToSetActiveNode:node initialLocation:location]) return YES;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
 	if(PGSortRepeatMask & o) {
 		if((PGSortOrderMask & o) == PGSortShuffle) {
 			[[[self activeDocument] node] sortOrderDidChange]; // Reshuffle.
 			[[self activeDocument] noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 		}
-		if([self tryToSetActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l]) {
+		if([self tryToSetActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:location]) {
 			if(showAlerts) {
 				[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic])];
 				[_graphicPanel displayOverWindow:[self window]];
@@ -371,11 +403,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)setFindPanelShown:(BOOL)flag
 {
 	if(flag) {
-		PGDisableScreenUpdates();
+		NSDisableScreenUpdates();
 		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
 		[_findPanel makeKeyWindow];
 		[self _updateInfoPanelLocationAnimate:NO];
-		PGEnableScreenUpdates();
+		NSEnableScreenUpdates();
 	} else {
 		[_findPanel fadeOut];
 		[[self window] makeKeyWindow];
@@ -655,13 +687,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if([self activeNode] == [[[self activeDocument] node] sortedViewableNodeFirst:NO]) {
 		if(@selector(lastPage:) == action) return NO;
 	}
-	// Actions that require a node before the folder.
-	if(![[self activeNode] sortedViewableNodeAfterFolder:NO]) {
+	// Actions that require a folder in a folder.
+	if(![[[self activeNode] containerAdapter] parentAdapter]) {
 		if(@selector(skipBeforeFolder:) == action) return NO;
-	}
-	// Actions that require a node after the folder.
-	if(![[self activeNode] sortedViewableNodeAfterFolder:YES]) {
 		if(@selector(skipPastFolder:) == action) return NO;
+	}
+	if(@selector(firstOfFolder:) == action) {
+		PGNode *const firstOfFolder = [[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES];
+		if(!firstOfFolder || [self activeNode] == firstOfFolder) return NO;
+	}
+	if(@selector(lastOfFolder:) == action) {
+		PGNode *const lastOfFolder = [[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO];
+		if(!lastOfFolder || [self activeNode] == lastOfFolder) return NO;
 	}
 	return [super validateMenuItem:anItem];
 }

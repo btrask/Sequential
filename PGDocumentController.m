@@ -38,10 +38,10 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGURLAlert.h"
 
 // Other
+#import "PGAttachments.h"
 #import "PGLegacy.h"
 
 // Categories
-#import "NSAttributedStringAdditions.h"
 #import "NSColorAdditions.h"
 #import "NSMenuItemAdditions.h"
 #import "NSObjectAdditions.h"
@@ -60,9 +60,9 @@ NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
 static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
 static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
 
-static NSString *const PGRecentDocumentsDeprecatedKey       = @"PGRecentDocuments"; // Deprecated after 1.2.2.
-static NSString *const PGRecentItemsDeprecatedKey           = @"PGRecentItems"; // Deprecated after 1.3.2
 static NSString *const PGRecentItemsKey                     = @"PGRecentItems2";
+static NSString *const PGRecentItemsDeprecated2Key          = @"PGRecentItems"; // Deprecated after 1.3.2
+static NSString *const PGRecentItemsDeprecatedKey           = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGBackgroundColorKey                 = @"PGBackgroundColor";
 static NSString *const PGBackgroundPatternKey               = @"PGBackgroundPattern";
 static NSString *const PGFullscreenKey                      = @"PGFullscreen";
@@ -147,6 +147,16 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
+- (IBAction)closeAll:(id)sender
+{
+	[[_fullscreenController window] close];
+	PGDocument *doc;
+	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
+	while((doc = [docEnum nextObject])) [[[doc displayController] window] performClose:self];
+}
+
+#pragma mark -
+
 - (IBAction)switchToPathFinder:(id)sender
 {
 	if(![[[[NSAppleScript alloc] initWithSource:@"tell application \"Path Finder\" to activate"] autorelease] executeAndReturnError:NULL]) NSBeep();
@@ -225,6 +235,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)changeReadingDirection:(id)sender
 {
 	[[self currentPrefObject] setReadingDirection:[sender tag]];
+}
+
+#pragma mark -
+
+- (IBAction)showKeyboardShortcuts:(id)sender
+{
+	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts"  inBook:@"Sequential Help"];
 }
 
 #pragma mark -
@@ -436,7 +453,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		NSEnumerator *const typeEnum = [OSTypes objectEnumerator];
 		while((type = [typeEnum nextObject])) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
 	}
-	[exts removeObject:@""]; // We specify a blank extension in our Info.plist to get proper behavior as a drop target, but it can break things internally.
 	return exts;
 }
 - (NSDictionary *)documentTypeDictionaryWhereAttribute:(NSString *)key
@@ -477,7 +493,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
       display:(BOOL)display
 {
 	PGDocument *const doc = [self documentForResourceIdentifier:[aBookmark documentIdentifier]];
-	[doc setOpenedBookmark:aBookmark];
+	[doc openBookmark:aBookmark];
 	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease]) display:display];
 }
 - (void)noteNewRecentDocument:(PGDocument *)document
@@ -541,7 +557,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)_setInFullscreen:(BOOL)flag
 {
 	if(flag == _inFullscreen) return;
-	PGDisableScreenUpdates();
+	NSDisableScreenUpdates();
 	if(!flag) {
 		_inFullscreen = flag;
 		[_fullscreenController prepareToExitFullscreen];
@@ -581,7 +597,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[tabsMenuItem AE_addAfterItem:windowsMenuItem];
 		[windowsMenuItem AE_removeFromMenu];
 	}
-	PGEnableScreenUpdates();
+	NSEnableScreenUpdates();
 }
 
 #pragma mark -
@@ -673,15 +689,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[tabsMenuItem retain];
 	[tabsSeparator retain];
 
-	if(PGIsLeopardOrLater()) {
-		[rotateRight setTitle:[NSString stringWithFormat:@"%C %@", 0x2B17, [rotateRight title]]]; 
-		[rotateLeft setTitle:[NSString stringWithFormat:@"%C %@", 0x2B16, [rotateLeft title]]];
-		[rotate180 setTitle:[NSString stringWithFormat:@"%C %@", 0x2B19, [rotate180 title]]];
-		[flipHorz setTitle:[NSString stringWithFormat:@"%C %@", 0x25E7, [flipHorz title]]];
-		[flipVert setTitle:[NSString stringWithFormat:@"%C %@", 0x2B12, [flipVert title]]]; // These unicode characters will work.
+	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
+	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
+	[rotate180 setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate180 rotation:180] autorelease] label:[rotate180 title]]];
 
-		[zoomIn setKeyEquivalent:@"+"]; // Leopard is smart about this.
-	} else [zoomIn setKeyEquivalent:@"="];
+	[mirrorHorz setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorHorz rotation:0] autorelease] label:[mirrorHorz title]]];
+	[mirrorVert setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorVert rotation:90] autorelease] label:[mirrorVert title]]];
+
+	[zoomIn setKeyEquivalent:(PGIsLeopardOrLater() ? @"+" : @"=")]; // Leopard is smart about this.
 	[zoomIn setKeyEquivalentModifierMask:NSCommandKeyMask];
 
 	[revealInBrowser AE_removeFromMenu];
@@ -839,12 +854,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 		id recentItemsData = [defaults objectForKey:PGRecentItemsKey];
 		if(!recentItemsData) {
-			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
-			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
+			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecated2Key];
+			[defaults removeObjectForKey:PGRecentItemsDeprecated2Key]; // Don't leave unused data around.
 		}
 		if(!recentItemsData) {
-			recentItemsData = [defaults objectForKey:PGRecentDocumentsDeprecatedKey];
-			[defaults removeObjectForKey:PGRecentDocumentsDeprecatedKey]; // Don't leave unused data around.
+			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
+			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
 			[NSKeyedUnarchiver setClass:[PGAlias class] forClassName:@"AEAlias"]; // PGAlias was known as AEAlias through 1.0b2.
 		}
 		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
