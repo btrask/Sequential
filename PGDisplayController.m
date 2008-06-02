@@ -275,12 +275,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	if(document == _activeDocument) return NO;
 	[_activeDocument storeNode:[self activeNode] center:[clipView center]];
-	if(flag && !document && _activeDocument) {
-		_activeDocument = nil;
-		[[self window] close];
-		return YES;
-	}
-	[self setActiveNode:nil initialLocation:PGHomeLocation];
 	[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
@@ -289,6 +283,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
+	if(flag && !document && _activeDocument) {
+		[self setActiveNode:nil initialLocation:PGHomeLocation]; // PGClipView modifies the image, so make sure it's back to normal.
+		_activeDocument = nil;
+		[[self window] close];
+		return YES;
+	}
 	_activeDocument = document;
 	if([[self window] isMainWindow]) [[PGDocumentController sharedDocumentController] setCurrentDocument:_activeDocument];
 	[_activeDocument AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
@@ -299,18 +299,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
-	[self documentSortedNodesDidChange:nil];
 	[self documentAnimatesImagesDidChange:nil];
 	NSDisableScreenUpdates();
+	[self documentSortedNodesDidChange:nil];
 	[self _updateInfoPanelLocationAnimate:NO];
-	if([[self activeDocument] showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
+	if([_activeDocument showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
 	else [_infoPanel close];
 	PGNode *node;
 	NSPoint center;
 	if([_activeDocument getStoredNode:&node center:&center]) {
 		[self setActiveNode:node initialLocation:PGHomeLocation];
 		[clipView scrollToCenterAt:center allowAnimation:NO];
-	} else [self setActiveNode:[[self activeDocument] initialNode] initialLocation:PGHomeLocation];
+	} else [self setActiveNode:[_activeDocument initialNode] initialLocation:PGHomeLocation];
 	NSEnableScreenUpdates();
 	[self setTimerInterval:0];
 	return NO;
@@ -386,12 +386,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)showLoadingIndicator
 {
-	if(!_loadingGraphic) {
-		_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
-		[(PGAlertView *)[_graphicPanel contentView] pushGraphic:_loadingGraphic];
-		[_graphicPanel displayOverWindow:[self window]];
-	}
+	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
+	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
 	[_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
+	[(PGAlertView *)[_graphicPanel contentView] pushGraphic:_loadingGraphic];
+	[_graphicPanel displayOverWindow:[self window]];
 }
 
 #pragma mark -

@@ -130,8 +130,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_cache
 {
-	if(_numberOfFrames > 1) return;
-	if([_image cacheMode] == NSImageCacheNever) return;
+	if(!_image || _numberOfFrames > 1 || [_image cacheMode] == NSImageCacheNever) return;
 	[_image removeRepresentation:_cache];
 	[_cache release];
 	_cache = nil;
@@ -255,10 +254,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[self setImage:nil orientation:PGUpright];
+	NSParameterAssert(!_image);
+	NSParameterAssert(!_rep);
+	NSParameterAssert(!_cache);
 	[self _animate:NO];
-	[_image release];
-	[_rep release];
-	[_cache release];
 	[super dealloc];
 }
 
