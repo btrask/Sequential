@@ -67,9 +67,8 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)fileResourceDidChange:(unsigned)flags
 {
-//	PGNode *const node = [self node];
-	if(flags & (NOTE_DELETE | NOTE_REVOKE)) NSBeep(); // TODO: Remove the node.
-	else if(flags & NOTE_WRITE && [self shouldRead]) [self readFromData:nil URLResponse:nil];
+	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [[self node] removeFromDocument];
+	if(flags & NOTE_WRITE && [self shouldRead]) [self readFromData:nil URLResponse:nil];
 	[super fileResourceDidChange:flags];
 }
 

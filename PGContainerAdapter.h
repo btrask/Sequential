@@ -39,6 +39,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSArray *)sortedChildren;
 - (NSArray *)unsortedChildren;
 - (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
+- (void)removeChild:(PGNode *)child;
 
 - (PGNode *)childForURL:(NSURL *)aURL;
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode;

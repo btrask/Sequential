@@ -64,6 +64,12 @@ DEALINGS WITH THE SOFTWARE. */
 	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
 	[[self document] noteSortedChildrenOfNodeDidChange:[self node] oldSortedChildren:oldSortedChildren];
 }
+- (void)removeChild:(PGNode *)node
+{
+	NSMutableArray *const unsortedChildren = [[_unsortedChildren mutableCopy] autorelease];
+	[unsortedChildren removeObjectIdenticalTo:node];
+	[self setUnsortedChildren:unsortedChildren presortedOrder:_unsortedOrder];
+}
 
 #pragma mark -
 

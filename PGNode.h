@@ -74,6 +74,8 @@ enum {
 - (PGResourceAdapter *)setResourceAdapter:(PGResourceAdapter *)adapter; // If it changes, returns -resourceAdapter, otherwise nil.
 - (PGResourceAdapter *)setResourceAdapterClass:(Class)aClass;
 
+- (void)removeFromDocument;
+
 - (void)setDateModified:(NSDate *)aDate;
 - (void)setDateCreated:(NSDate *)aDate;
 - (void)setDataLength:(NSNumber *)aNumber;

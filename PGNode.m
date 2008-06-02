@@ -152,6 +152,14 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
+- (void)removeFromDocument
+{
+	if([[self document] node] == self) [[self document] close];
+	else [[self parentAdapter] removeChild:self];
+}
+
+#pragma mark -
+
 - (void)setDateModified:(NSDate *)aDate
 {
 	if(aDate == _dateModified || (aDate && [_dateModified isEqualToDate:aDate])) return;
@@ -284,22 +292,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[[self resourceAdapter] sortOrderDidChange];
 }
 
-#pragma mark NSProxy
-
-- (BOOL)respondsToSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? YES : [_resourceAdapter respondsToSelector:sel];
-}
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
-{
-	return [_resourceAdapter methodSignatureForSelector:sel];
-}
-- (void)forwardInvocation:(NSInvocation *)invocation
-{
-	[invocation setTarget:_resourceAdapter];
-	[invocation invoke];
-}
-
 #pragma mark NSObject
 
 - (void)dealloc
@@ -313,6 +305,26 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_dateCreated release];
 	[_dataLength release];
 	[super dealloc];
+}
+
+#pragma mark -
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? YES : [_resourceAdapter respondsToSelector:sel];
+}
+- (IMP)methodForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_resourceAdapter methodForSelector:sel];
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+	return [_resourceAdapter methodSignatureForSelector:sel];
+}
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+	[invocation setTarget:_resourceAdapter];
+	[invocation invoke];
 }
 
 #pragma mark -

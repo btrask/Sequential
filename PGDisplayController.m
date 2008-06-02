@@ -333,6 +333,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
 	_initialLocation = location;
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
 	[self AE_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
@@ -896,7 +897,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)synchronizeWindowTitleWithDocumentName
 {
 	PGResourceIdentifier *const identifier = [[self activeDocument] identifier];
-	[[self window] setRepresentedFilename:([identifier isFileIdentifier] ? [[identifier URL] path] : @"")];
+	NSString *const path = [identifier isFileIdentifier] ? [[identifier URL] path] : nil;
+	[[self window] setRepresentedFilename:(path ? path : @"")];
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
 	if(!title) title = @"";

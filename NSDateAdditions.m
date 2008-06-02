@@ -39,12 +39,13 @@ DEALINGS WITH THE SOFTWARE. */
               timeStyle:(CFDateFormatterStyle)timeStyle
 {
 	static CFDateFormatterRef f = nil;
-	if(f && (CFDateFormatterGetDateStyle(f) != dateStyle || CFDateFormatterGetTimeStyle(f) != timeStyle)) {
-		CFRelease(CFDateFormatterGetLocale(f));
-		CFRelease(f);
-		f = nil;
+	if(!f || CFDateFormatterGetDateStyle(f) != dateStyle || CFDateFormatterGetTimeStyle(f) != timeStyle) {
+		if(f) {
+			CFRelease(CFDateFormatterGetLocale(f));
+			CFRelease(f);
+		}
+		f = CFDateFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), dateStyle, timeStyle);
 	}
-	if(!f) f = CFDateFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), dateStyle, timeStyle);
 	return [(NSString *)CFDateFormatterCreateStringWithDate(kCFAllocatorDefault, f, (CFDateRef)self) autorelease];
 }
 
