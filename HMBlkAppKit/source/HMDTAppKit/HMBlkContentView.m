@@ -128,11 +128,7 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	frame = [self frame];
 	
 	// Decide grow box region
-	NSRect  growBoxRect;
-	growBoxRect.origin.x = frame.size.width - 30;
-	growBoxRect.origin.y = 18;
-	growBoxRect.size.width = 16;
-	growBoxRect.size.height = 16;
+	NSRect  growBoxRect = NSMakeRect(NSWidth(frame) - 30, 18, 16, 16);
 	
 	// When click in the grow box
 	NSPoint mousePoint;
@@ -254,7 +250,7 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	// For dragging
 	else if (_isDragging) {
 		_isDragging = NO;
-		if(!_dragged) [[self window] makeFirstResponder:nil];
+		if(!_dragged) [[self window] makeFirstResponder:self];
 	}
 }
 

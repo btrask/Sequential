@@ -54,12 +54,14 @@ DEALINGS WITH THE SOFTWARE. */
 - (int)AE_fileDescriptor
 {
 	char const *const rep = [self fileSystemRepresentation];
+	errno = 0;
 	int fd = open(rep, O_EVTONLY);
-	if(-1 != fd) return fd;
-	struct rlimit limit;
-	if(getrlimit(RLIMIT_NOFILE, &limit)) return -1; // Couldn't get limit.
-	limit.rlim_cur = MIN(limit.rlim_cur * 2, limit.rlim_max);
-	if(setrlimit(RLIMIT_NOFILE, &limit)) return -1; // Couldn't change limit.
+	if(errno != EMFILE) return fd;
+	struct rlimit l;
+	if(getrlimit(RLIMIT_NOFILE, &l) != noErr) return -1;
+	l.rlim_cur = l.rlim_max;
+	if(setrlimit(RLIMIT_NOFILE, &l) != noErr) return -1;
+	errno = 0;
 	return open(rep, O_EVTONLY);
 }
 - (NSString *)AE_firstPathComponent

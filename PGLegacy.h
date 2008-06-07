@@ -32,6 +32,8 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGAlias : NSObject // Deprecated after 1.2.2.
 @end
 
+@compatibility_alias AEAlias PGAlias; // Deprecated after 1.0b2.
+
 @interface PGIndexBookmark : NSObject // Deprecated after 1.3.2.
 @end
 

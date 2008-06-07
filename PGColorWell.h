@@ -24,7 +24,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-int main(int argc, char **argv)
+@interface PGColorWell : NSColorWell
 {
-	return NSApplicationMain(argc, (const char **)argv);
+	@private
+	IBOutlet NSView *accessory;
 }
+
+- (void)PG_windowWillClose:(NSNotification *)aNotif;
+
+@end

@@ -22,25 +22,42 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
+#import "PGColorWell.h"
 
-// Views
-@class PGBezelPanel;
+// Categories
+#import "NSObjectAdditions.h"
 
-@interface PGWindow : NSWindow
+@implementation PGColorWell
+
+#pragma mark Instance Methods
+
+- (void)PG_windowWillClose:(NSNotification *)aNotif
 {
-	@private
-	PGBezelPanel *fDragHighlightPanel;
+	if([self isActive]) [self deactivate];
 }
 
-@end
+#pragma mark NSColorWell
 
-@interface NSObject (PGWindowDelegate)
+- (void)deactivate
+{
+	[super deactivate];
+	[[NSColorPanel sharedColorPanel] close];
+}
 
-- (NSDragOperation)window:(PGWindow *)window dragOperationForInfo:(id<NSDraggingInfo>)info;
-- (BOOL)window:(PGWindow *)window performDragOperation:(id<NSDraggingInfo>)info;
+#pragma mark NSView
 
-- (void)selectNextOutOfWindowKeyView:(NSWindow *)window;
-- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window;
+- (void)viewWillMoveToWindow:(NSWindow *)aWindow
+{
+	[[self window] AE_removeObserver:self name:NSWindowWillCloseNotification];
+	[aWindow AE_addObserver:self selector:@selector(PG_windowWillClose:) name:NSWindowWillCloseNotification];
+}
+
+#pragma mark NSObject
+
+- (void)dealloc
+{
+	[self AE_removeObserver];
+	[super dealloc];
+}
 
 @end

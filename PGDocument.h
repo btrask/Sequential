@@ -50,6 +50,7 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 	NSMutableArray       *_cachedNodes;
 	PGNode               *_storedNode;
 	NSPoint               _storedCenter;
+	NSString             *_storedQuery;
 	NSRect                _storedFrame;
 	PGResourceIdentifier *_initialIdentifier;
 	PGDisplayController  *_displayController;
@@ -63,8 +64,8 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (PGResourceIdentifier *)identifier;
 - (PGNode *)node;
 
-- (BOOL)getStoredNode:(out PGNode **)outNode center:(out NSPoint *)outCenter;
-- (void)storeNode:(PGNode *)node center:(NSPoint)center;
+- (BOOL)getStoredNode:(out PGNode **)outNode center:(out NSPoint *)outCenter query:(out NSString **)outQuery;
+- (void)storeNode:(PGNode *)node center:(NSPoint)center query:(NSString *)query;
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame;
 - (void)storeWindowFrame:(NSRect)frame;
 

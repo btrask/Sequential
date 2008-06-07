@@ -48,6 +48,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)deletesBookmarks;
 - (void)setDeletesBookmarks:(BOOL)flag; // If YES, the "Resume" menu becomes a "Delete" menu.
 
-- (void)bookmarkDidChange:(NSNotification *)aNotif;
+- (void)bookmarkDidUpdate:(NSNotification *)aNotif;
 
 @end

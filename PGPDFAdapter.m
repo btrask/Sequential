@@ -50,22 +50,23 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (BOOL)shouldReadRegardlessOfDepth
+- (PGReadingPolicy)descendentReadingPolicy
 {
-	return YES;
+	return MAX(PGReadAll, [self readingPolicy]);
 }
-- (void)readFromData:(NSData *)inData
-        URLResponse:(NSURLResponse *)response
+- (void)readWithURLResponse:(NSURLResponse *)response
 {
-	NSData *data = [inData copy];
-	if(!data) {
-		data = [[[self dataSource] dataForResourceAdapter:self] copy];
-		if(!data && [self needsPassword]) return;
-	}
-	if(!data) {
+	NSData *data;
+	switch([self getData:&data]) {
+	case PGWrongPassword: return;
+	case PGDataUnavailable:
+	{
 		PGResourceIdentifier *const identifier = [self identifier];
 		NSParameterAssert([identifier isFileIdentifier]);
 		data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+		break;
+	}
+	case PGDataAvailable: break;
 	}
 	_image = [[NSImage alloc] initWithData:data];
 	_rep = (NSPDFImageRep *)[[_image bestRepresentationForDevice:nil] retain];
@@ -77,7 +78,7 @@ DEALINGS WITH THE SOFTWARE. */
 	int i = 0;
 	for(; i < [_rep pageCount]; i++) {
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:i];
-		[identifier setDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict]];
+		[identifier setDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier adapterClass:[PGPDFPageAdapter class] dataSource:nil load:NO] autorelease];
 		if(node) [nodes addObject:node];
 	}

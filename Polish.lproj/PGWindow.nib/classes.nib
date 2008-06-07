@@ -22,14 +22,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -46,26 +38,48 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>FirstResponder</string>
+			<string>PGWindow</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>NSObject</string>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>changeOrientation</key>
 				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
+				<key>chooseEncoding</key>
+				<string>id</string>
 				<key>copy</key>
 				<string>id</string>
+				<key>decrypt</key>
+				<string>id</string>
 				<key>extractImages</key>
+				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
 				<string>id</string>
 				<key>firstPage</key>
 				<string>id</string>
 				<key>hideFindPanel</key>
 				<string>id</string>
 				<key>jumpToPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
 				<string>id</string>
 				<key>lastPage</key>
 				<string>id</string>
@@ -87,9 +101,17 @@
 				<string>id</string>
 				<key>revealInPathFinder</key>
 				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
+				<string>id</string>
 				<key>toggleFullscreen</key>
 				<string>id</string>
 				<key>toggleOnScreenDisplay</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -100,10 +122,26 @@
 			<dict>
 				<key>clipView</key>
 				<string>PGClipView</string>
+				<key>encodingLabel</key>
+				<string>NSTextField</string>
+				<key>encodingView</key>
+				<string>NSView</string>
+				<key>errorLabel</key>
+				<string>NSTextField</string>
+				<key>errorMessage</key>
+				<string>NSTextField</string>
+				<key>errorView</key>
+				<string>NSView</string>
 				<key>findView</key>
 				<string>PGFindView</string>
 				<key>imageView</key>
 				<string>PGImageView</string>
+				<key>passwordField</key>
+				<string>NSTextField</string>
+				<key>passwordLabel</key>
+				<string>NSTextField</string>
+				<key>passwordView</key>
+				<string>NSView</string>
 				<key>searchField</key>
 				<string>NSSearchField</string>
 			</dict>
@@ -117,6 +155,12 @@
 				<string>id</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
@@ -125,11 +169,27 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGImageView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLConnection</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -158,6 +218,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

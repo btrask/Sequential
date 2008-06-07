@@ -92,9 +92,12 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 
 - (BOOL)getStoredNode:(out PGNode **)outNode
         center:(out NSPoint *)outCenter
+        query:(out NSString **)outQuery
 {
 	if(outNode) *outNode = _storedNode;
 	if(outCenter) *outCenter = _storedCenter;
+	if(outQuery) *outQuery = [_storedQuery autorelease];
+	_storedQuery = nil;
 	if(_storedNode) {
 		_storedNode = nil;
 		return YES;
@@ -103,9 +106,11 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 }
 - (void)storeNode:(PGNode *)node
         center:(NSPoint)center
+        query:(NSString *)query
 {
 	_storedNode = node;
 	_storedCenter = center;
+	_storedQuery = [query copy];
 }
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame
 {
@@ -136,8 +141,11 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 - (void)openBookmark:(PGBookmark *)aBookmark
 {
 	[self setInitialIdentifier:[aBookmark fileIdentifier]];
-	if([[[self initialNode] identifier] isEqual:[aBookmark fileIdentifier]]) [[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
-	// TODO: Display the initial node in our open display controller, if we have one.
+	PGNode *const initialNode = [self initialNode];
+	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
+		[[self displayController] showNode:initialNode];
+		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
+	} else NSBeep();
 }
 
 #pragma mark -
@@ -211,6 +219,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 - (void)noteSortedChildrenOfNodeDidChange:(PGNode *)node
         oldSortedChildren:(NSArray *)children
 {
+	if(!_node) return;
 	int const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
@@ -220,17 +229,20 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
 {
+	if(!_node) return;
 	NSParameterAssert(node);
 	[self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {
+	if(!_node) return;
 	NSParameterAssert(node);
 	if([self node] == node) [[self displayController] synchronizeWindowTitleWithDocumentName];
 	[self AE_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDidCache:(PGNode *)node
 {
+	if(!_node) return;
 	NSParameterAssert(node);
 	[_cachedNodes removeObjectIdenticalTo:node];
 	[_cachedNodes insertObject:node atIndex:0];
@@ -276,11 +288,6 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	}
 	[[PGPrefObject globalPrefObject] setSortOrder:anOrder];
 }
-- (void)setAnimatesImages:(BOOL)flag
-{
-	[super setAnimatesImages:flag];
-	[[PGPrefObject globalPrefObject] setAnimatesImages:flag];
-}
 
 #pragma mark NSObject
 
@@ -298,6 +305,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	[_identifier release];
 	[_node release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
+	[_storedQuery release];
 	[_initialIdentifier release];
 	[_displayController release];
 	[_pageMenu release];

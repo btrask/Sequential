@@ -27,10 +27,12 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGDocument.h"
+#import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
 
 // Controllers
+#import "PGPrefController.h"
 #import "PGDisplayController.h"
 #import "PGWindowController.h"
 #import "PGFullscreenController.h"
@@ -57,19 +59,22 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGLSTypeIsPackageKey        = @"LSTypeIsPackage";
 NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
 
+NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
+NSString *const PGAnimatesImagesKey         = @"PGAnimatesImages";
+NSString *const PGBackgroundColorKey        = @"PGBackgroundColor";
+NSString *const PGBackgroundPatternKey      = @"PGBackgroundPattern";
+
 static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
 static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
 
 static NSString *const PGRecentItemsKey                     = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key          = @"PGRecentItems"; // Deprecated after 1.3.2
 static NSString *const PGRecentItemsDeprecatedKey           = @"PGRecentDocuments"; // Deprecated after 1.2.2.
-static NSString *const PGBackgroundColorKey                 = @"PGBackgroundColor";
-static NSString *const PGBackgroundPatternKey               = @"PGBackgroundPattern";
 static NSString *const PGFullscreenKey                      = @"PGFullscreen";
-static NSString *const PGDisplayScreenIndexKey              = @"PGDisplayScreenIndex";
 static NSString *const PGExifShownKey                       = @"PGExifShown";
 static NSString *const PGUsesDirectionMouseButtonMappingKey = @"PGUsesDirectionMouseButtonMapping";
 
+static NSString *const PGNSApplicationName         = @"NSApplicationName";
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 static NSString *const PGFinderApplicationName     = @"Finder";
 
@@ -84,6 +89,11 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type)
 }
 
 static PGDocumentController *PGSharedDocumentController = nil;
+
+@interface PGWindow : NSWindow
+@end
+@interface PGView : NSView
+@end
 
 @interface PGDocumentController (Private)
 
@@ -109,40 +119,32 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	return [[self alloc] init];
 }
 
+#pragma mark NSObject
+
++ (void)initialize
+{
+	if([PGDocumentController class] != self) return;
+	[PGWindow poseAsClass:[NSWindow class]];
+	[PGView poseAsClass:[NSView class]];
+	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+		[NSNumber numberWithBool:YES], PGAntialiasWhenUpscalingKey,
+		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
+		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
+		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
+		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
+		nil]];
+}
+
 #pragma mark Instance Methods
-
-- (IBAction)orderFrontColorPanel:(id)sender
-{
-	NSColorPanel *const colorPanel = [NSColorPanel sharedColorPanel];
-	[colorPanel setColor:[self backgroundColor]];
-	[colorPanel setTarget:self];
-	[colorPanel setAction:@selector(changeBackgroundColor:)];
-	if([colorPanel accessoryView] != colorPanelAccessory) {
-		NSSize const minSize = [colorPanel minSize];
-		[colorPanelAccessory setFrameSize:NSMakeSize(NSWidth([[colorPanel contentView] bounds]), NSHeight([colorPanelAccessory frame]))];
-		[colorPanel setAccessoryView:colorPanelAccessory];
-		[colorPanel setMinSize:minSize];
-	}
-	[checkerboardBackground setState:([self backgroundPattern] == PGCheckerboardPattern)];
-	[NSApp orderFrontColorPanel:sender];
-}
-- (IBAction)changeBackgroundColor:(id)sender
-{
-	[self setBackgroundColor:[[NSColorPanel sharedColorPanel] color]];
-}
-- (IBAction)changeBackgroundPattern:(id)sender
-{
-	[self setBackgroundPattern:([sender state] == NSOnState ? [sender tag] : PGNoPattern)];
-}
-
-- (IBAction)useScreen:(id)sender
-{
-	[self setDisplayScreen:[sender representedObject]];
-}
 
 - (IBAction)provideFeedback:(id)sender
 {
 	if(![[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"mailto:sequential@comcast.net"]]) NSBeep();
+}
+- (IBAction)showPreferences:(id)sender
+{
+	[[PGPrefController sharedPrefController] showWindow:self];
 }
 
 #pragma mark -
@@ -241,7 +243,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)showKeyboardShortcuts:(id)sender
 {
-	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts"  inBook:@"Sequential Help"];
+	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts" inBook:@"Sequential Help"];
 }
 
 #pragma mark -
@@ -261,38 +263,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (unsigned)maximumRecentDocumentCount
 {
 	return 10;
-}
-
-#pragma mark -
-
-- (NSColor *)backgroundPatternColor
-{
-	return _backgroundPattern == PGCheckerboardPattern ? [_backgroundColor AE_checkerboardPatternColor] : [self backgroundColor];
-}
-- (NSColor *)backgroundColor
-{
-	return [[_backgroundColor retain] autorelease];
-}
-- (void)setBackgroundColor:(NSColor *)aColor
-{
-	NSParameterAssert(aColor);
-	if(_prefsLoaded && [aColor isEqual:_backgroundColor]) return;
-	[_backgroundColor release];
-	_backgroundColor = [aColor retain];
-	[[NSUserDefaults standardUserDefaults] AE_encodeObject:aColor forKey:PGBackgroundColorKey];
-	[self AE_postNotificationName:PGDocumentControllerBackgroundPatternColorDidChangeNotification];
-}
-- (PGPatternType)backgroundPattern
-{
-	return _backgroundPattern;
-}
-- (void)setBackgroundPattern:(PGPatternType)aPattern
-{
-	// More patterns are likely to become available in the future, so accept them gracefully.
-	if(_prefsLoaded && aPattern == _backgroundPattern) return;
-	_backgroundPattern = aPattern;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:aPattern] forKey:PGBackgroundPatternKey];
-	[self AE_postNotificationName:PGDocumentControllerBackgroundPatternColorDidChangeNotification];
 }
 
 #pragma mark -
@@ -317,18 +287,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[toggleFullscreen setTitle:(flag ? NSLocalizedString(@"Exit Full Screen", nil) : NSLocalizedString(@"Enter Full Screen", nil))];
 	[fitToView setTitle:(flag ? NSLocalizedString(@"Fit to Screen", nil) : NSLocalizedString(@"Fit to Window", nil))];
 	[self _setInFullscreen:flag];
-}
-- (NSScreen *)displayScreen
-{
-	return [[_displayScreen retain] autorelease];
-}
-- (void)setDisplayScreen:(NSScreen *)anObject
-{
-	[_displayScreen autorelease];
-	_displayScreen = [anObject retain];
-	unsigned index = [[NSScreen screens] indexOfObjectIdenticalTo:anObject];
-	[[NSUserDefaults standardUserDefaults] setObject:(index == NSNotFound ? nil : [NSNumber numberWithUnsignedInt:index]) forKey:PGDisplayScreenIndexKey];
-	[self AE_postNotificationName:PGDocumentControllerDisplayScreenDidChangeNotification];
 }
 
 #pragma mark -
@@ -477,7 +435,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (Class)resourceAdapterClassForExtension:(NSString *)ext
 {
-	return [self resourceAdapterClassWhereAttribute:PGCFBundleTypeExtensionsKey matches:[ext lowercaseString]];
+	Class class = [_classesByExtension objectForKey:ext];
+	if(!class) {
+		class = [self resourceAdapterClassWhereAttribute:PGCFBundleTypeExtensionsKey matches:[ext lowercaseString]];
+		if(class) [_classesByExtension setObject:class forKey:ext];
+	}
+	return class;
 }
 
 #pragma mark -
@@ -518,7 +481,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (void)workspaceDidLaunchApplication:(NSNotification *)aNotif
 {
-	if(aNotif) return [self _applicationLaunched:[[aNotif userInfo] objectForKey:@"NSApplicationName"]];
+	if(aNotif) return [self _applicationLaunched:[[aNotif userInfo] objectForKey:PGNSApplicationName]];
 	[switchToPathFinder AE_removeFromMenu];
 	[revealInPathFinder AE_removeFromMenu];
 	[switchToFinder AE_removeFromMenu];
@@ -527,12 +490,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	_runningApps = [[NSCountedSet alloc] init];
 	NSDictionary *dict;
 	NSEnumerator *const dictEnum = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
-	while((dict = [dictEnum nextObject])) [self _applicationLaunched:[dict objectForKey:@"NSApplicationName"]];
+	while((dict = [dictEnum nextObject])) [self _applicationLaunched:[dict objectForKey:PGNSApplicationName]];
 }
 - (void)workspaceDidTerminateApplication:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	[self _applicationTerminated:[[aNotif userInfo] objectForKey:@"NSApplicationName"]];
+	[self _applicationTerminated:[[aNotif userInfo] objectForKey:PGNSApplicationName]];
 }
 
 - (void)readingDirectionDidChange:(NSNotification *)aNotif
@@ -716,7 +679,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
@@ -746,8 +709,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (int)numberOfItemsInMenu:(NSMenu *)menu
 {
-	if(menu == screenMenu) return [[NSScreen screens] count];
-	else if(menu == recentMenu) {
+	if(menu == recentMenu) {
 		NSMutableArray *const identifiers = [NSMutableArray array];
 		PGResourceIdentifier *identifier;
 		NSEnumerator *const identifierEnum = [[self recentDocumentIdentifiers] objectEnumerator];
@@ -771,13 +733,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	SEL action = NULL;
 	id representedObject = nil;
 	int tag = -1;
-	if(menu == screenMenu) {
-		NSScreen *const screen = [[NSScreen screens] objectAtIndex:index];
-		if([self displayScreen] == screen) state = NSOnState;
-		title = [NSString stringWithFormat:@"%@ (%dx%d)", (index ? [NSString stringWithFormat:NSLocalizedString(@"Screen %d", nil), index + 1] : NSLocalizedString(@"Main Screen", nil)), (int)NSWidth([screen frame]), (int)NSHeight([screen frame])];
-		action = @selector(useScreen:);
-		representedObject = screen;
-	} else if(menu == recentMenu) {
+	if(menu == recentMenu) {
 		NSArray *const identifiers = [self recentDocumentIdentifiers];
 		if((unsigned)index < [identifiers count]) {
 			PGResourceIdentifier *const identifier = [identifiers objectAtIndex:index];
@@ -826,18 +782,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
 }
 
-- (void)applicationDidChangeScreenParameters:(NSNotification *)aNotif
-{
-	NSArray *const screens = [NSScreen screens];
-	if(![screens count]) return [self setDisplayScreen:nil];
-
-	NSScreen *const currentScreen = [self displayScreen];
-	unsigned i = [screens indexOfObjectIdenticalTo:currentScreen];
-	if(NSNotFound != i) return [self setDisplayScreen:currentScreen];
-	i = [screens indexOfObject:currentScreen];
-	[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
-}
-
 #pragma mark NSResponder
 
 - (void)cancelOperation:(id)sender
@@ -860,23 +804,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if(!recentItemsData) {
 			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
 			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
-			[NSKeyedUnarchiver setClass:[PGAlias class] forClassName:@"AEAlias"]; // PGAlias was known as AEAlias through 1.0b2.
 		}
 		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
 
 		[self setUsesDirectionalMouseButtonMapping:PGValueWithSelectorOrDefault([defaults objectForKey:PGUsesDirectionMouseButtonMappingKey], boolValue, NO)];
 
-		[self setBackgroundColor:PGValueOrDefault([defaults AE_decodedObjectForKey:PGBackgroundColorKey], [NSColor blackColor])];
-		[self setBackgroundPattern:PGValueWithSelectorOrDefault([defaults objectForKey:PGBackgroundPatternKey], intValue, PGNoPattern)];
-
-		NSArray *const screens = [NSScreen screens];
-		unsigned const screenCount = [screens count];
-		if(screenCount) {
-			unsigned const screenIndex = PGValueWithSelectorOrDefault([defaults objectForKey:PGDisplayScreenIndexKey], unsignedIntValue, 0);
-			[self setDisplayScreen:[screens objectAtIndex:(screenIndex < screenCount ? screenIndex : 0)]];
-		}
-
 		_documents = [[NSMutableArray alloc] init];
+		_classesByExtension = [[NSMutableDictionary alloc] init];
 
 		NSNotificationCenter *const workspaceCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
 		[workspaceCenter addObserver:self selector:@selector(workspaceDidLaunchApplication:) name:NSWorkspaceDidLaunchApplicationNotification object:nil];
@@ -906,34 +840,57 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_runningApps release];
 	[_recentMenuSeparatorItem release];
 	[_recentDocumentIdentifiers release];
-	[_backgroundColor release];
-	[_displayScreen release];
 	[_documents release];
 	[_fullscreenController release];
 	[_exifPanel release];
+	[_classesByExtension release];
 	[super dealloc];
 }
-- (void)keyDown:(NSEvent *)anEvent
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	if([[anEvent characters] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) [NSApp terminate:self];
+	if([[anEvent characters] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
+		[NSApp terminate:self];
+		return YES;
+	}
+	return NO;
 }
 
 @end
 
 @interface PGApplication : NSApplication
-
 @end
 
 @implementation PGApplication
 
-+ (void)initialize
-{
-	if([PGApplication class] == self) [[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
-}
 - (void)sendEvent:(NSEvent *)anEvent
 {
-	if([anEvent window] || [anEvent type] != NSKeyDown) [super sendEvent:anEvent];
-	else if(![[self mainMenu] performKeyEquivalent:anEvent]) [self keyDown:anEvent];
+	if([anEvent window] || [anEvent type] != NSKeyDown || (![[self mainMenu] performKeyEquivalent:anEvent] && ![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent])) [super sendEvent:anEvent];
+}
+
+@end
+
+@implementation PGWindow
+
+// Catch events that would normally be swallowed.
+- (void)keyDown:(NSEvent *)anEvent
+{
+	if(![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super keyDown:anEvent];
+}
+
+@end
+
+@implementation PGView
+
+// Help tab between windows.
+- (NSView *)nextValidKeyView
+{
+	NSView *const view = [super nextValidKeyView];
+	return view ? view : self;
+}
+- (NSView *)previousValidKeyView
+{
+	NSView *const view = [super previousValidKeyView];
+	return view ? view : self;
 }
 
 @end

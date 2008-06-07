@@ -29,6 +29,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
+NSString *const PGMaxDepthKey = @"PGMaxDepth";
+
 @interface PGContainerAdapter (Private)
 
 - (PGNode *)_nodeForSelectorOrSelfIfViewable:(SEL)sel forward:(BOOL)flag;
@@ -36,6 +38,13 @@ DEALINGS WITH THE SOFTWARE. */
 @end
 
 @implementation PGContainerAdapter
+
+#pragma mark PGResourceAdapter
+
++ (BOOL)alwaysReads
+{
+	return NO;
+}
 
 #pragma mark Instance Methods
 
@@ -94,6 +103,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGNode *)outwardSearchForward:(BOOL)flag
             fromChild:(PGNode *)start
             withSelector:(SEL)sel
+            context:(id)context
 {
 	NSArray *const children = [self sortedChildren];
 	int i = [children indexOfObjectIdenticalTo:start];
@@ -101,10 +111,10 @@ DEALINGS WITH THE SOFTWARE. */
 	int const max = [children count], increment = flag ? 1 : -1;
 	for(i += increment; i >= 0 && i < max; i += increment) {
 		PGNode *const child = [children objectAtIndex:i];
-		PGNode *const node = [child methodForSelector:sel](child, sel, flag);
+		PGNode *const node = [child methodForSelector:sel](child, sel, flag, context);
 		if(node) return node;
 	}
-	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:sel];
+	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:sel context:context];
 }
 - (void)noteChild:(PGNode *)child
         didChangeForSortOrder:(PGSortOrder)order
@@ -147,15 +157,15 @@ DEALINGS WITH THE SOFTWARE. */
 	if([self isViewable]) return YES;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
-	while((child = [childEnum nextObject])) if([child hasViewableNodes]) return YES;
+	while((child = [childEnum nextObject])) if([[child resourceAdapter] hasViewableNodes]) return YES;
 	return NO;
 }
-- (BOOL)hasImageDataNodes
+- (BOOL)hasDataNodes
 {
-	if([self canGetImageData]) return YES;
+	if([self canGetData]) return YES;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
-	while((child = [childEnum nextObject])) if([child hasImageDataNodes]) return YES;
+	while((child = [childEnum nextObject])) if([[child resourceAdapter] hasDataNodes]) return YES;
 	return NO;
 }
 - (unsigned)viewableNodeCount
@@ -164,7 +174,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned count = 0;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
-	while((child = [childEnum nextObject])) count += [child viewableNodeCount];
+	while((child = [childEnum nextObject])) count += [[child resourceAdapter] viewableNodeCount];
 	return count;
 }
 
@@ -183,7 +193,7 @@ DEALINGS WITH THE SOFTWARE. */
 		if(node) return node;
 		if([descendent ancestorThatIsChildOfNode:[self node]] == child) return nil;
 	}
-	return [super sortedViewableNodeFirst:flag stopAtNode:descendent];
+	return flag ? nil : [super sortedViewableNodeFirst:NO stopAtNode:descendent];
 }
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
 {
@@ -199,6 +209,22 @@ DEALINGS WITH THE SOFTWARE. */
 	while((child = [childEnum nextObject])) if([child isViewable]) return child;
 	return nil;
 }
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+            matchSearchTerms:(NSArray *)terms
+            stopAtNode:(PGNode *)descendent
+{
+	if(descendent == [self node]) return nil;
+	PGNode *child = flag ? [super sortedViewableNodeFirst:YES matchSearchTerms:terms stopAtNode:descendent] : nil;
+	if(child) return child;
+	NSArray *const children = [self sortedChildren];
+	NSEnumerator *const childEnum = flag ? [children objectEnumerator] : [children reverseObjectEnumerator];
+	while((child = [childEnum nextObject])) {
+		PGNode *const node = [child sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:descendent];
+		if(node) return node;
+		if([descendent ancestorThatIsChildOfNode:[self node]] == child) return nil;
+	}
+	return flag ? nil : [super sortedViewableNodeFirst:NO matchSearchTerms:terms stopAtNode:descendent];
+}
 
 #pragma mark -
 
@@ -208,7 +234,7 @@ DEALINGS WITH THE SOFTWARE. */
 	PGNode *child;
 	NSEnumerator *const childEnum = [_unsortedChildren objectEnumerator];
 	while((child = [childEnum nextObject])) {
-		PGNode *const node = [[child resourceAdapter] nodeForIdentifier:ident]; // Send it directly to the resource adapter for speed.
+		PGNode *const node = [[child resourceAdapter] nodeForIdentifier:ident];
 		if(node) return node;
 	}
 	return [super nodeForIdentifier:ident];
@@ -237,14 +263,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (BOOL)shouldRead
-{
-	return [self shouldReadRegardlessOfDepth] || [[self node] depth] != 2;
-}
 - (void)readContents
 {
 	[self setHasReadContents];
-	if([self needsPassword]) [self readFromData:nil URLResponse:nil];
+	if([self needsPassword]) [self readWithURLResponse:nil];
 	NSError *error = nil;
 	if([self needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
 	else if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];

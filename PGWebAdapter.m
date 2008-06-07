@@ -29,6 +29,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGURLConnection.h"
 #import "PGResourceIdentifier.h"
 
+// Controllers
+#import "PGDocumentController.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 
@@ -36,17 +39,26 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGURLConnectionDelegate Protocol
 
+- (void)connectionDidReceiveResponse:(PGURLConnection *)sender
+{
+	if(sender != _mainConnection) return;
+	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[[sender response] MIMEType]];
+	if(pendingClass && ([pendingClass alwaysReads] || [self shouldRead:NO])) return;
+	[_mainConnection cancel];
+	[self setIsDeterminingType:NO];
+	if([self shouldReadContents]) [self readContents];
+}
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender
 {
 	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
 - (void)connectionDidClose:(PGURLConnection *)sender
 {
-	if(![_mainConnection isLoaded] || ![_faviconConnection isLoaded]) return;
-	[[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease]];
-	[self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
-	[self setIsDeterminingType:NO];
-	if([self shouldReadContents]) [self readContents];
+	if(sender == _mainConnection) {
+		[self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
+		[self setIsDeterminingType:NO];
+		if([self shouldReadContents]) [self readContents];
+	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
 }
 
 #pragma mark PGResourceAdapting
@@ -55,19 +67,17 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [_mainConnection progress];
 }
-- (BOOL)isViewable
-{
-	return YES;
-}
 
 #pragma mark PGResourceAdapter
 
-- (void)readFromData:(NSData *)data
-        URLResponse:(NSURLResponse *)response
+- (void)readWithURLResponse:(NSURLResponse *)response
 {
-	if(data || response) return;
+	if(response || [self canGetData]) {
+		[self setIsDeterminingType:NO];
+		return;
+	}
 	NSURL *const URL = [[self identifier] URL];
-	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL] delegate:self];
+	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
 	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
 }
 - (void)readContents
@@ -78,9 +88,9 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *message = nil;
 	if([resp respondsToSelector:@selector(statusCode)]) {
 		int const code = [(NSHTTPURLResponse *)resp statusCode];
-		message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", nil), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
+		if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", nil), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
 	} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", nil), [[_mainConnection request] URL]];
-	[self returnImage:nil error:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]]];
+	[self returnImage:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 
 #pragma mark NSObject

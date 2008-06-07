@@ -46,6 +46,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>FirstResponder</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -59,6 +67,12 @@
 				<string>id</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
@@ -72,6 +86,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLConnection</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -100,6 +122,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

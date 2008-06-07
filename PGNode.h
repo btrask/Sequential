@@ -47,6 +47,7 @@ enum {
 @interface PGNode : NSObject
 {
 	@private
+	BOOL                  _loaded;
 	PGContainerAdapter   *_parentAdapter;
 	PGDocument           *_document;
 	PGResourceIdentifier *_identifier;

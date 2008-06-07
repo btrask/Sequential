@@ -24,7 +24,23 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-int main(int argc, char **argv)
+// Views
+@class PGBezelPanel;
+
+@interface PGDocumentWindow : NSWindow
 {
-	return NSApplicationMain(argc, (const char **)argv);
+	@private
+	PGBezelPanel *fDragHighlightPanel;
 }
+
+@end
+
+@interface NSObject (PGDocumentWindowDelegate)
+
+- (NSDragOperation)window:(PGDocumentWindow *)window dragOperationForInfo:(id<NSDraggingInfo>)info;
+- (BOOL)window:(PGDocumentWindow *)window performDragOperation:(id<NSDraggingInfo>)info;
+
+- (void)selectNextOutOfWindowKeyView:(NSWindow *)window;
+- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window;
+
+@end

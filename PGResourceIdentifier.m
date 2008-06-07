@@ -43,10 +43,13 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	@private
 	AliasHandle     _alias;
 	PGSubscription *_subscription;
+	BOOL            _allowSubscription;
+	NSURL          *_cachedURL;
 }
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
+- (void)createSubscription;
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif;
 
 @end
@@ -92,13 +95,17 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	return [[[PGIndexIdentifier alloc] initWithSuperidentifier:self index:index] autorelease];
 }
-
-#pragma mark -
-
 - (PGResourceIdentifier *)superidentifier
 {
 	return nil;
 }
+- (PGResourceIdentifier *)rootIdentifier
+{
+	return [self superidentifier] ? [[self superidentifier] rootIdentifier] : self;
+}
+
+#pragma mark -
+
 - (NSURL *)superURLByFollowingAliases:(BOOL)flag
 {
 	NSURL *const URL = [self URLByFollowingAliases:flag];
@@ -135,11 +142,12 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	return _icon ? [[_icon retain] autorelease] : [[self URL] AE_icon];
 }
 - (void)setIcon:(NSImage *)icon
+        notify:(BOOL)flag
 {
 	if(icon == _icon) return;
 	[_icon release];
 	_icon = [icon retain];
-	[self AE_postNotificationName:PGResourceIdentifierIconDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierIconDidChangeNotification];
 }
 - (NSString *)displayName
 {
@@ -148,14 +156,16 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(!URL) return @"";
 	NSString *displayName = nil;
 	if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&displayName) == noErr && displayName) return [displayName autorelease];
-	return [[URL path] lastPathComponent];
+	NSString *const path = [URL path];
+	return [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
 }
 - (void)setDisplayName:(NSString *)aString
+        notify:(BOOL)flag
 {
 	if(aString == _displayName) return;
 	[_displayName release];
 	_displayName = [aString isEqual:@""] ? nil : [aString copy];
-	[self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
 }
 
 #pragma mark -
@@ -188,8 +198,8 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 		return [[class alloc] initWithCoder:aCoder];
 	}
 	if((self = [super init])) {
-		[self setIcon:[aCoder decodeObjectForKey:@"Icon"]];
-		[self setDisplayName:[aCoder decodeObjectForKey:@"DisplayName"]];
+		[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
+		[self setDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	}
 	return self;
 }
@@ -243,9 +253,11 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 		FSRef ref;
 		if(!CFURLGetFSRef((CFURLRef)URL, &ref) || FSNewAliasMinimal(&ref, &_alias) != noErr) {
 			[self release];
-			return nil;
+			return [[PGURLIdentifier alloc] initWithURL:URL];
 		}
-		(void)[self subscription];
+		_cachedURL = [URL retain];
+		_allowSubscription = YES;
+		[self createSubscription];
 	}
 	return self;
 }
@@ -259,13 +271,23 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if((self = [super init])) {
 		_alias = (AliasHandle)NewHandle(length);
 		memcpy(*_alias, data, length);
-		(void)[self subscription];
+		_allowSubscription = YES;
+		[self createSubscription];
 	}
 	return self;
+}
+- (void)createSubscription
+{
+	NSParameterAssert(!_subscription);
+	if(!_allowSubscription) return;
+	_subscription = [[PGSubscription alloc] initWithPath:[[self URL] path]];
+	[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 }
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
+	[_cachedURL release];
+	_cachedURL = nil;
 	if([[[aNotif userInfo] objectForKey:PGSubscriptionFlagsKey] unsignedIntValue] & NOTE_RENAME) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
 }
 
@@ -280,7 +302,8 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 			_alias = (AliasHandle)NewHandle(length);
 			memcpy(*_alias, data, length);
 		}
-		(void)[self subscription];
+		_allowSubscription = YES;
+		[self createSubscription];
 	}
 	return self;
 }
@@ -300,6 +323,11 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(flag && FSResolveAliasFileWithMountFlags(&ref, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) != noErr) return nil;
 	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
 }
+- (NSURL *)URL
+{
+	if(!_cachedURL) _cachedURL = [[super URL] retain];
+	return [[_cachedURL retain] autorelease];
+}
 - (BOOL)hasTarget
 {
 	return [self URLByFollowingAliases:YES] != nil;
@@ -310,10 +338,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 }
 - (PGSubscription *)subscription
 {
-	if(!_subscription) {
-		_subscription = [[PGSubscription alloc] initWithPath:[[self URL] path]];
-		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-	}
 	return [[_subscription retain] autorelease];
 }
 
@@ -324,6 +348,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	[self AE_removeObserver];
 	if(_alias) DisposeHandle((Handle)_alias);
 	[_subscription release];
+	[_cachedURL release];
 	[super dealloc];
 }
 
@@ -335,9 +360,8 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 
 - (id)initWithURL:(NSURL *)URL
 {
-	NSParameterAssert(![URL isFileURL]);
 	if((self = [super init])) {
-		_URL = [URL copy];
+		_URL = [URL retain];
 	}
 	return self;
 }

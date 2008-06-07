@@ -35,7 +35,6 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGFullscreenController;
 @class PGExifPanel;
 
-extern NSString *const PGDocumentControllerBackgroundPatternColorDidChangeNotification;
 extern NSString *const PGDocumentControllerDisplayScreenDidChangeNotification;
 
 extern NSString *const PGCFBundleTypeExtensionsKey;
@@ -44,16 +43,17 @@ extern NSString *const PGCFBundleTypeMIMETypesKey;
 extern NSString *const PGLSTypeIsPackageKey;
 extern NSString *const PGBundleTypeFourCCKey;
 
+extern NSString *const PGAntialiasWhenUpscalingKey;
+extern NSString *const PGAnimatesImagesKey;
+extern NSString *const PGBackgroundColorKey;
+extern NSString *const PGBackgroundPatternKey;
+
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
 
 @interface PGDocumentController : NSResponder
 {
 	@private
-	IBOutlet NSView                  *colorPanelAccessory;
-	IBOutlet NSButton                *checkerboardBackground;
-	IBOutlet NSMenu                  *screenMenu;
-
 	IBOutlet NSMenuItem              *precedingSwitchItem;
 	IBOutlet NSMenuItem              *switchToPathFinder;
 	IBOutlet NSMenuItem              *switchToFinder;
@@ -95,10 +95,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 	         BOOL                    _prefsLoaded;
 	         NSArray                *_recentDocumentIdentifiers;
-	         NSColor                *_backgroundColor;
-	         PGPatternType           _backgroundPattern;
 	         BOOL                    _fullscreen;
-	         NSScreen               *_displayScreen;
 	         BOOL                    _exifShown;
 	         BOOL                    _usesDirectionalMouseButtonMapping;
 
@@ -107,15 +104,14 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	         PGFullscreenController *_fullscreenController;
 	         BOOL                    _inFullscreen;
 	         PGExifPanel            *_exifPanel;
+
+	         NSMutableDictionary    *_classesByExtension;
 }
 
 + (PGDocumentController *)sharedDocumentController;
 
-- (IBAction)orderFrontColorPanel:(id)sender;
-- (IBAction)changeBackgroundColor:(id)sender;
-- (IBAction)changeBackgroundPattern:(id)sender;
-- (IBAction)useScreen:(id)sender;
 - (IBAction)provideFeedback:(id)sender;
+- (IBAction)showPreferences:(id)sender;
 
 - (IBAction)closeAll:(id)sender;
 
@@ -144,17 +140,9 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray;
 - (unsigned)maximumRecentDocumentCount;
 
-- (NSColor *)backgroundPatternColor;
-- (NSColor *)backgroundColor;
-- (void)setBackgroundColor:(NSColor *)aColor;
-- (PGPatternType)backgroundPattern;
-- (void)setBackgroundPattern:(PGPatternType)aPattern;
-
 - (PGDisplayController *)displayControllerForNewDocument; // Returns either the shared fullscreen controller or a new regular window controller.
 - (BOOL)fullscreen;
 - (void)setFullscreen:(BOOL)flag;
-- (NSScreen *)displayScreen;
-- (void)setDisplayScreen:(NSScreen *)anObject;
 
 - (BOOL)exifShown;
 - (void)setExifShown:(BOOL)flag;

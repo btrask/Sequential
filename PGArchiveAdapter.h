@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSMutableIndexSet *_remainingIndexes;
 	NSStringEncoding   _guessedEncoding;
 	BOOL               _isSubarchive;
-	BOOL               _hasCreatedChildren;
+	BOOL               _hasRead;
 }
 
 - (XADArchive *)archive;

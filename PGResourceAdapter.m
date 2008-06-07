@@ -37,8 +37,16 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Categories
 #import "NSMenuItemAdditions.h"
+#import "NSStringAdditions.h"
 
 @implementation PGResourceAdapter
+
+#pragma mark Class Methods
+
++ (BOOL)alwaysReads
+{
+	return YES;
+}
 
 #pragma mark Instance Methods
 
@@ -105,15 +113,25 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (void)setData:(NSData *)data
+{
+	if(data == _data) return;
+	[_data release];
+	_data = [data retain];
+	[self noteDataLengthDidChange];
+}
 - (void)loadFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {
-	PGResourceAdapter *const adapter = [[self node] setResourceAdapterClass:[self classForData:data URLResponse:response]];
-	if([adapter shouldRead]) [adapter readFromData:data URLResponse:response];
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+	[self setData:data];
+	PGResourceAdapter *const adapter = [[self node] setResourceAdapterClass:[self classWithURLResponse:response]];
+	[adapter setData:data];
+	if([adapter shouldRead:YES]) [adapter readWithURLResponse:response];
 	[self replacedWithAdapter:adapter];
+	[pool release];
 }
-- (Class)classForData:(NSData *)data
-         URLResponse:(NSURLResponse *)response
+- (Class)classWithURLResponse:(NSURLResponse *)response
 {
 	if([response respondsToSelector:@selector(statusCode)]) {
 		int const status = [(NSHTTPURLResponse *)response statusCode];
@@ -121,7 +139,8 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
-	if(!data && URL) {
+	NSData *data;
+	if([self getData:&data] == PGDataUnavailable && URL) {
 		if(![URL isFileURL]) return [PGWebAdapter class];
 		BOOL isDir;
 		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
@@ -141,15 +160,24 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
 }
-- (BOOL)shouldReadRegardlessOfDepth
+- (PGReadingPolicy)descendentReadingPolicy
 {
-	return [[self parentAdapter] shouldReadRegardlessOfDepth];
+	return MAX(PGReadToMaxDepth, [self readingPolicy]);
 }
-- (BOOL)shouldRead
+- (PGReadingPolicy)readingPolicy
 {
-	return YES;
+	return [self parentAdapter] ? [[self parentAdapter] descendentReadingPolicy] : PGReadToMaxDepth;
 }
-- (void)readFromData:(NSData *)data URLResponse:(NSURLResponse *)response {}
+- (BOOL)shouldRead:(BOOL)asAlways
+{
+	if(asAlways && [[self class] alwaysReads]) return YES;
+	switch([self readingPolicy]) {
+		case PGReadToMaxDepth: return [[self node] depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntValue];
+		case PGReadAll: return YES;
+		default: return NO;
+	}
+}
+- (void)readWithURLResponse:(NSURLResponse *)response {}
 
 #pragma mark -
 
@@ -215,6 +243,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self parentAdapter] node];
 }
+- (PGNode *)rootNode
+{
+	return [[self node] rootNode];
+}
 
 #pragma mark -
 
@@ -237,13 +269,19 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return 0;
 }
-- (BOOL)canGetImageData
+- (BOOL)canGetData
 {
-	return NO;
+	return _data != nil || [self dataSource];
 }
-- (PGDataAvailability)getImageData:(out NSData **)outData
+- (PGDataAvailability)getData:(out NSData **)outData
 {
-	return PGDataUnavailable;
+	NSData *data = [[_data retain] autorelease];
+	if(!data) {
+		data = [[self dataSource] dataForResourceAdapter:self];
+		if(!data && [self needsPassword]) return PGWrongPassword;
+	}
+	if(outData) *outData = data;
+	return data ? PGDataAvailable : PGDataUnavailable;
 }
 - (NSArray *)exifEntries
 {
@@ -287,9 +325,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [self isViewable];
 }
-- (BOOL)hasImageDataNodes
+- (BOOL)hasDataNodes
 {
-	return [self canGetImageData];
+	return [self canGetData];
 }
 - (unsigned)viewableNodeIndex
 {
@@ -314,17 +352,35 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
 {
-	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:)];
-}
-- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
-{
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:)];
-	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node]];
+	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:) context:nil];
 }
 
+- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
+{
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
+	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node]];
+}
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
 {
 	return nil;
+}
+
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
+	    matchSearchTerms:(NSArray *)terms
+{
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:) context:terms];
+	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+            matchSearchTerms:(NSArray *)terms
+{
+	return [self sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:nil];
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+            matchSearchTerms:(NSArray *)terms
+            stopAtNode:(PGNode *)descendent
+{
+	return [self isViewable] && [self node] != descendent && [[[self identifier] displayName] AE_matchesSearchTerms:terms] ? [self node] : nil;
 }
 
 #pragma mark -
@@ -366,7 +422,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSNumber *dataLength = [[self dataSource] dataLengthForResourceAdapter:self];
 	if(dataLength) return dataLength;
 	NSData *data;
-	if([self canGetImageData] && [self getImageData:&data] == PGDataAvailable) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
+	if([self canGetData] && [self getData:&data] == PGDataAvailable) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
 	if(dataLength) return dataLength;
 	PGResourceIdentifier *const identifier = [self identifier];
 	if([identifier isFileIdentifier]) {
@@ -419,6 +475,11 @@ DEALINGS WITH THE SOFTWARE. */
 		if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:YES];
 	}
 	return self;
+}
+- (void)dealloc
+{
+	[_data release];
+	[super dealloc];
 }
 
 @end

@@ -30,6 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Controllers
 #import "PGDocumentController.h"
+#import "PGPrefController.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -88,7 +89,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)displayScreenDidChange:(NSNotification *)aNotif
 {
-	NSScreen *const screen = [[PGDocumentController sharedDocumentController] displayScreen];
+	NSScreen *const screen = [[PGPrefController sharedPrefController] displayScreen];
 	[(PGFullscreenWindow *)[self window] moveToScreen:screen];
 	if(![[self window] isKeyWindow]) return;
 	if([NSScreen AE_mainScreen] == screen) [self _hideMenuBar];
@@ -104,7 +105,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	SEL const action = [anItem action];
 	if(@selector(activateTab:) == action) [anItem setState:([anItem representedObject] == [self activeDocument])];
@@ -137,18 +138,18 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
 {
-	if([[PGDocumentController sharedDocumentController] displayScreen] == [NSScreen AE_mainScreen]) [self AE_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self AE_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
-	if([[NSApp keyWindow] delegate] == self || [[PGDocumentController sharedDocumentController] displayScreen] != [NSScreen AE_mainScreen]) return;
+	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_hideMenuBar) object:nil];
 	SetSystemUIMode(kUIModeNormal, kNilOptions);
 }
 
-#pragma mark PGWindowDelegate Protocol
+#pragma mark PGDocumentWindowDelegate Protocol
 
-- (NSDragOperation)window:(PGWindow *)window
+- (NSDragOperation)window:(PGDocumentWindow *)window
                    dragOperationForInfo:(id<NSDraggingInfo>)info
 {
 	if(!([info draggingSourceOperationMask] & NSDragOperationGeneric)) return NSDragOperationNone;
@@ -162,7 +163,7 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	return NSDragOperationNone;
 }
-- (BOOL)window:(PGWindow *)window
+- (BOOL)window:(PGDocumentWindow *)window
         performDragOperation:(id<NSDraggingInfo>)info
 {
 	NSPasteboard *const pboard = [info draggingPasteboard];
@@ -194,7 +195,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)windowDidLoad
 {
-	NSWindow *const window = [[[PGFullscreenWindow alloc] initWithScreen:[[PGDocumentController sharedDocumentController] displayScreen]] autorelease];
+	NSWindow *const window = [[[PGFullscreenWindow alloc] initWithScreen:[[PGPrefController sharedPrefController] displayScreen]] autorelease];
 	NSView *const content = [[[[self window] contentView] retain] autorelease];
 	[[self window] setContentView:nil];
 	[window setContentView:content];

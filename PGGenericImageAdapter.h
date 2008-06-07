@@ -28,7 +28,6 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGGenericImageAdapter : PGResourceAdapter
 {
 	@private
-	NSData       *_imageData;
 	NSArray      *_exifEntries;
 	PGOrientation _orientation;
 	NSImage      *_cachedImage;

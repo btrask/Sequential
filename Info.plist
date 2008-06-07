@@ -14,6 +14,13 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-ZIP</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/zip</string>
+				<string>application/x-zip</string>
+				<string>application/x-zip-compressed</string>
+				<string>multipart/x-zip</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>ZIP Archive</string>
 			<key>CFBundleTypeRole</key>
@@ -52,6 +59,13 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-RAR</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/rar</string>
+				<string>application/x-rar</string>
+				<string>application/x-rar-compressed</string>
+				<string>compressed/rar</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>RAR Archive</string>
 			<key>CFBundleTypeRole</key>
@@ -113,6 +127,11 @@
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>application/pdf</string>
+				<string>application/x-pdf</string>
+				<string>application/acrobat</string>
+				<string>applications/vnd.pdf</string>
+				<string>text/pdf</string>
+				<string>text/x-pdf</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>PDF File</string>
@@ -290,6 +309,15 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-BMP</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>image/bmp</string>
+				<string>image/x-bmp</string>
+				<string>image/x-windows-bmp</string>
+				<string>image/ms-bmp</string>
+				<string>image/x-ms-bmp</string>
+				<string>application/bmp</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Windows Bitmap Image</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -369,6 +397,7 @@
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/jpeg</string>
+				<string>image/jpg</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>JPEG Image</string>
@@ -396,6 +425,11 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-PICT</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>image/pict</string>
+				<string>image/x-pict</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>PICT Image</string>
 			<key>CFBundleTypeOSTypes</key>
@@ -422,6 +456,8 @@
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>image/png</string>
+				<string>application/png</string>
+				<string>application/x-png</string>
 			</array>
 			<key>CFBundleTypeName</key>
 			<string>Portable Network Graphics Image</string>
@@ -515,6 +551,14 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-PSD</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>image/photoshop</string>
+				<string>image/x-photoshop</string>
+				<string>image/psd</string>
+				<string>application/photoshop</string>
+				<string>application/psd</string>
+			</array>
 			<key>CFBundleTypeName</key>
 			<string>Adobe Photoshop Image</string>
 			<key>CFBundleTypeOSTypes</key>

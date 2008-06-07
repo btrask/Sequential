@@ -38,6 +38,7 @@ DEALINGS WITH THE SOFTWARE. */
 	PGOrientation     _orientation;
 	unsigned          _numberOfFrames;
 	BOOL              _animating;
+	BOOL              _antialias;
 }
 
 - (NSImage *)image;
@@ -49,9 +50,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)isAnimating; // Can return YES even if the current image isn't animated.
 - (void)setAnimating:(BOOL)flag;
 
+- (BOOL)antialiasWhenUpscaling;
+- (void)setAntialiasWhenUpscaling:(BOOL)flag;
+
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;
-- (void)appDidResignActive:(NSNotification *)aNotif;
-- (void)appDidBecomeActive:(NSNotification *)aNotif;
 
 @end

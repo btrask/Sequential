@@ -90,6 +90,8 @@
 				<string>id</string>
 				<key>nextTab</key>
 				<string>id</string>
+				<key>openURL</key>
+				<string>id</string>
 				<key>pauseAndCloseDocument</key>
 				<string>id</string>
 				<key>pauseDocument</key>
@@ -176,10 +178,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>changeBackgroundColor</key>
-				<string>id</string>
-				<key>changeBackgroundPattern</key>
-				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
 				<key>changeImageScalingConstraint</key>
@@ -204,19 +202,17 @@
 				<string>id</string>
 				<key>openURL</key>
 				<string>id</string>
-				<key>orderFrontColorPanel</key>
-				<string>id</string>
 				<key>provideFeedback</key>
 				<string>id</string>
 				<key>showKeyboardShortcuts</key>
+				<string>id</string>
+				<key>showPreferences</key>
 				<string>id</string>
 				<key>switchToFinder</key>
 				<string>id</string>
 				<key>switchToPathFinder</key>
 				<string>id</string>
 				<key>toggleExif</key>
-				<string>id</string>
-				<key>useScreen</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>

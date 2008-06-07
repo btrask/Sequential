@@ -23,9 +23,9 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGWindow.h"
+#import "PGDocumentWindow.h"
 
-@interface PGFullscreenWindow : PGWindow
+@interface PGFullscreenWindow : PGDocumentWindow
 
 - (id)initWithScreen:(NSScreen *)anObject;
 - (void)moveToScreen:(NSScreen *)anObject;

@@ -29,6 +29,11 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceIdentifier.h"
 #import "PGSubscription.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
+NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
+
 @implementation PGBookmark
 
 #pragma mark Instance Methods
@@ -43,7 +48,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if((self = [super init])) {
 		_documentIdentifier = [docIdent retain];
+		[[_documentIdentifier subscription] AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_fileIdentifier = [fileIdent retain];
+		[[_fileIdentifier subscription] AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_backupDisplayName = [(aString ? aString : [fileIdent displayName]) copy];
 	}
 	return self;
@@ -65,23 +72,32 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSString *)displayName
 {
 	NSString *const name = [_fileIdentifier displayName];
-	return name ? name : [[_backupDisplayName retain] autorelease];
+	return name && ![@"" isEqualToString:name] ? name : [[_backupDisplayName retain] autorelease];
 }
 - (BOOL)isValid
 {
-	return [_documentIdentifier hasTarget] && [_fileIdentifier hasTarget];
+	if(![_documentIdentifier hasTarget] || ![_fileIdentifier hasTarget]) return NO;
+	if(![_documentIdentifier isFileIdentifier] || ![_fileIdentifier isFileIdentifier]) return YES;
+	return [[[[_fileIdentifier rootIdentifier] URL] path] hasPrefix:[[_documentIdentifier URL] path]];
+}
+
+#pragma mark -
+
+- (void)eventDidOccur:(NSNotification *)aNotif
+{
+	NSString *const displayName = [_fileIdentifier displayName];
+	if(displayName && ![@"" isEqualToString:displayName]) {
+		[_backupDisplayName release];
+		_backupDisplayName = [displayName copy];
+	}
+	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
 }
 
 #pragma mark NSCoding Protocol
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	if((self = [super init])) {
-		_documentIdentifier = [[aCoder decodeObjectForKey:@"DocumentIdentifier"] retain];
-		_fileIdentifier = [[aCoder decodeObjectForKey:@"FileIdentifier"] retain];
-		_backupDisplayName = [[aCoder decodeObjectForKey:@"BackupDisplayName"] retain];
-	}
-	return self;
+	return [self initWithDocumentIdentifier:[aCoder decodeObjectForKey:@"DocumentIdentifier"] fileIdentifier:[aCoder decodeObjectForKey:@"FileIdentifier"] displayName:[aCoder decodeObjectForKey:@"BackupDisplayName"]];
 }
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
@@ -94,6 +110,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)dealloc
 {
+	[self AE_removeObserver];
 	[_documentIdentifier release];
 	[_fileIdentifier release];
 	[_backupDisplayName release];

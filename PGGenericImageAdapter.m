@@ -77,30 +77,25 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)canGetImageData
+- (BOOL)canGetData
 {
 	return YES;
 }
-- (PGDataAvailability)getImageData:(out NSData **)outData
+- (PGDataAvailability)getData:(out NSData **)outData
 {
-	NSData *data = [[_imageData retain] autorelease];
-	if(!data) {
-		data = [[self dataSource] dataForResourceAdapter:self];
-		if(!data && [self needsPassword]) return PGWrongPassword;
-	}
-	if(!data) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	}
-	if(!data) return PGDataUnavailable;
+	PGDataAvailability const availability = [super getData:outData];
+	if(PGDataUnavailable != availability) return availability;
+	NSData *data = nil;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
 	if(outData) *outData = data;
-	return PGDataAvailable;
+	return data ? PGDataAvailable : PGDataUnavailable;
 }
 - (NSArray *)exifEntries
 {
-	if(!_exifEntries && [self canGetImageData]) {
+	if(!_exifEntries && [self canGetData]) {
 		NSData *data;
-		if(PGDataAvailable == [self getImageData:&data]) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
+		if(PGDataAvailable == [self getData:&data]) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 		[_exifEntries retain];
 	}
 	return [[_exifEntries retain] autorelease];
@@ -120,13 +115,9 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 
 #pragma mark PGResourceAdapter
 
-- (void)readFromData:(NSData *)data
-        URLResponse:(NSURLResponse *)response
+- (void)readWithURLResponse:(NSURLResponse *)response
 {
-	if(data) {
-		_imageData = [data copy];
-		[self noteDataLengthDidChange];
-	} else NSParameterAssert([self dataSource] || [[self identifier] isFileIdentifier]);
+	NSParameterAssert([self canGetData] || [self dataSource] || [[self identifier] isFileIdentifier]);
 	if([self shouldReadContents]) [self readContents];
 }
 - (void)readContents
@@ -137,9 +128,9 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 		[self returnImage:_cachedImage error:nil];
 		return;
 	}
-	NSParameterAssert([self canGetImageData]);
+	NSParameterAssert([self canGetData]);
 	NSData *data = nil;
-	PGDataAvailability const availability = [self getImageData:&data];
+	PGDataAvailability const availability = [self getData:&data];
 	[self setHasReadContents];
 	if(PGWrongPassword == availability) return [self returnImage:nil error:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
 	if(PGDataUnavailable == availability) {
@@ -161,7 +152,6 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 }
 - (void)dealloc
 {
-	[_imageData release];
 	[_exifEntries release];
 	[_cachedImage release];
 	[super dealloc];

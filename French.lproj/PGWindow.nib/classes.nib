@@ -18,7 +18,7 @@
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>PGWindow</string>
+			<string>PGDocumentWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -30,19 +30,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSTextField</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -55,10 +55,112 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>changeOrientation</key>
+				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
+				<key>chooseEncoding</key>
+				<string>id</string>
+				<key>copy</key>
+				<string>id</string>
+				<key>decrypt</key>
+				<string>id</string>
+				<key>extractImages</key>
+				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
+				<string>id</string>
+				<key>firstPage</key>
+				<string>id</string>
+				<key>hideFindPanel</key>
+				<string>id</string>
+				<key>jumpToPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
+				<string>id</string>
+				<key>lastPage</key>
+				<string>id</string>
+				<key>moveToTrash</key>
+				<string>id</string>
+				<key>nextPage</key>
+				<string>id</string>
+				<key>pauseAndCloseDocument</key>
+				<string>id</string>
+				<key>pauseDocument</key>
+				<string>id</string>
+				<key>performFindPanelAction</key>
+				<string>id</string>
+				<key>previousPage</key>
+				<string>id</string>
+				<key>revealInBrowser</key>
+				<string>id</string>
+				<key>revealInFinder</key>
+				<string>id</string>
+				<key>revealInPathFinder</key>
+				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
+				<string>id</string>
+				<key>toggleFullscreen</key>
+				<string>id</string>
+				<key>toggleOnScreenDisplay</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGDisplayController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>clipView</key>
+				<string>PGClipView</string>
+				<key>encodingLabel</key>
+				<string>NSTextField</string>
+				<key>encodingView</key>
+				<string>NSView</string>
+				<key>errorLabel</key>
+				<string>NSTextField</string>
+				<key>errorMessage</key>
+				<string>NSTextField</string>
+				<key>errorView</key>
+				<string>NSView</string>
+				<key>findView</key>
+				<string>PGFindView</string>
+				<key>imageView</key>
+				<string>PGImageView</string>
+				<key>passwordField</key>
+				<string>NSTextField</string>
+				<key>passwordLabel</key>
+				<string>NSTextField</string>
+				<key>passwordView</key>
+				<string>NSView</string>
+				<key>searchField</key>
+				<string>NSSearchField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>clipViewWasClicked</key>
 				<string>id</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
@@ -72,6 +174,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLConnection</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -100,6 +210,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -169,7 +287,7 @@
 				<string>NSSearchField</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
+			<string>PGDisplayController</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

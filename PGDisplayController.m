@@ -23,6 +23,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGDisplayController.h"
+#import <unistd.h>
 
 // Models
 #import "PGDocument.h"
@@ -32,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGExifEntry.h"
 
 // Views
-#import "PGWindow.h"
+#import "PGDocumentWindow.h"
 #import "PGImageView.h"
 #import "PGBezelPanel.h"
 #import "PGAlertView.h"
@@ -41,6 +42,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Controllers
 #import "PGDocumentController.h"
+#import "PGPrefController.h"
 #import "PGBookmarkController.h"
 #import "PGExtractAlert.h"
 #import "PGEncodingAlert.h"
@@ -89,6 +91,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[NSApp registerServicesMenuSendTypes:[self pasteboardTypes] returnTypes:[NSArray array]];
 }
+- (NSUserDefaultsController *)userDefaults
+{
+	return [NSUserDefaultsController sharedUserDefaultsController];
+}
 
 #pragma mark Instance Methods
 
@@ -127,7 +133,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (IBAction)performFindPanelAction:(id)sender
 {
-/*	switch([sender tag]) {
+	switch([sender tag]) {
 		case NSFindPanelActionShowFindPanel:
 			[self setFindPanelShown:!([self findPanelShown] && [_findPanel isKeyWindow])];
 			break;
@@ -135,13 +141,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case NSFindPanelActionPrevious:
 		{
 			NSArray *const terms = [[searchField stringValue] AE_searchTerms];
-			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedNext:([sender tag] == NSFindPanelActionNext) imageNodeWithSearchTerms:terms] initialLocation:PGHomeLocation]) NSBeep();
+			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:([sender tag] == NSFindPanelActionNext) matchSearchTerms:terms] initialLocation:PGHomeLocation]) NSBeep();
 			break;
 		}
 		default:
 			NSBeep();
 	}
-	if([_findPanel isKeyWindow]) [_findPanel makeFirstResponder:searchField];*/
+	if([_findPanel isKeyWindow]) [_findPanel makeFirstResponder:searchField];
 }
 - (IBAction)hideFindPanel:(id)sender
 {
@@ -185,7 +191,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (IBAction)previousPage:(id)sender
 {
-	(void)[self tryToGoForward:NO allowAlerts:YES];
+	[self tryToGoForward:NO allowAlerts:YES];
 }
 - (IBAction)nextPage:(id)sender
 {
@@ -205,19 +211,19 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (IBAction)skipBeforeFolder:(id)sender
 {
-	[self tryToGoForward:NO toNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO] initialLocation:PGEndLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO] initialLocation:PGEndLocation]) [self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
-	[self tryToGoForward:YES toNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
-	[self tryToGoForward:NO toNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) [self tryToLoopForward:NO toNode:[[[[[self activeDocument] node] sortedViewableNodeFirst:NO] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
-	[self tryToGoForward:YES toNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfFolder:(id)sender
 {
@@ -274,7 +280,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
         closeIfAppropriate:(BOOL)flag
 {
 	if(document == _activeDocument) return NO;
-	[_activeDocument storeNode:[self activeNode] center:[clipView center]];
+	[_activeDocument storeNode:[self activeNode] center:[clipView center] query:[searchField stringValue]];
 	[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
@@ -282,7 +288,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
 	if(flag && !document && _activeDocument) {
 		[self setActiveNode:nil initialLocation:PGHomeLocation]; // PGClipView modifies the image, so make sure it's back to normal.
 		_activeDocument = nil;
@@ -298,8 +303,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsOnScreenDisplayDidChange:) name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
-	[self documentAnimatesImagesDidChange:nil];
 	NSDisableScreenUpdates();
 	[self documentSortedNodesDidChange:nil];
 	[self _updateInfoPanelLocationAnimate:NO];
@@ -307,13 +310,25 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	else [_infoPanel close];
 	PGNode *node;
 	NSPoint center;
-	if([_activeDocument getStoredNode:&node center:&center]) {
+	NSString *query;
+	if([_activeDocument getStoredNode:&node center:&center query:&query]) {
 		[self setActiveNode:node initialLocation:PGHomeLocation];
 		[clipView scrollToCenterAt:center allowAnimation:NO];
+		[searchField setStringValue:query];
 	} else [self setActiveNode:[_activeDocument initialNode] initialLocation:PGHomeLocation];
 	NSEnableScreenUpdates();
 	[self setTimerInterval:0];
 	return NO;
+}
+- (void)ranOutOfFileDescriptorsWithDisplayName:(NSString *)displayName
+{
+	NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
+	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The document %@ could not be opened because Sequential reached the system's per-application limit on number of open files.", nil), displayName]];
+	long const limit = sysconf(_SC_OPEN_MAX);
+	[alert setInformativeText:[NSString stringWithFormat:NSLocalizedString(@"Try opening folders with fewer files. %@", nil), (-1 == limit ? NSLocalizedString(@"The current limit could not be determined.", nil) : [NSString stringWithFormat:NSLocalizedString(@"The current limit is %d, but may be slightly less in practice.", nil), limit])]];
+	[alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
+	[alert runModal];
+	[self release];
 }
 
 #pragma mark -
@@ -348,35 +363,37 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	return YES;
 }
 - (BOOL)tryToGoForward:(BOOL)forward
-        allowAlerts:(BOOL)showAlerts
+        allowAlerts:(BOOL)flag
 {
-	return [self tryToGoForward:forward toNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:(forward ? PGHomeLocation : PGEndLocation) allowAlerts:showAlerts];
+	PGClipViewLocation const l = forward ? PGHomeLocation : PGEndLocation;
+	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
+	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l allowAlerts:flag];
 }
-- (BOOL)tryToGoForward:(BOOL)forward
+- (BOOL)tryToLoopForward:(BOOL)forward
         toNode:(PGNode *)node
-        initialLocation:(PGClipViewLocation)location
-        allowAlerts:(BOOL)showAlerts
+	initialLocation:(PGClipViewLocation)loc
+        allowAlerts:(BOOL)flag
 {
-	if([self tryToSetActiveNode:node initialLocation:location]) return YES;
+	PGDocument *const doc = [self activeDocument];
+	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !forward;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
 	if(PGSortRepeatMask & o) {
 		if((PGSortOrderMask & o) == PGSortShuffle) {
-			[[[self activeDocument] node] sortOrderDidChange]; // Reshuffle.
-			[[self activeDocument] noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
+			[[doc node] sortOrderDidChange]; // Reshuffle.
+			[doc noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 		}
-		if([self tryToSetActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:location]) {
-			if(showAlerts) {
-				[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic])];
-				[_graphicPanel displayOverWindow:[self window]];
-			}
+		if([self tryToSetActiveNode:node initialLocation:loc]) {
+			if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
 			return YES;
 		}
 	}
-	if(showAlerts) {
-		[(PGAlertView *)[_graphicPanel contentView] pushGraphic:(([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight) == !forward ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic])];
-		[_graphicPanel displayOverWindow:[self window]];
-	}
+	if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
 	return NO;
+}
+- (void)showNode:(PGNode *)node
+{
+	[self setActiveDocument:[node document] closeIfAppropriate:NO];
+	[self setActiveNode:node initialLocation:PGHomeLocation];
 }
 
 #pragma mark -
@@ -390,8 +407,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
 	[_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
-	[(PGAlertView *)[_graphicPanel contentView] pushGraphic:_loadingGraphic];
-	[_graphicPanel displayOverWindow:[self window]];
+	[(PGAlertView *)[_graphicPanel contentView] pushGraphic:_loadingGraphic window:[self window]];
 }
 
 #pragma mark -
@@ -404,6 +420,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	if(flag) {
 		NSDisableScreenUpdates();
+		[[self window] orderFront:self];
 		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
 		[_findPanel makeKeyWindow];
 		[self _updateInfoPanelLocationAnimate:NO];
@@ -542,16 +559,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[imageView setImage:[imageView image] orientation:[[self activeNode] orientation]];
 	[self _updateImageViewSize];
 }
-- (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif
-{
-	[imageView setAnimating:[[self activeDocument] animatesImages]];
-}
 
 #pragma mark -
 
-- (void)documentControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif
+- (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 {
-	[clipView setBackgroundColor:[[PGDocumentController sharedDocumentController] backgroundPatternColor]];
+	[clipView setBackgroundColor:[[PGPrefController sharedPrefController] backgroundPatternColor]];
 }
 
 #pragma mark Private Protocol
@@ -619,7 +632,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	SEL const action = [anItem action];
 	if(@selector(jumpToPage:) == action) {
@@ -645,7 +658,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(@selector(pauseAndCloseDocument:) == action) return NO;
 	}
 	// Actions that require nodes with data.
-	if(![[[self activeDocument] node] hasImageDataNodes]) {
+	if(![[[self activeDocument] node] hasDataNodes]) {
 		if(@selector(extractImages:) == action) return NO;
 	}
 	// Actions that require the current node to be local.
@@ -678,6 +691,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(@selector(previousPage:) == action) return NO;
 		if(@selector(nextPage:) == action) return NO;
 		if(@selector(lastPage:) == action) return NO;
+		if(@selector(skipBeforeFolder:) == action) return NO;
+		if(@selector(skipPastFolder:) == action) return NO;
+		if(@selector(firstOfNextFolder:) == action) return NO;
+		if(@selector(firstOfPreviousFolder:) == action) return NO;
+		if(@selector(firstOfFolder:) == action) return NO;
+		if(@selector(lastOfFolder:) == action) return NO;
 	}
 	// Actions that require us to not be on the first image.
 	if([self activeNode] == firstNode) {
@@ -703,7 +722,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	return [super validateMenuItem:anItem];
 }
 
-#pragma mark PGWindowDelegate Protocol
+#pragma mark PGDocumentWindowDelegate Protocol
 
 - (void)selectNextOutOfWindowKeyView:(NSWindow *)window
 {
@@ -838,12 +857,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[pboard setData:[[imageView image] TIFFRepresentation] forType:NSTIFFPboardType];
 	} while(NO);
 	do {
-		if(![[self activeNode] canGetImageData]) break;
+		if(![[self activeNode] canGetData]) break;
 		if(![types containsObject:NSRTFDPboardType] && ![types containsObject:NSFileContentsPboardType]) break;
 		wrote = YES;
 		if(!pboard) break;
 		NSData *data;
-		if(PGDataAvailable != [(PGGenericImageAdapter *)[self activeNode] getImageData:&data] || !data) break;
+		if(PGDataAvailable != [(PGGenericImageAdapter *)[self activeNode] getData:&data] || !data) break;
 		if([types containsObject:NSRTFDPboardType]) {
 			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
 			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];
@@ -869,6 +888,16 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark NSWindowController
 
+- (void)loadWindow
+{
+	if(![NSBundle loadNibNamed:[self windowNibName] owner:self]) {
+		[self setWindow:nil];
+		[self retain];
+		PGDocument *const doc = [[[PGDocumentController sharedDocumentController] documents] lastObject];
+		[self AE_performSelector:@selector(ranOutOfFileDescriptorsWithDisplayName:) withObject:[doc displayName] afterDelay:0];
+		[doc close];
+	}
+}
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
@@ -886,7 +915,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_findPanel setDelegate:self];
 	[_findPanel setAcceptsEvents:YES];
 
-	[self documentControllerBackgroundPatternColorDidChange:nil];
+	[imageView bind:@"animating" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
+	[imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
+	[self prefControllerBackgroundPatternColorDidChange:nil];
 }
 - (IBAction)showWindow:(id)sender
 {
@@ -900,9 +931,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	NSString *const path = [identifier isFileIdentifier] ? [[identifier URL] path] : nil;
 	[[self window] setRepresentedFilename:(path ? path : @"")];
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	NSString *title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
-	if(!title) title = @"";
-	[[self window] setTitle:title];
+	NSString *const title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
+	[[self window] setTitle:(title ? title : @"")];
 	[[[PGDocumentController sharedDocumentController] tabMenuItemForDocument:[self activeDocument]] setTitle:title];
 }
 - (void)close
@@ -929,7 +959,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		_infoPanel = [[PGOSDView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
 
-		[[PGDocumentController sharedDocumentController] AE_addObserver:self selector:@selector(documentControllerBackgroundPatternColorDidChange:) name:PGDocumentControllerBackgroundPatternColorDidChangeNotification];
+		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 	}
 	return self;
 }
@@ -937,6 +967,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self AE_removeObserver];
+	[imageView unbind:@"animating"];
+	[imageView unbind:@"antialiasWhenUpscaling"];
 	[imageView release];
 	[passwordView release];
 	[encodingView release];

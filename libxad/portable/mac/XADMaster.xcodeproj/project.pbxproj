@@ -664,8 +664,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.3.9.sdk;
-				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";
 			};
@@ -675,8 +675,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = (
-					ppc,
 					i386,
+					ppc,
 				);
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
@@ -684,8 +684,8 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.3.9.sdk;
-				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
+				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.3.9.sdk";
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";
 			};

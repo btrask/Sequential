@@ -29,7 +29,6 @@ extern NSString *const PGPrefObjectReadingDirectionDidChangeNotification;
 extern NSString *const PGPrefObjectImageScaleDidChangeNotification;
 extern NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
-extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 
 enum {
 	PGNoPattern           = 0,
@@ -78,14 +77,12 @@ typedef int PGSortOrder;
 @interface PGPrefObject : NSObject
 {
 	@private
-	BOOL                     _loaded;
 	BOOL                     _showsOnScreenDisplay;
 	PGReadingDirection       _readingDirection;
 	PGImageScalingMode       _imageScalingMode;
 	float                    _imageScaleFactor;
 	PGImageScalingConstraint _imageScalingConstraint;
 	PGSortOrder              _sortOrder;
-	BOOL                     _animatesImages;
 }
 
 + (id)globalPrefObject;
@@ -105,8 +102,5 @@ typedef int PGSortOrder;
 
 - (PGSortOrder)sortOrder;
 - (void)setSortOrder:(PGSortOrder)anOrder;
-
-- (BOOL)animatesImages;
-- (void)setAnimatesImages:(BOOL)flag;
 
 @end

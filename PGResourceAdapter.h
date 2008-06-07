@@ -28,6 +28,13 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 
+enum {
+	PGReadToMaxDepth = 0,
+	PGReadAll        = 1,
+	PGReadNone       = 2
+};
+typedef int PGReadingPolicy;
+
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
@@ -36,8 +43,11 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL      _isImage;
 	BOOL      _needsPassword;
 	BOOL      _needsEncoding;
+	NSData   *_data;
 	BOOL      _hasReadContents;
 }
+
++ (BOOL)alwaysReads;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
@@ -52,12 +62,14 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setNeedsEncoding:(BOOL)flag;
 - (void)noteIsViewableDidChange;
 
+- (void)setData:(NSData *)data;
 - (void)loadFromData:(NSData *)data URLResponse:(NSURLResponse *)response;
-- (Class)classForData:(NSData *)data URLResponse:(NSURLResponse *)response;
+- (Class)classWithURLResponse:(NSURLResponse *)response;
 - (void)replacedWithAdapter:(PGResourceAdapter *)newAdapter;
-- (BOOL)shouldReadRegardlessOfDepth;
-- (BOOL)shouldRead;
-- (void)readFromData:(NSData *)data URLResponse:(NSURLResponse *)response; // Abstract method. Perform an initial read. PGContainerAdapters should create any child nodes here if possible. This gets called for every node created when the document is first opened, so defer anything slow to -readContents. -lastPassword won't be set yet.
+- (PGReadingPolicy)descendentReadingPolicy; // Return MAX(prefferedValue, [self readingPolicy]).
+- (PGReadingPolicy)readingPolicy; // Returns the parent adapter's or the default.
+- (BOOL)shouldRead:(BOOL)asAlways; // If 'asAlways', returns YES immediately if the class -alwaysReads. Otherwise looks at the -readingPolicy.
+- (void)readWithURLResponse:(NSURLResponse *)response; // Abstract method. Perform an initial read. PGContainerAdapters should create any child nodes here if possible. This gets called for every node created when the document is first opened, so defer anything slow to -readContents. -lastPassword won't be set yet.
 
 - (BOOL)shouldReadContents;
 - (void)setHasReadContents;

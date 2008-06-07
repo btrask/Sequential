@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	return [anItem action] == @selector(performClose:) ? YES : [super validateMenuItem:anItem]; // NSWindow doesn't like -performClose: for borderless windows.
 }

@@ -84,8 +84,6 @@ static xadUINT32 in_func(struct Hook *hook,xadPTR object,struct xadHookParam *pa
 -(void)decompress:(id)dummy
 {
 	NSAutoreleasePool *pool=[[NSAutoreleasePool alloc] init];
-	[self retain];
-
 	do
 	{
 //NSLog(@"*** Starting decomression");
@@ -95,8 +93,6 @@ static xadUINT32 in_func(struct Hook *hook,xadPTR object,struct xadHookParam *pa
 		[sourcearchive _extractFileInfo:[sourcearchive xadFileInfoForEntry:entry] tags:tags reportProgress:YES];
 	}
 	while(!writefailed);
-
-	[self release];
 	[pool release];
 }
 

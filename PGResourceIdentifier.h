@@ -42,6 +42,7 @@ extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
 
 - (PGResourceIdentifier *)subidentifierWithIndex:(int)index;
 - (PGResourceIdentifier *)superidentifier;
+- (PGResourceIdentifier *)rootIdentifier;
 
 - (NSURL *)superURLByFollowingAliases:(BOOL)flag; // Our URL, or our superidentifier's otherwise.
 - (NSURL *)URLByFollowingAliases:(BOOL)flag;
@@ -52,9 +53,9 @@ extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
 - (BOOL)isFileIdentifier;
 
 - (NSImage *)icon;
-- (void)setIcon:(NSImage *)icon;
+- (void)setIcon:(NSImage *)icon notify:(BOOL)flag;
 - (NSString *)displayName;
-- (void)setDisplayName:(NSString *)aString;
+- (void)setDisplayName:(NSString *)aString notify:(BOOL)flag;
 
 - (PGSubscription *)subscription;
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;

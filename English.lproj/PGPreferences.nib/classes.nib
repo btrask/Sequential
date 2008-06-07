@@ -14,6 +14,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>PGColorWell</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>accessory</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSColorWell</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -39,6 +52,26 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>setDisplayScreen</key>
+				<string>id</string>
+				<key>showPrefsHelp</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGPrefController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>screensPopUp</key>
+				<string>NSPopUpButton</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
 				<key>connectionDidClose</key>
@@ -54,28 +87,6 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>cancel</key>
-				<string>id</string>
-				<key>ok</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGURLAlert</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>OKButton</key>
-				<string>NSButton</string>
-				<key>URLField</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
-		</dict>
-		<dict>
 			<key>CLASS</key>
 			<string>PGURLConnection</string>
 			<key>LANGUAGE</key>
@@ -84,11 +95,6 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>performWindowClose</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
 			<string>NSWindow</string>
 			<key>LANGUAGE</key>

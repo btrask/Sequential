@@ -22,13 +22,13 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import "PGWindow.h"
+#import "PGDocumentWindow.h"
 
 // Views
 #import "PGBezelPanel.h"
 #import "PGDragHighlightView.h"
 
-@implementation PGWindow
+@implementation PGDocumentWindow
 
 #pragma mark NSDraggingDestination Protocol
 
@@ -79,14 +79,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 @end
 
-@implementation NSObject (PGWindowDelegate)
+@implementation NSObject (PGDocumentWindowDelegate)
 
-- (NSDragOperation)window:(PGWindow *)window
+- (NSDragOperation)window:(PGDocumentWindow *)window
                    dragOperationForInfo:(id<NSDraggingInfo>)info
 {
 	return NSDragOperationNone;
 }
-- (BOOL)window:(PGWindow *)window
+- (BOOL)window:(PGDocumentWindow *)window
         performDragOperation:(id<NSDraggingInfo>)info
 {
 	return NO;

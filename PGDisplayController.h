@@ -115,12 +115,14 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 
 - (PGDocument *)activeDocument;
 - (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag; // Returns YES if the window was closed.
+- (void)ranOutOfFileDescriptorsWithDisplayName:(NSString *)displayName;
 
 - (PGNode *)activeNode;
 - (void)setActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
-- (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)showAlerts;
-- (BOOL)tryToGoForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGClipViewLocation)location allowAlerts:(BOOL)showAlerts;
+- (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
+- (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGClipViewLocation)loc allowAlerts:(BOOL)flag;
+- (void)showNode:(PGNode *)node;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
@@ -144,8 +146,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
-- (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif;
 
-- (void)documentControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
+- (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 
 @end

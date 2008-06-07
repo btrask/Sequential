@@ -92,6 +92,13 @@ static NSMutableSet *PGSubscriptions = nil;
 	return self;
 }
 
+#pragma mark NSCopying Protocol
+
+- (id)copyWithZone:(NSZone *)zone
+{
+	return [self retain];
+}
+
 #pragma mark NSObject
 
 - (void)dealloc

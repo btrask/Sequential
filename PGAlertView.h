@@ -43,7 +43,7 @@ typedef unsigned PGAlertGraphicType;
 }
 
 - (PGAlertGraphic *)currentGraphic;
-- (void)pushGraphic:(PGAlertGraphic *)aGraphic;
+- (void)pushGraphic:(PGAlertGraphic *)aGraphic window:(NSWindow *)window;
 - (void)popGraphic:(PGAlertGraphic *)aGraphic;
 - (void)popGraphicIdenticalTo:(PGAlertGraphic *)aGraphic;
 - (void)popGraphicsOfType:(PGAlertGraphicType)type;

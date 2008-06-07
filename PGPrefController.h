@@ -24,7 +24,25 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-int main(int argc, char **argv)
+extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification;
+
+@interface PGPrefController : NSWindowController
 {
-	return NSApplicationMain(argc, (const char **)argv);
+	@private
+	IBOutlet NSPopUpButton *screensPopUp;
 }
+
++ (id)sharedPrefController;
+
+- (IBAction)showPrefsHelp:(id)sender;
+
+- (Class)screenClass;
+- (NSColor *)backgroundPatternColor;
+- (NSScreen *)displayScreen;
+- (void)setDisplayScreen:(id)sender;
+
+@end
+
+@interface PGScreenValueTransformer : NSValueTransformer
+
+@end

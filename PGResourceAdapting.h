@@ -44,6 +44,7 @@ typedef int PGDataAvailability;
 - (PGContainerAdapter *)parentAdapter;
 - (PGContainerAdapter *)containerAdapter;
 - (PGContainerAdapter *)rootContainerAdapter;
+- (PGNode *)rootNode;
 - (PGDocument *)document;
 - (PGNode *)parentNode;
 
@@ -52,8 +53,8 @@ typedef int PGDataAvailability;
 
 - (BOOL)isViewable;
 - (float)loadingProgress;
-- (BOOL)canGetImageData;
-- (PGDataAvailability)getImageData:(out NSData **)outData;
+- (BOOL)canGetData;
+- (PGDataAvailability)getData:(out NSData **)outData;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;
@@ -65,7 +66,7 @@ typedef int PGDataAvailability;
 - (void)returnImage:(NSImage *)anImage error:(NSError *)error;
 
 - (BOOL)hasViewableNodes;
-- (BOOL)hasImageDataNodes; // Nodes that return YES from -canGetImageData.
+- (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.
 - (unsigned)viewableNodeIndex;
 - (unsigned)viewableNodeCount;
 
@@ -74,6 +75,9 @@ typedef int PGDataAvailability;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag;
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent;
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
 - (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;

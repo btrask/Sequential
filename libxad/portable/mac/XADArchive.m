@@ -205,6 +205,7 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 
 -(void)dealloc
 {
+	[pipe dismantle];
 	xadFreeInfo(xmb,archive); // check?
 	xadFreeObjectA(xmb,archive,NULL);
 
@@ -212,7 +213,6 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 	[volumes release];
 	[memdata release];
 	[parentarchive release];
-	[pipe dismantle];
 	[pipe release];
 	[password release];
 	[fileinfos release];
@@ -521,6 +521,7 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 
 -(NSDictionary *)attributesOfEntry:(int)n withResourceFork:(BOOL)resfork
 {
+	NSString *const entryName = [self nameOfEntry:n];
 	struct xadFileInfo *info=[self xadFileInfoForEntry:n];
 	NSMutableDictionary *attrs=[NSMutableDictionary dictionary];
 
@@ -528,7 +529,7 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 	{
 		[attrs setObject:[NSNumber numberWithUnsignedShort:info->xfi_UnixProtect] forKey:NSFilePosixPermissions];
 	}
-	else if([[self nameOfEntry:n] rangeOfString:@".app/Contents/MacOS/"].location!=NSNotFound)
+	else if([entryName rangeOfString:@".app/Contents/MacOS/"].location!=NSNotFound)
 	{
 		// Kludge to make executables in bad app bundles without permission information executable.
 		mode_t mask=umask(0); umask(mask);
@@ -606,7 +607,7 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 		if(forkdata) [attrs setObject:forkdata forKey:XADResourceForkData];
 	}
 
-	NSValue *val=[dittoforks objectForKey:[self nameOfEntry:n]];
+	NSValue *val=[dittoforks objectForKey:entryName];
 	if(val) [self _parseDittoResourceFork:[val pointerValue] intoAttributes:attrs];
 
 	return [NSDictionary dictionaryWithDictionary:attrs];

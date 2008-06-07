@@ -89,9 +89,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
-		[self _updateMenuItem];
 		[self setResourceAdapterClass:(class ? class : [PGResourceAdapter class])];
 		if(flag) [[self resourceAdapter] loadFromData:nil URLResponse:nil];
+		_loaded = YES;
+		[self _updateMenuItem];
 	}
 	return self;
 }
@@ -142,7 +143,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_resourceAdapter autorelease]; // Don't let it get deallocated immediately.
 	_resourceAdapter = [adapter retain];
 	[_resourceAdapter setNode:self];
-	[self _updateMenuItem];
+	if(_loaded) [self _updateMenuItem];
 	return _resourceAdapter;
 }
 - (PGResourceAdapter *)setResourceAdapterClass:(Class)aClass
@@ -165,6 +166,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(aDate == _dateModified || (aDate && [_dateModified isEqualToDate:aDate])) return;
 	[_dateModified release];
 	_dateModified = [aDate copy];
+	if(!_loaded) return;
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
 	[self _updateMenuItem];
 }
@@ -173,6 +175,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(aDate == _dateCreated || (aDate && [_dateCreated isEqualToDate:aDate])) return;
 	[_dateCreated release];
 	_dateCreated = [aDate copy];
+	if(!_loaded) return;
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
 	[self _updateMenuItem];
 }
@@ -181,6 +184,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(aNumber == _dataLength || (aNumber && [_dataLength isEqualToNumber:aNumber])) return;
 	[_dataLength release];
 	_dataLength = [aNumber copy];
+	if(!_loaded) return;
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
 	[self _updateMenuItem];
 }
@@ -243,6 +247,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (PGNode *)parentNode
 {
 	return [_parentAdapter node];
+}
+- (PGNode *)rootNode
+{
+	return [self parentNode] ? [[self parentNode] rootNode] : self;
 }
 - (PGResourceIdentifier *)identifier
 {

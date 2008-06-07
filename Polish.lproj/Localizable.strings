@@ -105,11 +105,27 @@
 
 /* Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name. */
 "Are you sure you want to delete the bookmark %@?" = "Are you sure you want to delete the bookmark “%@?”";
+
+/* Confirmation dialog informative text. */
 "This operation cannot be undone." = "This operation cannot be undone.";
 
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
 "The file referenced by the bookmark %@ could not be found." = "Plik wskazywany przez zakładkę “%@” nie został znaleziony.";
+
+/* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Mógł zostać przeniesiony lub usunięty.";
+
+/* Too many open files alert message. %@ is replaced with the document name. */
+"The document %@ could not be opened because Sequential reached the system's per-application limit on number of open files." = "The document “%@” could not be opened because Sequential reached the system's per-application limit on number of open files.";
+
+/* Too many open files alert informative text. %@ is replaced with another sentence. */
+"Try opening folders with fewer files. %@" = "Try opening folders with fewer files. %@";
+
+/* One of the additional sentences for the too many open files alert. */
+"The current limit could not be determined." = "The current limit could not be determined.";
+
+/* One of the additional sentences for the too many open files alert. %d is replaced with the limit number. */
+"The current limit is %d, but may be slightly less in practice." = "The current limit is %d, but may be slightly less in practice.";
 
 /* Dialog button labels. */
 "OK" = "OK";

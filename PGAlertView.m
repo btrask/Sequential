@@ -56,6 +56,7 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 	return [[_currentGraphic retain] autorelease];
 }
 - (void)pushGraphic:(PGAlertGraphic *)aGraphic
+        window:(NSWindow *)window
 {
 	NSParameterAssert(aGraphic);
 	unsigned const i = [_graphicStack indexOfObject:aGraphic];
@@ -67,6 +68,7 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
 	if(fadeOutDelay) [self AE_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay];
+	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
 {

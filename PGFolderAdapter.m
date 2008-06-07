@@ -36,12 +36,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)readFromData:(NSData *)data
-        URLResponse:(NSURLResponse *)response
+- (void)readWithURLResponse:(NSURLResponse *)response
 {
-	NSParameterAssert([self shouldRead]);
-	NSParameterAssert(!data);
 	NSParameterAssert(!response);
+	NSParameterAssert([self shouldRead:YES]);
+	NSParameterAssert(![self canGetData]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
@@ -67,8 +66,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)fileResourceDidChange:(unsigned)flags
 {
+	NSLog(@"folder did change flags %u", flags);
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [[self node] removeFromDocument];
-	if(flags & NOTE_WRITE && [self shouldRead]) [self readFromData:nil URLResponse:nil];
+	if(flags & NOTE_WRITE && [self shouldRead:YES]) [self readWithURLResponse:nil];
 	[super fileResourceDidChange:flags];
 }
 

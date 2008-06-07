@@ -117,7 +117,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[item setAction:@selector(open:)];
 	[item setRepresentedObject:aBookmark];
 	[bookmarkMenu insertItem:item atIndex:0];
-//	[aBookmark AE_addObserver:self selector:@selector(bookmarkDidChange:) name:PGBookmarkDidChangeNotification];
+	[aBookmark AE_addObserver:self selector:@selector(bookmarkDidUpdate:) name:PGBookmarkDidUpdateNotification];
 	[self _updateMenuItemForBookmark:aBookmark];
 }
 
@@ -135,7 +135,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 #pragma mark -
 
-- (void)bookmarkDidChange:(NSNotification *)aNotif
+- (void)bookmarkDidUpdate:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
 	[self _updateMenuItemForBookmark:[aNotif object]];
@@ -161,7 +161,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 }
 - (void)_removeBookmarkAtIndex:(unsigned)index
 {
-//	[[_bookmarks objectAtIndex:index] AE_removeObserver:self name:PGBookmarkDidChangeNotification];
+	[[_bookmarks objectAtIndex:index] AE_removeObserver:self name:PGBookmarkDidUpdateNotification];
 	[_bookmarks removeObjectAtIndex:index];
 	[bookmarkMenu removeItemAtIndex:[bookmarkMenu numberOfItems] - index - 1];
 	if(![_bookmarks count]) [bookmarkMenu addItem:emptyMenuItem];

@@ -117,7 +117,7 @@ DEALINGS WITH THE SOFTWARE. */
 	for(; NSNotFound != i; i = [rows indexGreaterThanIndex:i]) {
 		id const node = [nodesOutline itemAtRow:i];
 		NSData *data;
-		if(PGDataAvailable == [node getImageData:&data] && [data writeToFile:[_destination stringByAppendingPathComponent:[self saveNameForNode:node]] atomically:NO]) continue;
+		if(PGDataAvailable == [node getData:&data] && [data writeToFile:[_destination stringByAppendingPathComponent:[self saveNameForNode:node]] atomically:NO]) continue;
 		[unsavedNodes addObject:node];
 		[unsavedRows addIndex:i];
 	}
@@ -142,7 +142,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[nodesOutline expandItem:_rootNode expandChildren:YES];
 	if(!_initialNode) return;
 	unsigned const defaultRow = [nodesOutline rowForItem:_initialNode];
-	if(NSNotFound != defaultRow) {
+	if(NSNotFound != defaultRow && [_initialNode canGetData]) {
 		[nodesOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:defaultRow] byExtendingSelection:NO];
 		[nodesOutline scrollRowToVisible:defaultRow];
 	}
@@ -208,7 +208,7 @@ DEALINGS WITH THE SOFTWARE. */
         forTableColumn:(NSTableColumn *)tableColumn
         item:(id)item
 {
-	if(tableColumn == nameColumn) [cell setTextColor:([item canGetImageData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
+	if(tableColumn == nameColumn) [cell setTextColor:([item canGetData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldEditTableColumn:(NSTableColumn *)tableColumn
@@ -225,7 +225,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldSelectItem:(id)item
 {
-	return [item canGetImageData];
+	return [item canGetData];
 }
 
 #pragma mark NSObject

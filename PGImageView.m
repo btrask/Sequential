@@ -29,9 +29,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Categories
 #import "NSObjectAdditions.h"
-#import "NSWindowAdditions.h"
-
-#define PGAntialiasWhenUpscaling true
 
 @interface PGImageView (Private)
 
@@ -42,6 +39,14 @@ DEALINGS WITH THE SOFTWARE. */
 @end
 
 @implementation PGImageView
+
+#pragma mark NSObject
+
++ (void)initialize
+{
+	[self exposeBinding:@"animating"];
+	[self exposeBinding:@"antialiasWhenUpscaling"];
+}
 
 #pragma mark Instance Methods
 
@@ -97,21 +102,27 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (BOOL)antialiasWhenUpscaling
+{
+	return _antialias;
+}
+- (void)setAntialiasWhenUpscaling:(BOOL)flag
+{
+	if(flag == _antialias) return;
+	_antialias = flag;
+	[self _cache];
+	[self setNeedsDisplay:YES];
+}
+
+#pragma mark -
+
 - (void)appDidHide:(NSNotification *)aNotif
 {
 	[self _animate:NO];
 }
 - (void)appDidUnhide:(NSNotification *)aNotif
 {
-	if([[self window] AE_isVisible]) [self _animate:YES];
-}
-- (void)appDidResignActive:(NSNotification *)aNotif
-{
-	if(![[self window] AE_isVisible]) [self _animate:NO];
-}
-- (void)appDidBecomeActive:(NSNotification *)aNotif
-{
-	if([[self window] AE_isVisible]) [self _animate:YES];
+	[self _animate:YES];
 }
 
 #pragma mark Private Protocol
@@ -130,6 +141,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_cache
 {
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_cache) object:nil];
 	if(!_image || _numberOfFrames > 1 || [_image cacheMode] == NSImageCacheNever) return;
 	[_image removeRepresentation:_cache];
 	[_cache release];
@@ -148,7 +160,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[view unlockFocus];
 	[_image addRepresentation:_cache];
 	[_image removeRepresentation:_rep];
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_cache) object:nil];
 }
 
 #pragma mark PGClipViewDocumentView Protocol
@@ -163,10 +174,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)initWithFrame:(NSRect)aRect
 {
 	if((self = [super initWithFrame:aRect])) {
+		_antialias = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
 		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
-		[NSApp AE_addObserver:self selector:@selector(appDidResignActive:) name:NSApplicationDidResignActiveNotification];
-		[NSApp AE_addObserver:self selector:@selector(appDidBecomeActive:) name:NSApplicationDidBecomeActiveNotification];
 	}
 	return self;
 }
@@ -177,13 +187,10 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setUpGState
 {
-#if PGAntialiasWhenUpscaling
-	return [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-#else
+	if([self antialiasWhenUpscaling]) return [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	NSSize const imageSize = [[self image] size];
 	NSSize const viewSize = [self frame].size;
 	[[NSGraphicsContext currentContext] setImageInterpolation:(imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh)];
-#endif
 }
 - (BOOL)wantsDefaultClipping
 {

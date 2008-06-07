@@ -27,10 +27,12 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-static NSString        *PGUserAgent          = nil;
-static PGURLConnection *PGActiveConnection   = nil;
-static NSURLConnection *PGConnection         = nil;
-static NSMutableArray  *PGPendingConnections = nil;
+static NSString       *PGUserAgent          = nil;
+static NSMutableArray *PGConnections        = nil;
+static NSMutableArray *PGActiveConnections  = nil;
+static NSMutableArray *PGPendingConnections = nil;
+
+#define PGMaxSimultaneousConnections 4
 
 @interface PGURLConnection (Private)
 
@@ -58,23 +60,28 @@ static NSMutableArray  *PGPendingConnections = nil;
 
 + (void)_startConnection
 {
-	if(PGActiveConnection) return;
-	NSParameterAssert(!PGConnection);
+	if([PGActiveConnections count] >= PGMaxSimultaneousConnections) return;
 	if(![PGPendingConnections count]) return;
-	PGActiveConnection = [[PGPendingConnections objectAtIndex:0] nonretainedObjectValue];
-	[PGPendingConnections removeObjectAtIndex:0];
-	NSMutableURLRequest *const request = [[[PGActiveConnection request] mutableCopy] autorelease];
+	if(!PGConnections) PGConnections = [[NSMutableArray alloc] init];
+	if(!PGActiveConnections) PGActiveConnections = [[NSMutableArray alloc] init];
+	NSValue *const connectionValue = [PGPendingConnections objectAtIndex:0];
+	PGURLConnection *const connection = [connectionValue nonretainedObjectValue];
+	NSMutableURLRequest *const request = [[[connection request] mutableCopy] autorelease];
 	if([self userAgent]) [request setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
-	PGConnection = [[NSURLConnection alloc] initWithRequest:request delegate:PGActiveConnection];
+	[PGConnections addObject:[[[NSURLConnection alloc] initWithRequest:request delegate:connection] autorelease]];
+	[PGActiveConnections addObject:connectionValue];
+	[PGPendingConnections removeObjectAtIndex:0];
 }
 + (void)_stopConnection:(PGURLConnection *)aConnection
 {
-	[PGPendingConnections removeObject:[NSValue valueWithNonretainedObject:aConnection]];
-	if(aConnection != PGActiveConnection) return;
-	PGActiveConnection = nil;
-	[PGConnection cancel];
-	[PGConnection release]; PGConnection = nil;
-	[self AE_performSelector:@selector(_startConnection) withObject:nil afterDelay:0];
+	NSValue *const connectionValue = [NSValue valueWithNonretainedObject:aConnection];
+	[PGPendingConnections removeObject:connectionValue];
+	unsigned i = [PGActiveConnections indexOfObject:connectionValue];
+	if(NSNotFound == i) return;
+	[PGActiveConnections removeObjectAtIndex:i];
+	[[PGConnections objectAtIndex:i] cancel];
+	[PGConnections removeObjectAtIndex:i];
+	[self _startConnection];
 }
 
 #pragma mark Instance Methods
@@ -168,7 +175,7 @@ static NSMutableArray  *PGPendingConnections = nil;
 - (void)dealloc
 {
 	NSParameterAssert(![PGPendingConnections containsObject:[NSValue valueWithNonretainedObject:self]]);
-	NSParameterAssert(PGActiveConnection != self);
+	NSParameterAssert(![PGActiveConnections containsObject:[NSValue valueWithNonretainedObject:self]]);
 	[_request release];
 	[_response release];
 	[_data release];

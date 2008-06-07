@@ -28,6 +28,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGPrefObject.h"
 
+extern NSString *const PGMaxDepthKey;
+
 @interface PGContainerAdapter : PGResourceAdapter
 {
 	@private
@@ -43,7 +45,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGNode *)childForURL:(NSURL *)aURL;
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel; // 'sel' may optionally take a single BOOL argument, which is given the value of 'flag'.
+- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel context:(id)context;
+/*
+The selector 'sel' should have one of the following forms:
+- (PGNode *)selector;
+- (PGNode *)selectorForward:(BOOL)flag;
+- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
+*/
 - (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
 
 @end

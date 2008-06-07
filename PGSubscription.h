@@ -29,7 +29,7 @@ extern NSString *const PGSubscriptionEventDidOccurNotification;
 
 extern NSString *const PGSubscriptionFlagsKey;
 
-@interface PGSubscription : NSObject
+@interface PGSubscription : NSObject <NSCopying>
 {
 	@private
 	int _descriptor;

@@ -59,17 +59,17 @@ DEALINGS WITH THE SOFTWARE. */
         didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setDisplayName:[[frame dataSource] pageTitle]];
+	[[self identifier] setDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	DOMDocument *const doc = [frame DOMDocument];
-	NSMutableArray *const URLs = [NSMutableArray array];
-	[doc AE_getLinkedURLs:URLs validExtensions:[[PGDocumentController sharedDocumentController] supportedExtensions]];
-	if(![URLs count]) [doc AE_getEmbeddedImageURLs:URLs];
-	if([URLs count]) {
+	NSMutableArray *const identifiers = [NSMutableArray array];
+	[doc AE_getLinkedResourceIdentifiers:identifiers validSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensions]];
+	if(![identifiers count]) [doc AE_getEmbeddedImageIdentifiers:identifiers];
+	if([identifiers count]) {
 		NSMutableArray *const pages = [NSMutableArray array];
-		NSURL *URL;
-		NSEnumerator *const URLEnum = [URLs objectEnumerator];
-		while((URL = [URLEnum nextObject])) {
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:URL] adapterClass:nil dataSource:nil load:YES] autorelease];
+		PGResourceIdentifier *ident;
+		NSEnumerator *const identEnum = [identifiers objectEnumerator];
+		while((ident = [identEnum nextObject])) {
+			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident adapterClass:nil dataSource:nil load:YES] autorelease];
 			if(node) [pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
@@ -87,12 +87,24 @@ DEALINGS WITH THE SOFTWARE. */
 	return _isLoading || [super isViewable];
 }
 
+#pragma mark PGContainerAdapter
+
+- (NSArray *)sortedChildren
+{
+	return [self unsortedChildren];
+}
+
 #pragma mark PGResourceAdapter
 
-- (void)readFromData:(NSData *)data
-        URLResponse:(NSURLResponse *)response
+- (PGReadingPolicy)descendentReadingPolicy
+{
+	return MAX(PGReadNone, [self readingPolicy]);
+}
+- (void)readWithURLResponse:(NSURLResponse *)response
 {
 	NSParameterAssert(!_webView);
+	NSData *data = nil;
+	if([self getData:&data] != PGDataAvailable) return;
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];

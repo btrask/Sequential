@@ -28,6 +28,8 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 @class PGResourceIdentifier;
 
+extern NSString *const PGBookmarkDidUpdateNotification;
+
 @interface PGBookmark : NSObject <NSCoding>
 {
 	@private
@@ -44,5 +46,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSString *)displayName;
 - (BOOL)isValid;
+
+- (void)eventDidOccur:(NSNotification *)aNotif;
 
 @end
