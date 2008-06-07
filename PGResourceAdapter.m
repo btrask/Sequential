@@ -123,13 +123,15 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {
-	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[self setData:data];
 	PGResourceAdapter *const adapter = [[self node] setResourceAdapterClass:[self classWithURLResponse:response]];
 	[adapter setData:data];
-	if([adapter shouldRead:YES]) [adapter readWithURLResponse:response];
+	if([adapter shouldRead:YES]) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
+		[adapter readWithURLResponse:response];
+		[pool release];
+	}
 	[self replacedWithAdapter:adapter];
-	[pool release];
 }
 - (Class)classWithURLResponse:(NSURLResponse *)response
 {
