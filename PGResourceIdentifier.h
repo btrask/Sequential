@@ -57,7 +57,13 @@ extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
 - (NSString *)displayName;
 - (void)setDisplayName:(NSString *)aString notify:(BOOL)flag;
 
-- (PGSubscription *)subscription;
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
+- (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;
+
+@end
+
+@interface NSURL (PGResourceIdentifierCreation)
+
+- (id)AE_resourceIdentifier;
 
 @end

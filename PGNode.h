@@ -82,8 +82,9 @@ enum {
 - (void)setDataLength:(NSNumber *)aNumber;
 - (NSComparisonResult)compare:(PGNode *)node; // Uses the document's sort mode.
 
+- (void)noteFileEventDidOccur;
+
 - (void)identifierDidChange:(NSNotification *)aNotif;
-- (void)fileEventDidOccur:(NSNotification *)aNotif;
 
 @end
 

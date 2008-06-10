@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 @class PGResourceIdentifier;
+@class PGSubscription;
 #import "PGExifEntry.h"
 @class PGBookmark;
 
@@ -47,6 +48,7 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 	@private
 	PGResourceIdentifier *_identifier;
 	PGNode               *_node;
+	PGSubscription       *_subscription;
 	NSMutableArray       *_cachedNodes;
 	PGNode               *_storedNode;
 	NSPoint               _storedCenter;
@@ -79,7 +81,6 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (NSString *)displayName;
 - (void)createUI;
 - (void)close;
-- (void)validate:(BOOL)knownInvalid;
 
 - (BOOL)isOnline;
 - (NSMenu *)pageMenu;
@@ -91,5 +92,7 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (void)noteNodeIsViewableDidChange:(PGNode *)node;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;
+
+- (void)subscriptionEventDidOccur:(NSNotification *)aNotif;
 
 @end

@@ -86,7 +86,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	PGNode *child;
 	NSEnumerator *const childEnum = [_unsortedChildren objectEnumerator];
-	while((child = [childEnum nextObject])) if([aURL isEqual:[[child identifier] URLByFollowingAliases:YES]]) return child;
+	while((child = [childEnum nextObject])) if([aURL isEqual:[[child identifier] URL]]) return child;
 	return nil;
 }
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode

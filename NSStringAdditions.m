@@ -23,9 +23,6 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSStringAdditions.h"
-#import <fcntl.h>
-#import <sys/time.h>
-#import <sys/resource.h>
 
 @implementation NSString (AEAdditions)
 
@@ -50,19 +47,6 @@ DEALINGS WITH THE SOFTWARE. */
 	SInt32 result;
 	UCCompareTextDefault(kUCCollateComposeInsensitiveMask | kUCCollateWidthInsensitiveMask | kUCCollateCaseInsensitiveMask | kUCCollateDigitsOverrideMask | kUCCollateDigitsAsNumberMask | kUCCollatePunctuationSignificantMask, str1, length1, str2, length2, NULL, &result);
 	return (NSComparisonResult)result;
-}
-- (int)AE_fileDescriptor
-{
-	char const *const rep = [self fileSystemRepresentation];
-	errno = 0;
-	int fd = open(rep, O_EVTONLY);
-	if(errno != EMFILE) return fd;
-	struct rlimit l;
-	if(getrlimit(RLIMIT_NOFILE, &l) != noErr) return -1;
-	l.rlim_cur = l.rlim_max;
-	if(setrlimit(RLIMIT_NOFILE, &l) != noErr) return -1;
-	errno = 0;
-	return open(rep, O_EVTONLY);
 }
 - (NSString *)AE_firstPathComponent
 {

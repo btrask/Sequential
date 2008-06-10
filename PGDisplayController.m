@@ -890,13 +890,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (void)loadWindow
 {
-	if(![NSBundle loadNibNamed:[self windowNibName] owner:self]) {
-		[self setWindow:nil];
-		[self retain];
-		PGDocument *const doc = [[[PGDocumentController sharedDocumentController] documents] lastObject];
-		[self AE_performSelector:@selector(ranOutOfFileDescriptorsWithDisplayName:) withObject:[doc displayName] afterDelay:0];
-		[doc close];
-	}
+	errno = 0;
+	if([NSBundle loadNibNamed:[self windowNibName] owner:self] || EMFILE != errno) return;
+	[self setWindow:nil];
+	[self retain];
+	PGDocument *const doc = [[[PGDocumentController sharedDocumentController] documents] lastObject];
+	[self AE_performSelector:@selector(ranOutOfFileDescriptorsWithDisplayName:) withObject:[doc displayName] afterDelay:0];
+	[doc close];
 }
 - (void)windowDidLoad
 {

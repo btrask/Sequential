@@ -79,7 +79,7 @@ typedef int PGReadingPolicy;
 - (void)noteDateCreatedDidChange;
 - (void)noteDataLengthDidChange;
 
-- (void)fileResourceDidChange:(unsigned)flags;
+- (void)noteResourceDidChange;
 
 @end
 

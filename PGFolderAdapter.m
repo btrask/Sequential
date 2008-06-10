@@ -57,19 +57,20 @@ DEALINGS WITH THE SOFTWARE. */
 		NSURL *const pageURL = [pagePath AE_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
 		PGNode *node = [self childForURL:pageURL];
-		if(node) [oldPages removeObjectIdenticalTo:node];
-		else node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:pageURL] adapterClass:nil dataSource:nil load:YES] autorelease];
+		if(node) {
+			[oldPages removeObjectIdenticalTo:node];
+			[node identifierDidChange:nil];
+		} else node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier] adapterClass:nil dataSource:nil load:YES] autorelease];
 		if(node) [newPages addObject:node];
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
 	if([self shouldReadContents]) [self readContents];
 }
-- (void)fileResourceDidChange:(unsigned)flags
+- (void)noteResourceDidChange
 {
-	NSLog(@"folder did change flags %u", flags);
-	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [[self node] removeFromDocument];
-	if(flags & NOTE_WRITE && [self shouldRead:YES]) [self readWithURLResponse:nil];
-	[super fileResourceDidChange:flags];
+	if(![[self identifier] hasTarget]) return [[self node] removeFromDocument];
+	if([self shouldRead:YES]) [self readWithURLResponse:nil];
+	[super noteResourceDidChange];
 }
 
 @end

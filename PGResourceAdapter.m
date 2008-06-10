@@ -216,7 +216,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (void)fileResourceDidChange:(unsigned)flags
+- (void)noteResourceDidChange
 {
 	[self noteDateModifiedDidChange];
 	[self noteDateCreatedDidChange];

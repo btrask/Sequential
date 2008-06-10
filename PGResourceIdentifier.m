@@ -42,15 +42,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	@private
 	AliasHandle     _alias;
-	PGSubscription *_subscription;
-	BOOL            _allowSubscription;
-	NSURL          *_cachedURL;
 }
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
-- (void)createSubscription;
-- (void)subscriptionEventDidOccur:(NSNotification *)aNotif;
 
 @end
 
@@ -170,10 +165,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 
 #pragma mark -
 
-- (PGSubscription *)subscription
-{
-	return nil;
-}
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag
 {
 	NSMutableAttributedString *const result = [NSMutableAttributedString PG_attributedStringWithFileIcon:[self icon] name:[self displayName]];
@@ -186,6 +177,10 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
 	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:([URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil) name:parentName]];
 	return result;
+}
+- (PGSubscription *)subscriptionWithDescendents:(BOOL)flag
+{
+	return [self isFileIdentifier] ? [PGSubscription subscriptionWithPath:[[self URL] path] descendents:flag] : nil;
 }
 
 #pragma mark NSCoding Protocol
@@ -255,9 +250,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 			[self release];
 			return [[PGURLIdentifier alloc] initWithURL:URL];
 		}
-		_cachedURL = [URL retain];
-		_allowSubscription = YES;
-		[self createSubscription];
 	}
 	return self;
 }
@@ -271,24 +263,8 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if((self = [super init])) {
 		_alias = (AliasHandle)NewHandle(length);
 		memcpy(*_alias, data, length);
-		_allowSubscription = YES;
-		[self createSubscription];
 	}
 	return self;
-}
-- (void)createSubscription
-{
-	NSParameterAssert(!_subscription);
-	if(!_allowSubscription) return;
-	_subscription = [[PGSubscription alloc] initWithPath:[[self URL] path]];
-	[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-}
-- (void)subscriptionEventDidOccur:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	[_cachedURL release];
-	_cachedURL = nil;
-	if([[[aNotif userInfo] objectForKey:PGSubscriptionFlagsKey] unsignedIntValue] & NOTE_RENAME) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
 }
 
 #pragma mark NSCoding Protocol
@@ -302,8 +278,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 			_alias = (AliasHandle)NewHandle(length);
 			memcpy(*_alias, data, length);
 		}
-		_allowSubscription = YES;
-		[self createSubscription];
 	}
 	return self;
 }
@@ -323,11 +297,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(flag && FSResolveAliasFileWithMountFlags(&ref, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) != noErr) return nil;
 	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
 }
-- (NSURL *)URL
-{
-	if(!_cachedURL) _cachedURL = [[super URL] retain];
-	return [[_cachedURL retain] autorelease];
-}
 - (BOOL)hasTarget
 {
 	return [self URLByFollowingAliases:YES] != nil;
@@ -336,10 +305,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	return YES;
 }
-- (PGSubscription *)subscription
-{
-	return [[_subscription retain] autorelease];
-}
 
 #pragma mark NSObject
 
@@ -347,8 +312,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	[self AE_removeObserver];
 	if(_alias) DisposeHandle((Handle)_alias);
-	[_subscription release];
-	[_cachedURL release];
 	[super dealloc];
 }
 
@@ -466,6 +429,15 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"%@:%d", [self superidentifier], [self index]];
+}
+
+@end
+
+@implementation NSURL (PGResourceIdentifierCreation)
+
+- (id)AE_resourceIdentifier
+{
+	return [PGResourceIdentifier resourceIdentifierWithURL:self];
 }
 
 @end

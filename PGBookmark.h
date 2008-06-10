@@ -27,6 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 @class PGResourceIdentifier;
+@class PGSubscription;
 
 extern NSString *const PGBookmarkDidUpdateNotification;
 
@@ -34,7 +35,9 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 {
 	@private
 	PGResourceIdentifier *_documentIdentifier;
+	PGSubscription       *_documentSubscription;
 	PGResourceIdentifier *_fileIdentifier;
+	PGSubscription       *_fileSubscription;
 	NSString             *_backupDisplayName;
 }
 

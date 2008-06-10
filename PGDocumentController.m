@@ -24,6 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGDocumentController.h"
 #import <Carbon/Carbon.h>
+#import <sys/resource.h>
 
 // Models
 #import "PGDocument.h"
@@ -134,6 +135,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		nil]];
+	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
+	(void)setrlimit(RLIMIT_NOFILE, &l);
 }
 
 #pragma mark Instance Methods
@@ -448,7 +451,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (id)openDocumentWithContentsOfURL:(NSURL *)URL
       display:(BOOL)display
 {
-	PGResourceIdentifier *const identifier = [PGResourceIdentifier resourceIdentifierWithURL:URL];
+	PGResourceIdentifier *const identifier = [URL AE_resourceIdentifier];
 	PGDocument *const doc = [self documentForResourceIdentifier:identifier];
 	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithResourceIdentifier:identifier] autorelease]) display:display];
 }

@@ -85,7 +85,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(href && ![@"" isEqualToString:href]) {
 		NSURL *const URL = [NSURL URLWithString:href];
 		if((!schemes || [schemes containsObject:[URL scheme]]) && (!exts || [exts containsObject:[[URL path] pathExtension]])) {
-			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:URL];
+			PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 			if(![array containsObject:ident]) {
 				[ident setDisplayName:[self AE_stringValue] notify:NO];
 				[array addObject:ident];
@@ -101,7 +101,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array
 {
-	PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:[self src]]];
+	PGResourceIdentifier *const ident = [[NSURL URLWithString:[self src]] AE_resourceIdentifier];
 	if(![array containsObject:ident]) {
 		[ident setDisplayName:[self alt] notify:NO];
 		[array addObject:ident];

@@ -27,7 +27,6 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSString (AEAdditions)
 
 - (NSComparisonResult)AE_localizedCaseInsensitiveNumericCompare:(NSString *)aString;
-- (int)AE_fileDescriptor; // Currently always uses O_EVTONLY.
 - (NSString *)AE_firstPathComponent;
 - (NSURL *)AE_fileURL;
 - (NSString *)AE_displayName;

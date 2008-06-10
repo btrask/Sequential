@@ -38,7 +38,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self release];
 	PGResourceIdentifier *result = nil;
 	NSURL *URL = [aCoder decodeObjectForKey:@"URL"];
-	if(URL) result = [[PGResourceIdentifier resourceIdentifierWithURL:URL] retain];
+	if(URL) result = [[URL AE_resourceIdentifier] retain];
 	else {
 		unsigned length;
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
@@ -86,7 +86,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self release];
 	PGResourceIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
 	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
-	PGResourceIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [PGResourceIdentifier resourceIdentifierWithURL:[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL]];
+	PGResourceIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
 }
 

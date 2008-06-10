@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
+#import "PGSubscription.h"
 #import "PGBookmark.h"
 
 // Controllers
@@ -58,19 +59,23 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	if((self = [self init])) {
 		_identifier = [ident retain];
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident adapterClass:nil dataSource:nil load:YES];
+		PGResourceIdentifier *rootIdentifier = ident;
 		if([_identifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
-			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:[PGResourceIdentifier resourceIdentifierWithURL:[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL]] adapterClass:nil dataSource:nil load:YES];
+			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
+			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier adapterClass:nil dataSource:nil load:YES];
 			[self setInitialIdentifier:ident];
 		}
+		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
+		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
 	}
 	return self;
 }
 - (id)initWithURL:(NSURL *)aURL
 {
-	return [self initWithResourceIdentifier:[PGResourceIdentifier resourceIdentifierWithURL:aURL]];
+	return [self initWithResourceIdentifier:[aURL AE_resourceIdentifier]];
 }
 - (id)initWithBookmark:(PGBookmark *)aBookmark
 {
@@ -182,12 +187,6 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	[self setDisplayController:nil];
 	[[PGDocumentController sharedDocumentController] removeDocument:self];
 }
-- (void)validate:(BOOL)knownInvalid
-{
-	if(!knownInvalid && [[self node] hasViewableNodes]) return;
-	[self close];
-	[[PGDocumentController sharedDocumentController] removeDocument:self];
-}
 
 #pragma mark -
 
@@ -237,7 +236,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 {
 	if(!_node) return;
 	NSParameterAssert(node);
-	if([self node] == node) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	if([[node identifier] isEqual:_identifier]) [[self displayController] synchronizeWindowTitleWithDocumentName];
 	[self AE_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDidCache:(PGNode *)node
@@ -250,6 +249,18 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 		[[_cachedNodes lastObject] clearCache];
 		[_cachedNodes removeLastObject];
 	}
+}
+
+#pragma mark -
+
+- (void)subscriptionEventDidOccur:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
+	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
+	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
+	if([ident isEqual:_identifier]) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccur];
 }
 
 #pragma mark PGPrefObject
@@ -302,8 +313,10 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 }
 - (void)dealloc
 {
+	[self AE_removeObserver];
 	[_identifier release];
 	[_node release];
+	[_subscription release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
 	[_storedQuery release];
 	[_initialIdentifier release];

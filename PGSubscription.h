@@ -27,14 +27,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGSubscriptionEventDidOccurNotification;
 
-extern NSString *const PGSubscriptionFlagsKey;
+extern NSString *const PGSubscriptionPathKey;
+extern NSString *const PGSubscriptionRootFlagsKey; // Only included when the subscription root changes.
 
-@interface PGSubscription : NSObject <NSCopying>
-{
-	@private
-	int _descriptor;
-}
+@interface PGSubscription : NSObject
 
-- (id)initWithPath:(NSString *)path;
++ (id)subscriptionWithPath:(NSString *)path descendents:(BOOL)flag;
++ (id)subscriptionWithPath:(NSString *)path;
+
+- (NSString *)path;
 
 @end

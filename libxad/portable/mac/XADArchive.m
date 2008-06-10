@@ -1,7 +1,8 @@
-#include <unistd.h>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <fcntl.h>
+#import <unistd.h>
+#import <sys/stat.h>
+#import <dirent.h>
+#import <fcntl.h>
+#import <sys/time.h>
 
 #import <UniversalDetector.h>
 

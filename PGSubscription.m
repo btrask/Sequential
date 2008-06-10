@@ -25,60 +25,118 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGSubscription.h"
 #import <sys/time.h>
 #import <unistd.h>
+#import <fcntl.h>
 
 // Categories
 #import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
 
 NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventDidOccur";
 
-NSString *const PGSubscriptionFlagsKey = @"PGSubscriptionFlags";
+NSString *const PGSubscriptionPathKey      = @"PGSubscriptionPath";
+NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
-static int           PGKQueue        = -1;
-static NSMutableSet *PGSubscriptions = nil;
+static int           PGKQueue                   = -1;
+static NSMutableSet *PGActiveSubscriptionValues = nil;
 
-@interface PGSubscription (Private)
+@interface PGLeafSubscription : PGSubscription
+{
+	@private
+	int _descriptor;
+}
 
-+ (void)_threaded_sendFileEvents;
-+ (void)_sendFileEvent:(NSDictionary *)aDict;
++ (void)threaded_sendFileEvents;
++ (void)sendFileEvent:(NSDictionary *)aDict;
+
+- (id)initWithPath:(NSString *)path;
+- (PGSubscription *)rootSubscription;
+- (void)noteFileEventDidOccurWithFlags:(unsigned)flags;
+
+@end
+
+@interface PGKQueueBranchSubscription : PGLeafSubscription
+{
+	@private
+	PGKQueueBranchSubscription *_parent;
+	NSArray                    *_children;
+}
+
+- (id)initWithPath:(NSString *)path parent:(PGKQueueBranchSubscription *)parent;
+
+@end
+
+@interface PGFSEventBranchSubscription : PGSubscription
+{
+	@private
+	FSEventStreamRef _eventStream;
+	PGSubscription  *_rootSubscription;
+}
+
+- (id)initWithPath:(NSString *)path;
+- (void)subscribeWithPath:(NSString *)path;
+- (void)unsubscribe;
+- (void)noteFileEventsDidOccurAtPaths:(NSArray *)paths;
+- (void)rootSubscriptionEventDidOccur:(NSNotification *)aNotif;
 
 @end
 
 @implementation PGSubscription
 
-#pragma mark Private Protocol
++ (id)subscriptionWithPath:(NSString *)path descendents:(BOOL)flag
+{
+	id result;
+	if(!flag) result = [PGLeafSubscription alloc];
+	else if(PGIsLeopardOrLater()) result = [PGFSEventBranchSubscription alloc];
+	else result = [PGKQueueBranchSubscription alloc];
+	return [[result initWithPath:path] autorelease];
+}
++ (id)subscriptionWithPath:(NSString *)path
+{
+	return [self subscriptionWithPath:path descendents:NO];
+}
+- (NSString *)path
+{
+	return nil;
+}
 
-+ (void)_threaded_sendFileEvents
+@end
+
+@implementation PGLeafSubscription
+
+#pragma mark Class Methods
+
++ (void)threaded_sendFileEvents
 {
 	for(;;) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		struct kevent ev[5]; // Group up to 5 events at once.
 		unsigned const count = kevent(PGKQueue, NULL, 0, ev, 5, NULL);
 		unsigned i = 0;
-		for(; i < count; i++) [self performSelectorOnMainThread:@selector(_sendFileEvent:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:(id)ev[i].udata], @"Subscription", [NSNumber numberWithUnsignedInt:ev[i].fflags], PGSubscriptionFlagsKey, nil] waitUntilDone:NO];
+		for(; i < count; i++) [self performSelectorOnMainThread:@selector(sendFileEvent:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:(id)ev[i].udata], @"Subscription", [NSNumber numberWithUnsignedInt:ev[i].fflags], @"Flags", nil] waitUntilDone:NO];
 		[pool release];
 	}
 }
-+ (void)_sendFileEvent:(NSDictionary *)aDict
++ (void)sendFileEvent:(NSDictionary *)aDict
 {
 	NSValue *const subscriptionValue = [aDict objectForKey:@"Subscription"];
-	if([PGSubscriptions containsObject:subscriptionValue]) [[subscriptionValue nonretainedObjectValue] AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[aDict objectForKey:PGSubscriptionFlagsKey], PGSubscriptionFlagsKey, nil]];
+	if([PGActiveSubscriptionValues containsObject:subscriptionValue]) [[subscriptionValue nonretainedObjectValue] noteFileEventDidOccurWithFlags:[[aDict objectForKey:@"Flags"] unsignedIntValue]];
 }
 
 #pragma mark Instance Methods
 
 - (id)initWithPath:(NSString *)path
 {
+	errno = 0;
 	if((self = [super init])) {
-		_descriptor = [path AE_fileDescriptor];
+		char const *const rep = [path fileSystemRepresentation];
+		_descriptor = open(rep, O_EVTONLY);
 		if(-1 == _descriptor) {
 			[self release];
 			return nil;
 		}
 		if(-1 == PGKQueue) {
 			PGKQueue = kqueue();
-			PGSubscriptions = [[NSMutableSet alloc] init];
-			[NSThread detachNewThreadSelector:@selector(_threaded_sendFileEvents) toTarget:[self class] withObject:nil];
+			PGActiveSubscriptionValues = [[NSMutableSet alloc] init];
+			[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:[self class] withObject:nil];
 		}
 		struct kevent ev;
 		EV_SET(&ev, _descriptor, EVFILT_VNODE, EV_ADD | EV_CLEAR, NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE, 0, self);
@@ -87,9 +145,21 @@ static NSMutableSet *PGSubscriptions = nil;
 			[self release];
 			return nil;
 		}
-		[PGSubscriptions addObject:[NSValue valueWithNonretainedObject:self]];
+		[PGActiveSubscriptionValues addObject:[NSValue valueWithNonretainedObject:self]];
 	}
 	return self;
+}
+- (PGSubscription *)rootSubscription
+{
+	return self;
+}
+- (void)noteFileEventDidOccurWithFlags:(unsigned)flags
+{
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	NSString *const path = [self path];
+	if(path) [dict setObject:path forKey:PGSubscriptionPathKey];
+	if(flags) [dict setObject:[NSNumber numberWithUnsignedInt:flags] forKey:PGSubscriptionRootFlagsKey];
+	[[self rootSubscription] AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
 #pragma mark NSCopying Protocol
@@ -99,12 +169,156 @@ static NSMutableSet *PGSubscriptions = nil;
 	return [self retain];
 }
 
+#pragma mark PGSubscription
+
+- (NSString *)path
+{
+	char *path = calloc(PATH_MAX, sizeof(char));
+	if(-1 == fcntl(_descriptor, F_GETPATH, path)) {
+		free(path);
+		return nil;
+	}
+	return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:path length:strlen(path)];
+}
+
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[PGSubscriptions removeObject:[NSValue valueWithNonretainedObject:self]];
+	[PGActiveSubscriptionValues removeObject:[NSValue valueWithNonretainedObject:self]];
 	if(-1 != _descriptor) close(_descriptor);
+	[super dealloc];
+}
+
+#pragma mark -
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self path]];
+}
+
+@end
+
+@implementation PGKQueueBranchSubscription
+
+#pragma mark Instance Methods
+
+- (id)initWithPath:(NSString *)path
+      parent:(PGKQueueBranchSubscription *)parent
+{
+	if((self = [self initWithPath:path])) {
+		_parent = parent;
+	}
+	return self;
+}
+- (PGSubscription *)rootSubscription
+{
+	return _parent ? [_parent rootSubscription] : self;
+}
+
+#pragma mark PGLeafSubscription
+
+- (id)initWithPath:(NSString *)path
+{
+	if(!(self = [super initWithPath:path])) return nil;
+	BOOL isDir;
+	if(![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir] || !isDir) {
+		[self release];
+		return nil;
+	}
+	NSMutableArray *const children = [NSMutableArray array];
+	NSString *pathComponent;
+	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
+	while((pathComponent = [pathComponentEnum nextObject])) {
+		PGSubscription *const child = [[[PGKQueueBranchSubscription alloc] initWithPath:[path stringByAppendingPathComponent:pathComponent] parent:self] autorelease];
+		if(child) [children addObject:child];
+		else if(EMFILE == errno) {
+			[self release];
+			return nil;
+		}
+	}
+	_children = [children retain];
+	return self;
+}
+- (void)noteFileEventDidOccurWithFlags:(unsigned)flags
+{
+	if([self rootSubscription] == self) [super noteFileEventDidOccurWithFlags:flags];
+	else if(NOTE_WRITE & flags) [super noteFileEventDidOccurWithFlags:0];
+}
+
+#pragma mark NSObject
+
+- (void)dealloc
+{
+	[_children release];
+	[super dealloc];
+}
+
+@end
+
+static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[])
+{
+	[(PGFSEventBranchSubscription *)clientCallBackInfo noteFileEventsDidOccurAtPaths:(id)eventPaths];
+}
+
+@implementation PGFSEventBranchSubscription
+
+#pragma mark Instance Methods
+
+- (id)initWithPath:(NSString *)path
+{
+	if((self = [super init])) {
+		_rootSubscription = [[PGSubscription subscriptionWithPath:path] retain];
+		[_rootSubscription AE_addObserver:self selector:@selector(rootSubscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		[self subscribeWithPath:nil];
+	}
+	return self;
+}
+- (void)subscribeWithPath:(NSString *)path
+{
+	if(_eventStream) [self unsubscribe];
+	FSEventStreamContext context = {0, self, NULL, NULL, NULL};
+	_eventStream = FSEventStreamCreate(kCFAllocatorDefault, PGEventStreamCallback, &context, (CFArrayRef)[NSArray arrayWithObject:(path ? path : [self path])], kFSEventStreamEventIdSinceNow, 0, kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagNoDefer);
+	FSEventStreamScheduleWithRunLoop(_eventStream, [[NSRunLoop currentRunLoop] getCFRunLoop], kCFRunLoopCommonModes);
+	FSEventStreamStart(_eventStream);
+}
+- (void)unsubscribe
+{
+	if(!_eventStream) return;
+	FSEventStreamStop(_eventStream);
+	FSEventStreamInvalidate(_eventStream);
+	FSEventStreamRelease(_eventStream);
+	_eventStream = NULL;
+}
+- (void)noteFileEventsDidOccurAtPaths:(NSArray *)paths
+{
+	NSString *path;
+	NSEnumerator *pathEnum = [paths objectEnumerator];
+	while((path = [pathEnum nextObject])) [self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path, PGSubscriptionPathKey, nil]];
+}
+- (void)rootSubscriptionEventDidOccur:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
+	if(!(flags & (NOTE_RENAME | NOTE_REVOKE | NOTE_DELETE))) return;
+	[self subscribeWithPath:[[aNotif userInfo] objectForKey:PGSubscriptionPathKey]];
+	[self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];
+}
+
+#pragma mark PGSubscription
+
+- (NSString *)path
+{
+	return [_rootSubscription path];
+}
+
+#pragma mark NSObject
+
+- (void)dealloc
+{
+	[self AE_removeObserver];
+	[self unsubscribe];
+	[_rootSubscription release];
 	[super dealloc];
 }
 

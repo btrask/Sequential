@@ -29,7 +29,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
-#import "PGSubscription.h"
 
 // Categories
 #import "NSDateAdditions.h"
@@ -84,7 +83,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
-		[[_identifier subscription] AE_addObserver:self selector:@selector(fileEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_dataSource = source;
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
@@ -206,15 +204,18 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
+- (void)noteFileEventDidOccur
+{
+	[[self resourceAdapter] noteResourceDidChange];
+}
+
+#pragma mark -
+
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
 	if([PGResourceIdentifierDisplayNameDidChangeNotification isEqualToString:[aNotif name]]) [[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
 	[[self document] noteNodeDisplayNameDidChange:self];
-}
-- (void)fileEventDidOccur:(NSNotification *)aNotif
-{
-	[[self resourceAdapter] fileResourceDidChange:[[[aNotif userInfo] objectForKey:PGSubscriptionFlagsKey] unsignedIntValue]];
 }
 
 #pragma mark Private Protocol

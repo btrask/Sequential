@@ -72,7 +72,7 @@ BOOL PGIsLeopardOrLater(void)
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	return [self respondsToSelector:[anItem action]];
 }

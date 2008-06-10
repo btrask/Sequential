@@ -48,9 +48,11 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	if((self = [super init])) {
 		_documentIdentifier = [docIdent retain];
-		[[_documentIdentifier subscription] AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		_documentSubscription = [_documentIdentifier subscriptionWithDescendents:NO];
+		[_documentSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_fileIdentifier = [fileIdent retain];
-		[[_fileIdentifier subscription] AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		_fileSubscription = [_fileIdentifier subscriptionWithDescendents:NO];
+		[_fileSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_backupDisplayName = [(aString ? aString : [fileIdent displayName]) copy];
 	}
 	return self;
@@ -112,7 +114,9 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	[self AE_removeObserver];
 	[_documentIdentifier release];
+	[_documentSubscription release];
 	[_fileIdentifier release];
+	[_fileSubscription release];
 	[_backupDisplayName release];
 	[super dealloc];
 }

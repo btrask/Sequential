@@ -167,18 +167,17 @@ POSSIBILITY OF SUCH DAMAGE.
     // Keep black content view
     if (oldContentView == _blkContentView) {
         // Remove old subviews
-        NSArray*    subviews;
-        subviews = [oldContentView subviews];
-        [subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        [[oldContentView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
         
         // Swap new subviews
-        subviews = [contentView subviews];
-        
         NSEnumerator*   enumerator;
         NSView*         view;
-        enumerator = [subviews objectEnumerator];
+        enumerator = [[[[contentView subviews] copy] autorelease] objectEnumerator];
         while (view = [enumerator nextObject]) {
-            [oldContentView addSubview:view];
+		[view retain];
+		[view removeFromSuperview];
+		[oldContentView addSubview:view];
+		[view release];
         }
         
         // Add close button
@@ -226,7 +225,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #pragma mark NSMenuValidation Protocol
 
-- (BOOL)validateMenuItem:(id<NSMenuItem>)anItem
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	return [anItem action] == @selector(performClose:) ? YES : [super validateMenuItem:anItem]; // NSWindow doesn't like -performClose: for borderless windows.
 }
