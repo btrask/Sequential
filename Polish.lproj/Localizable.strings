@@ -115,18 +115,6 @@
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Mógł zostać przeniesiony lub usunięty.";
 
-/* Too many open files alert message. %@ is replaced with the document name. */
-"The document %@ could not be opened because Sequential reached the system's per-application limit on number of open files." = "The document “%@” could not be opened because Sequential reached the system's per-application limit on number of open files.";
-
-/* Too many open files alert informative text. %@ is replaced with another sentence. */
-"Try opening folders with fewer files. %@" = "Try opening folders with fewer files. %@";
-
-/* One of the additional sentences for the too many open files alert. */
-"The current limit could not be determined." = "The current limit could not be determined.";
-
-/* One of the additional sentences for the too many open files alert. %d is replaced with the limit number. */
-"The current limit is %d, but may be slightly less in practice." = "The current limit is %d, but may be slightly less in practice.";
-
 /* Dialog button labels. */
 "OK" = "OK";
 "Cancel" = "Anuluj";

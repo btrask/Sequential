@@ -48,6 +48,7 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 + (void)sendFileEvent:(NSDictionary *)aDict;
 
 - (id)initWithPath:(NSString *)path;
+- (NSString *)path;
 - (PGSubscription *)rootSubscription;
 - (void)noteFileEventDidOccurWithFlags:(unsigned)flags;
 
@@ -149,6 +150,15 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 	}
 	return self;
 }
+- (NSString *)path
+{
+	char *path = calloc(PATH_MAX, sizeof(char));
+	if(-1 == fcntl(_descriptor, F_GETPATH, path)) {
+		free(path);
+		return nil;
+	}
+	return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:path length:strlen(path)];
+}
 - (PGSubscription *)rootSubscription
 {
 	return self;
@@ -167,18 +177,6 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 - (id)copyWithZone:(NSZone *)zone
 {
 	return [self retain];
-}
-
-#pragma mark PGSubscription
-
-- (NSString *)path
-{
-	char *path = calloc(PATH_MAX, sizeof(char));
-	if(-1 == fcntl(_descriptor, F_GETPATH, path)) {
-		free(path);
-		return nil;
-	}
-	return [[NSFileManager defaultManager] stringWithFileSystemRepresentation:path length:strlen(path)];
 }
 
 #pragma mark NSObject
@@ -268,9 +266,9 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 - (id)initWithPath:(NSString *)path
 {
 	if((self = [super init])) {
+		[self subscribeWithPath:path];
 		_rootSubscription = [[PGSubscription subscriptionWithPath:path] retain];
 		[_rootSubscription AE_addObserver:self selector:@selector(rootSubscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-		[self subscribeWithPath:nil];
 	}
 	return self;
 }
@@ -278,7 +276,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 {
 	if(_eventStream) [self unsubscribe];
 	FSEventStreamContext context = {0, self, NULL, NULL, NULL};
-	_eventStream = FSEventStreamCreate(kCFAllocatorDefault, PGEventStreamCallback, &context, (CFArrayRef)[NSArray arrayWithObject:(path ? path : [self path])], kFSEventStreamEventIdSinceNow, 0, kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagNoDefer);
+	_eventStream = FSEventStreamCreate(kCFAllocatorDefault, PGEventStreamCallback, &context, (CFArrayRef)[NSArray arrayWithObject:path], kFSEventStreamEventIdSinceNow, 0, kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagNoDefer);
 	FSEventStreamScheduleWithRunLoop(_eventStream, [[NSRunLoop currentRunLoop] getCFRunLoop], kCFRunLoopCommonModes);
 	FSEventStreamStart(_eventStream);
 }
@@ -303,13 +301,6 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 	if(!(flags & (NOTE_RENAME | NOTE_REVOKE | NOTE_DELETE))) return;
 	[self subscribeWithPath:[[aNotif userInfo] objectForKey:PGSubscriptionPathKey]];
 	[self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];
-}
-
-#pragma mark PGSubscription
-
-- (NSString *)path
-{
-	return [_rootSubscription path];
 }
 
 #pragma mark NSObject

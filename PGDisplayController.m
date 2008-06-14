@@ -320,16 +320,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self setTimerInterval:0];
 	return NO;
 }
-- (void)ranOutOfFileDescriptorsWithDisplayName:(NSString *)displayName
-{
-	NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
-	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The document %@ could not be opened because Sequential reached the system's per-application limit on number of open files.", nil), displayName]];
-	long const limit = sysconf(_SC_OPEN_MAX);
-	[alert setInformativeText:[NSString stringWithFormat:NSLocalizedString(@"Try opening folders with fewer files. %@", nil), (-1 == limit ? NSLocalizedString(@"The current limit could not be determined.", nil) : [NSString stringWithFormat:NSLocalizedString(@"The current limit is %d, but may be slightly less in practice.", nil), limit])]];
-	[alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
-	[alert runModal];
-	[self release];
-}
 
 #pragma mark -
 
@@ -888,16 +878,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark NSWindowController
 
-- (void)loadWindow
-{
-	errno = 0;
-	if([NSBundle loadNibNamed:[self windowNibName] owner:self] || EMFILE != errno) return;
-	[self setWindow:nil];
-	[self retain];
-	PGDocument *const doc = [[[PGDocumentController sharedDocumentController] documents] lastObject];
-	[self AE_performSelector:@selector(ranOutOfFileDescriptorsWithDisplayName:) withObject:[doc displayName] afterDelay:0];
-	[doc close];
-}
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
