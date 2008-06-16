@@ -64,10 +64,10 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
         presortedOrder:(PGSortOrder)anOrder
 {
 	if(anArray == _unsortedChildren) return;
+	NSArray *const oldSortedChildren = [self sortedChildren];
 	[_unsortedChildren release];
 	_unsortedChildren = [anArray copy];
 	_unsortedOrder = anOrder;
-	NSArray *const oldSortedChildren = [self sortedChildren];
 	[_sortedChildren release];
 	_sortedChildren = nil;
 	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
@@ -180,6 +180,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
+            includeChildren:(BOOL)children
+{
+	PGNode *node = nil;
+	if(flag && children) node = [self sortedViewableNodeFirst:YES];
+	return node ? node : [super sortedViewableNodeNext:flag includeChildren:children];
+}
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
             stopAtNode:(PGNode *)descendent
 {
@@ -270,7 +277,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSError *error = nil;
 	if([self needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
 	else if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
-	[self returnImage:nil error:error];
+	[self returnImageRep:nil error:error];
 }
 
 #pragma mark NSObject

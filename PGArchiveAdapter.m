@@ -116,6 +116,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setEncoding:(NSStringEncoding)encoding
 {
 	[_archive setNameEncoding:encoding];
+	_hasRead = NO;
 	[self setNeedsEncoding:NO];
 	[self readWithURLResponse:nil];
 }

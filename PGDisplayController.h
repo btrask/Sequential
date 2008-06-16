@@ -115,6 +115,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 
 - (PGDocument *)activeDocument;
 - (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag; // Returns YES if the window was closed.
+- (void)activateDocument:(PGDocument *)document; // Abstract.
 
 - (PGNode *)activeNode;
 - (void)setActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;

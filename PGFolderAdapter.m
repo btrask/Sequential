@@ -52,7 +52,7 @@ DEALINGS WITH THE SOFTWARE. */
 	while((pathComponent = [pathComponentEnum nextObject])) {
 		NSString *const pagePath = [path stringByAppendingPathComponent:pathComponent];
 		static NSArray *ignoredPaths = nil;
-		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", nil];
+		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];
 		if([ignoredPaths containsObject:pagePath]) continue;
 		NSURL *const pageURL = [pagePath AE_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;

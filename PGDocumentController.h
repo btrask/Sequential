@@ -87,11 +87,10 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	IBOutlet NSMenuItem              *nextPage;
 	IBOutlet NSMenuItem              *lastPage;
 
-	IBOutlet NSMenuItem              *windowsMenuItem;
 	IBOutlet NSMenu                  *windowsMenu;
-	IBOutlet NSMenuItem              *tabsMenuItem;
-	IBOutlet NSMenu                  *tabsMenu;
-	IBOutlet NSMenuItem              *tabsSeparator;
+	IBOutlet NSMenuItem              *windowsMenuSeparator;
+	IBOutlet NSMenuItem              *selectNextDocument;
+	IBOutlet NSMenuItem              *selectPreviousDocument;
 
 	         BOOL                    _prefsLoaded;
 	         NSArray                *_recentDocumentIdentifiers;
@@ -118,12 +117,10 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)switchToPathFinder:(id)sender;
 - (IBAction)switchToFinder:(id)sender;
 
-- (IBAction)openDocument:(id)sender;
+- (IBAction)open:(id)sender;
 - (IBAction)openURL:(id)sender;
 - (IBAction)openRecentDocument:(id)sender;
 - (IBAction)clearRecentDocuments:(id)sender;
-
-- (IBAction)toggleExif:(id)sender;
 
 - (IBAction)changeImageScalingMode:(id)sender; // PGImageScalingMode from [sender tag].
 - (IBAction)changeImageScalingConstraint:(id)sender; // PGImageScalingConstraint from [sender tag].
@@ -133,6 +130,11 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)changeSortDirection:(id)sender; // PGSortDescendingMask from [sender tag].
 - (IBAction)changeSortRepeat:(id)sender; // PGSortOrder from [sender tag].
 - (IBAction)changeReadingDirection:(id)sender; // PGReadingDirection from [sender tag].
+
+- (IBAction)toggleExif:(id)sender;
+- (IBAction)selectPreviousDocument:(id)sender;
+- (IBAction)selectNextDocument:(id)sender;
+- (IBAction)activateDocument:(id)sender;
 
 - (IBAction)showKeyboardShortcuts:(id)sender;
 
@@ -153,11 +155,12 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;
 - (void)removeDocument:(PGDocument *)document;
-- (id)documentForResourceIdentifier:(PGResourceIdentifier *)ident;
-- (NSMenuItem *)tabMenuItemForDocument:(PGDocument *)document;
+- (PGDocument *)documentForResourceIdentifier:(PGResourceIdentifier *)ident;
+- (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document;
+- (NSMenuItem *)windowsMenuItemForDocument:(PGDocument *)document;
 
 - (NSMenu *)defaultPageMenu;
-- (PGPrefObject *)currentPrefObject; // Current doc or PGGlobalPrefObject().
+- (PGPrefObject *)currentPrefObject; // Current doc or +[PGPrefObject globalPrefObject].
 - (PGDocument *)currentDocument;
 - (void)setCurrentDocument:(PGDocument *)document;
 

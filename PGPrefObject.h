@@ -71,9 +71,6 @@ enum {
 };
 typedef int PGSortOrder;
 
-#define PGValueOrDefault(val, default) ({ __typeof__(val) __val = (val); __val ? __val : (default); })
-#define PGValueWithSelectorOrDefault(val, msg, default) ({ id __val = (val); __val ? [__val msg] : (default); })
-
 @interface PGPrefObject : NSObject
 {
 	@private

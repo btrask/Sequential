@@ -56,29 +56,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Instance Methods
 
-- (IBAction)nextTab:(id)sender
-{
-	NSArray *const docs = [[PGDocumentController sharedDocumentController] documents];
-	unsigned i = [docs indexOfObjectIdenticalTo:[self activeDocument]];
-	if(NSNotFound == i) return;
-	if(0 == i) i = [docs count];
-	[self setActiveDocument:[docs objectAtIndex:i - 1] closeIfAppropriate:NO];
-}
-- (IBAction)previousTab:(id)sender
-{
-	NSArray *const docs = [[PGDocumentController sharedDocumentController] documents];
-	unsigned i = [docs indexOfObjectIdenticalTo:[self activeDocument]] + 1;
-	if(NSNotFound == i) return;
-	if(i >= [docs count]) i = 0;
-	[self setActiveDocument:[docs objectAtIndex:i] closeIfAppropriate:NO];
-}
-- (IBAction)activateTab:(id)sender
-{
-	[self setActiveDocument:[sender representedObject] closeIfAppropriate:NO];
-}
-
-#pragma mark -
-
 - (void)prepareToExitFullscreen
 {
 	_isExitingFullscreen = YES;
@@ -101,20 +78,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_hideMenuBar
 {
 	SetSystemUIMode(kUIModeAllSuppressed, kNilOptions);
-}
-
-#pragma mark NSMenuValidation Protocol
-
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem
-{
-	SEL const action = [anItem action];
-	if(@selector(activateTab:) == action) [anItem setState:([anItem representedObject] == [self activeDocument])];
-	// Actions which require multiple documents.
-	if([[[PGDocumentController sharedDocumentController] documents] count] < 2) {
-		if(@selector(nextTab:) == action) return NO;
-		if(@selector(previousTab:) == action) return NO;
-	}
-	return [super validateMenuItem:anItem];
 }
 
 #pragma mark PGFullscreenWindowDelegate Protocol
@@ -157,7 +120,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSArray *const types = [pboard types];
 	if([types containsObject:NSFilenamesPboardType]) {
 		NSArray *const paths = [pboard propertyListForType:NSFilenamesPboardType];
-		return [paths count] == 1 ? NSDragOperationGeneric : NSDragOperationNone; // TODO: Ignore documents of incompatible types.
+		return [paths count] == 1 ? NSDragOperationGeneric : NSDragOperationNone;
 	} else if([types containsObject:NSURLPboardType]) {
 		return [NSURL URLFromPasteboard:pboard] ? NSDragOperationGeneric : NSDragOperationNone;
 	}
@@ -181,10 +144,15 @@ DEALINGS WITH THE SOFTWARE. */
 	if(document || _isExitingFullscreen) return [super setActiveDocument:document closeIfAppropriate:NO];
 	if(![self activeDocument]) return NO;
 	NSMutableArray *const docs = [[[[PGDocumentController sharedDocumentController] documents] mutableCopy] autorelease];
+	PGDocument *const nextDoc = [[PGDocumentController sharedDocumentController] next:YES documentBeyond:[self activeDocument]];
 	[docs removeObjectIdenticalTo:[self activeDocument]];
-	if([docs count]) [self nextTab:self];
-	else [super setActiveDocument:nil closeIfAppropriate:NO]; // PGDocumentController knows when to close us, so don't close ourselves.
+	[super setActiveDocument:nextDoc closeIfAppropriate:NO]; // PGDocumentController knows when to close us, so don't close ourselves.
 	return NO;
+}
+- (void)activateDocument:(PGDocument *)document
+{
+	[self setActiveDocument:document closeIfAppropriate:NO];
+	[[self window] makeKeyAndOrderFront:self];
 }
 
 #pragma mark NSWindowController

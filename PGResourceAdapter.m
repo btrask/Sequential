@@ -196,7 +196,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if([self isDeterminingType]) return;
 	[self setHasReadContents];
-	[self returnImage:nil error:nil];
+	[self returnImageRep:nil error:nil];
 }
 
 #pragma mark -
@@ -313,12 +313,12 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self node] expectsReturnedImage];
 }
-- (void)returnImage:(NSImage *)anImage
+- (void)returnImageRep:(NSImageRep *)aRep
         error:(NSError *)error
 {
 	NSParameterAssert(_hasReadContents);
 	_hasReadContents = NO;
-	[[self node] returnImage:anImage error:error];
+	[[self node] returnImageRep:aRep error:error];
 }
 
 #pragma mark -
@@ -353,6 +353,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
+{
+	return [self sortedViewableNodeNext:flag includeChildren:YES];
+}
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
+            includeChildren:(BOOL)children
 {
 	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:) context:nil];
 }

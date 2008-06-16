@@ -36,13 +36,8 @@ extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotificati
 
 - (IBAction)showPrefsHelp:(id)sender;
 
-- (Class)screenClass;
 - (NSColor *)backgroundPatternColor;
 - (NSScreen *)displayScreen;
 - (void)setDisplayScreen:(id)sender;
-
-@end
-
-@interface PGScreenValueTransformer : NSValueTransformer
 
 @end

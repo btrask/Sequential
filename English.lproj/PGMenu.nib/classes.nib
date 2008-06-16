@@ -10,7 +10,7 @@
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>PGWindow</string>
+			<string>PGDocumentWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -19,14 +19,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -178,6 +170,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>activateDocument</key>
+				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
 				<key>changeImageScalingConstraint</key>
@@ -196,6 +190,8 @@
 				<string>id</string>
 				<key>closeAll</key>
 				<string>id</string>
+				<key>open</key>
+				<string>id</string>
 				<key>openDocument</key>
 				<string>id</string>
 				<key>openRecentDocument</key>
@@ -203,6 +199,10 @@
 				<key>openURL</key>
 				<string>id</string>
 				<key>provideFeedback</key>
+				<string>id</string>
+				<key>selectNextDocument</key>
+				<string>id</string>
+				<key>selectPreviousDocument</key>
 				<string>id</string>
 				<key>showKeyboardShortcuts</key>
 				<string>id</string>
@@ -263,6 +263,10 @@
 				<string>NSMenuItem</string>
 				<key>screenMenu</key>
 				<string>NSMenu</string>
+				<key>selectNextDocument</key>
+				<string>NSMenuItem</string>
+				<key>selectPreviousDocument</key>
+				<string>NSMenuItem</string>
 				<key>switchToFinder</key>
 				<string>NSMenuItem</string>
 				<key>switchToPathFinder</key>
@@ -281,13 +285,21 @@
 				<string>NSMenuItem</string>
 				<key>windowsMenu</key>
 				<string>NSMenu</string>
-				<key>windowsMenuItem</key>
+				<key>windowsMenuSeparator</key>
 				<string>NSMenuItem</string>
 				<key>zoomIn</key>
 				<string>NSMenuItem</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

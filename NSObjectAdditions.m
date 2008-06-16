@@ -28,6 +28,10 @@ BOOL PGIsLeopardOrLater(void)
 {
 	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4;
 }
+BOOL PGIsTigerOrLater(void)
+{
+	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_3;
+}
 
 @implementation NSObject (AEAdditions)
 

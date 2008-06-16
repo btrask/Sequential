@@ -24,10 +24,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-#ifndef NSAppKitVersionNumber10_4
-#define NSAppKitVersionNumber10_4 824
-#endif
 extern BOOL PGIsLeopardOrLater(void);
+extern BOOL PGIsTigerOrLater(void);
 
 #define PGCommonRunLoopsMode (NSString *)kCFRunLoopCommonModes
 

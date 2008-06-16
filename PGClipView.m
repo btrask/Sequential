@@ -306,7 +306,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		finalPoint = PGPointInRect(PGOffsetPoint(finalPoint, NSMakeSize([latestEvent deltaX], -[latestEvent deltaY])), availableDragRect);
 	}
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_beginPreliminaryDrag) object:nil];
-	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
+	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 	if(PGNotDragging != _dragMode) {
 		[PGPointingHandCursor() set];
 		if(PGMouseHiddenDraggingStyle) {
@@ -358,7 +358,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		} else pressedDirections &= ~direction;
 	} while(pressedDirections && (latestEvent = [NSApp nextEventMatchingMask:NSKeyUpMask | NSKeyDownMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
-	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
+	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 }
 - (void)scrollInDirection:(PGRectEdgeMask)direction
         type:(PGScrollType)scrollType

@@ -103,7 +103,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)readWithURLResponse:(NSURLResponse *)response
 {
 	NSParameterAssert(!_webView);
-	NSData *data = nil;
+	NSData *data;
 	if([self getData:&data] != PGDataAvailable) return;
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];

@@ -63,7 +63,7 @@ typedef int PGDataAvailability;
 
 - (NSString *)lastPassword;
 - (BOOL)expectsReturnedImage;
-- (void)returnImage:(NSImage *)anImage error:(NSError *)error;
+- (void)returnImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (BOOL)hasViewableNodes;
 - (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.
@@ -73,6 +73,7 @@ typedef int PGDataAvailability;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;

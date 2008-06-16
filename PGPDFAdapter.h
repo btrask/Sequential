@@ -28,7 +28,6 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGPDFAdapter : PGContainerAdapter
 {
 	@private
-	NSImage       *_image;
 	NSPDFImageRep *_rep;
 }
 

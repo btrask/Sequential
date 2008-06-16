@@ -211,11 +211,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (IBAction)skipBeforeFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO] initialLocation:PGEndLocation]) [self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) [self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
@@ -289,8 +289,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
 	if(flag && !document && _activeDocument) {
-		[self setActiveNode:nil initialLocation:PGHomeLocation]; // PGClipView modifies the image, so make sure it's back to normal.
 		_activeDocument = nil;
+		[[self retain] autorelease]; // Necessary if the find panel is open.
 		[[self window] close];
 		return YES;
 	}
@@ -320,6 +320,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self setTimerInterval:0];
 	return NO;
 }
+- (void)activateDocument:(PGDocument *)document {}
 
 #pragma mark -
 
@@ -473,7 +474,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
-		[imageView setImage:[[aNotif userInfo] objectForKey:PGImageKey] orientation:[[self activeNode] orientation]];
+		[imageView setImageRep:[[aNotif userInfo] objectForKey:PGImageRepKey] orientation:[[self activeNode] orientation]];
 		[self _updateImageViewSize];
 		[clipView setDocumentView:imageView];
 		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
@@ -546,7 +547,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
-	[imageView setImage:[imageView image] orientation:[[self activeNode] orientation]];
+	[imageView setImageRep:[imageView rep] orientation:[[self activeNode] orientation]];
 	[self _updateImageViewSize];
 }
 
@@ -561,9 +562,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (void)_updateImageViewSize
 {
-	NSImage *const image = [imageView image];
 	NSImageRep *const rep = [imageView rep];
-	if(!image || !rep) return [imageView setFrame:NSZeroRect];
+	if(!rep) return [imageView setFrame:NSZeroRect];
 	NSSize originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	if([imageView orientation] & PGRotated90CC) {
 		float const w = originalSize.width;
@@ -742,7 +742,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	NSParameterAssert(aNotif);
 	if([aNotif object] != [self window]) return;
-	[[PGDocumentController sharedDocumentController] setCurrentDocument:[self activeDocument]];
+	[[PGDocumentController sharedDocumentController] setCurrentDocument:nil];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
@@ -840,11 +840,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[pboard setString:[[[self activeNode] identifier] displayName] forType:NSStringPboardType];
 	} while(NO);
 	do {
-		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != imageView || ![imageView image]) break;
+		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != imageView) break;
+		NSImageRep *const rep = [imageView rep];
+		if(!rep || ![rep respondsToSelector:@selector(TIFFRepresentation)]) break;
 		wrote = YES;
 		if(!pboard) break;
 		[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
-		[pboard setData:[[imageView image] TIFFRepresentation] forType:NSTIFFPboardType];
+		[pboard setData:[(NSBitmapImageRep *)rep TIFFRepresentation] forType:NSTIFFPboardType];
 	} while(NO);
 	do {
 		if(![[self activeNode] canGetData]) break;
@@ -913,7 +915,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
 	[[self window] setTitle:(title ? title : @"")];
-	[[[PGDocumentController sharedDocumentController] tabMenuItemForDocument:[self activeDocument]] setTitle:title];
+	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setTitle:title];
 }
 - (void)close
 {

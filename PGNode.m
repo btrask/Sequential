@@ -39,7 +39,7 @@ DEALINGS WITH THE SOFTWARE. */
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
 
-NSString *const PGImageKey = @"PGImage";
+NSString *const PGImageRepKey = @"PGImageRep";
 NSString *const PGErrorKey = @"PGError";
 
 NSString *const PGNodeErrorDomain = @"PGNodeError";
@@ -273,13 +273,13 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	return _expectsReturnedImage;
 }
-- (void)returnImage:(NSImage *)anImage
+- (void)returnImageRep:(NSImageRep *)aRep
         error:(NSError *)error
 {
 	NSParameterAssert(_expectsReturnedImage);
 	_expectsReturnedImage = NO;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(anImage) [dict setObject:anImage forKey:PGImageKey];
+	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
 	if(error) [dict setObject:error forKey:PGErrorKey];
 	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }

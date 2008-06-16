@@ -29,13 +29,10 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
-static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapterImageReps";
-
 @interface PGGenericImageAdapter (Private)
 
-- (void)_threaded_getImageWithData:(NSData *)data;
-- (NSImage *)_threadsafe_imageWithReps:(NSArray *)reps;
-- (void)_returnImage:(NSDictionary *)aDict;
+- (void)_threaded_getImageRepWithData:(NSData *)data;
+- (void)_returnImageRep:(NSImageRep *)aRep;
 
 @end
 
@@ -43,36 +40,34 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 
 #pragma mark Private Protocol
 
-- (void)_threaded_getImageWithData:(NSData *)data
+- (void)_threaded_getImageRepWithData:(NSData *)data
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-	NSArray *reps = [NSBitmapImageRep imageRepsWithData:data];
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(PGIsLeopardOrLater()) { // NSImage is thread-safe.
-		NSImage *const image = [self _threadsafe_imageWithReps:reps];
-		if(image) [dict setObject:image forKey:PGImageKey];
-	} else if(reps) [dict setObject:reps forKey:PGGenericImageAdapterImageRepsKey];
-	[self performSelectorOnMainThread:@selector(_returnImage:) withObject:dict waitUntilDone:NO];
+	int bestPixelCount = 0;
+	NSBitmapImageRep *rep, *bestRep = nil;
+	NSEnumerator *const repEnum = [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator];
+	while((rep = [repEnum nextObject])) {
+		int const w = [rep pixelsWide], h = [rep pixelsHigh];
+		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
+			bestRep = rep;
+			break;
+		}
+		int const pixelCount = w * h;
+		if(pixelCount < bestPixelCount) continue;
+		if(pixelCount == bestPixelCount && [bestRep bitsPerPixel] > [rep bitsPerPixel]) continue;
+		bestRep = rep;
+		bestPixelCount = pixelCount;
+	}
+	[self performSelectorOnMainThread:@selector(_returnImageRep:) withObject:bestRep waitUntilDone:NO];
 	[pool release];
 }
-- (NSImage *)_threadsafe_imageWithReps:(NSArray *)reps
+- (void)_returnImageRep:(NSImageRep *)aRep
 {
-	if(![reps count]) return nil;
-	NSImage *const image = [[[NSImage alloc] init] autorelease];
-	[image addRepresentations:reps];
-	[image setDataRetained:YES];
-	[image setScalesWhenResized:YES];
-	return image;
-}
-- (void)_returnImage:(NSDictionary *)aDict
-{
-	NSImage *image = [aDict objectForKey:PGImageKey];
-	if(!image) image = [self _threadsafe_imageWithReps:[aDict objectForKey:PGGenericImageAdapterImageRepsKey]];
-	[self setIsImage:(image != nil)];
-	[_cachedImage release];
-	_cachedImage = [image retain];
+	[self setIsImage:(aRep != nil)];
+	[_cachedRep release];
+	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
-	[self returnImage:image error:nil];
+	[self returnImageRep:aRep error:nil];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -109,8 +104,8 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 {
 	[_exifEntries release];
 	_exifEntries = nil;
-	[_cachedImage release];
-	_cachedImage = nil;
+	[_cachedRep release];
+	_cachedRep = nil;
 }
 
 #pragma mark PGResourceAdapter
@@ -122,23 +117,23 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 }
 - (void)readContents
 {
-	if(_cachedImage) {
+	if(_cachedRep) {
 		[self setHasReadContents];
 		[[self document] noteNodeDidCache:[self node]];
-		[self returnImage:_cachedImage error:nil];
+		[self returnImageRep:_cachedRep error:nil];
 		return;
 	}
 	NSParameterAssert([self canGetData]);
 	NSData *data = nil;
 	PGDataAvailability const availability = [self getData:&data];
 	[self setHasReadContents];
-	if(PGWrongPassword == availability) return [self returnImage:nil error:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
+	if(PGWrongPassword == availability) return [self returnImageRep:nil error:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
 	if(PGDataUnavailable == availability) {
 		[self setIsImage:NO];
-		[self returnImage:nil error:nil];
+		[self returnImageRep:nil error:nil];
 		return;
 	}
-	[NSThread detachNewThreadSelector:@selector(_threaded_getImageWithData:) toTarget:self withObject:data];
+	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
 }
 
 #pragma mark NSObject
@@ -153,7 +148,7 @@ static NSString *const PGGenericImageAdapterImageRepsKey = @"PGGenericImageAdapt
 - (void)dealloc
 {
 	[_exifEntries release];
-	[_cachedImage release];
+	[_cachedRep release];
 	[super dealloc];
 }
 

@@ -26,8 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 static void PGEnsureWindowCreatedHack(void)
 {
-	// This is the ugliest hack I have ever written. The icons fail to draw if there has never been a window loaded. Defer must be NO.
-	// The specific error is "-[_NSExistingCGSContext focusView:inWindow:]: selector not recognized" in -[NSTextAttachmentCell drawWithFrame:inView:].
+	// The icons fail to draw if there has never been a window loaded. Defer must be NO. The specific error is "-[_NSExistingCGSContext focusView:inWindow:]: selector not recognized" in -drawWithFrame:inView:.
 	static BOOL createdWindow = NO;
 	if(createdWindow) return;
 	[[[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO] release];
@@ -35,8 +34,6 @@ static void PGEnsureWindowCreatedHack(void)
 }
 
 @interface PGFileIconAttachmentCell : NSTextAttachmentCell
-
-- (id)initImageCell:(NSImage *)anImage;
 
 @end
 
@@ -59,9 +56,9 @@ static void PGEnsureWindowCreatedHack(void)
 	return result;
 }
 + (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage
-                             name:(NSString *)fileName
+                               name:(NSString *)fileName
 {
-	return [self PG_attributedStringWithAttachmentCell:(anImage ? [[[PGFileIconAttachmentCell alloc] initImageCell:anImage] autorelease] : nil) label:fileName];
+	return [self PG_attributedStringWithAttachmentCell:[[[PGFileIconAttachmentCell alloc] initImageCell:anImage] autorelease] label:fileName];
 }
 
 @end
@@ -73,6 +70,10 @@ static void PGEnsureWindowCreatedHack(void)
 - (id)initWithMenuItem:(NSMenuItem *)anItem
       rotation:(float)angle
 {
+	if(!PGIsTigerOrLater()) {
+		[self release];
+		return nil;
+	}
 	if((self = [super init])) {
 		PGEnsureWindowCreatedHack();
 		_item = anItem;
@@ -103,7 +104,8 @@ static void PGEnsureWindowCreatedHack(void)
 	[t translateXBy:NSMidX(aRect) yBy:NSMidY(aRect)];
 	[t rotateByDegrees:_angle];
 	[t concat];
-	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:[_item isEnabled] highlighted:[[NSReadPixel(NSZeroPoint) colorUsingColorSpaceName:NSCalibratedWhiteColorSpace] whiteComponent] < 0.5]; // Yes, we use NSReadPixel to determine whether or not we're highlighted or not. Believe me, I've tried everything from aView to -isHighlighted to LMGetTheMenu() (don't ask).
+	NSColor *const color = [NSReadPixel(NSZeroPoint) colorUsingColorSpaceName:NSCalibratedWhiteColorSpace];
+	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:(!_item || [_item isEnabled]) highlighted:(color && [color whiteComponent] < 0.5)]; // Yes, we use NSReadPixel to determine whether or not we're highlighted or not. Believe me, I've tried a lot of things. It didn't even seem like Carbon menus could do it.
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSSize)cellSize
@@ -143,6 +145,19 @@ static void PGEnsureWindowCreatedHack(void)
 
 #pragma mark NSTextAttachmentCell
 
+- (void)drawWithFrame:(NSRect)aRect
+        inView:(NSView *)aView
+{
+	[NSGraphicsContext saveGraphicsState];
+	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+	[[self image] setFlipped:YES];
+	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	[NSGraphicsContext restoreGraphicsState];
+}
+- (NSSize)cellSize
+{
+	return NSMakeSize(16, 16);
+}
 - (NSPoint)cellBaselineOffset
 {
 	return NSMakePoint(0, -3);
@@ -152,9 +167,11 @@ static void PGEnsureWindowCreatedHack(void)
 
 - (id)initImageCell:(NSImage *)anImage
 {
+	if(!anImage || !PGIsTigerOrLater()) {
+		[self release];
+		return nil;
+	}
 	PGEnsureWindowCreatedHack();
-	[anImage setScalesWhenResized:YES];
-	[anImage setSize:NSMakeSize(16, 16)];
 	return [super initImageCell:anImage];
 }
 

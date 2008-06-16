@@ -141,8 +141,10 @@ DEALINGS WITH THE SOFTWARE. */
 	[nodesOutline reloadData];
 	[nodesOutline expandItem:_rootNode expandChildren:YES];
 	if(!_initialNode) return;
-	unsigned const defaultRow = [nodesOutline rowForItem:_initialNode];
-	if(NSNotFound != defaultRow && [_initialNode canGetData]) {
+	PGNode *node = _initialNode;
+	while(node && ![node canGetData]) node = [node parentNode];
+	unsigned const defaultRow = node ? [nodesOutline rowForItem:node] : NSNotFound;
+	if(NSNotFound != defaultRow) {
 		[nodesOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:defaultRow] byExtendingSelection:NO];
 		[nodesOutline scrollRowToVisible:defaultRow];
 	}

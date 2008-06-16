@@ -665,8 +665,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";
 			};
@@ -686,8 +684,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
-				SDKROOT_i386 = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
-				SDKROOT_ppc = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";
 			};

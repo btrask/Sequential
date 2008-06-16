@@ -83,16 +83,16 @@ DEALINGS WITH THE SOFTWARE. */
 		[URL appendFormat:@":%d", port];
 	}
 
+	NSMutableString *const path = [NSMutableString string];
 	[scanner scanString:@"/" intoString:NULL];
-	[URL appendString:@"/"];
-
+	[path appendString:@"/"];
 	NSCharacterSet *const hexCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"];
 	NSMutableData *const hexData = [NSMutableData data];
 	while(YES) {
 		NSString *pathPart;
 		if([scanner scanUpToString:@"%" intoString:&pathPart]) {
 			[hexData setLength:0];
-			[URL appendString:pathPart];
+			[path appendString:pathPart];
 		}
 		if(![scanner scanString:@"%" intoString:NULL]) break;
 		unsigned const percentLoc = [scanner scanLocation];
@@ -100,7 +100,7 @@ DEALINGS WITH THE SOFTWARE. */
 		if(![scanner scanCharactersFromSet:hexCharacterSet intoString:&hex] || [hex length] < 2) {
 			[hexData setLength:0];
 			[scanner setScanLocation:percentLoc];
-			[URL appendString:@"%"];
+			[path appendString:@"%"];
 			continue;
 		}
 		[scanner setScanLocation:percentLoc + 2];
@@ -110,11 +110,13 @@ DEALINGS WITH THE SOFTWARE. */
 			[hexData appendBytes:&character length:1];
 			NSString *const hexEncodedString = [[[NSString alloc] initWithData:hexData encoding:NSUTF8StringEncoding] autorelease];
 			if(hexEncodedString) {
-				[URL appendString:hexEncodedString];
+				[path appendString:hexEncodedString];
 				[hexData setLength:0];
 			}
 		}
 	}
+	if([path rangeOfString:@"//"].location != NSNotFound) return nil;
+	[URL appendString:path];
 	return [self URLWithString:[URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 }
 

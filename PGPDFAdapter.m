@@ -30,7 +30,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface PGPDFAdapter (Private)
 
-- (NSImage *)_image;
 - (NSPDFImageRep *)_rep;
 
 @end
@@ -39,10 +38,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Private Protocol
 
-- (NSImage *)_image
-{
-	return [[_image retain] autorelease];
-}
 - (NSPDFImageRep *)_rep
 {
 	return [[_rep retain] autorelease];
@@ -58,20 +53,18 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSData *data;
 	switch([self getData:&data]) {
-	case PGWrongPassword: return;
-	case PGDataUnavailable:
-	{
-		PGResourceIdentifier *const identifier = [self identifier];
-		NSParameterAssert([identifier isFileIdentifier]);
-		data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-		break;
+		case PGWrongPassword: return;
+		case PGDataUnavailable:
+		{
+			PGResourceIdentifier *const identifier = [self identifier];
+			NSParameterAssert([identifier isFileIdentifier]);
+			data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+			break;
+		}
+		case PGDataAvailable: break;
 	}
-	case PGDataAvailable: break;
-	}
-	_image = [[NSImage alloc] initWithData:data];
-	_rep = (NSPDFImageRep *)[[_image bestRepresentationForDevice:nil] retain];
-	if(!_rep || ![_rep isKindOfClass:[NSPDFImageRep class]]) return;
-	[_image setCacheMode:NSImageCacheNever]; // Caching is broken for PDFs.
+	_rep = [[NSPDFImageRep alloc] initWithData:data];
+	if(!_rep) return;
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
@@ -90,7 +83,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)dealloc
 {
-	[_image release];
 	[_rep release];
 	[super dealloc];
 }
@@ -104,10 +96,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)readContents
 {
 	[self setHasReadContents];
-	PGPDFAdapter *const adapter = (PGPDFAdapter *)[self parentAdapter];
-	NSParameterAssert(adapter);
-	[[adapter _rep] setCurrentPage:[[self identifier] index]];
-	[self returnImage:[adapter _image] error:nil];
+	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
+	[rep setCurrentPage:[[self identifier] index]];
+	[self returnImageRep:rep error:nil];
 }
 - (BOOL)isResolutionIndependent
 {

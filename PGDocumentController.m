@@ -134,6 +134,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
+		[NSNumber numberWithBool:NO], PGFullscreenKey,
+		[NSNumber numberWithBool:NO], PGExifShownKey,
+		[NSNumber numberWithBool:NO], PGUsesDirectionMouseButtonMappingKey,
 		nil]];
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l);
@@ -173,7 +176,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (IBAction)openDocument:(id)sender
+- (IBAction)open:(id)sender
 {
 	NSOpenPanel *const openPanel = [NSOpenPanel openPanel];
 	[openPanel setCanChooseDirectories:YES];
@@ -196,14 +199,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)clearRecentDocuments:(id)sender
 {
 	[self setRecentDocumentIdentifiers:[NSArray array]];
-}
-
-#pragma mark -
-
-- (IBAction)toggleExif:(id)sender
-{
-	if([self exifShown]) [[_exifPanel window] performClose:self];
-	else [self setExifShown:YES];
 }
 
 #pragma mark -
@@ -240,6 +235,29 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)changeReadingDirection:(id)sender
 {
 	[[self currentPrefObject] setReadingDirection:[sender tag]];
+}
+
+#pragma mark -
+
+- (IBAction)toggleExif:(id)sender
+{
+	if([self exifShown]) [[_exifPanel window] performClose:self];
+	else [self setExifShown:YES];
+}
+- (IBAction)selectPreviousDocument:(id)sender
+{
+	PGDocument *const doc = [self next:NO documentBeyond:[self currentDocument]];
+	if(doc) [[doc displayController] activateDocument:doc];
+}
+- (IBAction)selectNextDocument:(id)sender
+{
+	PGDocument *const doc = [self next:YES documentBeyond:[self currentDocument]];
+	if(doc) [[doc displayController] activateDocument:doc];
+}
+- (IBAction)activateDocument:(id)sender
+{
+	PGDocument *const doc = [sender representedObject];
+	[[doc displayController] activateDocument:doc];
 }
 
 #pragma mark -
@@ -335,12 +353,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)addDocument:(PGDocument *)document
 {
 	NSParameterAssert([_documents indexOfObjectIdenticalTo:document] == NSNotFound);
+	if(![_documents count]) [windowsMenu addItem:windowsMenuSeparator];
 	[_documents addObject:document];
 	NSMenuItem *const item = [[[NSMenuItem alloc] init] autorelease];
 	[item setRepresentedObject:document];
-	[item setAction:@selector(activateTab:)];
-	[item setTarget:nil];
-	[tabsMenu addItem:item];
+	[item setAction:@selector(activateDocument:)];
+	[item setTarget:self];
+	[windowsMenu addItem:item];
 	[self _setInFullscreen:YES];
 }
 - (void)removeDocument:(PGDocument *)document
@@ -349,21 +368,35 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(document == [self currentDocument]) [self setCurrentDocument:nil];
 	if(!document) return;
 	[_documents removeObject:document];
-	unsigned const i = [tabsMenu indexOfItemWithRepresentedObject:document];
-	if(NSNotFound != i) [tabsMenu removeItemAtIndex:i];
+	unsigned const i = [windowsMenu indexOfItemWithRepresentedObject:document];
+	if(NSNotFound != i) [windowsMenu removeItemAtIndex:i];
+	if(![_documents count]) [windowsMenuSeparator AE_removeFromMenu];
 	[self _setInFullscreen:[_documents count] > 0];
 }
-- (id)documentForResourceIdentifier:(PGResourceIdentifier *)ident
+- (PGDocument *)documentForResourceIdentifier:(PGResourceIdentifier *)ident
 {
 	PGDocument *doc;
 	NSEnumerator *const docEnum = [_documents objectEnumerator];
 	while((doc = [docEnum nextObject])) if([[doc identifier] isEqual:ident]) return doc;
 	return nil;
 }
-- (NSMenuItem *)tabMenuItemForDocument:(PGDocument *)document
+- (PGDocument *)next:(BOOL)flag
+                documentBeyond:(PGDocument *)document
 {
-	int const i = [tabsMenu indexOfItemWithRepresentedObject:document];
-	return -1 == i ? nil : [tabsMenu itemAtIndex:i];
+	NSArray *const docs = [[PGDocumentController sharedDocumentController] documents];
+	unsigned const count = [docs count];
+	if(count <= 1) return nil;
+	unsigned i = [docs indexOfObjectIdenticalTo:[self currentDocument]];
+	if(NSNotFound == i) return nil;
+	if(flag) {
+		if([docs count] == ++i) i = 0;
+	} else if(0 == i--) i = [docs count] - 1;
+	return [docs objectAtIndex:i];
+}
+- (NSMenuItem *)windowsMenuItemForDocument:(PGDocument *)document
+{
+	int const i = [windowsMenu indexOfItemWithRepresentedObject:document];
+	return -1 == i ? nil : [windowsMenu itemAtIndex:i];
 }
 
 #pragma mark -
@@ -542,9 +575,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[[_fullscreenController window] close];
 		[_fullscreenController release];
 		_fullscreenController = nil;
-
-		[windowsMenuItem AE_addAfterItem:tabsMenuItem];
-		[tabsMenuItem AE_removeFromMenu];
 	} else if([[self documents] count] && [self fullscreen]) {
 		_inFullscreen = flag;
 		PGDocument *const currentDoc = [self currentDocument];
@@ -559,9 +589,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		}
 		[_fullscreenController setActiveDocument:currentDoc closeIfAppropriate:NO];
 		[_fullscreenController showWindow:self];
-
-		[tabsMenuItem AE_addAfterItem:windowsMenuItem];
-		[windowsMenuItem AE_removeFromMenu];
 	}
 	NSEnableScreenUpdates();
 }
@@ -606,7 +633,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
                 document:(PGDocument *)document
                 display:(BOOL)display
 {
-	// TODO: Ignore failed docs.
+	if(!document) return nil;
 	if(flag) [self addDocument:document];
 	if(display) [document createUI];
 	return document;
@@ -643,17 +670,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (void)awakeFromNib
 {
-	[NSApp setWindowsMenu:windowsMenu];
-
 	[switchToPathFinder retain];
 	[switchToFinder retain];
 	[revealInPathFinder retain];
 	[revealInFinder retain];
 	[revealInBrowser retain];
+	[revealInBrowser AE_removeFromMenu];
 	[defaultPageMenu retain];
-	[windowsMenuItem retain];
-	[tabsMenuItem retain];
-	[tabsSeparator retain];
+	[windowsMenuSeparator retain];
+	[windowsMenuSeparator AE_removeFromMenu];
 
 	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
 	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
@@ -665,12 +690,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[zoomIn setKeyEquivalent:(PGIsLeopardOrLater() ? @"+" : @"=")]; // Leopard is smart about this.
 	[zoomIn setKeyEquivalentModifierMask:NSCommandKeyMask];
 
-	[revealInBrowser AE_removeFromMenu];
-	[tabsMenuItem AE_removeFromMenu];
+	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E2]];
+	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask | NSShiftKeyMask];
+	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E0]];
+	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask | NSShiftKeyMask];
 
 	NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
-	[self setFullscreen:PGValueWithSelectorOrDefault([defaults objectForKey:PGFullscreenKey], boolValue, NO)];
-	[self setExifShown:PGValueWithSelectorOrDefault([defaults objectForKey:PGExifShownKey], boolValue, NO)];
+	[self setFullscreen:[[defaults objectForKey:PGFullscreenKey] boolValue]];
+	[self setExifShown:[[defaults objectForKey:PGExifShownKey] boolValue]];
 	_prefsLoaded = YES;
 
 	[self setCurrentDocument:nil];
@@ -696,6 +723,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
 		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
 	} else if(@selector(changeSortRepeat:) == action) [anItem setState:tag == (PGSortRepeatMask & [pref sortOrder])];
+	if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
+	if([[self documents] count] <= 1) {
+		if(@selector(selectPreviousDocument:) == action) return NO;
+		if(@selector(selectNextDocument:) == action) return NO;
+	}
 	if(![self currentDocument]) {
 		if(@selector(changeReadingDirection:) == action) return NO;
 		if(@selector(changeImageScalingMode:) == action) return NO;
@@ -810,7 +842,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		}
 		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
 
-		[self setUsesDirectionalMouseButtonMapping:PGValueWithSelectorOrDefault([defaults objectForKey:PGUsesDirectionMouseButtonMappingKey], boolValue, NO)];
+		[self setUsesDirectionalMouseButtonMapping:[[defaults objectForKey:PGUsesDirectionMouseButtonMappingKey] boolValue]];
 
 		_documents = [[NSMutableArray alloc] init];
 		_classesByExtension = [[NSMutableDictionary alloc] init];
@@ -838,8 +870,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[revealInFinder release];
 	[revealInBrowser release];
 	[defaultPageMenu release];
-	[windowsMenuItem release];
-	[tabsMenuItem release];
+	[windowsMenuSeparator release];
 	[_runningApps release];
 	[_recentMenuSeparatorItem release];
 	[_recentDocumentIdentifiers release];

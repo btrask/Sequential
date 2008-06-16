@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithScreen:(NSScreen *)anObject
 {
-	if((self = [super initWithContentRect:[anObject frame] styleMask:(NSBorderlessWindowMask | AEUnscaledWindowMask) backing:NSBackingStoreBuffered defer:YES])) {
+	if((self = [super initWithContentRect:[anObject frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES])) {
 		[self setHasShadow:NO];
 	}
 	return self;

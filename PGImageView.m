@@ -50,10 +50,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Instance Methods
 
-- (NSImage *)image
-{
-	return [[_image retain] autorelease];
-}
 - (NSImageRep *)rep
 {
 	return [[_rep retain] autorelease];
@@ -62,21 +58,25 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return _orientation;
 }
-- (void)setImage:(NSImage *)anImage
+- (void)setImageRep:(NSImageRep *)rep
         orientation:(PGOrientation)orientation
 {
-	if(anImage != _image) {
+	if(rep != _rep) {
+		[_image removeRepresentation:_rep];
 		[_image removeRepresentation:_cache];
-		if([[_image representations] indexOfObjectIdenticalTo:_rep] == NSNotFound) [_image addRepresentation:_rep];
-		[_image release];
-		_image = [anImage retain];
+
 		[_rep release];
-		_rep = [[_image bestRepresentationForDevice:nil] retain];
+		_rep = [rep retain];
 		[_cache release];
 		_cache = nil;
+
+		[_image addRepresentation:_rep];
+
 		_isOpaque = _rep && ![_rep hasAlpha];
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
+
+		[self _cache];
 		[self _animate:YES];
 	}
 	_orientation = orientation;
@@ -142,24 +142,30 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_cache
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_cache) object:nil];
-	if(!_image || _numberOfFrames > 1 || [_image cacheMode] == NSImageCacheNever) return;
+	if(!_rep || _numberOfFrames > 1 || _isPDF) return;
 	[_image removeRepresentation:_cache];
 	[_cache release];
 	_cache = nil;
-	if([[_image representations] indexOfObjectIdenticalTo:_rep] == NSNotFound) [_image addRepresentation:_rep];
-	if([self inLiveResize]) return; // Don't bother.
+	[_image removeRepresentation:_rep];
+	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+	[_image setSize:pixelSize];
+	[_image addRepresentation:_rep];
 	if(_orientation & PGRotated90CC) return; // Caching doesn't help rotated images.
 	NSSize const scaledSize = [self frame].size;
-	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	if(scaledSize.width > pixelSize.width || scaledSize.height > pixelSize.height) return; // Only cache if the image is smaller than full size, because caching huge images takes FOREVER.
+	if([self inLiveResize]) {
+		_cheatedDuringLiveResize = YES;
+		return; // Don't bother until we stop.
+	}
 	_cache = [[NSCachedImageRep alloc] initWithSize:scaledSize depth:[[self window] depthLimit] separate:YES alpha:!_isOpaque];
 	NSView *const view = [[_cache window] contentView];
 	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
 	[self setUpGState];
-	[_image drawRepresentation:_rep inRect:[_cache rect]];
+	[_rep drawInRect:[_cache rect]];
 	[view unlockFocus];
-	[_image addRepresentation:_cache];
 	[_image removeRepresentation:_rep];
+	[_image setSize:scaledSize];
+	[_image addRepresentation:_cache];
 }
 
 #pragma mark PGClipViewDocumentView Protocol
@@ -174,6 +180,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)initWithFrame:(NSRect)aRect
 {
 	if((self = [super initWithFrame:aRect])) {
+		_image = [[NSImage alloc] init];
+		[_image setDataRetained:YES];
+		[_image setScalesWhenResized:NO];
 		_antialias = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
 		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
@@ -188,7 +197,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setUpGState
 {
 	if([self antialiasWhenUpscaling]) return [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	NSSize const imageSize = [[self image] size];
+	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	NSSize const viewSize = [self frame].size;
 	[[NSGraphicsContext currentContext] setImageInterpolation:(imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh)];
 }
@@ -243,13 +252,15 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setFrameSize:(NSSize)aSize
 {
+	if(NSEqualSizes(aSize, [self frame].size)) return;
 	[super setFrameSize:aSize];
 	[self _cache];
 }
 - (void)viewDidEndLiveResize
 {
 	[super viewDidEndLiveResize];
-	[self _cache];
+	if(_cheatedDuringLiveResize) [self _cache];
+	_cheatedDuringLiveResize = NO;
 }
 
 #pragma mark NSObject
@@ -261,10 +272,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
-	[self setImage:nil orientation:PGUpright];
-	NSParameterAssert(!_image);
+	[self setImageRep:nil orientation:PGUpright];
 	NSParameterAssert(!_rep);
 	NSParameterAssert(!_cache);
+	[_image release];
 	[self _animate:NO];
 	[super dealloc];
 }

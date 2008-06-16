@@ -73,7 +73,7 @@ typedef int PGReadingPolicy;
 
 - (BOOL)shouldReadContents;
 - (void)setHasReadContents;
-- (void)readContents; // Abstract method. Sent by -becomeViewed and -becomeViewedWithPassword:. -lastPassword may be set--you can send -readFromData:URLResponse: if you need to defer loading until a password is set. If -[node expectsReturnedImage], should send -setHasReadContents and then -returnImage:error must be sent sometime thereafter.
+- (void)readContents; // Abstract method. Sent by -becomeViewed and -becomeViewedWithPassword:. -lastPassword may be set--you can send -readFromData:URLResponse: if you need to defer loading until a password is set. If -[node expectsReturnedImage], should send -setHasReadContents and then -returnImageRep:error must be sent sometime thereafter.
 
 - (void)noteDateModifiedDidChange;
 - (void)noteDateCreatedDidChange;

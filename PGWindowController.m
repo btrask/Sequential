@@ -67,6 +67,11 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	if([[self activeDocument] getStoredWindowFrame:&frame]) [[self window] AE_setContentRect:frame];
 	return NO;
 }
+- (void)activateDocument:(PGDocument *)document
+{
+	NSParameterAssert([self activeDocument] == document);
+	[[self window] makeKeyAndOrderFront:self];
+}
 
 #pragma mark NSWindowController
 

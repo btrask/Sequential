@@ -62,8 +62,8 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 	[self cancelFadeOut];
 	if(aWindow != _parentWindow) [_parentWindow removeChildWindow:self];
 	[self setIgnoresMouseEvents:!_acceptsEvents];
-
 	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:[aWindow AE_contentRect] scale:[self AE_userSpaceScaleFactor]] display:NO];
+	[self orderFront:self];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
 }
 

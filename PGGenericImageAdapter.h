@@ -30,7 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	NSArray      *_exifEntries;
 	PGOrientation _orientation;
-	NSImage      *_cachedImage;
+	NSImageRep   *_cachedRep;
 }
 
 @end

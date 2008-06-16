@@ -56,10 +56,6 @@ static PGPrefController *PGSharedPrefController = nil;
 
 #pragma mark -
 
-- (Class)screenClass
-{
-	return [NSScreen class];
-}
 - (NSColor *)backgroundPatternColor
 {
 	NSColor *const color = [[NSUserDefaults standardUserDefaults] AE_decodedObjectForKey:@"PGBackgroundColor"];
@@ -119,31 +115,6 @@ static PGPrefController *PGSharedPrefController = nil;
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"PGBackgroundColor"];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"PGBackgroundPattern"];
 	[super dealloc];
-}
-
-@end
-
-@implementation PGScreenValueTransformer
-
-#pragma mark NSValueTransformer
-
-+ (Class)transformedValueClass
-{
-	return [NSArray class];
-}
-- (id)transformedValue:(id)value
-{
-	NSMutableArray *const results = [NSMutableArray array];
-	NSArray *const screens = [NSScreen screens];
-	if(![screens count]) return results;
-	NSScreen *screen;
-	NSEnumerator *const screenEnum = [value objectEnumerator];
-	while((screen = [screenEnum nextObject])) {
-		unsigned const i = [screens indexOfObjectIdenticalTo:screen];
-		if(NSNotFound == i) continue;
-		[results addObject:[NSString stringWithFormat:@"%@ (%dx%d)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %d", nil), i + 1] : NSLocalizedString(@"Main Screen", nil)), (int)NSWidth([screen frame]), (int)NSHeight([screen frame])]];
-	}
-	return results;
 }
 
 @end

@@ -90,7 +90,7 @@ DEALINGS WITH THE SOFTWARE. */
 		int const code = [(NSHTTPURLResponse *)resp statusCode];
 		if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", nil), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
 	} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", nil), [[_mainConnection request] URL]];
-	[self returnImage:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
+	[self returnImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 
 #pragma mark NSObject

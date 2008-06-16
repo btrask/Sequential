@@ -24,10 +24,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-enum {
-	AEUnscaledWindowMask = 1 << 11 // Equivalent to NSUnscaledWindowMask but available on Panther.
-};
-
 @interface NSWindow (AEAdditions)
 
 - (BOOL)AE_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.
