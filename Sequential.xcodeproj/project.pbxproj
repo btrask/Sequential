@@ -58,7 +58,6 @@
 		0E53BF510DB760EC0012AC5B /* HMBlkAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */; };
 		0E53BF560DB761180012AC5B /* HMBlkAppKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */; };
 		0E5B552F0D0B7FCF0094938A /* NSDateAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B552E0D0B7FCF0094938A /* NSDateAdditions.m */; };
-		0E5EBE7C0CE9BD5000E7FF9A /* PGLoading.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E5EBE7A0CE9BD5000E7FF9A /* PGLoading.nib */; };
 		0E5EBF710CEB751300E7FF9A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E5EBF700CEB751300E7FF9A /* WebKit.framework */; };
 		0E5EC04B0CEB850300E7FF9A /* PGMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */; };
 		0E5EC1D60CEDFBBC00E7FF9A /* PGURLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */; };
@@ -247,7 +246,6 @@
 		0E12117D0D31A5D10055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0E12117E0D31A5D70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0E1211800D31A5E70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGEncoding.nib; sourceTree = "<group>"; };
-		0E1211810D31A5EE0055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGLoading.nib; sourceTree = "<group>"; };
 		0E1D374F0A7E319100C542A6 /* PGFullscreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFullscreenController.h; sourceTree = "<group>"; };
 		0E1D37500A7E319100C542A6 /* PGFullscreenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFullscreenController.m; sourceTree = "<group>"; };
 		0E1D379A0A7E532300C542A6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
@@ -286,7 +284,6 @@
 		0E5DD3540CAF915A0085241E /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = Spanish.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0E5DD3550CAF91640085241E /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGMenu.nib; sourceTree = "<group>"; };
 		0E5DD3580CAF91840085241E /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGEncoding.nib; sourceTree = "<group>"; };
-		0E5EBE7B0CE9BD5000E7FF9A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGLoading.nib; sourceTree = "<group>"; };
 		0E5EBF700CEB751300E7FF9A /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGMainThreadProxy.h; sourceTree = "<group>"; };
 		0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGMainThreadProxy.m; sourceTree = "<group>"; };
@@ -302,8 +299,6 @@
 		0E81357A0D01998F001A5B60 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0E81357B0D019996001A5B60 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0E81357C0D019999001A5B60 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGExtract.nib; sourceTree = "<group>"; };
-		0E81357D0D0199A3001A5B60 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGLoading.nib; sourceTree = "<group>"; };
-		0E81357E0D0199A6001A5B60 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGLoading.nib; sourceTree = "<group>"; };
 		0E82626B0CA950770041FA9D /* Sequential.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sequential.icns; sourceTree = "<group>"; };
 		0E9012A30DF22636004B6F69 /* Mirror-Black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Mirror-Black.png"; sourceTree = "<group>"; };
 		0E9012A40DF22636004B6F69 /* Mirror-White.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Mirror-White.png"; sourceTree = "<group>"; };
@@ -355,7 +350,6 @@
 		0EC999F00D9762CE0093187C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0EC999F10D9762D20093187C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0EC999F30D9762DB0093187C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGEncoding.nib; sourceTree = "<group>"; };
-		0EC999F40D9762E00093187C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGLoading.nib; sourceTree = "<group>"; };
 		0ECD9FFC0CB3961B0059C754 /* PGFindView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFindView.h; sourceTree = "<group>"; };
 		0ECD9FFD0CB3961B0059C754 /* PGFindView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFindView.m; sourceTree = "<group>"; };
 		0ECF36E60C7DC4FC0009EB00 /* PGSubscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSubscription.h; sourceTree = "<group>"; };
@@ -774,13 +768,12 @@
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
 				0EB167DF0A82AD89001999E7 /* Localizable.strings */,
 				2A37F4B6FDCFA73011CA2CEA /* PGMenu.nib */,
+				0E90163F0DF44051004B6F69 /* PGPreferences.nib */,
 				0EE98F8B0DEEB13F0004F628 /* PGWindow.nib */,
+				0EEE55930DB0C3E2006E5B9C /* PGExif.nib */,
 				0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */,
 				0EE059AB0CF29F240080061B /* PGExtract.nib */,
 				0E051D9B0C801B150041874F /* PGEncoding.nib */,
-				0E5EBE7A0CE9BD5000E7FF9A /* PGLoading.nib */,
-				0EEE55930DB0C3E2006E5B9C /* PGExif.nib */,
-				0E90163F0DF44051004B6F69 /* PGPreferences.nib */,
 				0EE991040DEFFBAA0004F628 /* SequentialHelp */,
 				0E82626B0CA950770041FA9D /* Sequential.icns */,
 				0E82627E0CA96CD10041FA9D /* Document Icons */,
@@ -905,7 +898,6 @@
 				0EB167E00A82AD89001999E7 /* Localizable.strings in Resources */,
 				0E051D9D0C801B160041874F /* PGEncoding.nib in Resources */,
 				0E82626C0CA950770041FA9D /* Sequential.icns in Resources */,
-				0E5EBE7C0CE9BD5000E7FF9A /* PGLoading.nib in Resources */,
 				0E5EC1D90CEDFEED00E7FF9A /* PGURL.nib in Resources */,
 				0EE059AD0CF29F250080061B /* PGExtract.nib in Resources */,
 				0E06CBA60CF9A8C2004124B0 /* URL.png in Resources */,
@@ -1073,18 +1065,6 @@
 				0E5DD3580CAF91840085241E /* Spanish */,
 			);
 			name = PGEncoding.nib;
-			sourceTree = "<group>";
-		};
-		0E5EBE7A0CE9BD5000E7FF9A /* PGLoading.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0E5EBE7B0CE9BD5000E7FF9A /* English */,
-				0EC999F40D9762E00093187C /* French */,
-				0E81357D0D0199A3001A5B60 /* it_IT */,
-				0E1211810D31A5EE0055F587 /* Polish */,
-				0E81357E0D0199A6001A5B60 /* Spanish */,
-			);
-			name = PGLoading.nib;
 			sourceTree = "<group>";
 		};
 		0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */ = {

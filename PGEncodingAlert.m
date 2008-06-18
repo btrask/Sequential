@@ -34,7 +34,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)initWithString:(char const *)bytes
       guess:(NSStringEncoding)guess
 {
-	if(!(self = [self initWithWindowNibName:@""])) return nil;
+	if(!(self = [self initWithWindowNibName:@"PGEncoding"])) return nil;
 	(void)[self window]; // Just load it.
 	NSStringEncoding const *const encodings = [NSString availableStringEncodings];
 	NSMutableArray *const usedEncodings = [[NSMutableArray alloc] init];

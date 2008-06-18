@@ -16,10 +16,6 @@
 "Show Info" = "Mostrar información";
 "Hide Info" = "Ocultar información";
 
-/* Toggle the Exif panel. Two states. */
-"Show Exif Data" = "Show Exif Data";
-"Hide Exif Data" = "Hide Exif Data";
-
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Ajustar a pantalla";
 "Fit to Window" = "Fit to Window";
@@ -31,53 +27,11 @@
 /* Bookmark menu item used when the file named %@ cannot be found. */
 "Missing File %@" = "Archivo no ncontrado “%@”";
 
-/* Folder with no displayable images error. %@ is replaced by the filename. */
-"The folder %@ contains no displayable images." = "La carpeta “%@” no contiene imágenes para mostrar.";
-"If one of this folder's subfolders contains images you wish to view, open that folder directly." = "Si una carpeta dentro de ésta contiene imágenes que quiere ver, ábrala directamente.";
-
-/* Archive with no displayable images error. %@ is replaced by the filename. */
-"The archive %@ contains no displayable images." = "El archivo “%@” no tiene imágenes para mostrar.";
-"If you know it does, try expanding it with another application." = "Si sabe que es posible, intente expandirlo mediante otra aplicación.";
-
-/* Invalid archive type error. %@ is replaced by the filename. */
-"The file %@ does not appear to be in a supported format." = "El archivo “%@” no parece ser un formato soportado.";
-"If this file is an archive, try expanding it with another application." = "Si este archivo es un archivo comprimido, intente expandirlo con otra aplicación.";
-
-/* Archive requires a password prompt. %@ is replaced by the filename. */
-"The archive %@ is encrypted and requires a password in order to be opened." = "El archivo comprimido “%@” está encriptado y requiere un password para ser abierto.";
-
-/* The archive has an unknown encoding prompt. %@ is replaced by the filename. */
-"The correct text encoding for the file %@ could not be automatically determined." = "La codificación de texto correcta para “%@” no se pudo determinar automáticamente.";
-
 /* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %u %@ was generated while loading the URL %@." = "El error “%u %@” se generó mientras se cargaba la URL “%@.”";
-"Make sure the URL is correct and the page is available." = "Asegúrese de que la URL es correcta y la página está disponible";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
 "The URL %@ could not be loaded." = "La URL “%@” no pudo cargarse.";
-"Make sure the connection and server are available." = "Asegúrese de que la conexión y el servidor funcionan.";
-
-/* The URL didn't have any images, and was not an image itself. %@ is replaced by the full URL. */
-"The URL %@ did not contain any displayable images." = "La URL “%@” no contiene imágenes que mostrar";
-"Sequential displays images that are linked to by or embedded within the page." = "Sequential muestra imágenes enlazadas o contenidas en la página web.";
-
-/* The URL is being loaded. %@ is replaced by the full URL. */
-"Sequential is loading the URL %@." = "Sequential está cargando la URL “%@.”";
-"Calculating time remaining..." = "Calculando tiempo restante";
-
-/* The URL is being loaded. %@ is replaced by a number with the units below. */
-"Loading URL: About %@ remaining." = "Cargando URL: Acerca de %@ restante.";
-"Scanning Links: About %@ remaining." = "Escaneando enlaces: Acerca de %@ restante.";
-
-/* Units used for time remaining. Only the largest unit is shown. %u is replaced by a non-1 number. */
-"%u hours" = "%u horas";
-"%u minutes" = "%u minutos";
-"%u seconds" = "%u segundos";
-
-/* Units used for time remaining when the amount is 1. */
-"1 hour" = "1 hora";
-"1 minute" = "1 minuto";
-"1 second" = "1 segundo";
 
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "%@ already exists in %@. Do you want to replace it?" = "“%@” ya existe en “%@.” ¿Desea reemplazarla?";

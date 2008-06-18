@@ -86,7 +86,7 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (NSMenu *)pageMenu;
 
 - (PGOrientation)baseOrientation;
-- (void)addToBaseOrientation:(PGOrientation)anOrientation;
+- (void)setOrientation:(PGOrientation)anOrientation;
 
 - (void)noteSortedChildrenOfNodeDidChange:(PGNode *)node oldSortedChildren:(NSArray *)children;
 - (void)noteNodeIsViewableDidChange:(PGNode *)node;

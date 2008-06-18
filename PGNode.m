@@ -192,14 +192,15 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	NSParameterAssert([self document]);
 	PGSortOrder const o = [[self document] sortOrder];
 	int const d = PGSortDescendingMask & o ? -1 : 1;
+	NSComparisonResult r = NSOrderedSame;
 	switch(PGSortOrderMask & o) {
 		case PGUnsorted:           return NSOrderedSame;
-		case PGSortByDateModified: return [[self dateModified] compare:[node dateModified]] * d;
-		case PGSortByDateCreated:  return [[self dateCreated] compare:[node dateCreated]] * d;
-		case PGSortBySize:         return [[self dataLength] compare:[node dataLength]] * d;
+		case PGSortByDateModified: r = [[self dateModified] compare:[node dateModified]]; break;
+		case PGSortByDateCreated:  r = [[self dateCreated] compare:[node dateCreated]]; break;
+		case PGSortBySize:         r = [[self dataLength] compare:[node dataLength]]; break;
 		case PGSortShuffle:        return random() & 1 ? NSOrderedAscending : NSOrderedDescending;
 	}
-	return [[[self identifier] displayName] AE_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] * d;
+	return (NSOrderedSame == r ? [[[self identifier] displayName] AE_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
 }
 
 #pragma mark -

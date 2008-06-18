@@ -26,5 +26,5 @@ DEALINGS WITH THE SOFTWARE. */
 
 int main(int argc, char **argv)
 {
-	return NSApplicationMain(argc, (const char **)argv);
+	return NSApplicationMain(argc, (char const **)argv);
 }

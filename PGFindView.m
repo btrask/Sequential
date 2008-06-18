@@ -38,6 +38,18 @@ DEALINGS WITH THE SOFTWARE. */
 	return (NSRect){aRect.origin, NSWidth([self frame]) * s, NSHeight([self frame]) * s};
 }
 
+#pragma mark NSResponder
+
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+	return YES;
+}
+- (void)mouseDown:(NSEvent *)anEvent
+{
+	[[self window] makeKeyAndOrderFront:self];
+	[[self window] makeFirstResponder:[[self window] initialFirstResponder]]; // Fitt's law.
+}
+
 @end
 
 @implementation PGFindlessTextView

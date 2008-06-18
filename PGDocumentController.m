@@ -116,8 +116,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 + (PGDocumentController *)sharedDocumentController
 {
-	if(PGSharedDocumentController) return PGSharedDocumentController;
-	return [[self alloc] init];
+	return PGSharedDocumentController ? PGSharedDocumentController : [[self alloc] init];
 }
 
 #pragma mark NSObject
@@ -321,7 +320,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(_prefsLoaded && flag == _exifShown) return;
 	_exifShown = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGExifShownKey];
-	[toggleExif setTitle:(flag ? NSLocalizedString(@"Hide Exif Data", nil) : NSLocalizedString(@"Show Exif Data", nil))];
 	if(flag) {
 		_exifPanel = [[PGExifPanel alloc] init];
 		[_exifPanel showWindow:self];

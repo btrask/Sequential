@@ -42,9 +42,9 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL              _antialias;
 }
 
-- (NSImageRep *)rep; // The image's representations may be changed by PGImageView. This method is guaranteed to return the original.
+- (NSImageRep *)rep;
 - (PGOrientation)orientation;
-- (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
+- (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 
 - (BOOL)canAnimate;
 - (BOOL)isAnimating; // Can return YES even if the current image isn't animated.
@@ -52,6 +52,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)antialiasWhenUpscaling;
 - (void)setAntialiasWhenUpscaling:(BOOL)flag;
+- (NSImageInterpolation)interpolation; // The image interpolation to use.
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;

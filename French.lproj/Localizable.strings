@@ -16,10 +16,6 @@
 "Show Info" = "Montrer les informations";
 "Hide Info" = "Masquer les informations";
 
-/* Toggle the Exif panel. Two states. */
-"Show Exif Data" = "Show Exif Data";
-"Hide Exif Data" = "Hide Exif Data";
-
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Ajuster à l'écran";
 "Fit to Window" = "Fit to Window";
@@ -31,53 +27,11 @@
 /* Bookmark menu item used when the file named %@ cannot be found. */
 "Missing File %@" = "Impossible de trouver “%@”";
 
-/* Folder with no displayable images error. %@ is replaced by the filename. */
-"The folder %@ contains no displayable images." = "Le dossier “%@” ne contient aucune image valide.";
-"If one of this folder's subfolders contains images you wish to view, open that folder directly." = "Si un des sous-dossiers de ce dossier contient des images que vous souhaitez ouvrir, ouvrez ce dossier directement.";
-
-/* Archive with no displayable images error. %@ is replaced by the filename. */
-"The archive %@ contains no displayable images." = "L'archive “%@” ne contient aucune image valide.";
-"If you know it does, try expanding it with another application." = "Si vous pensez que c'est le cas, tentez d'extraire les données avec une autre application.";
-
-/* Invalid archive type error. %@ is replaced by the filename. */
-"The file %@ does not appear to be in a supported format." = "L'archive “%@” ne semble pas être dans un format supporté.";
-"If this file is an archive, try expanding it with another application." = "Si ce fichier est une archive, tentez d'extraire les données avec une autre application.";
-
-/* Archive requires a password prompt. %@ is replaced by the filename. */
-"The archive %@ is encrypted and requires a password in order to be opened." = "L'archive “%@” est chiffrée et nécessite de fournir un mot de passe pour l'ouvrir.";
-
-/* The archive has an unknown encoding prompt. %@ is replaced by the filename. */
-"The correct text encoding for the file %@ could not be automatically determined." = "L'encodage correct pour le fichier “%@” n'a pu être déterminé automatiquement.";
-
 /* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %u %@ was generated while loading the URL %@." = "L'erreur “%u %@” a été générée lors de l'ouverture de l'adresse “%@.”";
-"Make sure the URL is correct and the page is available." = "Assurez-vous que l'adresse est correcte et que la page est disponible";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
 "The URL %@ could not be loaded." = "L'adresse “%@”  n'a pu être chargée.";
-"Make sure the connection and server are available." = "Assurez-vous que la connexion et le serveur sont disponibles.";
-
-/* The URL didn't have any images, and was not an image itself. %@ is replaced by the full URL. */
-"The URL %@ did not contain any displayable images." = "L'adresse “%@” ne contient aucune image valide.";
-"Sequential displays images that are linked to by or embedded within the page." = "Sequential affiche les images qui sont liées ou affichées dans cette page web.";
-
-/* The URL is being loaded. %@ is replaced by the full URL. */
-"Sequential is loading the URL %@." = "Sequential charge l'adresse “%@.”";
-"Calculating time remaining..." = "Calcul du temps restant...";
-
-/* The URL is being loaded. %@ is replaced by a number with the units below. */
-"Loading URL: About %@ remaining." = "Chargement de l'adresse : environ %@ restant.";
-"Scanning Links: About %@ remaining." = "Parcours des liens : environ %@ restant.";
-
-/* Units used for time remaining. Only the largest unit is shown. %u is replaced by a non-1 number. */
-"%u hours" = "%u heures";
-"%u minutes" = "%u minutes";
-"%u seconds" = "%u secondes";
-
-/* Units used for time remaining when the amount is 1. */
-"1 hour" = "1 heure";
-"1 minute" = "1 minute";
-"1 second" = "1 seconde";
 
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "%@ already exists in %@. Do you want to replace it?" = "“%@” existe déjà dans “%@.” Souhaitez-vous le remplacer ?";

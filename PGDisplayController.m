@@ -68,6 +68,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 @interface PGDisplayController (Private)
 
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (void)_updateImageViewSize;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelLocationAnimate:(BOOL)flag;
@@ -129,7 +130,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (IBAction)changeOrientation:(id)sender
 {
-	[[self activeDocument] addToBaseOrientation:[sender tag]];
+	[[self activeDocument] setOrientation:PGAddOrientation([[self activeDocument] baseOrientation], [sender tag])];
+}
+- (IBAction)revertOrientation:(id)sender
+{
+	[[self activeDocument] setOrientation:PGUpright];
 }
 - (IBAction)performFindPanelAction:(id)sender
 {
@@ -474,8 +479,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
-		[imageView setImageRep:[[aNotif userInfo] objectForKey:PGImageRepKey] orientation:[[self activeNode] orientation]];
-		[self _updateImageViewSize];
+		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
+		PGOrientation const orientation = [[self activeNode] orientation];
+		[imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
 		[clipView setDocumentView:imageView];
 		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 		[[self window] makeFirstResponder:clipView];
@@ -547,8 +553,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
-	[imageView setImageRep:[imageView rep] orientation:[[self activeNode] orientation]];
-	[self _updateImageViewSize];
+	[imageView setImageRep:[imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[imageView rep] orientation:[[self activeNode] orientation]]];
 }
 
 #pragma mark -
@@ -560,12 +565,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark Private Protocol
 
-- (void)_updateImageViewSize
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep
+          orientation:(PGOrientation)orientation
 {
-	NSImageRep *const rep = [imageView rep];
-	if(!rep) return [imageView setFrame:NSZeroRect];
+	if(!rep) return NSZeroSize;
 	NSSize originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	if([imageView orientation] & PGRotated90CC) {
+	if(orientation & PGRotated90CC) {
 		float const w = originalSize.width;
 		originalSize.width = originalSize.height;
 		originalSize.height = w;
@@ -588,7 +593,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSize(newSize, scaleX, scaleY), maxSize);
 	}
-	[imageView setFrameSize:NSMakeSize(roundf(newSize.width), roundf(newSize.height))];
+	return NSMakeSize(roundf(newSize.width), roundf(newSize.height));
+}
+- (void)_updateImageViewSize
+{
+	[imageView setFrameSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]]];
 }
 - (void)_updateNodeIndex
 {
@@ -639,7 +648,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[anItem setState:(0 != tag && tag == interval ? NSOnState : NSOffState)];
 		return tag != 0 || tag != interval;
 	}
-	// Actions that require a valid image.
 	if(![[self activeNode] isViewable]) {
 		if(@selector(revealInPathFinder:) == action) return NO;
 		if(@selector(revealInFinder:) == action) return NO;
@@ -647,19 +655,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(@selector(pauseDocument:) == action) return NO;
 		if(@selector(pauseAndCloseDocument:) == action) return NO;
 	}
-	// Actions that require nodes with data.
 	if(![[[self activeDocument] node] hasDataNodes]) {
 		if(@selector(extractImages:) == action) return NO;
 	}
-	// Actions that require the current node to be local.
 	if(![[[self activeNode] identifier] isFileIdentifier]) {
 		if(@selector(moveToTrash:) == action) return NO;
 	}
-	// Actions that require the current node to be its own file.
 	if(![[[self activeNode] identifier] URL]) {
 		if(@selector(moveToTrash:) == action) return NO;
 	}
-	// Actions that require an active node.
 	if(![self activeNode]) {
 		if(@selector(copy:) == action) return NO;
 	}
@@ -669,13 +673,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
 	}
+	if([[self activeDocument] baseOrientation] == PGUpright) {
+		if(@selector(revertOrientation:) == action) return NO;
+	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScalingMode] == PGConstantFactorScaling) {
 		if(@selector(zoomIn:) == action && [doc imageScaleFactor] >= PGScaleMax) return NO;
 		if(@selector(zoomOut:) == action && [doc imageScaleFactor] <= PGScaleMin) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
-	// Actions that require image nodes.
 	if(!firstNode) { // We could use -hasViewableNodes, but we might have to get -firstNode anyway.
 		if(@selector(firstPage:) == action) return NO;
 		if(@selector(previousPage:) == action) return NO;
@@ -688,15 +694,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(@selector(firstOfFolder:) == action) return NO;
 		if(@selector(lastOfFolder:) == action) return NO;
 	}
-	// Actions that require us to not be on the first image.
 	if([self activeNode] == firstNode) {
 		if(@selector(firstPage:) == action) return NO;
 	}
-	// Actions that require us to not be on the last image.
 	if([self activeNode] == [[[self activeDocument] node] sortedViewableNodeFirst:NO]) {
 		if(@selector(lastPage:) == action) return NO;
 	}
-	// Actions that require a folder in a folder.
 	if(![[[self activeNode] containerAdapter] parentAdapter]) {
 		if(@selector(skipBeforeFolder:) == action) return NO;
 		if(@selector(skipPastFolder:) == action) return NO;
@@ -915,7 +918,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
 	[[self window] setTitle:(title ? title : @"")];
-	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setTitle:title];
+	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:[identifier attributedStringWithWithAncestory:NO]];
 }
 - (void)close
 {

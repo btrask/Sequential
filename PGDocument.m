@@ -205,11 +205,10 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 {
 	return _baseOrientation;
 }
-- (void)addToBaseOrientation:(PGOrientation)anOrientation
+- (void)setOrientation:(PGOrientation)anOrientation
 {
-	PGOrientation const o = PGAddOrientation(_baseOrientation, anOrientation);
-	if(o == _baseOrientation) return;
-	_baseOrientation = o;
+	if(anOrientation == _baseOrientation) return;
+	_baseOrientation = anOrientation;
 	[self AE_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
 }
 

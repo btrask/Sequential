@@ -118,8 +118,11 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	window = [self window];
 	
 	// Store size information
-	NSPoint mouseLocation;
-	mouseLocation = [event locationInWindow];
+	NSPoint mouseLocation = [event locationInWindow];
+
+	// We can't make the shadow ignore mouse clicks, but at least we can not let the user drag by it.
+	if(![self mouse:mouseLocation inRect:NSMakeRect(8, 12, NSWidth([self bounds]) - 16, NSHeight([self bounds]) - 16)]) return;
+
 	_startWindowFrame = [window frame];
 	_startLocation = [window convertBaseToScreen:mouseLocation];
 	

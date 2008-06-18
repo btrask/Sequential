@@ -30,11 +30,17 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
+#define PGCacheOnSeparateThread false // Not as fast as I thought it would be.
+
 @interface PGImageView (Private)
 
 - (void)_animate:(BOOL)flag;
 - (void)_animate; // Should only be called by -_animate:.
 - (void)_cache;
+#if PGCacheOnSeparateThread
+- (void)_threaded_cache:(NSDictionary *)dict;
+- (void)_useCache:(NSDictionary *)dict;
+#endif
 
 @end
 
@@ -60,16 +66,20 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setImageRep:(NSImageRep *)rep
         orientation:(PGOrientation)orientation
+        size:(NSSize)size
 {
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
 		[_image removeRepresentation:_cache];
 
 		[_rep release];
-		_rep = [rep retain];
+		_rep = nil;
 		[_cache release];
 		_cache = nil;
 
+		[self setFrameSize:size];
+
+		_rep = [rep retain];
 		[_image addRepresentation:_rep];
 
 		_isOpaque = _rep && ![_rep hasAlpha];
@@ -78,7 +88,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 		[self _cache];
 		[self _animate:YES];
-	}
+	} else [self setFrameSize:size];
 	_orientation = orientation;
 	[self setNeedsDisplay:YES];
 }
@@ -112,6 +122,13 @@ DEALINGS WITH THE SOFTWARE. */
 	_antialias = flag;
 	[self _cache];
 	[self setNeedsDisplay:YES];
+}
+- (NSImageInterpolation)interpolation
+{
+	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
+	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+	NSSize const viewSize = [self frame].size;
+	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
 }
 
 #pragma mark -
@@ -157,16 +174,49 @@ DEALINGS WITH THE SOFTWARE. */
 		_cheatedDuringLiveResize = YES;
 		return; // Don't bother until we stop.
 	}
-	_cache = [[NSCachedImageRep alloc] initWithSize:scaledSize depth:[[self window] depthLimit] separate:YES alpha:!_isOpaque];
+	NSCachedImageRep *const cache = [[NSCachedImageRep alloc] initWithSize:scaledSize depth:[[self window] depthLimit] separate:YES alpha:!_isOpaque];
+#if PGCacheOnSeparateThread
+	[NSApplication detachDrawingThread:@selector(_threaded_cache:) toTarget:self withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+		[cache autorelease], @"Cache",
+		_rep, @"Rep",
+		[NSNumber numberWithUnsignedInt:[self interpolation]], @"Interpolation",
+		nil]];
+#else
+	_cache = cache;
 	NSView *const view = [[_cache window] contentView];
 	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
-	[self setUpGState];
+	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
 	[_rep drawInRect:[_cache rect]];
 	[view unlockFocus];
 	[_image removeRepresentation:_rep];
 	[_image setSize:scaledSize];
 	[_image addRepresentation:_cache];
+#endif
 }
+#if PGCacheOnSeparateThread
+- (void)_threaded_cache:(NSDictionary *)dict
+{
+	// We don't need an autorelease pool because we call this with -[NSApplication detachDrawingThread:toTarget:withObject:].
+	NSCachedImageRep *const cache = [dict objectForKey:@"Cache"];
+	NSImageRep *const rep = [dict objectForKey:@"Rep"];
+	NSView *const view = [[cache window] contentView];
+	if(![view lockFocusIfCanDraw]) return;
+	[[NSGraphicsContext currentContext] setImageInterpolation:[[dict objectForKey:@"Interpolation"] unsignedIntValue]];
+	[rep drawInRect:[cache rect]];
+	[view unlockFocus];
+	[self performSelectorOnMainThread:@selector(_useCache:) withObject:dict waitUntilDone:NO];
+}
+- (void)_useCache:(NSDictionary *)dict
+{
+	NSCachedImageRep *const cache = [dict objectForKey:@"Cache"];
+	if([dict objectForKey:@"Rep"] != _rep || !NSEqualSizes([cache size], [self frame].size)) return; // Make sure we still care.
+	[_cache release];
+	_cache = [cache retain];
+	[_image removeRepresentation:_rep];
+	[_image setSize:[cache size]];
+	[_image addRepresentation:cache];
+}
+#endif
 
 #pragma mark PGClipViewDocumentView Protocol
 
@@ -181,8 +231,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if((self = [super initWithFrame:aRect])) {
 		_image = [[NSImage alloc] init];
-		[_image setDataRetained:YES];
-		[_image setScalesWhenResized:NO];
+		[_image setScalesWhenResized:NO]; // NSImage seems to make copies of its reps when resizing despite this, so be careful..
+		[_image setCacheMode:NSImageCacheNever]; // We do our own caching.
+		[_image setDataRetained:YES]; // Seems appropriate.
 		_antialias = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
 		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
@@ -194,21 +245,15 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return _isOpaque;
 }
-- (void)setUpGState
-{
-	if([self antialiasWhenUpscaling]) return [[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-	NSSize const viewSize = [self frame].size;
-	[[NSGraphicsContext currentContext] setImageInterpolation:(imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh)];
-}
 - (BOOL)wantsDefaultClipping
 {
 	return PGUpright != _orientation;
 }
 - (void)drawRect:(NSRect)aRect
 {
+	if(!_cache) [[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]]; // If we've cached, the interpolation has already been done.
 	int count = 0;
-	NSRect const *rects;
+	NSRect const *rects = NULL;
 	if(_isPDF) {
 		[self getRectsBeingDrawn:&rects count:&count];
 		[[NSColor whiteColor] set];
@@ -217,7 +262,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSCompositingOperation const operation = _isOpaque && !_isPDF ? NSCompositeCopy : NSCompositeSourceOver;
 	if(PGUpright == _orientation) {
 		NSParameterAssert(![self wantsDefaultClipping]);
-		if(!_isPDF) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
+		if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
 		float const horz = [_image size].width / [self bounds].size.width;
 		float const vert = [_image size].height / [self bounds].size.height;
 		int i = count;
@@ -272,7 +317,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
-	[self setImageRep:nil orientation:PGUpright];
+	[self setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	NSParameterAssert(!_rep);
 	NSParameterAssert(!_cache);
 	[_image release];

@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGMouseHiddenDraggingStyle true
 #define PGAnimateScrolling         true
 #define PGAnimationFrameRate       (1.0 / 30.0)
-#define PGOptimizedScrolling       false
+#define PGCopiesOnScroll           false // Not much of a speedup.
 #define PGClickSlopDistance        3.0
 #define PGShowBorders              true
 #define PGPageTurnMovementDelay    0.5
@@ -412,13 +412,13 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
-#if PGOptimizedScrolling
 	if(![documentView isOpaque]) return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
 	NSRect const oldBounds = [self bounds];
 	if(![self _setPosition:aPoint markForRedisplayIfNeeded:NO]) return NO;
 	NSRect const bounds = [self bounds];
 	float const x = NSMinX(bounds) - NSMinX(oldBounds);
 	float const y = NSMinY(bounds) - NSMinY(oldBounds);
+#if PGCopiesOnScroll
 	NSRect const copiedRect = NSIntersectionRect(NSIntersectionRect(bounds, oldBounds), _documentFrame);
 	if(![self lockFocusIfCanDraw]) {
 		[self setNeedsDisplay:YES];
@@ -432,10 +432,10 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	PGGetRectDifference(rects, &i, NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame), copiedRect);
 	while(i--) [self setNeedsDisplayInRect:rects[i]];
 	[self displayIfNeededIgnoringOpacity];
-	return YES;
 #else
-	return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
+	[self setNeedsDisplayInRect:NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame)]; // On 10.5.3, at least, -setBoundsOrigin: seems to cause the entire view to redisplay (without ever sending either -setNeedsDisplay: or -setNeedsDisplayInRect:, of course), despite the docs explicitly promising otherwise. If this behavior were guaranteed, we might try to be smarter, but as it is, just do the right thing.
 #endif
+	return YES;
 }
 - (void)_scrollOneFrame:(NSTimer *)timer
 {
@@ -471,8 +471,8 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (void)drawRect:(NSRect)aRect
 {
-	NSRect const *rects;
 	int count;
+	NSRect const *rects;
 	[self getRectsBeingDrawn:&rects count:&count];
 	[[self backgroundColor] set];
 	NSRectFillList(rects, count);
@@ -554,6 +554,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	if(1 != [characters length]) return;
 	unichar const character = [characters characterAtIndex:0];
 	unsigned const modifiers = [anEvent modifierFlags];
+	if(modifiers & NSCommandKeyMask) return [super keyDown:anEvent]; // Ignore all command key equivalents.
 	BOOL const forward = !(NSShiftKeyMask & modifiers);
 	switch(character) {
 #if PGGameStyleArrowScrolling
@@ -564,11 +565,12 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 			return [self arrowKeyDown:anEvent];
 #endif
 		case ' ': [self magicPanForward:forward acrossFirst:YES]; return;
-		case 'v': [self magicPanForward:forward acrossFirst:NO]; return;
+		case 'v': [self magicPanForward:YES acrossFirst:NO]; return;
+		case 'V': [self magicPanForward:NO acrossFirst:NO]; return;
 		case 'b': [self magicPanForward:NO acrossFirst:YES]; return;
 		case 'c': [self magicPanForward:NO acrossFirst:NO]; return;
 		case NSCarriageReturnCharacter: [super keyDown:anEvent]; return; // Pass on the return key so the default button can be pressed.
-		case 'q': if(!(modifiers & (NSCommandKeyMask | NSAlternateKeyMask | NSControlKeyMask | NSShiftKeyMask))) [NSApp terminate:self]; return;
+		case 'q': [super keyDown:anEvent]; return;
 	}
 	if(NSNumericPadKeyMask & modifiers) switch(character) {
 		case '1': [self scrollInDirection:PGMinXEdgeMask | PGMinYEdgeMask type:PGScrollByPage]; return;

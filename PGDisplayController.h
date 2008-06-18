@@ -82,6 +82,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 
 - (IBAction)copy:(id)sender;
 - (IBAction)changeOrientation:(id)sender; // Gets the orientation from [sender tag].
+- (IBAction)revertOrientation:(id)sender;
 - (IBAction)performFindPanelAction:(id)sender;
 - (IBAction)hideFindPanel:(id)sender;
 
