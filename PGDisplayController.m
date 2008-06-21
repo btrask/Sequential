@@ -113,7 +113,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (IBAction)extractImages:(id)sender
 {
-	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialNode:[self activeNode]] autorelease] beginSheetForWindow:([[self window] styleMask] & NSTitledWindowMask ? [self window] : nil)];
+	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialNode:[self activeNode]] autorelease] beginSheetForWindow:nil];
 }
 - (IBAction)moveToTrash:(id)sender
 {
@@ -272,7 +272,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (IBAction)chooseEncoding:(id)sender
 {
 	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithString:[[self activeNode] unencodedSampleString] guess:[[self activeNode] defaultEncoding]] autorelease];
-	[alert beginSheetForWindow:([[self window] styleMask] & NSTitledWindowMask ? [self window] : nil) withDelegate:self];
+	[alert beginSheetForWindow:nil withDelegate:self];
 }
 
 #pragma mark -
@@ -912,7 +912,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)synchronizeWindowTitleWithDocumentName
 {
-	PGResourceIdentifier *const identifier = [[self activeDocument] identifier];
+	PGResourceIdentifier *const identifier = [[[self activeDocument] node] identifier];
 	NSString *const path = [identifier isFileIdentifier] ? [[identifier URL] path] : nil;
 	[[self window] setRepresentedFilename:(path ? path : @"")];
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];

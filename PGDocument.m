@@ -235,7 +235,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 {
 	if(!_node) return;
 	NSParameterAssert(node);
-	if([[node identifier] isEqual:_identifier]) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	if([self node] == node) [[self displayController] synchronizeWindowTitleWithDocumentName];
 	[self AE_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDidCache:(PGNode *)node
@@ -258,7 +258,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
-	if([ident isEqual:_identifier]) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	if([ident isEqual:[[self node] identifier]]) [[self displayController] synchronizeWindowTitleWithDocumentName];
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccur];
 }
 
