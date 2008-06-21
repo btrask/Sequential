@@ -713,7 +713,7 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
-	<string>1.4</string>
+	<string>2.0</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>SequentialHelp</string>
 	<key>CFBundleHelpBookName</key>
@@ -743,7 +743,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1.4</string>
+	<string>2.0</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.3.9</string>
 	<key>NSMainNibFile</key>
