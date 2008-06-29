@@ -900,7 +900,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_findPanel setDelegate:self];
 	[_findPanel setAcceptsEvents:YES];
 
-	[imageView bind:@"animating" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
+	[imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
 	[imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
 	[self prefControllerBackgroundPatternColorDidChange:nil];
 }
@@ -952,7 +952,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[self AE_removeObserver];
-	[imageView unbind:@"animating"];
+	[imageView unbind:@"animates"];
 	[imageView unbind:@"antialiasWhenUpscaling"];
 	[imageView release];
 	[passwordView release];

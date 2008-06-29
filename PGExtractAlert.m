@@ -142,7 +142,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[nodesOutline expandItem:_rootNode expandChildren:YES];
 	if(!_initialNode) return;
 	PGNode *node = _initialNode;
-	while(node && ![node canGetData]) node = [node parentNode];
+	while(node && ![node canExtractData]) node = [node parentNode];
 	unsigned const defaultRow = node ? [nodesOutline rowForItem:node] : NSNotFound;
 	if(NSNotFound != defaultRow) {
 		[nodesOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:defaultRow] byExtendingSelection:NO];
@@ -210,7 +210,7 @@ DEALINGS WITH THE SOFTWARE. */
         forTableColumn:(NSTableColumn *)tableColumn
         item:(id)item
 {
-	if(tableColumn == nameColumn) [cell setTextColor:([item canGetData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
+	if(tableColumn == nameColumn) [cell setTextColor:([item canExtractData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldEditTableColumn:(NSTableColumn *)tableColumn
@@ -227,7 +227,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldSelectItem:(id)item
 {
-	return [item canGetData];
+	return [item canExtractData];
 }
 
 #pragma mark NSObject

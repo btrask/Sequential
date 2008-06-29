@@ -40,7 +40,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(!response);
 	NSParameterAssert([self shouldRead:YES]);
-	NSParameterAssert(![self canGetData]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];

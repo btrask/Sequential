@@ -412,13 +412,13 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
+#if PGCopiesOnScroll
 	if(![documentView isOpaque]) return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
 	NSRect const oldBounds = [self bounds];
 	if(![self _setPosition:aPoint markForRedisplayIfNeeded:NO]) return NO;
 	NSRect const bounds = [self bounds];
 	float const x = NSMinX(bounds) - NSMinX(oldBounds);
 	float const y = NSMinY(bounds) - NSMinY(oldBounds);
-#if PGCopiesOnScroll
 	NSRect const copiedRect = NSIntersectionRect(NSIntersectionRect(bounds, oldBounds), _documentFrame);
 	if(![self lockFocusIfCanDraw]) {
 		[self setNeedsDisplay:YES];
@@ -432,10 +432,10 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	PGGetRectDifference(rects, &i, NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame), copiedRect);
 	while(i--) [self setNeedsDisplayInRect:rects[i]];
 	[self displayIfNeededIgnoringOpacity];
-#else
-	[self setNeedsDisplayInRect:NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame)]; // On 10.5.3, at least, -setBoundsOrigin: seems to cause the entire view to redisplay (without ever sending either -setNeedsDisplay: or -setNeedsDisplayInRect:, of course), despite the docs explicitly promising otherwise. If this behavior were guaranteed, we might try to be smarter, but as it is, just do the right thing.
-#endif
 	return YES;
+#else
+	return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
+#endif
 }
 - (void)_scrollOneFrame:(NSTimer *)timer
 {

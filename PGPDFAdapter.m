@@ -43,6 +43,13 @@ DEALINGS WITH THE SOFTWARE. */
 	return [[_rep retain] autorelease];
 }
 
+#pragma mark PGResourceAdapting Protocol
+
+- (BOOL)canExtractData
+{
+	return YES;
+}
+
 #pragma mark PGResourceAdapter
 
 - (PGReadingPolicy)descendentReadingPolicy
@@ -52,17 +59,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)readWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	switch([self getData:&data]) {
-		case PGWrongPassword: return;
-		case PGDataUnavailable:
-		{
-			PGResourceIdentifier *const identifier = [self identifier];
-			NSParameterAssert([identifier isFileIdentifier]);
-			data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-			break;
-		}
-		case PGDataAvailable: break;
-	}
+	if([self getData:&data] != PGDataAvailable) return;
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
 	if(!_rep) return;
 

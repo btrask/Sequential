@@ -105,6 +105,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return (!_hasRead && [self shouldRead:YES]) || [super isViewable];
 }
+- (BOOL)canExtractData
+{
+	return YES;
+}
 - (char const *)unencodedSampleString
 {
 	return [_archive numberOfEntries] ? [_archive _undecodedNameOfEntry:0] : NULL;
@@ -158,20 +162,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(!_archive) {
 		XADError error;
-		NSData *data;
-		switch([self getData:&data]) {
-		case PGWrongPassword: return;
-		case PGDataUnavailable:
-		{
-			PGResourceIdentifier *const identifier = [self identifier];
-			NSParameterAssert([identifier isFileIdentifier]);
-			_archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error];
-			break;
-		}
-		case PGDataAvailable:
-			_archive = [[XADArchive alloc] initWithData:data error:&error];
-			[_archive setDelegate:self];
-			break;
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error]; // -getData: will return data for file identifiers, but it's worth using -[XADArchive initWithFile:...].
+		else {
+			NSData *data;
+			if([self getData:&data] == PGDataAvailable) {
+				_archive = [[XADArchive alloc] initWithData:data error:&error];
+				[_archive setDelegate:self];
+			} else return;
 		}
 		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return;
 	}

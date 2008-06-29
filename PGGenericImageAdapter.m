@@ -72,19 +72,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)canGetData
+- (BOOL)canExtractData
 {
 	return YES;
-}
-- (PGDataAvailability)getData:(out NSData **)outData
-{
-	PGDataAvailability const availability = [super getData:outData];
-	if(PGDataUnavailable != availability) return availability;
-	NSData *data = nil;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	if(outData) *outData = data;
-	return data ? PGDataAvailable : PGDataUnavailable;
 }
 - (NSArray *)exifEntries
 {

@@ -33,12 +33,15 @@ DEALINGS WITH THE SOFTWARE. */
 	NSImage          *_image;
 	NSImageRep       *_rep;
 	NSCachedImageRep *_cache;
+	BOOL              _cacheIsValid;
 	BOOL              _cheatedDuringLiveResize;
 	BOOL              _isOpaque;
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
 	unsigned          _numberOfFrames;
-	BOOL              _animating;
+	BOOL              _animates;
+	unsigned          _pauseCount;
+	NSTimer          *_animationTimer;
 	BOOL              _antialias;
 }
 
@@ -46,13 +49,17 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGOrientation)orientation;
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 
-- (BOOL)canAnimate;
-- (BOOL)isAnimating; // Can return YES even if the current image isn't animated.
-- (void)setAnimating:(BOOL)flag;
+- (BOOL)canAnimateRep;
+- (BOOL)animates;
+- (void)setAnimates:(BOOL)flag;
+- (void)pauseAnimation;
+- (void)resumeAnimation;
 
 - (BOOL)antialiasWhenUpscaling;
 - (void)setAntialiasWhenUpscaling:(BOOL)flag;
 - (NSImageInterpolation)interpolation; // The image interpolation to use.
+
+- (BOOL)usesOptimizedDrawing;
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;

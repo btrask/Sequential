@@ -30,17 +30,11 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-#define PGCacheOnSeparateThread false // Not as fast as I thought it would be.
-
 @interface PGImageView (Private)
 
-- (void)_animate:(BOOL)flag;
-- (void)_animate; // Should only be called by -_animate:.
+- (void)_updateAnimationTimer;
+- (void)_animate;
 - (void)_cache;
-#if PGCacheOnSeparateThread
-- (void)_threaded_cache:(NSDictionary *)dict;
-- (void)_useCache:(NSDictionary *)dict;
-#endif
 
 @end
 
@@ -50,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 + (void)initialize
 {
-	[self exposeBinding:@"animating"];
+	[self exposeBinding:@"animates"];
 	[self exposeBinding:@"antialiasWhenUpscaling"];
 }
 
@@ -68,46 +62,51 @@ DEALINGS WITH THE SOFTWARE. */
         orientation:(PGOrientation)orientation
         size:(NSSize)size
 {
+	_orientation = orientation;
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
 		[_image removeRepresentation:_cache];
-
 		[_rep release];
 		_rep = nil;
-		[_cache release];
-		_cache = nil;
-
 		[self setFrameSize:size];
-
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
-
 		_isOpaque = _rep && ![_rep hasAlpha];
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
-		[self _cache];
-		[self _animate:YES];
+		[self _updateAnimationTimer];
 	} else [self setFrameSize:size];
-	_orientation = orientation;
+	[self _cache];
 	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -
 
-- (BOOL)canAnimate
+- (BOOL)canAnimateRep
 {
 	return _numberOfFrames > 1;
 }
-- (BOOL)isAnimating
+- (BOOL)animates
 {
-	return _animating;
+	return _animates;
 }
-- (void)setAnimating:(BOOL)flag
+- (void)setAnimates:(BOOL)flag
 {
-	if(flag == _animating) return;
-	_animating = flag;
-	[self _animate:YES]; // Stops the animation if _animating is NO (regardless of its argument).
+	if(flag == _animates) return;
+	_animates = flag;
+	[self _updateAnimationTimer];
+}
+- (void)pauseAnimation
+{
+	_pauseCount++;
+	[self _updateAnimationTimer];
+}
+- (void)resumeAnimation
+{
+	NSParameterAssert(_pauseCount);
+	_pauseCount--;
+	[self _updateAnimationTimer];
 }
 
 #pragma mark -
@@ -133,90 +132,101 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (BOOL)usesOptimizedDrawing
+{
+	return PGUpright == _orientation || _cacheIsValid;
+}
+
+#pragma mark -
+
 - (void)appDidHide:(NSNotification *)aNotif
 {
-	[self _animate:NO];
+	[self pauseAnimation];
 }
 - (void)appDidUnhide:(NSNotification *)aNotif
 {
-	[self _animate:YES];
+	[self resumeAnimation];
 }
 
 #pragma mark Private Protocol
 
-- (void)_animate:(BOOL)flag
+- (void)_updateAnimationTimer
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_animate) object:nil];
-	if(flag && _animating && _numberOfFrames > 1) [self AE_performSelector:@selector(_animate) withObject:nil afterDelay:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue]];
+	if([self canAnimateRep] && _animates && !_pauseCount) {
+		if(_animationTimer) return;
+		_animationTimer = [NSTimer timerWithTimeInterval:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] target:[self autorelease] selector:@selector(_animate) userInfo:nil repeats:YES]; // The timer retains us.
+		[[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:PGCommonRunLoopsMode];
+	} else {
+		if(!_animationTimer) return;
+		[self retain];
+		[_animationTimer invalidate];
+		_animationTimer = nil;
+	}
 }
 - (void)_animate
 {
 	unsigned const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntValue] + 1;
 	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInt:(i < _numberOfFrames ? i : 0)]];
 	[self setNeedsDisplay:YES];
-	[self _animate:YES];
 }
 - (void)_cache
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_cache) object:nil];
-	if(!_rep || _numberOfFrames > 1 || _isPDF) return;
-	[_image removeRepresentation:_cache];
-	[_cache release];
-	_cache = nil;
-	[_image removeRepresentation:_rep];
+	if(!_cache || !_rep || _isPDF || [self canAnimateRep]) return;
+	if(_cacheIsValid) {
+		_cacheIsValid = NO;
+		[_image removeRepresentation:_cache];
+	} else [_image removeRepresentation:_rep];
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if(_orientation & PGRotated90CC) return; // Caching doesn't help rotated images.
-	NSSize const scaledSize = [self frame].size;
-	if(scaledSize.width > pixelSize.width || scaledSize.height > pixelSize.height) return; // Only cache if the image is smaller than full size, because caching huge images takes FOREVER.
 	if([self inLiveResize]) {
 		_cheatedDuringLiveResize = YES;
 		return; // Don't bother until we stop.
 	}
-	NSCachedImageRep *const cache = [[NSCachedImageRep alloc] initWithSize:scaledSize depth:[[self window] depthLimit] separate:YES alpha:!_isOpaque];
-#if PGCacheOnSeparateThread
-	[NSApplication detachDrawingThread:@selector(_threaded_cache:) toTarget:self withObject:[NSDictionary dictionaryWithObjectsAndKeys:
-		[cache autorelease], @"Cache",
-		_rep, @"Rep",
-		[NSNumber numberWithUnsignedInt:[self interpolation]], @"Interpolation",
-		nil]];
-#else
-	_cache = cache;
-	NSView *const view = [[_cache window] contentView];
+	NSSize const scaledSize = [self frame].size;
+	if(scaledSize.width > 10000 || scaledSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
+
+	[_cache setSize:scaledSize];
+	[_cache setPixelsWide:scaledSize.width];
+	[_cache setPixelsHigh:scaledSize.height];
+	NSWindow *const cacheWindow = [_cache window];
+	NSRect cacheWindowFrame = [cacheWindow frame];
+	cacheWindowFrame.size.width = MAX(NSWidth(cacheWindowFrame), scaledSize.width);
+	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), scaledSize.height);
+	[cacheWindow setFrame:cacheWindowFrame display:NO];
+	NSView *const view = [cacheWindow contentView];
 	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
+	[[NSColor greenColor] set];
 	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
-	[_rep drawInRect:[_cache rect]];
+
+	NSRect cacheRect = [_cache rect];
+	NSRectFill(cacheRect);
+	NSAffineTransform *orient = nil;
+	if(PGUpright != _orientation) {
+		orient = [[[NSAffineTransform alloc] init] autorelease];
+		[orient translateXBy:scaledSize.width / 2 yBy:scaledSize.height / 2];
+		if(_orientation & PGRotated90CC) {
+			float const swap = cacheRect.size.width;
+			cacheRect.size.width = cacheRect.size.height;
+			cacheRect.size.height = swap;
+			[orient rotateByDegrees:90];
+		}
+		[orient scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
+		[orient concat];
+		cacheRect.origin.x = NSWidth(cacheRect) / -2;
+		cacheRect.origin.y = NSHeight(cacheRect) / -2;
+	}
+	[_rep drawInRect:cacheRect];
+	[orient invert];
+	[orient concat];
+
 	[view unlockFocus];
 	[_image removeRepresentation:_rep];
 	[_image setSize:scaledSize];
 	[_image addRepresentation:_cache];
-#endif
+	_cacheIsValid = YES;
 }
-#if PGCacheOnSeparateThread
-- (void)_threaded_cache:(NSDictionary *)dict
-{
-	// We don't need an autorelease pool because we call this with -[NSApplication detachDrawingThread:toTarget:withObject:].
-	NSCachedImageRep *const cache = [dict objectForKey:@"Cache"];
-	NSImageRep *const rep = [dict objectForKey:@"Rep"];
-	NSView *const view = [[cache window] contentView];
-	if(![view lockFocusIfCanDraw]) return;
-	[[NSGraphicsContext currentContext] setImageInterpolation:[[dict objectForKey:@"Interpolation"] unsignedIntValue]];
-	[rep drawInRect:[cache rect]];
-	[view unlockFocus];
-	[self performSelectorOnMainThread:@selector(_useCache:) withObject:dict waitUntilDone:NO];
-}
-- (void)_useCache:(NSDictionary *)dict
-{
-	NSCachedImageRep *const cache = [dict objectForKey:@"Cache"];
-	if([dict objectForKey:@"Rep"] != _rep || !NSEqualSizes([cache size], [self frame].size)) return; // Make sure we still care.
-	[_cache release];
-	_cache = [cache retain];
-	[_image removeRepresentation:_rep];
-	[_image setSize:[cache size]];
-	[_image addRepresentation:cache];
-}
-#endif
 
 #pragma mark PGClipViewDocumentView Protocol
 
@@ -247,11 +257,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)wantsDefaultClipping
 {
-	return PGUpright != _orientation;
+	return ![self usesOptimizedDrawing];
 }
 - (void)drawRect:(NSRect)aRect
 {
-	if(!_cache) [[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]]; // If we've cached, the interpolation has already been done.
+	if(!_cacheIsValid) [[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]]; // If we've cached, the interpolation has already been done.
 	int count = 0;
 	NSRect const *rects = NULL;
 	if(_isPDF) {
@@ -260,8 +270,7 @@ DEALINGS WITH THE SOFTWARE. */
 		NSRectFillList(rects, count);
 	}
 	NSCompositingOperation const operation = _isOpaque && !_isPDF ? NSCompositeCopy : NSCompositeSourceOver;
-	if(PGUpright == _orientation) {
-		NSParameterAssert(![self wantsDefaultClipping]);
+	if([self usesOptimizedDrawing]) {
 		if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
 		float const horz = [_image size].width / [self bounds].size.width;
 		float const vert = [_image size].height / [self bounds].size.height;
@@ -307,6 +316,16 @@ DEALINGS WITH THE SOFTWARE. */
 	if(_cheatedDuringLiveResize) [self _cache];
 	_cheatedDuringLiveResize = NO;
 }
+- (void)viewDidMoveToWindow
+{
+	if(_cacheIsValid) {
+		_cacheIsValid = NO;
+		[_image removeRepresentation:_cache];
+	}
+	[_cache release];
+	_cache = [self window] ? [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:[[self window] depthLimit] separate:YES alpha:YES] : nil;
+	[self _cache];
+}
 
 #pragma mark NSObject
 
@@ -317,11 +336,13 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[self unbind:@"animates"];
+	[self unbind:@"antialiasWhenUpscaling"];
 	[self setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	NSParameterAssert(!_rep);
-	NSParameterAssert(!_cache);
+	[_cache release];
+	[self setAnimates:NO];
 	[_image release];
-	[self _animate:NO];
 	[super dealloc];
 }
 

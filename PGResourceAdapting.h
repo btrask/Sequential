@@ -54,6 +54,7 @@ typedef int PGDataAvailability;
 - (BOOL)isViewable;
 - (float)loadingProgress;
 - (BOOL)canGetData;
+- (BOOL)canExtractData;
 - (PGDataAvailability)getData:(out NSData **)outData;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.

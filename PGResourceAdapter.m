@@ -273,7 +273,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)canGetData
 {
-	return _data != nil || [self dataSource];
+	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
+}
+- (BOOL)canExtractData
+{
+	return NO;
 }
 - (PGDataAvailability)getData:(out NSData **)outData
 {
@@ -281,6 +285,10 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!data) {
 		data = [[self dataSource] dataForResourceAdapter:self];
 		if(!data && [self needsPassword]) return PGWrongPassword;
+	}
+	if(!data) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
 	}
 	if(outData) *outData = data;
 	return data ? PGDataAvailable : PGDataUnavailable;
