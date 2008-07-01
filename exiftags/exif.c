@@ -291,11 +291,12 @@ postprop(struct exifprop *prop, struct exiftags *t)
 			    !(unitsProp = findprop(h, tags, EXIF_T_FPRESUNITS)))
 				break;
 		}
-		u_int32_t xRes = exif4byte(t->md.btiff + prop->value, o) /
-			exif4byte(t->md.btiff + prop->value + 4, o);
-		u_int32_t yRes = exif4byte(t->md.btiff + yProp->value, o) /
-			exif4byte(t->md.btiff + yProp->value + 4, o);
-		if(xRes == yRes)
+		u_int32_t const xDenom = exif4byte(t->md.btiff + prop->value + 4, o);
+		u_int32_t const yDenom = exif4byte(t->md.btiff + yProp->value + 4, o);
+		if (!xDenom || !yDenom) break; // Avoid divide by zero.
+		u_int32_t const xRes = exif4byte(t->md.btiff + prop->value, o) / xDenom;
+		u_int32_t const yRes = exif4byte(t->md.btiff + yProp->value, o) / yDenom;
+		if (xRes == yRes)
 			snprintf(prop->str, 31, "%u dp%s", xRes, unitsProp->str);
 		else
 			snprintf(prop->str, 31, "%ux%u dp%s", xRes, yRes, unitsProp->str);
