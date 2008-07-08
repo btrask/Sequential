@@ -84,6 +84,12 @@ POSSIBILITY OF SUCH DAMAGE.
     return self;
 }
 
+- (void)mouseDown:(NSEvent *)anEvent
+{
+	[[self window] makeKeyAndOrderFront:self]; // Make sure the panel becomes key.
+	[super mouseDown:anEvent];
+}
+
 //--------------------------------------------------------------//
 #pragma mark -- Cell attributes --
 //--------------------------------------------------------------//

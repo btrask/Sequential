@@ -198,7 +198,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 - (BOOL)becomesKeyOnlyIfNeeded
 {
-    return YES;
+	return YES;
 }
 - (BOOL)canBecomeKeyWindow
 {

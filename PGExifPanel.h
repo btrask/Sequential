@@ -36,5 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 - (IBAction)changeSearch:(id)sender;
+- (IBAction)copy:(id)sender;
 
 @end

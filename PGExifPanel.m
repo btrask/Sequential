@@ -50,6 +50,28 @@ static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
 	_matchingEntries = [e retain];
 	[entriesTable reloadData];
 }
+- (IBAction)copy:(id)sender
+{
+	NSMutableString *const string = [NSMutableString string];
+	NSIndexSet *const indexes = [entriesTable selectedRowIndexes];
+	unsigned i = [indexes firstIndex];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
+		PGExifEntry *const entry = [_matchingEntries objectAtIndex:i];
+		[string appendFormat:@"%@: %@\n", [entry label], [entry value]];
+	}
+	NSPasteboard *const pboard = [NSPasteboard generalPasteboard];
+	[pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+	[pboard setString:string forType:NSStringPboardType];
+}
+
+#pragma mark NSMenuValidation Protocol
+
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
+{
+	SEL const action = [anItem action];
+	if(@selector(copy:) == action && ![[entriesTable selectedRowIndexes] count]) return NO;
+	return [super validateMenuItem:anItem];
+}
 
 #pragma mark NSTableViewDelegate Protocol
 
