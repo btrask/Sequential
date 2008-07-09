@@ -738,6 +738,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>http</string>
+				<string>https</string>
 				<string>ftp</string>
 			</array>
 		</dict>

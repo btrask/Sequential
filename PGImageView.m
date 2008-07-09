@@ -63,12 +63,12 @@ DEALINGS WITH THE SOFTWARE. */
         size:(NSSize)size
 {
 	_orientation = orientation;
+	[super setFrameSize:size];
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
+		_cacheIsValid = NO;
 		[_image removeRepresentation:_cache];
 		[_rep release];
-		_rep = nil;
-		[self setFrameSize:size];
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
 		_isOpaque = _rep && ![_rep hasAlpha];
@@ -76,7 +76,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
 		[self _updateAnimationTimer];
-	} else [self setFrameSize:size];
+	}
 	[self _cache];
 	[self setNeedsDisplay:YES];
 }
@@ -197,14 +197,12 @@ DEALINGS WITH THE SOFTWARE. */
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
-	[[NSColor greenColor] set];
+	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
 
 	NSRect cacheRect = [_cache rect];
-	NSRectFill(cacheRect);
-	NSAffineTransform *orient = nil;
 	if(PGUpright != _orientation) {
-		orient = [[[NSAffineTransform alloc] init] autorelease];
+		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
 		[orient translateXBy:scaledSize.width / 2 yBy:scaledSize.height / 2];
 		if(_orientation & PGRotated90CC) {
 			float const swap = cacheRect.size.width;
@@ -218,9 +216,8 @@ DEALINGS WITH THE SOFTWARE. */
 		cacheRect.origin.y = NSHeight(cacheRect) / -2;
 	}
 	[_rep drawInRect:cacheRect];
-	[orient invert];
-	[orient concat];
 
+	[NSGraphicsContext restoreGraphicsState];
 	[view unlockFocus];
 	[_image removeRepresentation:_rep];
 	[_image setSize:scaledSize];
@@ -286,6 +283,7 @@ DEALINGS WITH THE SOFTWARE. */
 		}
 	} else {
 		NSParameterAssert([self wantsDefaultClipping]);
+		[NSGraphicsContext saveGraphicsState];
 		NSRect bounds = [self bounds];
 		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
 		[orient translateXBy:NSMidX(bounds) yBy:NSMidY(bounds)];
@@ -300,8 +298,7 @@ DEALINGS WITH THE SOFTWARE. */
 		bounds.origin.x = NSWidth(bounds) / -2;
 		bounds.origin.y = NSHeight(bounds) / -2;
 		[_image drawInRect:bounds fromRect:NSZeroRect operation:operation fraction:1.0];
-		[orient invert];
-		[orient concat];
+		[NSGraphicsContext restoreGraphicsState];
 	}
 }
 - (void)setFrameSize:(NSSize)aSize
