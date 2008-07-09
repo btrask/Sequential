@@ -183,24 +183,24 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
             includeChildren:(BOOL)children
 {
-	PGNode *node = nil;
-	if(flag && children) node = [self sortedViewableNodeFirst:YES];
+	PGNode *const node = children && flag ? [self sortedViewableNodeFirst:YES stopAtNode:nil includeSelf:NO] : nil;
 	return node ? node : [super sortedViewableNodeNext:flag includeChildren:children];
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
             stopAtNode:(PGNode *)descendent
+            includeSelf:(BOOL)includeSelf
 {
 	if(descendent == [self node]) return nil;
-	PGNode *child = flag ? [super sortedViewableNodeFirst:YES stopAtNode:descendent] : nil;
+	PGNode *child = flag ? [super sortedViewableNodeFirst:YES stopAtNode:descendent includeSelf:includeSelf] : nil;
 	if(child) return child;
 	NSArray *const children = [self sortedChildren];
 	NSEnumerator *const childEnum = flag ? [children objectEnumerator] : [children reverseObjectEnumerator];
 	while((child = [childEnum nextObject])) {
-		PGNode *const node = [child sortedViewableNodeFirst:flag stopAtNode:descendent];
+		PGNode *const node = [child sortedViewableNodeFirst:flag stopAtNode:descendent includeSelf:YES];
 		if(node) return node;
 		if([descendent ancestorThatIsChildOfNode:[self node]] == child) return nil;
 	}
-	return flag ? nil : [super sortedViewableNodeFirst:NO stopAtNode:descendent];
+	return flag ? nil : [super sortedViewableNodeFirst:NO stopAtNode:descendent includeSelf:includeSelf];
 }
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
 {

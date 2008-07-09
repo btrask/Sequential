@@ -352,12 +352,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
 {
-	return [self sortedViewableNodeFirst:flag stopAtNode:nil];
+	return [self sortedViewableNodeFirst:flag stopAtNode:nil includeSelf:YES];
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-	    stopAtNode:(PGNode *)descendent
+            stopAtNode:(PGNode *)descendent
+            includeSelf:(BOOL)includeSelf
 {
-	return [self isViewable] && [self node] != descendent ? [self node] : nil;
+	return includeSelf && [self isViewable] && [self node] != descendent ? [self node] : nil;
 }
 
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
@@ -373,7 +374,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
 {
 	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
-	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node]];
+	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];
 }
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
 {

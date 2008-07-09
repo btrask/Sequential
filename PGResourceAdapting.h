@@ -72,7 +72,7 @@ typedef int PGDataAvailability;
 - (unsigned)viewableNodeCount;
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
