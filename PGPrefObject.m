@@ -62,7 +62,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
 		[NSNumber numberWithInt:PGConstantFactorScaling], PGImageScalingModeKey,
 		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
-		[NSNumber numberWithInt:PGDownscale], PGImageScalingConstraintKey,
+		[NSNumber numberWithInt:PGScaleFreely], PGImageScalingConstraintKey,
 		[NSNumber numberWithInt:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
 		nil]];
 }
