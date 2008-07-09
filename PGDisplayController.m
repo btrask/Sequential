@@ -785,10 +785,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)clipViewWasClicked:(PGClipView *)sender
         event:(NSEvent *)anEvent
 {
-	BOOL forward = YES;
-	if([anEvent modifierFlags] & NSShiftKeyMask) forward = NO;
-	else if([[PGDocumentController sharedDocumentController] usesDirectionalMouseButtonMapping]) forward = ([anEvent type] == NSLeftMouseDown) == ([[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft);
-	else forward = [anEvent type] != NSRightMouseDown;
+	BOOL const primary = [anEvent type] == NSLeftMouseDown;
+	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
+	BOOL forward;
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] intValue]) {
+		case PGNextPreviousAction: forward = primary; break;
+		case PGLeftRightAction: forward = primary == rtl; break;
+		case PGRightLeftAction: forward = primary != rtl; break;
+	}
+	if([anEvent modifierFlags] & NSShiftKeyMask) forward = !forward;
 	if(forward) [self nextPage:self];
 	else [self previousPage:self];
 }
@@ -883,6 +888,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark NSWindowController
 
+- (IBAction)showWindow:(id)sender
+{
+	[super showWindow:sender];
+	[self _updateInfoPanelLocationAnimate:NO];
+	[self documentShowsOnScreenDisplayDidChange:nil];
+}
+
+#pragma mark -
+
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
@@ -903,12 +917,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
 	[imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
 	[self prefControllerBackgroundPatternColorDidChange:nil];
-}
-- (IBAction)showWindow:(id)sender
-{
-	[super showWindow:sender];
-	[self _updateInfoPanelLocationAnimate:NO];
-	[self documentShowsOnScreenDisplayDidChange:nil];
 }
 - (void)synchronizeWindowTitleWithDocumentName
 {

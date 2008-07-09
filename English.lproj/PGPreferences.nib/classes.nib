@@ -57,6 +57,8 @@
 			<dict>
 				<key>screensPopUp</key>
 				<string>NSPopUpButton</string>
+				<key>secondaryMouseActionLabel</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>

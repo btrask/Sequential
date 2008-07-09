@@ -26,5 +26,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDisplayController.h"
 
 @interface PGWindowController : PGDisplayController
+{
+	@private
+	BOOL _shouldZoomOnNextImageLoad;
+}
 
 @end

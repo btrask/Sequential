@@ -26,8 +26,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGDocument.h"
+#import "PGNode.h"
+
+// Controllers
+#import "PGDocumentController.h"
 
 // Categories
+#import "NSScreenAdditions.h"
 #import "NSWindowAdditions.h"
 
 // Other
@@ -64,7 +69,10 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	[[self activeDocument] storeWindowFrame:[[self window] AE_contentRect]];
 	if([super setActiveDocument:document closeIfAppropriate:flag]) return YES;
 	NSRect frame;
-	if([[self activeDocument] getStoredWindowFrame:&frame]) [[self window] AE_setContentRect:frame];
+	if([[self activeDocument] getStoredWindowFrame:&frame]) {
+		[[self window] AE_setContentRect:frame];
+		_shouldZoomOnNextImageLoad = NO;
+	}
 	return NO;
 }
 - (void)activateDocument:(PGDocument *)document
@@ -73,17 +81,31 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	[[self window] makeKeyAndOrderFront:self];
 }
 
+#pragma mark -
+
+- (void)nodeReadyForViewing:(NSNotification *)aNotif
+{
+	[super nodeReadyForViewing:aNotif];
+	if(!_shouldZoomOnNextImageLoad) return;
+	BOOL const hasImage = !![[aNotif userInfo] objectForKey:PGImageRepKey];
+	if(!hasImage) return;
+	_shouldZoomOnNextImageLoad = NO;
+	if(hasImage) [[self window] setFrame:[[self window] PG_zoomedRectWithDefaultFrame:[[NSScreen AE_mainScreen] visibleFrame]] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
+}
+
 #pragma mark NSWindowController
 
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
+	NSWindow *const window = [self window];
 	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGMainWindowFrameKey];
-	if(savedFrame) [[self window] setFrameFromString:savedFrame];
+	if(savedFrame) [window setFrameFromString:savedFrame];
 	else {
-		[[self window] setFrame:NSMakeRect(0, 0, 500, 500) display:NO];
-		[[self window] center];
+		[window setFrame:NSMakeRect(0, 0, 500, 500) display:NO];
+		[window center];
 	}
+	_shouldZoomOnNextImageLoad = [[[NSUserDefaults standardUserDefaults] objectForKey:PGAutozoomsWindowsKey] boolValue];
 }
 
 @end

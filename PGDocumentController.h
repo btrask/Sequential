@@ -45,8 +45,16 @@ extern NSString *const PGBundleTypeFourCCKey;
 
 extern NSString *const PGAntialiasWhenUpscalingKey;
 extern NSString *const PGAnimatesImagesKey;
+extern NSString *const PGAutozoomsWindowsKey;
 extern NSString *const PGBackgroundColorKey;
 extern NSString *const PGBackgroundPatternKey;
+extern NSString *const PGMouseClickActionKey;
+
+enum {
+	PGNextPreviousAction = 0,
+	PGLeftRightAction = 1,
+	PGRightLeftAction = 2
+};
 
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
@@ -95,7 +103,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	         NSArray                *_recentDocumentIdentifiers;
 	         BOOL                    _fullscreen;
 	         BOOL                    _exifShown;
-	         BOOL                    _usesDirectionalMouseButtonMapping;
 
 	         PGDocument             *_currentDocument;
 	         NSMutableArray         *_documents;
@@ -147,9 +154,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (BOOL)exifShown;
 - (void)setExifShown:(BOOL)flag;
-
-- (BOOL)usesDirectionalMouseButtonMapping;
-- (void)setUsesDirectionalMouseButtonMapping:(BOOL)flag;
 
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;

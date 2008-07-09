@@ -62,8 +62,10 @@ NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGAnimatesImagesKey         = @"PGAnimatesImages";
+NSString *const PGAutozoomsWindowsKey       = @"PGAutozoomsWindows";
 NSString *const PGBackgroundColorKey        = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey      = @"PGBackgroundPattern";
+NSString *const PGMouseClickActionKey       = @"PGMouseClickAction";
 
 static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
 static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
@@ -73,7 +75,6 @@ static NSString *const PGRecentItemsDeprecated2Key          = @"PGRecentItems"; 
 static NSString *const PGRecentItemsDeprecatedKey           = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey                      = @"PGFullscreen";
 static NSString *const PGExifShownKey                       = @"PGExifShown";
-static NSString *const PGUsesDirectionMouseButtonMappingKey = @"PGUsesDirectionMouseButtonMapping";
 
 static NSString *const PGNSApplicationName         = @"NSApplicationName";
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
@@ -130,12 +131,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSNumber numberWithBool:YES], PGAntialiasWhenUpscalingKey,
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
+		[NSNumber numberWithBool:YES], PGAutozoomsWindowsKey,
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
+		[NSNumber numberWithInt:PGNextPreviousAction], PGMouseClickActionKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		[NSNumber numberWithBool:NO], PGFullscreenKey,
 		[NSNumber numberWithBool:NO], PGExifShownKey,
-		[NSNumber numberWithBool:NO], PGUsesDirectionMouseButtonMappingKey,
 		nil]];
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l);
@@ -327,19 +329,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[_exifPanel release];
 		_exifPanel = nil;
 	}
-}
-
-#pragma mark -
-
-- (BOOL)usesDirectionalMouseButtonMapping
-{
-	return _usesDirectionalMouseButtonMapping;
-}
-- (void)setUsesDirectionalMouseButtonMapping:(BOOL)flag
-{
-	if(_prefsLoaded && !flag == !_usesDirectionalMouseButtonMapping) return;
-	_usesDirectionalMouseButtonMapping = flag;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGUsesDirectionMouseButtonMappingKey];
 }
 
 #pragma mark -
@@ -839,8 +828,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
 		}
 		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
-
-		[self setUsesDirectionalMouseButtonMapping:[[defaults objectForKey:PGUsesDirectionMouseButtonMappingKey] boolValue]];
 
 		_documents = [[NSMutableArray alloc] init];
 		_classesByExtension = [[NSMutableDictionary alloc] init];

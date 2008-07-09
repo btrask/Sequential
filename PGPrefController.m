@@ -38,6 +38,12 @@ static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
 static PGPrefController *PGSharedPrefController = nil;
 
+@interface PGPrefController (Private)
+
+- (void)_updateSecondaryMouseActionLabel;
+
+@end
+
 @implementation PGPrefController
 
 #pragma mark Class Methods
@@ -70,6 +76,19 @@ static PGPrefController *PGSharedPrefController = nil;
 	// TODO: Implement
 }
 
+#pragma mark Private Protocol
+
+- (void)_updateSecondaryMouseActionLabel
+{
+	NSString *label = @"";
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] intValue]) {
+		case PGNextPreviousAction: label = @"Secondary click goes to the previous page."; break;
+		case PGLeftRightAction: label = @"Secondary click goes right."; break;
+		case PGRightLeftAction: label = @"Secondary click goes left."; break;
+	}
+	[secondaryMouseActionLabel setStringValue:NSLocalizedString(label, @"Informative string for secondary mouse button action.")];
+}
+
 #pragma mark NSKeyValueObserving Protocol
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -77,8 +96,9 @@ static PGPrefController *PGSharedPrefController = nil;
         change:(NSDictionary *)change
 	context:(void *)context
 {
-	if(context == self) [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
-	else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
+	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 }
 
 #pragma mark NSApplicationNotifications Protocol
@@ -95,6 +115,14 @@ static PGPrefController *PGSharedPrefController = nil;
 	[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
 }
 
+#pragma mark NSWindowController
+
+- (void)windowDidLoad
+{
+	[super windowDidLoad];
+	[self _updateSecondaryMouseActionLabel];
+}
+
 #pragma mark NSObject
 
 - (id)init
@@ -105,15 +133,16 @@ static PGPrefController *PGSharedPrefController = nil;
 			return [PGSharedPrefController retain];
 		} else PGSharedPrefController = [self retain];
 		[[self window] center]; // Load and center the window.
-		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:@"PGBackgroundColor" options:0 context:self];
-		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:@"PGBackgroundPattern" options:0 context:self];
+		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundColorKey options:0 context:self];
+		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundPatternKey options:0 context:self];
+		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGMouseClickActionKey options:0 context:self];
 	}
 	return self;
 }
 - (void)dealloc
 {
-	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"PGBackgroundColor"];
-	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:@"PGBackgroundPattern"];
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundColorKey];
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundPatternKey];
 	[super dealloc];
 }
 

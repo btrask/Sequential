@@ -69,6 +69,15 @@
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Il a peut-être été déplacé ou supprimé.";
 
+/* Informative string for secondary mouse button action. */
+"Secondary click goes to the previous page." = "Secondary click goes to the previous page.";
+
+/* Informative string for secondary mouse button action. */
+"Secondary click goes right." = "Secondary click goes right.";
+
+/* Informative string for secondary mouse button action. */
+"Secondary click goes left." = "Secondary click goes left.";
+
 /* Dialog button labels. */
 "OK" = "Valider";
 "Cancel" = "Annuler";

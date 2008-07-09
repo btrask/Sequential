@@ -30,6 +30,7 @@ extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotificati
 {
 	@private
 	IBOutlet NSPopUpButton *screensPopUp;
+	IBOutlet NSTextField   *secondaryMouseActionLabel;
 }
 
 + (id)sharedPrefController;
