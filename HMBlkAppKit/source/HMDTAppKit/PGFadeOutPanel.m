@@ -59,6 +59,23 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSWindow
 
+- (IBAction)makeKeyAndOrderFront:(id)sender
+{
+	[self cancelFadeOut];
+	[super makeKeyAndOrderFront:sender];
+}
+- (IBAction)orderFront:(id)sender
+{
+	[self cancelFadeOut];
+	[super orderFront:sender];
+}
+
+- (void)orderFrontRegardless
+{
+	[self cancelFadeOut];
+	[super orderFrontRegardless];
+}
+
 - (void)close
 {
 	[super close];

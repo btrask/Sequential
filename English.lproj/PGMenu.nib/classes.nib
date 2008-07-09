@@ -214,6 +214,8 @@
 				<string>id</string>
 				<key>switchToPathFinder</key>
 				<string>id</string>
+				<key>toggleActivity</key>
+				<string>id</string>
 				<key>toggleExif</key>
 				<string>id</string>
 			</dict>

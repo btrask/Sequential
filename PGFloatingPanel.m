@@ -89,6 +89,11 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return NO;
 }
+- (void)windowDidLoad
+{
+	[super windowDidLoad];
+	[self windowDidBecomeMain:nil];
+}
 
 #pragma mark NSObject
 

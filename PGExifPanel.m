@@ -137,7 +137,6 @@ static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
 	[super windowDidLoad];
 	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGExifWindowFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
 	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
-	[self windowDidBecomeMain:nil];
 }
 
 #pragma mark NSObject

@@ -34,6 +34,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGDisplayController;
 @class PGFullscreenController;
 @class PGExifPanel;
+@class PGActivityPanel;
 
 extern NSString *const PGDocumentControllerDisplayScreenDidChangeNotification;
 
@@ -102,13 +103,16 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	         BOOL                    _prefsLoaded;
 	         NSArray                *_recentDocumentIdentifiers;
 	         BOOL                    _fullscreen;
-	         BOOL                    _exifShown;
 
 	         PGDocument             *_currentDocument;
 	         NSMutableArray         *_documents;
 	         PGFullscreenController *_fullscreenController;
 	         BOOL                    _inFullscreen;
+
+	         BOOL                    _exifShown;
 	         PGExifPanel            *_exifPanel;
+	         BOOL                    _activityShown;
+	         PGActivityPanel        *_activityPanel;
 
 	         NSMutableDictionary    *_classesByExtension;
 }
@@ -138,6 +142,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)changeReadingDirection:(id)sender; // PGReadingDirection from [sender tag].
 
 - (IBAction)toggleExif:(id)sender;
+- (IBAction)toggleActivity:(id)sender;
 - (IBAction)selectPreviousDocument:(id)sender;
 - (IBAction)selectNextDocument:(id)sender;
 - (IBAction)activateDocument:(id)sender;
@@ -154,6 +159,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (BOOL)exifShown;
 - (void)setExifShown:(BOOL)flag;
+- (BOOL)activityShown;
+- (void)setActivityShown:(BOOL)flag;
 
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;

@@ -38,6 +38,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGWindowController.h"
 #import "PGFullscreenController.h"
 #import "PGExifPanel.h"
+#import "PGActivityPanel.h"
 #import "PGURLAlert.h"
 
 // Other
@@ -70,11 +71,11 @@ NSString *const PGMouseClickActionKey       = @"PGMouseClickAction";
 static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
 static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
 
-static NSString *const PGRecentItemsKey                     = @"PGRecentItems2";
-static NSString *const PGRecentItemsDeprecated2Key          = @"PGRecentItems"; // Deprecated after 1.3.2
-static NSString *const PGRecentItemsDeprecatedKey           = @"PGRecentDocuments"; // Deprecated after 1.2.2.
-static NSString *const PGFullscreenKey                      = @"PGFullscreen";
-static NSString *const PGExifShownKey                       = @"PGExifShown";
+static NSString *const PGRecentItemsKey            = @"PGRecentItems2";
+static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
+static NSString *const PGRecentItemsDeprecatedKey  = @"PGRecentDocuments"; // Deprecated after 1.2.2.
+static NSString *const PGFullscreenKey             = @"PGFullscreen";
+static NSString *const PGExifShownKey              = @"PGExifShown";
 
 static NSString *const PGNSApplicationName         = @"NSApplicationName";
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
@@ -242,8 +243,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)toggleExif:(id)sender
 {
-	if([self exifShown]) [[_exifPanel window] performClose:self];
-	else [self setExifShown:YES];
+	[self setExifShown:![self exifShown]];
+}
+- (IBAction)toggleActivity:(id)sender
+{
+	[self setActivityShown:![self activityShown]];
 }
 - (IBAction)selectPreviousDocument:(id)sender
 {
@@ -306,8 +310,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(_prefsLoaded && flag == _fullscreen) return;
 	_fullscreen = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGFullscreenKey];
-	[toggleFullscreen setTitle:(flag ? NSLocalizedString(@"Exit Full Screen", nil) : NSLocalizedString(@"Enter Full Screen", nil))];
-	[fitToView setTitle:(flag ? NSLocalizedString(@"Fit to Screen", nil) : NSLocalizedString(@"Fit to Window", nil))];
+	[toggleFullscreen setTitle:NSLocalizedString((flag ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
+	[fitToView setTitle:NSLocalizedString((flag ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
 	[self _setInFullscreen:flag];
 }
 
@@ -323,12 +327,22 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	_exifShown = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGExifShownKey];
 	if(flag) {
-		_exifPanel = [[PGExifPanel alloc] init];
+		if(!_exifPanel) _exifPanel = [[PGExifPanel alloc] init];
 		[_exifPanel showWindow:self];
-	} else {
-		[_exifPanel release];
-		_exifPanel = nil;
-	}
+	} else [[_exifPanel window] performClose:self];
+}
+- (BOOL)activityShown
+{
+	return _activityShown;
+}
+- (void)setActivityShown:(BOOL)flag
+{
+	if(flag == _activityShown) return;
+	_activityShown = flag;
+	if(flag) {
+		if(!_activityPanel) _activityPanel = [[PGActivityPanel alloc] init];
+		[_activityPanel showWindow:self];
+	} else [[_activityPanel window] performClose:self];
 }
 
 #pragma mark -
@@ -862,6 +876,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_documents release];
 	[_fullscreenController release];
 	[_exifPanel release];
+	[_activityPanel release];
 	[_classesByExtension release];
 	[super dealloc];
 }
