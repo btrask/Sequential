@@ -102,7 +102,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSRect)windowWillUseStandardFrame:(NSWindow *)window
           defaultFrame:(NSRect)defaultFrame
 {
-	return [window PG_zoomedRectWithDefaultFrame:defaultFrame];
+	return [window PG_zoomedFrame];
 }
 
 #pragma mark NSTableDataSource Protocol

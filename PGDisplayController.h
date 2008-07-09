@@ -43,9 +43,9 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 	@protected
 	IBOutlet PGClipView          *clipView;
 	IBOutlet PGImageView         *imageView;
+	         PGClipViewLocation  _initialLocation;
 
 	@private
-	         PGClipViewLocation  _initialLocation;
 	         unsigned            _displayImageIndex;
 
 	         PGBezelPanel       *_graphicPanel;

@@ -58,7 +58,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 - (NSRect)windowWillUseStandardFrame:(NSWindow *)window
           defaultFrame:(NSRect)newFrame
 {
-	return [window PG_zoomedRectWithDefaultFrame:newFrame];
+	return [window PG_zoomedFrame];
 }
 
 #pragma mark PGDisplayController
@@ -87,10 +87,10 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 {
 	[super nodeReadyForViewing:aNotif];
 	if(!_shouldZoomOnNextImageLoad) return;
-	BOOL const hasImage = !![[aNotif userInfo] objectForKey:PGImageRepKey];
-	if(!hasImage) return;
+	if(![[aNotif userInfo] objectForKey:PGImageRepKey]) return;
 	_shouldZoomOnNextImageLoad = NO;
-	if(hasImage) [[self window] setFrame:[[self window] PG_zoomedRectWithDefaultFrame:[[NSScreen AE_mainScreen] visibleFrame]] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
+	[[self window] setFrame:[[self window] PG_zoomedFrame] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
+	[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 }
 
 #pragma mark NSWindowController

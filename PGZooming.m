@@ -29,19 +29,28 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSWindow (PGZooming)
 
-- (NSRect)PG_zoomedRectWithDefaultFrame:(NSRect)newFrame
+- (NSRect)PG_zoomedFrame
 {
 	NSRect f = [self contentRectForFrameRect:[self frame]];
 	NSSize s = [[self contentView] PG_zoomedFrameSize];
 	s.width /= [self AE_userSpaceScaleFactor];
 	s.height /= [self AE_userSpaceScaleFactor];
-	NSRect const minRect = [self contentRectForFrameRect:(NSRect){0, 0, [self minSize]}];
-	NSRect const maxRect = [self contentRectForFrameRect:(NSRect){0, 0, [self maxSize]}];
-	f.size.width = MIN(MAX(s.width, NSWidth(minRect)), NSWidth(maxRect));
-	float const height = MIN(MAX(s.height, NSHeight(minRect)), NSHeight(maxRect));
-	f.origin.y += NSHeight(f) - height;
-	f.size.height = height;
-	return [self frameRectForContentRect:f];
+	f.origin.y += NSHeight(f) - s.height;
+	f.size = s;
+	return [self PG_constrainedFrameRect:[self frameRectForContentRect:f]];
+}
+- (NSRect)PG_constrainedFrameRect:(NSRect)aRect
+{
+	NSRect const b = [[self screen] visibleFrame];
+	NSRect r = aRect;
+	r.size.width = MIN(MAX(MIN(NSWidth(r), NSWidth(b)), [self minSize].width), [self maxSize].width);
+	r.size.height = MIN(MAX(MIN(NSHeight(r), NSHeight(b)), [self minSize].height), [self maxSize].height);
+	r.origin.y += NSHeight(aRect) - NSHeight(r);
+	r.origin.x -= MAX(NSMaxX(r) - NSMaxX(b), 0);
+	r.origin.y += MAX(NSMinY(b) - NSMinY(r), 0);
+	r.origin.x += MAX(NSMinX(b) - NSMinX(r), 0);
+	r.origin.y -= MAX(NSMaxY(r) - NSMaxY(b), 0);
+	return r;
 }
 
 @end

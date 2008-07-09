@@ -26,7 +26,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSWindow (PGZooming)
 
-- (NSRect)PG_zoomedRectWithDefaultFrame:(NSRect)newFrame;
+- (NSRect)PG_zoomedFrame;
+- (NSRect)PG_constrainedFrameRect:(NSRect)aRect;
 
 @end
 
