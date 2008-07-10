@@ -547,7 +547,6 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (void)keyDown:(NSEvent *)anEvent
 {
-	if([[NSApp mainMenu] performKeyEquivalent:anEvent]) return; // For the sake of our one-key menu shortcuts (which don't get priority since they don't have NSCommandKeyMask).
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	if([[self delegate] clipView:self handleKeyDown:anEvent]) return;
 	NSString *const characters = [anEvent charactersIgnoringModifiers];
@@ -585,7 +584,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		case '0': [self magicPanForward:forward acrossFirst:YES]; return;
 		case NSEnterCharacter: [self magicPanForward:forward acrossFirst:NO]; return;
 	}
-	[self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
+	if(![[NSApp mainMenu] performKeyEquivalent:anEvent]) [self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
 }
 
 #if !PGGameStyleArrowScrolling
