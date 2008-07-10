@@ -79,8 +79,7 @@ static PGPrefController *PGSharedPrefController = nil;
 }
 - (void)setDisplayScreen:(NSScreen *)aScreen
 {
-	if(aScreen == _displayScreen) return;
-	[_displayScreen release];
+	[_displayScreen autorelease];
 	_displayScreen = [aScreen retain];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInt:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
 	[self AE_postNotificationName:PGPrefControllerDisplayScreenDidChangeNotification];
@@ -126,7 +125,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	if(NSNotFound == i) {
 		i = [screens indexOfObject:currentScreen];
 		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
-	}
+	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPrefControllerDisplayScreenDidChangeNotification.
 
 	NSMenu *const screensMenu = [screensPopUp menu];
 	for(i = 0; i < [screens count]; i++) {
@@ -161,8 +160,9 @@ static PGPrefController *PGSharedPrefController = nil;
 
 		NSArray *const screens = [NSScreen screens];
 		unsigned const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntValue];
-		[self setDisplayScreen:(screenIndex > [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex])];
+		[self setDisplayScreen:(screenIndex >= [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex])];
 
+		[NSApp AE_addObserver:self selector:@selector(applicationDidChangeScreenParameters:) name:NSApplicationDidChangeScreenParametersNotification];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundColorKey options:0 context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundPatternKey options:0 context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGMouseClickActionKey options:0 context:self];
@@ -171,6 +171,7 @@ static PGPrefController *PGSharedPrefController = nil;
 }
 - (void)dealloc
 {
+	[self AE_removeObserver];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundColorKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundPatternKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGMouseClickActionKey];
