@@ -34,13 +34,14 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGGraphicalIndicatorStyle YES
 #define PGMarginSize              7.0 // Outside the window.
 #define PGPaddingSize             3.0 // Inside the window.
-#define PGTotalPaddingSize        (PGPaddingSize * 2)
+#define PGTotalPaddingSize        (PGPaddingSize * 2.0)
 #define PGTextBottomPadding       (PGPaddingSize - 1.0)
 #define PGTextTotalVertPadding    (PGPaddingSize + PGTextBottomPadding)
-#define PGTextTotalHorzPadding    2.0
+#define PGTextHorzPadding         1.0
+#define PGTextTotalHorzPadding    (PGTextHorzPadding * 2.0)
 #define PGIndicatorHeight         11.0
-#define PGIndicatorRadius         (PGIndicatorHeight / 2)
-#define PGMinWidth                (PGGraphicalIndicatorStyle ? 50.0 : 0.0)
+#define PGIndicatorRadius         (PGIndicatorHeight / 2.0)
+#define PGIndicatorWidth          150.0
 
 @implementation PGOSDView
 
@@ -49,7 +50,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSAttributedString *)displayText
 {
 	NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-	[style setAlignment:NSCenterTextAlignment];
+	[style setAlignment:([self origin] == PGMinXMinYCorner ? NSLeftTextAlignment : NSRightTextAlignment)];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%u/%u)", [self messageText], [self index] + 1, [self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0], NSFontAttributeName,
@@ -61,14 +62,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSString *)messageText
 {
-	return fMessageText ? [[fMessageText retain] autorelease] : @"";
+	return _messageText ? [[_messageText retain] autorelease] : @"";
 }
 - (void)setMessageText:(NSString *)aString
 {
 	NSString *const string = aString ? aString : @"";
-	if(string == fMessageText) return;
-	[fMessageText release];
-	fMessageText = [string copy];
+	if(string == _messageText) return;
+	[_messageText release];
+	_messageText = [string copy];
 	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:PGBezelPanelShouldAnimateKey]]; // The animation happens syncrhonously, which slows down page switching.
 }
 
@@ -76,23 +77,23 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (unsigned)index
 {
-	return fIndex;
+	return _index;
 }
 - (void)setIndex:(unsigned)anInt
 {
-	fIndex = anInt;
+	_index = anInt;
 	[self setNeedsDisplay:YES];
 }
 
 - (unsigned)count
 {
-	return fCount;
+	return _count;
 }
 - (void)setCount:(unsigned)anInt
 {
-	if(anInt == fCount) return;
+	if(anInt == _count) return;
 	BOOL const showedIndicator = [self displaysProgressIndicator];
-	fCount = anInt;
+	_count = anInt;
 	if(!showedIndicator != ![self displaysProgressIndicator]) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 	else [self setNeedsDisplay:YES];
 }
@@ -105,17 +106,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGOSDCorner)origin
 {
-	return fOrigin;
+	return _origin;
 }
 - (NSSize)originOffset
 {
-	return fOriginOffset;
+	return _originOffset;
 }
 - (void)setOrigin:(PGOSDCorner)aSide
         offset:(NSSize)aSize
 {
-	fOrigin = aSide;
-	fOriginOffset = aSize;
+	_origin = aSide;
+	_originOffset = aSize;
 }
 
 #pragma mark PGBezelPanelContentView Protocol
@@ -128,9 +129,9 @@ DEALINGS WITH THE SOFTWARE. */
 	float const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
 		NSMakeRect(
-			NSMinX(aRect) + MAX(scaledMarginSize, fOriginOffset.width),
-			NSMinY(aRect) + MAX(scaledMarginSize, fOriginOffset.height),
-			MAX(ceilf(messageSize.width + PGTotalPaddingSize + PGTextTotalHorzPadding), PGMinWidth) * scaleFactor,
+			NSMinX(aRect) + MAX(scaledMarginSize, _originOffset.width),
+			NSMinY(aRect) + MAX(scaledMarginSize, _originOffset.height),
+			ceilf(MAX(messageSize.width + PGTextTotalHorzPadding, ([self displaysProgressIndicator] ? PGIndicatorWidth : 0)) + PGTotalPaddingSize) * scaleFactor,
 			ceilf(messageSize.height + PGTextTotalVertPadding + ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MIN(NSWidth(frame), NSWidth(aRect) / 2 - scaledMarginSize); // Don't allow the panel to be more than half the width of the window.
@@ -154,11 +155,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 	if([self displaysProgressIndicator]) {
 		[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(0.5 + PGPaddingSize, 0.5 + PGPaddingSize, NSWidth(b) - 1 - PGTotalPaddingSize, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5 + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5), 0.5 + PGPaddingSize, PGIndicatorWidth - 1, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
 		unsigned const maxValue = [self count] - 1;
 		NSBezierPath *const indicator = [NSBezierPath bezierPath];
-		float x = roundf(((float)MIN([self index], maxValue) / maxValue) * (NSWidth(b) - 1 - PGTotalPaddingSize - PGIndicatorHeight) + 1);
+		float x = roundf(((float)MIN([self index], maxValue) / maxValue) * (PGIndicatorWidth - 1 - PGIndicatorHeight) + 1);
 		if([self origin] == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10 - PGPaddingSize;
 		else x += PGPaddingSize;
 		[indicator moveToPoint:NSMakePoint(x + 0.5, 6 + PGPaddingSize)];
@@ -169,14 +170,14 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 
 	float const indicatorHeight = [self displaysProgressIndicator] ? PGIndicatorHeight : 0;
-	[[self displayText] drawInRect:NSMakeRect(PGPaddingSize, PGTextBottomPadding + indicatorHeight, NSWidth(b) - PGTotalPaddingSize, NSHeight(b) - PGTextTotalVertPadding - indicatorHeight)];
+	[[self displayText] drawInRect:NSMakeRect(PGPaddingSize + PGTextHorzPadding, PGTextBottomPadding + indicatorHeight, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding, NSHeight(b) - PGTextTotalVertPadding - indicatorHeight)];
 }
 
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[fMessageText release];
+	[_messageText release];
 	[super dealloc];
 }
 

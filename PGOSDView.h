@@ -33,11 +33,11 @@ typedef int PGOSDCorner;
 @interface PGOSDView : NSView
 {
 	@private
-	NSString   *fMessageText;
-	unsigned    fIndex;
-	unsigned    fCount;
-	PGOSDCorner fOrigin;
-	NSSize      fOriginOffset;
+	NSString   *_messageText;
+	unsigned    _index;
+	unsigned    _count;
+	PGOSDCorner _origin;
+	NSSize      _originOffset;
 }
 
 - (NSAttributedString *)displayText;
