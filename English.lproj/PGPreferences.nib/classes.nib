@@ -44,6 +44,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>changeDisplayScreen</key>
+				<string>id</string>
 				<key>setDisplayScreen</key>
 				<string>id</string>
 				<key>showPrefsHelp</key>
