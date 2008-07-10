@@ -52,9 +52,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSStringAdditions.h"
 #import "NSUserDefaultsAdditions.h"
 
-NSString *const PGDocumentControllerBackgroundPatternColorDidChangeNotification = @"PGDocumentControllerBackgroundPatternColorDidChange";
-NSString *const PGDocumentControllerDisplayScreenDidChangeNotification          = @"PGDocumentControllerDisplayScreenDidChange";
-
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";

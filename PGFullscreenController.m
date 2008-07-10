@@ -187,7 +187,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)init
 {
 	if((self = [super init])) {
-		[[PGDocumentController sharedDocumentController] AE_addObserver:self selector:@selector(displayScreenDidChange:) name:PGDocumentControllerDisplayScreenDidChangeNotification];
+		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(displayScreenDidChange:) name:PGPrefControllerDisplayScreenDidChangeNotification];
 	}
 	return self;
 }

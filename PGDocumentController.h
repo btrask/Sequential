@@ -36,8 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGExifPanel;
 @class PGActivityPanel;
 
-extern NSString *const PGDocumentControllerDisplayScreenDidChangeNotification;
-
 extern NSString *const PGCFBundleTypeExtensionsKey;
 extern NSString *const PGCFBundleTypeOSTypesKey;
 extern NSString *const PGCFBundleTypeMIMETypesKey;

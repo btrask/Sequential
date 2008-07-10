@@ -25,20 +25,23 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
 extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification;
+extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
 
 @interface PGPrefController : NSWindowController
 {
 	@private
 	IBOutlet NSPopUpButton *screensPopUp;
 	IBOutlet NSTextField   *secondaryMouseActionLabel;
+		 NSScreen     *_displayScreen;
 }
 
 + (id)sharedPrefController;
 
+- (IBAction)changeDisplayScreen:(id)sender;
 - (IBAction)showPrefsHelp:(id)sender;
 
 - (NSColor *)backgroundPatternColor;
 - (NSScreen *)displayScreen;
-- (void)setDisplayScreen:(id)sender;
+- (void)setDisplayScreen:(NSScreen *)aScreen;
 
 @end

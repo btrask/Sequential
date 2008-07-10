@@ -1,6 +1,8 @@
-/* Screen names. %d is replaced with the screen number. */
+/* The primary screen. */
 "Main Screen" = "Main Screen";
-"Screen %d" = "Screen %d";
+
+/* Non-primary screens. %u is replaced with the screen number. */
+"Screen %u" = "Screen %u";
 
 /* Clear the Open Recent menu. Should be the same as the standard text. */
 "Clear Menu" = "Clear Menu";

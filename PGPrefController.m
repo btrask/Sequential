@@ -30,9 +30,11 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSColorAdditions.h"
 #import "NSObjectAdditions.h"
+#import "NSScreenAdditions.h"
 #import "NSUserDefaultsAdditions.h"
 
 NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification = @"PGPrefControllerBackgroundPatternColorDidChange";
+NSString *const PGPrefControllerDisplayScreenDidChangeNotification          = @"PGPrefControllerDisplayScreenDidChange";
 
 static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
@@ -55,6 +57,10 @@ static PGPrefController *PGSharedPrefController = nil;
 
 #pragma mark Instance Methods
 
+- (IBAction)changeDisplayScreen:(id)sender
+{
+	[self setDisplayScreen:[sender representedObject]];
+}
 - (IBAction)showPrefsHelp:(id)sender
 {
 	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"preferences" inBook:@"Sequential Help"];
@@ -69,11 +75,15 @@ static PGPrefController *PGSharedPrefController = nil;
 }
 - (NSScreen *)displayScreen
 {
-	return [[NSScreen screens] objectAtIndex:0]; // TODO: Implement.
+	return [[_displayScreen retain] autorelease];
 }
-- (void)setDisplayScreen:(id)sender
+- (void)setDisplayScreen:(NSScreen *)aScreen
 {
-	// TODO: Implement
+	if(aScreen == _displayScreen) return;
+	[_displayScreen release];
+	_displayScreen = [aScreen retain];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInt:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
+	[self AE_postNotificationName:PGPrefControllerDisplayScreenDidChangeNotification];
 }
 
 #pragma mark Private Protocol
@@ -106,13 +116,27 @@ static PGPrefController *PGSharedPrefController = nil;
 - (void)applicationDidChangeScreenParameters:(NSNotification *)aNotif
 {
 	NSArray *const screens = [NSScreen screens];
-	if(![screens count]) return [self setDisplayScreen:nil];
+	[screensPopUp removeAllItems];
+	BOOL const hasScreens = [screens count] != 0;
+	[screensPopUp setEnabled:hasScreens];
+	if(!hasScreens) return [self setDisplayScreen:nil];
 
 	NSScreen *const currentScreen = [self displayScreen];
 	unsigned i = [screens indexOfObjectIdenticalTo:currentScreen];
-	if(NSNotFound != i) return [self setDisplayScreen:currentScreen];
-	i = [screens indexOfObject:currentScreen];
-	[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
+	if(NSNotFound == i) {
+		i = [screens indexOfObject:currentScreen];
+		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
+	}
+
+	NSMenu *const screensMenu = [screensPopUp menu];
+	for(i = 0; i < [screens count]; i++) {
+		NSScreen *const screen = [screens objectAtIndex:i];
+		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%ux%u)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %u", @"Non-primary screens. %u is replaced with the screen number."), i + 1] : NSLocalizedString(@"Main Screen", @"The primary screen.")), (unsigned)NSWidth([screen frame]), (unsigned)NSHeight([screen frame])] action:@selector(changeDisplayScreen:) keyEquivalent:@""] autorelease];
+		[item setRepresentedObject:screen];
+		[item setTarget:self];
+		[screensMenu addItem:item];
+		if([self displayScreen] == screen) [screensPopUp selectItem:item];
+	}
 }
 
 #pragma mark NSWindowController
@@ -120,7 +144,9 @@ static PGPrefController *PGSharedPrefController = nil;
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
+	[[self window] center];
 	[self _updateSecondaryMouseActionLabel];
+	[self applicationDidChangeScreenParameters:nil];
 }
 
 #pragma mark NSObject
@@ -132,7 +158,11 @@ static PGPrefController *PGSharedPrefController = nil;
 			[self release];
 			return [PGSharedPrefController retain];
 		} else PGSharedPrefController = [self retain];
-		[[self window] center]; // Load and center the window.
+
+		NSArray *const screens = [NSScreen screens];
+		unsigned const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntValue];
+		[self setDisplayScreen:(screenIndex > [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex])];
+
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundColorKey options:0 context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundPatternKey options:0 context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGMouseClickActionKey options:0 context:self];
@@ -143,6 +173,7 @@ static PGPrefController *PGSharedPrefController = nil;
 {
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundColorKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundPatternKey];
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGMouseClickActionKey];
 	[super dealloc];
 }
 
