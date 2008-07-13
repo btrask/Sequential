@@ -32,4 +32,6 @@ DEALINGS WITH THE SOFTWARE. */
 	IBOutlet NSTableColumn *progressColumn;
 }
 
+- (void)connectionsDidChange:(NSNotification *)aNotif;
+
 @end

@@ -86,6 +86,7 @@
 		0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DEF0CA02B7B003E492C /* PGZooming.m */; };
 		0EC11DF30CA02B98003E492C /* PGByteOrdering.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DF20CA02B98003E492C /* PGByteOrdering.m */; };
 		0EC11EA20CA14F0C003E492C /* NSColorAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */; };
+		0EC33E3F0E29B0A700450CF8 /* PGLevelIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC33E3E0E29B0A700450CF8 /* PGLevelIndicatorCell.m */; };
 		0EC614F50BE43B1100D04615 /* NSWindowAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC614F40BE43B1100D04615 /* NSWindowAdditions.m */; };
 		0ECD9FFE0CB3961B0059C754 /* PGFindView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECD9FFD0CB3961B0059C754 /* PGFindView.m */; };
 		0ECF36E80C7DC4FC0009EB00 /* PGSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */; };
@@ -346,6 +347,8 @@
 		0EC11DF20CA02B98003E492C /* PGByteOrdering.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGByteOrdering.m; sourceTree = "<group>"; };
 		0EC11EA00CA14F0C003E492C /* NSColorAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorAdditions.h; sourceTree = "<group>"; };
 		0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorAdditions.m; sourceTree = "<group>"; };
+		0EC33E3D0E29B0A700450CF8 /* PGLevelIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLevelIndicatorCell.h; sourceTree = "<group>"; };
+		0EC33E3E0E29B0A700450CF8 /* PGLevelIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLevelIndicatorCell.m; sourceTree = "<group>"; };
 		0EC614F30BE43B1100D04615 /* NSWindowAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWindowAdditions.h; sourceTree = "<group>"; };
 		0EC614F40BE43B1100D04615 /* NSWindowAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSWindowAdditions.m; sourceTree = "<group>"; };
 		0EC999EB0D9762A60093187C /* French */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = French; path = French.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -488,6 +491,8 @@
 				0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */,
 				0E2D08770DD2B4F800EC128A /* PGRoundedBackgroundView.h */,
 				0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */,
+				0EC33E3D0E29B0A700450CF8 /* PGLevelIndicatorCell.h */,
+				0EC33E3E0E29B0A700450CF8 /* PGLevelIndicatorCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -1034,6 +1039,7 @@
 				0E9016AB0DF44A7E004B6F69 /* PGColorWell.m in Sources */,
 				0E90195C0DF55F50004B6F69 /* PGDocumentWindow.m in Sources */,
 				0E56B8DD0E24918C00987F57 /* PGActivityPanel.m in Sources */,
+				0EC33E3F0E29B0A700450CF8 /* PGLevelIndicatorCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

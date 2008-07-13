@@ -24,29 +24,53 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGActivityPanel.h"
 
+// Models
+#import "PGURLConnection.h"
+
 // Controllers
 #import "PGDocumentController.h"
+
+// Categories
+#import "NSObjectAdditions.h"
 
 static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 
 @implementation PGActivityPanel
 
+#pragma mark Instance Methods
+
+- (void)connectionsDidChange:(NSNotification *)aNotif
+{
+	[activityTable reloadData];
+}
+
 #pragma mark NSTableDataSource Protocol
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return 5;
+	return [[PGURLConnection connectionValues] count];
 }
 - (id)tableView:(NSTableView *)tableView
       objectValueForTableColumn:(NSTableColumn *)tableColumn
       row:(int)row
 {
+	PGURLConnection *const connection = [[[PGURLConnection connectionValues] objectAtIndex:row] nonretainedObjectValue];
 	if(tableColumn == identifierColumn) {
-		return [NSNumber numberWithInt:row + 1];
+		return [[[connection request] URL] absoluteString];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithInt:(row + 1) * 15];
+		return [NSNumber numberWithFloat:[[connection delegate] loadingProgress] * 100.0];
 	}
 	return nil;
+}
+
+#pragma mark NSTableViewDelegate Protocol
+
+- (void)tableView:(NSTableView *)tableView
+        willDisplayCell:(id)cell
+        forTableColumn:(NSTableColumn *)tableColumn
+	row:(NSInteger)row
+{
+	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnectionValues] count])];
 }
 
 #pragma mark NSWindowNotifications Protocol
@@ -78,7 +102,15 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 
 - (id)init
 {
-	return [self initWithWindowNibName:@"PGActivity"];
+	if((self = [self initWithWindowNibName:@"PGActivity"])) {
+		[PGURLConnection AE_addObserver:self selector:@selector(connectionsDidChange:) name:PGURLConnectionConnectionsDidChangeNotification];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[self AE_removeObserver];
+	[super dealloc];
 }
 
 @end

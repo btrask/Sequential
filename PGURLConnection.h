@@ -24,6 +24,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
+
 @interface PGURLConnection : NSObject // Wraps NSURLConnection so only a few connections are active at a time.
 {
 	@private
@@ -36,6 +38,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 + (NSString *)userAgent;
 + (void)setUserAgent:(NSString *)aString;
+
++ (NSArray *)connectionValues; // Use -nonretainedObjectValue to get the actual connection.
++ (NSArray *)activeConnectionValues;
++ (NSArray *)pendingConnectionValues;
 
 - (id)initWithRequest:(NSURLRequest *)aRequest delegate:(id)anObject;
 - (NSURLRequest *)request;
@@ -54,5 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)connectionDidReceiveResponse:(PGURLConnection *)sender;
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender;
 - (void)connectionDidClose:(PGURLConnection *)sender;
+
+- (float)loadingProgress;
 
 @end
