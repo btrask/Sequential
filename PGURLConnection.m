@@ -213,9 +213,5 @@ static NSMutableArray *PGPendingConnections = nil;
 - (void)connectionDidReceiveResponse:(PGURLConnection *)sender {}
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender {}
 - (void)connectionDidClose:(PGURLConnection *)sender {}
-- (float)loadingProgress
-{
-	return 0;
-}
 
 @end

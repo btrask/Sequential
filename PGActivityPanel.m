@@ -58,7 +58,7 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 	if(tableColumn == identifierColumn) {
 		return [[[connection request] URL] absoluteString];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithFloat:[[connection delegate] loadingProgress] * 100.0];
+		return [NSNumber numberWithFloat:[connection progress] * 100.0];
 	}
 	return nil;
 }

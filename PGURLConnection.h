@@ -61,6 +61,4 @@ extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender;
 - (void)connectionDidClose:(PGURLConnection *)sender;
 
-- (float)loadingProgress;
-
 @end
