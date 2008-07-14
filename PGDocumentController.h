@@ -184,6 +184,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 
+- (void)recentDocumentIdentifierDidChange:(NSNotification *)aNotif;
 - (void)workspaceDidLaunchApplication:(NSNotification *)aNotif;
 - (void)workspaceDidTerminateApplication:(NSNotification *)aNotif;
 - (void)readingDirectionDidChange:(NSNotification *)aNotif;

@@ -35,8 +35,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSStringAdditions.h"
 #import "NSURLAdditions.h"
 
-NSString *const PGResourceIdentifierIconDidChangeNotification        = @"PGResourceIdentifierIconDidChange";
-NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResourceIdentifierDisplayNameDidChange";
+NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifierDidChange";
+NSString *const PGResourceIdentifierDisplayNameChangedKey = @"PGResourceIdentifierDisplayNameChanged";
 
 @interface PGAliasIdentifier : PGResourceIdentifier <NSCoding>
 {
@@ -142,7 +142,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(icon == _icon) return;
 	[_icon release];
 	_icon = [icon retain];
-	if(flag) [self AE_postNotificationName:PGResourceIdentifierIconDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
 }
 - (NSString *)displayName
 {
@@ -160,7 +160,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(aString == _displayName) return;
 	[_displayName release];
 	_displayName = [aString isEqual:@""] ? nil : [aString copy];
-	if(flag) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGResourceIdentifierDisplayNameChangedKey, nil]];
 }
 
 #pragma mark -

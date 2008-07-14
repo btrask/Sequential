@@ -139,6 +139,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 {
 	NSParameterAssert(aNotif);
 	[self _updateMenuItemForBookmark:[aNotif object]];
+	[self _saveBookmarks];
 }
 
 #pragma mark Private Protocol

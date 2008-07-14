@@ -81,8 +81,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 			return nil;
 		}
 		_identifier = [ident retain];
-		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
 		_dataSource = source;
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
@@ -215,7 +214,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
-	if([PGResourceIdentifierDisplayNameDidChangeNotification isEqualToString:[aNotif name]]) [[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
+	if([[[aNotif userInfo] objectForKey:PGResourceIdentifierDisplayNameChangedKey] boolValue]) [[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
 	[[self document] noteNodeDisplayNameDidChange:self];
 }
 

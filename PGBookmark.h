@@ -51,5 +51,6 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 - (BOOL)isValid;
 
 - (void)eventDidOccur:(NSNotification *)aNotif;
+- (void)identifierDidChange:(NSNotification *)aNotif;
 
 @end

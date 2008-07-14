@@ -27,8 +27,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGSubscription;
 
-extern NSString *const PGResourceIdentifierIconDidChangeNotification;
-extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
+extern NSString *const PGResourceIdentifierDidChangeNotification;
+extern NSString *const PGResourceIdentifierDisplayNameChangedKey;
 
 @interface PGResourceIdentifier : NSObject <NSCoding>
 {

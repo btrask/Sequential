@@ -46,6 +46,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGLegacy.h"
 
 // Categories
+#import "NSArrayAdditions.h"
 #import "NSColorAdditions.h"
 #import "NSMenuItemAdditions.h"
 #import "NSObjectAdditions.h"
@@ -279,9 +280,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSParameterAssert(anArray);
 	if(_prefsLoaded && [anArray isEqual:_recentDocumentIdentifiers]) return;
+	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierDidChangeNotification];
 	[_recentDocumentIdentifiers release];
 	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] retain];
-	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_recentDocumentIdentifiers] forKey:PGRecentItemsKey];
+	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+	[self recentDocumentIdentifierDidChange:nil];
 }
 - (unsigned)maximumRecentDocumentCount
 {
@@ -513,6 +516,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
+- (void)recentDocumentIdentifierDidChange:(NSNotification *)aNotif
+{
+	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_recentDocumentIdentifiers] forKey:PGRecentItemsKey];
+}
 - (void)workspaceDidLaunchApplication:(NSNotification *)aNotif
 {
 	if(aNotif) return [self _applicationLaunched:[[aNotif userInfo] objectForKey:PGNSApplicationName]];
@@ -817,9 +824,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark NSResponder
 
-- (void)cancelOperation:(id)sender
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	[NSApp terminate:sender];
+	if([[anEvent characters] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
+		[NSApp terminate:self];
+		return YES;
+	}
+	return NO;
 }
 
 #pragma mark NSObject
@@ -876,14 +887,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_activityPanel release];
 	[_classesByExtension release];
 	[super dealloc];
-}
-- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
-{
-	if([[anEvent characters] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
-		[NSApp terminate:self];
-		return YES;
-	}
-	return NO;
 }
 
 @end

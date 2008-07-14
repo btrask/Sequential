@@ -24,6 +24,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSArrayAdditions.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 @implementation NSArray (AEAdditions)
 
 - (NSArray *)AE_arrayWithUniqueObjects
@@ -32,6 +35,21 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned i = 0, count;
 	for(; i < (count = [array count]); i++) [array removeObject:[array objectAtIndex:i] inRange:NSMakeRange(i + 1, count - i - 1)];
 	return array;
+}
+- (void)AE_addObjectObserver:(id)observer
+        selector:(SEL)aSelector
+        name:(NSString *)aName
+{
+	id obj;
+	NSEnumerator *const objEnum = [self objectEnumerator];
+	while((obj = [objEnum nextObject])) [obj AE_addObserver:observer selector:aSelector name:aName];
+}
+- (void)AE_removeObjectObserver:(id)observer
+        name:(NSString *)aName
+{
+	id obj;
+	NSEnumerator *const objEnum = [self objectEnumerator];
+	while((obj = [objEnum nextObject])) [obj AE_removeObserver:observer name:aName];
 }
 
 @end

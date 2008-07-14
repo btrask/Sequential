@@ -27,5 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSArray (AEAdditions)
 
 - (NSArray *)AE_arrayWithUniqueObjects;
+- (void)AE_addObjectObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName;
+- (void)AE_removeObjectObserver:(id)observer name:(NSString *)aName;
 
 @end
