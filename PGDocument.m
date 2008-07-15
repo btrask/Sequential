@@ -40,13 +40,14 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 
+NSString *const PGDocumentWillRemoveNodesNotification          = @"PGDocumentWillRemoveNodes";
 NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSortedNodesDidChange";
 NSString *const PGDocumentNodeIsViewableDidChangeNotification  = @"PGDocumentNodeIsViewableDidChange";
 NSString *const PGDocumentNodeDisplayNameDidChangeNotification = @"PGDocumentNodeDisplayNameDidChange";
 NSString *const PGDocumentBaseOrientationDidChangeNotification = @"PGDocumentBaseOrientationDidChange";
 
-NSString *const PGDocumentNodeKey              = @"PGDocumentNode";
-NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
+NSString *const PGDocumentNodeKey            = @"PGDocumentNode";
+NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 #define PGDocumentMaxCachedNodes 3
 
@@ -69,7 +70,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 		}
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
+		[self noteSortedChildrenDidChange];
 	}
 	return self;
 }
@@ -214,16 +215,19 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 
 #pragma mark -
 
-- (void)noteSortedChildrenOfNodeDidChange:(PGNode *)node
-        oldSortedChildren:(NSArray *)children
+- (void)noteNode:(PGNode *)node
+        willRemoveNodes:(NSArray *)anArray
 {
-	if(!_node) return;
+	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
+}
+- (void)noteSortedChildrenDidChange
+{
 	int const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
 	[[self node] addMenuItemsToMenu:_pageMenu];
 	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
-	[self AE_postNotificationName:PGDocumentSortedNodesDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:children, PGDocumentOldSortedChildrenKey, node, PGDocumentNodeKey, nil]];
+	[self AE_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
 {
@@ -294,7 +298,7 @@ NSString *const PGDocumentOldSortedChildrenKey = @"PGDocumentOldSortedChildren";
 	if([self sortOrder] != anOrder) {
 		[super setSortOrder:anOrder];
 		[[self node] sortOrderDidChange];
-		[self noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
+		[self noteSortedChildrenDidChange];
 	}
 	[[PGPrefObject globalPrefObject] setSortOrder:anOrder];
 }

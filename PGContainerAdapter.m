@@ -64,14 +64,18 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
         presortedOrder:(PGSortOrder)anOrder
 {
 	if(anArray == _unsortedChildren) return;
-	NSArray *const oldSortedChildren = [self sortedChildren];
+	NSMutableArray *const removedChildren = [_unsortedChildren mutableCopy];
+	PGNode *newChild;
+	NSEnumerator *const newChildEnum = [anArray objectEnumerator];
+	while((newChild = [newChildEnum nextObject])) [removedChildren removeObjectIdenticalTo:newChild];
+	[[self document] noteNode:[self node] willRemoveNodes:removedChildren];
 	[_unsortedChildren release];
 	_unsortedChildren = [anArray copy];
 	_unsortedOrder = anOrder;
 	[_sortedChildren release];
 	_sortedChildren = nil;
 	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
-	[[self document] noteSortedChildrenOfNodeDidChange:[self node] oldSortedChildren:oldSortedChildren];
+	[[self document] noteSortedChildrenDidChange];
 }
 - (void)removeChild:(PGNode *)node
 {
@@ -123,7 +127,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	if((PGSortOrderMask & order) != (PGSortOrderMask & [[self document] sortOrder])) return;
 	[_sortedChildren release];
 	_sortedChildren = nil;
-	[[self document] noteSortedChildrenOfNodeDidChange:[self node] oldSortedChildren:nil];
+	[[self document] noteSortedChildrenDidChange];
 }
 
 #pragma mark PGResourceAdapting Protocol

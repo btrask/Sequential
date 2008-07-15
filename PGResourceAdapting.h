@@ -75,6 +75,7 @@ typedef int PGDataAvailability;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode; // Returns a node that will still exist after the change.
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;

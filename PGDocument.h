@@ -35,13 +35,14 @@ DEALINGS WITH THE SOFTWARE. */
 // Controllers
 @class PGDisplayController;
 
+extern NSString *const PGDocumentWillRemoveNodesNotification;
 extern NSString *const PGDocumentSortedNodesDidChangeNotification;
 extern NSString *const PGDocumentNodeIsViewableDidChangeNotification;
 extern NSString *const PGDocumentNodeDisplayNameDidChangeNotification;
 extern NSString *const PGDocumentBaseOrientationDidChangeNotification;
 
 extern NSString *const PGDocumentNodeKey;
-extern NSString *const PGDocumentOldSortedChildrenKey;
+extern NSString *const PGDocumentRemovedChildrenKey;
 
 @interface PGDocument : PGPrefObject
 {
@@ -88,7 +89,8 @@ extern NSString *const PGDocumentOldSortedChildrenKey;
 - (PGOrientation)baseOrientation;
 - (void)setOrientation:(PGOrientation)anOrientation;
 
-- (void)noteSortedChildrenOfNodeDidChange:(PGNode *)node oldSortedChildren:(NSArray *)children;
+- (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray;
+- (void)noteSortedChildrenDidChange;
 - (void)noteNodeIsViewableDidChange:(PGNode *)node;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;

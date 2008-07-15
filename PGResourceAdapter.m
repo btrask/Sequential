@@ -370,6 +370,15 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:) context:nil];
 }
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
+            afterRemovalOfChildren:(NSArray *)removedChildren
+            fromNode:(PGNode *)changedNode
+{
+	if(!removedChildren) return [self node];
+	PGNode *const potentiallyRemovedAncestor = [[self node] ancestorThatIsChildOfNode:changedNode];
+	if(!potentiallyRemovedAncestor || NSNotFound == [removedChildren indexOfObjectIdenticalTo:potentiallyRemovedAncestor]) return [self node];
+	return [[self sortedViewableNodeNext:flag] sortedViewableNodeNext:flag afterRemovalOfChildren:removedChildren fromNode:changedNode];
+}
 
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
 {

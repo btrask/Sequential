@@ -286,6 +286,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	if(document == _activeDocument) return NO;
 	[_activeDocument storeNode:[self activeNode] center:[clipView center] query:[searchField stringValue]];
+	[_activeDocument AE_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
@@ -301,6 +302,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	}
 	_activeDocument = document;
 	if([[self window] isMainWindow]) [[PGDocumentController sharedDocumentController] setCurrentDocument:_activeDocument];
+	[_activeDocument AE_addObserver:self selector:@selector(documentWillRemoveNodes:) name:PGDocumentWillRemoveNodesNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
@@ -376,7 +378,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if(PGSortRepeatMask & o) {
 		if((PGSortOrderMask & o) == PGSortShuffle) {
 			[[doc node] sortOrderDidChange]; // Reshuffle.
-			[doc noteSortedChildrenOfNodeDidChange:nil oldSortedChildren:nil];
+			[doc noteSortedChildrenDidChange];
 		}
 		if([self tryToSetActiveNode:node initialLocation:loc]) {
 			if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
@@ -498,26 +500,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark -
 
+- (void)documentWillRemoveNodes:(NSNotification *)aNotif
+{
+	PGNode *const changedNode = [[aNotif userInfo] objectForKey:PGDocumentNodeKey];
+	NSArray *const removedChildren = [[aNotif userInfo] objectForKey:PGDocumentRemovedChildrenKey];
+	PGNode *node = [[self activeNode] sortedViewableNodeNext:YES afterRemovalOfChildren:removedChildren fromNode:changedNode];
+	if(!node) node = [[self activeNode] sortedViewableNodeNext:NO afterRemovalOfChildren:removedChildren fromNode:changedNode];
+	[self setActiveNode:node initialLocation:PGHomeLocation];
+}
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
 	[(PGOSDView *)[_infoPanel contentView] setCount:[[[self activeDocument] node] viewableNodeCount]];
 	[self _updateNodeIndex];
-
-	PGNode *const ancestor = [[aNotif userInfo] objectForKey:PGDocumentNodeKey];
-	if([[self activeNode] isRooted]) return;
-	PGNode *removedNode = [[self activeNode] ancestorThatIsChildOfNode:ancestor];
-	if([removedNode isRooted]) return;
-	NSArray *const oldChildren = [[aNotif userInfo] objectForKey:PGDocumentOldSortedChildrenKey];
-	unsigned i = [oldChildren indexOfObjectIdenticalTo:removedNode];
-	if(NSNotFound == i) return;
-	PGNode *newActiveNode = nil;
-	if(0 == i) newActiveNode = [ancestor sortedViewableNodeFirst:YES];
-	while(!newActiveNode && i--) {
-		PGNode *const earlierNode = [oldChildren objectAtIndex:i];
-		if(![earlierNode isRooted]) continue;
-		newActiveNode = [earlierNode sortedViewableNodeNext:YES];
-	}
-	[self setActiveNode:newActiveNode initialLocation:PGHomeLocation];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
 {

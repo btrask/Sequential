@@ -140,6 +140,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (void)nodeLoadingDidProgress:(NSNotification *)aNotif;
 - (void)nodeReadyForViewing:(NSNotification *)aNotif;
 
+- (void)documentWillRemoveNodes:(NSNotification *)aNotif;
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
