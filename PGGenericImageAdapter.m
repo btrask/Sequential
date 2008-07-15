@@ -102,7 +102,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)readWithURLResponse:(NSURLResponse *)response
 {
-	NSParameterAssert([self canGetData] || [self dataSource] || [[self identifier] isFileIdentifier]);
+	[self clearCache];
+	[self setIsImage:YES];
 	if([self shouldReadContents]) [self readContents];
 }
 - (void)readContents
@@ -125,16 +126,13 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
 }
+- (void)noteResourceMightHaveChanged
+{
+	[self loadFromData:nil URLResponse:nil];
+}
 
 #pragma mark NSObject
 
-- (id)init
-{
-	if((self = [super init])) {
-		[self setIsImage:YES];
-	}
-	return self;
-}
 - (void)dealloc
 {
 	[_exifEntries release];

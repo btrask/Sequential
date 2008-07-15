@@ -377,7 +377,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	PGSortOrder const o = [[self activeDocument] sortOrder];
 	if(PGSortRepeatMask & o) {
 		if((PGSortOrderMask & o) == PGSortShuffle) {
-			[[doc node] sortOrderDidChange]; // Reshuffle.
+			[[doc node] noteSortOrderDidChange]; // Reshuffle.
 			[doc noteSortedChildrenDidChange];
 		}
 		if([self tryToSetActiveNode:node initialLocation:loc]) {
@@ -510,8 +510,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
-	[(PGOSDView *)[_infoPanel contentView] setCount:[[[self activeDocument] node] viewableNodeCount]];
-	[self _updateNodeIndex];
+	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
+	[(PGOSDView *)[_infoPanel contentView] setCount:count];
+	if(![self activeNode] && count) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+	else [self _updateNodeIndex];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
 {

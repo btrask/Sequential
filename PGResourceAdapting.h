@@ -99,6 +99,7 @@ typedef int PGDataAvailability;
 - (BOOL)canBookmark;
 - (PGBookmark *)bookmark;
 
-- (void)sortOrderDidChange;
+- (void)noteSortOrderDidChange;
+- (void)noteResourceMightHaveChanged;
 
 @end

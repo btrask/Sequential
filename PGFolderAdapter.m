@@ -60,7 +60,9 @@ DEALINGS WITH THE SOFTWARE. */
 			[oldPages removeObjectIdenticalTo:node];
 			[node identifierDidChange:nil];
 		} else node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier] adapterClass:nil dataSource:nil load:YES] autorelease];
-		if(node) [newPages addObject:node];
+		if(!node) continue;
+		[node noteResourceMightHaveChanged];
+		[newPages addObject:node];
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
 	if([self shouldReadContents]) [self readContents];

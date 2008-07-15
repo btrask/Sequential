@@ -123,15 +123,23 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {
+	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:YES];
 	[self setData:data];
-	PGResourceAdapter *const adapter = [[self node] setResourceAdapterClass:[self classWithURLResponse:response]];
+	PGResourceAdapter *adapter = [[self node] setResourceAdapterClass:[self classWithURLResponse:response]];
 	[adapter setData:data];
+	if(!adapter) {
+		[self noteIsViewableDidChange];
+		[self noteDateModifiedDidChange];
+		[self noteDateCreatedDidChange];
+		[self noteDataLengthDidChange];
+		adapter = self;
+	}
 	if([adapter shouldRead:YES]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
 		[adapter readWithURLResponse:response];
 		[pool release];
 	}
-	[self replacedWithAdapter:adapter];
+	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
 }
 - (Class)classWithURLResponse:(NSURLResponse *)response
 {
@@ -157,10 +165,6 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
 	return class;
-}
-- (void)replacedWithAdapter:(PGResourceAdapter *)newAdapter
-{
-	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
 }
 - (PGReadingPolicy)descendentReadingPolicy
 {
@@ -490,17 +494,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (void)sortOrderDidChange {}
+- (void)noteSortOrderDidChange {}
+- (void)noteResourceMightHaveChanged
+{
+	if([self isMemberOfClass:[PGResourceAdapter class]]) [self loadFromData:nil URLResponse:nil];
+}
 
 #pragma mark NSObject
 
-- (id)init
-{
-	if((self = [super init])) {
-		if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:YES];
-	}
-	return self;
-}
 - (void)dealloc
 {
 	[_data release];

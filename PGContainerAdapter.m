@@ -111,7 +111,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	NSArray *const children = [self sortedChildren];
 	int i = [children indexOfObjectIdenticalTo:start];
-	NSParameterAssert(NSNotFound != i);
+	if(NSNotFound == i) return nil;
 	int const max = [children count], increment = flag ? 1 : -1;
 	for(i += increment; i >= 0 && i < max; i += increment) {
 		PGNode *const child = [children objectAtIndex:i];
@@ -263,13 +263,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) [child addMenuItemsToMenu:menu];
 }
-- (void)sortOrderDidChange
+- (void)noteSortOrderDidChange
 {
 	[_sortedChildren release];
 	_sortedChildren = nil;
 	PGNode *child;
 	NSEnumerator *childEnum = [_unsortedChildren objectEnumerator];
-	while((child = [childEnum nextObject])) [child sortOrderDidChange];
+	while((child = [childEnum nextObject])) [child noteSortOrderDidChange];
 }
 
 #pragma mark PGResourceAdapter

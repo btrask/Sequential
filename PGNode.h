@@ -65,6 +65,7 @@ enum {
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident adapterClass:(Class)class dataSource:(id)source load:(BOOL)flag;
 
 - (unsigned)depth;
+- (BOOL)isLoaded;
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
 - (void)setIsViewable:(BOOL)flag;

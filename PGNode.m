@@ -100,6 +100,12 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
 }
+- (BOOL)isLoaded
+{
+	if(!_loaded) return NO;
+	if([[self document] node] == self) return YES;
+	return [self parentNode] ? [[self parentNode] isLoaded] : NO;
+}
 - (BOOL)isRooted
 {
 	return [[self document] node] == self || ([[[self parentAdapter] unsortedChildren] indexOfObjectIdenticalTo:self] != NSNotFound && [[self parentNode] isRooted]);
@@ -295,10 +301,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
 }
-- (void)sortOrderDidChange
+- (void)noteSortOrderDidChange
 {
 	[self _updateMenuItem];
-	[[self resourceAdapter] sortOrderDidChange];
+	[[self resourceAdapter] noteSortOrderDidChange];
 }
 
 #pragma mark NSObject

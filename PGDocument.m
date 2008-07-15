@@ -233,7 +233,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if(!_node) return;
 	NSParameterAssert(node);
-	[self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	if([node isLoaded]) [self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {
@@ -263,6 +263,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
 	if([ident isEqual:[[self node] identifier]]) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	NSLog(@"event did occur for identifier %@", ident);
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccur];
 }
 
@@ -297,7 +298,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if([self sortOrder] != anOrder) {
 		[super setSortOrder:anOrder];
-		[[self node] sortOrderDidChange];
+		[[self node] noteSortOrderDidChange];
 		[self noteSortedChildrenDidChange];
 	}
 	[[PGPrefObject globalPrefObject] setSortOrder:anOrder];
