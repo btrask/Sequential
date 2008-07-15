@@ -102,7 +102,9 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if(outNode) *outNode = _storedNode;
 	if(outCenter) *outCenter = _storedCenter;
-	if(outQuery) *outQuery = [_storedQuery autorelease];
+	if(outQuery) *outQuery = _storedQuery;
+	[_storedNode autorelease];
+	[_storedQuery autorelease];
 	_storedQuery = nil;
 	if(_storedNode) {
 		_storedNode = nil;
@@ -114,10 +116,13 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
         center:(NSPoint)center
         query:(NSString *)query
 {
-	_storedNode = node;
+	[_storedNode autorelease];
+	_storedNode = [node retain];
 	_storedCenter = center;
+	[_storedQuery autorelease];
 	_storedQuery = [query copy];
 }
+
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame
 {
 	if(NSEqualRects(_storedFrame, NSZeroRect)) return NO;
@@ -218,6 +223,13 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 - (void)noteNode:(PGNode *)node
         willRemoveNodes:(NSArray *)anArray
 {
+	PGNode *newStoredNode = [_storedNode sortedViewableNodeNext:YES afterRemovalOfChildren:anArray fromNode:node];
+	if(!newStoredNode) newStoredNode = [_storedNode sortedViewableNodeNext:NO afterRemovalOfChildren:anArray fromNode:node];
+	if(_storedNode != newStoredNode) {
+		[_storedNode release];
+		_storedNode = [newStoredNode retain];
+		_storedCenter = PGRectEdgeMaskToPoint(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation));
+	}
 	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
 }
 - (void)noteSortedChildrenDidChange
@@ -263,7 +275,6 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
 	if([ident isEqual:[[self node] identifier]]) [[self displayController] synchronizeWindowTitleWithDocumentName];
-	NSLog(@"event did occur for identifier %@", ident);
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccur];
 }
 
@@ -322,6 +333,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	[_node release];
 	[_subscription release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
+	[_storedNode release];
 	[_storedQuery release];
 	[_initialIdentifier release];
 	[_displayController release];

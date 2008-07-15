@@ -24,27 +24,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-enum {
-	PGNoEdges       = 0,
-	PGMinXEdgeMask  = 1 << NSMinXEdge,
-	PGMinYEdgeMask  = 1 << NSMinYEdge,
-	PGMaxXEdgeMask  = 1 << NSMaxXEdge,
-	PGMaxYEdgeMask  = 1 << NSMaxYEdge,
-	PGHorzEdgesMask = PGMinXEdgeMask | PGMaxXEdgeMask,
-	PGVertEdgesMask = PGMinYEdgeMask | PGMaxYEdgeMask,
-	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
-	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
-};
-typedef unsigned PGRectEdgeMask;
-
-extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
-extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
-
-enum {
-	PGHomeLocation = 0,
-	PGEndLocation  = 1
-};
-typedef int PGClipViewLocation;
+// Other
+#import "PGGeometry.h"
 
 enum {
 	PGScrollByLine = 0,
@@ -91,7 +72,7 @@ typedef int PGScrollType;
 - (BOOL)scrollToCenterAt:(NSPoint)aPoint allowAnimation:(BOOL)flag;
 - (BOOL)scrollBy:(NSSize)aSize allowAnimation:(BOOL)flag;
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask allowAnimation:(BOOL)flag;
-- (BOOL)scrollToLocation:(PGClipViewLocation)location allowAnimation:(BOOL)flag;
+- (BOOL)scrollToLocation:(PGPageLocation)location allowAnimation:(BOOL)flag;
 - (void)stopAnimatedScrolling;
 
 - (void)mouseDown:(NSEvent *)firstEvent secondaryButton:(BOOL)flag;
@@ -108,7 +89,7 @@ typedef int PGScrollType;
 - (void)clipViewWasClicked:(PGClipView *)sender event:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
-- (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGClipViewLocation)pageLocation; // Don't provide contradictory directions.
+- (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.
 
 @end
 

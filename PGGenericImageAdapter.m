@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
+#import "PGExifEntry.h"
 
 @interface PGGenericImageAdapter (Private)
 

@@ -24,8 +24,8 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-// Models
-#import "PGExifEntry.h"
+// Other
+#import "PGGeometry.h"
 
 @interface PGImageView : NSView
 {

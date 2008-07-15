@@ -36,6 +36,9 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGFindView;
 @class PGFindlessTextView;
 
+// Other
+#import "PGGeometry.h"
+
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 
 @interface PGDisplayController : NSWindowController
@@ -43,7 +46,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 	@protected
 	IBOutlet PGClipView          *clipView;
 	IBOutlet PGImageView         *imageView;
-	         PGClipViewLocation  _initialLocation;
+	         PGPageLocation  _initialLocation;
 
 	@private
 	         unsigned            _displayImageIndex;
@@ -119,10 +122,10 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (void)activateDocument:(PGDocument *)document; // Abstract.
 
 - (PGNode *)activeNode;
-- (void)setActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
-- (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGClipViewLocation)location;
+- (void)setActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
+- (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
-- (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGClipViewLocation)loc allowAlerts:(BOOL)flag;
+- (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)showNode:(PGNode *)node;
 
 - (BOOL)loadingIndicatorShown;

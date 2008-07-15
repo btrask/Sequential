@@ -54,6 +54,7 @@ enum {
 	id                    _dataSource;
 	NSMenuItem           *_menuItem;
 	BOOL                  _isViewable;
+	unsigned              _determiningTypeCount;
 	NSString             *_lastPassword;
 	BOOL                  _expectsReturnedImage;
 	PGResourceAdapter    *_resourceAdapter;
@@ -69,6 +70,7 @@ enum {
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
 - (void)setIsViewable:(BOOL)flag;
+- (void)setDeterminingType:(BOOL)flag;
 - (void)becomeViewed;
 - (void)becomeViewedWithPassword:(NSString *)pass;
 

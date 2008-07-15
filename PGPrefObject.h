@@ -24,6 +24,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+// Other
+#import "PGGeometry.h"
+
 extern NSString *const PGPrefObjectShowsOnScreenDisplayDidChangeNotification;
 extern NSString *const PGPrefObjectReadingDirectionDidChangeNotification;
 extern NSString *const PGPrefObjectImageScaleDidChangeNotification;
@@ -35,12 +38,6 @@ enum {
 	PGCheckerboardPattern = 1
 };
 typedef int PGPatternType;
-
-enum {
-	PGReadingDirectionLeftToRight = 0,
-	PGReadingDirectionRightToLeft = 1
-};
-typedef int PGReadingDirection;
 
 enum {
 	PGConstantFactorScaling        = 0, // Formerly known as PGNoScaling.

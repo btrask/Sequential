@@ -30,15 +30,6 @@ DEALINGS WITH THE SOFTWARE. */
 // External
 #import "exif.h"
 
-PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
-{
-	PGOrientation n1 = o1, n2 = o2;
-	if(o1 & PGRotated90CC && !(o2 & PGRotated90CC)) n2 = ((o2 & PGFlippedHorz) >> 1) | ((o2 & PGFlippedVert) << 1);
-	PGOrientation r = n1 ^ n2;
-	if(o1 & PGRotated90CC && o2 & PGRotated90CC) r ^= PGUpsideDown;
-	return r;
-}
-
 enum {
 	PGExifOrientationTag = 0x0112,
 };

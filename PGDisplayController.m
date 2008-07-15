@@ -30,7 +30,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
-#import "PGExifEntry.h"
 
 // Views
 #import "PGDocumentWindow.h"
@@ -336,7 +335,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	return [[_activeNode retain] autorelease];
 }
 - (void)setActiveNode:(PGNode *)aNode
-        initialLocation:(PGClipViewLocation)location
+        initialLocation:(PGPageLocation)location
 {
 	if(aNode == _activeNode) return;
 	[_activeNode AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
@@ -354,7 +353,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeNode becomeViewed];
 }
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode
-        initialLocation:(PGClipViewLocation)location
+        initialLocation:(PGPageLocation)location
 {
 	if(!aNode) return NO;
 	[self setActiveNode:aNode initialLocation:location];
@@ -363,13 +362,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (BOOL)tryToGoForward:(BOOL)forward
         allowAlerts:(BOOL)flag
 {
-	PGClipViewLocation const l = forward ? PGHomeLocation : PGEndLocation;
+	PGPageLocation const l = forward ? PGHomeLocation : PGEndLocation;
 	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
 	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l allowAlerts:flag];
 }
 - (BOOL)tryToLoopForward:(BOOL)forward
         toNode:(PGNode *)node
-	initialLocation:(PGClipViewLocation)loc
+	initialLocation:(PGPageLocation)loc
         allowAlerts:(BOOL)flag
 {
 	PGDocument *const doc = [self activeDocument];
@@ -822,11 +821,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	return [self activeNode] != activeNode;
 }
 - (PGRectEdgeMask)clipView:(PGClipView *)sender
-                  directionFor:(PGClipViewLocation)nodeLocation
+                  directionFor:(PGPageLocation)nodeLocation
 {
-	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-	if(PGHomeLocation == nodeLocation) return PGMaxYEdgeMask | (ltr ? PGMinXEdgeMask : PGMaxXEdgeMask);
-	else return PGMinYEdgeMask | (ltr ? PGMaxXEdgeMask : PGMinXEdgeMask);
+	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
 }
 
 #pragma mark NSServicesRequests Protocol

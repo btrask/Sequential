@@ -41,18 +41,6 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
 #define PGLineScrollDistance       (PGBorderPadding * 3)
 
-PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask)
-{
-	PGRectEdgeMask r = mask;
-	if((r & PGHorzEdgesMask) == PGHorzEdgesMask) r &= ~PGHorzEdgesMask;
-	if((r & PGVertEdgesMask) == PGVertEdgesMask) r &= ~PGVertEdgesMask;
-	return r;
-}
-BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask)
-{
-	return PGNonContradictoryRectEdges(mask) != mask;
-}
-
 static NSCursor *PGPointingHandCursor(void)
 {
 	static NSCursor *cursor = nil;
@@ -85,15 +73,6 @@ static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect m
 	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0), sidesHeight);
 	if(!NSIsEmptyRect(diff[i])) i++;
 	*count = i;
-}
-static inline NSPoint PGRectEdgeMaskToPoint(PGRectEdgeMask mask)
-{
-	NSPoint location = NSZeroPoint;
-	if(mask & PGMinXEdgeMask) location.x = -FLT_MAX;
-	else if(mask & PGMaxXEdgeMask) location.x = FLT_MAX;
-	if(mask & PGMinYEdgeMask) location.y = -FLT_MAX;
-	else if(mask & PGMaxYEdgeMask) location.y = FLT_MAX;
-	return location;
 }
 static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
@@ -264,7 +243,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
 	return PGNoEdges == mask ? NO : [self scrollTo:PGRectEdgeMaskToPoint(mask) allowAnimation:flag];
 }
-- (BOOL)scrollToLocation:(PGClipViewLocation)location
+- (BOOL)scrollToLocation:(PGPageLocation)location
         allowAnimation:(BOOL)flag
 {
 	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] allowAnimation:flag];
@@ -670,7 +649,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	return NO;
 }
 - (PGRectEdgeMask)clipView:(PGClipView *)sender
-                  directionFor:(PGClipViewLocation)pageLocation
+                  directionFor:(PGPageLocation)pageLocation
 {
 	return PGNoEdges;
 }

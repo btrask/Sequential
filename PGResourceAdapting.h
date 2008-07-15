@@ -29,8 +29,10 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 @class PGContainerAdapter;
 @class PGResourceIdentifier;
-#import "PGExifEntry.h"
 @class PGBookmark;
+
+// Other
+#import "PGGeometry.h"
 
 enum {
 	PGWrongPassword   = -1,

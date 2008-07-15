@@ -74,6 +74,7 @@
 		0E9016410DF44051004B6F69 /* PGPreferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E90163F0DF44051004B6F69 /* PGPreferences.nib */; };
 		0E9016AB0DF44A7E004B6F69 /* PGColorWell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E9016AA0DF44A7E004B6F69 /* PGColorWell.m */; };
 		0E90195C0DF55F50004B6F69 /* PGDocumentWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E90195A0DF55F50004B6F69 /* PGDocumentWindow.m */; };
+		0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E92E1350E2CA88400276801 /* PGGeometry.m */; };
 		0E94F5250DAA6B0F00A23F73 /* PGWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94F5240DAA6B0F00A23F73 /* PGWindowController.m */; };
 		0E94F9CC0DAD37D000A23F73 /* PGPrefObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94F9CB0DAD37D000A23F73 /* PGPrefObject.m */; };
 		0E94FBAF0DAE739700A23F73 /* PGDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94FBAE0DAE739700A23F73 /* PGDisplayController.m */; };
@@ -315,6 +316,8 @@
 		0E9016AA0DF44A7E004B6F69 /* PGColorWell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGColorWell.m; sourceTree = "<group>"; };
 		0E90195A0DF55F50004B6F69 /* PGDocumentWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDocumentWindow.m; sourceTree = "<group>"; };
 		0E90195B0DF55F50004B6F69 /* PGDocumentWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDocumentWindow.h; sourceTree = "<group>"; };
+		0E92E1340E2CA88400276801 /* PGGeometry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGGeometry.h; sourceTree = "<group>"; };
+		0E92E1350E2CA88400276801 /* PGGeometry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGGeometry.m; sourceTree = "<group>"; };
 		0E94F5230DAA6B0F00A23F73 /* PGWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGWindowController.h; sourceTree = "<group>"; };
 		0E94F5240DAA6B0F00A23F73 /* PGWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGWindowController.m; sourceTree = "<group>"; };
 		0E94F9CA0DAD37D000A23F73 /* PGPrefObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPrefObject.h; sourceTree = "<group>"; };
@@ -613,6 +616,8 @@
 				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
 				0EC11DF10CA02B98003E492C /* PGByteOrdering.h */,
 				0EC11DF20CA02B98003E492C /* PGByteOrdering.m */,
+				0E92E1340E2CA88400276801 /* PGGeometry.h */,
+				0E92E1350E2CA88400276801 /* PGGeometry.m */,
 				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
 				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
 				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
@@ -1040,6 +1045,7 @@
 				0E90195C0DF55F50004B6F69 /* PGDocumentWindow.m in Sources */,
 				0E56B8DD0E24918C00987F57 /* PGActivityPanel.m in Sources */,
 				0EC33E3F0E29B0A700450CF8 /* PGLevelIndicatorCell.m in Sources */,
+				0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

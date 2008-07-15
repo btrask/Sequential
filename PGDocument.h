@@ -29,11 +29,13 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 @class PGResourceIdentifier;
 @class PGSubscription;
-#import "PGExifEntry.h"
 @class PGBookmark;
 
 // Controllers
 @class PGDisplayController;
+
+// Other
+#import "PGGeometry.h"
 
 extern NSString *const PGDocumentWillRemoveNodesNotification;
 extern NSString *const PGDocumentSortedNodesDidChangeNotification;

@@ -24,22 +24,53 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-// Other
-#import "PGGeometry.h"
+#pragma mark PGRectEdgeMask
 
-@interface PGExifEntry : NSObject
-{
-	@private
-	NSString *_label;
-	NSString *_value;
-}
+enum {
+	PGNoEdges       = 0,
+	PGMinXEdgeMask  = 1 << NSMinXEdge,
+	PGMinYEdgeMask  = 1 << NSMinYEdge,
+	PGMaxXEdgeMask  = 1 << NSMaxXEdge,
+	PGMaxYEdgeMask  = 1 << NSMaxYEdge,
+	PGHorzEdgesMask = PGMinXEdgeMask | PGMaxXEdgeMask,
+	PGVertEdgesMask = PGMinYEdgeMask | PGMaxYEdgeMask,
+	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
+	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
+};
+typedef unsigned PGRectEdgeMask;
 
-+ (NSData *)exifDataWithImageData:(NSData *)data;
-+ (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data;
+NSPoint PGRectEdgeMaskToPoint(PGRectEdgeMask mask);
+extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
+extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
 
-- (id)initWithLabel:(NSString *)label value:(NSString *)value;
-- (NSString *)label;
-- (NSString *)value;
-- (NSComparisonResult)compare:(PGExifEntry *)anEntry;
+#pragma mark PGReadingDirection
 
-@end
+enum {
+	PGReadingDirectionLeftToRight = 0,
+	PGReadingDirectionRightToLeft = 1
+};
+typedef int PGReadingDirection;
+
+#pragma mark PGPageLocation
+
+enum {
+	PGHomeLocation = 0,
+	PGEndLocation  = 1
+};
+typedef int PGPageLocation;
+
+PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir);
+
+#pragma mark PGOrientation
+
+enum {
+	PGUpright      = 0,
+	PGFlippedVert  = 1 << 0,
+	PGFlippedHorz  = 1 << 1,
+	PGRotated90CC  = 1 << 2, // Counter-Clockwise.
+	PGUpsideDown   = PGFlippedVert | PGFlippedHorz,
+	PGRotated270CC = PGFlippedVert | PGFlippedHorz | PGRotated90CC
+};
+typedef unsigned PGOrientation;
+
+PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);

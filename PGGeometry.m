@@ -22,24 +22,48 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
-
-// Other
 #import "PGGeometry.h"
 
-@interface PGExifEntry : NSObject
+#pragma mark PGRectEdgeMask
+
+NSPoint PGRectEdgeMaskToPoint(PGRectEdgeMask mask)
 {
-	@private
-	NSString *_label;
-	NSString *_value;
+	NSCParameterAssert(!PGHasContradictoryRectEdges(mask));
+	NSPoint location = NSZeroPoint;
+	if(mask & PGMinXEdgeMask) location.x = -FLT_MAX;
+	else if(mask & PGMaxXEdgeMask) location.x = FLT_MAX;
+	if(mask & PGMinYEdgeMask) location.y = -FLT_MAX;
+	else if(mask & PGMaxYEdgeMask) location.y = FLT_MAX;
+	return location;
+}
+PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask)
+{
+	PGRectEdgeMask r = mask;
+	if((r & PGHorzEdgesMask) == PGHorzEdgesMask) r &= ~PGHorzEdgesMask;
+	if((r & PGVertEdgesMask) == PGVertEdgesMask) r &= ~PGVertEdgesMask;
+	return r;
+}
+BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask)
+{
+	return PGNonContradictoryRectEdges(mask) != mask;
 }
 
-+ (NSData *)exifDataWithImageData:(NSData *)data;
-+ (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data;
+#pragma mark PGPageLocation
 
-- (id)initWithLabel:(NSString *)label value:(NSString *)value;
-- (NSString *)label;
-- (NSString *)value;
-- (NSComparisonResult)compare:(PGExifEntry *)anEntry;
+PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir)
+{
+	BOOL const ltr = dir == PGReadingDirectionLeftToRight;
+	if(PGHomeLocation == loc) return PGMaxYEdgeMask | (ltr ? PGMinXEdgeMask : PGMaxXEdgeMask);
+	else return PGMinYEdgeMask | (ltr ? PGMaxXEdgeMask : PGMinXEdgeMask);
+}
 
-@end
+#pragma mark PGOrientation
+
+PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
+{
+	PGOrientation n1 = o1, n2 = o2;
+	if(o1 & PGRotated90CC && !(o2 & PGRotated90CC)) n2 = ((o2 & PGFlippedHorz) >> 1) | ((o2 & PGFlippedVert) << 1);
+	PGOrientation r = n1 ^ n2;
+	if(o1 & PGRotated90CC && o2 & PGRotated90CC) r ^= PGUpsideDown;
+	return r;
+}

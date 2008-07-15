@@ -123,9 +123,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadFromData:(NSData *)data
         URLResponse:(NSURLResponse *)response
 {
-	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:YES];
+	PGNode *const node = [self node];
+	[node setDeterminingType:YES];
 	[self setData:data];
-	PGResourceAdapter *adapter = [[self node] setResourceAdapterClass:[self classWithURLResponse:response]];
+	PGResourceAdapter *adapter = [node setResourceAdapterClass:[self classWithURLResponse:response]];
 	[adapter setData:data];
 	if(!adapter) {
 		[self noteIsViewableDidChange];
@@ -139,7 +140,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[adapter readWithURLResponse:response];
 		[pool release];
 	}
-	if([self isMemberOfClass:[PGResourceAdapter class]]) [self setIsDeterminingType:NO];
+	[node setDeterminingType:NO];
 }
 - (Class)classWithURLResponse:(NSURLResponse *)response
 {

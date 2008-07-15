@@ -120,6 +120,11 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	_isViewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
 }
+- (void)setDeterminingType:(BOOL)flag
+{
+	if(!flag) NSParameterAssert(_determiningTypeCount);
+	_determiningTypeCount += flag ? 1 : -1;
+}
 - (void)becomeViewed
 {
 	[self becomeViewedWithPassword:nil];
@@ -269,7 +274,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (BOOL)isViewable
 {
-	return _isViewable;
+	return _isViewable || _determiningTypeCount > 0;
 }
 - (NSString *)lastPassword
 {

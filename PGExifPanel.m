@@ -26,6 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGNode.h"
+#import "PGExifEntry.h"
 
 // Controllers
 #import "PGDocumentController.h"
