@@ -228,7 +228,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(_storedNode != newStoredNode) {
 		[_storedNode release];
 		_storedNode = [newStoredNode retain];
-		_storedCenter = PGRectEdgeMaskToPoint(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation));
+		_storedCenter = PGRectEdgeMaskToPointWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), FLT_MAX);
 	}
 	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
 }

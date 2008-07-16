@@ -26,15 +26,26 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGRectEdgeMask
 
-NSPoint PGRectEdgeMaskToPoint(PGRectEdgeMask mask)
+NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
 {
+	float const m = fabs(magnitude);
 	NSCParameterAssert(!PGHasContradictoryRectEdges(mask));
 	NSPoint location = NSZeroPoint;
-	if(mask & PGMinXEdgeMask) location.x = -FLT_MAX;
-	else if(mask & PGMaxXEdgeMask) location.x = FLT_MAX;
-	if(mask & PGMinYEdgeMask) location.y = -FLT_MAX;
-	else if(mask & PGMaxYEdgeMask) location.y = FLT_MAX;
+	if(mask & PGMinXEdgeMask) location.x = -m;
+	else if(mask & PGMaxXEdgeMask) location.x = m;
+	if(mask & PGMinYEdgeMask) location.y = -m;
+	else if(mask & PGMaxYEdgeMask) location.y = m;
 	return location;
+}
+PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold)
+{
+	float const t = fabs(threshhold);
+	PGRectEdgeMask direction = PGNoEdges;
+	if(p.x <= -t) direction |= PGMinXEdgeMask;
+	else if(p.x >= t) direction |= PGMaxXEdgeMask;
+	if(p.y <= -t) direction |= PGMinYEdgeMask;
+	else if(p.y >= t) direction |= PGMaxYEdgeMask;
+	return direction;
 }
 PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask)
 {

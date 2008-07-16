@@ -241,7 +241,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
         allowAnimation:(BOOL)flag
 {
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
-	return PGNoEdges == mask ? NO : [self scrollTo:PGRectEdgeMaskToPoint(mask) allowAnimation:flag];
+	return PGNoEdges == mask ? NO : [self scrollTo:PGRectEdgeMaskToPointWithMagnitude(mask, FLT_MAX) allowAnimation:flag];
 }
 - (BOOL)scrollToLocation:(PGPageLocation)location
         allowAnimation:(BOOL)flag
@@ -357,7 +357,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		position = PGOffsetPoint(position, [self distanceInDirection:dir2 forScrollType:PGScrollByPage fromPosition:position]);
 		if([self shouldExitForMovementInDirection:dir2]) {
 			if([[self delegate] clipView:self shouldExitEdges:mask]) return;
-			position = PGRectEdgeMaskToPoint(mask); // We can't exit, but make sure we're at the very end.
+			position = PGRectEdgeMaskToPointWithMagnitude(mask, FLT_MAX); // We can't exit, but make sure we're at the very end.
 		} else if(across) position.x = FLT_MAX * (mask & PGMinXEdgeMask ? 1 : -1);
 		else position.y = FLT_MAX * (mask & PGMinYEdgeMask ? 1 : -1);
 	}
@@ -509,13 +509,13 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	static float minValue = 0;
 	if(!minValue) minValue = MAX(fabs(x), fabs(y)) * 1.5;
 
-	PGRectEdgeMask direction = PGNoEdges;
-	if(x < 0) direction |= PGMinXEdgeMask;
-	else if(x > 0) direction |= PGMaxXEdgeMask;
-	if(y < 0) direction |= PGMinYEdgeMask;
-	else if(y > 0) direction |= PGMaxYEdgeMask;
+	PGRectEdgeMask const direction = PGPointToRectEdgeMaskWithThreshhold(NSMakePoint(x, y), 0);
 	if(hypotf(x, y) < minValue && [self shouldExitForMovementInDirection:direction] && [[self delegate] clipView:self shouldExitEdges:direction]) return; // When the user starts scrolling, there is always a slow event (ie. less than minValue) before the speed ramps up. We require a very slow combined speed (which seems to exclude everything but an initial scroll event, but that isn't important) in order to prevent the user from accidentally going between pages.
 	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) allowAnimation:YES];
+}
+- (void)swipeWithEvent:(NSEvent *)anEvent // Private, invoked from three finger guestures on new laptop trackpads.
+{
+	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint([anEvent deltaX], [anEvent deltaY]), 0.1)];
 }
 
 #pragma mark -

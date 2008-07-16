@@ -39,7 +39,8 @@ enum {
 };
 typedef unsigned PGRectEdgeMask;
 
-NSPoint PGRectEdgeMaskToPoint(PGRectEdgeMask mask);
+NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
+PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
 extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
 
