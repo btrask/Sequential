@@ -45,14 +45,11 @@
 			<string>NSResponder</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>NSApplication</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelLoad</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>PGActivityPanel</string>
 			<key>LANGUAGE</key>
@@ -61,6 +58,8 @@
 			<dict>
 				<key>activityTable</key>
 				<string>NSTableView</string>
+				<key>cancelButton</key>
+				<string>NSButton</string>
 				<key>identifierColumn</key>
 				<string>NSTableColumn</string>
 				<key>progressColumn</key>
@@ -71,11 +70,27 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>HMBlkTableView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSTableView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSControl</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -141,14 +156,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGLevelIndicatorCell</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSLevelIndicatorCell</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

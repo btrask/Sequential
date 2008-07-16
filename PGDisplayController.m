@@ -47,9 +47,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGEncodingAlert.h"
 
 // Categories
+#import "NSControlAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
-#import "NSTextFieldAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 

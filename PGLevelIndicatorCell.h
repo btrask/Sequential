@@ -1,6 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-@interface PGLevelIndicatorCell : NSLevelIndicatorCell
+@interface PGLevelIndicatorCell : NSCell
 {
 	@private
 	BOOL _hidden;

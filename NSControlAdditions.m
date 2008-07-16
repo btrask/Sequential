@@ -1,6 +1,6 @@
-#import "NSTextFieldAdditions.h"
+#import "NSControlAdditions.h"
 
-@implementation NSTextField (AEAdditions)
+@implementation NSControl (AEAdditions)
 
 - (void)AE_setAttributedStringValue:(NSAttributedString *)anObject
 {

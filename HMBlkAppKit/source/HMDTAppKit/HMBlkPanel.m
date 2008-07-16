@@ -25,7 +25,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#import "HMBlkButton.h"
 #import "HMBlkContentView.h"
 #import "HMBlkPanel.h"
 
@@ -125,7 +124,7 @@ POSSIBILITY OF SUCH DAMAGE.
         buttonRect.origin.y = contentRect.size.height - 7 - [closeButtonImage size].height;
         buttonRect.size = [closeButtonImage size];
         
-        _closeButton = [[HMBlkButton alloc] initWithFrame:buttonRect];
+        _closeButton = [[NSButton alloc] initWithFrame:buttonRect];
         [_closeButton setButtonType:NSMomentaryChangeButton];
         [_closeButton setBezelStyle:NSRegularSquareBezelStyle];
         [_closeButton setBordered:NO];
@@ -135,8 +134,6 @@ POSSIBILITY OF SUCH DAMAGE.
         [_closeButton setAction:@selector(fadeOut)];
         
         [_blkContentView addSubview:_closeButton];
-        
-        [self addMouseMoveListener:_closeButton];
     }
     
     // Set accepts mouse moved events

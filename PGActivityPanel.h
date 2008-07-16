@@ -30,7 +30,10 @@ DEALINGS WITH THE SOFTWARE. */
 	IBOutlet NSTableView   *activityTable;
 	IBOutlet NSTableColumn *identifierColumn;
 	IBOutlet NSTableColumn *progressColumn;
+	IBOutlet NSButton      *cancelButton;
 }
+
+- (IBAction)cancelLoad:(id)sender;
 
 - (void)connectionsDidChange:(NSNotification *)aNotif;
 

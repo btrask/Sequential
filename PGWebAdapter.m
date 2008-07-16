@@ -56,9 +56,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)connectionDidClose:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
-		[self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
+		if([_mainConnection status] == PGLoaded) [self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
 		[self setIsDeterminingType:NO];
-		_encounteredLoadingError = YES;
+		if([_mainConnection status] == PGLoadFailed) _encounteredLoadingError = YES;
 		if([self shouldReadContents]) [self readContents];
 	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
 }
@@ -88,6 +88,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if([self isDeterminingType]) return;
 	[self setHasReadContents];
+	if(!_encounteredLoadingError) return;
 	NSURLResponse *const resp = [_mainConnection response];
 	NSString *message = nil;
 	if([resp respondsToSelector:@selector(statusCode)]) {

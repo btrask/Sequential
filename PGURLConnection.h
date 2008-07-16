@@ -26,14 +26,22 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 
+enum {
+	PGLoading      = 0,
+	PGLoaded       = 1,
+	PGLoadCanceled = 2,
+	PGLoadFailed   = 3
+};
+typedef unsigned PGLoadingStatus;
+
 @interface PGURLConnection : NSObject // Wraps NSURLConnection so only a few connections are active at a time.
 {
 	@private
-	NSURLRequest  *_request;
-	NSURLResponse *_response;
-	NSMutableData *_data;
-	BOOL           _isLoaded;
-	id             _delegate;
+	NSURLRequest   *_request;
+	NSURLResponse  *_response;
+	NSMutableData  *_data;
+	PGLoadingStatus _status;
+	id              _delegate;
 }
 
 + (NSString *)userAgent;
@@ -48,7 +56,7 @@ extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 - (id)delegate;
 - (NSURLResponse *)response;
 - (NSMutableData *)data;
-- (BOOL)isLoaded;
+- (PGLoadingStatus)status;
 - (float)progress;
 - (void)prioritize;
 - (void)cancel;

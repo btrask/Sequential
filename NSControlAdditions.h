@@ -1,6 +1,6 @@
 #import <Cocoa/Cocoa.h>
 
-@interface NSTextField (AEAdditions)
+@interface NSControl (AEAdditions)
 
 - (void)AE_setAttributedStringValue:(NSAttributedString *)str; // Keeps existing attributes.
 

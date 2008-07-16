@@ -29,12 +29,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #import "HMBlkAppKit.h"
 #import "PGFadeOutPanel.h"
 
-@class HMBlkButton;
-
 @interface HMBlkPanel : PGFadeOutPanel
 {
     HMBlkContentView*   _blkContentView;
-    HMBlkButton*        _closeButton;
+    NSButton*           _closeButton;
     
     NSMutableSet*       _mouseMoveListeners;
 }

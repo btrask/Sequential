@@ -138,13 +138,13 @@ static NSMutableArray *PGPendingConnections = nil;
 {
 	return [[_data retain] autorelease];
 }
-- (BOOL)isLoaded
+- (PGLoadingStatus)status
 {
-	return _isLoaded;
+	return _status;
 }
 - (float)progress
 {
-	if(_isLoaded) return 1;
+	if(PGLoaded == [self status]) return 1;
 	if(!_response) return 0;
 	long long const expectedLength = [_response expectedContentLength];
 	if(-1 == expectedLength) return 0;
@@ -153,6 +153,7 @@ static NSMutableArray *PGPendingConnections = nil;
 
 - (void)prioritize
 {
+	if(PGLoading != [self status]) return;
 	NSValue *const value = [NSValue valueWithNonretainedObject:self];
 	if(![PGPendingConnections containsObject:value]) return;
 	[PGPendingConnections removeObject:value];
@@ -161,7 +162,14 @@ static NSMutableArray *PGPendingConnections = nil;
 }
 - (void)cancel
 {
+	if(PGLoading != [self status]) return;
 	[[self class] _stopConnection:self];
+	[_data release];
+	_data = nil;
+	[_response release];
+	_response = nil;
+	_status = PGLoadCanceled;
+	[[self delegate] connectionDidClose:self];
 }
 
 #pragma mark NSURLConnectionDelegate Protocol
@@ -183,14 +191,16 @@ static NSMutableArray *PGPendingConnections = nil;
 - (void)connection:(NSURLConnection *)connection
 	didFailWithError:(NSError *)error
 {
+	[[self class] _stopConnection:self];
 	[_data release];
 	_data = nil;
-	[self connectionDidFinishLoading:connection];
+	_status = PGLoadFailed;
+	[[self delegate] connectionDidClose:self];
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-	_isLoaded = YES;
 	[[self class] _stopConnection:self];
+	_status = PGLoaded;
 	[[self delegate] connectionDidClose:self];
 }
 
@@ -198,8 +208,7 @@ static NSMutableArray *PGPendingConnections = nil;
 
 - (void)dealloc
 {
-	NSParameterAssert(![PGPendingConnections containsObject:[NSValue valueWithNonretainedObject:self]]);
-	NSParameterAssert(![PGActiveConnections containsObject:[NSValue valueWithNonretainedObject:self]]);
+	[[self class] _stopConnection:self];
 	[_request release];
 	[_response release];
 	[_data release];

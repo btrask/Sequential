@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		0B6BCA340BB236390014D0BF /* HMAppKitEx.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9E50BB236390014D0BF /* HMAppKitEx.m */; };
 		0B6BCA360BB236390014D0BF /* HMBlkBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9E70BB236390014D0BF /* HMBlkBox.m */; };
-		0B6BCA380BB236390014D0BF /* HMBlkButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9E90BB236390014D0BF /* HMBlkButton.m */; };
-		0B6BCA3A0BB236390014D0BF /* HMBlkButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9EB0BB236390014D0BF /* HMBlkButtonCell.m */; };
 		0B6BCA3C0BB236390014D0BF /* HMBlkContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9ED0BB236390014D0BF /* HMBlkContentView.m */; };
 		0B6BCA3E0BB236390014D0BF /* HMBlkOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9EF0BB236390014D0BF /* HMBlkOutlineView.m */; };
 		0B6BCA400BB236390014D0BF /* HMBlkPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BC9F10BB236390014D0BF /* HMBlkPanel.m */; };
@@ -79,6 +77,12 @@
 		0E2707630E2DD59C00D65876 /* search-cancel-hilite.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707320E2DD59C00D65876 /* search-cancel-hilite.tiff */; };
 		0E2707640E2DD59C00D65876 /* search-cancel.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707330E2DD59C00D65876 /* search-cancel.tiff */; };
 		0E2707650E2DD59C00D65876 /* search-icon.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707340E2DD59C00D65876 /* search-icon.tiff */; };
+		0E2707970E2DEA4E00D65876 /* button-left-hilite.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707910E2DEA4E00D65876 /* button-left-hilite.png */; };
+		0E2707980E2DEA4E00D65876 /* button-left.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707920E2DEA4E00D65876 /* button-left.png */; };
+		0E2707990E2DEA4E00D65876 /* button-middle-hilite.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707930E2DEA4E00D65876 /* button-middle-hilite.png */; };
+		0E27079A0E2DEA4E00D65876 /* button-middle.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707940E2DEA4E00D65876 /* button-middle.png */; };
+		0E27079B0E2DEA4E00D65876 /* button-right-hilite.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707950E2DEA4E00D65876 /* button-right-hilite.png */; };
+		0E27079C0E2DEA4E00D65876 /* button-right.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707960E2DEA4E00D65876 /* button-right.png */; };
 		0E50B1030DBE93FB0036CA3E /* PGFadeOutPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E50B1010DBE93FB0036CA3E /* PGFadeOutPanel.m */; };
 		0EEE5B9A0DB61620006E5B9C /* HMBlkSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE5B980DB61620006E5B9C /* HMBlkSearchField.m */; };
 		0EEE5B9E0DB61632006E5B9C /* HMBlkSearchFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE5B9C0DB61632006E5B9C /* HMBlkSearchFieldCell.m */; };
@@ -116,10 +120,6 @@
 		0B6BC9E50BB236390014D0BF /* HMAppKitEx.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMAppKitEx.m; sourceTree = "<group>"; };
 		0B6BC9E60BB236390014D0BF /* HMBlkBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkBox.h; sourceTree = "<group>"; };
 		0B6BC9E70BB236390014D0BF /* HMBlkBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkBox.m; sourceTree = "<group>"; };
-		0B6BC9E80BB236390014D0BF /* HMBlkButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkButton.h; sourceTree = "<group>"; };
-		0B6BC9E90BB236390014D0BF /* HMBlkButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkButton.m; sourceTree = "<group>"; };
-		0B6BC9EA0BB236390014D0BF /* HMBlkButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkButtonCell.h; sourceTree = "<group>"; };
-		0B6BC9EB0BB236390014D0BF /* HMBlkButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkButtonCell.m; sourceTree = "<group>"; };
 		0B6BC9EC0BB236390014D0BF /* HMBlkContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkContentView.h; sourceTree = "<group>"; };
 		0B6BC9ED0BB236390014D0BF /* HMBlkContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkContentView.m; sourceTree = "<group>"; };
 		0B6BC9EE0BB236390014D0BF /* HMBlkOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkOutlineView.h; sourceTree = "<group>"; };
@@ -199,6 +199,12 @@
 		0E2707320E2DD59C00D65876 /* search-cancel-hilite.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "search-cancel-hilite.tiff"; sourceTree = "<group>"; };
 		0E2707330E2DD59C00D65876 /* search-cancel.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "search-cancel.tiff"; sourceTree = "<group>"; };
 		0E2707340E2DD59C00D65876 /* search-icon.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = "search-icon.tiff"; sourceTree = "<group>"; };
+		0E2707910E2DEA4E00D65876 /* button-left-hilite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-left-hilite.png"; sourceTree = "<group>"; };
+		0E2707920E2DEA4E00D65876 /* button-left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-left.png"; sourceTree = "<group>"; };
+		0E2707930E2DEA4E00D65876 /* button-middle-hilite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-middle-hilite.png"; sourceTree = "<group>"; };
+		0E2707940E2DEA4E00D65876 /* button-middle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-middle.png"; sourceTree = "<group>"; };
+		0E2707950E2DEA4E00D65876 /* button-right-hilite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-right-hilite.png"; sourceTree = "<group>"; };
+		0E2707960E2DEA4E00D65876 /* button-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-right.png"; sourceTree = "<group>"; };
 		0E50B1010DBE93FB0036CA3E /* PGFadeOutPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFadeOutPanel.m; sourceTree = "<group>"; };
 		0E50B1020DBE93FB0036CA3E /* PGFadeOutPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFadeOutPanel.h; sourceTree = "<group>"; };
 		0EEE5B970DB61620006E5B9C /* HMBlkSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkSearchField.h; sourceTree = "<group>"; };
@@ -300,10 +306,6 @@
 				0B6BC9E50BB236390014D0BF /* HMAppKitEx.m */,
 				0B6BC9E60BB236390014D0BF /* HMBlkBox.h */,
 				0B6BC9E70BB236390014D0BF /* HMBlkBox.m */,
-				0B6BC9E80BB236390014D0BF /* HMBlkButton.h */,
-				0B6BC9E90BB236390014D0BF /* HMBlkButton.m */,
-				0B6BC9EA0BB236390014D0BF /* HMBlkButtonCell.h */,
-				0B6BC9EB0BB236390014D0BF /* HMBlkButtonCell.m */,
 				0B6BC9EC0BB236390014D0BF /* HMBlkContentView.h */,
 				0B6BC9ED0BB236390014D0BF /* HMBlkContentView.m */,
 				0B6BC9EE0BB236390014D0BF /* HMBlkOutlineView.h */,
@@ -380,6 +382,12 @@
 				0E2707210E2DD59C00D65876 /* blkSegmentSelectedL.tiff */,
 				0E2707220E2DD59C00D65876 /* blkSegmentSelectedM.tiff */,
 				0E2707230E2DD59C00D65876 /* blkSegmentSelectedR.tiff */,
+				0E2707910E2DEA4E00D65876 /* button-left-hilite.png */,
+				0E2707920E2DEA4E00D65876 /* button-left.png */,
+				0E2707930E2DEA4E00D65876 /* button-middle-hilite.png */,
+				0E2707940E2DEA4E00D65876 /* button-middle.png */,
+				0E2707950E2DEA4E00D65876 /* button-right-hilite.png */,
+				0E2707960E2DEA4E00D65876 /* button-right.png */,
 				0E2707240E2DD59C00D65876 /* scroller-horz-cap.tiff */,
 				0E2707250E2DD59C00D65876 /* scroller-horz-inner-hilite.tiff */,
 				0E2707260E2DD59C00D65876 /* scroller-horz-inner.tiff */,
@@ -550,6 +558,12 @@
 				0E2707630E2DD59C00D65876 /* search-cancel-hilite.tiff in Resources */,
 				0E2707640E2DD59C00D65876 /* search-cancel.tiff in Resources */,
 				0E2707650E2DD59C00D65876 /* search-icon.tiff in Resources */,
+				0E2707970E2DEA4E00D65876 /* button-left-hilite.png in Resources */,
+				0E2707980E2DEA4E00D65876 /* button-left.png in Resources */,
+				0E2707990E2DEA4E00D65876 /* button-middle-hilite.png in Resources */,
+				0E27079A0E2DEA4E00D65876 /* button-middle.png in Resources */,
+				0E27079B0E2DEA4E00D65876 /* button-right-hilite.png in Resources */,
+				0E27079C0E2DEA4E00D65876 /* button-right.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -571,8 +585,6 @@
 			files = (
 				0B6BCA340BB236390014D0BF /* HMAppKitEx.m in Sources */,
 				0B6BCA360BB236390014D0BF /* HMBlkBox.m in Sources */,
-				0B6BCA380BB236390014D0BF /* HMBlkButton.m in Sources */,
-				0B6BCA3A0BB236390014D0BF /* HMBlkButtonCell.m in Sources */,
 				0B6BCA3C0BB236390014D0BF /* HMBlkContentView.m in Sources */,
 				0B6BCA3E0BB236390014D0BF /* HMBlkOutlineView.m in Sources */,
 				0B6BCA400BB236390014D0BF /* HMBlkPanel.m in Sources */,

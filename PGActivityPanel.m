@@ -27,6 +27,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGURLConnection.h"
 
+// Views
+#import "PGLevelIndicatorCell.h"
+
 // Controllers
 #import "PGDocumentController.h"
 
@@ -38,6 +41,17 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 @implementation PGActivityPanel
 
 #pragma mark Instance Methods
+
+- (IBAction)cancelLoad:(id)sender
+{
+	NSMutableArray *const canceledConnections = [NSMutableArray array];
+	NSIndexSet *const indexes = [activityTable selectedRowIndexes];
+	unsigned i = [indexes firstIndex];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [canceledConnections addObject:[[[PGURLConnection connectionValues] objectAtIndex:i] nonretainedObjectValue]];
+	[canceledConnections makeObjectsPerformSelector:@selector(cancel)];
+}
+
+#pragma mark -
 
 - (void)connectionsDidChange:(NSNotification *)aNotif
 {
@@ -58,7 +72,8 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 	if(tableColumn == identifierColumn) {
 		return [[[connection request] URL] absoluteString];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithFloat:[connection progress] * 100.0];
+		NSLog(@"the value we put in %@", [NSNumber numberWithFloat:[connection progress]]);
+		return [NSNumber numberWithFloat:[connection progress]];
 	}
 	return nil;
 }
@@ -71,6 +86,13 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 	row:(NSInteger)row
 {
 	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnectionValues] count])];
+}
+
+#pragma mark NSTableViewNotifications Protocol
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotif
+{
+	[cancelButton setEnabled:[[activityTable selectedRowIndexes] count] > 0];
 }
 
 #pragma mark NSWindowNotifications Protocol
@@ -94,6 +116,19 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
+	[progressColumn setDataCell:[[[PGLevelIndicatorCell alloc] init] autorelease]];
+	NSLog(@"%@, %@", progressColumn, [progressColumn dataCell]);
+
+	NSMutableDictionary *const buttonAttributes = [[[[cancelButton attributedTitle] attributesAtIndex:0 effectiveRange:NULL] mutableCopy] autorelease];
+	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
+	[shadow setShadowOffset:NSMakeSize(0, 1)];
+	[shadow setShadowBlurRadius:1];
+	[buttonAttributes setObject:shadow forKey:NSShadowAttributeName];
+	[buttonAttributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
+	[cancelButton setAttributedTitle:[[[NSAttributedString alloc] initWithString:[cancelButton title] attributes:buttonAttributes] autorelease]];
+
+	[self tableViewSelectionDidChange:nil];
+
 	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGActivityWindowFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
 	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }

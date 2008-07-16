@@ -44,6 +44,9 @@
 		0E1D39F40A7F24E700C542A6 /* PGFullscreenWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D39F30A7F24E700C542A6 /* PGFullscreenWindow.m */; };
 		0E1D3A4C0A7FA7B500C542A6 /* PGClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */; };
 		0E1D3EC90A8091FE00C542A6 /* PGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */; };
+		0E2708070E2E20B100D65876 /* Button-Hilite.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2708050E2E20B100D65876 /* Button-Hilite.png */; };
+		0E2708080E2E20B100D65876 /* Button.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2708060E2E20B100D65876 /* Button.png */; };
+		0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E27080D0E2E222700D65876 /* NSControlAdditions.m */; };
 		0E2D08790DD2B4F800EC128A /* PGRoundedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */; };
 		0E4793930DF15FD90083B7CA /* PGAttachments.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E4793920DF15FD90083B7CA /* PGAttachments.m */; };
 		0E4794290DF182C40083B7CA /* Silhouette-Black.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E4794280DF182C40083B7CA /* Silhouette-Black.png */; };
@@ -113,7 +116,6 @@
 		0EE7617E0DDB7C4900ED8ABB /* PGLegacy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */; };
 		0EE761810DDB7F8A00ED8ABB /* NSURLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE761800DDB7F8A00ED8ABB /* NSURLAdditions.m */; };
 		0EE98F8D0DEEB13F0004F628 /* PGWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0EE98F8B0DEEB13F0004F628 /* PGWindow.nib */; };
-		0EE9904C0DEED4080004F628 /* NSTextFieldAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE9904B0DEED4080004F628 /* NSTextFieldAdditions.m */; };
 		0EE991060DEFFBAA0004F628 /* SequentialHelp in Resources */ = {isa = PBXBuildFile; fileRef = 0EE991040DEFFBAA0004F628 /* SequentialHelp */; };
 		0EEE55950DB0C3E2006E5B9C /* PGExif.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0EEE55930DB0C3E2006E5B9C /* PGExif.nib */; };
 		0EEE58220DB55B61006E5B9C /* asahi.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58060DB55B61006E5B9C /* asahi.c */; };
@@ -259,6 +261,10 @@
 		0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGClipView.m; sourceTree = "<group>"; };
 		0E1D3EC70A8091FD00C542A6 /* PGDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDocumentController.h; sourceTree = "<group>"; };
 		0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDocumentController.m; sourceTree = "<group>"; };
+		0E2708050E2E20B100D65876 /* Button-Hilite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Button-Hilite.png"; sourceTree = "<group>"; };
+		0E2708060E2E20B100D65876 /* Button.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Button.png; sourceTree = "<group>"; };
+		0E27080C0E2E222700D65876 /* NSControlAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSControlAdditions.h; sourceTree = "<group>"; };
+		0E27080D0E2E222700D65876 /* NSControlAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSControlAdditions.m; sourceTree = "<group>"; };
 		0E2D08770DD2B4F800EC128A /* PGRoundedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGRoundedBackgroundView.h; sourceTree = "<group>"; };
 		0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGRoundedBackgroundView.m; sourceTree = "<group>"; };
 		0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HMBlkAppKit.xcodeproj; path = HMBlkAppKit/HMBlkAppKit.xcodeproj; sourceTree = "<group>"; };
@@ -406,8 +412,6 @@
 		0EE98F8F0DEEB1510004F628 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F900DEEB1540004F628 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F910DEEB1570004F628 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGWindow.nib; sourceTree = "<group>"; };
-		0EE9904A0DEED4080004F628 /* NSTextFieldAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSTextFieldAdditions.h; sourceTree = "<group>"; };
-		0EE9904B0DEED4080004F628 /* NSTextFieldAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSTextFieldAdditions.m; sourceTree = "<group>"; };
 		0EE991050DEFFBAA0004F628 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0EEE55940DB0C3E2006E5B9C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGExif.nib; sourceTree = "<group>"; };
 		0EEE58060DB55B61006E5B9C /* asahi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = asahi.c; path = exiftags/asahi.c; sourceTree = "<group>"; };
@@ -551,6 +555,8 @@
 				0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */,
 				0EC11EA00CA14F0C003E492C /* NSColorAdditions.h */,
 				0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */,
+				0E27080C0E2E222700D65876 /* NSControlAdditions.h */,
+				0E27080D0E2E222700D65876 /* NSControlAdditions.m */,
 				0E5B552D0D0B7FCF0094938A /* NSDateAdditions.h */,
 				0E5B552E0D0B7FCF0094938A /* NSDateAdditions.m */,
 				0EBF5A140C44DF56004584D2 /* NSMenuItemAdditions.h */,
@@ -563,8 +569,6 @@
 				0EA540980DB7067D00F60F0E /* NSScreenAdditions.m */,
 				0E47C0A80B93AE670060E8A8 /* NSStringAdditions.h */,
 				0E47C0A90B93AE670060E8A8 /* NSStringAdditions.m */,
-				0EE9904A0DEED4080004F628 /* NSTextFieldAdditions.h */,
-				0EE9904B0DEED4080004F628 /* NSTextFieldAdditions.m */,
 				0EE7617F0DDB7F8A00ED8ABB /* NSURLAdditions.h */,
 				0EE761800DDB7F8A00ED8ABB /* NSURLAdditions.m */,
 				0E47C0AB0B93AEDB0060E8A8 /* NSUserDefaultsAdditions.h */,
@@ -800,6 +804,8 @@
 				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
 				0E9012A30DF22636004B6F69 /* Mirror-Black.png */,
 				0E9012A40DF22636004B6F69 /* Mirror-White.png */,
+				0E2708050E2E20B100D65876 /* Button-Hilite.png */,
+				0E2708060E2E20B100D65876 /* Button.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -955,6 +961,8 @@
 				0E9012A60DF22636004B6F69 /* Mirror-White.png in Resources */,
 				0E9016410DF44051004B6F69 /* PGPreferences.nib in Resources */,
 				0E56B8D90E24917C00987F57 /* PGActivity.nib in Resources */,
+				0E2708070E2E20B100D65876 /* Button-Hilite.png in Resources */,
+				0E2708080E2E20B100D65876 /* Button.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1038,7 +1046,6 @@
 				0E50357B0DDBFF550067FF6A /* PGEncodingAlert.m in Sources */,
 				0E5038D50DE010D20067FF6A /* PGResourceAdapting.m in Sources */,
 				0E503A790DE0CFBF0067FF6A /* NSNumberAdditions.m in Sources */,
-				0EE9904C0DEED4080004F628 /* NSTextFieldAdditions.m in Sources */,
 				0E4793930DF15FD90083B7CA /* PGAttachments.m in Sources */,
 				0E90163D0DF435AB004B6F69 /* PGPrefController.m in Sources */,
 				0E9016AB0DF44A7E004B6F69 /* PGColorWell.m in Sources */,
@@ -1046,6 +1053,7 @@
 				0E56B8DD0E24918C00987F57 /* PGActivityPanel.m in Sources */,
 				0EC33E3F0E29B0A700450CF8 /* PGLevelIndicatorCell.m in Sources */,
 				0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */,
+				0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

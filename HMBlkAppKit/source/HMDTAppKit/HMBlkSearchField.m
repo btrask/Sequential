@@ -27,7 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation HMBlkSearchField
 
-#pragma mark NSCell
+#pragma mark NSControl
 
 + (Class)cellClass
 {
