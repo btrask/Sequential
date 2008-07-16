@@ -564,24 +564,23 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
           orientation:(PGOrientation)orientation
 {
 	if(!rep) return NSZeroSize;
-	NSSize originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
+	PGImageScalingMode const scalingMode = [[self activeDocument] imageScalingMode];
+	NSSize originalSize = PGActualSizeWithDPI == scalingMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	if(orientation & PGRotated90CC) {
 		float const w = originalSize.width;
 		originalSize.width = originalSize.height;
 		originalSize.height = w;
 	}
 	NSSize newSize = originalSize;
-	PGImageScalingMode const scalingMode = [[self activeDocument] imageScalingMode];
 	if(PGConstantFactorScaling == scalingMode) {
 		float const factor = [[self activeDocument] imageScaleFactor];
 		newSize.width *= factor;
 		newSize.height *= factor;
-	}
-	PGImageScalingConstraint const constraint = [[self activeDocument] imageScalingConstraint];
-	BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
-	NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
-	NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
-	if(PGConstantFactorScaling != scalingMode) {
+	} else if(PGActualSizeWithDPI != scalingMode) {
+		PGImageScalingConstraint const constraint = [[self activeDocument] imageScalingConstraint];
+		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
+		NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
+		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
 		float scaleX = NSWidth([clipView bounds]) / roundf(newSize.width);
 		float scaleY = NSHeight([clipView bounds]) / roundf(newSize.height);
 		if(PGAutomaticScaling == scalingMode) scaleX = scaleY = MAX(scaleX, scaleY);

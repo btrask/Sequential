@@ -43,7 +43,8 @@ enum {
 	PGConstantFactorScaling        = 0, // Formerly known as PGNoScaling.
 	PGAutomaticScaling             = 1,
 	PGDeprecatedVerticalFitScaling = 2, // Deprecated after 1.0.3.
-	PGViewFitScaling               = 3  // Fits the entire image inside the screen/window.
+	PGViewFitScaling               = 3, // Fits the entire image inside the screen/window.
+	PGActualSizeWithDPI            = 4
 };
 typedef int PGImageScalingMode;
 

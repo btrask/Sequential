@@ -157,7 +157,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 		_showsOnScreenDisplay = [[d objectForKey:PGShowsOnScreenDisplayKey] boolValue];
 		_readingDirection = [[d objectForKey:PGReadingDirectionRightToLeftKey] boolValue] ? PGReadingDirectionRightToLeft : PGReadingDirectionLeftToRight;
 		_imageScalingMode = [[d objectForKey:PGImageScalingModeKey] intValue];
-		if(_imageScalingMode < 0 || _imageScalingMode > 3) _imageScalingMode = PGConstantFactorScaling;
+		if(_imageScalingMode < 0 || _imageScalingMode > 4) _imageScalingMode = PGConstantFactorScaling;
 		if(PGDeprecatedVerticalFitScaling == _imageScalingMode) _imageScalingMode = PGAutomaticScaling;
 		_imageScaleFactor = [[d objectForKey:PGImageScaleFactorKey] floatValue];
 		_imageScalingConstraint = [[d objectForKey:PGImageScalingConstraintKey] intValue];
