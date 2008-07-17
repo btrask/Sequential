@@ -1583,7 +1583,7 @@ XADUNARCHIVE(bzip2) {
         while (bzerr == BZ_OK) {
           /* fill input buffer when empty */
           if (bzs.avail_in == 0) {
-            size = ai->xai_InSize - ai->xai_InPos.S;
+            size = ai->xai_InSize - ai->xai_InPos;
             if (size > BZ2_BUFSIZE) size = BZ2_BUFSIZE;
 
             if (size == 0) { /* normal exit point = EOF */

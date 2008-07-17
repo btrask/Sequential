@@ -135,7 +135,7 @@ XADGETINFO(Tar)
   xadINT32 err = 0, size, ok, a, b, d, i, pos;
   xadSTRPTR longname = 0, longlink = 0, name, link;
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize &&
+  while(!err && ai->xai_InPos < ai->xai_InSize &&
   !(err = xadHookAccess(XADM XADAC_READ, sizeof(struct TarHeader), &th, ai)))
   {
     if(!th.th_Name[0])
@@ -143,7 +143,7 @@ XADGETINFO(Tar)
     ok = checktarsum(&th); /* check checksum and init ok */
     size = octtonum((xadSTRPTR)th.th_Size, 12, &ok);
 
-    pos = ai->xai_InPos.S;
+    pos = ai->xai_InPos;
     if(ok && th.th_Typeflag == TF_LONGNAME)
     {
       if((longname = xadAllocVec(XADM (xadUINT32)size, XADMEMF_ANY)))
@@ -285,7 +285,7 @@ XADGETINFO(Tar)
         else
           size = 0;
 
-        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+size,
+        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+size,
         TAG_DONE);
       }
       if(th.th_Typeflag != TF_LONGNAME && longname)

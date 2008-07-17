@@ -58,7 +58,7 @@ FUNCxadFileUnArc /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     {
       switch(ti->ti_Tag)
       {
-      case XAD_ENTRYNUMBER: entry = ti->ti_Data.S; ++numentry; break;
+      case XAD_ENTRYNUMBER: entry = ti->ti_Data; ++numentry; break;
       }
     }
 
@@ -91,7 +91,7 @@ FUNCxadFileUnArc /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
           if(ai->xaip_ArchiveInfo.xai_CurFile->xfi_Flags & XADFIF_SEEKDATAPOS)
           {
             if((i = (ai->xaip_ArchiveInfo.xai_CurFile->xfi_DataPos
-            - ai->xaip_ArchiveInfo.xai_InPos.S)))
+            - ai->xaip_ArchiveInfo.xai_InPos)))
             {
               err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0,
               XADM_AI(ai));

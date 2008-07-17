@@ -54,9 +54,9 @@ FUNCxadDiskUnArc /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     {
       switch(ti->ti_Tag)
       {
-      case XAD_ENTRYNUMBER: entry = ti->ti_Data.S; ++numentry; break;
-      case XAD_HIGHCYLINDER: highcyl = ti->ti_Data.S; ++numhigh; break;
-      case XAD_LOWCYLINDER: lowcyl = ti->ti_Data.S; ++numlow; break;
+      case XAD_ENTRYNUMBER: entry = ti->ti_Data; ++numentry; break;
+      case XAD_HIGHCYLINDER: highcyl = ti->ti_Data; ++numhigh; break;
+      case XAD_LOWCYLINDER: lowcyl = ti->ti_Data; ++numlow; break;
       }
     }
 
@@ -96,7 +96,7 @@ FUNCxadDiskUnArc /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
           if(ai->xaip_ArchiveInfo.xai_CurDisk->xdi_Flags & XADDIF_SEEKDATAPOS)
           {
             if((i = (ai->xaip_ArchiveInfo.xai_CurDisk->xdi_DataPos
-            - ai->xaip_ArchiveInfo.xai_InPos.S)))
+            - ai->xaip_ArchiveInfo.xai_InPos)))
             {
               err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0,
               XADM_AI(ai));

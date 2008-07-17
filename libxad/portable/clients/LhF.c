@@ -52,7 +52,7 @@ XADGETINFO(LhF)
 
   if((err = xadHookAccess(XADM XADAC_READ, 8, data, ai)))
     return err;
-  while(!err && ai->xai_InPos.S < ai->xai_InSize && ai->xai_InPos.S < data[1])
+  while(!err && ai->xai_InPos < ai->xai_InSize && ai->xai_InPos < data[1])
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct LhFData), &ld, ai)))
     {
@@ -70,7 +70,7 @@ XADGETINFO(LhF)
               ;
             fi2->xfi_Comment = ++a;
           }
-          fi2->xfi_DataPos = ai->xai_InPos.S;
+          fi2->xfi_DataPos = ai->xai_InPos;
           fi2->xfi_EntryNumber = num++;
           if(ld.Size == 0xFFFFFFFF)
             fi2->xfi_Flags |= XADFIF_DIRECTORY;

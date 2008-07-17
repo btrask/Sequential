@@ -127,9 +127,9 @@ FUNCHOOK(InHookFH)
     }
     break;
   case XADHC_SEEK:
-    if(param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_InSize)
+    if(param->xhp_DataPos + param->xhp_CommandData > ai->xaip_InSize)
       return XADERR_INPUT;
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_FREE: /* free filehandle */
     if(param->xhp_PrivatePtr)
@@ -150,7 +150,7 @@ FUNCHOOK(InHookFH)
       if(lseek(ai->xaip_InFileHandle, 0, SEEK_SET) == -1)
         return XADERR_INPUT;
 
-      param->xhp_CommandData.S = s1;
+      param->xhp_CommandData = s1;
       //ai->xaip_InSize = s1;
     }
     break;
@@ -297,10 +297,10 @@ FUNCHOOK(OutHookFH)
     param->xhp_DataPos += param->xhp_BufferSize;
     break;
   case XADHC_SEEK:
-    if(param->xhp_CommandData.S && /* skip useless 0 seek */
-    lseek(ai->xaip_OutFileHandle, param->xhp_CommandData.S, SEEK_CUR) == -1)
+    if(param->xhp_CommandData && /* skip useless 0 seek */
+    lseek(ai->xaip_OutFileHandle, param->xhp_CommandData, SEEK_CUR) == -1)
       return XADERR_OUTPUT;
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_ABORT:
     if(ai->xaip_OutFileName && ai->xaip_OutFileHandle)

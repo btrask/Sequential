@@ -250,7 +250,7 @@ case MAKESIT('S','T','i','4'):
 default: DebugFileSearched(ai, "File has unknown identifier.");
 }
 #endif
-    while(!err && ai->xai_InPos.S+SIT_FILEHDRSIZE <= fullsize)
+    while(!err && ai->xai_InPos+SIT_FILEHDRSIZE <= fullsize)
     {
       if(!(err =  xadHookAccess(XADM XADAC_READ, SIT_FILEHDRSIZE, sithdr, ai)))
       {
@@ -286,7 +286,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
                 &fi->xfi_Date, TAG_DONE);
                 fi->xfi_PrivateInfo = (xadPTR) ldir;
                 ldir = fi;
-                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
               }
               else
               {
@@ -316,7 +316,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
                   fi->xfi_Size = EndGetM32(&sithdr[SITFH_RSRCLENGTH]);
 
                   fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACRESOURCE|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-                  fi->xfi_DataPos = ai->xai_InPos.S;
+                  fi->xfi_DataPos = ai->xai_InPos;
                   lfi = fi;
 
                   SITPI(fi)->CRC = EndGetM16(&sithdr[SITFH_RSRCCRC]);
@@ -344,7 +344,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
                     ai->xai_Flags |= XADAIF_CRYPTED;
                   }
 
-                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                 }
                 else
                 {
@@ -369,7 +369,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
                   fi->xfi_Size = EndGetM32(&sithdr[SITFH_DATALENGTH]);
 
                   fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACDATA|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-                  fi->xfi_DataPos = ai->xai_InPos.S;
+                  fi->xfi_DataPos = ai->xai_InPos;
 
                   if(EndGetM32(&sithdr[SITFH_RSRCLENGTH]))
                   {
@@ -403,7 +403,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
                     ai->xai_Flags |= XADAIF_CRYPTED;
                   }
 
-                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                 }
                 else
                 {
@@ -421,7 +421,7 @@ default: DebugFileSearched(ai, "File has unknown identifier.");
       }
     }
 
-    if(!err && ai->xai_InPos.S < fullsize)
+    if(!err && ai->xai_InPos < fullsize)
       err = XADERR_ILLEGALDATA;
     if(err)
     {
@@ -2223,9 +2223,9 @@ XADGETINFO(SIT5)
       i = EndGetM32(buffer + SIT5AH_FIRSTENTRY)-92;
       if(!i || !(err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0, ai)))
       {
-        while(!err && ai->xai_InPos.S < ai->xai_InSize)
+        while(!err && ai->xai_InPos < ai->xai_InSize)
         {
-          offset = ai->xai_InPos.S;
+          offset = ai->xai_InPos;
 
           if(!(err = xadHookAccess(XADM XADAC_READ, 48, buffer, ai)))
           {
@@ -2276,7 +2276,7 @@ XADGETINFO(SIT5)
                         fi->xfi_Flags |= XADFIF_DIRECTORY|XADFIF_XADSTRFILENAME;
                         SITDPI(fi)->Offset = offset;
 
-                        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                       }
                       else
                       {
@@ -2321,7 +2321,7 @@ XADGETINFO(SIT5)
                           fi->xfi_Size = EndGetM32(buffer+i+SIT5FH_RSRCSIZE);
 
                           fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACRESOURCE|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-                          fi->xfi_DataPos = ai->xai_InPos.S;
+                          fi->xfi_DataPos = ai->xai_InPos;
                           lfi = fi;
 
                           SITPI(fi)->CRC = EndGetM16(buffer+i+SIT5FH_RSRCCRC16);
@@ -2336,7 +2336,7 @@ XADGETINFO(SIT5)
                           if(SITPI(fi)->Method <= STUFFITMAXALGO)
                             fi->xfi_EntryInfo = sittypes[SITPI(fi)->Method];
 
-                          err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                          err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                         }
                         else
                         {
@@ -2377,7 +2377,7 @@ XADGETINFO(SIT5)
                           fi->xfi_Size = EndGetM32(buffer+SIT5FH_DATASIZE);
 
                           fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACDATA|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-                          fi->xfi_DataPos = ai->xai_InPos.S;
+                          fi->xfi_DataPos = ai->xai_InPos;
 
                           SITPI(fi)->CRC = EndGetM16(buffer+SIT5FH_DATACRC16);
                           SITPI(fi)->Method = buffer[SIT5FH_DATAALGORITHM];
@@ -2391,7 +2391,7 @@ XADGETINFO(SIT5)
                           if(SITPI(fi)->Method <= STUFFITMAXALGO)
                             fi->xfi_EntryInfo = sittypes[SITPI(fi)->Method];
 
-                          err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                          err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                         }
                         else
                         {
@@ -2496,14 +2496,14 @@ XADGETINFO(MacBinary)
   xadINT32 err = 0, type, rsize, dsize, csize, i;
   xadUINT8 header[128];
 
-  while(!err && ai->xai_InPos.S + 128 <= ai->xai_InSize)
+  while(!err && ai->xai_InPos + 128 <= ai->xai_InSize)
   {
     if(!(err =  xadHookAccess(XADM XADAC_READ, 128, header, ai)))
     {
       type = MacBinary_RecogData(128, header, xadMasterBase);
 
 #ifdef DEBUG
-  if(header[0] == 1 || (ai->xai_InPos.S != 128 && type))
+  if(header[0] == 1 || (ai->xai_InPos != 128 && type))
   {
     DebugFileSearched(ai, "Strange data.");
   }
@@ -2526,7 +2526,7 @@ XADGETINFO(MacBinary)
             xadConvertDates(XADM XAD_DATEMAC, EndGetM32(header+95), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
             fi->xfi_PrivateInfo = (xadPTR) ldir;
             ldir = fi;
-            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
           }
           else
           {
@@ -2558,14 +2558,14 @@ XADGETINFO(MacBinary)
               lfi = fi;
 
               fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACDATA|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-              fi->xfi_DataPos = ai->xai_InPos.S;
+              fi->xfi_DataPos = ai->xai_InPos;
 
               xadConvertDates(XADM XAD_DATEMAC, EndGetM32(header+95), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
 
               i = (fi->xfi_CrunchSize+127)&(~127);
-              if(ai->xai_InSize-ai->xai_InPos.S == fi->xfi_CrunchSize)
+              if(ai->xai_InSize-ai->xai_InPos == fi->xfi_CrunchSize)
                i = fi->xfi_CrunchSize;
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+i, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+i, TAG_DONE);
             }
             else
             {
@@ -2589,7 +2589,7 @@ XADGETINFO(MacBinary)
               fi->xfi_CrunchSize = fi->xfi_Size = rsize;
 
               fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACRESOURCE|XADFIF_EXTRACTONBUILD|XADFIF_XADSTRFILENAME;
-              fi->xfi_DataPos = ai->xai_InPos.S;
+              fi->xfi_DataPos = ai->xai_InPos;
 
               if((fi->xfi_MacFork = lfi))
                 lfi->xfi_MacFork = fi;
@@ -2597,9 +2597,9 @@ XADGETINFO(MacBinary)
               xadConvertDates(XADM XAD_DATEMAC, EndGetM32(header+95), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
 
               i = (fi->xfi_CrunchSize+127)&(~127);
-              if(ai->xai_InSize-ai->xai_InPos.S == fi->xfi_CrunchSize)
+              if(ai->xai_InSize-ai->xai_InPos == fi->xfi_CrunchSize)
                i = fi->xfi_CrunchSize;
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+i, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+i, TAG_DONE);
             }
             else
             {
@@ -2720,12 +2720,12 @@ XADGETINFO(PackIt)
   xadSTRPTR entryinfo;
   xadUINT8 header[PIT_HDRBYTES], type[4];
 
-  while(!err && ai->xai_InPos.S + 4 <= ai->xai_InSize)
+  while(!err && ai->xai_InPos + 4 <= ai->xai_InSize)
   {
     if(!(err =  xadHookAccess(XADM XADAC_READ, 4, type, ai)))
     {
       entryinfo = (xadSTRPTR) header; /* to silent compiler warnings */
-      pos = ai->xai_InPos.S;
+      pos = ai->xai_InPos;
       if(type[0] == 'P' && type[1] == 'E' && type[2] == 'n' && type[3] == 'd')
         break;
       else if(type[0] != 'P' || type[1] != 'M' || type[2] != 'a')
@@ -2737,7 +2737,7 @@ XADGETINFO(PackIt)
         if((io = xadIOAlloc(XADIOF_ALLOCINBUFFER|XADIOF_NOCRC32|XADIOF_NOCRC16, ai, xadMasterBase)))
         {
           io->xio_PutFunc = PackIt_Put;
-          io->xio_InSize = ai->xai_InSize-ai->xai_InPos.S;
+          io->xio_InSize = ai->xai_InSize-ai->xai_InPos;
           io->xio_OutSize = PIT_HDRBYTES;
           io->xio_OutBuffer = (xadSTRPTR) header;
           entryinfo = "Huffmann";

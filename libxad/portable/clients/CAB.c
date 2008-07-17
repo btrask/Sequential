@@ -74,7 +74,7 @@ XADCLIENTVERSTR("CAB 1.6 (04.04.2004)")
 
 #define SKIP(offset) if ((err = xadHookAccess(XADM XADAC_INPUTSEEK, \
   (xadUINT32)(offset), NULL, ai))) goto exit_handler
-#define SEEK(offset) SKIP((offset) - ai->xai_InPos.S)
+#define SEEK(offset) SKIP((offset) - ai->xai_InPos)
 
 #define READ(buffer,length) if ((err = xadHookAccess(XADM XADAC_READ, \
   (xadUINT32)(length), (xadPTR)(buffer), ai))) goto exit_handler
@@ -2029,7 +2029,7 @@ XADGETINFO(CAB) {
   while (1) {
     /* the below if statement is the natural exit point of this loop */
     if (ai->xai_MultiVolume) {
-      xadUINT32 pos = ai->xai_InPos.S, next = ai->xai_MultiVolume[++curvol];
+      xadUINT32 pos = ai->xai_InPos, next = ai->xai_MultiVolume[++curvol];
       D(("CAB: top wanted=%ld actual=%ld\n",next,pos))
       /* files end when the 'next file' offset is 0 - except, of course
        * for the very first iteration of this loop, because the first
@@ -2044,7 +2044,7 @@ XADGETINFO(CAB) {
       if (++curvol) goto exit_handler;
     }
 
-    base_offset = ai->xai_InPos.S;
+    base_offset = ai->xai_InPos;
 
     /* ------------- PROCESS CFHEADER -------------- */
 
@@ -2120,7 +2120,7 @@ XADGETINFO(CAB) {
     mergeok = 1;
 
     /* ------------- PROCESS CFFILEs ------------- */
-    if (ai->xai_InPos.S != files_offset) TAINT("not at file offset");
+    if (ai->xai_InPos != files_offset) TAINT("not at file offset");
 
     for (i = 0; i < num_files; i++) {
       READ(&buf, cffile_SIZEOF);
@@ -2146,19 +2146,19 @@ XADGETINFO(CAB) {
       fi->xfi_DataPos     = GETLONG(cffile_FolderOffset);
 
       /* convert filename */
-      nametags[0].ti_Data.S = (GETWORD(cffile_Attribs) & cffileUTFNAME)
+      nametags[0].ti_Data = (GETWORD(cffile_Attribs) & cffileUTFNAME)
                           ? CHARSET_UNICODE_UTF8 : CHARSET_WINDOWS;
-      nametags[1].ti_Data.S = (xadUINT32) (namep - namebuf);
-      nametags[2].ti_Data.S = (xadUINT32) namebuf;
+      nametags[1].ti_Data = (xadUINT32) (namep - namebuf);
+      nametags[2].ti_Data = (xadUINT32) namebuf;
       fi->xfi_FileName = xadConvertNameA(XADM CHARSET_HOST, nametags);
       if (!fi->xfi_FileName) ERROR(NOMEMORY);
 
-      prottags[0].ti_Data.S = GETWORD(cffile_Attribs);
-      prottags[1].ti_Data.S = (xadUINT32) &fi->xfi_Protection;
+      prottags[0].ti_Data = GETWORD(cffile_Attribs);
+      prottags[1].ti_Data = (xadUINT32) &fi->xfi_Protection;
       xadConvertProtectionA(XADM prottags);
 
-      datetags[0].ti_Data.S = (GETWORD(cffile_Date)<<16)|GETWORD(cffile_Time);
-      datetags[1].ti_Data.S = (xadUINT32) &fi->xfi_Date;
+      datetags[0].ti_Data = (GETWORD(cffile_Date)<<16)|GETWORD(cffile_Time);
+      datetags[1].ti_Data = (xadUINT32) &fi->xfi_Date;
       xadConvertDatesA(XADM datetags);
 
       /* which folder is this file in? */

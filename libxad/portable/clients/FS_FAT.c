@@ -197,12 +197,12 @@ static xadINT32 FATparsedir(struct FATDiskParseData *pd, xadINT32 pos, xadINT32 
     {
       numentr /= FATPI(ai)->SecSize;
 
-      if(ai->xai_InPos.S != (xadUINT32) pos && (err = xadHookAccess(XADM XADAC_INPUTSEEK, pos-ai->xai_InPos.S, 0, ai)))
+      if(ai->xai_InPos != (xadUINT32) pos && (err = xadHookAccess(XADM XADAC_INPUTSEEK, pos-ai->xai_InPos, 0, ai)))
        break;
 
       while(!err && !stop && numentr--)
       {
-        if(ai->xai_InPos.S + 512 > ai->xai_InSize)
+        if(ai->xai_InPos + 512 > ai->xai_InSize)
         {
           ++pd->Corrupt; stop = 1;
         }
@@ -380,8 +380,8 @@ XADGETINFO(FSFAT)
             else
               FATPI(ai)->MaxNumClusters = FATPI(ai)->FATSize >> 1; /* 2 byte */
 
-            if(ai->xai_InPos.S == EndGetI16(mem+14)*FATPI(ai)->SecSize || !(err =
-            xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI16(mem+14)*FATPI(ai)->SecSize-ai->xai_InPos.S, 0, ai)))
+            if(ai->xai_InPos == EndGetI16(mem+14)*FATPI(ai)->SecSize || !(err =
+            xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI16(mem+14)*FATPI(ai)->SecSize-ai->xai_InPos, 0, ai)))
             {
               if(!(err = xadHookAccess(XADM XADAC_READ, FATPI(ai)->FATSize, FATPI(ai)->FAT, ai)))
               {
@@ -440,7 +440,7 @@ XADGETINFO(FSFAT)
             s = EndGetI16(mem+14)*FATPI(ai)->SecSize;
             if((i = EndGetI16(mem+40)&(1<<7)))
               s += (i&15)*FATPI(ai)->FATSize; /* do not use first, but valid FAT */
-            if(ai->xai_InPos.S == s || !(err = xadHookAccess(XADM XADAC_INPUTSEEK, s-ai->xai_InPos.S, 0, ai)))
+            if(ai->xai_InPos == s || !(err = xadHookAccess(XADM XADAC_INPUTSEEK, s-ai->xai_InPos, 0, ai)))
             {
               if(!(err = xadHookAccess(XADM XADAC_READ, FATPI(ai)->FATSize, FATPI(ai)->FAT, ai)))
               {
@@ -513,7 +513,7 @@ XADUNARCHIVE(FSFAT)
     s = FATPI(ai)->StartBlock+(block-2)*FATPI(ai)->ClusterSize;
     if(s + FATPI(ai)->ClusterSize > ai->xai_InSize)
       err = XADERR_ILLEGALDATA;
-    else if(s == ai->xai_InPos.S || !(err = xadHookAccess(XADM XADAC_INPUTSEEK, s-ai->xai_InPos.S, 0, ai)))
+    else if(s == ai->xai_InPos || !(err = xadHookAccess(XADM XADAC_INPUTSEEK, s-ai->xai_InPos, 0, ai)))
     {
       s = FATPI(ai)->ClusterSize;
       if(s > i)

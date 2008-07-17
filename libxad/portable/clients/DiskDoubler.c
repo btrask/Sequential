@@ -473,7 +473,7 @@ XADGETINFO(DiskDoubler1)
       err = XADERR_ILLEGALDATA;
     else
     {
-      while(!err && ai->xai_InPos.S + DDAR_FILEHDRSIZE <= ai->xai_InSize)
+      while(!err && ai->xai_InPos + DDAR_FILEHDRSIZE <= ai->xai_InSize)
       {
         if(!(err = xadHookAccess(XADM XADAC_READ, DDAR_FILEHDRSIZE, header, ai)))
         {
@@ -508,7 +508,7 @@ XADGETINFO(DiskDoubler1)
                   &fi->xfi_Date, TAG_DONE);
                   fi->xfi_PrivateInfo = (xadPTR) ldir;
                   ldir = fi;
-                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                 }
                 else
                 {
@@ -573,7 +573,7 @@ DebugClient(ai, "%s\n\n", header+DDAR_FNAME);
               }
 
               csize = SITmakecomment(ftype, finderflags, 0, 0, 0);
-              pos = ai->xai_InPos.S;
+              pos = ai->xai_InPos;
 
               if(dsize || !rsize)
               {
@@ -762,7 +762,7 @@ DebugClient(ai, "RSRCCRC2 = $%04lx\n", EndGetM16(header+DDARC_RSRCCRC2));
             fi->xfi_CrunchSize = EndGetM32(&header[DDARC_RSRCCLENGTH]);
             fi->xfi_Size = rsize;
             fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_MACRESOURCE|XADFIF_EXTRACTONBUILD;
-            fi->xfi_DataPos = ai->xai_InPos.S+EndGetM32(&header[DDARC_DATACLENGTH]);
+            fi->xfi_DataPos = ai->xai_InPos+EndGetM32(&header[DDARC_DATACLENGTH]);
 
             if(dsize)
             {
@@ -853,7 +853,7 @@ XADGETINFO(DiskDoubler2)
       err = XADERR_ILLEGALDATA;
     else
     {
-      while(!err && ai->xai_InPos.S + DDA2_FILEHDRSIZE <= ai->xai_InSize)
+      while(!err && ai->xai_InPos + DDA2_FILEHDRSIZE <= ai->xai_InSize)
       {
         if(!(err = xadHookAccess(XADM XADAC_READ, DDA2_FILEHDRSIZE, header, ai)))
         {
@@ -899,7 +899,7 @@ XADGETINFO(DiskDoubler2)
                       DDA2PI(fi)->Parent = (xadPTR) ldir;
                       ldir = fi;
                       DDA2PI(fi)->Level = ++dirlevel;
-                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                     }
                     else
                     {
@@ -950,7 +950,7 @@ DebugClient(ai, "%s\n\n", header+DDA2_FNAME);
                     dsize = EndGetM32(&header2[DDARC_DATALENGTH]);
                     rcsize = EndGetM32(&header2[DDARC_RSRCCLENGTH]);
                     dcsize = EndGetM32(&header2[DDARC_DATACLENGTH]);
-                    pos = ai->xai_InPos.S;
+                    pos = ai->xai_InPos;
 
                     if(dsize || !rsize)
                     {
@@ -1197,7 +1197,7 @@ XADGETINFO(Compactor)
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, CPT_HDR2SIZE, header+CPT_HDR1SIZE, ai)))
       {
-printf("%lx, %ld, %ld, %08lx\n", ai->xai_InPos.S, ai->xai_InSize-ai->xai_InPos.S, EndGetM16(header+CPT_H2_ENTRIES),
+printf("%lx, %ld, %ld, %08lx\n", ai->xai_InPos, ai->xai_InSize-ai->xai_InPos, EndGetM16(header+CPT_H2_ENTRIES),
 EndGetM32(header+CPT_H2_HDRCRC));
 /* check crc, sizes? */
 
@@ -1214,14 +1214,14 @@ EndGetM32(header+CPT_H2_HDRCRC));
             fi->xfi_Size = fi->xfi_CrunchSize = header[CPT_H2_COMMENT];
 
             CPTPI(fi)->Method = -1;
-            fi->xfi_DataPos = ai->xai_InPos.S;
+            fi->xfi_DataPos = ai->xai_InPos;
             fi->xfi_Flags = XADFIF_NODATE|XADFIF_SEEKDATAPOS|XADFIF_INFOTEXT|XADFIF_NOFILENAME|XADFIF_EXTRACTONBUILD;
 
-            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_Size, TAG_DONE);
+            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_Size, TAG_DONE);
           }
         }
 
-        while(!err && ai->xai_InPos.S+5 < ai->xai_InSize)
+        while(!err && ai->xai_InPos+5 < ai->xai_InSize)
         {
           if(ldir)
           {
@@ -1250,7 +1250,7 @@ EndGetM32(header+CPT_H2_HDRCRC));
                     CPTDIRPI(fi)->Parent = ldir;
                     CPTDIRPI(fi)->NumEntries = EndGetM16(data+nsize);
                     ldir = fi;
-                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                   }
                   else
                   {
@@ -1317,7 +1317,7 @@ EndGetM32(header+CPT_H2_HDRCRC));
                       xadConvertDates(XADM XAD_DATEMAC, EndGetM32(data+nsize+CPT_MODDATE), XAD_GETDATEXADDATE,
                       &fi->xfi_Date, TAG_DONE);
 
-                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                     }
                     else
                     {
@@ -1373,7 +1373,7 @@ EndGetM32(header+CPT_H2_HDRCRC));
                       xadConvertDates(XADM XAD_DATEMAC, EndGetM32(data+nsize+CPT_MODDATE), XAD_GETDATEXADDATE,
                       &fi->xfi_Date, TAG_DONE);
 
-                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                     }
                     else
                     {

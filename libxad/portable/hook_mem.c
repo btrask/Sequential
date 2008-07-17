@@ -46,10 +46,10 @@ FUNCHOOK(InHookMem)
     param->xhp_DataPos += param->xhp_BufferSize;
     break;
   case XADHC_SEEK:
-    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData.S < 0) ||
-    (param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_InSize))
+    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData < 0) ||
+    (param->xhp_DataPos + param->xhp_CommandData > ai->xaip_InSize))
       return XADERR_INPUT;
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_INIT:
 #ifdef DEBUG
@@ -83,10 +83,10 @@ FUNCHOOK(OutHookMem)
     param->xhp_DataPos += param->xhp_BufferSize;
     break;
   case XADHC_SEEK:
-    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData.S < 0) ||
-    (param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_OutSize))
+    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData < 0) ||
+    (param->xhp_DataPos + param->xhp_CommandData > ai->xaip_OutSize))
       return XADERR_OUTPUT;
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_INIT:
 #ifdef DEBUG

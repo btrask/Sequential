@@ -513,9 +513,19 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	if(hypotf(x, y) < minValue && [self shouldExitForMovementInDirection:direction] && [[self delegate] clipView:self shouldExitEdges:direction]) return; // When the user starts scrolling, there is always a slow event (ie. less than minValue) before the speed ramps up. We require a very slow combined speed (which seems to exclude everything but an initial scroll event, but that isn't important) in order to prevent the user from accidentally going between pages.
 	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) allowAnimation:YES];
 }
-- (void)swipeWithEvent:(NSEvent *)anEvent // Private, invoked from three finger guestures on new laptop trackpads.
+
+// Private, invoked by guestures on new laptop trackpads.
+- (void)swipeWithEvent:(NSEvent *)anEvent
 {
 	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint([anEvent deltaX], [anEvent deltaY]), 0.1)];
+}
+- (void)magnifyWithEvent:(NSEvent *)anEvent
+{
+	NSLog(@"-magnifyWithEvent: %@", anEvent);
+}
+- (void)rotateWithEvent:(NSEvent *)anEvent
+{
+	NSLog(@"-rotateWithEvent: %@", anEvent);
 }
 
 #pragma mark -

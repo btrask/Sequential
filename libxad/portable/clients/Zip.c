@@ -159,7 +159,7 @@ struct xadArchiveInfo *ai, struct xadMasterBase *xadMasterBase)
 {
   xadINT32 err = 0;
   xadUINT32 j;
-  xadSize end = ai->xai_InPos.S + len, next;
+  xadSize end = ai->xai_InPos + len, next;
   struct ZipExtra ze;
 
   while(len >= 9 && !err)
@@ -173,7 +173,7 @@ struct xadArchiveInfo *ai, struct xadMasterBase *xadMasterBase)
         break;
 
 	  len -= j;
-	  next = ai->xai_InPos.S + j;
+	  next = ai->xai_InPos + j;
 
       if(EndGetI16(ze.ID) == 0x5455 && j == 5)
       {
@@ -311,12 +311,12 @@ struct xadArchiveInfo *ai, struct xadMasterBase *xadMasterBase)
         }
       }
 
-      err = xadHookAccess(XADM XADAC_INPUTSEEK, next-ai->xai_InPos.S, 0, ai);
+      err = xadHookAccess(XADM XADAC_INPUTSEEK, next-ai->xai_InPos, 0, ai);
     }
   }
 
   if(!err)
-    err = xadHookAccess(XADM XADAC_INPUTSEEK, end-ai->xai_InPos.S, 0, ai);
+    err = xadHookAccess(XADM XADAC_INPUTSEEK, end-ai->xai_InPos, 0, ai);
 
   return err;
 }
@@ -333,7 +333,7 @@ struct xadMasterBase *xadMasterBase)
   if((fsize = ai->xai_InSize-lastpos) < 15)
     return 0;
 
-  if((i = lastpos - ai->xai_InPos.S))
+  if((i = lastpos - ai->xai_InPos))
   {
     if((err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0, ai)))
       return err;
@@ -373,7 +373,7 @@ struct xadMasterBase *xadMasterBase)
   if(found)
   {
     err = xadHookAccess(XADM XADAC_INPUTSEEK, i-1-bufsize, 0, ai);
-    /* *lastpos = ai->xai_InPos.S + 2; */
+    /* *lastpos = ai->xai_InPos + 2; */
   }
 
   return err;
@@ -386,7 +386,7 @@ struct xadMasterBase *xadMasterBase)
   xadSTRPTR buf;
   xadSize i=0,bufsize, fsize, spos = 0, size = 0;
 
-  if((fsize = ai->xai_InSize-ai->xai_InPos.S) < 20)
+  if((fsize = ai->xai_InSize-ai->xai_InPos) < 20)
     return 0;
 
   if((bufsize = ZIPBUFFSIZE) > fsize)
@@ -452,14 +452,14 @@ XADGETINFO(Zip)
   xadUINT32 lastpos, o;
   xadUINT8 id[4];
 
-  lastpos = ai->xai_InPos.S;
-  while(ai->xai_InPos.S + 3 < ai->xai_InSize && !stop)
+  lastpos = ai->xai_InPos;
+  while(ai->xai_InPos + 3 < ai->xai_InSize && !stop)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 4, id, ai)))
     {
       switch(EndGetM32(id))
       {
-      case ZIPLOCAL: lastpos = ai->xai_InPos.S;
+      case ZIPLOCAL: lastpos = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct ZipLocal), &zl, ai)))
         {
           xadUINT32 i;
@@ -532,7 +532,7 @@ XADGETINFO(Zip)
                 fi2->xfi_Flags |= XADFIF_CRYPTED;
                 ai->xai_Flags |= XADAIF_CRYPTED;
               }
-              fi2->xfi_DataPos = ai->xai_InPos.S;
+              fi2->xfi_DataPos = ai->xai_InPos;
               fi2->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_ENTRYMAYCHANGE|XADFIF_EXTRACTONBUILD;
 
               if(ZIPPI(fi2)->Flags & (1<<3))
@@ -549,7 +549,7 @@ XADGETINFO(Zip)
                 xadFreeObjectA(XADM fi2, 0);
               else
               {
-                err = xadAddFileEntry(XADM fi2, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                err = xadAddFileEntry(XADM fi2, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                 fi = fi2;
               }
 
@@ -557,7 +557,7 @@ XADGETINFO(Zip)
                 stop = 1;
               else if(!(ZIPPI(fi2)->Flags & (1<<3)))
               {
-                if(fi2->xfi_CrunchSize+ai->xai_InPos.S > ai->xai_InSize)
+                if(fi2->xfi_CrunchSize+ai->xai_InPos > ai->xai_InSize)
                 {
                   ai->xai_Flags |= XADAIF_FILECORRUPT; /* cannot seek, scan for next! */
                 }
@@ -570,7 +570,7 @@ XADGETINFO(Zip)
         else
           stop = 1;
         break;
-      case ZIPCENTRAL: lastpos = ai->xai_InPos.S;
+      case ZIPCENTRAL: lastpos = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct ZipCentral), &zc, ai)))
         {
           xadUINT32 i;
@@ -628,7 +628,7 @@ XADGETINFO(Zip)
                 if(!fi2->xfi_LinkName && (fi2->xfi_LinkName = (xadSTRPTR)
                 xadAllocVec(XADM namelen+1, XADMEMF_CLEAR|XADMEMF_PUBLIC)))
                 {
-                  xadSize currpos = ai->xai_InPos.S;
+                  xadSize currpos = ai->xai_InPos;
                   err = xadHookAccess(XADM XADAC_INPUTSEEK, fi2->xfi_DataPos-currpos, 0, ai);
                   if(!err) err = xadHookAccess(XADM XADAC_READ, namelen, fi2->xfi_LinkName, ai);
                   if(!err) err = xadHookAccess(XADM XADAC_INPUTSEEK, currpos-fi2->xfi_DataPos-namelen, 0, ai);
@@ -664,7 +664,7 @@ XADGETINFO(Zip)
         else
           stop = 1;
         break;
-      case ZIPEND: lastpos = ai->xai_InPos.S;
+      case ZIPEND: lastpos = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct ZipEnd), &ze, ai)))
         {
           xadINT32 i;
@@ -682,10 +682,10 @@ XADGETINFO(Zip)
               fi2->xfi_Size = fi2->xfi_CrunchSize = i;
 
               ZIPPI(fi2)->CompressionMethod = ZIPM_COPY;
-              fi2->xfi_DataPos = ai->xai_InPos.S;
+              fi2->xfi_DataPos = ai->xai_InPos;
               fi2->xfi_Flags = XADFIF_NODATE|XADFIF_SEEKDATAPOS|XADFIF_INFOTEXT|XADFIF_NOFILENAME|XADFIF_EXTRACTONBUILD;
 
-              if((err = xadAddFileEntry(XADM fi2, ai, XAD_SETINPOS, ai->xai_InPos.S+i, TAG_DONE)))
+              if((err = xadAddFileEntry(XADM fi2, ai, XAD_SETINPOS, ai->xai_InPos+i, TAG_DONE)))
                 stop = 1;
               fi = fi2;
             }
@@ -695,7 +695,7 @@ XADGETINFO(Zip)
           stop = 1;
         break;
       case ZIPMULTI: case ZIPSTRANGE: /* ignore these */
-        lastpos = ai->xai_InPos.S;
+        lastpos = ai->xai_InPos;
         if((err = ZIPScanNext(lastpos, ai, xadMasterBase)))
           stop = 1;
         break;
@@ -716,7 +716,7 @@ XADGETINFO(Zip)
       }
     }
     else
-      lastpos = ai->xai_InPos.S;
+      lastpos = ai->xai_InPos;
   }
 
   return (ai->xai_FileInfo ? 0 : err);
@@ -2516,12 +2516,12 @@ XADGETINFO(WinZip)
           if(b[i] == 'P' && b[i+1] == 'K' && b[i+2] == 5 && b[i+3] == 6)
           {
             if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK,
-            EndGetI32(((struct ZipEnd *) (b+i+4))->CentralOffset)-ai->xai_InPos.S+4, 0, ai)))
+            EndGetI32(((struct ZipEnd *) (b+i+4))->CentralOffset)-ai->xai_InPos+4, 0, ai)))
             {
               if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct ZipCentral), b, ai)))
               {
                 if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK,
-                EndGetI32(((struct ZipCentral *) b)->LocHeaderOffset)-ai->xai_InPos.S, 0, ai)))
+                EndGetI32(((struct ZipCentral *) b)->LocHeaderOffset)-ai->xai_InPos, 0, ai)))
                   err = Zip_GetInfo(ai, xadMasterBase);
               }
             }
@@ -2615,7 +2615,7 @@ static xadUINT8 GZipGetByte(struct GZipBuf *gb, struct xadMasterBase *xadMasterB
   {
     if(gb->pos == 255)
     {
-      if((size = ai->xai_InSize-ai->xai_InPos.S) > 255)
+      if((size = ai->xai_InSize-ai->xai_InPos) > 255)
         size = 255;
       gb->size = size;
       gb->pos = 0;
@@ -2681,13 +2681,13 @@ XADGETINFO(GZip)
         if(csize)
           gz->Comment[csize++] = 0;
       }
-      a = ai->xai_InPos.S - gz->gb.size + gz->gb.pos;
+      a = ai->xai_InPos - gz->gb.size + gz->gb.pos;
     }
     else
       a = 2;
 
     err = gz->gb.err;
-    if(!err && !(err = xadHookAccess(XADM XADAC_INPUTSEEK, ai->xai_InSize-8-ai->xai_InPos.S, 0, ai)))
+    if(!err && !(err = xadHookAccess(XADM XADAC_INPUTSEEK, ai->xai_InSize-8-ai->xai_InPos, 0, ai)))
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, 8, &gz->ge, ai)))
       {

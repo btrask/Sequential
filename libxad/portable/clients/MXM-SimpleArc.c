@@ -69,7 +69,7 @@ XADGETINFO(MXMSimpleArc)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 24, &sd, ai)))
     {
-      j = ai->xai_InPos.S;
+      j = ai->xai_InPos;
       if(!(i = strlen((char *)sd.Name)))
         break; /* last entry */
       if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, sd.SkipSize-24, 0, ai)))

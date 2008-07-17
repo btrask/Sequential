@@ -24,6 +24,7 @@
 */
 
 #include "xadClient.h"
+#include "xadXPK.c"
 
 #ifndef XADMASTERVERSION
   #define XADMASTERVERSION      8
@@ -267,7 +268,12 @@ XADUNARCHIVE(CrunchDisk)
               err = XADERR_NOMEMORY;
             break;
           case 2:
-            err = XADERR_NOTSUPPORTED;
+            if(!(err = xpkDecrunch(&s, &dat.s, ai, xadMasterBase)))
+            {
+              CrunchDiskResort(s, buf, cd->BlockSize, ai->xai_CurDisk->xdi_CylSectors, dat.s);
+              err = xadHookAccess(XADM XADAC_WRITE, m, buf, ai);
+              xadFreeObjectA(XADM s, 0);
+            }
             break;
           default: err = XADERR_ILLEGALDATA; break;
           }

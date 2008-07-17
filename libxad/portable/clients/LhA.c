@@ -294,7 +294,7 @@ struct xadMasterBase *xadMasterBase)
       }
       fi->xfi_Size = EndGetI32(&head[11]);
       fi->xfi_CrunchSize = EndGetI32(&head[7]) - (head[20] == 1 ? extsize : 0);
-      fi->xfi_DataPos = ai->xai_InPos.S;
+      fi->xfi_DataPos = ai->xai_InPos;
       fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_EXTRACTONBUILD;
       if(head[20] == 1)
         LHAPI(fi)->CRC = EndGetI16(&head[22+head[21]]);
@@ -337,7 +337,7 @@ static xadINT32 LhAScanNext(xadUINT32 *lastpos, struct xadArchiveInfo *ai, struc
   if((fsize = ai->xai_InSize-*lastpos) < 15)
     return 0;
 
-  if((i = *lastpos - ai->xai_InPos.S))
+  if((i = *lastpos - ai->xai_InPos))
     if((err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0, ai)))
       return err;
 
@@ -372,7 +372,7 @@ static xadINT32 LhAScanNext(xadUINT32 *lastpos, struct xadArchiveInfo *ai, struc
   if(found)
   {
     err = xadHookAccess(XADM XADAC_INPUTSEEK, i-1-bufsize-2, 0, ai);
-    *lastpos = ai->xai_InPos.S + 5;
+    *lastpos = ai->xai_InPos + 5;
   }
 
   return err;
@@ -385,7 +385,7 @@ XADGETINFO(LhA)
   xadUINT32 lastokpos = 0;
   xadUINT8 buf[258];
 
-  while(ai->xai_InPos.S + 21 < ai->xai_InSize && !err)
+  while(ai->xai_InPos + 21 < ai->xai_InSize && !err)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 21, buf, ai)))
     {
@@ -395,7 +395,7 @@ XADGETINFO(LhA)
         err = XADERR_ILLEGALDATA;
       else
       {
-        lastokpos = ai->xai_InPos.S - 21 + 7; /* position after header text */
+        lastokpos = ai->xai_InPos - 21 + 7; /* position after header text */
         switch(buf[20])
         {
         case 0:
@@ -446,7 +446,7 @@ XADGETINFO(LhA)
               fi->xfi_Size = EndGetI32(&buf[11]);
               fi->xfi_CrunchSize = EndGetI32(&buf[7]);
               fi->xfi_Protection = buf[19];
-              fi->xfi_DataPos = ai->xai_InPos.S;
+              fi->xfi_DataPos = ai->xai_InPos;
               fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_EXTRACTONBUILD;
               LHAPI(fi)->CRC = EndGetI16(&buf[22+buf[21]]);
               xadCopyMem(XADM buf+2, LHAPI(fi)->NamePart, 5); /* 0 byte already there! */
@@ -492,7 +492,7 @@ XADGETINFO(LhA)
                 }
               }
 
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
             }
           }
           break;
@@ -510,7 +510,7 @@ XADGETINFO(LhA)
             else if(!(fi = LhAParseExt((xadSTRPTR)buf, ai, xadMasterBase)))
               err = ai->xai_LastError;
             else
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
           }
           break;
         case 2:
@@ -519,7 +519,7 @@ XADGETINFO(LhA)
             if(!(fi = LhAParseExt((xadSTRPTR)buf, ai, xadMasterBase)))
               err = ai->xai_LastError;
             else
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
           }
           break;
         default:
@@ -2104,7 +2104,7 @@ XADGETINFO(Zoo)
     return err;
   if((err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) EndGetI32(data)-28, 0, ai)))
     return err;
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 51, &zd, ai)))
     {
@@ -2155,7 +2155,7 @@ XADGETINFO(Zoo)
           {
             if(commsize)
             {
-              if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI32(zd.Commentoffset)-ai->xai_InPos.S, 0, ai)))
+              if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI32(zd.Commentoffset)-ai->xai_InPos, 0, ai)))
                 err = xadHookAccess(XADM XADAC_READ, commsize-1, fi->xfi_Comment, ai);
             }
             /* Every entry is preceeded by a header ( "@)#(\0" ) ! */
@@ -2447,11 +2447,11 @@ static xadINT32 ArjScanNext(xadUINT32 *lastpos, struct xadArchiveInfo *ai, struc
   xadSTRPTR buf;
   xadUINT32 bufsize, fsize, spos = 0;
 
-  if((i = *lastpos - ai->xai_InPos.S))
+  if((i = *lastpos - ai->xai_InPos))
     if((err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0, ai)))
       return err;
 
-  if((fsize = ai->xai_InSize-ai->xai_InPos.S) < 15)
+  if((fsize = ai->xai_InSize-ai->xai_InPos) < 15)
     return 0;
 
   if((bufsize = ARJBUFFSIZE) > fsize)
@@ -2485,7 +2485,7 @@ static xadINT32 ArjScanNext(xadUINT32 *lastpos, struct xadArchiveInfo *ai, struc
   if(found)
   {
     err = xadHookAccess(XADM XADAC_INPUTSEEK, i-1-bufsize, 0, ai);
-    *lastpos = ai->xai_InPos.S + 2;
+    *lastpos = ai->xai_InPos + 2;
   }
 
   return err;
@@ -2502,7 +2502,7 @@ XADGETINFO(Arj)
   if(!(ah = (struct ArjHeader *) xadAllocVec(XADM 2600, XADMEMF_PUBLIC)))
     return XADERR_NOMEMORY;
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 4, ah, ai)))
     {
@@ -2520,7 +2520,7 @@ XADGETINFO(Arj)
       }
       else if(hs) /* no file end */
       {
-        lastpos = ai->xai_InPos.S;
+        lastpos = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_READ, hs+6, ((xadSTRPTR)ah)+4, ai)))
         {
           xadUINT16 nextsize;
@@ -2565,7 +2565,7 @@ XADGETINFO(Arj)
                   ap->Method = ah->arj_Method;
                   ap->Flags = ah->arj_Flags;
                   ap->PwdModifier = ah->arj_GarblePasswordModifier;
-                  ap->DataPos = ai->xai_InPos.S;
+                  ap->DataPos = ai->xai_InPos;
                   ap->FileEndPos = ap->Size = EndGetI32(ah->arj_Size);
                   if(ah->arj_FirstHeaderSize >= 0x22)
                     ap->FileEndPos += EndGetI32(ah->arj_ExtFilePos);
@@ -2612,7 +2612,7 @@ XADGETINFO(Arj)
                 ap->Method = ah->arj_Method;
                 ap->Flags = ah->arj_Flags;
                 ap->PwdModifier = ah->arj_GarblePasswordModifier;
-                ap->DataPos = ai->xai_InPos.S;
+                ap->DataPos = ai->xai_InPos;
                 ap->FileEndPos = fi->xfi_Size = ap->Size = EndGetI32(ah->arj_Size);
                 if(ah->arj_FirstHeaderSize >= 0x22)
                   ap->FileEndPos += EndGetI32(ah->arj_ExtFilePos);
@@ -2627,7 +2627,7 @@ XADGETINFO(Arj)
 
                 fi->xfi_EntryInfo = arjtypes[ah->arj_Method];
 
-                err = xadAddFileEntry(XADM fi,  ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                err = xadAddFileEntry(XADM fi,  ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                 lfi = fi;
               }
             } /* valid CRC ? */
@@ -2642,7 +2642,7 @@ XADGETINFO(Arj)
       }
       else
       {
-        lastpos = ai->xai_InPos.S;
+        lastpos = ai->xai_InPos;
         err = ArjScanNext(&lastpos, ai, xadMasterBase);
       }
     }
@@ -2777,7 +2777,7 @@ XADUNARCHIVE(Arj)
     ac.mod = ap->PwdModifier;
     if((ap->Flags & ARJFLAG_GARBLED) && !(ai->xai_Password && *ai->xai_Password))
       err = XADERR_PASSWORD;
-    else if((s = ap->DataPos-ai->xai_InPos.S) && (err = xadHookAccess(XADM XADAC_INPUTSEEK, s, 0, ai)))
+    else if((s = ap->DataPos-ai->xai_InPos) && (err = xadHookAccess(XADM XADAC_INPUTSEEK, s, 0, ai)))
       ;
     else
     {

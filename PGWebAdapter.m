@@ -93,8 +93,8 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *message = nil;
 	if([resp respondsToSelector:@selector(statusCode)]) {
 		int const code = [(NSHTTPURLResponse *)resp statusCode];
-		if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", nil), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
-	} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", nil), [[_mainConnection request] URL]];
+		if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
+	} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]];
 	[self returnImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 

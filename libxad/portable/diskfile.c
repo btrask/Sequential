@@ -41,16 +41,16 @@ FUNCxadGetDiskInfo /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     switch(ti->ti_Tag)
     {
     case XAD_STARTCLIENT: ai->xaip_ArchiveInfo.xai_Client
-    = (struct xadClient *) ti->ti_Data.P; break;
-    case XAD_NOEXTERN: noext = ti->ti_Data.S; break;
+    = (struct xadClient *) ti->ti_Data; break;
+    case XAD_NOEXTERN: noext = ti->ti_Data; break;
     case XAD_NOEMPTYERROR:
-      if(ti->ti_Data.S)
+      if(ti->ti_Data)
         ai->xaip_ArchiveInfo.xai_Flags |= XADAIF_NOEMPTYERROR;
       else
         ai->xaip_ArchiveInfo.xai_Flags &= ~XADAIF_NOEMPTYERROR;
       break;
-    case XAD_IGNOREFLAGS: ignoreflags = ti->ti_Data.S; break;
-    case XAD_ONLYFLAGS:   onlyflags = ti->ti_Data.S; break;
+    case XAD_IGNOREFLAGS: ignoreflags = ti->ti_Data; break;
+    case XAD_ONLYFLAGS:   onlyflags = ti->ti_Data; break;
     }
   }
 
@@ -68,7 +68,7 @@ FUNCxadGetDiskInfo /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     {
       struct xadClient *xc;
       ai->xaip_InHookParam.xhp_Command = XADHC_IMAGEINFO;
-      ai->xaip_InHookParam.xhp_CommandData.S = (xadINT32) ii;
+      ai->xaip_InHookParam.xhp_CommandData = (xadINT32) ii;
       if(CallHookPkt(ai->xaip_InHook, ai, &ai->xaip_InHookParam))
       {
 #ifdef DEBUG
@@ -110,9 +110,9 @@ FUNCxadGetDiskInfo /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
   DebugOther("xadGetDiskInfoA: Testing client %s", xc->xc_ArchiverName);
 #endif
           err = 0;
-          if(ai->xaip_ArchiveInfo.xai_InPos.S)
+          if(ai->xaip_ArchiveInfo.xai_InPos)
             err = xadHookAccess(XADM XADAC_INPUTSEEK,
-            -ai->xaip_ArchiveInfo.xai_InPos.S, 0, XADM_AI(ai));
+            -ai->xaip_ArchiveInfo.xai_InPos, 0, XADM_AI(ai));
           if(!err)
           {
             ai->xaip_ArchiveInfo.xai_Client = xc;

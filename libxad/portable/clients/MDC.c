@@ -67,7 +67,7 @@ XADGETINFO(MDC)
 
   if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, sizeof(struct MDC), 0, ai)))
   {
-    while(ai->xai_InPos.S < ai->xai_InSize && !err)
+    while(ai->xai_InPos < ai->xai_InSize && !err)
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, 20, &dat, ai)))
       {

@@ -99,7 +99,7 @@ static xadUINT8 xadIOGetFunc(struct xadInOut *io)
   "xadIOGetFunc NeedData BufferPos %ld InSize %ld Load %ld BufferSize %ld",
   io->xio_InBufferPos, io->xio_InSize, i, io->xio_InBufferSize);
 #endif
-          j = io->xio_ArchiveInfo->xai_InSize-io->xio_ArchiveInfo->xai_InPos.S;
+          j = io->xio_ArchiveInfo->xai_InSize-io->xio_ArchiveInfo->xai_InPos;
           if(i > j)
             i = j;
           if(!i)

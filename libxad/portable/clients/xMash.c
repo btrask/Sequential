@@ -23,6 +23,7 @@
 */
 
 #include "xadClient.h"
+#include "xadXPK.c"
 
 #ifndef XADMASTERVERSION
   #define XADMASTERVERSION      8
@@ -84,7 +85,7 @@ XADGETINFO(xMash)
   if((err = xadHookAccess(XADM XADAC_INPUTSEEK, 3, 0, ai))) /* skip MSH */
     return err;
 
-  while(ai->xai_InPos.S < ai->xai_InSize && !err)
+  while(ai->xai_InPos < ai->xai_InSize && !err)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 3, &h, ai)) &&
     !(err = xadHookAccess(XADM XADAC_READ, 4, dat, ai)))
@@ -99,9 +100,9 @@ XADGETINFO(xMash)
             if(h.type == XMASH_BANNER)
               ti2->xti_Flags |= XADTIF_BANNER;
 
-            err = XADERR_NOTSUPPORTED;
+            err = XADERR_NOTSUPPORTED/*xpkDecrunch(&ti2->xti_Text, &ti2->xti_Size, ai, xadMasterBase)*/;
 
-            start = ai->xai_InPos.S;
+            start = ai->xai_InPos;
 
             if(!ti)
               xdi->xdi_TextInfo = ti2;
@@ -153,6 +154,7 @@ XADUNARCHIVE(xMash)
   struct xMashHead h;
   xadINT32 err = 0;
   xadUINT32 size, lowcyl;
+  xadSTRPTR a;
 
   lowcyl = ai->xai_LowCyl;
 
@@ -161,7 +163,7 @@ XADUNARCHIVE(xMash)
     if(!(err = xadHookAccess(XADM XADAC_READ, 3, &h, ai)) &&
     !(err = xadHookAccess(XADM XADAC_READ, 4, &size, ai)))
     {
-      xadINT32 endcyl, startcyl;
+      xadINT32 endcyl, startcyl, skipbyte;
 
       startcyl = h.start>>1;
       endcyl = ((h.start+h.num)>>1)-1;
@@ -170,7 +172,21 @@ XADUNARCHIVE(xMash)
         err = xadHookAccess(XADM XADAC_INPUTSEEK, size, 0, ai);
       else
       {
-        err = XADERR_NOTSUPPORTED;
+        xadUINT32 size;
+        if(!(err = xpkDecrunch(&a, &size, ai, xadMasterBase)))
+        {
+          skipbyte = 0;
+
+          if(startcyl < lowcyl)
+            skipbyte = (lowcyl-startcyl)*22*512;
+          if(endcyl > ai->xai_HighCyl)
+            endcyl = ai->xai_HighCyl;
+          size = (endcyl+1-lowcyl)*22*512;
+
+          err = xadHookAccess(XADM XADAC_WRITE, size, a+skipbyte, ai);
+          xadFreeObjectA(XADM a, 0);
+          lowcyl = endcyl+1;
+        }
       }
     }
   }

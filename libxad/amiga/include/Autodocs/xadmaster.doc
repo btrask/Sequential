@@ -1118,7 +1118,7 @@ VERSION
         This function is for external clients only. It is needed to get
         data, store results and seek in input or output. There are 5
         commands XADAC_READ, XADAC_WRITE, XADAC_COPY, XADAC_INPUTSEEK,
-        XADAC_OUTPUTSEEK to do that. This function updates the xai_InPos.S,
+        XADAC_OUTPUTSEEK to do that. This function updates the xai_InPos,
         xai_OutPos and xai_OutSize fields in xadArchiveInfo structure. The
         seek commands and the copy command should set buffer parameter to
         zero. Seek's and reads should not exceed the file borders! The
@@ -1817,7 +1817,7 @@ VERSION
         command). The offset you have to seek is always relative to
         current position. It can be negative too. Seek's with size 0 can
         be used to get current file position.
-        Input:  xhp_CommandData.S offset you have to seek
+        Input:  xhp_CommandData offset you have to seek
         Output: xhp_DataPos     buffer position after seek
 
       XADHC_INIT                (both)
@@ -1844,16 +1844,16 @@ VERSION
         The hook should return complete size of input data which should be
         processed.
         Input:  none
-        Output: xhp_CommandData.S size of input file
+        Output: xhp_CommandData size of input file
 
       XADHC_IMAGEINFO           (input hooks only) (V4)
         The hook should return information about disk image file. Normally
         hooks return XADERR_NOTSUPPORTED for this, like for all unsupported
         commands. Only the internal disk archive hook is able to return
         useful data.
-        Input:  xhp_CommandData.S contains pointer to xadImageInfo structure,
+        Input:  xhp_CommandData contains pointer to xadImageInfo structure,
                 which should be filled
-        Output: xadImageInfo structure in xhp_CommandData.S is filled with data
+        Output: xadImageInfo structure in xhp_CommandData is filled with data
 
 xadmaster.library/-- progress hooks--    xadmaster.library/--progress hooks--
 

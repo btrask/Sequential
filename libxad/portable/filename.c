@@ -528,13 +528,13 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
   {
     switch(ti->ti_Tag)
     {
-    case XAD_CHARACTERSET: cset = ti->ti_Data.S; break;
-    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data.P; break;
-    case XAD_STRINGSIZE: if(!(strs = ti->ti_Data.S)) strs = 0xFFFFFFFF; break;
+    case XAD_CHARACTERSET: cset = ti->ti_Data; break;
+    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data; break;
+    case XAD_STRINGSIZE: if(!(strs = ti->ti_Data)) strs = 0xFFFFFFFF; break;
     case XAD_XADSTRING:
-      if(ti->ti_Data.P)
+      if(ti->ti_Data)
       {
-        obj = ((struct xadObject *)ti->ti_Data.P)-1;
+        obj = ((struct xadObject *)ti->ti_Data)-1;
         se = ((struct xadStringEnd *)(((xadSTRPTR)obj)+obj->xo_Size))-1;
         len += (se->xse_UnicodeSize ? se->xse_UnicodeSize
         : se->xse_StringSize)-1+1;
@@ -542,17 +542,17 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
       strs = 0xFFFFFFFF;
       break;
     case XAD_PSTRING:
-      if(ti->ti_Data.P)
+      if(ti->ti_Data)
       {
-        len += 1 + ((xadSTRPTR) ti->ti_Data.P)[0];
+        len += 1 + ((xadSTRPTR) ti->ti_Data)[0];
       }
       strs = 0xFFFFFFFF;
       break;
     case XAD_CSTRING:
-      if(ti->ti_Data.P)
+      if(ti->ti_Data)
       {
         ++len;
-        if((i = getlen((xadUINT8 *)ti->ti_Data.P, cset, strs)) < 0)
+        if((i = getlen((xadUINT8 *)ti->ti_Data, cset, strs)) < 0)
           err = -i;
         else
           len += i;
@@ -586,17 +586,17 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
     {
       switch(ti->ti_Tag)
       {
-      case XAD_STRINGSIZE: if(!(strs = ti->ti_Data.S)) strs = 0xFFFFFFFF; break;
+      case XAD_STRINGSIZE: if(!(strs = ti->ti_Data)) strs = 0xFFFFFFFF; break;
       case XAD_ADDPATHSEPERATOR:
-        mystr->addpathsep = ti->ti_Data.S ? XADTRUE : XADFALSE; break;
+        mystr->addpathsep = ti->ti_Data ? XADTRUE : XADFALSE; break;
       case XAD_PATHSEPERATOR:
-        mystr->pathsep = ti->ti_Data.P ? (const xadUINT16 *) ti->ti_Data.P
+        mystr->pathsep = ti->ti_Data ? (const xadUINT16 *) ti->ti_Data
         : psep+2; break;
-      case XAD_CHARACTERSET: cset = ti->ti_Data.S; break;
+      case XAD_CHARACTERSET: cset = ti->ti_Data; break;
       case XAD_XADSTRING:
-        if(ti->ti_Data.P)
+        if(ti->ti_Data)
         {
-          obj = ((struct xadObject *)ti->ti_Data.P)-1;
+          obj = ((struct xadObject *)ti->ti_Data)-1;
           se = ((struct xadStringEnd *)(((xadSTRPTR)obj)+obj->xo_Size))-1;
           if(se->xse_UnicodeSize)
             err = makestring(mystr, CHARSET_UNICODE_UCS2_HOST,
@@ -604,23 +604,23 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
             -se->xse_UnicodeSize), strs < se->xse_UnicodeSize-1 ? strs :
             se->xse_UnicodeSize-1);
           else
-            err = makestring(mystr, se->xse_Charset, (xadSTRPTR) ti->ti_Data.P,
+            err = makestring(mystr, se->xse_Charset, (xadSTRPTR) ti->ti_Data,
             strs < se->xse_StringSize-1 ? strs : se->xse_StringSize-1);
         }
         strs = 0xFFFFFFFF;
         break;
       case XAD_PSTRING:
-        if(ti->ti_Data.P)
+        if(ti->ti_Data)
         {
-          str = (xadSTRPTR) ti->ti_Data.P;
+          str = (xadSTRPTR) ti->ti_Data;
           err = makestring(mystr, cset, str+1, strs < str[0] ? strs : str[0]);
         }
         strs = 0xFFFFFFFF;
         break;
       case XAD_CSTRING:
-        if(ti->ti_Data.P)
+        if(ti->ti_Data)
         {
-          str = (xadSTRPTR) ti->ti_Data.P;
+          str = (xadSTRPTR) ti->ti_Data;
           if((i = getlen((xadUINT8 *)str, cset, strs)) < 0)
             err = -i;
           else
@@ -727,12 +727,12 @@ FUNCxadGetFilename /* xadUINT32 buffersize, xadSTRPTR buffer,
   {
     switch(ti->ti_Tag)
     {
-    case XAD_NOLEADINGPATH: nopath = ti->ti_Data.S ? XADTRUE : XADFALSE; break;
-    case XAD_NOTRAILINGPATH: notrailingpath = ti->ti_Data.S
+    case XAD_NOLEADINGPATH: nopath = ti->ti_Data ? XADTRUE : XADFALSE; break;
+    case XAD_NOTRAILINGPATH: notrailingpath = ti->ti_Data
       ? XADTRUE : XADFALSE; break;
     case XAD_MASKCHARACTERS:
       {
-        const xadSTRING *mm = (xadSTRPTR) ti->ti_Data.P;
+        const xadSTRING *mm = (xadSTRPTR) ti->ti_Data;
         for(i = 0; i < 256/8; ++i)
           mask[i] = 0;
         while(mm && *mm)
@@ -742,8 +742,8 @@ FUNCxadGetFilename /* xadUINT32 buffersize, xadSTRPTR buffer,
         }
       }
       break;
-    case XAD_MASKINGCHAR: maskchar = ti->ti_Data.S; break;
-    case XAD_REQUIREDBUFFERSIZE: reqbufsize = (xadUINT32 *) ti->ti_Data.P; break;
+    case XAD_MASKINGCHAR: maskchar = ti->ti_Data; break;
+    case XAD_REQUIREDBUFFERSIZE: reqbufsize = (xadUINT32 *) ti->ti_Data; break;
     }
   }
   if(nopath)
@@ -821,8 +821,8 @@ FUNCxadGetDefaultName /* xadTAGPTR tags */
   {
     switch(ti->ti_Tag)
     {
-    case XAD_ARCHIVEINFO: ai = (struct xadArchiveInfo *) ti->ti_Data.P; break;
-    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data.P; break;
+    case XAD_ARCHIVEINFO: ai = (struct xadArchiveInfo *) ti->ti_Data; break;
+    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data; break;
     }
   }
 
@@ -843,7 +843,7 @@ FUNCxadGetDefaultName /* xadTAGPTR tags */
     {
       if(ti->ti_Tag == XAD_EXTENSION)
       {
-        ext = (xadSTRPTR) ti->ti_Data.P;
+        ext = (xadSTRPTR) ti->ti_Data;
         for(extsize = 0; ext[extsize] && ext[extsize] != ';'; ++extsize)
           ;
         if(extsize < namesize && !strnicmp(ai->xai_InName+namesize-extsize,

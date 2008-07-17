@@ -72,7 +72,6 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 	if(tableColumn == identifierColumn) {
 		return [[[connection request] URL] absoluteString];
 	} else if(tableColumn == progressColumn) {
-		NSLog(@"the value we put in %@", [NSNumber numberWithFloat:[connection progress]]);
 		return [NSNumber numberWithFloat:[connection progress]];
 	}
 	return nil;
@@ -117,7 +116,6 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 {
 	[super windowDidLoad];
 	[progressColumn setDataCell:[[[PGLevelIndicatorCell alloc] init] autorelease]];
-	NSLog(@"%@, %@", progressColumn, [progressColumn dataCell]);
 
 	NSMutableDictionary *const buttonAttributes = [[[[cancelButton attributedTitle] attributesAtIndex:0 effectiveRange:NULL] mutableCopy] autorelease];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];

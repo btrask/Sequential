@@ -1132,9 +1132,9 @@ struct xadArchiveInfo *ai, xadINT32 *more, xadINT32 crypted, xadINT32 *ret)
       if(crypted)
         d->UsePwd = DMSPWD_USE;
 
-      di->xdi_DataPos = ai->xai_InPos.S;
+      di->xdi_DataPos = ai->xai_InPos;
 
-      while(!stop && !err && ai->xai_InPos.S < ai->xai_InSize)
+      while(!stop && !err && ai->xai_InPos < ai->xai_InSize)
       {
         if(xadHookAccess(XADM XADAC_READ, sizeof(struct DMSTrack), &t, ai))
           stop = 1;
@@ -1193,7 +1193,7 @@ struct xadArchiveInfo *ai, xadINT32 *more, xadINT32 crypted, xadINT32 *ret)
                 ti = ti2;
 
                 if(highcyl == -1)
-                  di->xdi_DataPos = ai->xai_InPos.S;
+                  di->xdi_DataPos = ai->xai_InPos;
               }
               else
                 err = XADERR_NOMEMORY;
@@ -1206,8 +1206,8 @@ struct xadArchiveInfo *ai, xadINT32 *more, xadINT32 crypted, xadINT32 *ret)
                 highcyl = lowcyl = tr;
                 tracksize = upsize;
                 /* store first track to extract */
-/* FIXME - make real pointer! */ /* I don't know what's going on here but it's nothing a union can't fix. */
-                di->xdi_PrivateInfo = ai->xai_InPos.P-sizeof(struct DMSTrack);
+/* FIXME - make real pointer! */
+                di->xdi_PrivateInfo = (xadPTR) (ai->xai_InPos-sizeof(struct DMSTrack));
                 if(!tr)
                 {
                   zerosize = upsize;
@@ -1318,7 +1318,7 @@ XADGETINFO(DMS)
   /* appended stuff is treated as own archive, as there may be gaps and double
      parts due to the chaotic file format of DMS. */
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize &&
+  while(!err && ai->xai_InPos < ai->xai_InSize &&
   !xadHookAccess(XADM XADAC_READ, sizeof(struct DMSHeader), &h, ai))
   {
     if(!testDMSTrack((struct DMSTrack *) &h, xadMasterBase))
@@ -1341,7 +1341,7 @@ XADGETINFO(DMS)
             return XADERR_NOMEMORY;
           if(!(err = xadHookAccess(XADM XADAC_READ, EndGetM16(t.UnpackedSize), fi->xfi_FileName, ai)))
           {
-            i = ai->xai_InPos.S;
+            i = ai->xai_InPos;
             j = 0;
             while(j < EndGetM32(h.UnpackedSize) && !err)
             {
@@ -1384,7 +1384,7 @@ XADGETINFO(DMS)
               fi->xfi_Flags |= XADFIF_SEEKDATAPOS;
               fi->xfi_Size = EndGetM32(h.UnpackedSize);
               fi->xfi_CrunchSize = EndGetM32(h.PackedSize);
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
               fi = 0;
             }
           }
@@ -1399,7 +1399,7 @@ XADGETINFO(DMS)
         while(more)
         {
           if((di = DMSOneArc(xadMasterBase, ai, &more, EndGetM32(h.InfoFlags) & DMSINFO_ENCRYPT, &err)))
-            err = xadAddDiskEntry(XADM di, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+            err = xadAddDiskEntry(XADM di, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
         }
       } /* DISK ARCHIVE */
     } /* found correct track */
@@ -1444,12 +1444,12 @@ XADUNARCHIVE(DMS)
     pwd = 0;
   }
 
-  k = ai->xai_InPos.S;
+  k = ai->xai_InPos;
   do
   {
     err = 0;
-    if(k != ai->xai_InPos.S)
-      xadHookAccess(XADM XADAC_INPUTSEEK, k-ai->xai_InPos.S, 0, ai);
+    if(k != ai->xai_InPos)
+      xadHookAccess(XADM XADAC_INPUTSEEK, k-ai->xai_InPos, 0, ai);
     if(ai->xai_OutPos)
       xadHookAccess(XADM XADAC_OUTPUTSEEK, -ai->xai_OutPos, 0, ai);
 #else
@@ -1522,7 +1522,7 @@ XADUNARCHIVE(DMS)
 
         if(!(err = DecrunchDMS(&t, ai, xadMasterBase, &res, d)))
         { /* xdi_PrivateInfo contains start pos of useful data */
-          if(ai->xai_InPos.S > (xadUINT32) di->xdi_PrivateInfo) /* skip unusable parts */
+          if(ai->xai_InPos > (xadUINT32) di->xdi_PrivateInfo) /* skip unusable parts */
           {
             if(i == EndGetM16(t.TrackNumber))
             {
@@ -1630,7 +1630,7 @@ XADGETINFO(SDSSFX)
     return err;
   while(!err)
   {
-    j = ai->xai_InPos.S;
+    j = ai->xai_InPos;
     if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct SDSSFXData), &sd, ai)))
     {
       if(!(i = strlen((char *)sd.Name)))
@@ -1647,7 +1647,7 @@ XADGETINFO(SDSSFX)
         xadConvertDates(XADM XAD_DATECURRENTTIME, 1, XAD_GETDATEXADDATE,
         &fi->xfi_Date, TAG_DONE);
 
-        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+        err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
       }
       else
         err = XADERR_NOMEMORY;

@@ -108,7 +108,7 @@ XADGETINFO(SOS)
       &fi->xfi_Date, TAG_DONE);
       xadCopyMem(XADM file.name, fi->xfi_FileName, 24);
 
-      if(!(err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE)))
+      if(!(err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE)))
         err = xadHookAccess(XADM XADAC_READ, sizeof(struct SOSfile), &file, ai);
     }
     else

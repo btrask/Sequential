@@ -74,10 +74,7 @@ typedef xadUINT32        xadTag;
 
 struct TagItem {
   xadTag  ti_Tag;
-  union {
-    xadSize S;
-	xadPTR  P;
-  } ti_Data;
+  xadSize ti_Data;
 };
 
 #include <stdio.h>
@@ -93,9 +90,9 @@ typedef const struct TagItem * xadTAGPTR;
 #define TAG_DONE   (TAG_INT + 0x10000000UL)
 /* ignore this tag */
 #define TAG_IGNORE (TAG_INT + 0x10000001UL)
-/* taglist continues at (struct TagItem *) ti_Data.S */
+/* taglist continues at (struct TagItem *) ti_Data */
 #define TAG_MORE   (TAG_PTR + 0x10000002UL)
-/* ignore the next [(xadUINT32) ti_Data.S] tags */
+/* ignore the next [(xadUINT32) ti_Data] tags */
 #define TAG_SKIP   (TAG_INT + 0x10000003UL)
 
 /* a standard callback system */
@@ -234,7 +231,7 @@ struct xadMasterBase {
 #define XAD_EXTENSION           (TAG_PTR+202) /* argument for xadGetDefaultName() (V13) */
 
 /* tags for xadAddFileEntry and xadAddDiskEntry (V10) */
-#define XAD_SETINPOS            (TAG_SIZ+240) /* set xai_InPos.S after call (V10) */
+#define XAD_SETINPOS            (TAG_SIZ+240) /* set xai_InPos after call (V10) */
 #define XAD_INSERTDIRSFIRST     (TAG_INT+241) /* insert dirs at list start (V10) */
 
 /* tags for xadConvertName (V12) */
@@ -304,10 +301,7 @@ struct xadMasterBase {
 
 struct xadHookParam {
   xadUINT32    xhp_Command;
-  union {
-	xadPTR      P;
-    xadSignSize S;
-  } xhp_CommandData;
+  xadSignSize  xhp_CommandData;
   xadPTR       xhp_BufferPtr;
   xadSize      xhp_BufferSize;
   xadSize      xhp_DataPos;        /* current seek position */
@@ -404,10 +398,7 @@ struct xadArchiveInfo {
   xadUINT32            xai_Flags;    /* read only XADAIF_ flags */
   xadUINT32            xai_LowCyl;   /* lowest cylinder to unarchive */
   xadUINT32            xai_HighCyl;  /* highest cylinder to unarchive */
-  union {
-    xadSize S;
-	xadPTR  P;
-  } xai_InPos;    /* input position, read only */
+  xadSize              xai_InPos;    /* input position, read only */
   xadSize              xai_InSize;   /* input size, read only */
   xadSize              xai_OutPos;   /* output position, read only */
   xadSize              xai_OutSize;  /* output file size, read only */

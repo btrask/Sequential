@@ -159,7 +159,7 @@ XADGETINFO(LZX)
 
   if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, sizeof(struct LZXInfo_Header), 0, ai)))
   {
-    while(!err && ai->xai_InPos.S < ai->xai_InSize)
+    while(!err && ai->xai_InPos < ai->xai_InSize)
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, LZXHEADERSIZE, &head, ai)))
       {
@@ -262,12 +262,12 @@ XADGETINFO(LZX)
 
               if(l)
               {
-                LZXPE(fi)->ArchivePos = ai->xai_InPos.S-l;
+                LZXPE(fi)->ArchivePos = ai->xai_InPos-l;
                 LZXPE(fi)->PackMode = head.PackMode;
                 while(fig)
                 {
                   fig->xfi_GroupCrSize = l;
-                  LZXPE(fig)->ArchivePos = ai->xai_InPos.S-l;
+                  LZXPE(fig)->ArchivePos = ai->xai_InPos-l;
                   LZXPE(fig)->PackMode = head.PackMode;
                   fig = fig->xfi_Next;
                 }
@@ -881,7 +881,7 @@ XADUNARCHIVE(LZX)
       xadFreeObjectA(XADM ai->xai_PrivateClient, 0);
       ai->xai_PrivateClient = 0;
     }
-    if((i = LZXPE(fi)->ArchivePos - ai->xai_InPos.S))
+    if((i = LZXPE(fi)->ArchivePos - ai->xai_InPos))
     {
       if((ret = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) i, 0, ai)))
         return ret;

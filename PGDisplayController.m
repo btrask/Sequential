@@ -614,7 +614,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		text = [[node identifier] displayName];
 		PGNode *const parent = [node parentNode];
 		if([parent parentNode]) text = [NSString stringWithFormat:@"%@\n%@", [[parent identifier] displayName], text];
-	} else text = NSLocalizedString(@"No image", nil);
+	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
 	[[_infoPanel contentView] setMessageText:text];
 }
 - (void)_runTimer

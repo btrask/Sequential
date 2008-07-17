@@ -518,7 +518,7 @@ static xadINT32 AceExtractEntry(struct AceData *ad, struct xadFileInfo *fi)
     ad->crc32 = ~0;
     ad->insize = fis->xfi_CrunchSize;
 
-    if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, fis->xfi_DataPos-ad->ai->xai_InPos.S, 0, ad->ai)))
+    if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, fis->xfi_DataPos-ad->ai->xai_InPos, 0, ad->ai)))
     {
       switch(ACEPI(fis)->Compression)
       {
@@ -575,7 +575,7 @@ XADGETINFO(Ace)
   xadUINT32 i, num = 1, lastpos = 0;
   xadUINT8 ac[4];
 
-  while(ai->xai_InPos.S + 3 < ai->xai_InSize && !err)
+  while(ai->xai_InPos + 3 < ai->xai_InSize && !err)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 4, &ac, ai)))
     {
@@ -599,7 +599,7 @@ XADGETINFO(Ace)
               {
                 fi2->xfi_FileName = "AceInfo.TXT";
                 fi2->xfi_EntryNumber = num++;
-                fi2->xfi_DataPos = ai->xai_InPos.S-i+29+bptr[26];
+                fi2->xfi_DataPos = ai->xai_InPos-i+29+bptr[26];
                 fi2->xfi_CrunchSize = EndGetI16(bptr+bptr[26]+27);
                 fi2->xfi_Size = EndGetI16(bptr+31+bptr[26])>>1;
                 fi2->xfi_Flags = XADFIF_NODATE|XADFIF_SEEKDATAPOS|XADFIF_INFOTEXT|XADFIF_NOFILENAME;
@@ -630,11 +630,11 @@ XADGETINFO(Ace)
               {
                 si->xsi_Next = ai->xai_SkipInfo;
                 ai->xai_SkipInfo = si;
-                si->xsi_SkipSize = ai->xai_InPos.S - lastpos;
+                si->xsi_SkipSize = ai->xai_InPos - lastpos;
                 si->xsi_Position = lastpos;
                 ACEPI(fi)->CRC32 = EndGetI32(bptr+19);
                 fi->xfi_CrunchSize += EndGetI32(bptr+3);
-                lastpos = ai->xai_InPos.S + EndGetI32(bptr+3);
+                lastpos = ai->xai_InPos + EndGetI32(bptr+3);
               }
               else
                 err = XADERR_NOMEMORY;
@@ -672,7 +672,7 @@ XADGETINFO(Ace)
                 fi2->xfi_Flags |= XADFIF_CRYPTED;
                 ai->xai_Flags |= XADAIF_CRYPTED;
               }
-              fi2->xfi_DataPos = ai->xai_InPos.S;
+              fi2->xfi_DataPos = ai->xai_InPos;
               if(bptr[2] & ACEFFLAG_SOLID)
               {
                 ACEPI(fi2)->Solid = fi;
@@ -746,7 +746,7 @@ XADUNARCHIVE(Ace)
   {
     /* this ensures we can always extract stored files, even if solid extraction fails */
     xadUINT32 crc32 = ~0;
-    if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, fi->xfi_DataPos-ai->xai_InPos.S, 0, ai)))
+    if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, fi->xfi_DataPos-ai->xai_InPos, 0, ai)))
       if(!(err = xadHookTagAccess(XADM XADAC_COPY, fi->xfi_Size, 0, ai, XAD_GETCRC32, &crc32, XAD_USESKIPINFO, 1, TAG_DONE)))
         if(crc32 != ACEPI(fi)->CRC32)
           err = XADERR_CHECKSUM;

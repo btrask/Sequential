@@ -131,7 +131,7 @@ XADGETINFO(Cpio)
   xadINT32 err = 0, size, ok = 1, a, b, type;
   xadSTRPTR ch_Name;               /* 110 */
 
-  while(!err && ai->xai_InPos.S+sizeof(struct CpioHeader) < ai->xai_InSize &&
+  while(!err && ai->xai_InPos+sizeof(struct CpioHeader) < ai->xai_InSize &&
   !(err = xadHookAccess(XADM XADAC_READ, 6, &ch, ai)) &&
   !(err = xadHookAccess(XADM XADAC_READ, ch.ch_Magic[5] == '7' ?
   sizeof(struct CpioHeaderExt) : sizeof(struct CpioHeaderNorm), &ch.ch_Data, ai)))
@@ -168,7 +168,7 @@ XADGETINFO(Cpio)
         if((fi = (struct xadFileInfo *) xadAllocObject(XADM XADOBJ_FILEINFO,
         XAD_OBJNAMESIZE, a+b, TAG_DONE)))
         {
-          fi->xfi_DataPos = ai->xai_InPos.S;
+          fi->xfi_DataPos = ai->xai_InPos;
           fi->xfi_Flags = XADFIF_SEEKDATAPOS;
 
           if(UP_ISDIR(type))

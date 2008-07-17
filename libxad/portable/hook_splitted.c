@@ -42,7 +42,7 @@ xadUINT32 command, xadSignSize data, xadPTR bufptr, xadUINT32 bufsize)
 #endif
 
   sd->xsd_HookParam.xhp_Command = command;
-  sd->xsd_HookParam.xhp_CommandData.S = data;
+  sd->xsd_HookParam.xhp_CommandData = data;
   sd->xsd_HookParam.xhp_BufferPtr = bufptr;
   sd->xsd_HookParam.xhp_BufferSize = bufsize;
 
@@ -134,20 +134,20 @@ FUNCHOOK(InHookSplitted)
     break;
   case XADHC_SEEK:
     /* we cannot do any seeks, only set the current position */
-    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData.S < 0) ||
-    (param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_InSize))
+    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData < 0) ||
+    (param->xhp_DataPos + param->xhp_CommandData > ai->xaip_InSize))
       return XADERR_INPUT;
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_FULLSIZE:
     /* only last assignment is useful! */
     while(sd->xsd_InSize)
     {
-      param->xhp_CommandData.S = sd->xsd_Offset + sd->xsd_InSize;
+      param->xhp_CommandData = sd->xsd_Offset + sd->xsd_InSize;
       ++sd;
     }
 #ifdef DEBUG
-  DebugOther("InHookSplitted: XADHC_FULLSIZE is %ld", param->xhp_CommandData.S);
+  DebugOther("InHookSplitted: XADHC_FULLSIZE is %ld", param->xhp_CommandData);
 #endif
     break;
   case XADHC_INIT:
@@ -245,7 +245,7 @@ FUNCHOOK(InHookSplitted)
           else if((err = callsplitthook(sd+i, ai, XADHC_FULLSIZE, 0, 0, 0)))
             return err;
           else
-            sd[i].xsd_InSize = sd[i].xsd_HookParam.xhp_CommandData.S;
+            sd[i].xsd_InSize = sd[i].xsd_HookParam.xhp_CommandData;
           sd[i].xsd_Offset = ai->xaip_ArchiveInfo.xai_MultiVolume[i] = ofs;
           ofs += sd[i].xsd_InSize;
           sf = sf->xsf_Next;

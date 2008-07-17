@@ -571,16 +571,16 @@ va_list data)
           }
           switch(dmode)
           {
-          case 1: i[0] = ti->ti_Data.S ? (xadUINT32) "TRUE" : (xadUINT32) "FALSE"; break;
-          case 2: i[0] = ti->ti_Tag; i[1] = ti->ti_Data.S; break;
+          case 1: i[0] = ti->ti_Data ? (xadUINT32) "TRUE" : (xadUINT32) "FALSE"; break;
+          case 2: i[0] = ti->ti_Tag; i[1] = ti->ti_Data; break;
           #ifdef AMIGA
-          case 3: i[0] = (xadUINT32) xadGetErrorText(XADM ti->ti_Data.S); i[1] = ti->ti_Data.S; break;
+          case 3: i[0] = (xadUINT32) xadGetErrorText(XADM ti->ti_Data); i[1] = ti->ti_Data; break;
           #else
           /* Special case: We pass a NULL to xadGetErrorText() since we don't have XMB as a global
              variable in Unix. xadGetErrorText() will make an exception for this. */
-          case 3: i[0] = (xadUINT32) xadGetErrorText(NULL, ti->ti_Data.S); i[1] = ti->ti_Data.S; break;
+          case 3: i[0] = (xadUINT32) xadGetErrorText(NULL, ti->ti_Data); i[1] = ti->ti_Data; break;
           #endif
-          case 4: i[0] = ti->ti_Data.S;
+          case 4: i[0] = ti->ti_Data;
             switch(i[0])
             {
             case CHARSET_HOST: i[1] = (xadUINT32) "CHARSET_HOST"; break;
@@ -604,7 +604,7 @@ va_list data)
             default: i[1] = (xadUINT32) "unknown"; break;
             }
             break;
-          default: i[0] = i[1] = ti->ti_Data.S;
+          default: i[0] = i[1] = ti->ti_Data;
           }
 
           OutputDebug("   ", (putchtype) function, fh);

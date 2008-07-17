@@ -1,0 +1,177 @@
+--- old/StuffIt.c	2006-06-22 00:23:18.000000000 +0300
++++ clients/StuffIt.c	2006-06-21 18:49:06.000000000 +0300
+@@ -42,10 +42,10 @@
+ #include "xadCRC_1021.c"
+ #include "xadIO_Compress.c"
+ 
+-XADCLIENTVERSTR("StuffIt 1.12 (21.2.2004)")
++XADCLIENTVERSTR("StuffIt 1.13 (20.6.2006)")
+ 
+ #define SIT_VERSION             1
+-#define SIT_REVISION            12
++#define SIT_REVISION            13
+ #define SIT5_VERSION            SIT_VERSION
+ #define SIT5_REVISION           SIT_REVISION
+ #define SIT5EXE_VERSION         SIT_VERSION
+@@ -102,6 +102,13 @@
+ 
+ #define SITPI(a)        ((struct SITPrivate *) ((a)->xfi_PrivateInfo))
+ 
++struct SITDirPrivate {
++  xadUINT16 NumFilesLeft;
++  struct xadFileInfo *Parent;
++};
++
++#define SITDPI(a)       ((struct SITDirPrivate *) ((a)->xfi_PrivateInfo))
++
+ /*****************************************************************************/
+ 
+ #define STUFFITMAXALGO  15
+@@ -243,10 +250,15 @@
+           }
+           else if(sithdr[SITFH_COMPRMETHOD] == SITsfolder || sithdr[SITFH_COMPDMETHOD] == SITsfolder)
+           {
+-            if((fi = xadAllocObjectA(XADM XADOBJ_FILEINFO, 0)))
++            csize = SITmakecomment("????????", EndGetM16(&sithdr[SITFH_FNDRFLAGS]), 0, 0, 0);
++
++            if((fi = xadAllocObject(XADM XADOBJ_FILEINFO,
++			!csize ? TAG_IGNORE : XAD_OBJCOMMENTSIZE, csize, TAG_DONE)))
+             {
+               if((fi->xfi_FileName = MACname(xadMasterBase, ldir, (xadSTRPTR) sithdr+SITFH_FNAME, nsize, 0)))
+               {
++                SITmakecomment("????????", EndGetM16(&sithdr[SITFH_FNDRFLAGS]), 0, 0, fi->xfi_Comment);
++
+                 fi->xfi_Flags |= XADFIF_DIRECTORY|XADFIF_XADSTRFILENAME;
+                 xadConvertDates(XADM XAD_DATEMAC, EndGetM32(&sithdr[SITFH_MODDATE]), XAD_GETDATEXADDATE,
+                 &fi->xfi_Date, TAG_DONE);
+@@ -397,10 +409,9 @@
+   }
+ 
+ #ifdef DEBUG
+-  if(err || (ai->xai_Flags & XADAIF_CRYPTED))
++  if((ai->xai_Flags & XADAIF_CRYPTED))
+   {
+-    DebugFileSearched(ai, "Encrypted data.",
+-    SITPI(fi)->Method);
++    DebugFileSearched(ai, "Encrypted data.");
+   }
+ #endif
+ 
+@@ -2087,11 +2098,11 @@
+ 
+ /* archive block entry                          directory:
+  0  xadUINT32     id = SIT5_ID                      <--
+- 4  xadUINT8     version                           <--
++ 4  xadUINT8     version                            <--
+  5  xadUINT8     ???
+  6  xadUINT16     header size                       <--
+  8  xadUINT8     ??? (system ID?)
+- 9  xadUINT8     type                              <--
++ 9  xadUINT8     type                               <--
+ 10  xadUINT32     creation date                     <--
+ 14  xadUINT32     modification date                 <--
+ 18  xadUINT32     offset of previous entry          <--
+@@ -2100,22 +2111,25 @@
+ 30  xadUINT16     filename size                     <--
+ 32  xadUINT16     header crc                        <--
+ 34  xadUINT32     data file size                    offset of first entry
++                                                    (can also be 0xffffffff, such entries seem to appear
++													after each directory entry. meaning unclear.
+ 38  xadUINT32     data crunched size                size of complete directory
+ 42  xadUINT16     data old crc16 (not with algo 15)
+ 44  xadUINT16     ???
+-46  xadUINT8     data algorithm
++46  xadUINT8     data algorithm                     number of files high byte?
+                 none    ==  0
+                 fastest == 13
+                 max     == 15
+-47  xadUINT8     password data len                 number of files
++47  xadUINT8     password data len                  number of files low byte
+ 48  xadUINT8[..] password information
+-48+pwdlen            xadUINT8[..] filename         <--
++48+pwdlen            xadUINT8[..] filename          <--
+ 48+pwdlen+namelen    xadUINT16     commentsize
+ 48+pwdlen+namelen+2  xadUINT16     ????
+ 48+pwdlen+namelen+4  xadUINT8[..] comment
+ 
+   second block:
+- 0  xadUINT16     ??? (resource exists?)
++ 0  xadUINT16     ??? (bitfield
++                       bit 0: resource exists?)
+  2  xadUINT16     ???
+  4  xadUINT32     file type
+  8  xadUINT32     file creator
+@@ -2158,6 +2172,8 @@
+ #define SIT5FH_PASSWORDSIZE     47
+ #define SIT5FH_FILENAME         48
+ 
++#define SIT5FH_NUMFILES         46
++
+ #define SIT5FH_FILETYPE          4
+ #define SIT5FH_FILECREATOR       8
+ #define SIT5FH_FINDERFLAGS      12
+@@ -2190,7 +2206,8 @@
+           {
+             if((buffer[SIT5FH_FLAGS] & SIT5FLAGS_DIRECTORY) && EndGetM32(buffer+SIT5FH_DATASIZE) == 0xFFFFFFFF)
+             {
+-              ldir = (struct xadFileInfo *) ldir->xfi_PrivateInfo;
++			  // Do nothing for these entries, whatever they are.
++              // They seem to appear after every directory entry.
+             }
+             else
+             {
+@@ -2200,8 +2217,11 @@
+                 err = XADERR_DATAFORMAT;
+               else if(!(err =  xadHookAccess(XADM XADAC_READ, i+j-48, buffer+48, ai)))
+               {
+-                if(!buffer[i+1] || !(err =  xadHookAccess(XADM XADAC_READ, 14, buffer+i+j, ai)))
++                if(!(buffer[i+1]&0x01) || !(err =  xadHookAccess(XADM XADAC_READ, 14, buffer+i+j, ai)))
+                 {
++                  if(ldir&&!SITDPI(ldir)->NumFilesLeft) ldir=SITDPI(ldir)->Parent;
++                  if(ldir) SITDPI(ldir)->NumFilesLeft--;
++
+                   nsize = EndGetM16(buffer+SIT5FH_FILENAMESIZE);
+                   if(buffer[SIT5FH_FLAGS] & SIT5FLAGS_DIRECTORY)
+                   {
+@@ -2210,19 +2230,23 @@
+                     else
+                       csize = 0;
+ 
+-                    if((fi = xadAllocObject(XADM XADOBJ_FILEINFO, csize ?
+-                    XAD_OBJCOMMENTSIZE : TAG_IGNORE, csize + 1, TAG_DONE)))
++                    csize2 = SITmakecomment("????????", EndGetM16(buffer+i+SIT5FH_FINDERFLAGS),
++                    buffer+SIT5FH_FILENAME+nsize+4, csize, 0);
++
++                    if((fi = xadAllocObject(XADM XADOBJ_FILEINFO, XAD_OBJPRIVINFOSIZE,sizeof(struct SITDirPrivate),
++					csize2 ? XAD_OBJCOMMENTSIZE : TAG_IGNORE, csize2 + 1, TAG_DONE)))
+                     {
+                       if((fi->xfi_FileName = MACname(xadMasterBase, ldir, buffer+SIT5FH_FILENAME, nsize, 0)))
+                       {
+-                        if(csize)
+-                          xadCopyMem(XADM buffer+SIT5FH_FILENAME+nsize+4, fi->xfi_Comment, csize);
++                        SITmakecomment("????????", EndGetM16(buffer+i+SIT5FH_FINDERFLAGS),
++                        buffer+SIT5FH_FILENAME+nsize+4, csize, fi->xfi_Comment);
+ 
+                         xadConvertDates(XADM XAD_DATEMAC, EndGetM32(buffer+SIT5FH_MODDATE), XAD_GETDATEXADDATE,
+                         &fi->xfi_Date, TAG_DONE);
+ 
+                         fi->xfi_Flags |= XADFIF_DIRECTORY|XADFIF_XADSTRFILENAME;
+-                        fi->xfi_PrivateInfo = (xadPTR) ldir;
++                        SITDPI(fi)->NumFilesLeft = EndGetM16(buffer+SIT5FH_NUMFILES);
++                        SITDPI(fi)->Parent = ldir;
+                         ldir = fi;
+ 
+                         err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
+@@ -2371,10 +2395,9 @@
+   }
+ 
+ #ifdef DEBUG
+-  if(err || (ai->xai_Flags & XADAIF_CRYPTED))
++  if(ai->xai_Flags & XADAIF_CRYPTED)
+   {
+-    DebugFileSearched(ai, "Encrypted data.",
+-    SITPI(fi)->Method);
++    DebugFileSearched(ai, "Encrypted data.");
+   }
+ #endif
+ 

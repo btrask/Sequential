@@ -553,7 +553,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)showsOnScreenDisplayDidChange:(NSNotification *)aNotif
 {
-	[toggleInfo setTitle:([[self currentPrefObject] showsOnScreenDisplay] ? NSLocalizedString(@"Hide Info", nil) : NSLocalizedString(@"Show Info", nil))];
+	[toggleInfo setTitle:NSLocalizedString(([[self currentPrefObject] showsOnScreenDisplay] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 }
 
 #pragma mark Private Protocol
@@ -788,7 +788,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			action = @selector(openRecentDocument:);
 			representedObject = identifier;
 		} else if([identifiers count] == (unsigned)index) {
-			title = NSLocalizedString(@"Clear Menu", nil);
+			title = NSLocalizedString(@"Clear Menu", @"Clear the Open Recent menu. Should be the same as the standard text.");
 			if(index) {
 				if(!_recentMenuSeparatorItem) _recentMenuSeparatorItem = [[NSMenuItem separatorItem] retain];
 				[menu insertItem:_recentMenuSeparatorItem atIndex:index];

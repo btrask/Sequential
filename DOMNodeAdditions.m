@@ -123,7 +123,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSString *)AE_computedStylePropertyValue:(NSString *)aString
 {
-	return [[[self ownerDocument] getComputedStyle:self :nil] getPropertyValue:aString];
+	return [[[self ownerDocument] getComputedStyle:self :@""] getPropertyValue:aString];
 }
 - (NSString *)AE_stringValue:(inout AEWhitespace *)trailing
 {

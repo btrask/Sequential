@@ -354,7 +354,7 @@ XADGETINFO(IFF_CDAF)
     return err;
   if((err = xadHookAccess(XADM XADAC_INPUTSEEK, a[0], 0, ai)))
     return err;
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct CDAFfile), &cf, ai)))
     {
@@ -387,7 +387,7 @@ XADGETINFO(IFF_CDAF)
                 else
                 {
                   struct xadDate xd;
-                  fi->xfi_DataPos = ai->xai_InPos.S; /* file position */
+                  fi->xfi_DataPos = ai->xai_InPos; /* file position */
                   CDAFPI(fi)->Method = cf.Method;
                   CDAFPI(fi)->Offset = 4;
                   CDAFPI(fi)->CRC = cf.CRC;
@@ -413,7 +413,7 @@ XADGETINFO(IFF_CDAF)
               if(err)
                 xadFreeObjectA(XADM fi, 0);
               else
-                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+((a[1]+1)&(~1)), TAG_DONE);
+                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+((a[1]+1)&(~1)), TAG_DONE);
             }
             else
               err = XADERR_NOMEMORY;
@@ -575,14 +575,14 @@ XADGETINFO(SPack)
   xadINT32 err;
   struct xadFileInfo *fi;
 
-  i = ai->xai_InPos.S; /* save StartPosition for BackSeek. */
+  i = ai->xai_InPos; /* save StartPosition for BackSeek. */
 
   if(ai->xai_MultiVolume)
   {
     struct xadSkipInfo *si = 0, *si2;
-    xadSize *a;
+    xadUINT32 *a;
 
-    for(a = ai->xai_MultiVolume+1; *a; ++a)
+    for(a = (xadUINT32 *)(ai->xai_MultiVolume+1); *a; ++a)
     {
       if(!(si2 = (struct xadSkipInfo *) xadAllocObjectA(XADM XADOBJ_SKIPINFO, 0)))
         return XADERR_NOMEMORY;
@@ -640,7 +640,7 @@ XADGETINFO(SPack)
                 err = XADERR_NOMEMORY;
               if(!err)
               {
-                if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, -ai->xai_InPos.S+i+4, 0, ai)))
+                if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, -ai->xai_InPos+i+4, 0, ai)))
                 {
                   xadSTRPTR dat;
                   struct SPackData sp;
@@ -675,18 +675,18 @@ XADGETINFO(SPack)
                           if(sp.Num & 0x8000)
                           {
                             CDAFPI(fi)->Method = 0;
-                            fi->xfi_DataPos = ai->xai_InPos.S - 6;
+                            fi->xfi_DataPos = ai->xai_InPos - 6;
                             fi->xfi_CrunchSize = sp.UnCrSize;
-                            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+sp.UnCrSize-6,
+                            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+sp.UnCrSize-6,
                             XAD_USESKIPINFO, 1, TAG_DONE);
                           }
                           else
                           {
                             CDAFPI(fi)->Method = 7;
                             CDAFPI(fi)->CRC = sp.CRC;
-                            fi->xfi_DataPos = ai->xai_InPos.S;
+                            fi->xfi_DataPos = ai->xai_InPos;
                             fi->xfi_CrunchSize = sp.CrSize;
-                            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+sp.CrSize,
+                            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+sp.CrSize,
                             XAD_USESKIPINFO, 1, TAG_DONE);
                           }
                         }

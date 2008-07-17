@@ -77,12 +77,12 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	NSButton *const deleteButton = [alert addButtonWithTitle:NSLocalizedString(@"Delete Bookmark", nil)];
 	NSButton *const cancelButton = [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
 	if(_deletesBookmarks) {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to delete the bookmark %@?", nil), [bookmark displayName]]];
-		[alert setInformativeText:NSLocalizedString(@"This operation cannot be undone.", nil)];
+		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to delete the bookmark %@?", @"Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name."), [bookmark displayName]]];
+		[alert setInformativeText:NSLocalizedString(@"This operation cannot be undone.", @"Confirmation dialog informative text.")];
 		[deleteButton setKeyEquivalent:@"\r"];
 	} else {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", nil), [bookmark displayName]]];
-		[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", nil)];
+		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [bookmark displayName]]];
+		[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", @"Bookmarked file could not be found error informative text.")];
 		[deleteButton setKeyEquivalent:@""];
 		[cancelButton setKeyEquivalent:@"\r"];
 	}
@@ -130,7 +130,8 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (void)setDeletesBookmarks:(BOOL)flag
 {
 	_deletesBookmarks = flag;
-	[bookmarkItem setTitle:(flag ? NSLocalizedString(@"Delete...", nil) : NSLocalizedString(@"Resume", nil))];
+	[bookmarkItem setTitle:NSLocalizedString((flag ? @"Delete..." : @"Resume"), @"The title of the bookmarks menu. Two states.")];
+	[bookmarkItem setTitle:[bookmarkItem title]]; // Set it twice so that Panther can keep up with us.
 }
 
 #pragma mark -
@@ -149,7 +150,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	NSMenuItem *const item = [bookmarkMenu itemAtIndex:[bookmarkMenu indexOfItemWithRepresentedObject:aBookmark]];
 	if(![aBookmark isValid]) {
 		[item setAttributedTitle:nil];
-		[item setTitle:[NSString stringWithFormat:NSLocalizedString(@"Missing File %@", nil), [aBookmark displayName]]];
+		[item setTitle:[NSString stringWithFormat:NSLocalizedString(@"Missing File %@", @"Bookmark menu item used when the file named %@ cannot be found."), [aBookmark displayName]]];
 		return;
 	}
 	NSMutableAttributedString *const title = [[[NSMutableAttributedString alloc] init] autorelease];

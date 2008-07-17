@@ -50,7 +50,7 @@ static void binhex_setup_hook_parser(struct binhex_parser *parser,struct xadArch
 {
 	parser->ai=ai;
 	parser->xmb=xmb;
-	parser->start_xadpos=ai->xai_InPos.S;
+	parser->start_xadpos=ai->xai_InPos;
 	parser->mem_buf=NULL;
 	parser->mem_size=0;
 	parser->mem_pos=0;
@@ -61,7 +61,7 @@ static void binhex_setup_hook_parser(struct binhex_parser *parser,struct xadArch
 	parser->err=XADERR_OK;
 }
 
-static void binhex_setup_mem_parser(struct binhex_parser *parser,const xadPTR buf,xadUINT32 size)
+static void binhex_setup_mem_parser(struct binhex_parser *parser,const xadUINT8 *buf,xadUINT32 size)
 {
 	parser->ai=NULL;
 	parser->xmb=NULL;
@@ -181,7 +181,7 @@ static xadERROR binhex_seek(struct binhex_parser *parser,xadUINT32 newpos)
 		if(parser->ai)
 		{
 			if(parser->err=xadHookAccess(parser->xmb,XADAC_INPUTSEEK,
-			parser->start_xadpos-parser->ai->xai_InPos.S,NULL,parser->ai)) return parser->err;
+			parser->start_xadpos-parser->ai->xai_InPos,NULL,parser->ai)) return parser->err;
 		}
 		else if(parser->mem_buf) parser->mem_pos=0;
 
@@ -217,7 +217,7 @@ XADRECOGDATA(BinHex)
 
 	// Start memory buffer parser
 	struct binhex_parser parser;
-	binhex_setup_mem_parser(&parser,(const xadPTR)data+i+1,size-i-1);
+	binhex_setup_mem_parser(&parser,data+i+1,size-i-1);
 
 	xadUINT16 crc=0;
 

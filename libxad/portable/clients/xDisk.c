@@ -99,7 +99,7 @@ XADGETINFO(xDisk)
     xdi->xdi_TrackSectors = xdi->xdi_CylSectors>>1;
   }
 
-  while(ai->xai_InPos.S < ai->xai_InSize)
+  while(ai->xai_InPos < ai->xai_InSize)
   {
     if((err = xadHookAccess(XADM XADAC_READ, 36, dat, ai)))
       return err;
@@ -121,16 +121,22 @@ XADGETINFO(xDisk)
     struct xadTextInfo *ti;
 
     if((err = xadHookAccess(XADM XADAC_INPUTSEEK, sizeof(struct xDisk) -
-    ai->xai_InPos.S, 0, ai)))
+    ai->xai_InPos, 0, ai)))
       return err;
     if((ti = (struct xadTextInfo *) xadAllocObjectA(XADM XADOBJ_TEXTINFO, 0)))
     {
-      xadFreeObjectA(XADM ti, 0);
-      return XADERR_NOTSUPPORTED;
+      xadINT32 err;
+
+      if((err = XADERR_NOTSUPPORTED/*xpkDecrunch(&ti->xti_Text, &ti->xti_Size, ai,
+      xadMasterBase)*/))
+        xadFreeObjectA(XADM ti, 0);
+      else
+        xdi->xdi_TextInfo = ti;
+      return err;
     }
     else
       return XADERR_NOMEMORY;
-    xdi->xdi_DataPos = ai->xai_InPos.S;
+    xdi->xdi_DataPos = ai->xai_InPos;
   }
   else if(num != i)
     return XADERR_ILLEGALDATA;
@@ -232,7 +238,7 @@ XADGETINFO(GDC)
   }
   xdi->xdi_DataPos = EndGetM32(head+16);
 
-  if((err = xadHookAccess(XADM XADAC_INPUTSEEK, xdi->xdi_DataPos-ai->xai_InPos.S, 0, ai)))
+  if((err = xadHookAccess(XADM XADAC_INPUTSEEK, xdi->xdi_DataPos-ai->xai_InPos, 0, ai)))
     return err;
   if((err = xadHookAccess(XADM XADAC_READ, 36, head, ai)))
     return err;

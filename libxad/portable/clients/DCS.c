@@ -52,7 +52,7 @@ XADGETINFO(DCS)
   if(!(err = xadHookAccess(XADM XADAC_READ, 6, dat, ai)))
   {
     cr = dat[5];
-    while(ai->xai_InPos.S+6 < ai->xai_InSize && !err)
+    while(ai->xai_InPos+6 < ai->xai_InSize && !err)
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, 6, dat, ai)))
       {

@@ -181,7 +181,7 @@ xadUINT32 block, xadSTRPTR buf, xadUINT32 r)
     err = XADERR_ILLEGALDATA;
   else
   {
-    if((i = ((block - ii->xii_FirstSector)*ii->xii_SectorSize)-ai->xai_InPos.S))
+    if((i = ((block - ii->xii_FirstSector)*ii->xii_SectorSize)-ai->xai_InPos))
       err = xadHookAccess(XADM XADAC_INPUTSEEK, i, 0, ai);
     if(!err)
       err = xadHookAccess(XADM XADAC_READ, ii->xii_SectorSize, buf, ai);

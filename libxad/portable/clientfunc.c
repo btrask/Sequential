@@ -59,11 +59,11 @@ FUNCxadAddDiskEntry /* struct xadDiskInfo *di, struct xadArchiveInfoP *ai,
     ret = XADERR_BREAK;
   ai->xaip_ArchiveInfo.xai_CurDisk = ldi; /* reset */
   if(!ret && (ti = FindTagItem(XAD_SETINPOS, tags)) &&
-  (ai->xaip_ArchiveInfo.xai_InPos.S != ti->ti_Data.S
+  (ai->xaip_ArchiveInfo.xai_InPos != ti->ti_Data
   || FindTagItem(XAD_USESKIPINFO, tags)))
   {
     ret = xadHookTagAccessA(XADM_PRIV XADAC_INPUTSEEK,
-    ti->ti_Data.S-ai->xaip_ArchiveInfo.xai_InPos.S, 0, XADM_AI(ai), tags);
+    ti->ti_Data-ai->xaip_ArchiveInfo.xai_InPos, 0, XADM_AI(ai), tags);
   }
 
   return ret;
@@ -124,10 +124,10 @@ FUNCxadAddFileEntry /* struct xadFileInfo *fi, struct xadArchiveInfoP *ai,
     ret = XADERR_BREAK;
   ai->xaip_ArchiveInfo.xai_CurFile = lfi; /* reset */
   if(!ret && (ti = FindTagItem(XAD_SETINPOS, tags)) &&
-  (ai->xaip_ArchiveInfo.xai_InPos.S != ti->ti_Data.S
+  (ai->xaip_ArchiveInfo.xai_InPos != ti->ti_Data
   || FindTagItem(XAD_USESKIPINFO, tags)))
     ret = xadHookTagAccessA(XADM XADAC_INPUTSEEK,
-    ti->ti_Data.S-ai->xaip_ArchiveInfo.xai_InPos.S, 0,
+    ti->ti_Data-ai->xaip_ArchiveInfo.xai_InPos, 0,
     XADM_AI(ai), tags);
 
   return ret;
@@ -165,23 +165,23 @@ struct xadArchiveInfoP *ai, xadUINT32 skip)
       for(si = ai->xaip_ArchiveInfo.xai_SkipInfo; si; si = si->xsi_Next)
       {
         /* skip buffer at start */
-        if(si->xsi_Position <= ai->xaip_ArchiveInfo.xai_InPos.S &&
-        si->xsi_Position+si->xsi_SkipSize > ai->xaip_ArchiveInfo.xai_InPos.S)
+        if(si->xsi_Position <= ai->xaip_ArchiveInfo.xai_InPos &&
+        si->xsi_Position+si->xsi_SkipSize > ai->xaip_ArchiveInfo.xai_InPos)
         {
           ihp->xhp_Command = XADHC_SEEK;
-          ihp->xhp_CommandData.S = si->xsi_Position+si->xsi_SkipSize
-          - ai->xaip_ArchiveInfo.xai_InPos.S;
+          ihp->xhp_CommandData = si->xsi_Position+si->xsi_SkipSize
+          - ai->xaip_ArchiveInfo.xai_InPos;
           ret = CallHookPkt(ih, ai, ihp);
-          ai->xaip_ArchiveInfo.xai_InPos.S  = ihp->xhp_DataPos;
+          ai->xaip_ArchiveInfo.xai_InPos  = ihp->xhp_DataPos;
         }
-        else if(si->xsi_Position > ai->xaip_ArchiveInfo.xai_InPos.S &&
+        else if(si->xsi_Position > ai->xaip_ArchiveInfo.xai_InPos &&
         (!si2 || si2->xsi_Position > si->xsi_Position))
           si2 = si;
       }
 
       if(!ret)
       {
-        if(!si2 || (s = si2->xsi_Position - ai->xaip_ArchiveInfo.xai_InPos.S)
+        if(!si2 || (s = si2->xsi_Position - ai->xaip_ArchiveInfo.xai_InPos)
         > size)
           s = size;
 
@@ -190,7 +190,7 @@ struct xadArchiveInfoP *ai, xadUINT32 skip)
         ihp->xhp_BufferSize = s;
         ret = CallHookPkt(ih, ai, ihp);
         buf += s;
-        ai->xaip_ArchiveInfo.xai_InPos.S  = ihp->xhp_DataPos;
+        ai->xaip_ArchiveInfo.xai_InPos  = ihp->xhp_DataPos;
         size -= s;
       }
     }
@@ -201,7 +201,7 @@ struct xadArchiveInfoP *ai, xadUINT32 skip)
     ihp->xhp_BufferPtr  = buf;
     ihp->xhp_BufferSize = size;
     ret = CallHookPkt(ih, ai, ihp);
-    ai->xaip_ArchiveInfo.xai_InPos.S  = ihp->xhp_DataPos;
+    ai->xaip_ArchiveInfo.xai_InPos  = ihp->xhp_DataPos;
   }
   return ret;
 }
@@ -227,13 +227,13 @@ xadSignSize getskipsize(xadSignSize data, const struct xadArchiveInfoP *ai)
   {
     for(;;)
     {
-      if(sihi->xsi_Position < ai->xaip_ArchiveInfo.xai_InPos.S)
+      if(sihi->xsi_Position < ai->xaip_ArchiveInfo.xai_InPos)
       {
         if(sihi->xsi_Position + sihi->xsi_SkipSize
-        > ai->xaip_ArchiveInfo.xai_InPos.S)
-          data -= ai->xaip_ArchiveInfo.xai_InPos.S - sihi->xsi_Position;
+        > ai->xaip_ArchiveInfo.xai_InPos)
+          data -= ai->xaip_ArchiveInfo.xai_InPos - sihi->xsi_Position;
         else if(sihi->xsi_Position + sihi->xsi_SkipSize
-        > ai->xaip_ArchiveInfo.xai_InPos.S+data)
+        > ai->xaip_ArchiveInfo.xai_InPos+data)
           data -= sihi->xsi_SkipSize;
       }
       if(silo == sihi)
@@ -255,15 +255,15 @@ xadSignSize getskipsize(xadSignSize data, const struct xadArchiveInfoP *ai)
   {
     for(;;)
     {
-      if(silo->xsi_Position >= ai->xaip_ArchiveInfo.xai_InPos.S) /* in buffer */
+      if(silo->xsi_Position >= ai->xaip_ArchiveInfo.xai_InPos) /* in buffer */
       {
-        if(silo->xsi_Position <= ai->xaip_ArchiveInfo.xai_InPos.S+data)
+        if(silo->xsi_Position <= ai->xaip_ArchiveInfo.xai_InPos+data)
           data += silo->xsi_SkipSize;
       }
       else if(silo->xsi_Position+silo->xsi_SkipSize
-      > ai->xaip_ArchiveInfo.xai_InPos.S) /* first border partial */
+      > ai->xaip_ArchiveInfo.xai_InPos) /* first border partial */
         data += silo->xsi_Position+silo->xsi_SkipSize
-        -ai->xaip_ArchiveInfo.xai_InPos.S;
+        -ai->xaip_ArchiveInfo.xai_InPos;
       if(silo == sihi)
         break;
       else
@@ -303,12 +303,12 @@ FUNCxadHookTagAccess /* xadUINT32 command, xadSignSize data, xadPTR buffer,
   static const xadSTRPTR comname[] = {"XADAC_READ", "XADAC_WRITE",
   "XADAC_COPY", "XADAC_INPUTSEEK", "XADAC_OUTPUTSEEK"};
   DebugHookTagList("xadHookAccess(%-16s, %7lld, %08lx, .) pos(%6lld|%6lld)", tags,
-  comname[command-XADAC_READ], data, buffer, ai->xaip_ArchiveInfo.xai_InPos.S,
+  comname[command-XADAC_READ], data, buffer, ai->xaip_ArchiveInfo.xai_InPos,
   ai->xaip_ArchiveInfo.xai_OutPos);
 #endif
 
   tis[0].ti_Tag = XAD_SECTORLABELS;
-  tis[0].ti_Data.S = 0;
+  tis[0].ti_Data = 0;
   tis[1].ti_Tag = TAG_DONE;
 
   ihp = &(ai->xaip_InHookParam);
@@ -326,16 +326,16 @@ FUNCxadHookTagAccess /* xadUINT32 command, xadSignSize data, xadPTR buffer,
   {
     switch(tags->ti_Tag)
     {
-    case XAD_USESKIPINFO: skip = (xadUINT32) tags->ti_Data.S; break;
-    case XAD_SECTORLABELS: tis[0].ti_Data.S = tags->ti_Data.S; break;
-    case XAD_GETCRC32: crc32 = (xadUINT32 *) tags->ti_Data.P; break;
-    case XAD_GETCRC16: crc16 = (xadUINT16 *) tags->ti_Data.P; break;
-    case XAD_CRC32ID: crc32ID = (xadUINT32) tags->ti_Data.S; break;
-    case XAD_CRC16ID: crc16ID = (xadUINT16)  tags->ti_Data.S; break;
+    case XAD_USESKIPINFO: skip = (xadUINT32) tags->ti_Data; break;
+    case XAD_SECTORLABELS: tis[0].ti_Data = tags->ti_Data; break;
+    case XAD_GETCRC32: crc32 = (xadUINT32 *) tags->ti_Data; break;
+    case XAD_GETCRC16: crc16 = (xadUINT16 *) tags->ti_Data; break;
+    case XAD_CRC32ID: crc32ID = (xadUINT32) tags->ti_Data; break;
+    case XAD_CRC16ID: crc16ID = (xadUINT16)  tags->ti_Data; break;
     }
   }
 
-  if(tis[0].ti_Data.S && (data&(512-1)))
+  if(tis[0].ti_Data && (data&(512-1)))
     return XADERR_BADPARAMS;
 
   switch(command)
@@ -351,13 +351,13 @@ FUNCxadHookTagAccess /* xadUINT32 command, xadSignSize data, xadPTR buffer,
       ohp->xhp_Command    = XADHC_WRITE;
       ohp->xhp_BufferPtr  = buffer;
       ohp->xhp_BufferSize = data;
-      if(tis[0].ti_Data.S)
+      if(tis[0].ti_Data)
       {
 #ifdef DEBUG
         xadINT32 i, j;
         xadUINT8 r[16*2+1+16+1], *s;
 
-        s = (xadUINT8 *) tis[0].ti_Data.S;
+        s = (xadUINT8 *) tis[0].ti_Data;
         for(i = 0; i < data; i += 512)
         {
           for(j = 0; j < 16; ++j)
@@ -445,13 +445,13 @@ FUNCxadHookTagAccess /* xadUINT32 command, xadSignSize data, xadPTR buffer,
         data = getskipsize(data, ai);
 
       ihp->xhp_Command     = XADHC_SEEK;
-      ihp->xhp_CommandData.S = data;
+      ihp->xhp_CommandData = data;
       ret = CallHookPkt(ih, ai, ihp);
-      ai->xaip_ArchiveInfo.xai_InPos.S = ihp->xhp_DataPos;
+      ai->xaip_ArchiveInfo.xai_InPos = ihp->xhp_DataPos;
       break;
     case XADAC_OUTPUTSEEK:
       ohp->xhp_Command     = XADHC_SEEK;
-      ohp->xhp_CommandData.S = data;
+      ohp->xhp_CommandData = data;
       ret = CallHookPkt(oh, ai, ohp);
       ai->xaip_ArchiveInfo.xai_OutPos = ohp->xhp_DataPos;
       break;

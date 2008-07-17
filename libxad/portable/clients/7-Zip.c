@@ -3040,7 +3040,7 @@ struct sevenzip_file_private
 SZ_RESULT sevenzip_read(void *object,void **buffer,size_t maxsize,size_t *actualsize)
 {
 	struct sevenzip_stream *s=(struct sevenzip_stream *)object;
-	xadSize bytesleft=s->ai->xai_InSize-s->ai->xai_InPos.S;
+	xadSize bytesleft=s->ai->xai_InSize-s->ai->xai_InPos;
 
 	if(maxsize>SEVENZIP_BUFSIZE) maxsize=SEVENZIP_BUFSIZE;
 	if(maxsize>bytesleft) maxsize=bytesleft;
@@ -3056,7 +3056,7 @@ SZ_RESULT sevenzip_read(void *object,void **buffer,size_t maxsize,size_t *actual
 SZ_RESULT sevenzip_seek(void *object,CFileSize pos)
 {
 	struct sevenzip_stream *s=(struct sevenzip_stream *)object;
-	if(s->err=xadHookAccess(s->xmb,XADAC_INPUTSEEK,pos-s->ai->xai_InPos.S,NULL,s->ai)) return SZE_FAIL;
+	if(s->err=xadHookAccess(s->xmb,XADAC_INPUTSEEK,pos-s->ai->xai_InPos,NULL,s->ai)) return SZE_FAIL;
 	return SZ_OK;
 }
 

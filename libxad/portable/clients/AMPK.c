@@ -1381,7 +1381,7 @@ XADGETINFO(AMPK)
   if((err = xadHookAccess(XADM XADAC_READ, AMPKHead_TRUESIZE, &hd, ai)))
     return err;
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, AMPKEntry_TRUESIZE, &et, ai)))
     {
@@ -1396,7 +1396,7 @@ XADGETINFO(AMPK)
       {
         if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, skip-AMPKEntry_TRUESIZE, 0, ai)))
         {
-          if(ai->xai_InPos.S < ai->xai_InSize)
+          if(ai->xai_InPos < ai->xai_InSize)
           {
             if(!(err = xadHookAccess(XADM XADAC_READ, AMPKEntry_TRUESIZE, &et, ai)))
             {
@@ -1408,7 +1408,7 @@ XADGETINFO(AMPK)
       }
 
       skip = 0;
-      if(!err && ai->xai_InPos.S < ai->xai_InSize)
+      if(!err && ai->xai_InPos < ai->xai_InSize)
       {
         switch(et.Type)
         {
@@ -1433,7 +1433,7 @@ XADGETINFO(AMPK)
               &fi->xfi_Date, TAG_DONE);
               for(i = 0; i < dirnamesize; ++i)
                 fi->xfi_FileName[i] = dirname[i];
-              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+              err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
             }
             else
               err = XADERR_NOMEMORY;
@@ -1454,7 +1454,7 @@ XADGETINFO(AMPK)
               {
                 if(!fl.CommentSize || !(err = xadHookAccess(XADM XADAC_READ, fl.CommentSize, fi->xfi_Comment, ai)))
                 {
-                  fi->xfi_DataPos = ai->xai_InPos.S;
+                  fi->xfi_DataPos = ai->xai_InPos;
                   fi->xfi_PrivateInfo = (xadPTR) (xadUINT32) fl.CrunchType;
                   fi->xfi_EntryInfo = ampktype[fl.CrunchType];
                   for(i = 0; i < dirnamesize + et.NameSize; ++i)
@@ -1466,7 +1466,7 @@ XADGETINFO(AMPK)
                   &fi->xfi_Date, TAG_DONE);
                   fi->xfi_Protection = protection;
                   skip = crunchedSize - fi->xfi_CrunchSize;
-                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
                 }
                 else
                   xadFreeObjectA(XADM fi, 0);
@@ -1605,7 +1605,7 @@ XADGETINFO(AmPlusUnpack)
   dh.crc = 0;
   if((err = xadHookAccess(XADM XADAC_INPUTSEEK, 12, 0, ai)))
     return err;
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct AmUnpackIFF), &iff, ai)))
     {
@@ -1626,7 +1626,7 @@ XADGETINFO(AmPlusUnpack)
           xadConvertDates(XADM XAD_DATECURRENTTIME, 1, XAD_GETDATEXADDATE,
           &fi->xfi_Date, TAG_DONE);
           if(!(err = xadHookAccess(XADM XADAC_READ, iff.Size, fi->xfi_FileName, ai)))
-            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
           else
             xadFreeObjectA(XADM fi, 0);
         }
@@ -1663,7 +1663,7 @@ XADGETINFO(AmPlusUnpack)
                   {
                     if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct AmUnpackIFF), &iff, ai)))
                     {
-                      fi->xfi_DataPos = ai->xai_InPos.S;
+                      fi->xfi_DataPos = ai->xai_InPos;
                       fi->xfi_Flags = XADFIF_SEEKDATAPOS|XADFIF_EXTRACTONBUILD;
                       ((struct AmUnpackPriv *)fi->xfi_PrivateInfo)->Mode = dh.type;
                       fi->xfi_EntryInfo = apuptype[dh.type];
@@ -1678,7 +1678,7 @@ XADGETINFO(AmPlusUnpack)
                       &fi->xfi_Date, TAG_DONE);
                       fi->xfi_Protection = sd.Protection;
                       fi->xfi_Size = sd.FileSize;
-                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, (ai->xai_InPos.S + (iff.Size+1)) & ~1, TAG_DONE);
+                      err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, (ai->xai_InPos + (iff.Size+1)) & ~1, TAG_DONE);
                     }
                     else
                       xadFreeObjectA(XADM fi, 0);
@@ -2331,7 +2331,7 @@ XADGETINFO(Arc)
   struct xadFileInfo *fi, *ld = 0;
   xadINT32 err = 0, namesize = 0, i;
   struct ArcHeader ah;
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 2, ((xadSTRPTR)(&ah))+1, ai)))
     {
@@ -2384,7 +2384,7 @@ XADGETINFO(Arc)
             else
             {
               ARCPI(fi)->CRC = EndGetI16(ah.CRC);
-              fi->xfi_DataPos = ai->xai_InPos.S;
+              fi->xfi_DataPos = ai->xai_InPos;
               ARCPI(fi)->Method = ah.Method & 0x7F;
 #ifdef DEBUG
   if(ARCPI(fi)->Method == 1 || ARCPI(fi)->Method == 5 || ARCPI(fi)->Method == 6 ||
@@ -2411,7 +2411,7 @@ XADGETINFO(Arc)
             }
 
             err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS,
-            ai->xai_InPos.S+fi->xfi_CrunchSize, TAG_DONE);
+            ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
           }
         }
       }
@@ -2613,8 +2613,8 @@ struct xadFileInfo *fi, xadUINT8 *data, struct xadMasterBase *xadMasterBase)
   xadSTRPTR buf;
   xadUINT32 bufsize, fsize, pos;
 
-  pos = ai->xai_InPos.S;
-  fsize = ai->xai_InSize-ai->xai_InPos.S;
+  pos = ai->xai_InPos;
+  fsize = ai->xai_InSize-ai->xai_InPos;
   bufsize = 254*50;
   if(!(buf = xadAllocVec(XADM bufsize+254*2, XADMEMF_PUBLIC)))
     return XADERR_NOMEMORY;
@@ -2646,7 +2646,7 @@ struct xadFileInfo *fi, xadUINT8 *data, struct xadMasterBase *xadMasterBase)
   }
 
   i -= 254*2;
-  fi->xfi_CrunchSize += (ai->xai_InPos.S-pos)+254-bufsize+i;
+  fi->xfi_CrunchSize += (ai->xai_InPos-pos)+254-bufsize+i;
   if(!fsize) /* find CRC and size */
   {
     xadINT32 j, k, l, m;
@@ -2691,7 +2691,7 @@ struct xadFileInfo *fi, xadUINT8 *data, struct xadMasterBase *xadMasterBase)
   if(err)
     xadAddFileEntryA(XADM fi, ai,0);
   else
-    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S-bufsize+i,
+    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos-bufsize+i,
     TAG_DONE);
 
   return err;
@@ -2704,10 +2704,10 @@ XADGETINFO(ArcCBM)
   struct xadSpecial *sp;
   xadINT32 err = XADERR_OK, blocksize, insize;
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize-11)
+  while(!err && ai->xai_InPos < ai->xai_InSize-11)
   {
     /* Read archive header */
-    if((insize = ai->xai_InSize-ai->xai_InPos.S) > sizeof(data))
+    if((insize = ai->xai_InSize-ai->xai_InPos) > sizeof(data))
       insize = sizeof(data);
     if(!(err = xadHookAccess(XADM XADAC_READ, insize, data, ai)))
     {
@@ -2720,7 +2720,7 @@ XADGETINFO(ArcCBM)
                           XADFIF_XADSTRFILENAME;
 
           blocksize = EndGetI16(data+7)*254;
-          fi->xfi_DataPos = ai->xai_InPos.S+11+data[10]-insize;
+          fi->xfi_DataPos = ai->xai_InPos+11+data[10]-insize;
           if(data[0] == 2)
             fi->xfi_DataPos += 3;
           if(data[1] == 5) /* Original size invalid? */
@@ -2778,7 +2778,7 @@ XADGETINFO(ArcCBM)
               }
               if(data[1] != 5) /* Mode 5? */
               {
-                blocksize = ((blocksize+253)/254)*254 + ai->xai_InPos.S - insize;
+                blocksize = ((blocksize+253)/254)*254 + ai->xai_InPos - insize;
                 if(blocksize > ai->xai_InSize)
                   blocksize = ai->xai_InSize;
                 err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, blocksize, TAG_DONE);
@@ -2952,7 +2952,7 @@ XADGETINFO(Warp)
   xadUINT32 low = 0, cur = 0, c, num = 1;
   struct xadDiskInfo *xdi = 0, *xdi2;
 
-  while(!err && ai->xai_InPos.S < ai->xai_InSize)
+  while(!err && ai->xai_InPos < ai->xai_InSize)
   {
     if(!(err = xadHookAccess(XADM XADAC_READ, 26, dat, ai)))
     {
@@ -2980,7 +2980,7 @@ XADGETINFO(Warp)
               xdi->xdi_Cylinders = 80;
               xdi->xdi_Heads = 2;
               xdi->xdi_Flags = XADDIF_SEEKDATAPOS|XADDIF_SECTORLABELS;
-              xdi->xdi_DataPos = ai->xai_InPos.S-26-EndGetM32(dat+22);
+              xdi->xdi_DataPos = ai->xai_InPos-26-EndGetM32(dat+22);
               xdi->xdi_TrackSectors = 11;
               xdi->xdi_CylSectors = 22;
               xdi->xdi_TotalSectors = 1760;
@@ -3145,7 +3145,7 @@ XADGETINFO(SQ)
             xadCopyMem(XADM buf+s-8, buf, 8);
           else
           {
-            if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, ai->xai_InSize-ai->xai_InPos.S-8, 0, ai)))
+            if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, ai->xai_InSize-ai->xai_InPos-8, 0, ai)))
               err = xadHookAccess(XADM XADAC_READ, 8, buf, ai);
           }
 

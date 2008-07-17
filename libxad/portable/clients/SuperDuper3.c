@@ -68,7 +68,7 @@ XADGETINFO(SuperDuper3)
   xdi->xdi_CylSectors = 2 * xdi->xdi_TrackSectors;
   xdi->xdi_TotalSectors = 80 * xdi->xdi_CylSectors;
 
-  while(ai->xai_InPos.S < ai->xai_InSize)
+  while(ai->xai_InPos < ai->xai_InSize)
   {
     if((err = xadHookAccess(XADM XADAC_READ, 36, data, ai)))
       return err;

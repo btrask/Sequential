@@ -43,7 +43,7 @@ XADCLIENTVERSTR("RPM 1.3 (04.04.2004)")
 
 #define RPMSKIP(offset) if ((err = xadHookAccess(XADM XADAC_INPUTSEEK, \
   (xadUINT32)(offset), NULL, ai))) goto exit_handler
-#define RPMSEEK(offset) RPMSKIP((offset) - ai->xai_InPos.S)
+#define RPMSEEK(offset) RPMSKIP((offset) - ai->xai_InPos)
 #define RPMREAD(buffer,length) if ((err = xadHookAccess(XADM XADAC_READ, \
   (xadUINT32)(length), (xadPTR)(buffer), ai))) goto exit_handler
 #define RPMALLOC(t,v,l) \
@@ -88,8 +88,8 @@ XADGETINFO(RPM) {
     { TAG_DONE, 0 }
   };
 
-  tags[0].ti_Data.P = &tags[2];
-  tags[2].ti_Data.P = ai;
+  tags[0].ti_Data = (xadSize) &tags[2];
+  tags[2].ti_Data = (xadSize) ai;
 
   RPMALLOC(xadUINT8 *, buffer, 96+80); /* buffer = 96 bytes buffer for reading */
   fname = (xadSTRPTR) buffer + 96; /* fname = 80 bytes for final archive filename */
@@ -145,19 +145,19 @@ XADGETINFO(RPM) {
 
   /* NOW GENERATE THE FILEINFO */
 
-  filetags[0].ti_Data.S = namelen = strlen(fname) + 1;
+  filetags[0].ti_Data = namelen = strlen(fname) + 1;
   RPMALLOCOBJ(struct xadArchiveInfo *, ai2, XADOBJ_ARCHIVEINFO, NULL);
   RPMALLOCOBJ(struct xadFileInfo *, fi, XADOBJ_FILEINFO, filetags);
 
-  fi->xfi_Size        = fi->xfi_CrunchSize = ai->xai_InSize - ai->xai_InPos.S;
-  fi->xfi_DataPos     = ai->xai_InPos.S;
+  fi->xfi_Size        = fi->xfi_CrunchSize = ai->xai_InSize - ai->xai_InPos;
+  fi->xfi_DataPos     = ai->xai_InPos;
   fi->xfi_Flags       = XADFIF_SEEKDATAPOS | XADFIF_NODATE;
 
   /* copy name */
   xadCopyMem(XADM fname, fi->xfi_FileName, (xadUINT32)namelen);
 
   /* fill in today's date */
-  datetags[1].ti_Data.P = &fi->xfi_Date;
+  datetags[1].ti_Data = (xadSize) &fi->xfi_Date;
   xadConvertDatesA(XADM datetags);
 
   /* call 'get info' on embedded archive for accurate filesizes */
@@ -189,9 +189,9 @@ XADUNARCHIVE(RPM) {
   xadINT32 err, recog = 0;
 
   tags[0].ti_Tag  = XAD_ARCHIVEINFO;
-  tags[0].ti_Data.S = (xadUINT32) ai;
+  tags[0].ti_Data = (xadUINT32) ai;
   tags[2].ti_Tag  = XAD_INXADSTREAM;
-  tags[2].ti_Data.S = (xadUINT32) tags;
+  tags[2].ti_Data = (xadUINT32) tags;
   tags[1].ti_Tag  = tags[3].ti_Tag = TAG_DONE;
 
   RPMALLOCOBJ(struct xadArchiveInfo *, ai2, XADOBJ_ARCHIVEINFO, NULL);
@@ -200,9 +200,9 @@ XADUNARCHIVE(RPM) {
     if (fi2 && !fi2->xfi_Next) {
       recog = 1;
 
-      tags[2].ti_Tag  = XAD_OUTXADSTREAM; /* ti_Data.S is still &arcinfo tag */
+      tags[2].ti_Tag  = XAD_OUTXADSTREAM; /* ti_Data is still &arcinfo tag */
       tags[3].ti_Tag  = XAD_ENTRYNUMBER;
-      tags[3].ti_Data.S = ai2->xai_FileInfo->xfi_EntryNumber;
+      tags[3].ti_Data = ai2->xai_FileInfo->xfi_EntryNumber;
       tags[4].ti_Tag  = TAG_DONE;
 
       /* extract the first file */

@@ -1,0 +1,109 @@
+--- old/Zip.c	2006-06-22 00:22:58.000000000 +0300
++++ clients/Zip.c	2006-06-18 18:13:36.000000000 +0300
+@@ -216,12 +216,12 @@
+           }
+         }
+         if(s < j)
+-          err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) j-s, 0, ai);
++          err = xadHookAccess(XADM XADAC_INPUTSEEK, j-s, 0, ai);
+         len -= j;
+       }
+       else
+       {
+-        err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) j, 0, ai);
++        err = xadHookAccess(XADM XADAC_INPUTSEEK, j, 0, ai);
+         len -= j;
+       }
+     }
+@@ -388,16 +388,19 @@
+               xadFreeObjectA(XADM fi2, 0);
+             else
+             {
++#ifndef NO_FILENAME_MANGLING
+               for(o = 0; o < i; ++o)
+               {
+                 if((xadUINT8)fi2->xfi_FileName[o] >= 0x80 && (xadUINT8)fi2->xfi_FileName[o] < 0x9B)
+                   fi2->xfi_FileName[o] = remapPC8[fi2->xfi_FileName[o]-0x80];
+                 if((fi2->xfi_FileName[o]&0x7F) < 0x20)
++                if((fi2->xfi_FileName[o]) < 0x20)
+                 {
+                   fi2->xfi_FileName[o] = 0;
+                   i = o;
+                 }
+-              }
++             }
++#endif
+ 
+               if(!i)
+               {
+@@ -484,7 +487,7 @@
+           xadUINT32 i;
+ 
+           if(zc.NameLength)
+-            err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) EndGetI16(zc.NameLength), 0, ai);
++            err = xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI16(zc.NameLength), 0, ai);
+           o = EndGetI32(zc.LocHeaderOffset);
+           if((i = EndGetI16(zc.StartDisk)) && ai->xai_MultiVolume)
+           {
+@@ -511,20 +514,42 @@
+               ZIPPI(fi2)->Date = EndGetI32(zc.Date);
+             if(EndGetI32(zc.CRC32) && !ZIPPI(fi2)->CRC32)
+               ZIPPI(fi2)->CRC32 = EndGetI32(zc.CRC32);
++
+             if(zc.System == 1)
+               fi2->xfi_Protection = ((EndGetI32(zc.ExtFileAttrib)>>16)^15)&0xFF;
+             else if(!zc.System)
+             {
+-              xadConvertProtection(XADM XAD_PROTMSDOS, EndGetI32(zc.ExtFileAttrib), XAD_GETPROTAMIGA,
+-              &fi2->xfi_Protection, TAG_DONE);
++              xadConvertProtection(XADM XAD_PROTMSDOS, EndGetI32(zc.ExtFileAttrib), XAD_GETPROTFILEINFO,
++              fi2, TAG_DONE);
+               if(EndGetI32(zc.ExtFileAttrib) & (1<<4))
+                 fi2->xfi_Flags |= XADFIF_DIRECTORY;
+             }
+-            else if(zc.System == 2)
+-              xadConvertProtection(XADM XAD_PROTUNIX, EndGetI32(zc.ExtFileAttrib), XAD_GETPROTAMIGA,
+-              &fi2->xfi_Protection, TAG_DONE);
++            else if(zc.System == 3)
++            {
++              xadUINT16 unixprot = EndGetI32(zc.ExtFileAttrib)>>16;
++              xadConvertProtection(XADM XAD_PROTUNIX, unixprot, XAD_GETPROTFILEINFO,
++              fi2, TAG_DONE);
++              if((unixprot & 0xf000) == 0x4000)
++                fi2->xfi_Flags |= XADFIF_DIRECTORY;
++              else if((unixprot & 0xf000) == 0xa000)
++			  {
++                xadSize namelen = fi2->xfi_Size;
++                fi2->xfi_Flags |= XADFIF_LINK;
++
++                if(ZIPPI(fi2)->CompressionMethod == 0)
++                  if(!fi2->xfi_LinkName && (fi2->xfi_LinkName = (xadSTRPTR)
++                  xadAllocVec(XADM namelen+1, XADMEMF_CLEAR|XADMEMF_PUBLIC)))
++                  {
++                    xadSize currpos = ai->xai_InPos;
++                    err = xadHookAccess(XADM XADAC_INPUTSEEK, fi2->xfi_DataPos-currpos, 0, ai);
++                    if(!err) err = xadHookAccess(XADM XADAC_READ, namelen, fi2->xfi_LinkName, ai);
++                    if(!err) err = xadHookAccess(XADM XADAC_INPUTSEEK, currpos-fi2->xfi_DataPos-namelen, 0, ai);
++                  }
++                  else err=XADERR_NOMEMORY;
++              }
++            }
+ 
+-            if((i = EndGetI16(zc.ExtraLength)))
++            if(!err && (i = EndGetI16(zc.ExtraLength)))
+               err = ParseZipExt(i, fi2, ai, xadMasterBase);
+             if(!err && (i = EndGetI16(zc.CommentLength)))
+             {
+@@ -541,10 +566,10 @@
+           else if(!err)
+           {
+             if(EndGetI16(zc.ExtraLength))
+-              if((err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) EndGetI16(zc.ExtraLength), 0, ai)))
++              if((err = xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI16(zc.ExtraLength), 0, ai)))
+                 stop = 1;
+             if(EndGetI16(zc.CommentLength) && !err)
+-              if((err = xadHookAccess(XADM XADAC_INPUTSEEK, (xadUINT32) EndGetI16(zc.CommentLength), 0, ai)))
++              if((err = xadHookAccess(XADM XADAC_INPUTSEEK, EndGetI16(zc.CommentLength), 0, ai)))
+                 stop = 1;
+           }
+         }

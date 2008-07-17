@@ -110,11 +110,11 @@ FUNCxadAllocObject /* xadUINT32 type, xadTAGPTR tags */
       xadTAGPTR ti;
       xadSize nsize = 0, csize = 0, psize = 0;
       if((ti = FindTagItem(XAD_OBJNAMESIZE, tags)))
-        nsize = ti->ti_Data.S + 1; /* +1 for programs forgetting 0 byte */
+        nsize = ti->ti_Data + 1; /* +1 for programs forgetting 0 byte */
       if((ti = FindTagItem(XAD_OBJCOMMENTSIZE, tags)))
-        csize = ti->ti_Data.S + 1;
+        csize = ti->ti_Data + 1;
       if((ti = FindTagItem(XAD_OBJPRIVINFOSIZE, tags)))
-        psize = ti->ti_Data.S;
+        psize = ti->ti_Data;
 
       if((obj = xadAllocVec(XADM nsize + csize + psize + sizeof(struct xadFileInfo),
       XADMEMF_PUBLIC|XADMEMF_CLEAR)))
@@ -136,9 +136,9 @@ FUNCxadAllocObject /* xadUINT32 type, xadTAGPTR tags */
       xadTAGPTR ti;
       xadSize bsize = 0, psize = 0;
       if((ti = FindTagItem(XAD_OBJBLOCKENTRIES, tags)))
-        bsize = ti->ti_Data.S;
+        bsize = ti->ti_Data;
       if((ti = FindTagItem(XAD_OBJPRIVINFOSIZE, tags)))
-        psize = (ti->ti_Data.S+3)&(~3);   /* rounded to long */
+        psize = (ti->ti_Data+3)&(~3);   /* rounded to long */
       if((obj = xadAllocVec(XADM bsize + psize + sizeof(struct xadDiskInfo),
       XADMEMF_PUBLIC|XADMEMF_CLEAR)))
       {

@@ -59,7 +59,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_openPanel setDelegate:self];
 	[_openPanel setAccessoryView:accessoryView];
 	[_openPanel setPrompt:NSLocalizedString(@"Choose", nil)];
-	[_openPanel setTitle:NSLocalizedString(@"Extract", nil)];
+	[_openPanel setTitle:NSLocalizedString(@"Extract", @"Extraction window title.")];
 	[self retain];
 	if(window) [_openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 	else [self openPanelDidEnd:_openPanel returnCode:[_openPanel runModalForTypes:nil] contextInfo:NULL];
@@ -102,9 +102,9 @@ DEALINGS WITH THE SOFTWARE. */
 	if(existingFileCount && !_extractOnSheetClose) {
 		NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
 		[alert setAlertStyle:NSCriticalAlertStyle];
-		if(1 == existingFileCount) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%@ already exists in %@. Do you want to replace it?", nil), existingFilename, [_destination AE_displayName]]];
-		else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages already exist in %@. Do you want to replace them?", nil), existingFileCount, [_destination AE_displayName]]];
-		[alert setInformativeText:NSLocalizedString(@"Replacing a file overwrites its current contents.", nil)];
+		if(1 == existingFileCount) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%@ already exists in %@. Do you want to replace it?", @"Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), existingFilename, [_destination AE_displayName]]];
+		else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages already exist in %@. Do you want to replace them?", @"Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name."), existingFileCount, [_destination AE_displayName]]];
+		[alert setInformativeText:NSLocalizedString(@"Replacing a file overwrites its current contents.", @"Informative text for replacement alerts.")];
 		[[alert addButtonWithTitle:NSLocalizedString(@"Replace", nil)] setKeyEquivalent:@""];
 		[[alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)] setKeyEquivalent:@"\r"];
 		[alert beginSheetModalForWindow:_openPanel modalDelegate:self didEndSelector:@selector(replaceAlertDidEnd:returnCode:contextInfo:) contextInfo:nil];
@@ -125,9 +125,9 @@ DEALINGS WITH THE SOFTWARE. */
 	[nodesOutline reloadData];
 	[nodesOutline selectRowIndexes:unsavedRows byExtendingSelection:NO];
 	NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
-	if(1 == [unsavedNodes count]) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The page %@ could not be extracted to %@.", nil), [self saveNameForNode:[unsavedNodes objectAtIndex:0]], [_destination AE_displayName]]];
-	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages could not be extracted to %@.", nil), [unsavedNodes count], [_destination AE_displayName]]];
-	[alert setInformativeText:NSLocalizedString(@"Make sure the volume is writable and has enough free space.", nil)];
+	if(1 == [unsavedNodes count]) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The page %@ could not be extracted to %@.", @"Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), [self saveNameForNode:[unsavedNodes objectAtIndex:0]], [_destination AE_displayName]]];
+	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages could not be extracted to %@.", @"Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name."), [unsavedNodes count], [_destination AE_displayName]]];
+	[alert setInformativeText:NSLocalizedString(@"Make sure the volume is writable and has enough free space.", @"Informative text for extraction failure alerts.")];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
 	[alert beginSheetModalForWindow:_openPanel modalDelegate:nil didEndSelector:NULL contextInfo:nil];
 	return NO;
@@ -191,7 +191,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSString *const saveName = [self saveNameForNode:item];
 	if(tableColumn == nameColumn) return saveName;
-	else if(tableColumn == errorColumn) if([[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:saveName]]) return NSLocalizedString(@"File already exists.", nil);
+	else if(tableColumn == errorColumn) if([[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:saveName]]) return NSLocalizedString(@"File already exists.", @"Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder.");
 	return nil;
 }
 - (void)outlineView:(NSOutlineView *)outlineView

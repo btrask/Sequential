@@ -84,15 +84,15 @@ FUNCHOOK(InHookDiskArc)
     }
     break;
   case XADHC_SEEK:
-    if(param->xhp_DataPos + param->xhp_CommandData.S > dap->insize)
+    if(param->xhp_DataPos + param->xhp_CommandData > dap->insize)
       return XADERR_INPUT;
 #ifdef DEBUG
-  DebugOther("InHookDiskArc: XADHC_SEEK, %ld from %ld", param->xhp_CommandData.S, param->xhp_DataPos);
+  DebugOther("InHookDiskArc: XADHC_SEEK, %ld from %ld", param->xhp_CommandData, param->xhp_DataPos);
 #endif
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_FULLSIZE:
-    param->xhp_CommandData.S = dap->insize;
+    param->xhp_CommandData = dap->insize;
     break;
   case XADHC_INIT:
 #ifdef DEBUG
@@ -113,7 +113,7 @@ FUNCHOOK(InHookDiskArc)
           UtilityBase = xadMasterBase->xmb_UtilityBase;
 #endif
           if((ti = FindTagItem(XAD_ENTRYNUMBER, ai->xaip_InDiskArc)))
-            i = ti->ti_Data.S;
+            i = ti->ti_Data;
 
           if(!(di = dap->ai->xai_DiskInfo))
             err = XADERR_ILLEGALDATA;
@@ -159,7 +159,7 @@ FUNCHOOK(InHookDiskArc)
     {
       struct xadImageInfo *ii;
 
-      ii = (struct xadImageInfo *) param->xhp_CommandData.P;
+      ii = (struct xadImageInfo *) param->xhp_CommandData;
       ii->xii_SectorSize = dap->di->xdi_SectorSize;
       ii->xii_TotalSectors = dap->di->xdi_TotalSectors;
       if(dap->di->xdi_Flags & (XADDIF_NOCYLINDERS|XADDIF_NOCYLSECTORS))

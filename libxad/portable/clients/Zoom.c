@@ -698,7 +698,7 @@ XADGETINFO(Zoom)
           else
             ret = XADERR_NOMEMORY;
         }
-        di->xdi_DataPos = ai->xai_InPos.S;
+        di->xdi_DataPos = ai->xai_InPos;
         if(zh->Flags & USEHEADER)
           di->xdi_Flags |= XADDIF_SECTORLABELS;
         di->xdi_Flags |= XADDIF_SEEKDATAPOS;
@@ -707,7 +707,7 @@ XADGETINFO(Zoom)
         {
           struct ZoomNote zn;
 
-          if(xadHookAccess(XADM XADAC_INPUTSEEK, zh->NoteOffset - ai->xai_InPos.S, 0, ai))
+          if(xadHookAccess(XADM XADAC_INPUTSEEK, zh->NoteOffset - ai->xai_InPos, 0, ai))
             ai->xai_Flags |= XADAIF_FILECORRUPT;
           else if(!(ret = xadHookAccess(XADM XADAC_READ, sizeof(struct ZoomNote), &zn, ai)))
           {
@@ -937,7 +937,7 @@ XADGETINFO(LhPak)
 
       while(goon && !err)
       {
-        pos = ai->xai_InPos.S;
+        pos = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct LhPakHead), &ph, ai)))
         {
           if(!ph.Entry.SkipSize)
@@ -1090,9 +1090,9 @@ XADGETINFO(PCompPACK)
 
   if((err = xadHookAccess(XADM XADAC_INPUTSEEK, 4, 0, ai)))
     return err;
-  while(!err && ai->xai_InSize-ai->xai_InPos.S > 4)
+  while(!err && ai->xai_InSize-ai->xai_InPos > 4)
   {
-    if((j = ai->xai_InSize-ai->xai_InPos.S) > 512)
+    if((j = ai->xai_InSize-ai->xai_InPos) > 512)
       j = 512;
     if(!(err = xadHookAccess(XADM XADAC_READ, j, buffer, ai)))
     {
@@ -1102,9 +1102,9 @@ XADGETINFO(PCompPACK)
       {
         k = (buffer[i+1]<<24)+(buffer[i+2]<<16)+(buffer[i+3]<<8)+buffer[i+4];
 
-        j = ai->xai_InPos.S-j+i+5;
+        j = ai->xai_InPos-j+i+5;
 
-        if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, j-ai->xai_InPos.S+k, 0, ai)))
+        if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, j-ai->xai_InPos+k, 0, ai)))
         {
           if((fi2 = (struct xadFileInfo *) xadAllocObject(XADM XADOBJ_FILEINFO,
           XAD_OBJNAMESIZE, i+1, TAG_DONE)))
@@ -1243,7 +1243,7 @@ XADGETINFO(SOmni)
         {
           if(!(err = xadHookAccess(XADM XADAC_READ, 4, &i, ai)))
           {
-            fi2->xfi_DataPos = ai->xai_InPos.S; /* file position */
+            fi2->xfi_DataPos = ai->xai_InPos; /* file position */
             fi2->xfi_CrunchSize = i;
             j = i+2;
             fi2->xfi_EntryNumber = num++;
@@ -1333,7 +1333,7 @@ XADGETINFO(LhSFX)
     {
       if(!(err = xadHookAccess(XADM XADAC_READ, sizeof(struct LhSFXData), &sf, ai)))
       {
-        j = ai->xai_InPos.S;
+        j = ai->xai_InPos;
         if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, sf.CrSize, 0, ai)))
         {
           for(i = 0; i < 48 && sf.Name[i]; ++i)

@@ -47,7 +47,7 @@ xadTAGPTR NextTagItem(xadTAGPTR *tp )
     }
     else if (tag == TAG_MORE)
     {
-        if ((*tp = (xadTAGPTR)(*tp)->ti_Data.P) == NULL)
+        if ((*tp = (xadTAGPTR)(*tp)->ti_Data) == NULL)
           return NULL;
 
         continue;
@@ -85,6 +85,6 @@ xadUINT32 GetTagData(xadTag tagValue, xadUINT32 defVal, xadTAGPTR tagList)
   if((ti = FindTagItem(tagValue, tagList)) == NULL)
     return defVal;
 
-  return ti->ti_Data.S;
+  return ti->ti_Data;
 }
 

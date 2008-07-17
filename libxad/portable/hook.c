@@ -24,7 +24,7 @@
 
 #include "functions.h"
 
-#define MakeXADFlag(fl) if(ti->ti_Data.S) flags |= fl; else flags &= ~fl
+#define MakeXADFlag(fl) if(ti->ti_Data) flags |= fl; else flags &= ~fl
 
 FUNCxadGetHookAccess /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
 {
@@ -62,21 +62,21 @@ FUNCxadGetHookAccess /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
   {
     switch(ti->ti_Tag)
     {
-    case XAD_INSIZE: insize = (xadSignSize) ti->ti_Data.S; break;
-    case XAD_INFILENAME: ++in; inname = (xadSTRPTR) ti->ti_Data.P; break;
-    case XAD_INFILEHANDLE: ++in; infh = (xadFileHandle) ti->ti_Data.P; break;
-    case XAD_INMEMORY: ++in; inbuf = ti->ti_Data.P; break;
-    case XAD_INHOOK: ++in; inhook = (struct Hook *) ti->ti_Data.P; break;
-    case XAD_INSPLITTED: ++in; insplitt = (struct xadSplitFile *) ti->ti_Data.P;
+    case XAD_INSIZE: insize = (xadSignSize) ti->ti_Data; break;
+    case XAD_INFILENAME: ++in; inname = (xadSTRPTR) ti->ti_Data; break;
+    case XAD_INFILEHANDLE: ++in; infh = (xadFileHandle) ti->ti_Data; break;
+    case XAD_INMEMORY: ++in; inbuf = (xadPTR) ti->ti_Data; break;
+    case XAD_INHOOK: ++in; inhook = (struct Hook *) ti->ti_Data; break;
+    case XAD_INSPLITTED: ++in; insplitt = (struct xadSplitFile *) ti->ti_Data;
       break;
-    case XAD_INDISKARCHIVE: ++in; inda = (xadTAGPTR) ti->ti_Data.P;
+    case XAD_INDISKARCHIVE: ++in; inda = (xadTAGPTR) ti->ti_Data;
       break;
-    case XAD_INXADSTREAM: ++in; inai = (xadTAGPTR) ti->ti_Data.P; break;
+    case XAD_INXADSTREAM: ++in; inai = (xadTAGPTR) ti->ti_Data; break;
 
 #ifdef AMIGA
-    case XAD_INDEVICE: ++in; indev = (struct xadDeviceInfo *) ti->ti_Data.P;
+    case XAD_INDEVICE: ++in; indev = (struct xadDeviceInfo *) ti->ti_Data;
       break;
-    case XAD_OUTDEVICE: ++out; outdev = (struct xadDeviceInfo *) ti->ti_Data.P;
+    case XAD_OUTDEVICE: ++out; outdev = (struct xadDeviceInfo *) ti->ti_Data;
       break;
     case XAD_VERIFY: ++outfl; MakeXADFlag(XADAIF_VERIFY); break;
     case XAD_FORMAT: ++outfl; MakeXADFlag(XADAIF_FORMAT); break;
@@ -86,17 +86,17 @@ FUNCxadGetHookAccess /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
       break;
 #endif
 
-    case XAD_OUTFILEHANDLE: ++out; outfh = (xadFileHandle) ti->ti_Data.P; break;
-    case XAD_OUTFILENAME: ++out; outname = (xadSTRPTR) ti->ti_Data.P; break;
-    case XAD_OUTHOOK: ++out; outhook = (struct Hook *) ti->ti_Data.P; break;
-    case XAD_OUTMEMORY: ++out; outbuf = ti->ti_Data.P; break;
-    case XAD_OUTSIZE: outsize = ti->ti_Data.S; break;
-    case XAD_OUTXADSTREAM: ++out; outai = (xadTAGPTR) ti->ti_Data.P;
+    case XAD_OUTFILEHANDLE: ++out; outfh = (xadFileHandle) ti->ti_Data; break;
+    case XAD_OUTFILENAME: ++out; outname = (xadSTRPTR) ti->ti_Data; break;
+    case XAD_OUTHOOK: ++out; outhook = (struct Hook *) ti->ti_Data; break;
+    case XAD_OUTMEMORY: ++out; outbuf = (xadPTR) ti->ti_Data; break;
+    case XAD_OUTSIZE: outsize = ti->ti_Data; break;
+    case XAD_OUTXADSTREAM: ++out; outai = (xadTAGPTR) ti->ti_Data;
       break;
 
-    case XAD_PROGRESSHOOK: proghook = (struct Hook *) ti->ti_Data.P; break;
+    case XAD_PROGRESSHOOK: proghook = (struct Hook *) ti->ti_Data; break;
     case XAD_PASSWORD: ai->xaip_ArchiveInfo.xai_Password
-    = (xadSTRPTR) ti->ti_Data.P; break;
+    = (xadSTRPTR) ti->ti_Data; break;
 
     case XAD_OVERWRITE: ++outfl; MakeXADFlag(XADAIF_OVERWRITE); break;
     case XAD_MAKEDIRECTORY: ++outfl; MakeXADFlag(XADAIF_MAKEDIRECTORY); break;
@@ -182,7 +182,7 @@ FUNCxadGetHookAccess /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
       if(!(ret = CallHookPkt(ai->xaip_InHook, ai, &ai->xaip_InHookParam)))
       {
         ai->xaip_ArchiveInfo.xai_InSize = ai->xaip_InSize =
-        ai->xaip_InHookParam.xhp_CommandData.S;
+        ai->xaip_InHookParam.xhp_CommandData;
       }
     }
   }

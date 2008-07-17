@@ -67,14 +67,14 @@ FUNCHOOK(InHookStream)
     }
     break;
   case XADHC_SEEK:
-    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData.S < 0)
-    || (param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_InSize))
+    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData < 0)
+    || (param->xhp_DataPos + param->xhp_CommandData > ai->xaip_InSize))
     {
       return XADERR_INPUT;
     }
     err = xadHookTagAccessA(XADM_PRIV XADAC_INPUTSEEK,
-    param->xhp_CommandData.S, 0, XADM_AI(sp->ai), sp->ti);
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_CommandData, 0, XADM_AI(sp->ai), sp->ti);
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_INIT:
 #ifdef DEBUG
@@ -99,12 +99,12 @@ FUNCHOOK(InHookStream)
       {
         switch(ti2->ti_Tag)
         {
-          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data.P; break;
-          case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_CRC32ID: sp->ti[3].ti_Tag = ti2->ti_Tag; sp->ti[3].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_CRC16ID: sp->ti[4].ti_Tag = ti2->ti_Tag; sp->ti[4].ti_Data.S = ti2->ti_Data.S; break;
+          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data; break;
+          case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data = ti2->ti_Data; break;
+          case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data = ti2->ti_Data; break;
+          case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data = ti2->ti_Data; break;
+          case XAD_CRC32ID: sp->ti[3].ti_Tag = ti2->ti_Tag; sp->ti[3].ti_Data = ti2->ti_Data; break;
+          case XAD_CRC16ID: sp->ti[4].ti_Tag = ti2->ti_Tag; sp->ti[4].ti_Data = ti2->ti_Data; break;
         }
       }
 
@@ -126,14 +126,14 @@ FUNCHOOK(InHookStream)
     }
     break;
   case XADHC_FULLSIZE:
-    param->xhp_CommandData.S = sp->ai->xai_InSize-sp->ai->xai_InPos.S;
-    if(sp->ti[0].ti_Data.S) /* use skipinfo */
+    param->xhp_CommandData = sp->ai->xai_InSize-sp->ai->xai_InPos;
+    if(sp->ti[0].ti_Data) /* use skipinfo */
     {
-      param->xhp_CommandData.S += param->xhp_CommandData.S
-      - getskipsize(param->xhp_CommandData.S, (struct xadArchiveInfoP *) sp->ai);
+      param->xhp_CommandData += param->xhp_CommandData
+      - getskipsize(param->xhp_CommandData, (struct xadArchiveInfoP *) sp->ai);
     }
 #ifdef DEBUG
-  DebugOther("InHookStream: XADHC_FULLSIZE = %ld", param->xhp_CommandData.S);
+  DebugOther("InHookStream: XADHC_FULLSIZE = %ld", param->xhp_CommandData);
 #endif
     break;
   case XADHC_ABORT:
@@ -164,11 +164,11 @@ FUNCHOOK(OutHookStream)
     param->xhp_DataPos += param->xhp_BufferSize;
     break;
   case XADHC_SEEK:
-    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData.S < 0) || (param->xhp_DataPos + param->xhp_CommandData.S > ai->xaip_OutSize))
+    if(((xadSignSize)param->xhp_DataPos + param->xhp_CommandData < 0) || (param->xhp_DataPos + param->xhp_CommandData > ai->xaip_OutSize))
       return XADERR_OUTPUT;
-    err = xadHookTagAccessA(XADM XADAC_OUTPUTSEEK, param->xhp_CommandData.S,
+    err = xadHookTagAccessA(XADM XADAC_OUTPUTSEEK, param->xhp_CommandData,
     0, XADM_AI(sp->ai), sp->ti);
-    param->xhp_DataPos += param->xhp_CommandData.S;
+    param->xhp_DataPos += param->xhp_CommandData;
     break;
   case XADHC_INIT:
 #ifdef DEBUG
@@ -193,12 +193,12 @@ FUNCHOOK(OutHookStream)
       {
         switch(ti2->ti_Tag)
         {
-          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data.P; break;
-          case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_CRC32ID: sp->ti[3].ti_Tag = ti2->ti_Tag; sp->ti[3].ti_Data.S = ti2->ti_Data.S; break;
-          case XAD_CRC16ID: sp->ti[4].ti_Tag = ti2->ti_Tag; sp->ti[4].ti_Data.S = ti2->ti_Data.S; break;
+          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data; break;
+          case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data = ti2->ti_Data; break;
+          case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data = ti2->ti_Data; break;
+          case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data = ti2->ti_Data; break;
+          case XAD_CRC32ID: sp->ti[3].ti_Tag = ti2->ti_Tag; sp->ti[3].ti_Data = ti2->ti_Data; break;
+          case XAD_CRC16ID: sp->ti[4].ti_Tag = ti2->ti_Tag; sp->ti[4].ti_Data = ti2->ti_Data; break;
         }
       }
 

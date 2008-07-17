@@ -128,7 +128,7 @@ XADGETINFO(TRD)
                   sprintf(fi->xfi_Comment, "%ld", (long) EndGetI16(&(fl[11])));
                   sprintf(fi->xfi_FileName, "%.8s.!%lc", fl, fl[8]);
 
-                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S,
+                  err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos,
                   TAG_DONE);
                 }
                 else err = XADERR_NOMEMORY;

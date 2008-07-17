@@ -93,7 +93,7 @@ XADUNARCHIVE(PackDisk)
   {
     for(i = ai->xai_LowCyl; !err && i <= ai->xai_HighCyl; ++i)
     {
-      if((j = EndGetM32(pdi[i].EntryPos) - ai->xai_InPos.S))
+      if((j = EndGetM32(pdi[i].EntryPos) - ai->xai_InPos))
         err = xadHookAccess(XADM XADAC_INPUTSEEK, j, 0, ai);
 
       if((EndGetM32(pdi[i].EntryPos) < 42+sizeof(struct PackDiskInfo)*80)

@@ -9,7 +9,7 @@
 #import "XADArchive.h"
 #import "XADArchivePipe.h"
 #import "XADRegex.h"
-#import "ConvertE.c"
+#import "../include/ConvertE.c"
 
 
 static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgressInfo *info);
@@ -362,8 +362,7 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 
 -(NSString *)formatName
 {
-	NSString *format=[[[NSString alloc] initWithBytes:archive->xai_Client->xc_ArchiverName
-	length:strlen(archive->xai_Client->xc_ArchiverName) encoding:NSISOLatin1StringEncoding] autorelease];
+	NSString *format = archive && archive->xai_Client && archive->xai_Client->xc_ArchiverName ? [[[NSString alloc] initWithBytes:archive->xai_Client->xc_ArchiverName length:strlen(archive->xai_Client->xc_ArchiverName) encoding:NSISOLatin1StringEncoding] autorelease] : nil;
 	if(parentarchive) return [NSString stringWithFormat:@"%@ in %@",format,[parentarchive formatName]];
 	else return format;
 }
@@ -1168,7 +1167,7 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 	int progress,filesize;
 	if(info->xpi_FileInfo->xfi_Flags&XADFIF_NOUNCRUNCHSIZE)
 	{
-		progress=archive->xai_InPos.S-info->xpi_FileInfo->xfi_DataPos;
+		progress=archive->xai_InPos-info->xpi_FileInfo->xfi_DataPos;
 		filesize=info->xpi_FileInfo->xfi_CrunchSize;
 	}
 	else

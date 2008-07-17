@@ -27,6 +27,7 @@ PackDev has empty labels always. */
 
 
 #include "xadClient.h"
+#include "xadXPK.c"
 
 #ifndef XADMASTERVERSION
   #define XADMASTERVERSION      8
@@ -97,7 +98,11 @@ struct xadMasterBase *xadMasterBase, xadUINT32 oldmode)
   xadINT32 err, size;
   if(!(err = xadHookAccess(XADM XADAC_READ, 4, &size, ai)))
   {
-    err = XADERR_NOTSUPPORTED;
+    if(!(err = xpkDecrunch(buf, i, ai, xadMasterBase)))
+    {
+      if(!oldmode)
+        err = xadHookAccess(XADM XADAC_READ, 4, &size, ai);
+    }
   }
   return err;
 }
@@ -132,7 +137,7 @@ XADGETINFO(PackDev)
           ai->xai_Flags |= XADAIF_CRYPTED;
       }
 
-      spos = ai->xai_InPos.S;
+      spos = ai->xai_InPos;
 
       if(h.pd_KnownFileSys)
       {
@@ -146,7 +151,7 @@ XADGETINFO(PackDev)
           else
           {
             err = xadHookAccess(XADM XADAC_READ, i, buf, ai);
-            spos = ai->xai_InPos.S;
+            spos = ai->xai_InPos;
           }
         }
       }

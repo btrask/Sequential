@@ -123,9 +123,9 @@ XADGETINFO(HA)
   {
     if((hdr = xadAllocVec(XADM HASCANSIZE, XADMEMF_PUBLIC)))
     {
-      while(ai->xai_InPos.S < ai->xai_InSize && !err)
+      while(ai->xai_InPos < ai->xai_InSize && !err)
       {
-        if((s = ai->xai_InSize - ai->xai_InPos.S) > HASCANSIZE)
+        if((s = ai->xai_InSize - ai->xai_InPos) > HASCANSIZE)
           s = HASCANSIZE;
         if(!(err = xadHookAccess(XADM XADAC_READ, s, hdr, ai)))
         {
@@ -177,7 +177,7 @@ XADGETINFO(HA)
                     fi->xfi_Flags |= XADFIF_LINK|XADFIF_EXTRACTONBUILD;
                     xadConvertDates(XADM XAD_DATEUNIX, EndGetI32(hdr+13), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
 
-                    i = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S, TAG_DONE);
+                    i = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos, TAG_DONE);
                     if(!err && i)
                       err = i;
                   }
@@ -204,7 +204,7 @@ XADGETINFO(HA)
                     xadConvertProtection(XADM XAD_PROTUNIX, EndGetI16(machine+1), XAD_GETPROTFILEINFO, fi, TAG_DONE);
                     xadConvertDates(XADM XAD_DATEUNIX, EndGetI32(hdr+13), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
 
-                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S-s+20+nsize+psize+msize, TAG_DONE);
+                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos-s+20+nsize+psize+msize, TAG_DONE);
                   }
                 }
                 else if((machine[2]>>4) == 0x2 || (machine[2]>>4) == 0x6)
@@ -230,7 +230,7 @@ XADGETINFO(HA)
                     i = EndGetI32(hdr+1);
                     /* set the block-special types here ??? */
 
-                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos.S-s+20+nsize+psize+msize+i, TAG_DONE);
+                    err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, ai->xai_InPos-s+20+nsize+psize+msize+i, TAG_DONE);
                   }
                 }
                 else
@@ -269,7 +269,7 @@ XADGETINFO(HA)
               }
 
               fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_EXTRACTONBUILD;
-              fi->xfi_DataPos = ai->xai_InPos.S-s+20+nsize+psize+msize;
+              fi->xfi_DataPos = ai->xai_InPos-s+20+nsize+psize+msize;
 
               xadConvertDates(XADM XAD_DATEUNIX, EndGetI32(hdr+13), XAD_GETDATEXADDATE, &fi->xfi_Date, TAG_DONE);
 
@@ -293,7 +293,7 @@ XADGETINFO(HA)
     else
       err = XADERR_NOMEMORY;
 
-    if(!err && ai->xai_InPos.S < ai->xai_InSize)
+    if(!err && ai->xai_InPos < ai->xai_InSize)
       err = XADERR_ILLEGALDATA;
     if(err)
     {

@@ -142,10 +142,10 @@ XADGETINFO(Rar)
 	namebuf=xadAllocVec(XADM 65536,XADMEMF_CLEAR);
 	if(!namebuf) return XADERR_NOMEMORY;
 
-	while(ai->xai_InPos.S<ai->xai_InSize)
+	while(ai->xai_InPos<ai->xai_InSize)
 	{
-		xadSize block_start=ai->xai_InPos.S;
-//printf("inpos:%qu ",ai->xai_InPos.S);
+		xadSize block_start=ai->xai_InPos;
+//printf("inpos:%qu ",ai->xai_InPos);
 
 		if(err=xadHookAccess(XADM XADAC_READ,7,buf,ai)) goto rar_getinfo_end;
 
@@ -316,7 +316,7 @@ fprintf(stderr,"err\n");
 			//	goto rar_getinfo_end;
 		}
 //printf("\n");
-		if(err=xadHookAccess(XADM XADAC_INPUTSEEK,block_start+size1+size2-ai->xai_InPos.S,NULL,ai)) goto rar_getinfo_end;
+		if(err=xadHookAccess(XADM XADAC_INPUTSEEK,block_start+size1+size2-ai->xai_InPos,NULL,ai)) goto rar_getinfo_end;
 	}
 
 	rar_getinfo_end:
@@ -383,7 +383,7 @@ XADUNARCHIVE(Rar)
 			// Run unpacker until we reach the file we want.
 			while(dry_fi&&dry_fi!=fi)
 			{
-				if(err=xadHookAccess(XADM XADAC_INPUTSEEK,dry_fi->xfi_DataPos-ai->xai_InPos.S,NULL,ai)) return err;
+				if(err=xadHookAccess(XADM XADAC_INPUTSEEK,dry_fi->xfi_DataPos-ai->xai_InPos,NULL,ai)) return err;
 				if(err=rar_run_unpacker(RARPAI(ai)->unpacker,dry_fi->xfi_CrunchSize,dry_fi->xfi_Size,
 				RARPFI(dry_fi)->version,RARPFI(dry_fi)->solid,XADTRUE,NULL)) return err;
 				dry_fi=RARPFI(dry_fi)->next_solid;
@@ -391,7 +391,7 @@ XADUNARCHIVE(Rar)
 			if(!dry_fi) return XADERR_DECRUNCH;
 
 			// Seek back to the current file data position.
-			if(err=xadHookAccess(XADM XADAC_INPUTSEEK,fi->xfi_DataPos-ai->xai_InPos.S,NULL,ai)) return err;
+			if(err=xadHookAccess(XADM XADAC_INPUTSEEK,fi->xfi_DataPos-ai->xai_InPos,NULL,ai)) return err;
 		}
 
 		err=rar_run_unpacker(RARPAI(ai)->unpacker,fi->xfi_CrunchSize,fi->xfi_Size,

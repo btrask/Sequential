@@ -375,13 +375,13 @@ static xadUINT32 in_func(struct Hook *hook,xadPTR object,struct xadHookParam *pa
 			return 0;
 
 		case XADHC_SEEK:
-			return [pipe seekReadPosition:param->xhp_CommandData.S newPosition:&param->xhp_DataPos];
+			return [pipe seekReadPosition:param->xhp_CommandData newPosition:&param->xhp_DataPos];
 
 		case XADHC_READ:
 			return [pipe readBytes:param->xhp_BufferPtr length:param->xhp_BufferSize newPosition:&param->xhp_DataPos];
 
 		case XADHC_FULLSIZE:
-			param->xhp_CommandData.S=[pipe fullSize];
+			param->xhp_CommandData=[pipe fullSize];
 			return 0;
 
 		case XADHC_FREE:
