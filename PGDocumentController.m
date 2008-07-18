@@ -61,6 +61,7 @@ NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGAnimatesImagesKey         = @"PGAnimatesImages";
+NSString *const PGRoundsImageCornersKey     = @"PGRoundsImageCorners";
 NSString *const PGAutozoomsWindowsKey       = @"PGAutozoomsWindows";
 NSString *const PGBackgroundColorKey        = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey      = @"PGBackgroundPattern";
@@ -130,6 +131,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSNumber numberWithBool:YES], PGAntialiasWhenUpscalingKey,
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
+		[NSNumber numberWithBool:YES], PGRoundsImageCornersKey,
 		[NSNumber numberWithBool:YES], PGAutozoomsWindowsKey,
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,

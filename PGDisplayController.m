@@ -908,6 +908,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 	[imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
 	[imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
+	[imageView bind:@"drawsRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
 	[self prefControllerBackgroundPatternColorDidChange:nil];
 }
 - (void)synchronizeWindowTitleWithDocumentName
@@ -954,6 +955,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self AE_removeObserver];
 	[imageView unbind:@"animates"];
 	[imageView unbind:@"antialiasWhenUpscaling"];
+	[imageView unbind:@"drawsRoundedCorners"];
 	[imageView release];
 	[passwordView release];
 	[encodingView release];

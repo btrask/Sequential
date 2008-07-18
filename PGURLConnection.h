@@ -29,8 +29,7 @@ extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 enum {
 	PGLoading      = 0,
 	PGLoaded       = 1,
-	PGLoadCanceled = 2,
-	PGLoadFailed   = 3
+	PGLoadCanceled = 2
 };
 typedef unsigned PGLoadingStatus;
 
@@ -65,8 +64,8 @@ typedef unsigned PGLoadingStatus;
 
 @interface NSObject (PGURLConnectionDelegate)
 
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender;
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender;
+- (void)connectionDidReceiveResponse:(PGURLConnection *)sender;
 - (void)connectionDidClose:(PGURLConnection *)sender;
 
 @end

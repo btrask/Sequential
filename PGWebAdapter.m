@@ -39,26 +39,27 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGURLConnectionDelegate Protocol
 
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender
-{
-	if(sender != _mainConnection) return;
-	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[[sender response] MIMEType]];
-	if(pendingClass && ([pendingClass alwaysReads] || [self shouldRead:NO])) return;
-	[_mainConnection cancel];
-	[self setIsDeterminingType:NO];
-	_encounteredLoadingError = YES;
-	if([self shouldReadContents]) [self readContents];
-}
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender
 {
 	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
+- (void)connectionDidReceiveResponse:(PGURLConnection *)sender
+{
+	if(sender != _mainConnection) return;
+	id const resp = [sender response];
+	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[resp MIMEType]];
+	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) _encounteredLoadingError = YES;
+	else if(pendingClass && ([pendingClass alwaysReads] || [self shouldRead:NO])) return;
+	[_mainConnection cancel];
+}
 - (void)connectionDidClose:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
-		if([_mainConnection status] == PGLoaded) [self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
+		if([_mainConnection status] == PGLoaded) {
+			if([_mainConnection data]) [self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
+			else if([self shouldReadContents]) _encounteredLoadingError = YES;
+		}
 		[self setIsDeterminingType:NO];
-		if([_mainConnection status] == PGLoadFailed) _encounteredLoadingError = YES;
 		if([self shouldReadContents]) [self readContents];
 	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
 }
@@ -88,13 +89,15 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if([self isDeterminingType]) return;
 	[self setHasReadContents];
-	if(!_encounteredLoadingError) return;
-	NSURLResponse *const resp = [_mainConnection response];
+	id const resp = [_mainConnection response];
+	NSLog(@"connection = %@, response = %@", _mainConnection, resp);
 	NSString *message = nil;
-	if([resp respondsToSelector:@selector(statusCode)]) {
-		int const code = [(NSHTTPURLResponse *)resp statusCode];
-		if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
-	} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]];
+	if(_encounteredLoadingError) {
+		if([resp respondsToSelector:@selector(statusCode)]) {
+			int const code = [resp statusCode];
+			if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
+		} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]];
+	}
 	[self returnImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 

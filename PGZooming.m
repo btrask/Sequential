@@ -112,7 +112,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	float totalWidth = 0;
 	NSArray *const columns = [self tableColumns];
-	if([self autoresizesAllColumnsToFit]) {
+	BOOL const resizesAllColumns = [self respondsToSelector:@selector(columnAutoresizingStyle)] ? NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle] : [self autoresizesAllColumnsToFit];
+	if(resizesAllColumns) {
 		NSTableColumn *column;
 		NSEnumerator *const columnEnum = [columns objectEnumerator];
 		while((column = [columnEnum nextObject])) {

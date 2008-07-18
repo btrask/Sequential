@@ -166,8 +166,6 @@ static NSMutableArray *PGPendingConnections = nil;
 	[[self class] _stopConnection:self];
 	[_data release];
 	_data = nil;
-	[_response release];
-	_response = nil;
 	_status = PGLoadCanceled;
 	[[self delegate] connectionDidClose:self];
 }
@@ -194,7 +192,7 @@ static NSMutableArray *PGPendingConnections = nil;
 	[[self class] _stopConnection:self];
 	[_data release];
 	_data = nil;
-	_status = PGLoadFailed;
+	_status = PGLoaded;
 	[[self delegate] connectionDidClose:self];
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -219,8 +217,8 @@ static NSMutableArray *PGPendingConnections = nil;
 
 @implementation NSObject (PGURLConnectionDelegate)
 
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender {}
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender {}
+- (void)connectionDidReceiveResponse:(PGURLConnection *)sender {}
 - (void)connectionDidClose:(PGURLConnection *)sender {}
 
 @end

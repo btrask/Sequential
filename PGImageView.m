@@ -35,6 +35,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_updateAnimationTimer;
 - (void)_animate;
 - (void)_cache;
+- (void)_drawInRect:(NSRect)aRect;
+- (void)_drawCornersOnRect:(NSRect)r;
 
 @end
 
@@ -44,8 +46,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 + (void)initialize
 {
+	if([PGImageView class] != self) return;
 	[self exposeBinding:@"animates"];
 	[self exposeBinding:@"antialiasWhenUpscaling"];
+	[self exposeBinding:@"drawsRoundedCorners"];
 }
 
 #pragma mark Instance Methods
@@ -132,9 +136,22 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (BOOL)drawsRoundedCorners
+{
+	if(!_drawsRoundedCorners) return NO;
+	NSSize const s = [self frame].size;
+	return s.width >= 16 && s.height >= 16;
+}
+- (void)setDrawsRoundedCorners:(BOOL)flag
+{
+	if(flag == _drawsRoundedCorners) return;
+	_drawsRoundedCorners = flag;
+	[self _cache];
+	[self setNeedsDisplay:YES];
+}
 - (BOOL)usesOptimizedDrawing
 {
-	return PGUpright == _orientation || _cacheIsValid;
+	return _cacheIsValid  || PGUpright == _orientation;
 }
 
 #pragma mark -
@@ -197,32 +214,48 @@ DEALINGS WITH THE SOFTWARE. */
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
-	[NSGraphicsContext saveGraphicsState];
-	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
-
-	NSRect cacheRect = [_cache rect];
-	if(PGUpright != _orientation) {
-		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
-		[orient translateXBy:scaledSize.width / 2 yBy:scaledSize.height / 2];
-		if(_orientation & PGRotated90CC) {
-			float const swap = cacheRect.size.width;
-			cacheRect.size.width = cacheRect.size.height;
-			cacheRect.size.height = swap;
-			[orient rotateByDegrees:90];
-		}
-		[orient scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
-		[orient concat];
-		cacheRect.origin.x = NSWidth(cacheRect) / -2;
-		cacheRect.origin.y = NSHeight(cacheRect) / -2;
-	}
-	[_rep drawInRect:cacheRect];
-
-	[NSGraphicsContext restoreGraphicsState];
+	[self _drawInRect:[_cache rect]];
+	[self _drawCornersOnRect:[_cache rect]];
 	[view unlockFocus];
 	[_image removeRepresentation:_rep];
 	[_image setSize:scaledSize];
 	[_image addRepresentation:_cache];
 	_cacheIsValid = YES;
+}
+- (void)_drawInRect:(NSRect)aRect
+{
+	[NSGraphicsContext saveGraphicsState];
+	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
+	NSRect r = aRect;
+	if(PGUpright != _orientation) {
+		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
+		[orient translateXBy:NSWidth(r) / 2 yBy:NSHeight(r) / 2];
+		if(_orientation & PGRotated90CC) {
+			float const swap = r.size.width;
+			r.size.width = r.size.height;
+			r.size.height = swap;
+			[orient rotateByDegrees:90];
+		}
+		[orient scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
+		[orient concat];
+		r.origin.x = NSWidth(r) / -2;
+		r.origin.y = NSHeight(r) / -2;
+	}
+	[_rep drawInRect:r];
+	[NSGraphicsContext restoreGraphicsState];
+}
+- (void)_drawCornersOnRect:(NSRect)r
+{
+	if(!_rep || ![self drawsRoundedCorners]) return;
+	static NSImage *tl = nil, *tr = nil, *br = nil, *bl = nil;
+	if(!tl) tl = [[NSImage imageNamed:@"Corner-Top-Left"] retain];
+	if(!tr) tr = [[NSImage imageNamed:@"Corner-Top-Right"] retain];
+	if(!br) br = [[NSImage imageNamed:@"Corner-Bottom-Right"] retain];
+	if(!bl) bl = [[NSImage imageNamed:@"Corner-Bottom-Left"] retain];
+	[tl drawAtPoint:NSMakePoint(NSMinX(r), NSMaxY(r) - [tl size].height) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+	[tr drawAtPoint:NSMakePoint(NSMaxX(r) - [tr size].width, NSMaxY(r) - [tr size].height) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+	[br drawAtPoint:NSMakePoint(NSMaxX(r) - [br size].width, NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+	[bl drawAtPoint:NSMakePoint(NSMinX(r), NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 }
 
 #pragma mark PGClipViewDocumentView Protocol
@@ -242,6 +275,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_image setCacheMode:NSImageCacheNever]; // We do our own caching.
 		[_image setDataRetained:YES]; // Seems appropriate.
 		_antialias = YES;
+		_drawsRoundedCorners = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
 		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
 	}
@@ -250,15 +284,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)isOpaque
 {
-	return _isOpaque;
-}
-- (BOOL)wantsDefaultClipping
-{
-	return ![self usesOptimizedDrawing];
+	return _isOpaque && ![self drawsRoundedCorners];
 }
 - (void)drawRect:(NSRect)aRect
 {
-	if(!_cacheIsValid) [[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]]; // If we've cached, the interpolation has already been done.
 	int count = 0;
 	NSRect const *rects = NULL;
 	if(_isPDF) {
@@ -266,11 +295,14 @@ DEALINGS WITH THE SOFTWARE. */
 		[[NSColor whiteColor] set];
 		NSRectFillList(rects, count);
 	}
-	NSCompositingOperation const operation = _isOpaque && !_isPDF ? NSCompositeCopy : NSCompositeSourceOver;
+	NSRect const b = [self bounds];
+	BOOL const drawCorners = !_cacheIsValid && [self drawsRoundedCorners];
+	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	if([self usesOptimizedDrawing]) {
+		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
 		if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
-		float const horz = [_image size].width / [self bounds].size.width;
-		float const vert = [_image size].height / [self bounds].size.height;
+		float const horz = [_image size].width / b.size.width;
+		float const vert = [_image size].height / b.size.height;
 		int i = count;
 		while(i--) {
 			NSRect sourceRect = rects[i];
@@ -281,24 +313,10 @@ DEALINGS WITH THE SOFTWARE. */
 			sourceRect.size.height *= vert;
 			[_image drawInRect:rects[i] fromRect:sourceRect operation:operation fraction:1.0];
 		}
-	} else {
-		NSParameterAssert([self wantsDefaultClipping]);
-		[NSGraphicsContext saveGraphicsState];
-		NSRect bounds = [self bounds];
-		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
-		[orient translateXBy:NSMidX(bounds) yBy:NSMidY(bounds)];
-		if(_orientation & PGRotated90CC) {
-			float const swap = bounds.size.width;
-			bounds.size.width = bounds.size.height;
-			bounds.size.height = swap;
-			[orient rotateByDegrees:90];
-		}
-		[orient scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
-		[orient concat];
-		bounds.origin.x = NSWidth(bounds) / -2;
-		bounds.origin.y = NSHeight(bounds) / -2;
-		[_image drawInRect:bounds fromRect:NSZeroRect operation:operation fraction:1.0];
-		[NSGraphicsContext restoreGraphicsState];
+	} else [self _drawInRect:b];
+	if(drawCorners) {
+		[self _drawCornersOnRect:aRect];
+		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
 	}
 }
 - (void)setFrameSize:(NSSize)aSize

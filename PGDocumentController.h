@@ -44,6 +44,7 @@ extern NSString *const PGBundleTypeFourCCKey;
 
 extern NSString *const PGAntialiasWhenUpscalingKey;
 extern NSString *const PGAnimatesImagesKey;
+extern NSString *const PGRoundsImageCornersKey;
 extern NSString *const PGAutozoomsWindowsKey;
 extern NSString *const PGBackgroundColorKey;
 extern NSString *const PGBackgroundPatternKey;

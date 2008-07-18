@@ -43,6 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned          _pauseCount;
 	NSTimer          *_animationTimer;
 	BOOL              _antialias;
+	BOOL              _drawsRoundedCorners;
 }
 
 - (NSImageRep *)rep;
@@ -59,6 +60,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setAntialiasWhenUpscaling:(BOOL)flag;
 - (NSImageInterpolation)interpolation; // The image interpolation to use.
 
+- (BOOL)drawsRoundedCorners;
+- (void)setDrawsRoundedCorners:(BOOL)flag;
 - (BOOL)usesOptimizedDrawing;
 
 - (void)appDidHide:(NSNotification *)aNotif;
