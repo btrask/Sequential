@@ -6,6 +6,14 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>PGFullscreenWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>PGWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSTableColumn</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -25,8 +33,6 @@
 			<dict>
 				<key>cancel</key>
 				<string>id</string>
-				<key>cancelAndDeleteBookmark</key>
-				<string>id</string>
 				<key>ok</key>
 				<string>id</string>
 			</dict>
@@ -36,31 +42,63 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>cancelAndDeleteBookmarkButton</key>
-				<string>NSButton</string>
 				<key>encodingColumn</key>
 				<string>NSTableColumn</string>
 				<key>encodingsTable</key>
 				<string>NSTableView</string>
-				<key>infoField</key>
-				<string>NSTextField</string>
-				<key>messageField</key>
-				<string>NSTextField</string>
 				<key>sampleColumn</key>
 				<string>NSTableColumn</string>
-				<key>tableScrollView</key>
-				<string>NSScrollView</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>PGWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSControl</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>closeWindowContent</key>
+				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
+			</dict>
+			<key>CLASS</key>
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>PGURLConnection</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>performWindowClose</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>NSWindow</string>
 			<key>LANGUAGE</key>

@@ -10,15 +10,7 @@
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>PGWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
+			<string>PGDocumentWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -45,13 +37,31 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>NSControl</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>changeOrientation</key>
 				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
 				<key>extractImages</key>
 				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
+				<string>id</string>
 				<key>firstPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
 				<string>id</string>
 				<key>lastPage</key>
 				<string>id</string>
@@ -61,11 +71,11 @@
 				<string>id</string>
 				<key>nextTab</key>
 				<string>id</string>
+				<key>openURL</key>
+				<string>id</string>
 				<key>pauseAndCloseDocument</key>
 				<string>id</string>
 				<key>pauseDocument</key>
-				<string>id</string>
-				<key>performWindowClose</key>
 				<string>id</string>
 				<key>previousPage</key>
 				<string>id</string>
@@ -76,6 +86,12 @@
 				<key>revealInFinder</key>
 				<string>id</string>
 				<key>revealInPathFinder</key>
+				<string>id</string>
+				<key>revertOrientation</key>
+				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
 				<string>id</string>
 				<key>toggleFullscreen</key>
 				<string>id</string>
@@ -102,9 +118,13 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>changeEncoding</key>
+				<string>id</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
 				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
@@ -160,9 +180,7 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>changeBackgroundColor</key>
-				<string>id</string>
-				<key>changeBackgroundPattern</key>
+				<key>activateDocument</key>
 				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
@@ -176,7 +194,13 @@
 				<string>id</string>
 				<key>changeSortOrder</key>
 				<string>id</string>
+				<key>changeSortRepeat</key>
+				<string>id</string>
 				<key>clearRecentDocuments</key>
+				<string>id</string>
+				<key>closeAll</key>
+				<string>id</string>
+				<key>open</key>
 				<string>id</string>
 				<key>openDocument</key>
 				<string>id</string>
@@ -184,21 +208,23 @@
 				<string>id</string>
 				<key>openURL</key>
 				<string>id</string>
-				<key>orderFrontColorPanel</key>
-				<string>id</string>
 				<key>provideFeedback</key>
+				<string>id</string>
+				<key>selectNextDocument</key>
+				<string>id</string>
+				<key>selectPreviousDocument</key>
+				<string>id</string>
+				<key>showKeyboardShortcuts</key>
+				<string>id</string>
+				<key>showPreferences</key>
 				<string>id</string>
 				<key>switchToFinder</key>
 				<string>id</string>
 				<key>switchToPathFinder</key>
 				<string>id</string>
+				<key>toggleActivity</key>
+				<string>id</string>
 				<key>toggleExif</key>
-				<string>id</string>
-				<key>useScreen</key>
-				<string>id</string>
-				<key>zoomIn</key>
-				<string>id</string>
-				<key>zoomOut</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -217,11 +243,11 @@
 				<string>NSMenuItem</string>
 				<key>fitToView</key>
 				<string>NSMenuItem</string>
-				<key>flipHorz</key>
-				<string>NSMenuItem</string>
-				<key>flipVert</key>
-				<string>NSMenuItem</string>
 				<key>lastPage</key>
+				<string>NSMenuItem</string>
+				<key>mirrorHorz</key>
+				<string>NSMenuItem</string>
+				<key>mirrorVert</key>
 				<string>NSMenuItem</string>
 				<key>nextPage</key>
 				<string>NSMenuItem</string>
@@ -243,12 +269,16 @@
 				<string>NSMenuItem</string>
 				<key>rotate180</key>
 				<string>NSMenuItem</string>
-				<key>rotateLeft</key>
+				<key>rotate270CC</key>
 				<string>NSMenuItem</string>
-				<key>rotateRight</key>
+				<key>rotate90CC</key>
 				<string>NSMenuItem</string>
 				<key>screenMenu</key>
 				<string>NSMenu</string>
+				<key>selectNextDocument</key>
+				<string>NSMenuItem</string>
+				<key>selectPreviousDocument</key>
+				<string>NSMenuItem</string>
 				<key>switchToFinder</key>
 				<string>NSMenuItem</string>
 				<key>switchToPathFinder</key>
@@ -267,13 +297,21 @@
 				<string>NSMenuItem</string>
 				<key>windowsMenu</key>
 				<string>NSMenu</string>
-				<key>windowsMenuItem</key>
+				<key>windowsMenuSeparator</key>
 				<string>NSMenuItem</string>
 				<key>zoomIn</key>
 				<string>NSMenuItem</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.01">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9C7010</string>
+		<string key="IBDocument.SystemVersion">9E17</string>
 		<string key="IBDocument.InterfaceBuilderVersion">629</string>
-		<string key="IBDocument.AppKitVersion">949.26</string>
+		<string key="IBDocument.AppKitVersion">949.33</string>
 		<string key="IBDocument.HIToolboxVersion">352.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -17,7 +17,7 @@
 		<object class="NSMutableArray" key="IBDocument.RootObjects" id="1000">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<object class="NSCustomObject" id="1001">
-				<string key="NSClassName">PGExifController</string>
+				<string key="NSClassName">PGExifPanel</string>
 			</object>
 			<object class="NSCustomObject" id="1003">
 				<string key="NSClassName">FirstResponder</string>
@@ -72,7 +72,7 @@
 														<int key="NSCellFlags2">67108864</int>
 														<string key="NSContents" id="216841917"/>
 														<object class="NSFont" key="NSSupport" id="26">
-															<string key="NSName" id="117726785">LucidaGrande</string>
+															<string key="NSName" id="68475535">LucidaGrande</string>
 															<double key="NSSize">1.100000e+01</double>
 															<int key="NSfFlags">3100</int>
 														</object>
@@ -82,7 +82,7 @@
 														</object>
 														<object class="NSColor" key="NSTextColor" id="921880492">
 															<int key="NSColorSpace">6</int>
-															<string key="NSCatalogName" id="421953033">System</string>
+															<string key="NSCatalogName" id="1052675950">System</string>
 															<string key="NSColorName">headerTextColor</string>
 															<object class="NSColor" key="NSColor" id="651199186">
 																<int key="NSColorSpace">3</int>
@@ -93,16 +93,16 @@
 													<object class="NSTextFieldCell" key="NSDataCell" id="5018194">
 														<int key="NSCellFlags">337772096</int>
 														<int key="NSCellFlags2">2048</int>
-														<string key="NSContents" id="664392021">Text Cell</string>
+														<string key="NSContents" id="864231344">Text Cell</string>
 														<object class="NSFont" key="NSSupport" id="925936228">
-															<reference key="NSName" ref="117726785"/>
+															<reference key="NSName" ref="68475535"/>
 															<double key="NSSize">1.300000e+01</double>
 															<int key="NSfFlags">1044</int>
 														</object>
 														<reference key="NSControlView" ref="798846297"/>
 														<object class="NSColor" key="NSBackgroundColor" id="907411160">
 															<int key="NSColorSpace">6</int>
-															<reference key="NSCatalogName" ref="421953033"/>
+															<reference key="NSCatalogName" ref="1052675950"/>
 															<string key="NSColorName">controlBackgroundColor</string>
 															<object class="NSColor" key="NSColor">
 																<int key="NSColorSpace">3</int>
@@ -111,7 +111,7 @@
 														</object>
 														<object class="NSColor" key="NSTextColor" id="879308058">
 															<int key="NSColorSpace">6</int>
-															<reference key="NSCatalogName" ref="421953033"/>
+															<reference key="NSCatalogName" ref="1052675950"/>
 															<string key="NSColorName">controlTextColor</string>
 															<reference key="NSColor" ref="651199186"/>
 														</object>
@@ -133,7 +133,7 @@
 													<object class="NSTextFieldCell" key="NSDataCell" id="35643812">
 														<int key="NSCellFlags">337772096</int>
 														<int key="NSCellFlags2">2048</int>
-														<reference key="NSContents" ref="664392021"/>
+														<reference key="NSContents" ref="864231344"/>
 														<reference key="NSSupport" ref="925936228"/>
 														<reference key="NSControlView" ref="798846297"/>
 														<reference key="NSBackgroundColor" ref="907411160"/>
@@ -152,7 +152,7 @@
 											</object>
 											<object class="NSColor" key="NSGridColor">
 												<int key="NSColorSpace">6</int>
-												<reference key="NSCatalogName" ref="421953033"/>
+												<reference key="NSCatalogName" ref="1052675950"/>
 												<string key="NSColorName">gridColor</string>
 												<object class="NSColor" key="NSColor">
 													<int key="NSColorSpace">3</int>
@@ -275,7 +275,7 @@
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 1008}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMinSize">{300, 209}</string>
 				<reference key="NSFrameAutosaveName" ref="216841917"/>
 			</object>
@@ -597,32 +597,6 @@
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
 				<bool key="EncodedWithXMLCoder">YES</bool>
 				<object class="IBPartialClassDescription">
-					<string key="className">PGFullscreenWindow</string>
-					<string key="superclassName">PGWindow</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey" id="810262493">IBProjectSource</string>
-						<string key="minorKey">PGFullscreenWindow.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">NSScroller</string>
 					<nil key="superclassName"/>
 					<object class="NSMutableDictionary" key="actions">
@@ -675,266 +649,8 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">PGWindow</string>
-					<string key="superclassName" id="487732159">NSWindow</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGWindow.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="487732159"/>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGZooming.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="487732159"/>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">performWindowClose:</string>
-						<string key="NS.object.0" id="557406321">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">NSWindowAdditions.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<reference key="className" ref="582463646"/>
 					<string key="superclassName">NSSearchFieldCell</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="224886579"/>
-						<reference key="minorKey" ref="216841917"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className" id="649147216">NSTableView</string>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="224886579"/>
-						<reference key="minorKey" ref="216841917"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="268420873"/>
-					<string key="superclassName">NSScrollView</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="224886579"/>
-						<reference key="minorKey" ref="216841917"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className" id="314592066">NSTableColumn</string>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGZooming.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">PGExifController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">changeSearch:</string>
-						<reference key="NS.object.0" ref="557406321"/>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSMutableArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>entriesTable</string>
-							<string>searchField</string>
-							<string>tagColumn</string>
-							<string>valueColumn</string>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>NSTableView</string>
-							<string>NSSearchField</string>
-							<reference ref="314592066"/>
-							<reference ref="314592066"/>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGExifController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="60607431"/>
-					<string key="superclassName">NSSearchField</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="224886579"/>
-						<reference key="minorKey" ref="216841917"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="591171235"/>
-					<string key="superclassName">NSPanel</string>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="224886579"/>
-						<reference key="minorKey" ref="216841917"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="756775020"/>
-					<reference key="superclassName" ref="649147216"/>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
@@ -980,53 +696,6 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGTableView.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="225877868"/>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">closeWindowContent:</string>
-						<string key="NS.object.0">PGFullscreenWindow</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGFullscreenWindow.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<reference key="className" ref="225877868"/>
-					<nil key="superclassName"/>
-					<object class="NSMutableDictionary" key="actions">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSArray" key="dict.sortedKeys">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-						<object class="NSMutableArray" key="dict.values">
-							<bool key="EncodedWithXMLCoder">YES</bool>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<reference key="majorKey" ref="224886579"/>
 						<reference key="minorKey" ref="216841917"/>
 					</object>
@@ -1053,8 +722,8 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">NSObjectAdditions.h</string>
+						<string key="majorKey" id="715771675">IBProjectSource</string>
+						<string key="minorKey">PGDocumentWindow.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1079,7 +748,59 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGEncodingAlert.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="225877868"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGResourceAdapter.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="225877868"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
 						<string key="minorKey">PGClipView.h</string>
 					</object>
 				</object>
@@ -1105,12 +826,65 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGWindow.h</string>
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">NSObjectAdditions.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className" id="230895063">NSView</string>
+					<reference key="className" ref="225877868"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>connectionDidClose:</string>
+							<string>connectionDidReceiveResponse:</string>
+							<string>connectionLoadingDidProgress:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>PGURLConnection</string>
+							<string>PGURLConnection</string>
+							<string>PGURLConnection</string>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGURLConnection.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="225877868"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">closeWindowContent:</string>
+						<string key="NS.object.0">PGFullscreenWindow</string>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGFullscreenWindow.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSControl</string>
 					<nil key="superclassName"/>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1131,12 +905,64 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">NSControlAdditions.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="756775020"/>
+					<string key="superclassName" id="709396007">NSTableView</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="224886579"/>
+						<reference key="minorKey" ref="216841917"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className" id="487732159">NSWindow</string>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
 						<string key="minorKey">PGZooming.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<reference key="className" ref="230895063"/>
+					<reference key="className" ref="487732159"/>
 					<nil key="superclassName"/>
 					<object class="NSMutableDictionary" key="actions">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1157,8 +983,150 @@
 						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<reference key="majorKey" ref="810262493"/>
-						<string key="minorKey">PGBezelPanel.h</string>
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">NSWindowAdditions.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="709396007"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="224886579"/>
+						<reference key="minorKey" ref="216841917"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PGExifPanel</string>
+					<string key="superclassName">PGFloatingPanel</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>changeSearch:</string>
+							<string>copy:</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string id="307963076">id</string>
+							<reference ref="307963076"/>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSMutableArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>entriesTable</string>
+							<string>searchField</string>
+							<string>tagColumn</string>
+							<string>valueColumn</string>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSTableView</string>
+							<string>NSSearchField</string>
+							<string id="314592066">NSTableColumn</string>
+							<reference ref="314592066"/>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGExifPanel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PGURLConnection</string>
+					<reference key="superclassName" ref="225877868"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGURLConnection.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="268420873"/>
+					<string key="superclassName">NSScrollView</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="224886579"/>
+						<reference key="minorKey" ref="216841917"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PGFullscreenWindow</string>
+					<string key="superclassName">PGDocumentWindow</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGFullscreenWindow.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -1187,6 +1155,214 @@
 						<reference key="minorKey" ref="216841917"/>
 					</object>
 				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PGFloatingPanel</string>
+					<string key="superclassName">NSWindowController</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGFloatingPanel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="591171235"/>
+					<string key="superclassName">NSPanel</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="224886579"/>
+						<reference key="minorKey" ref="216841917"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">PGDocumentWindow</string>
+					<reference key="superclassName" ref="487732159"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGDocumentWindow.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="60607431"/>
+					<string key="superclassName">NSSearchField</string>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="224886579"/>
+						<reference key="minorKey" ref="216841917"/>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className" id="230895063">NSView</string>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGBezelPanel.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="230895063"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGClipView.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="230895063"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGZooming.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<reference key="className" ref="314592066"/>
+					<nil key="superclassName"/>
+					<object class="NSMutableDictionary" key="actions">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="NSMutableDictionary" key="outlets">
+						<bool key="EncodedWithXMLCoder">YES</bool>
+						<object class="NSArray" key="dict.sortedKeys">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+						<object class="NSMutableArray" key="dict.values">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+						</object>
+					</object>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<reference key="majorKey" ref="715771675"/>
+						<string key="minorKey">PGZooming.h</string>
+					</object>
+				</object>
 			</object>
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
@@ -1195,141 +1371,141 @@
 		<object class="NSMutableData" key="IBDocument.RunnableNib">
 			<bytes key="NS.bytes">YnBsaXN0MDDUAAEAAgADAAQABQAGAAkAClgkdmVyc2lvblQkdG9wWSRhcmNoaXZlclgkb2JqZWN0cxIA
 AYag0QAHAAhdSUIub2JqZWN0ZGF0YYABXxAPTlNLZXllZEFyY2hpdmVyrxCzAAsADAAxADUANgA8AD0A
-QQBFAFUAXQBvAH0AfgCGAIcAigCQAJMAmwCcAJ0AoACmALAAsQC2AN0A4gDjAOYA6wDsAO4A8QDyAPYA
-+wBlAPwBDQALAQ4BEwEUARkBHgEkASsBMgE2ATkBPgE/AUIBRQFGAUsBZAFlAWYBZwFoAW8BdAGJAYoB
-iwGRAZUBlgGZAaUBpgGnAasBtAG1AbYBwQHCAcMBxAHaAdsB3AHsAe0B7gHxAfoB+wH/AggCCQIKAGsC
-CwIPAhAACwIRAhMCFAIVAhgCHQIeAiECJgInAiwCLQIyAjMCOAI5Aj4CPwJEAkUCSgJPAlQCVQJlAmgC
-aQJrAnsCjAKdAp4CnwKgAqECogKjAqQCpQKmAqcCqAKpAqoCqwKyArkC1wL1AJgC9gL3AvgC+QL6AvsC
-/ACOAv0C/gFhAv8DAAF/ANEA2QMBAwIDAwMEAwUDBgMHAwgDCQMMAw8DElUkbnVsbN8QEgANAA4ADwAQ
+QQBFAFUAXQCGAIcAiACZAAsAmgCfAKAApQCqALcAxADFAM0AzgDRANcA2gDiAOMA5ADnAO0A9wD4AP0B
+AgEDAQYBCwEMAQ4BEQEbASEBKAEsAS8BNAE1ATgBOwE8AUABRQFGAUsBZAFlAWYBZwFoAW8BdAGJAYoB
+iwGRAZUBlgGZAaUBpgGnAasBtAG1AbYBwQHCAcMBxAHaAdsB3AHsAe0B7gHxAfoB+wH/AggCCQIKARkC
+CwIPAhAACwIRAhMCFAIVAhgCGQIeAh8CJAIlAioCKwIwAjECNgI7AjwCPwJEAkUCSgJPAlQCVQJlAmgC
+aQJrAnsCjAKdAp4CnwKgAqECogKjAqQCpQKmAqcCqAKpAqoCqwKyArkC1wL1AvYBfwL3AvgC+QL6AvsA
+3wDVAvwAggL9Av4C/wMAAwEDAgMDAwQBYQMFAwYDBwMIAHoDCQMMAw8DElUkbnVsbN8QEgANAA4ADwAQ
 ABEAEgATABQAFQAWABcAGAAZABoAGwAcAB0AHgAfACAAIQAiACMAJAAlACYAJwAoACkAKgArACwALQAu
 AC8AMFZOU1Jvb3RWJGNsYXNzXU5TT2JqZWN0c0tleXNfEA9OU0NsYXNzZXNWYWx1ZXNfEBlOU0FjY2Vz
 c2liaWxpdHlPaWRzVmFsdWVzXU5TQ29ubmVjdGlvbnNbTlNOYW1lc0tleXNbTlNGcmFtZXdvcmtdTlND
 bGFzc2VzS2V5c1pOU09pZHNLZXlzXU5TTmFtZXNWYWx1ZXNfEBlOU0FjY2Vzc2liaWxpdHlDb25uZWN0
 b3JzXU5TRm9udE1hbmFnZXJfEBBOU1Zpc2libGVXaW5kb3dzXxAPTlNPYmplY3RzVmFsdWVzXxAXTlNB
 Y2Nlc3NpYmlsaXR5T2lkc0tleXNZTlNOZXh0T2lkXE5TT2lkc1ZhbHVlc4ACgLKAfICSgLGACICBgAWA
-kYCTgIKAr4AAgAaAgICwECGAlNIADgAyADMANFtOU0NsYXNzTmFtZYAEgANfEBBQR0V4aWZDb250cm9s
-bGVy0gA3ADgAOQA6WCRjbGFzc2VzWiRjbGFzc25hbWWiADoAO15OU0N1c3RvbU9iamVjdFhOU09iamVj
-dF8QEElCQ29jb2FGcmFtZXdvcmvSAA4APgA/AEBaTlMub2JqZWN0c4AHoNIANwA4AEIAQ6MAQwBEADtc
-TlNNdXRhYmxlU2V0VU5TU2V00gAOAD4ARgBHgDGtAEgASQBKAEsATABNAE4ATwBQAFEAUgBTAFSACYAk
-gDiAaYBsgG6AcIBygHSAdoB4gHmAetQADgBWAFcAWABZAFoAHwBcXU5TRGVzdGluYXRpb25YTlNTb3Vy
-Y2VXTlNMYWJlbIAjgAqAAoAi2QBeAA4AXwBgAGEAYgBjAGQAZQBmAGcAaABpAGoAawBsAG0Abl5OU0lz
-UmVzaXplYWJsZVxOU0hlYWRlckNlbGxXTlNXaWR0aFpOU0RhdGFDZWxsXk5TUmVzaXppbmdNYXNrWk5T
-TWluV2lkdGhaTlNNYXhXaWR0aFtOU1RhYmxlVmlldwmAIYALI0BeQAAAAAAAgBcQASNARAAAAAAAACNA
-j0AAAAAAAIAa1wBwAA4AcQByAHMAdAB1AHYAdwB4AHkAegB7AHxbTlNDZWxsRmxhZ3NfEBFOU0JhY2tn
-cm91bmRDb2xvclpOU0NvbnRlbnRzWU5TU3VwcG9ydFxOU0NlbGxGbGFnczJbTlNUZXh0Q29sb3ISBIH+
-AIAWgBCADIANEACAElDUAA4AfwCAAIEAggCDAIQAhVZOU1NpemVWTlNOYW1lWE5TZkZsYWdzgA8jQCYA
-AAAAAACADhEMHFxMdWNpZGFHcmFuZGXSADcAOACIAImiAIkAO1ZOU0ZvbnTTAA4AiwCMAI0AjgCPXE5T
-Q29sb3JTcGFjZVdOU1doaXRlgBEQA0swLjMzMzMzMjk5ANIANwA4AJEAkqIAkgA7V05TQ29sb3LVAA4A
-kgCLAJQAlQCNAJcAmACZAJpbTlNDb2xvck5hbWVdTlNDYXRhbG9nTmFtZYARgBUQBoAUgBNWU3lzdGVt
-XxAPaGVhZGVyVGV4dENvbG9y0wAOAIsAjACNAI4An4ARQjAA0gA3ADgAoQCipQCiAKMApAClADtfEBFO
-U1RhYmxlSGVhZGVyQ2VsbF8QD05TVGV4dEZpZWxkQ2VsbFxOU0FjdGlvbkNlbGxWTlNDZWxs2ABwAA4A
-cQByAHMApwB0AHUAqACpAKoAqwCsAG4ArgCvXU5TQ29udHJvbFZpZXcSFCH+QIAggBuAGIAZgBoRCACA
-HllUZXh0IENlbGzUAA4AfwCAAIEAggCzAIQAtYAPI0AqAAAAAAAAgA4RBBTfEBUAtwC4AA4AuQC6AHEA
-uwC8AL0AvgC/AMAAwQDCAMMAMgDEAMUAxgDHAMgAyQB7AMoAywDMAM0AzgDPANAA0QDSANMA1ABmANYA
-1wDYANkAyQDbANxfEA9OU05leHRSZXNwb25kZXJfEB9OU0RyYWdnaW5nU291cmNlTWFza0Zvck5vbkxv
-Y2FsWU5TVHZGbGFnc18QE05TT3JpZ2luYWxDbGFzc05hbWVfEBJOU0FsbG93c1R5cGVTZWxlY3RcTlND
-b3JuZXJWaWV3XxAXTlNJbnRlcmNlbGxTcGFjaW5nV2lkdGhfEBlOU0NvbHVtbkF1dG9yZXNpemluZ1N0
-eWxlXxAYTlNJbnRlcmNlbGxTcGFjaW5nSGVpZ2h0WE5TdkZsYWdzW05TRnJhbWVTaXplWU5TRW5hYmxl
-ZFhOU1dpbmRvd1tOU0dyaWRDb2xvcl8QHE5TRHJhZ2dpbmdTb3VyY2VNYXNrRm9yTG9jYWxbTlNTdXBl
-cnZpZXdeTlNUYWJsZUNvbHVtbnNbTlNSb3dIZWlnaHSAJ4A2EhLAAACAJoAyCIAqI0AIAAAAAAAAEAQj
-QAAAAAAAAAAREQCAKAmAKYAlgDMQD4AngC0jQDEAAAAAAADVAA4AkgCLAJQAlQCNAN8AmADgAJqAEYAd
-gByAE18QFmNvbnRyb2xCYWNrZ3JvdW5kQ29sb3LTAA4AiwCMAI0AjgDlgBFLMC42NjY2NjY2OQDVAA4A
-kgCLAJQAlQCNAJcAmADpAJqAEYAVgB+AE18QEGNvbnRyb2xUZXh0Q29sb3LSADcAOADtAKOkAKMApACl
-ADvSADcAOADvAPCiAPAAO11OU1RhYmxlQ29sdW1uW3ZhbHVlQ29sdW1u0gA3ADgA8wD0owD0APUAO18Q
-FE5TTmliT3V0bGV0Q29ubmVjdG9yXk5TTmliQ29ubmVjdG9y1AAOAFYAVwBYAFkAHwBuAPqAI4ACgBqA
-N15ITUJsa1RhYmxlVmlld9sAtwAOAP0A/gD/AMABAADDAQEAxgECAQMBBAEFANEBBgEHAG4A1gCqAQMA
-bldOU0ZyYW1lWU5TY3ZGbGFnc1pOU1N1YnZpZXdzWU5TRG9jVmlld1lOU0JHQ29sb3JdTlNOZXh0S2V5
-Vmlld4BAgEaARYBEEQkAgBqAKYAbgECAGlp7MjY5LCAxNjh91AC3AA4A/QDAACsBEAERARKAAIAsgCsR
-AQBfEBR7ezI3MCwgMX0sIHsxNiwgMTd9fdIANwA4ARUBFqQBFgEXARgAO11fTlNDb3JuZXJWaWV3Vk5T
-Vmlld1tOU1Jlc3BvbmRlctIADgA+AEYBG4AxogEcAFqALoAK1wAOAF8AYABhAGMAZABlAGcBIAEhASIA
-bABtAG6AIYAvI0BhwAAAAAAAgDCAGtcAcAAOAHEAcgBzAHQAdQB2AHcAeAB5AHoBKQB8gBaAEIAMgA0S
-BAAAAIAS2ABwAA4AcQByAHMApwB0AHUAqACpAKoAqwCsAG4ArgCvgCCAG4AYgBmAGoAe0gA3ADgBMwE0
-owE0ATUAO15OU011dGFibGVBcnJheVdOU0FycmF50wAOAIsAjACNAI4BOIARQjEA1QAOAJIAiwCUAJUA
-jQE7AJgBPACagBGANYA0gBNZZ3JpZENvbG9y0wAOAIsAjACNAI4BQYARRDAuNQDSADcAOAFDAUSiAUQA
-O15OU0NsYXNzU3dhcHBlclhkZWxlZ2F0ZdQADgBWAFcAWABZAB8BSQD6gCOAAoA5gDfdAUwADgFNAU4B
-TwFQAVEBUgFTAVQBVQFWAVcBWAFZAVoAeQFcAV0BXgFfAWABYQDZAWIAK1xOU1dpbmRvd1ZpZXdcTlNT
-Y3JlZW5SZWN0XxATTlNGcmFtZUF1dG9zYXZlTmFtZV1OU1dpbmRvd1RpdGxlWU5TV1RGbGFnc11OU1dp
-bmRvd0NsYXNzXxAWTlNXaW5kb3dDb250ZW50TWluU2l6ZVxOU1dpbmRvd1JlY3RfEA9OU1dpbmRvd0Jh
-Y2tpbmdfEBFOU1dpbmRvd1N0eWxlTWFza1lOU01pblNpemVbTlNWaWV3Q2xhc3OAPoBogGaADIA7E///
-//+gAAAAgDyAPYA6EAKAZ4AAXxAYe3sxOTYsIDI2OX0sIHszMDAsIDI0MX19WUV4aWYgRGF0YVpITUJs
-a1BhbmVsWnszMDAsIDE4N33XALcADgD/AMAAwQDDAMYA1gFqAWsBEgFsANYBboApgGWAP4BjgCmAZNIA
-DgA+AEYBcYAxogEDAXOAQIBO3xAPALcBdQAOAP0AugF2AP8BdwDAAMMAMgDGAXgBAgF5AVgBewDKAX0B
-fgF/AYABgQGCANYBhAFYAYYAyQDJW05TSFNjcm9sbGVyWE5Tc0ZsYWdzXE5TU2Nyb2xsQW10c1tOU1ZT
-Y3JvbGxlcl1OU0NvbnRlbnRWaWV3gD6AS4A2gE2AQhASgENPEBBBIAAAQSAAAEGYAABBmAAAERESgCmA
-QYA+gEeAJ4AnXxAPSE1CbGtTY3JvbGxWaWV3XE5TU2Nyb2xsVmlld9IADgA+AEYBjYAxowDJAYYBe4An
-gEeAS9IADgA+AEYBk4AxoQBugBpfEBR7ezEsIDF9LCB7MjY5LCAxNjh9fdIANwA4AZcBmKQBmAEXARgA
-O1pOU0NsaXBWaWV32QC3AZoADgD9AMAAwwGbAMYBnAEDAQMBnwGgARIA1gGiAQMBpFhOU1RhcmdldFhO
-U0FjdGlvbllOU1BlcmNlbnSAQIBAgEqASIApgEmAQCM/78+HAAAAAF8QFXt7MjcwLCAxfSwgezE1LCAx
-Njh9fVxfZG9TY3JvbGxlcjrSADcAOAGoAamlAakBqgEXARgAO1pOU1Njcm9sbGVyWU5TQ29udHJvbNoA
-twGaAA4A/QF2AMAAwwGbAMYBnAEDAQMBnwGvAGsBEgDWAaIBAwGzgECAQIBKgEyAKYBJgEAjP+/dJAAA
-AABfEBl7ey0xMDAsIC0xMDB9LCB7MjM0LCAxNX19XxAVe3s3LCA0N30sIHsyODYsIDE3MH192gC3AA4A
-/QC6AKUAwADCAMMAMgDGAVgAygG5AboBuwG8AGYA1gG/AViAPoA2gFGAUIBSEQEkCYApgE+APl8QEEhN
-QmxrU2VhcmNoRmllbGRdTlNTZWFyY2hGaWVsZF8QFXt7MjAsIDIwfSwgezEyMCwgMTl9fd8QEABwAcUA
-DgHGALoAcQByAHMApwB0AccAMgHIAckBygB1AcsBzADKAc4BzwCqAHkAegFzAdQAawHVAGYB1wHYAM1f
-EBJOU1NlYXJjaEZpZWxkRmxhZ3NfEBJOU0NhbmNlbEJ1dHRvbkNlbGxfEBBOU1RleHRCZXplbFN0eWxl
-XxARTlNEcmF3c0JhY2tncm91bmRfEBJOU1NlYXJjaEJ1dHRvbkNlbGxfEBBOU01heGltdW1SZWNlbnRz
-EhRx/kBECAAAAIA2gFmAVIAbgAyADYBOEhACBACAUwmAVRD/gDJfEBRITUJsa1NlYXJjaEZpZWxkQ2Vs
-bF8QEU5TU2VhcmNoRmllbGRDZWxs3AGaAHAADgHdAd4B3wByAKcB4AB0AZsB4QG7AeMB5AHlAHsAeQHn
-AXMB6QB7AeoB618QEk5TUGVyaW9kaWNJbnRlcnZhbF5OU0J1dHRvbkZsYWdzMl8QD05TS2V5RXF1aXZh
-bGVudF8QD05TUGVyaW9kaWNEZWxheV1OU0J1dHRvbkZsYWdzgFISAAH+AIBYEEuADIBWgE4RAZCAVxII
-RED/VnNlYXJjaF8QE19zZWFyY2hGaWVsZFNlYXJjaDrSADcAOAHvAfCkAfAApAClADtcTlNCdXR0b25D
-ZWxs3QGaAHAADgHdAd4B3wHyAHIApwHgAHQBmwHhAbsB4wHkAeUAewB5AfYB9wFzAekAewH5AetfECNO
-U0FjY2Vzc2liaWxpdHlPdmVycmlkZGVuQXR0cmlidXRlc4BSgFiADIBbgFqAToBiVWNsZWFy0gAOAD4A
-RgH9gDGhAf6AXNMADgIAAD4CAQICAgVXTlMua2V5c4BhogIDAgSAXYBeogIGAgeAX4BgXUFYRGVzY3Jp
-cHRpb25fEClOU0FjY2Vzc2liaWxpdHlFbmNvZGVkQXR0cmlidXRlc1ZhbHVlVHlwZVZjYW5jZWzSADcA
-OAIMAg2jAg0CDgA7XxATTlNNdXRhYmxlRGljdGlvbmFyeVxOU0RpY3Rpb25hcnlfEBNfc2VhcmNoRmll
-bGRDYW5jZWw6WnszMDAsIDI0MX3SADcAOAISARejARcBGAA7XxAWe3swLCAwfSwgezEyODAsIDEwMDh9
-fVp7MzAwLCAyMDl90gA3ADgCFgIXogIXADtfEBBOU1dpbmRvd1RlbXBsYXRl1AAOAFYAVwBYAhkAHwFz
-AhyAa4ACgE6Aal1jaGFuZ2VTZWFyY2g60gA3ADgCHwIgowIgAPUAO18QFU5TTmliQ29udHJvbENvbm5l
-Y3RvctQADgBWAFcAWABZAXMBAwIlgCOAToBAgG1bbmV4dEtleVZpZXfUAA4AVgBXAFgAWQBuAB8CK4Aj
-gBqAAoBvXGVudHJpZXNUYWJsZdQADgBWAFcAWABZAXMAHwIxgCOAToACgHFbc2VhcmNoRmllbGTUAA4A
-VgBXAFgAWQBuAUkCN4AjgBqAOYBzXxAVaW5pdGlhbEZpcnN0UmVzcG9uZGVy1AAOAFYAVwBYAFkBSQAf
-Aj2AI4A5gAKAdVZ3aW5kb3fUAA4AVgBXAFgAWQAfAG4CQ4AjgAKAGoB3WmRhdGFTb3VyY2XUAA4AVgBX
-AFgAWQFzAG4CJYAjgE6AGoBt1AAOAFYAVwBYAFkAbgFzAiWAI4AagE6AbdQADgBWAFcAWABZARwAHwJT
-gCOALoACgHtZdGFnQ29sdW1u0gAOAD4CVgJXgH+tAUkAbgFzAYYBewBaARwBuwJgAQMAagFYASKAOYAa
-gE6AR4BLgAqALoBSgH2AQIAXgD6AMNIADgAyADMCZ4AEgH5dTlNBcHBsaWNhdGlvbtIANwA4AmoBNaIB
-NQA70gAOAD4CVgJtgH+tAB8BAwFYAQMBAwBuAG4BcwAfAVgAWgFJARyAAoBAgD6AQIBAgBqAGoBOgAKA
-PoAKgDmALtIADgA+AlYCfYB/rgAfAUkBcwBuAYYBewBaARwBuwJgAQMAagFYASKAAoA5gE6AGoBHgEuA
-CoAugFKAfYBAgBeAPoAw0gAOAD4CVgKOgH+uAo8CkAKRApICkwKUApUClgKXApgCmQKaApsCnICDgISA
-hYCGgIeAiICJgIqAi4CMgI2AjoCPgJBcRmlsZSdzIE93bmVyWkV4aWYgUGFuZWxfEBBCbGsgU2VhcmNo
-IEZpZWxkXkJsayBUYWJsZSBWaWV3XxARVmVydGljYWwgU2Nyb2xsZXJfEBNIb3Jpem9udGFsIFNjcm9s
-bGVyXFRhYmxlIENvbHVtbl5UYWJsZSBDb2x1bW4tMV8QFUJsayBTZWFyY2ggRmllbGQgQ2VsbFtBcHBs
-aWNhdGlvbl8QD0JsayBTY3JvbGwgVmlld18QG1RleHQgRmllbGQgQ2VsbCAoVGV4dCBDZWxsKVxDb250
-ZW50IFZpZXdfEB1UZXh0IEZpZWxkIENlbGwgKFRleHQgQ2VsbCktMdIADgA+AlYCrYB/pAFzAG4BuwED
-gE6AGoBSgEDSAA4APgJWArSAf6QBvwDXAdUBhIBPgCWAU4BB0gAOAD4CVgK7gH+vEBsAHwBuAXMAWgBI
-AbsASQBLAmABAwBOAGoBWABKASIAVAFJAYYAUAF7AEwBHABTAFIATwBRAE2AAoAagE6ACoAJgFKAJIBp
-gH2AQIBwgBeAPoA4gDCAeoA5gEeAdIBLgGyALoB5gHiAcoB2gG7SAA4APgJWAtmAf68QGwLaAtsC3ALd
-At4C3wLgAuEC4gLjAuQC5QLmAucC6ALpAgcC6wLsAu0C7gLvAvAC8QLyAvMC9ICVgJaAl4CYgJmAmoCb
-gJyAnYCegJ+AoIChgKKAo4CkgGCApYCmgKeAqICpgKqAq4CsgK2ArhAgEAwQCRATEA0QFRAbE///////
-///9EBoQChAZEAsQBRAeEAgQHRAfEBcQFBAR0gAOAD4ARgMLgDGg0gAOAD4CVgMOgH+g0gAOAD4CVgMR
-gH+g0gA3ADgDEwMUogMUADteTlNJQk9iamVjdERhdGEACAAZACIAJwAxADoAPwBEAFIAVABmAc8B1QIg
-AicCLgI8Ak4CagJ4AoQCkAKeAqkCtwLTAuEC9AMGAyADKgM3AzkDOwM9Az8DQQNDA0UDRwNJA0sDTQNP
-A1EDUwNVA1cDWQNbA2QDcANyA3QDhwOQA5kDpAOpA7gDwQPUA90D6APqA+sD9AP7BAgEDgQXBBkENAQ2
-BDgEOgQ8BD4EQARCBEQERgRIBEoETAROBF8EbQR2BH4EgASCBIQEhgSrBLoExwTPBNoE6QT0BP8FCwUM
-BQ4FEAUZBRsFHQUmBS8FMQVOBVoFbgV5BYMFkAWcBaEFowWlBacFqQWrBa0FrgW/BcYFzQXWBdgF4QXj
-BeYF8wX8BgEGCAYVBiIGKgYsBi4GOgZDBkgGUAZlBnEGfwaBBoMGhQaHBokGkAaiBq8GsQa0Br0GyAbc
-Bu4G+wcCByMHMQc2BzgHOgc8Bz4HQAdDB0UHTwdgB2IHawdtB3AHxwfZB/sIBQgbCDAIPQhXCHMIjgiX
-CKMIrQi2CMII4QjtCPwJCAkKCQwJEQkTCRUJFgkYCSEJIwksCS8JMQkyCTQJNgk4CToJPAk+CUcJXAle
-CWAJYglkCX0JigmMCZgJrQmvCbEJswm1CcgJ0QnaCeMJ6An2CgIKCwoSCikKOApJCksKTQpPClEKYAqN
-CpUKnwqqCrQKvgrMCs4K0ArSCtQK1wrZCtsK3QrfCuEK7Ar9Cv8LAQsDCwYLHQsmCy8LPQtEC1ALWQtb
-C2ALYgtkC4ELgwuFC44LkAuSC68LsQuzC7ULtwu8C74L3wvhC+ML5QvnC+kL6wv0C/sMCgwSDB8MIQwk
-DDkMOww9DD8MQQxLDFgMWgxfDGgMbQx8DIUMlgyYDJoMnAyeDNMM4AztDQMNEQ0bDSkNQg1PDWENdQ1/
-DYsNjQ2PDZENkw2VDZ4NoA2iDaQNpg2oDaoNxQ3PDdoN5Q4CDgQOBg4IDgoODA4ODhcOGQ4eDiAOIg5h
-Dm0Odg6DDo8OnQ6fDqEOow6lDqcOqQ6rDr4OwQ7DDsUOxw7JDssOzQ7fDuwO9Q73Dv4PAA8CDwQPDQ8P
-DxIPFA8rDzQPPQ9ID20Pdg9/D4kPiw+ND48PkQ+TD5UPlw+gD7gPxQ/OD9kP5A/uEBcQGRAbEB0QHxAh
-ECMQJRAuEEoQYhCLEI0QjxCREJMQlRCYEJkQmxCdEJ8QshDAENgRGxEwEUURWBFsEYERlBGZEZ4RoBGi
-EaQRphGoEaoRrBGxEbMRtBG2EbgRuhHREeUSFhIrEjoSTBJeEmwSbhJzEnUSdxJ5EnsSfRKAEoIShxKO
-EqQSrRK2EsMS+BMeEyATIhMkEyYTKBMqEywTMhM7Ez0TQBNCE08TVxNZE14TYBNiE2cTaRNrE3kTpROs
-E7UTvBPSE98T9RQAFAkUEBQpFDQUPRRCFFUUZhRoFGoUbBRuFHwUhRSMFKQUtRS3FLkUuxS9FMkU2hTc
-FN4U4BTiFO8VABUCFQQVBhUIFRQVJRUnFSkVKxUtFUUVVhVYFVoVXBVeFWUVdhV4FXoVfBV+FYkVmhWc
-FZ4VoBWiFbMVtRW3FbkVuxXMFc4V0BXSFdQV3hXnFekWBBYGFggWChYMFg4WEBYSFhQWFhYYFhoWHBYe
-FicWKRYrFjkWQhZHFlAWUhZtFm8WcRZzFnUWdxZ5FnsWfRZ/FoEWgxaFFocWkBaSFq8WsRazFrUWtxa5
-FrsWvRa/FsEWwxbFFscWyRbLFtQW1hbzFvUW9xb5FvsW/Rb/FwEXAxcFFwcXCRcLFw0XDxccFycXOhdJ
-F10XcxeAF48XpxezF8UX4xfwGBAYGRgbGCQYJhgoGCoYLBg1GDcYQBhCGEQYRhhIGFEYUxiMGI4YkBiS
-GJQYlhiYGJoYnBieGKAYohikGKYYqBiqGKwYrhiwGLIYtBi2GLgYuhi8GL4YwBjCGMsYzRkGGQgZChkM
-GQ4ZEBkSGRQZFhkYGRoZHBkeGSAZIhkkGSYZKBkqGSwZLhkwGTIZNBk2GTgZOhk8GT4ZQBlCGUQZRhlI
-GUoZUxlVGVcZWRlbGV0ZXxlhGWMZZRlnGWkZaxl0GXYZdxmAGYIZgxmMGY4ZjxmYGZ0AAAAAAAACAgAA
-AAAAAAMVAAAAAAAAAAAAAAAAAAAZrA</bytes>
+kYCTgIKAr4AAgAaAgICwECGAlNIADgAyADMANFtOU0NsYXNzTmFtZYAEgANbUEdFeGlmUGFuZWzSADcA
+OAA5ADpYJGNsYXNzZXNaJGNsYXNzbmFtZaIAOgA7Xk5TQ3VzdG9tT2JqZWN0WE5TT2JqZWN0XxAQSUJD
+b2NvYUZyYW1ld29ya9IADgA+AD8AQFpOUy5vYmplY3RzgAeg0gA3ADgAQgBDowBDAEQAO1xOU011dGFi
+bGVTZXRVTlNTZXTSAA4APgBGAEeALq0ASABJAEoASwBMAE0ATgBPAFAAUQBSAFMAVIAJgDaAOIBqgGyA
+boBwgHKAc4B2gHiAeYB61AAOAFYAVwBYAFkAHwBbAFxdTlNEZXN0aW5hdGlvblhOU1NvdXJjZVdOU0xh
+YmVsgDWAAoAKgDTfEBUAXgBfAA4AYABhAGIAYwBkAGUAZgBnAGgAaQBqAGsAMgBsAG0AbgBvAHAAcQBy
+AHMAdAB1AHYAdwB4AHkAegB7AHwAfQB+AH8AgACBAIIAcQCEAIVfEA9OU05leHRSZXNwb25kZXJfEB9O
+U0RyYWdnaW5nU291cmNlTWFza0Zvck5vbkxvY2FsWU5TVHZGbGFnc18QE05TT3JpZ2luYWxDbGFzc05h
+bWVfEBFOU0JhY2tncm91bmRDb2xvcl8QEk5TQWxsb3dzVHlwZVNlbGVjdFxOU0Nvcm5lclZpZXdfEBdO
+U0ludGVyY2VsbFNwYWNpbmdXaWR0aF8QGU5TQ29sdW1uQXV0b3Jlc2l6aW5nU3R5bGVfEBhOU0ludGVy
+Y2VsbFNwYWNpbmdIZWlnaHRYTlN2RmxhZ3NbTlNGcmFtZVNpemVZTlNFbmFibGVkWE5TV2luZG93W05T
+R3JpZENvbG9yXxAcTlNEcmFnZ2luZ1NvdXJjZU1hc2tGb3JMb2NhbFtOU1N1cGVydmlld15OU1RhYmxl
+Q29sdW1uc1tOU1Jvd0hlaWdodIANEACAMxISwAAAgAyALwiAECNACAAAAAAAABAEI0AAAAAAAAAAEREA
+gA4JgA+AC4AwEA+ADYATI0AxAAAAAAAAXkhNQmxrVGFibGVWaWV3W05TVGFibGVWaWV32wBeAA4AiQCK
+AIsAaACMAGsAjQBuAI4AjwCQAJEAegCSAJMAWwB/AJYAjwBbV05TRnJhbWVZTlNjdkZsYWdzWk5TU3Vi
+dmlld3NZTlNEb2NWaWV3WU5TQkdDb2xvcl1OU05leHRLZXlWaWV3gECARoBFgEQRCQCACoAPgCSAQIAK
+WnsyNjksIDE2OH3UAF4ADgCJAGgAKwCcAJ0AnoAAgBKAEREBAF8QFHt7MjcwLCAxfSwgezE2LCAxN319
+0gA3ADgAoQCipACiAKMApAA7XV9OU0Nvcm5lclZpZXdWTlNWaWV3W05TUmVzcG9uZGVy0gAOAD4ARgCn
+gC6iAKgAqYAUgCvXAA4AqwCsAK0ArgCvAIcAsACxALIAswC0ALUAW1xOU0hlYWRlckNlbGxXTlNXaWR0
+aFpOU0RhdGFDZWxsWk5TTWluV2lkdGhaTlNNYXhXaWR0aIAqgBUjQGHAAAAAAACAISNARAAAAAAAACNA
+j0AAAAAAAIAK1wC4AA4AYgC5ALoAuwC8AL0AvgC/AMAAwQDCAMNbTlNDZWxsRmxhZ3NaTlNDb250ZW50
+c1lOU1N1cHBvcnRcTlNDZWxsRmxhZ3MyW05TVGV4dENvbG9yEgSB/gCAIIAagBaAFxIEAAAAgBxQ1AAO
+AMYAxwDIAMkAygDLAMxWTlNTaXplVk5TTmFtZVhOU2ZGbGFnc4AZI0AmAAAAAAAAgBgRDBxcTHVjaWRh
+R3JhbmRl0gA3ADgAzwDQogDQADtWTlNGb2500wAOANIA0wDUANUA1lxOU0NvbG9yU3BhY2VXTlNXaGl0
+ZYAbEANLMC4zMzMzMzI5OQDSADcAOADYANmiANkAO1dOU0NvbG9y1QAOANkA0gDbANwA1ADeAN8A4ADh
+W05TQ29sb3JOYW1lXU5TQ2F0YWxvZ05hbWWAG4AfEAaAHoAdVlN5c3RlbV8QD2hlYWRlclRleHRDb2xv
+ctMADgDSANMA1ADVAOaAG0IwANIANwA4AOgA6aUA6QDqAOsA7AA7XxARTlNUYWJsZUhlYWRlckNlbGxf
+EA9OU1RleHRGaWVsZENlbGxcTlNBY3Rpb25DZWxsVk5TQ2VsbNgAuAAOAGIAuQC6AO4AuwC8AO8A8ACW
+APIA8wBbAPUA9l1OU0NvbnRyb2xWaWV3EhQh/kCAKYAkgCKAI4AKEQgAgCdZVGV4dCBDZWxs1AAOAMYA
+xwDIAMkA+gDLAPyAGSNAKgAAAAAAAIAYEQQU1QAOANkA0gDbANwA1AD/AN8BAADhgBuAJoAlgB1fEBZj
+b250cm9sQmFja2dyb3VuZENvbG9y0wAOANIA0wDUANUBBYAbSzAuNjY2NjY2NjkA1QAOANkA0gDbANwA
+1ADeAN8BCQDhgBuAH4AogB1fEBBjb250cm9sVGV4dENvbG9y0gA3ADgBDQDqpADqAOsA7AA70gA3ADgB
+DwEQogEQADtdTlNUYWJsZUNvbHVtbtkBEgAOAKsArACtARMArgCvAIcAfgCwARYBFwEYARkAtAC1AFte
+TlNJc1Jlc2l6ZWFibGVeTlNSZXNpemluZ01hc2sJgCqALCNAXkAAAAAAAIAtEAGACtcAuAAOAGIAuQC6
+ALsAvAC9AL4AvwDAAMEAcgDDgCCAGoAWgBeAHNgAuAAOAGIAuQC6AO4AuwC8AO8A8ACWAPIA8wBbAPUA
+9oApgCSAIoAjgAqAJ9IANwA4ASkBKqMBKgErADteTlNNdXRhYmxlQXJyYXlXTlNBcnJhedMADgDSANMA
+1ADVAS6AG0IxANUADgDZANIA2wDcANQBMQDfATIA4YAbgDKAMYAdWWdyaWRDb2xvctMADgDSANMA1ADV
+ATeAG0QwLjUA0gA3ADgBOQE6ogE6ADteTlNDbGFzc1N3YXBwZXJYZGVsZWdhdGXSADcAOAE9AT6jAT4B
+PwA7XxAUTlNOaWJPdXRsZXRDb25uZWN0b3JeTlNOaWJDb25uZWN0b3LUAA4AVgBXAFgAWQCoAB8BRIA1
+gBSAAoA3WXRhZ0NvbHVtbtQADgBWAFcAWABZAFsBSQFKgDWACoA5gGndAUwADgFNAU4BTwFQAVEBUgFT
+AVQBVQFWAVcBWAFZAVoAwAFcAV0BXgFfAWABYQCCAWIAK1xOU1dpbmRvd1ZpZXdcTlNTY3JlZW5SZWN0
+XxATTlNGcmFtZUF1dG9zYXZlTmFtZV1OU1dpbmRvd1RpdGxlWU5TV1RGbGFnc11OU1dpbmRvd0NsYXNz
+XxAWTlNXaW5kb3dDb250ZW50TWluU2l6ZVxOU1dpbmRvd1JlY3RfEA9OU1dpbmRvd0JhY2tpbmdfEBFO
+U1dpbmRvd1N0eWxlTWFza1lOU01pblNpemVbTlNWaWV3Q2xhc3OAPoBogGaAFoA7E/////+gAAAAgDyA
+PYA6EAKAZ4AAXxAYe3sxOTYsIDI2OX0sIHszMDAsIDI0MX19WUV4aWYgRGF0YVpITUJsa1BhbmVsWnsz
+MDAsIDE4N33XAF4ADgCLAGgAaQBrAG4AfwFqAWsAngFsAH8BboAPgGWAP4BjgA+AZNIADgA+AEYBcYAu
+ogCPAXOAQIBO3xAPAF4BdQAOAIkAYQF2AIsBdwBoAGsAMgBuAXgAjgF5AVgBewBzAX0BfgF/AYABgQGC
+AH8BhAFYAYYAcQBxW05TSFNjcm9sbGVyWE5Tc0ZsYWdzXE5TU2Nyb2xsQW10c1tOU1ZTY3JvbGxlcl1O
+U0NvbnRlbnRWaWV3gD6AS4AzgE2AQhASgENPEBBBIAAAQSAAAEGYAABBmAAAERESgA+AQYA+gEeADYAN
+XxAPSE1CbGtTY3JvbGxWaWV3XE5TU2Nyb2xsVmlld9IADgA+AEYBjYAuowBxAYYBe4ANgEeAS9IADgA+
+AEYBk4AuoQBbgApfEBR7ezEsIDF9LCB7MjY5LCAxNjh9fdIANwA4AZcBmKQBmACjAKQAO1pOU0NsaXBW
+aWV32QBeAZoADgCJAGgAawGbAG4BnACPAI8BnwGgAJ4AfwGiAI8BpFhOU1RhcmdldFhOU0FjdGlvbllO
+U1BlcmNlbnSAQIBAgEqASIAPgEmAQCM/78+HAAAAAF8QFXt7MjcwLCAxfSwgezE1LCAxNjh9fVxfZG9T
+Y3JvbGxlcjrSADcAOAGoAamlAakBqgCjAKQAO1pOU1Njcm9sbGVyWU5TQ29udHJvbNoAXgGaAA4AiQF2
+AGgAawGbAG4BnACPAI8BnwGvARkAngB/AaIAjwGzgECAQIBKgEyAD4BJgEAjP+/dJAAAAABfEBl7ey0x
+MDAsIC0xMDB9LCB7MjM0LCAxNX19XxAVe3s3LCA0N30sIHsyODYsIDE3MH192gBeAA4AiQBhAOwAaABq
+AGsAMgBuAVgAcwG5AboBuwG8AH4AfwG/AViAPoAzgFGAUIBSEQEkCYAPgE+APl8QEEhNQmxrU2VhcmNo
+RmllbGRdTlNTZWFyY2hGaWVsZF8QFXt7MjAsIDIwfSwgezEyMCwgMTl9fd8QEAC4AcUADgHGAGEAYgC5
+ALoA7gC7AccAMgHIAckBygC8AcsBzABzAc4BzwCWAMAAwQFzAdQBGQHVAH4B1wHYAHZfEBJOU1NlYXJj
+aEZpZWxkRmxhZ3NfEBJOU0NhbmNlbEJ1dHRvbkNlbGxfEBBOU1RleHRCZXplbFN0eWxlXxARTlNEcmF3
+c0JhY2tncm91bmRfEBJOU1NlYXJjaEJ1dHRvbkNlbGxfEBBOU01heGltdW1SZWNlbnRzEhRx/kBECAAA
+AIAzgFmAVIAkgBaAF4BOEhACBACAUwmAVRD/gC9fEBRITUJsa1NlYXJjaEZpZWxkQ2VsbF8QEU5TU2Vh
+cmNoRmllbGRDZWxs3AGaALgADgHdAd4B3wC5AO4B4AC7AZsB4QG7AeMB5AHlAHIAwAHnAXMB6QByAeoB
+618QEk5TUGVyaW9kaWNJbnRlcnZhbF5OU0J1dHRvbkZsYWdzMl8QD05TS2V5RXF1aXZhbGVudF8QD05T
+UGVyaW9kaWNEZWxheV1OU0J1dHRvbkZsYWdzgFISAAH+AIBYEEuAFoBWgE4RAZCAVxIIRED/VnNlYXJj
+aF8QE19zZWFyY2hGaWVsZFNlYXJjaDrSADcAOAHvAfCkAfAA6wDsADtcTlNCdXR0b25DZWxs3QGaALgA
+DgHdAd4B3wHyALkA7gHgALsBmwHhAbsB4wHkAeUAcgDAAfYB9wFzAekAcgH5AetfECNOU0FjY2Vzc2li
+aWxpdHlPdmVycmlkZGVuQXR0cmlidXRlc4BSgFiAFoBbgFqAToBiVWNsZWFy0gAOAD4ARgH9gC6hAf6A
+XNMADgIAAD4CAQICAgVXTlMua2V5c4BhogIDAgSAXYBeogIGAgeAX4BgXUFYRGVzY3JpcHRpb25fEClO
+U0FjY2Vzc2liaWxpdHlFbmNvZGVkQXR0cmlidXRlc1ZhbHVlVHlwZVZjYW5jZWzSADcAOAIMAg2jAg0C
+DgA7XxATTlNNdXRhYmxlRGljdGlvbmFyeVxOU0RpY3Rpb25hcnlfEBNfc2VhcmNoRmllbGRDYW5jZWw6
+WnszMDAsIDI0MX3SADcAOAISAKOjAKMApAA7XxAWe3swLCAwfSwgezE5MjAsIDExNzh9fVp7MzAwLCAy
+MDl90gA3ADgCFgIXogIXADtfEBBOU1dpbmRvd1RlbXBsYXRlXxAVaW5pdGlhbEZpcnN0UmVzcG9uZGVy
+1AAOAFYAVwBYAFkAWwAfAh2ANYAKgAKAa1xlbnRyaWVzVGFibGXUAA4AVgBXAFgAWQFzAB8CI4A1gE6A
+AoBtW3NlYXJjaEZpZWxk1AAOAFYAVwBYAFkAWwFzAimANYAKgE6Ab1tuZXh0S2V5Vmlld9QADgBWAFcA
+WABZAKkAHwIvgDWAK4ACgHFbdmFsdWVDb2x1bW7UAA4AVgBXAFgAWQFzAI8CKYA1gE6AQIBv1AAOAFYA
+VwBYAjcAHwFzAjqAdYACgE6AdF1jaGFuZ2VTZWFyY2g60gA3ADgCPQI+owI+AT8AO18QFU5TTmliQ29u
+dHJvbENvbm5lY3RvctQADgBWAFcAWABZAB8AWwJDgDWAAoAKgHdaZGF0YVNvdXJjZdQADgBWAFcAWABZ
+AB8BSQBcgDWAAoA5gDTUAA4AVgBXAFgAWQFzAFsCKYA1gE6ACoBv1AAOAFYAVwBYAFkBSQAfAlOANYA5
+gAKAe1Z3aW5kb3fSAA4APgJWAleAf60BcwG7AFsAjwCpAVgAqACzAmABSQF7AYYBGIBOgFKACoBAgCuA
+PoAUgCGAfYA5gEuAR4At0gAOADIAMwJngASAfl1OU0FwcGxpY2F0aW9u0gA3ADgCagErogErADvSAA4A
+PgJWAm2Af60BWAFzAI8BWABbAUkAWwCoAB8AHwCPAI8AqYA+gE6AQIA+gAqAOYAKgBSAAoACgECAQIAr
+0gAOAD4CVgJ9gH+uAXMBuwBbAI8AqQFYAKgAswAfAmABSQF7AYYBGIBOgFKACoBAgCuAPoAUgCGAAoB9
+gDmAS4BHgC3SAA4APgJWAo6Af64CjwKQApECkgKTApQClQKWApcCmAKZApoCmwKcgIOAhICFgIaAh4CI
+gImAioCLgIyAjYCOgI+AkF8QEEJsayBTZWFyY2ggRmllbGRfEBVCbGsgU2VhcmNoIEZpZWxkIENlbGxe
+QmxrIFRhYmxlIFZpZXdfEA9CbGsgU2Nyb2xsIFZpZXdcVGFibGUgQ29sdW1uXENvbnRlbnQgVmlld15U
+YWJsZSBDb2x1bW4tMV8QHVRleHQgRmllbGQgQ2VsbCAoVGV4dCBDZWxsKS0xXEZpbGUncyBPd25lcltB
+cHBsaWNhdGlvblpFeGlmIFBhbmVsXxATSG9yaXpvbnRhbCBTY3JvbGxlcl8QEVZlcnRpY2FsIFNjcm9s
+bGVyXxAbVGV4dCBGaWVsZCBDZWxsIChUZXh0IENlbGwp0gAOAD4CVgKtgH+kAFsAjwFzAbuACoBAgE6A
+UtIADgA+AlYCtIB/pACAAYQBvwHVgAuAQYBPgFPSAA4APgJWAruAf68QGwBSAXMASQBLAE4ATQBQAFMA
+WwCPAKkAVABKAB8BewBIARgATAG7AFEBWACoALMATwJgAUkBhoB4gE6ANoBqgHCAboBzgHmACoBAgCuA
+eoA4gAKAS4AJgC2AbIBSgHaAPoAUgCGAcoB9gDmAR9IADgA+AlYC2YB/rxAbAtoC2wLcAt0C3gLfAuAC
+4QLiAuMC5ALlAuYC5wLoAukC6gLrAuwC7QLuAu8C8ALxAvICBwL0gJWAloCXgJiAmYCagJuAnICdgJ6A
+n4CggKGAooCjgKSApYCmgKeAqICpgKqAq4CsgK2AYICuEBkQDBAREBMQHRAbEB8QCRAXECAQBRAVEAoQ
+GhANEBQQCBALEB4T//////////3SAA4APgBGAwuALqDSAA4APgJWAw6Af6DSAA4APgJWAxGAf6DSADcA
+OAMTAxSiAxQAO15OU0lCT2JqZWN0RGF0YQAIABkAIgAnADEAOgA/AEQAUgBUAGYBzwHVAiACJwIuAjwC
+TgJqAngChAKQAp4CqQK3AtMC4QL0AwYDIAMqAzcDOQM7Az0DPwNBA0MDRQNHA0kDSwNNA08DUQNTA1UD
+VwNZA1sDZANwA3IDdAOAA4kDkgOdA6IDsQO6A80D1gPhA+MD5APtA/QEAQQHBBAEEgQtBC8EMQQzBDUE
+NwQ5BDsEPQQ/BEEEQwRFBEcEWARmBG8EdwR5BHsEfQR/BNYE6AUKBRQFKgU+BVMFYAV6BZYFsQW6BcYF
+0AXZBeUGBAYQBh8GKwYtBi8GMQY2BjgGOgY7Bj0GRgZIBlEGVAZWBlcGWQZbBl0GXwZhBmMGbAZ7BocG
+tAa8BsYG0QbbBuUG8wb1BvcG+Qb7Bv4HAAcCBwQHBgcIBxMHJAcmBygHKgctB0QHTQdWB2QHawd3B4AH
+ggeHB4kHiweoB7UHvQfIB9MH3gfgB+IH6wftB/YH/wgBCB4IKgg1CD8ITAhYCF0IXwhhCGMIZQhqCGwI
+bQh+CIUIjAiVCJcIoAiiCKUIsgi7CMAIxwjUCOEI6QjrCO0I+QkCCQcJDwkkCTAJPglACUIJRAlGCUgJ
+TwlhCW4JcAlzCXwJhwmbCa0JugnBCeIJ8An1CfcJ+Qn7Cf0J/woCCgQKDgofCiEKKgosCi8KRApGCkgK
+SgpMCmUKcgp0CoAKlQqXCpkKmwqdCrAKuQrCCssK0AreCwMLEgshCyILJAsmCy8LMQszCzULUgtUC1YL
+WAtaC1wLfQt/C4ELgwuFC4cLiQuSC5kLqAuwC70LvwvCC9cL2QvbC90L3wvpC/YL+Av9DAYMCwwaDCMM
+LAwzDEoMWQxqDGwMbgxwDHIMfAyNDI8MkQyTDJUMygzXDOQM+g0IDRINIA05DUYNWA1sDXYNgg2EDYYN
+iA2KDYwNlQ2XDZkNmw2dDZ8NoQ28DcYN0Q3cDfkN+w39Df8OAQ4DDgUODg4QDhUOFw4ZDlgOZA5tDnoO
+hg6UDpYOmA6aDpwOng6gDqIOtQ64DroOvA6+DsAOwg7EDtYO4w7sDu4O9Q73DvkO+w8EDwYPCQ8LDyIP
+Kw80Dz8PZA9tD3YPgA+CD4QPhg+ID4oPjA+OD5cPrw+8D8UP0A/bD+UQDhAQEBIQFBAWEBgQGhAcECUQ
+QRBZEIIQhBCGEIgQihCMEI8QkBCSEJQQlhCpELcQzxESEScRPBFPEWMReBGLEZARlRGXEZkRmxGdEZ8R
+oRGjEagRqhGrEa0RrxGxEcgR3BINEiISMRJDElUSYxJlEmoSbBJuEnASchJ0EncSeRJ+EoUSmxKkEq0S
+uhLvExUTFxMZExsTHRMfEyETIxMpEzITNBM3EzkTRhNOE1ATVRNXE1kTXhNgE2ITcBOcE6MTrBOzE8kT
+1hPsE/cUABQHFCAUKxQ0FDkUTBRkFHUUdxR5FHsUfRSKFJsUnRSfFKEUoxSvFMAUwhTEFMYUyBTUFOUU
+5xTpFOsU7RT5FQoVDBUOFRAVEhUjFSUVJxUpFSsVORVCFUkVYRVyFXQVdhV4FXoVhRWWFZgVmhWcFZ4V
+rxWxFbMVtRW3FcgVyhXMFc4V0BXXFeAV4hX9Ff8WARYDFgUWBxYJFgsWDRYPFhEWExYVFhcWIBYiFiQW
+MhY7FkAWSRZLFmYWaBZqFmwWbhZwFnIWdBZ2FngWehZ8Fn4WgBaJFosWqBaqFqwWrhawFrIWtBa2FrgW
+uha8Fr4WwBbCFsQWzRbPFuwW7hbwFvIW9Bb2FvgW+hb8Fv4XABcCFwQXBhcIFxsXMxdCF1QXYRduF30X
+nReqF7YXwRfXF+sYCRgSGBQYHRgfGCEYIxglGC4YMBg5GDsYPRg/GEEYShhMGIUYhxiJGIsYjRiPGJEY
+kxiVGJcYmRibGJ0YnxihGKMYpRinGKkYqxitGK8YsRizGLUYtxi5GLsYxBjGGP8ZARkDGQUZBxkJGQsZ
+DRkPGREZExkVGRcZGRkbGR0ZHxkhGSMZJRknGSkZKxktGS8ZMRkzGTUZNxk5GTsZPRk/GUEZQxlFGUcZ
+SRlLGU0ZTxlRGVMZVRlXGVkZWxlkGW0ZbxlwGXkZexl8GYUZhxmIGZEZlgAAAAAAAAICAAAAAAAAAxUA
+AAAAAAAAAAAAAAAAABmlA</bytes>
 		</object>
 	</data>
 </archive>

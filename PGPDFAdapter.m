@@ -60,6 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSData *data;
 	if([self getData:&data] != PGDataAvailable) return;
+	if(![NSPDFImageRep canInitWithData:data]) return;
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
 	if(!_rep) return;
 
@@ -95,6 +96,8 @@ DEALINGS WITH THE SOFTWARE. */
 	[self setHasReadContents];
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
 	[rep setCurrentPage:[[self identifier] index]];
+	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
+	[rep setPixelsHigh:NSHeight([rep bounds])];
 	[self returnImageRep:rep error:nil];
 }
 - (BOOL)isResolutionIndependent

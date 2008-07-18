@@ -1,21 +1,35 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<title>Modalità di scala</title>
+		<title>Scaling modes</title>
 		<link rel="stylesheet" type="text/css" href="main.css" media="all">
 	</head>
 	<body>
 		<a name="scaling"></a>
-		<h1>Modalità di scala</h1>
-		<p>La modalità di scala determina come vengono visualizzate le immagini. Ci sono tre modalità:</p>
-		<ul>
-			<li><b>Dimensioni reali</b>: Mostra l'immagine senza alcuna modifica.</li>
-			<li><b>Adatta allo schermo</b>: Ridimensiona l'immagine in modo tale che non sia richiesto alcuno scorrimento per vederla.</li>
-			<li><b>Ridimensiona automaticamente</b>: Ridimensiona le immagini larghe adattandole verticalmente, e quelle alte adattandole orizzontalmente.</li>
-		</ul>
-		<p>Per le modalità Adatta allo schermo e Ridimensiona automaticamente, puoi limitare le immagini ad essere soltanto ingrandite o ridotte o entrambe le cose. Le immagini indipendenti dalla risoluzione (come i PDF) non possono essere limitate.</p>
-		<p>Puoi anche scegliere di applicare un fattore di scala determinato.</p>
-		<h3>Consulta anche</h3>
-		<a href="help:anchor='panning' bookID='Sequential Help'">Vedere immagini grandi</a><br>
+		<h1><img src="Sequential.png" class="icon"> Scaling modes</h1>
+		<table cellspacing=0 width=100%>
+			<tr class="header">
+				<td>Mode</td>
+				<td>Description</td>
+			</tr>
+			<tr>
+				<td>Actual size</td>
+				<td>Displays images normally with no scaling.</td>
+			</tr>
+			<tr>
+				<td>Actual size with DPI</td>
+				<td>Scales images according to their stated DPIs.</td>
+			</tr>
+			<tr>
+				<td>Automatic fit</td>
+				<td>Scales wide images to fit vertically, and tall images to fit horizontally.</td>
+			</tr>
+			<tr>
+				<td>Fit to window/screen</td>
+				<td>Scales images so that no scrolling is required.</td>
+			</tr>
+		</table>
+		<p>For the Automatic Fit and Fit to Window/Screen modes, you can choose whether to allow images to be upscaled, downscaled, or scaled freely (both). Resolution independent images (such as PDFs) as always scaled freely.</p>
+		<p>You can also choose to apply a constant scaling factor.</p>
 	</body>
 </html>

@@ -47,25 +47,6 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
-				<key>changeEncoding</key>
-				<string>id</string>
-				<key>closeWindowContent</key>
-				<string>PGFullscreenWindow</string>
-				<key>connectionDidClose</key>
-				<string>PGURLConnection</string>
-				<key>connectionDidReceiveResponse</key>
-				<string>PGURLConnection</string>
-				<key>connectionLoadingDidProgress</key>
-				<string>PGURLConnection</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSObject</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
 				<key>changeOrientation</key>
 				<string>id</string>
 				<key>changeTimerInterval</key>
@@ -133,6 +114,25 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>changeEncoding</key>
+				<string>id</string>
+				<key>closeWindowContent</key>
+				<string>PGFullscreenWindow</string>
+				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionLoadingDidProgress</key>
+				<string>PGURLConnection</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
