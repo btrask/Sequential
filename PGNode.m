@@ -151,6 +151,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
+	if(!class) class = [PGResourceAdapter class];
 	return class;
 }
 - (BOOL)shouldLoadAdapterClass:(Class)aClass
