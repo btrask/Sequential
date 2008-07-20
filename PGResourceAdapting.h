@@ -35,38 +35,36 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 enum {
-	PGWrongPassword   = -1,
-	PGDataUnavailable = 0,
-	PGDataAvailable   = 1
+	PGWrongPassword = -1,
+	PGNoData        = 0,
+	PGDataReturned  = 1
 };
-typedef int PGDataAvailability;
+typedef int PGDataError;
 
 @protocol PGResourceAdapting
 
+- (PGNode *)parentNode;
 - (PGContainerAdapter *)parentAdapter;
 - (PGContainerAdapter *)containerAdapter;
-- (PGContainerAdapter *)rootContainerAdapter;
 - (PGNode *)rootNode;
+- (PGContainerAdapter *)rootContainerAdapter;
 - (PGDocument *)document;
-- (PGNode *)parentNode;
 
 - (PGResourceIdentifier *)identifier;
-- (id)dataSource;
+- (void)loadWithURLResponse:(NSURLResponse *)response;
 
-- (BOOL)isViewable;
+- (BOOL)isContainer;
 - (float)loadingProgress;
 - (BOOL)canGetData;
 - (BOOL)canExtractData;
-- (PGDataAvailability)getData:(out NSData **)outData;
+- (PGDataError)getData:(out NSData **)outData;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;
 - (void)clearCache;
-- (BOOL)isContainer;
 
-- (NSString *)lastPassword;
-- (BOOL)expectsReturnedImage;
-- (void)returnImageRep:(NSImageRep *)aRep error:(NSError *)error;
+- (void)readIfNecessary;
+- (void)readReturnedImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (BOOL)hasViewableNodes;
 - (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.
@@ -88,20 +86,14 @@ typedef int PGDataAvailability;
 - (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
 - (BOOL)isDescendantOfNode:(PGNode *)aNode;
 
-- (NSDate *)dateModified;
-- (NSDate *)dateCreated;
-- (NSNumber *)dataLength;
-
 - (void)addMenuItemsToMenu:(NSMenu *)aMenu;
 
 - (char const *)unencodedSampleString;
 - (NSStringEncoding)defaultEncoding;
 - (void)setEncoding:(NSStringEncoding)encoding;
 
-- (BOOL)canBookmark;
-- (PGBookmark *)bookmark;
-
+- (void)noteFileEventDidOccurDirect:(BOOL)flag;
 - (void)noteSortOrderDidChange;
-- (void)noteResourceMightHaveChanged;
+- (void)noteIsViewableDidChange;
 
 @end

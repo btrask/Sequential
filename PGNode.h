@@ -47,49 +47,79 @@ enum {
 @interface PGNode : NSObject
 {
 	@private
-	BOOL                  _loaded;
 	PGContainerAdapter   *_parentAdapter;
 	PGDocument           *_document;
+
 	PGResourceIdentifier *_identifier;
+	NSData               *_data;
 	id                    _dataSource;
+
+	NSString             *_lastPassword;
+	BOOL                  _needsPassword;
+
 	NSMenuItem           *_menuItem;
 	BOOL                  _isViewable;
 	unsigned              _determiningTypeCount;
-	NSString             *_lastPassword;
-	BOOL                  _expectsReturnedImage;
+
+	BOOL                  _shouldRead;
+
 	PGResourceAdapter    *_resourceAdapter;
+
 	NSDate               *_dateModified;
 	NSDate               *_dateCreated;
 	NSNumber             *_dataLength;
 }
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident adapterClass:(Class)class dataSource:(id)source load:(BOOL)flag;
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident;
+
+- (id)dataSource;
+- (void)setDataSource:(id)anObject;
+- (void)setData:(NSData *)data;
+
+- (PGResourceAdapter *)resourceAdapter;
+- (void)setResourceAdapterClass:(Class)aClass;
+- (Class)classWithURLResponse:(NSURLResponse *)response;
+- (BOOL)shouldLoadAdapterClass:(Class)aClass;
+
+- (NSString *)lastPassword;
+- (BOOL)needsPassword;
+- (void)setNeedsPassword:(BOOL)flag;
 
 - (unsigned)depth;
-- (BOOL)isLoaded;
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
-- (void)setIsViewable:(BOOL)flag;
+- (BOOL)isViewable;
 - (void)setDeterminingType:(BOOL)flag;
 - (void)becomeViewed;
 - (void)becomeViewedWithPassword:(NSString *)pass;
 
-- (PGResourceAdapter *)resourceAdapter;
-- (PGResourceAdapter *)setResourceAdapter:(PGResourceAdapter *)adapter; // If it changes, returns -resourceAdapter, otherwise nil.
-- (PGResourceAdapter *)setResourceAdapterClass:(Class)aClass;
-
 - (void)removeFromDocument;
 
-- (void)setDateModified:(NSDate *)aDate;
-- (void)setDateCreated:(NSDate *)aDate;
-- (void)setDataLength:(NSNumber *)aNumber;
+- (NSDate *)dateModified;
+- (NSDate *)dateCreated;
+- (NSNumber *)dataLength;
 - (NSComparisonResult)compare:(PGNode *)node; // Uses the document's sort mode.
 
-- (void)noteFileEventDidOccur;
+- (BOOL)canBookmark;
+- (PGBookmark *)bookmark;
+
+- (void)noteDateModifiedDidChange;
+- (void)noteDateCreatedDidChange;
+- (void)noteDataLengthDidChange;
 
 - (void)identifierDidChange:(NSNotification *)aNotif;
 
 @end
 
 @interface PGNode (PGResourceAdapterProxy) <PGResourceAdapting>
+@end
+
+@interface NSObject (PGNodeDataSource)
+
+- (Class)classForNode:(PGNode *)sender;
+- (NSDate *)dateModifiedForNode:(PGNode *)sender;
+- (NSDate *)dateCreatedForNode:(PGNode *)sender;
+- (NSNumber *)dataLengthForNode:(PGNode *)sender;
+- (NSData *)dataForNode:(PGNode *)sender; // If a password is required, sends -lastPassword, then sends -setNeedsPassword: with whether the password worked.
+
 @end

@@ -49,26 +49,29 @@ DEALINGS WITH THE SOFTWARE. */
 	id const resp = [sender response];
 	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[resp MIMEType]];
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) _encounteredLoadingError = YES;
-	else if(pendingClass && ([pendingClass alwaysReads] || [self shouldRead:NO])) return;
+	else if(pendingClass && [[self node] shouldLoadAdapterClass:pendingClass]) return;
 	[_mainConnection cancel];
 }
 - (void)connectionDidClose:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
 		if([_mainConnection status] == PGLoaded) {
-			if([_mainConnection data]) [self loadFromData:[_mainConnection data] URLResponse:[_mainConnection response]];
-			else if([self shouldReadContents]) _encounteredLoadingError = YES;
+			if([_mainConnection data]) {
+				[[self node] setData:[_mainConnection data]];
+				[[self node] loadWithURLResponse:[_mainConnection response]];
+			} else _encounteredLoadingError = YES;
 		}
-		[self setIsDeterminingType:NO];
-		if([self shouldReadContents]) [self readContents];
+		_isDownloading = NO;
+		[self noteIsViewableDidChange];
+		[self readIfNecessary];
 	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
 }
 
 #pragma mark PGResourceAdapting
 
-- (BOOL)isViewable
+- (BOOL)adapterIsViewable
 {
-	return _encounteredLoadingError || [super isViewable];
+	return _isDownloading || _encounteredLoadingError || [super adapterIsViewable];
 }
 - (float)loadingProgress
 {
@@ -77,20 +80,20 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)readWithURLResponse:(NSURLResponse *)response
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	if(response || [self canGetData]) return;
-	[self setIsDeterminingType:YES];
+	if(response || [self canGetData] || _isDownloading) return;
+	_isDownloading = YES;
+	_encounteredLoadingError = NO;
+	[self noteIsViewableDidChange];
 	NSURL *const URL = [[self identifier] URL];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
 	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
 }
-- (void)readContents
+- (void)read
 {
-	if([self isDeterminingType]) return;
-	[self setHasReadContents];
+	if(_isDownloading) return;
 	id const resp = [_mainConnection response];
-	NSLog(@"connection = %@, response = %@", _mainConnection, resp);
 	NSString *message = nil;
 	if(_encounteredLoadingError) {
 		if([resp respondsToSelector:@selector(statusCode)]) {
@@ -98,7 +101,7 @@ DEALINGS WITH THE SOFTWARE. */
 			if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
 		} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]];
 	}
-	[self returnImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
+	[self readReturnedImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 
 #pragma mark NSObject

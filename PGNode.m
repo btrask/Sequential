@@ -27,8 +27,13 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGDocument.h"
 #import "PGResourceAdapter.h"
+#import "PGWebAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
+#import "PGBookmark.h"
+
+// Controllers
+#import "PGDocumentController.h"
 
 // Categories
 #import "NSDateAdditions.h"
@@ -64,9 +69,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent
       document:(PGDocument *)doc
       identifier:(PGResourceIdentifier *)ident
-      adapterClass:(Class)class
-      dataSource:(id)source
-      load:(BOOL)flag;
 {
 	if(!ident) {
 		[self release];
@@ -82,13 +84,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		}
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
-		_dataSource = source;
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
-		[self setResourceAdapterClass:(class ? class : [PGResourceAdapter class])];
-		if(flag) [[self resourceAdapter] loadFromData:nil URLResponse:nil];
-		_loaded = YES;
 		[self _updateMenuItem];
 	}
 	return self;
@@ -96,15 +94,95 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
+- (void)setData:(NSData *)data
+{
+	if(data == _data) return;
+	[_data release];
+	_data = [data retain];
+	[self noteDataLengthDidChange];
+}
+- (id)dataSource
+{
+	return _dataSource;
+}
+- (void)setDataSource:(id)anObject
+{
+	if(anObject == _dataSource) return;
+	_dataSource = anObject;
+	// note stuff did change
+}
+
+#pragma mark -
+
+- (PGResourceAdapter *)resourceAdapter
+{
+	return [[_resourceAdapter retain] autorelease];
+}
+- (void)setResourceAdapterClass:(Class)aClass
+{
+	if(!aClass || [_resourceAdapter isKindOfClass:aClass]) return;
+	if([_resourceAdapter node] == self) [_resourceAdapter setNode:nil];
+	[_resourceAdapter autorelease]; // Don't let it get deallocated immediately.
+	_resourceAdapter = [[aClass alloc] init];
+	[_resourceAdapter setNode:self];
+	[self _updateMenuItem];
+}
+- (Class)classWithURLResponse:(NSURLResponse *)response
+{
+	Class class = [[self dataSource] classForNode:self];
+	if(class) return class;
+	if([response respondsToSelector:@selector(statusCode)]) {
+		int const status = [(NSHTTPURLResponse *)response statusCode];
+		if(status < 200 || status >= 300) return Nil;
+	}
+	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
+	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
+	NSData *data;
+	if([self getData:&data] == PGNoData && URL) {
+		if(![URL isFileURL]) return [PGWebAdapter class];
+		BOOL isDir;
+		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
+		if(isDir) return [d resourceAdapterClassWhereAttribute:PGLSTypeIsPackageKey matches:[NSNumber numberWithBool:YES]];
+	}
+	if(data || [self canGetData]) {
+		NSData *realData = data;
+		if(!realData && [self getData:&realData] == PGDataReturned &&  [realData length] < 4) return Nil;
+		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
+	}
+	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
+	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
+	return class;
+}
+- (BOOL)shouldLoadAdapterClass:(Class)aClass
+{
+	if([aClass alwaysLoads]) return YES;
+	switch([[self parentAdapter] descendentLoadingPolicy]) {
+		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntValue];
+		case PGLoadAll: return YES;
+		default: return NO;
+	}
+}
+
+- (NSString *)lastPassword
+{
+	return [[_lastPassword retain] autorelease];
+}
+- (BOOL)needsPassword
+{
+	return _needsPassword;
+}
+- (void)setNeedsPassword:(BOOL)flag
+{
+	if(flag == _needsPassword) return;
+	_needsPassword = flag;
+	[self noteIsViewableDidChange];
+}
+
+#pragma mark -
+
 - (unsigned)depth
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
-}
-- (BOOL)isLoaded
-{
-	if(!_loaded) return NO;
-	if([[self document] node] == self) return YES;
-	return [self parentNode] ? [[self parentNode] isLoaded] : NO;
 }
 - (BOOL)isRooted
 {
@@ -114,16 +192,15 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	return [[_menuItem retain] autorelease];
 }
-- (void)setIsViewable:(BOOL)flag
+- (BOOL)isViewable
 {
-	if(flag == _isViewable) return;
-	_isViewable = flag;
-	[[self document] noteNodeIsViewableDidChange:self];
+	return _isViewable;
 }
 - (void)setDeterminingType:(BOOL)flag
 {
 	if(!flag) NSParameterAssert(_determiningTypeCount);
 	_determiningTypeCount += flag ? 1 : -1;
+	[self noteIsViewableDidChange];
 }
 - (void)becomeViewed
 {
@@ -133,30 +210,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	[_lastPassword autorelease];
 	_lastPassword = [pass copy];
-	if(_expectsReturnedImage) return;
-	_expectsReturnedImage = YES;
-	[[self resourceAdapter] readContents];
-}
-
-#pragma mark -
-
-- (PGResourceAdapter *)resourceAdapter
-{
-	return [[_resourceAdapter retain] autorelease];
-}
-- (PGResourceAdapter *)setResourceAdapter:(PGResourceAdapter *)adapter
-{
-	if(adapter == _resourceAdapter) return nil;
-	if([_resourceAdapter node] == self) [_resourceAdapter setNode:nil];
-	[_resourceAdapter autorelease]; // Don't let it get deallocated immediately.
-	_resourceAdapter = [adapter retain];
-	[_resourceAdapter setNode:self];
-	if(_loaded) [self _updateMenuItem];
-	return _resourceAdapter;
-}
-- (PGResourceAdapter *)setResourceAdapterClass:(Class)aClass
-{
-	return aClass && (!_resourceAdapter || ![_resourceAdapter isKindOfClass:aClass]) ? [self setResourceAdapter:[[[aClass alloc] init] autorelease]] : nil;
+	if(_shouldRead) return;
+	_shouldRead = YES;
+	[_resourceAdapter read];
 }
 
 #pragma mark -
@@ -169,32 +225,17 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (void)setDateModified:(NSDate *)aDate
+- (NSDate *)dateModified
 {
-	if(aDate == _dateModified || (aDate && [_dateModified isEqualToDate:aDate])) return;
-	[_dateModified release];
-	_dateModified = [aDate copy];
-	if(!_loaded) return;
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
-	[self _updateMenuItem];
+	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
 }
-- (void)setDateCreated:(NSDate *)aDate
+- (NSDate *)dateCreated
 {
-	if(aDate == _dateCreated || (aDate && [_dateCreated isEqualToDate:aDate])) return;
-	[_dateCreated release];
-	_dateCreated = [aDate copy];
-	if(!_loaded) return;
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
-	[self _updateMenuItem];
+	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
 }
-- (void)setDataLength:(NSNumber *)aNumber
+- (NSNumber *)dataLength
 {
-	if(aNumber == _dataLength || (aNumber && [_dataLength isEqualToNumber:aNumber])) return;
-	[_dataLength release];
-	_dataLength = [aNumber copy];
-	if(!_loaded) return;
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
-	[self _updateMenuItem];
+	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
 }
 - (NSComparisonResult)compare:(PGNode *)node
 {
@@ -215,9 +256,52 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (void)noteFileEventDidOccur
+- (BOOL)canBookmark
 {
-	[[self resourceAdapter] noteResourceDidChange];
+	return [self isViewable] && [[self identifier] hasTarget];
+}
+- (PGBookmark *)bookmark
+{
+	return [[[PGBookmark alloc] initWithNode:self] autorelease];
+}
+
+#pragma mark -
+
+- (void)noteDateModifiedDidChange
+{
+	[_dateModified release];
+	_dateModified = [[[self dataSource] dateModifiedForNode:self] retain];
+	if(_dateModified) return;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) _dateModified = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate] retain];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+	[self _updateMenuItem];
+}
+- (void)noteDateCreatedDidChange
+{
+	[_dateCreated release];
+	_dateCreated = [[[self dataSource] dateCreatedForNode:self] retain];
+	if(_dateCreated) return;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) _dateCreated = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate] retain];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+	[self _updateMenuItem];
+}
+- (void)noteDataLengthDidChange
+{
+	[_dataLength release];
+	_dataLength = [[[self dataSource] dataLengthForNode:self] retain];
+	if(_dataLength) return;
+	NSData *data;
+	if([self canGetData] && [self getData:&data] == PGDataReturned) _dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
+	if(_dataLength) return;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) {
+		NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
+		if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) _dataLength = [[attrs objectForKey:NSFileSize] retain]; // File size is meaningless for folders.
+	}
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+	[self _updateMenuItem];
 }
 
 #pragma mark -
@@ -248,68 +332,104 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark PGResourceAdapting Proxy
 
-- (PGContainerAdapter *)parentAdapter
-{
-	return _parentAdapter;
-}
-- (PGDocument *)document
-{
-	return _document;
-}
 - (PGNode *)parentNode
 {
 	return [_parentAdapter node];
+}
+- (PGContainerAdapter *)parentAdapter
+{
+	return _parentAdapter;
 }
 - (PGNode *)rootNode
 {
 	return [self parentNode] ? [[self parentNode] rootNode] : self;
 }
+- (PGDocument *)document
+{
+	return _document;
+}
+
+#pragma mark -
+
 - (PGResourceIdentifier *)identifier
 {
 	return [[_identifier retain] autorelease];
 }
-- (id)dataSource
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	return _dataSource;
+	[self setDeterminingType:YES];
+	[self setResourceAdapterClass:[self classWithURLResponse:response]];
+	if([_resourceAdapter shouldLoad]) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
+		[_resourceAdapter loadWithURLResponse:response];
+		[_resourceAdapter readIfNecessary];
+		[pool release];
+	}
+	[self noteDateModifiedDidChange];
+	[self noteDateCreatedDidChange];
+	[self noteDataLengthDidChange];
+	[self setDeterminingType:NO];
 }
-- (BOOL)isViewable
+
+#pragma mark -
+
+- (BOOL)canGetData
 {
-	return _isViewable || _determiningTypeCount > 0;
+	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
 }
-- (NSString *)lastPassword
+- (PGDataError)getData:(out NSData **)outData
 {
-	return [[_lastPassword retain] autorelease];
+	NSData *data = [[_data retain] autorelease];
+	if(!data) {
+		data = [[self dataSource] dataForNode:self];
+		if(!data && [self needsPassword]) return PGWrongPassword;
+	}
+	if(!data) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+	}
+	if(outData) *outData = data;
+	return data ? PGDataReturned : PGNoData;
 }
-- (BOOL)expectsReturnedImage
+
+#pragma mark -
+
+- (void)readIfNecessary
 {
-	return _expectsReturnedImage;
+	if(_shouldRead) [_resourceAdapter read];
 }
-- (void)returnImageRep:(NSImageRep *)aRep
+- (void)readReturnedImageRep:(NSImageRep *)aRep
         error:(NSError *)error
 {
-	NSParameterAssert(_expectsReturnedImage);
-	_expectsReturnedImage = NO;
+	NSParameterAssert(_shouldRead);
+	_shouldRead = NO;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
 	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
 	if(error) [dict setObject:error forKey:PGErrorKey];
 	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
-- (NSDate *)dateModified
+
+#pragma mark -
+
+- (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
-}
-- (NSDate *)dateCreated
-{
-	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
-}
-- (NSNumber *)dataLength
-{
-	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
+	[self identifierDidChange:nil];
+	[self noteDateModifiedDidChange];
+	[self noteDateCreatedDidChange];
+	[self noteDataLengthDidChange];
+	[_resourceAdapter noteFileEventDidOccurDirect:flag];
 }
 - (void)noteSortOrderDidChange
 {
 	[self _updateMenuItem];
-	[[self resourceAdapter] noteSortOrderDidChange];
+	[_resourceAdapter noteSortOrderDidChange];
+}
+- (void)noteIsViewableDidChange
+{
+	BOOL const flag = !!_resourceAdapter && (_determiningTypeCount > 0 || _needsPassword || [_resourceAdapter adapterIsViewable]);
+	if(flag == _isViewable) return;
+	_isViewable = flag;
+	[[self document] noteNodeIsViewableDidChange:self];
 }
 
 #pragma mark NSObject
@@ -317,6 +437,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[_data release];
 	[_identifier release];
 	[_menuItem release];
 	[_resourceAdapter release];
@@ -362,7 +483,32 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ (%@): %p %@>", [self class], [[self resourceAdapter] class], self, [self identifier]];
+	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_resourceAdapter class], self, [self identifier]];
+}
+
+@end
+
+@implementation NSObject (PGNodeDataSource)
+
+- (Class)classForNode:(PGNode *)sender
+{
+	return Nil;
+}
+- (NSDate *)dateModifiedForNode:(PGNode *)sender
+{
+	return nil;
+}
+- (NSDate *)dateCreatedForNode:(PGNode *)sender
+{
+	return nil;
+}
+- (NSNumber *)dataLengthForNode:(PGNode *)sender
+{
+	return nil;
+}
+- (NSData *)dataForNode:(PGNode *)sender
+{
+	return nil;
 }
 
 @end

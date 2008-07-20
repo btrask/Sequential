@@ -36,10 +36,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)readWithURLResponse:(NSURLResponse *)response
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSParameterAssert(!response);
-	NSParameterAssert([self shouldRead:YES]);
+	NSParameterAssert([self shouldLoad]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
@@ -58,20 +58,20 @@ DEALINGS WITH THE SOFTWARE. */
 		PGNode *node = [self childForURL:pageURL];
 		if(node) {
 			[oldPages removeObjectIdenticalTo:node];
-			[node identifierDidChange:nil];
-		} else node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier] adapterClass:nil dataSource:nil load:YES] autorelease];
-		if(!node) continue;
-		[node noteResourceMightHaveChanged];
-		[newPages addObject:node];
+			[node noteFileEventDidOccurDirect:NO];
+		} else {
+			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier]] autorelease];
+			[node loadWithURLResponse:nil];
+		}
+		if(node) [newPages addObject:node];
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
-	if([self shouldReadContents]) [self readContents];
 }
-- (void)noteResourceDidChange
+- (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
+	NSLog(@"noteFileEventDidOccurDirect: %@", self);
 	if(![[self identifier] hasTarget]) return [[self node] removeFromDocument];
-	if([self shouldRead:YES]) [self readWithURLResponse:nil];
-	[super noteResourceDidChange];
+	if(flag) [super noteFileEventDidOccurDirect:YES];
 }
 
 @end

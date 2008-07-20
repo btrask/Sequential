@@ -30,7 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	@private
 	WebView *_webView;
-	BOOL     _isLoading;
+	BOOL     _isRendering;
 }
 
 @end

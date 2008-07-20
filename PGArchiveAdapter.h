@@ -30,18 +30,12 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	@private
 	XADArchive        *_archive;
-	NSMutableIndexSet *_remainingIndexes;
 	NSStringEncoding   _guessedEncoding;
 	BOOL               _isSubarchive;
-	BOOL               _hasRead;
 }
 
 - (XADArchive *)archive;
-- (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent;
+- (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes;
 - (void)setIsSubarchive:(BOOL)flag;
-
-@end
-
-@interface PGArchiveResourceAdapter : PGResourceAdapter
 
 @end

@@ -31,6 +31,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSArray      *_exifEntries;
 	PGOrientation _orientation;
 	NSImageRep   *_cachedRep;
+	BOOL          _gettingImageRep;
 }
 
 @end

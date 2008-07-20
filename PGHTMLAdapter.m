@@ -51,7 +51,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(frame != [_webView mainFrame]) return;
 	[_webView release];
 	_webView = nil;
-	_isLoading = NO;
+	_isRendering = NO;
 	[self noteIsViewableDidChange];
 }
 
@@ -69,22 +69,24 @@ DEALINGS WITH THE SOFTWARE. */
 		PGResourceIdentifier *ident;
 		NSEnumerator *const identEnum = [identifiers objectEnumerator];
 		while((ident = [identEnum nextObject])) {
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident adapterClass:nil dataSource:nil load:YES] autorelease];
-			if(node) [pages addObject:node];
+			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+			if(!node) continue;
+			[node loadWithURLResponse:nil];
+			[pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
 	}
 	[_webView autorelease];
 	_webView = nil;
-	_isLoading = NO;
+	_isRendering = NO;
 	[self noteIsViewableDidChange];
 }
 
 #pragma mark PGResourceAdapting
 
-- (BOOL)isViewable
+- (BOOL)adapterIsViewable
 {
-	return _isLoading || [super isViewable];
+	return _isRendering || [super adapterIsViewable];
 }
 
 #pragma mark PGContainerAdapter
@@ -96,15 +98,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGReadingPolicy)descendentReadingPolicy
+- (PGLoadingPolicy)descendentLoadingPolicy
 {
-	return MAX(PGReadNone, [self readingPolicy]);
+	return MAX(PGLoadNone, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)readWithURLResponse:(NSURLResponse *)response
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSParameterAssert(!_webView);
 	NSData *data;
-	if([self getData:&data] != PGDataAvailable) return;
+	if([self getData:&data] != PGDataReturned) return;
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];
@@ -114,7 +116,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[prefs setLoadsImagesAutomatically:NO];
 	[_webView setPreferences:prefs];
 	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
-	_isLoading = YES;
+	_isRendering = YES;
 	[self noteIsViewableDidChange];
 }
 

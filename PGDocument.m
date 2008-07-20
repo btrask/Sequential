@@ -59,15 +59,16 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if((self = [self init])) {
 		_identifier = [ident retain];
-		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident adapterClass:nil dataSource:nil load:YES];
+		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident];
 		PGResourceIdentifier *rootIdentifier = ident;
-		if([_identifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
+		if([_identifier isFileIdentifier] && [[_node classWithURLResponse:nil] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
 			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
-			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier adapterClass:nil dataSource:nil load:YES];
+			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier];
 			[self setInitialIdentifier:ident];
 		}
+		[_node loadWithURLResponse:nil];
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
@@ -245,7 +246,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if(!_node) return;
 	NSParameterAssert(node);
-	if([node isLoaded]) [self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	[self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {
@@ -275,7 +276,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
 	if([ident isEqual:[[self node] identifier]]) [[self displayController] synchronizeWindowTitleWithDocumentName];
-	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccur];
+	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 
 #pragma mark PGPrefObject

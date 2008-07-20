@@ -55,18 +55,18 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSArray *)nodesUnderPath:(NSString *)path
              parentAdapter:(PGContainerAdapter *)parent
+             remainingIndexes:(NSMutableIndexSet *)indexes
 {
 	NSParameterAssert(path);
 	NSParameterAssert(parent);
 	NSParameterAssert(_archive);
-	NSParameterAssert(_remainingIndexes);
 	NSMutableArray *const children = [NSMutableArray array];
-	int i = [_remainingIndexes firstIndex];
-	for(; NSNotFound != i; i = [_remainingIndexes indexGreaterThanIndex:i]) {
+	int i = [indexes firstIndex];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
 		if([self needsEncoding]) return nil;
 		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
-		[_remainingIndexes removeIndex:i];
+		[indexes removeIndex:i];
 		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
 		NSString *const subpath = [path stringByAppendingPathComponent:[[entryPath substringFromIndex:[path length]] AE_firstPathComponent]];
 		if([path isEqualToString:entryPath]) continue;
@@ -75,11 +75,14 @@ DEALINGS WITH THE SOFTWARE. */
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : @"'fldr'")] notify:NO];
 		[identifier setDisplayName:[subpath lastPathComponent] notify:NO];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier adapterClass:(isFile ? [PGArchiveResourceAdapter class] : [PGContainerAdapter class]) dataSource:self load:YES] autorelease];
-		if(!isFile) {
-			if(isEntrylessFolder) [_remainingIndexes addIndex:i]; // We ended up taking care of a folder in its path instead.
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
+		[node setDataSource:self];
+		if(isFile) [node loadWithURLResponse:nil];
+		else {
+			[node setResourceAdapterClass:[PGContainerAdapter class]];
+			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
-			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter] presortedOrder:PGUnsorted];
+			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
 		}
 		[children addObject:node];
 	}
@@ -101,10 +104,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)isViewable
-{
-	return (!_hasRead && [self shouldRead:YES]) || [super isViewable];
-}
 - (BOOL)canExtractData
 {
 	return YES;
@@ -120,14 +119,26 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setEncoding:(NSStringEncoding)encoding
 {
 	[_archive setNameEncoding:encoding];
-	_hasRead = NO;
+	[self setIsTemporarilyViewable:YES];
 	[self setNeedsEncoding:NO];
-	[self readWithURLResponse:nil];
+	[self loadWithURLResponse:nil];
+	[self setIsTemporarilyViewable:NO];
 }
 
-#pragma mark PGResourceAdapterDataSource Protocol
+#pragma mark PGNodeDataSource Protocol
 
-- (NSDate *)dateCreatedForResourceAdapter:(PGResourceAdapter *)sender
+- (Class)classForNode:(PGNode *)sender
+{
+	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
+	unsigned const index = [[sender identifier] index];
+	NSParameterAssert(NSNotFound != index);
+	Class class = Nil;
+	if([_archive entryIsArchive:index]) class = [PGArchiveAdapter class];
+	if(!class) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeOSTypesKey matches:[_archive HFSTypeCodeForEntry:index standardFormat:NO]];
+	if(!class) class = [d resourceAdapterClassForExtension:[_archive typeForEntry:index preferHFSTypeCode:NO]];
+	return class;
+}
+- (NSDate *)dateCreatedForNode:(PGNode *)sender
 {
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return nil;
@@ -136,12 +147,12 @@ DEALINGS WITH THE SOFTWARE. */
 	if(info->xfi_Flags & XADFIF_NODATE || xadConvertDates([_archive xadMasterBase], XAD_DATEXADDATE, &info->xfi_Date, XAD_DATEUNIX, &timestamp, TAG_DONE) != XADERR_OK) return nil;
 	return [NSDate dateWithTimeIntervalSince1970:timestamp];
 }
-- (NSNumber *)dataLengthForResourceAdapter:(PGResourceAdapter *)sender
+- (NSNumber *)dataLengthForNode:(PGNode *)sender
 {
 	unsigned const i = [[sender identifier] index];
 	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive xadFileInfoForEntry:i]->xfi_Size];
 }
-- (NSData *)dataForResourceAdapter:(PGResourceAdapter *)sender
+- (NSData *)dataForNode:(PGNode *)sender
 {
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return nil;
@@ -154,11 +165,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGReadingPolicy)descendentReadingPolicy
+- (PGLoadingPolicy)descendentLoadingPolicy
 {
-	return MAX(PGReadAll, [self readingPolicy]);
+	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)readWithURLResponse:(NSURLResponse *)response
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	if(!_archive) {
 		XADError error;
@@ -166,22 +177,16 @@ DEALINGS WITH THE SOFTWARE. */
 		if([identifier isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error]; // -getData: will return data for file identifiers, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *data;
-			if([self getData:&data] == PGDataAvailable) {
+			if([self getData:&data] == PGDataReturned) {
 				_archive = [[XADArchive alloc] initWithData:data error:&error];
 				[_archive setDelegate:self];
 			} else return;
 		}
 		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return;
 	}
-	_remainingIndexes = [[[NSMutableIndexSet alloc] initWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])] autorelease];
 	NSString *const root = [_archive commonTopDirectory];
-	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self];
+	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	_remainingIndexes = nil;
-	if(!children) return;
-	_hasRead = YES;
-	[self noteIsViewableDidChange];
-	if([self shouldReadContents]) [self readContents];
 }
 
 #pragma mark NSObject
@@ -190,26 +195,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[_archive release];
 	[super dealloc];
-}
-
-@end
-
-@implementation PGArchiveResourceAdapter
-
-#pragma mark PGResourceAdapter
-
-- (Class)classWithURLResponse:(NSURLResponse *)response
-{
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	XADArchive *const archive = [(PGArchiveAdapter *)[self dataSource] archive];
-	unsigned const index = [[self identifier] index];
-	NSParameterAssert(NSNotFound != index);
-	Class class = Nil;
-	if([archive entryIsArchive:index]) class = [PGArchiveAdapter class];
-	if(!class) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeOSTypesKey matches:[archive HFSTypeCodeForEntry:index standardFormat:NO]];
-	if(!class) class = [d resourceAdapterClassForExtension:[archive typeForEntry:index preferHFSTypeCode:NO]];
-	if(!class) class = [super classWithURLResponse:response];
-	return class;
 }
 
 @end

@@ -100,7 +100,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) {
 		if(child == aNode) return index + [[self parentAdapter] viewableIndexOfChild:[self node]];
-		index += [child viewableNodeCount];
+		index += [[child resourceAdapter] viewableNodeCount];
 	}
 	return 0;
 }
@@ -158,7 +158,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 - (BOOL)hasViewableNodes
 {
-	if([self isViewable]) return YES;
+	if([[self node] isViewable]) return YES;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) if([[child resourceAdapter] hasViewableNodes]) return YES;
@@ -174,7 +174,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (unsigned)viewableNodeCount
 {
-	if([self isViewable]) return 1;
+	if([[self node] isViewable]) return 1;
 	unsigned count = 0;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
@@ -200,7 +200,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSArray *const children = [self sortedChildren];
 	NSEnumerator *const childEnum = flag ? [children objectEnumerator] : [children reverseObjectEnumerator];
 	while((child = [childEnum nextObject])) {
-		PGNode *const node = [child sortedViewableNodeFirst:flag stopAtNode:descendent includeSelf:YES];
+		PGNode *const node = [[child resourceAdapter] sortedViewableNodeFirst:flag stopAtNode:descendent includeSelf:YES];
 		if(node) return node;
 		if([descendent ancestorThatIsChildOfNode:[self node]] == child) return nil;
 	}
@@ -213,7 +213,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSArray *const children = [self sortedChildren];
 	NSEnumerator *childEnum = [children reverseObjectEnumerator];
 	while((child = [childEnum nextObject])) {
-		PGNode *const node = [child sortedFirstViewableNodeInFolderFirst:flag];
+		PGNode *const node = [[child resourceAdapter] sortedFirstViewableNodeInFolderFirst:flag];
 		if(node) return node;
 	}
 	childEnum = [children objectEnumerator];
@@ -230,7 +230,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSArray *const children = [self sortedChildren];
 	NSEnumerator *const childEnum = flag ? [children objectEnumerator] : [children reverseObjectEnumerator];
 	while((child = [childEnum nextObject])) {
-		PGNode *const node = [child sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:descendent];
+		PGNode *const node = [[child resourceAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:descendent];
 		if(node) return node;
 		if([descendent ancestorThatIsChildOfNode:[self node]] == child) return nil;
 	}
@@ -256,12 +256,10 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	if([self parentNode]) {
 		[super addMenuItemsToMenu:aMenu];
 		menu = [[[self node] menuItem] submenu];
-	} else {
-		menu = aMenu;
-	}
+	} else menu = aMenu;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
-	while((child = [childEnum nextObject])) [child addMenuItemsToMenu:menu];
+	while((child = [childEnum nextObject])) [[child resourceAdapter] addMenuItemsToMenu:menu];
 }
 - (void)noteSortOrderDidChange
 {
@@ -274,14 +272,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark PGResourceAdapter
 
-- (void)readContents
+- (void)read
 {
-	[self setHasReadContents];
-	if([self needsPassword]) [self readWithURLResponse:nil];
+	if([[self node] needsPassword]) [self loadWithURLResponse:nil];
 	NSError *error = nil;
-	if([self needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
+	if([[self node] needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
 	else if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
-	[self returnImageRep:nil error:error];
+	[self readReturnedImageRep:nil error:error];
 }
 
 #pragma mark NSObject

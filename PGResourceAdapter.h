@@ -29,64 +29,38 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 
 enum {
-	PGReadToMaxDepth = 0,
-	PGReadAll        = 1,
-	PGReadNone       = 2
+	PGLoadToMaxDepth = 0,
+	PGLoadAll        = 1,
+	PGLoadNone       = 2
 };
-typedef int PGReadingPolicy;
+typedef int PGLoadingPolicy;
 
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
-	PGNode   *_node;
-	unsigned  _determiningTypeCount;
-	BOOL      _isImage;
-	BOOL      _needsPassword;
-	BOOL      _needsEncoding;
-	NSData   *_data;
-	BOOL      _hasReadContents;
+	PGNode  *_node;
+	BOOL     _isImage;
+	BOOL     _needsEncoding;
+	unsigned _temporarilyViewableCount;
 }
 
-+ (BOOL)alwaysReads;
++ (BOOL)alwaysLoads;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
 
-- (BOOL)isDeterminingType;
+- (BOOL)adapterIsViewable;
 - (BOOL)isImage;
-- (BOOL)needsPassword;
-- (BOOL)needsEncoding;
-- (void)setIsDeterminingType:(BOOL)flag;
 - (void)setIsImage:(BOOL)flag;
-- (void)setNeedsPassword:(BOOL)flag;
+- (BOOL)needsEncoding;
 - (void)setNeedsEncoding:(BOOL)flag;
-- (void)noteIsViewableDidChange;
+- (void)setIsTemporarilyViewable:(BOOL)flag;
 
-- (void)setData:(NSData *)data;
-- (void)loadFromData:(NSData *)data URLResponse:(NSURLResponse *)response;
-- (Class)classWithURLResponse:(NSURLResponse *)response;
-- (PGReadingPolicy)descendentReadingPolicy; // Return MAX(prefferedValue, [self readingPolicy]).
-- (PGReadingPolicy)readingPolicy; // Returns the parent adapter's or the default.
-- (BOOL)shouldRead:(BOOL)asAlways; // If 'asAlways', returns YES immediately if the class -alwaysReads. Otherwise looks at the -readingPolicy.
-- (void)readWithURLResponse:(NSURLResponse *)response; // Abstract method. Perform an initial read. PGContainerAdapters should create any child nodes here if possible. This gets called for every node created when the document is first opened, so defer anything slow to -readContents. -lastPassword won't be set yet.
+- (PGLoadingPolicy)descendentLoadingPolicy; // Return MAX(preferredValue, [[self parentAdapter] descendentLoadingPolicy]).
+- (BOOL)shouldLoad;
 
-- (BOOL)shouldReadContents;
-- (void)setHasReadContents;
-- (void)readContents; // Abstract method. Sent by -becomeViewed and -becomeViewedWithPassword:. -lastPassword may be set--you can send -readFromData:URLResponse: if you need to defer loading until a password is set. If -[node expectsReturnedImage], should send -setHasReadContents and then -returnImageRep:error must be sent sometime thereafter.
-
-- (void)noteDateModifiedDidChange;
-- (void)noteDateCreatedDidChange;
-- (void)noteDataLengthDidChange;
+- (void)read; // Abstract method. Sent by -becomeViewed and -becomeViewedWithPassword:. -returnImageRep:error must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;
-
-@end
-
-@interface NSObject (PGResourceAdapterDataSource)
-
-- (NSDate *)dateModifiedForResourceAdapter:(PGResourceAdapter *)sender;
-- (NSDate *)dateCreatedForResourceAdapter:(PGResourceAdapter *)sender;
-- (NSNumber *)dataLengthForResourceAdapter:(PGResourceAdapter *)sender;
-- (NSData *)dataForResourceAdapter:(PGResourceAdapter *)sender; // If a password is required, sends -lastPassword, then sends -setNeedsPassword: with whether the password worked.
 
 @end

@@ -52,14 +52,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGReadingPolicy)descendentReadingPolicy
+- (PGLoadingPolicy)descendentLoadingPolicy
 {
-	return MAX(PGReadAll, [self readingPolicy]);
+	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)readWithURLResponse:(NSURLResponse *)response
+- (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	if([self getData:&data] != PGDataAvailable) return;
+	if([self getData:&data] != PGDataReturned) return;
 	if(![NSPDFImageRep canInitWithData:data]) return;
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
 	if(!_rep) return;
@@ -70,11 +70,13 @@ DEALINGS WITH THE SOFTWARE. */
 	for(; i < [_rep pageCount]; i++) {
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:i];
 		[identifier setDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier adapterClass:[PGPDFPageAdapter class] dataSource:nil load:NO] autorelease];
-		if(node) [nodes addObject:node];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
+		if(!node) continue;
+		[node setResourceAdapterClass:[PGPDFPageAdapter class]];
+		[node loadWithURLResponse:nil];
+		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];
-	if([self shouldReadContents]) [self readContents];
 }
 
 #pragma mark NSObject
@@ -91,14 +93,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)readContents
+- (void)read
 {
-	[self setHasReadContents];
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
 	[rep setCurrentPage:[[self identifier] index]];
 	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
 	[rep setPixelsHigh:NSHeight([rep bounds])];
-	[self returnImageRep:rep error:nil];
+	[self readReturnedImageRep:rep error:nil];
 }
 - (BOOL)isResolutionIndependent
 {

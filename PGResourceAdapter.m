@@ -27,13 +27,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGDocument.h"
 #import "PGNode.h"
-#import "PGWebAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
-#import "PGBookmark.h"
-
-// Controllers
-#import "PGDocumentController.h"
 
 // Categories
 #import "NSMenuItemAdditions.h"
@@ -43,7 +38,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Class Methods
 
-+ (BOOL)alwaysReads
++ (BOOL)alwaysLoads
 {
 	return YES;
 }
@@ -59,34 +54,17 @@ DEALINGS WITH THE SOFTWARE. */
 	if(aNode == _node) return;
 	_node = aNode;
 	[self noteIsViewableDidChange];
-	[self noteDateModifiedDidChange];
-	[self noteDateCreatedDidChange];
-	[self noteDataLengthDidChange];
 }
 
 #pragma mark -
 
-- (BOOL)isDeterminingType
+- (BOOL)adapterIsViewable
 {
-	return _determiningTypeCount > 0;
+	return [self isImage] || [self needsEncoding] || _temporarilyViewableCount > 0;
 }
 - (BOOL)isImage
 {
 	return _isImage;
-}
-- (BOOL)needsPassword
-{
-	return _needsPassword;
-}
-- (BOOL)needsEncoding
-{
-	return _needsEncoding;
-}
-- (void)setIsDeterminingType:(BOOL)flag
-{
-	if(!flag) NSParameterAssert(_determiningTypeCount);
-	_determiningTypeCount += flag ? 1 : -1;
-	[self noteIsViewableDidChange];
 }
 - (void)setIsImage:(BOOL)flag
 {
@@ -94,139 +72,44 @@ DEALINGS WITH THE SOFTWARE. */
 	_isImage = flag;
 	[self noteIsViewableDidChange];
 }
+- (BOOL)needsEncoding
+{
+	return _needsEncoding;
+}
 - (void)setNeedsEncoding:(BOOL)flag
 {
 	if(flag == _needsEncoding) return;
 	_needsEncoding = flag;
 	[self noteIsViewableDidChange];
 }
-- (void)setNeedsPassword:(BOOL)flag
+- (void)setIsTemporarilyViewable:(BOOL)flag
 {
-	if(flag == _needsPassword) return;
-	_needsPassword = flag;
+	if(!flag) NSParameterAssert(_temporarilyViewableCount);
+	_temporarilyViewableCount += flag ? 1 : -1;
 	[self noteIsViewableDidChange];
 }
-- (void)noteIsViewableDidChange
+
+#pragma mark -
+
+- (PGLoadingPolicy)descendentLoadingPolicy
 {
-	[[self node] setIsViewable:[self isViewable]];
+	return MAX(PGLoadToMaxDepth, [[self parentAdapter] descendentLoadingPolicy]);
+}
+- (BOOL)shouldLoad
+{
+	return [[self node] shouldLoadAdapterClass:[self class]];
 }
 
 #pragma mark -
 
-- (void)setData:(NSData *)data
+- (void)read
 {
-	if(data == _data) return;
-	[_data release];
-	_data = [data retain];
-	[self noteDataLengthDidChange];
-}
-- (void)loadFromData:(NSData *)data
-        URLResponse:(NSURLResponse *)response
-{
-	PGNode *const node = [self node];
-	[node setDeterminingType:YES];
-	[self setData:data];
-	PGResourceAdapter *adapter = [node setResourceAdapterClass:[self classWithURLResponse:response]];
-	[adapter setData:data];
-	if(!adapter) {
-		[self noteIsViewableDidChange];
-		[self noteDateModifiedDidChange];
-		[self noteDateCreatedDidChange];
-		[self noteDataLengthDidChange];
-		adapter = self;
-	}
-	if([adapter shouldRead:YES]) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
-		[adapter readWithURLResponse:response];
-		[pool release];
-	}
-	[node setDeterminingType:NO];
-}
-- (Class)classWithURLResponse:(NSURLResponse *)response
-{
-	if([response respondsToSelector:@selector(statusCode)]) {
-		int const status = [(NSHTTPURLResponse *)response statusCode];
-		if(status < 200 || status >= 300) return Nil;
-	}
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
-	NSData *data;
-	if([self getData:&data] == PGDataUnavailable && URL) {
-		if(![URL isFileURL]) return [PGWebAdapter class];
-		BOOL isDir;
-		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
-		if(isDir) return [d resourceAdapterClassWhereAttribute:PGLSTypeIsPackageKey matches:[NSNumber numberWithBool:YES]];
-	}
-	Class class = Nil;
-	if(data || [URL isFileURL]) {
-		NSData *const realData = data ? data : [NSData dataWithContentsOfMappedFile:[URL path]];
-		if([realData length] < 4) return Nil;
-		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
-	}
-	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
-	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
-	return class;
-}
-- (PGReadingPolicy)descendentReadingPolicy
-{
-	return MAX(PGReadToMaxDepth, [self readingPolicy]);
-}
-- (PGReadingPolicy)readingPolicy
-{
-	return [self parentAdapter] ? [[self parentAdapter] descendentReadingPolicy] : PGReadToMaxDepth;
-}
-- (BOOL)shouldRead:(BOOL)asAlways
-{
-	if(asAlways && [[self class] alwaysReads]) return YES;
-	switch([self readingPolicy]) {
-		case PGReadToMaxDepth: return [[self node] depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntValue];
-		case PGReadAll: return YES;
-		default: return NO;
-	}
-}
-- (void)readWithURLResponse:(NSURLResponse *)response {}
-
-#pragma mark -
-
-- (BOOL)shouldReadContents
-{
-	return [self expectsReturnedImage] && !_hasReadContents;
-}
-- (void)setHasReadContents
-{
-	NSParameterAssert([self expectsReturnedImage]);
-	_hasReadContents = YES;
-}
-- (void)readContents
-{
-	if([self isDeterminingType]) return;
-	[self setHasReadContents];
-	[self returnImageRep:nil error:nil];
+	[self readReturnedImageRep:nil error:nil];
 }
 
 #pragma mark -
 
-- (void)noteDateModifiedDidChange
-{
-	[[self node] setDateModified:[self dateModified]];
-}
-- (void)noteDateCreatedDidChange
-{
-	[[self node] setDateCreated:[self dateCreated]];
-}
-- (void)noteDataLengthDidChange
-{
-	[[self node] setDataLength:[self dataLength]];
-}
-
-#pragma mark -
-
-- (void)noteResourceDidChange
-{
-	[self noteDateModifiedDidChange];
-	[self noteDateCreatedDidChange];
-	[self noteDataLengthDidChange];
-}
+- (void)noteResourceDidChange {}
 
 #pragma mark PGResourceAdapting Protocol
 
@@ -259,18 +142,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (PGResourceIdentifier *)identifier
 {
-	return [_node identifier];
+	return [[self node] identifier];
 }
-- (id)dataSource
-{
-	return [_node dataSource];
-}
+- (void)loadWithURLResponse:(NSURLResponse *)response {}
 
 #pragma mark -
 
-- (BOOL)isViewable
+- (BOOL)isContainer
 {
-	return [self isDeterminingType] || [self isImage] || [self needsPassword] || [self needsEncoding];
+	return NO;
 }
 - (float)loadingProgress
 {
@@ -278,25 +158,15 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)canGetData
 {
-	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
+	return [[self node] canGetData];
 }
 - (BOOL)canExtractData
 {
 	return NO;
 }
-- (PGDataAvailability)getData:(out NSData **)outData
+- (PGDataError)getData:(out NSData **)outData
 {
-	NSData *data = [[_data retain] autorelease];
-	if(!data) {
-		data = [[self dataSource] dataForResourceAdapter:self];
-		if(!data && [self needsPassword]) return PGWrongPassword;
-	}
-	if(!data) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	}
-	if(outData) *outData = data;
-	return data ? PGDataAvailable : PGDataUnavailable;
+	return [[self node] getData:outData];
 }
 - (NSArray *)exifEntries
 {
@@ -311,34 +181,24 @@ DEALINGS WITH THE SOFTWARE. */
 	return NO;
 }
 - (void)clearCache {}
-- (BOOL)isContainer
-{
-	return NO;
-}
 
 #pragma mark -
 
-- (NSString *)lastPassword
+- (void)readIfNecessary
 {
-	return [[self node] lastPassword];
+	return [[self node] readIfNecessary];
 }
-- (BOOL)expectsReturnedImage
-{
-	return [[self node] expectsReturnedImage];
-}
-- (void)returnImageRep:(NSImageRep *)aRep
+- (void)readReturnedImageRep:(NSImageRep *)aRep
         error:(NSError *)error
 {
-	NSParameterAssert(_hasReadContents);
-	_hasReadContents = NO;
-	[[self node] returnImageRep:aRep error:error];
+	[[self node] readReturnedImageRep:aRep error:error];
 }
 
 #pragma mark -
 
 - (BOOL)hasViewableNodes
 {
-	return [self isViewable];
+	return [[self node] isViewable];
 }
 - (BOOL)hasDataNodes
 {
@@ -350,7 +210,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (unsigned)viewableNodeCount
 {
-	return [self isViewable] ? 1 : 0;
+	return [[self node] isViewable] ? 1 : 0;
 }
 
 #pragma mark -
@@ -363,7 +223,7 @@ DEALINGS WITH THE SOFTWARE. */
             stopAtNode:(PGNode *)descendent
             includeSelf:(BOOL)includeSelf
 {
-	return includeSelf && [self isViewable] && [self node] != descendent ? [self node] : nil;
+	return includeSelf && [[self node] isViewable] && [self node] != descendent ? [self node] : nil;
 }
 
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
@@ -410,7 +270,7 @@ DEALINGS WITH THE SOFTWARE. */
             matchSearchTerms:(NSArray *)terms
             stopAtNode:(PGNode *)descendent
 {
-	return [self isViewable] && [self node] != descendent && [[[self identifier] displayName] AE_matchesSearchTerms:terms] ? [self node] : nil;
+	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] AE_matchesSearchTerms:terms] ? [self node] : nil;
 }
 
 #pragma mark -
@@ -427,39 +287,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)isDescendantOfNode:(PGNode *)aNode
 {
 	return [self ancestorThatIsChildOfNode:aNode] != nil;
-}
-
-#pragma mark -
-
-- (NSDate *)dateModified
-{
-	NSDate *date = [[self dataSource] dateModifiedForResourceAdapter:self];
-	if(date) return date;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate];
-	return date;
-}
-- (NSDate *)dateCreated
-{
-	NSDate *date = [[self dataSource] dateCreatedForResourceAdapter:self];
-	if(date) return date;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) date = [[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate];
-	return date;
-}
-- (NSNumber *)dataLength
-{
-	NSNumber *dataLength = [[self dataSource] dataLengthForResourceAdapter:self];
-	if(dataLength) return dataLength;
-	NSData *data;
-	if([self canGetData] && [self getData:&data] == PGDataAvailable) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
-	if(dataLength) return dataLength;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) {
-		NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
-		if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) dataLength = [attrs objectForKey:NSFileSize]; // File size is meaningless for folders.
-	}
-	return dataLength;
 }
 
 #pragma mark -
@@ -484,50 +311,21 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (BOOL)canBookmark
+- (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	return [self isViewable] && [[self identifier] hasTarget];
+	if([self shouldLoad]) [self loadWithURLResponse:nil];
 }
-- (PGBookmark *)bookmark
-{
-	return [[[PGBookmark alloc] initWithNode:[self node]] autorelease];
-}
-
-#pragma mark -
-
 - (void)noteSortOrderDidChange {}
-- (void)noteResourceMightHaveChanged
+- (void)noteIsViewableDidChange
 {
-	if([self isMemberOfClass:[PGResourceAdapter class]]) [self loadFromData:nil URLResponse:nil];
+	[[self node] noteIsViewableDidChange];
 }
 
 #pragma mark NSObject
 
-- (void)dealloc
+- (NSString *)description
 {
-	[_data release];
-	[super dealloc];
-}
-
-@end
-
-@implementation NSObject (PGResourceAdapterDataSource)
-
-- (NSDate *)dateModifiedForResourceAdapter:(PGResourceAdapter *)sender
-{
-	return nil;
-}
-- (NSDate *)dateCreatedForResourceAdapter:(PGResourceAdapter *)sender
-{
-	return nil;
-}
-- (NSNumber *)dataLengthForResourceAdapter:(PGResourceAdapter *)sender
-{
-	return nil;
-}
-- (NSData *)dataForResourceAdapter:(PGResourceAdapter *)sender
-{
-	return nil;
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
 }
 
 @end
