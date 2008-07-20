@@ -124,6 +124,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)dealloc
 {
+	[_webView setFrameLoadDelegate:nil];
 	[_webView release];
 	[super dealloc];
 }
