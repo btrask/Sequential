@@ -77,7 +77,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[identifier setDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
-		if(isFile) [node loadWithURLResponse:nil];
+		if(isFile) [node loadIfNecessaryWithURLResponse:nil];
 		else {
 			[node setResourceAdapterClass:[PGContainerAdapter class]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.

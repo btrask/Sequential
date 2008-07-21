@@ -95,10 +95,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return MAX(PGLoadToMaxDepth, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (BOOL)shouldLoad
-{
-	return [[self node] shouldLoadAdapterClass:[self class]];
-}
 
 #pragma mark -
 
@@ -143,6 +139,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGResourceIdentifier *)identifier
 {
 	return [[self node] identifier];
+}
+- (BOOL)shouldLoad
+{
+	return [[self node] shouldLoadAdapterClass:[self class]];
 }
 - (void)loadWithURLResponse:(NSURLResponse *)response {}
 
@@ -313,7 +313,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if([self shouldLoad]) [self loadWithURLResponse:nil];
+	[[self node] loadIfNecessaryWithURLResponse:nil];
 }
 - (void)noteSortOrderDidChange {}
 - (void)noteIsViewableDidChange

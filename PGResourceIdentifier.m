@@ -36,7 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSURLAdditions.h"
 
 NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifierDidChange";
-NSString *const PGResourceIdentifierDisplayNameChangedKey = @"PGResourceIdentifierDisplayNameChanged";
 
 @interface PGAliasIdentifier : PGResourceIdentifier <NSCoding>
 {
@@ -161,7 +160,7 @@ NSString *const PGResourceIdentifierDisplayNameChangedKey = @"PGResourceIdentifi
 	if(aString == _displayName) return;
 	[_displayName release];
 	_displayName = [aString isEqual:@""] ? nil : [aString copy];
-	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGResourceIdentifierDisplayNameChangedKey, nil]];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
 }
 
 #pragma mark -

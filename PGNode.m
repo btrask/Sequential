@@ -80,6 +80,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		_document = doc ? doc : [parent document];
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+		[self setResourceAdapterClass:[PGResourceAdapter class]];
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
@@ -95,7 +96,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(data == _data) return;
 	[_data release];
 	_data = [data retain];
-	[self noteDataLengthDidChange];
 }
 - (id)dataSource
 {
@@ -105,7 +105,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	if(anObject == _dataSource) return;
 	_dataSource = anObject;
-	// note stuff did change
 }
 
 #pragma mark -
@@ -142,8 +141,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	if(data || [self canGetData]) {
 		NSData *realData = data;
-		if(!realData && [self getData:&realData] == PGDataReturned &&  [realData length] < 4) return Nil;
-		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
+		if(realData || [self getData:&realData] == PGDataReturned) {
+			if([realData length] < 4) return Nil;
+			class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
+		}
 	}
 	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
@@ -159,6 +160,12 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		default: return NO;
 	}
 }
+- (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response
+{
+	if([self shouldLoad]) [self loadWithURLResponse:response];
+}
+
+#pragma mark -
 
 - (NSString *)lastPassword
 {
@@ -306,7 +313,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
-	if([[[aNotif userInfo] objectForKey:PGResourceIdentifierDisplayNameChangedKey] boolValue]) [[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
+	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
 	[[self document] noteNodeDisplayNameDidChange:self];
 }
 
@@ -423,7 +430,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = !!_resourceAdapter && (_determiningTypeCount > 0 || _needsPassword || [_resourceAdapter adapterIsViewable]);
+	BOOL const flag = _determiningTypeCount > 0 || _needsPassword || [_resourceAdapter adapterIsViewable];
 	if(flag == _isViewable) return;
 	_isViewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];

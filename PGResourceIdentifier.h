@@ -28,13 +28,13 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGSubscription;
 
 extern NSString *const PGResourceIdentifierDidChangeNotification;
-extern NSString *const PGResourceIdentifierDisplayNameChangedKey;
 
 @interface PGResourceIdentifier : NSObject <NSCoding>
 {
 	@private
 	NSImage  *_icon;
 	NSString *_displayName;
+	NSString *_previousName;
 }
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL;

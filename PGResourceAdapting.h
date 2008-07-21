@@ -51,6 +51,7 @@ typedef int PGDataError;
 - (PGDocument *)document;
 
 - (PGResourceIdentifier *)identifier;
+- (BOOL)shouldLoad;
 - (void)loadWithURLResponse:(NSURLResponse *)response;
 
 - (BOOL)isContainer;

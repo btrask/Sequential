@@ -61,7 +61,7 @@ DEALINGS WITH THE SOFTWARE. */
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
 			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier]] autorelease];
-			[node loadWithURLResponse:nil];
+			[node loadIfNecessaryWithURLResponse:nil];
 		}
 		if(node) [newPages addObject:node];
 	}

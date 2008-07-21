@@ -57,7 +57,6 @@ typedef int PGLoadingPolicy;
 - (void)setIsTemporarilyViewable:(BOOL)flag;
 
 - (PGLoadingPolicy)descendentLoadingPolicy; // Return MAX(preferredValue, [[self parentAdapter] descendentLoadingPolicy]).
-- (BOOL)shouldLoad;
 
 - (void)read; // Abstract method. Sent by -becomeViewed and -becomeViewedWithPassword:. -returnImageRep:error must be sent sometime hereafter.
 

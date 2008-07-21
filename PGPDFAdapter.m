@@ -73,7 +73,7 @@ DEALINGS WITH THE SOFTWARE. */
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
 		[node setResourceAdapterClass:[PGPDFPageAdapter class]];
-		[node loadWithURLResponse:nil];
+		[node loadIfNecessaryWithURLResponse:nil];
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];

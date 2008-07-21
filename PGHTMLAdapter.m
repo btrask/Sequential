@@ -71,7 +71,7 @@ DEALINGS WITH THE SOFTWARE. */
 		while((ident = [identEnum nextObject])) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
 			if(!node) continue;
-			[node loadWithURLResponse:nil];
+			[node loadIfNecessaryWithURLResponse:nil];
 			[pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];

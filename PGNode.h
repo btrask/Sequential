@@ -80,6 +80,7 @@ enum {
 - (void)setResourceAdapterClass:(Class)aClass;
 - (Class)classWithURLResponse:(NSURLResponse *)response;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
+- (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response;
 
 - (NSString *)lastPassword;
 - (BOOL)needsPassword;

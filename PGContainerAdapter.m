@@ -41,7 +41,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark PGResourceAdapter
 
-+ (BOOL)alwaysReads
++ (BOOL)alwaysLoads
 {
 	return NO;
 }
@@ -95,7 +95,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode
 {
-	unsigned index = 0;
+	unsigned index = [[self node] isViewable] ? 1 : 0;
 	id child;
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) {
@@ -174,8 +174,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (unsigned)viewableNodeCount
 {
-	if([[self node] isViewable]) return 1;
-	unsigned count = 0;
+	unsigned count = [[self node] isViewable] ? 1 : 0;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) count += [[child resourceAdapter] viewableNodeCount];
@@ -263,7 +262,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(flag) [super noteFileEventDidOccurDirect:YES];
+	if(flag && [self shouldLoad]) [self loadWithURLResponse:nil];
 }
 - (void)noteSortOrderDidChange
 {
