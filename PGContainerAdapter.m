@@ -261,6 +261,10 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) [[child resourceAdapter] addMenuItemsToMenu:menu];
 }
+- (void)noteFileEventDidOccurDirect:(BOOL)flag
+{
+	if(flag) [super noteFileEventDidOccurDirect:YES];
+}
 - (void)noteSortOrderDidChange
 {
 	[_sortedChildren release];

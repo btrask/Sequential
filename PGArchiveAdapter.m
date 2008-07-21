@@ -84,7 +84,7 @@ DEALINGS WITH THE SOFTWARE. */
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
 		}
-		[children addObject:node];
+		if(node) [children addObject:node];
 	}
 	return children;
 }

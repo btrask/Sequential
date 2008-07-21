@@ -78,10 +78,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if((self = [super init])) {
 		_parentAdapter = parent;
 		_document = doc ? doc : [parent document];
-		if([[[self document] node] nodeForIdentifier:ident]) { // It's already open.
-			[self release];
-			return nil;
-		}
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
 		_menuItem = [[NSMenuItem alloc] init];

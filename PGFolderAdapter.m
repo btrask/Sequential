@@ -70,7 +70,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
 	if(![[self identifier] hasTarget]) return [[self node] removeFromDocument];
-	if(flag) [super noteFileEventDidOccurDirect:YES];
+	[super noteFileEventDidOccurDirect:flag];
 }
 
 @end
