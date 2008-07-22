@@ -365,6 +365,18 @@
 		0EC11DF20CA02B98003E492C /* PGByteOrdering.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGByteOrdering.m; sourceTree = "<group>"; };
 		0EC11EA00CA14F0C003E492C /* NSColorAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorAdditions.h; sourceTree = "<group>"; };
 		0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorAdditions.m; sourceTree = "<group>"; };
+		0EC1C52F0E366F9E00E911E7 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0EC1C5300E366FA200E911E7 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0EC1C5310E366FAA00E911E7 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0EC1C5320E366FAD00E911E7 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0EC1C5330E366FB700E911E7 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EC1C5340E366FBA00E911E7 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EC1C5350E366FBD00E911E7 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EC1C5360E366FBF00E911E7 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Spanish; path = Spanish.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EC1C5380E366FD600E911E7 /* French */ = {isa = PBXFileReference; lastKnownFileType = folder; name = French; path = French.lproj/SequentialHelp; sourceTree = "<group>"; };
+		0EC1C5440E366FD900E911E7 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = folder; name = it_IT; path = it_IT.lproj/SequentialHelp; sourceTree = "<group>"; };
+		0EC1C5500E366FDC00E911E7 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Polish; path = Polish.lproj/SequentialHelp; sourceTree = "<group>"; };
+		0EC1C55C0E366FDE00E911E7 /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Spanish; path = Spanish.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0EC33E3D0E29B0A700450CF8 /* PGLevelIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLevelIndicatorCell.h; sourceTree = "<group>"; };
 		0EC33E3E0E29B0A700450CF8 /* PGLevelIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLevelIndicatorCell.m; sourceTree = "<group>"; };
 		0EC614F30BE43B1100D04615 /* NSWindowAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSWindowAdditions.h; sourceTree = "<group>"; };
@@ -1119,6 +1131,10 @@
 			isa = PBXVariantGroup;
 			children = (
 				0E56B8D80E24917C00987F57 /* English */,
+				0EC1C5330E366FB700E911E7 /* French */,
+				0EC1C5340E366FBA00E911E7 /* it_IT */,
+				0EC1C5350E366FBD00E911E7 /* Polish */,
+				0EC1C5360E366FBF00E911E7 /* Spanish */,
 			);
 			name = PGActivity.nib;
 			sourceTree = "<group>";
@@ -1139,6 +1155,10 @@
 			isa = PBXVariantGroup;
 			children = (
 				0E9016400DF44051004B6F69 /* English */,
+				0EC1C52F0E366F9E00E911E7 /* French */,
+				0EC1C5300E366FA200E911E7 /* it_IT */,
+				0EC1C5310E366FAA00E911E7 /* Polish */,
+				0EC1C5320E366FAD00E911E7 /* Spanish */,
 			);
 			name = PGPreferences.nib;
 			sourceTree = "<group>";
@@ -1183,6 +1203,10 @@
 			isa = PBXVariantGroup;
 			children = (
 				0EE991050DEFFBAA0004F628 /* English */,
+				0EC1C5380E366FD600E911E7 /* French */,
+				0EC1C5440E366FD900E911E7 /* it_IT */,
+				0EC1C5500E366FDC00E911E7 /* Polish */,
+				0EC1C55C0E366FDE00E911E7 /* Spanish */,
 			);
 			name = SequentialHelp;
 			sourceTree = "<group>";
