@@ -288,6 +288,8 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
+	BOOL const drawCorners = !_cacheIsValid && [self drawsRoundedCorners];
+	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	int count = 0;
 	NSRect const *rects = NULL;
 	if(_isPDF) {
@@ -296,8 +298,6 @@ DEALINGS WITH THE SOFTWARE. */
 		NSRectFillList(rects, count);
 	}
 	NSRect const b = [self bounds];
-	BOOL const drawCorners = !_cacheIsValid && [self drawsRoundedCorners];
-	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	if([self usesOptimizedDrawing]) {
 		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
 		if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
@@ -315,7 +315,7 @@ DEALINGS WITH THE SOFTWARE. */
 		}
 	} else [self _drawInRect:b];
 	if(drawCorners) {
-		[self _drawCornersOnRect:aRect];
+		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
 	}
 }

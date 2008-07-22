@@ -49,7 +49,9 @@ DEALINGS WITH THE SOFTWARE. */
         forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[_webView release];
+	[_webView stopLoading:self];
+	[_webView setFrameLoadDelegate:nil];
+	[_webView autorelease];
 	_webView = nil;
 	_isRendering = NO;
 	[self noteIsViewableDidChange];
@@ -76,17 +78,23 @@ DEALINGS WITH THE SOFTWARE. */
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
 	}
+	[_webView stopLoading:self];
+	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
 	_isRendering = NO;
 	[self noteIsViewableDidChange];
 }
 
-#pragma mark PGResourceAdapting
+#pragma mark PGResourceAdapting Protocol
 
 - (BOOL)adapterIsViewable
 {
 	return _isRendering || [super adapterIsViewable];
+}
+- (float)loadingProgress
+{
+	return 1.0;
 }
 
 #pragma mark PGContainerAdapter
@@ -120,12 +128,15 @@ DEALINGS WITH THE SOFTWARE. */
 	[self noteIsViewableDidChange];
 }
 
+- (void)read {}
+
 #pragma mark NSObject
 
 - (void)dealloc
 {
+	[_webView stopLoading:self];
 	[_webView setFrameLoadDelegate:nil];
-	[_webView release];
+	[_webView autorelease];
 	[super dealloc];
 }
 

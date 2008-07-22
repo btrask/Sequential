@@ -828,7 +828,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	if([[anEvent characters] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
+	if([[anEvent charactersIgnoringModifiers] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
 		[NSApp terminate:self];
 		return YES;
 	}
