@@ -805,6 +805,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	} else if(key >= '0' && key <= '9') {
 		[self setTimerInterval:(modifiers & NSAlternateKeyMask ? 10.0 : 1.0) * (key - '0')];
 		return YES;
+	} else switch(key) {
+		case '\e': [self toggleFullscreen:self]; return YES;
+		case 'i':
+		{
+			if(NSCommandKeyMask & modifiers) {
+				[self toggleOnScreenDisplay:self];
+				return YES;
+			}
+		}
 	}
 	return NO;
 }
