@@ -44,6 +44,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGDisplayController *)displayController;
 - (BOOL)setDisplayController:(PGDisplayController *)controller; // Don't call this, but go ahead and override it. Returns whether it changed.
 
+- (NSString *)nibName; // Overriders should implement this to return the name of the nib.
+- (NSString *)windowFrameAutosaveName; // Automatically generates one using -nibName by default.
+
 - (void)windowDidBecomeMain:(NSNotification *)aNotif;
 - (void)windowDidResignMain:(NSNotification *)aNotif;
 

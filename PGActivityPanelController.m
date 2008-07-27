@@ -36,8 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-static NSString *const PGActivityPanelFrameKey = @"PGActivityPanelFrame";
-
 @implementation PGActivityPanelController
 
 #pragma mark Instance Methods
@@ -94,15 +92,11 @@ static NSString *const PGActivityPanelFrameKey = @"PGActivityPanelFrame";
 	[cancelButton setEnabled:[[activityTable selectedRowIndexes] count] > 0];
 }
 
-#pragma mark NSWindowNotifications Protocol
+#pragma mark PGFloatingPanelController
 
-- (void)windowDidResize:(NSNotification *)notification
+- (NSString *)nibName
 {
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGActivityPanelFrameKey];
-}
-- (void)windowDidMove:(NSNotification *)notification
-{
-	[self windowDidResize:nil];
+	return @"PGActivity";
 }
 
 #pragma mark NSWindowController
@@ -121,16 +115,13 @@ static NSString *const PGActivityPanelFrameKey = @"PGActivityPanelFrame";
 	[cancelButton setAttributedTitle:[[[NSAttributedString alloc] initWithString:[cancelButton title] attributes:buttonAttributes] autorelease]];
 
 	[self tableViewSelectionDidChange:nil];
-
-	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGActivityPanelFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
-	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }
 
 #pragma mark NSObject
 
 - (id)init
 {
-	if((self = [self initWithWindowNibName:@"PGActivity"])) {
+	if((self = [super init])) {
 		[PGURLConnection AE_addObserver:self selector:@selector(connectionsDidChange:) name:PGURLConnectionConnectionsDidChangeNotification];
 	}
 	return self;

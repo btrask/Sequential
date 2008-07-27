@@ -75,6 +75,18 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (NSString *)nibName
+{
+	return nil;
+}
+- (NSString *)windowFrameAutosaveName
+{
+	NSString *const name = [self nibName];
+	return name ? [NSString stringWithFormat:@"%@PanelFrame", name] : nil;
+}
+
+#pragma mark -
+
 - (void)windowDidBecomeMain:(NSNotification *)aNotif
 {
 	[self _updateWithDisplayController:(aNotif ? [[aNotif object] windowController] : [[NSApp mainWindow] windowController])];
@@ -93,6 +105,15 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 #pragma mark NSWindowNotifications Protocol
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:[self windowFrameAutosaveName]];
+}
+- (void)windowDidMove:(NSNotification *)notification
+{
+	[self windowDidResize:nil];
+}
 
 - (void)windowWillClose:(NSNotification *)aNotif
 {
@@ -127,10 +148,16 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[super windowDidLoad];
 	[self windowDidBecomeMain:nil];
+	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:[self windowFrameAutosaveName]]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
+	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }
 
 #pragma mark NSObject
 
+- (id)init
+{
+	return [self initWithWindowNibName:[self nibName]];
+}
 - (void)dealloc
 {
 	[self AE_removeObserver];

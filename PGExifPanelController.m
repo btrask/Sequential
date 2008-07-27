@@ -36,8 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 
-static NSString *const PGExifPanelFrameKey = @"PGExifPanelFrame";
-
 @implementation PGExifPanelController
 
 #pragma mark Instance Methods
@@ -117,17 +115,6 @@ static NSString *const PGExifPanelFrameKey = @"PGExifPanelFrame";
 	return nil;
 }
 
-#pragma mark NSWindowNotifications Protocol
-
-- (void)windowDidResize:(NSNotification *)notification
-{
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGExifPanelFrameKey];
-}
-- (void)windowDidMove:(NSNotification *)notification
-{
-	[self windowDidResize:nil];
-}
-
 #pragma mark PGFloatingPanelController
 
 - (BOOL)setDisplayController:(PGDisplayController *)controller
@@ -139,22 +126,13 @@ static NSString *const PGExifPanelFrameKey = @"PGExifPanelFrame";
 	[self displayControllerActiveNodeDidChange:nil];
 	return YES;
 }
-
-#pragma mark NSWindowController
-
-- (void)windowDidLoad
+- (NSString *)nibName
 {
-	[super windowDidLoad];
-	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGExifPanelFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
-	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
+	return @"PGExif";
 }
 
 #pragma mark NSObject
 
-- (id)init
-{
-	return [self initWithWindowNibName:@"PGExif"];
-}
 - (void)dealloc
 {
 	[entriesTable setDelegate:nil];

@@ -113,6 +113,10 @@ DEALINGS WITH THE SOFTWARE. */
 	[self _updateOnTimer:nil];
 	return YES;
 }
+- (NSString *)nibName
+{
+	return @"PGTimer";
+}
 
 #pragma mark NSWindowController
 
