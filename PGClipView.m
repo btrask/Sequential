@@ -504,13 +504,6 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	float const x = -[anEvent deltaX], y = [anEvent deltaY];
-
-	// On Intel, the starting value is always 0.100006. On PPC, it was the same in a test program, but now it's always 1.0. I swear this has to be a compiler/framework bug. However, we don't really care what the number is, just as long as we can tell that the number is low. Multiply by 1.5 in case of slight variance.
-	static float minValue = 0;
-	if(!minValue) minValue = MAX(fabs(x), fabs(y)) * 1.5;
-
-	PGRectEdgeMask const direction = PGPointToRectEdgeMaskWithThreshhold(NSMakePoint(x, y), 0);
-	if(hypotf(x, y) < minValue && [self shouldExitForMovementInDirection:direction] && [[self delegate] clipView:self shouldExitEdges:direction]) return; // When the user starts scrolling, there is always a slow event (ie. less than minValue) before the speed ramps up. We require a very slow combined speed (which seems to exclude everything but an initial scroll event, but that isn't important) in order to prevent the user from accidentally going between pages.
 	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) allowAnimation:YES];
 }
 
