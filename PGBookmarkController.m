@@ -146,7 +146,9 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark
 {
-	NSMenuItem *const item = [bookmarkMenu itemAtIndex:[bookmarkMenu indexOfItemWithRepresentedObject:aBookmark]];
+	int const index = [bookmarkMenu indexOfItemWithRepresentedObject:aBookmark];
+	if(-1 == index) return; // Fail gracefully.
+	NSMenuItem *const item = [bookmarkMenu itemAtIndex:index];
 	if(![aBookmark isValid]) {
 		[item setAttributedTitle:nil];
 		[item setTitle:[NSString stringWithFormat:NSLocalizedString(@"Missing File %@", @"Bookmark menu item used when the file named %@ cannot be found."), [aBookmark displayName]]];
