@@ -22,7 +22,7 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import "PGExifPanel.h"
+#import "PGExifPanelController.h"
 
 // Models
 #import "PGNode.h"
@@ -30,13 +30,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Controllers
 #import "PGDocumentController.h"
+#import "PGDisplayController.h"
 
 // Categories
+#import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 
-static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
+static NSString *const PGExifPanelFrameKey = @"PGExifPanelFrame";
 
-@implementation PGExifPanel
+@implementation PGExifPanelController
 
 #pragma mark Instance Methods
 
@@ -63,6 +65,15 @@ static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
 	NSPasteboard *const pboard = [NSPasteboard generalPasteboard];
 	[pboard declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
 	[pboard setString:string forType:NSStringPboardType];
+}
+
+#pragma mark -
+
+- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
+{
+	[_allEntries release];
+	_allEntries = [[[[self displayController] activeNode] exifEntries] copy];
+	[self changeSearch:nil];
 }
 
 #pragma mark NSMenuValidation Protocol
@@ -110,25 +121,23 @@ static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGExifWindowFrameKey];
+	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGExifPanelFrameKey];
 }
 - (void)windowDidMove:(NSNotification *)notification
 {
 	[self windowDidResize:nil];
 }
 
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	[[PGDocumentController sharedDocumentController] setExifShown:NO];
-}
+#pragma mark PGFloatingPanelController
 
-#pragma mark PGFloatingPanel
-
-- (void)nodeChanged
+- (BOOL)setDisplayController:(PGDisplayController *)controller
 {
-	[_allEntries release];
-	_allEntries = [[[self node] exifEntries] copy];
-	[self changeSearch:nil];
+	PGDisplayController *const oldController = [self displayController];
+	if(![super setDisplayController:controller]) return NO;
+	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
+	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
+	[self displayControllerActiveNodeDidChange:nil];
+	return YES;
 }
 
 #pragma mark NSWindowController
@@ -136,7 +145,7 @@ static NSString *const PGExifWindowFrameKey = @"PGExifWindowFrame";
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGExifWindowFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
+	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGExifPanelFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
 	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }
 

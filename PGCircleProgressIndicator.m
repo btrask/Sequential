@@ -22,19 +22,49 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
+#import "PGCircleProgressIndicator.h"
 
-@interface PGActivityPanel : NSWindowController
+@implementation PGCircleProgressIndicator
+
+#pragma mark Instance Methods
+
+- (float)floatValue
 {
-	@private
-	IBOutlet NSTableView   *activityTable;
-	IBOutlet NSTableColumn *identifierColumn;
-	IBOutlet NSTableColumn *progressColumn;
-	IBOutlet NSButton      *cancelButton;
+	return _floatValue;
+}
+- (void)setFloatValue:(float)val
+{
+	_floatValue = MIN(MAX(val, 0), 1);
+	[self setNeedsDisplay:YES];
 }
 
-- (IBAction)cancelLoad:(id)sender;
+#pragma mark NSView
 
-- (void)connectionsDidChange:(NSNotification *)aNotif;
+- (void)drawRect:(NSRect)aRect
+{
+	NSRect const b = [self bounds];
+	[[NSColor colorWithDeviceWhite:0.9 alpha:0.8] set];
+	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5, 0.5)] stroke];
+
+	[NSGraphicsContext saveGraphicsState];
+
+	NSBezierPath *path = [NSBezierPath bezierPath];
+	NSPoint const center = NSMakePoint(NSMidX(b), NSMidY(b));
+	[path moveToPoint:center];
+	[path appendBezierPathWithArcWithCenter:center radius:NSWidth(b) / 2 - 2 startAngle:90 endAngle:[self floatValue] * -360.0 + 90 clockwise:YES];
+	[path addClip];
+
+	[[NSColor colorWithDeviceWhite:0.85 alpha:0.8] set];
+	NSRectFillUsingOperation(b, NSCompositeSourceOver);
+
+	[[NSColor colorWithDeviceWhite:1 alpha:0.2] set];
+	[[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(NSMinX(b), NSMaxY(b) - NSHeight(b) * 0.6, NSWidth(b), NSHeight(b) * 0.75)] fill];
+
+	[NSGraphicsContext restoreGraphicsState];
+}
+- (BOOL)acceptsFirstMouse:(NSEvent *)anEvent
+{
+	return YES;
+}
 
 @end

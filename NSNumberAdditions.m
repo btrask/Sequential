@@ -26,6 +26,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSNumber (AEAdditions)
 
+- (NSString *)AE_localizedStringWithFractionDigits:(unsigned)placesAfterDecimal
+{
+	static CFNumberFormatterRef f = nil;
+	if(!f) f = CFNumberFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), kCFNumberFormatterDecimalStyle);
+	NSNumber *const precision = [NSNumber numberWithInt:placesAfterDecimal];
+	CFNumberFormatterSetProperty(f, kCFNumberFormatterMinFractionDigits, (CFNumberRef)precision);
+	CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)precision);
+	return [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)self) autorelease];
+}
 - (NSString *)AE_localizedStringAsBytes
 {
 	double b = (double)[self unsignedLongLongValue];

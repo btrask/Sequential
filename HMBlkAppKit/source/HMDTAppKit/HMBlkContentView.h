@@ -28,13 +28,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #import <Cocoa/Cocoa.h>
 
 @interface HMBlkContentView : NSView
-{
-    // Resizing
-    BOOL        _isResizing;
-    BOOL        _isDragging;
-	BOOL        _dragged;
-    NSRect      _startWindowFrame;
-    NSPoint     _startLocation;
-    NSScreen   *_boundingScreen;
-}
+
+- (void)trackResize:(BOOL)isResize withEvent:(NSEvent *)firstEvent;
+
 @end

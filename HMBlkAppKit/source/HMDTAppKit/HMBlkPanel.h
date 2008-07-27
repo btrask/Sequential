@@ -24,28 +24,23 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-
 #import <Cocoa/Cocoa.h>
 #import "HMBlkAppKit.h"
 #import "PGFadeOutPanel.h"
 
 @interface HMBlkPanel : PGFadeOutPanel
 {
-    HMBlkContentView*   _blkContentView;
-    NSButton*           _closeButton;
-    
-    NSMutableSet*       _mouseMoveListeners;
+	HMBlkContentView *_blkContentView;
+	NSButton         *_closeButton;
+	BOOL              _resizable;
+	NSMutableSet     *_mouseMoveListeners;
 }
 
-// Black image
-+ (NSImage*)contentBackgroundImage;
++ (NSImage *)contentBackgroundImage;
++ (NSColor *)highlighedCellColor;
++ (NSArray *)alternatingRowBackgroundColors;
++ (NSColor *)majorGridColor;
 
-// Colors
-+ (NSColor*)highlighedCellColor;
-+ (NSArray*)alternatingRowBackgroundColors;
-+ (NSColor*)majorGridColor;
-
-// Mouse move listener
 - (void)addMouseMoveListener:(id)listener;
 - (void)removeMouseMoveListener:(id)listener;
 

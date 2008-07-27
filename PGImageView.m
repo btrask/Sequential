@@ -27,6 +27,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 @class PGClipView;
 
+// Other
+#import "PGNonretainedObjectProxy.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 
@@ -188,7 +191,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_cache
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_cache) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(_cache) object:nil];
 	if(!_cache || !_rep || _isPDF || [self canAnimateRep]) return;
 	if(_cacheIsValid) {
 		_cacheIsValid = NO;
@@ -213,7 +216,7 @@ DEALINGS WITH THE SOFTWARE. */
 	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), scaledSize.height);
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
-	if(![view lockFocusIfCanDraw]) return [self AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
+	if(![view lockFocusIfCanDraw]) return [[self PG_nonretainedObjectProxy] AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
 	[self _drawInRect:[_cache rect]];
 	[self _drawCornersOnRect:[_cache rect]];
 	[view unlockFocus];

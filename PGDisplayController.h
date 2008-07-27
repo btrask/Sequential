@@ -40,6 +40,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
+extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 @interface PGDisplayController : NSWindowController
 {
@@ -73,6 +74,8 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 	         PGNode             *_activeNode;
 
 	         NSTimeInterval      _timerInterval;
+	         NSDate             *_nextTimerFireDate;
+	         NSTimer            *_timer;
 }
 
 + (NSArray *)pasteboardTypes;
@@ -94,8 +97,6 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
-
-- (IBAction)changeTimerInterval:(id)sender; // Gets the interval in seconds from [sender tag].
 
 - (IBAction)previousPage:(id)sender;
 - (IBAction)nextPage:(id)sender;
@@ -134,9 +135,10 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 - (BOOL)findPanelShown;
 - (void)setFindPanelShown:(BOOL)flag;
 
+- (NSDate *)nextTimerFireDate;
 - (NSTimeInterval)timerInterval;
 - (void)setTimerInterval:(NSTimeInterval)time; // 0 for off.
-- (void)advanceOnTimer;
+- (void)advanceOnTimer:(NSTimer *)timer;
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif;
 

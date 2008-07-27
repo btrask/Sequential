@@ -37,8 +37,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDisplayController.h"
 #import "PGWindowController.h"
 #import "PGFullscreenController.h"
-#import "PGExifPanel.h"
-#import "PGActivityPanel.h"
+#import "PGExifPanelController.h"
+#import "PGTimerPanelController.h"
+#import "PGActivityPanelController.h"
 #import "PGURLAlert.h"
 
 // Other
@@ -74,7 +75,6 @@ static NSString *const PGRecentItemsKey            = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
 static NSString *const PGRecentItemsDeprecatedKey  = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey             = @"PGFullscreen";
-static NSString *const PGExifShownKey              = @"PGExifShown";
 
 static NSString *const PGNSApplicationName         = @"NSApplicationName";
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
@@ -138,7 +138,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithInt:PGNextPreviousAction], PGMouseClickActionKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		[NSNumber numberWithBool:NO], PGFullscreenKey,
-		[NSNumber numberWithBool:NO], PGExifShownKey,
 		nil]];
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l);
@@ -243,11 +242,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)toggleExif:(id)sender
 {
-	[self setExifShown:![self exifShown]];
+	[_exifPanel toggleShown];
+}
+- (IBAction)toggleTimer:(id)sender
+{
+	[_timerPanel toggleShown];
 }
 - (IBAction)toggleActivity:(id)sender
 {
-	[self setActivityShown:![self activityShown]];
+	[_activityPanel toggleShown];
 }
 - (IBAction)selectPreviousDocument:(id)sender
 {
@@ -315,36 +318,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[toggleFullscreen setTitle:NSLocalizedString((flag ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 	[fitToView setTitle:NSLocalizedString((flag ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
 	[self _setInFullscreen:flag];
-}
-
-#pragma mark -
-
-- (BOOL)exifShown
-{
-	return _exifShown;
-}
-- (void)setExifShown:(BOOL)flag
-{
-	if(_prefsLoaded && flag == _exifShown) return;
-	_exifShown = flag;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGExifShownKey];
-	if(flag) {
-		if(!_exifPanel) _exifPanel = [[PGExifPanel alloc] init];
-		[_exifPanel showWindow:self];
-	} else [[_exifPanel window] performClose:self];
-}
-- (BOOL)activityShown
-{
-	return _activityShown;
-}
-- (void)setActivityShown:(BOOL)flag
-{
-	if(flag == _activityShown) return;
-	_activityShown = flag;
-	if(flag) {
-		if(!_activityPanel) _activityPanel = [[PGActivityPanel alloc] init];
-		[_activityPanel showWindow:self];
-	} else [[_activityPanel window] performClose:self];
 }
 
 #pragma mark -
@@ -704,7 +677,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
 	[self setFullscreen:[[defaults objectForKey:PGFullscreenKey] boolValue]];
-	[self setExifShown:[[defaults objectForKey:PGExifShownKey] boolValue]];
 	_prefsLoaded = YES;
 
 	[self setCurrentDocument:nil];
@@ -856,6 +828,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		_documents = [[NSMutableArray alloc] init];
 		_classesByExtension = [[NSMutableDictionary alloc] init];
 
+		_exifPanel = [[PGExifPanelController alloc] init];
+		_timerPanel = [[PGTimerPanelController alloc] init];
+		_activityPanel = [[PGActivityPanelController alloc] init];
+
 		NSNotificationCenter *const workspaceCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
 		[workspaceCenter addObserver:self selector:@selector(workspaceDidLaunchApplication:) name:NSWorkspaceDidLaunchApplicationNotification object:nil];
 		[workspaceCenter addObserver:self selector:@selector(workspaceDidTerminateApplication:) name:NSWorkspaceDidTerminateApplicationNotification object:nil];
@@ -886,6 +862,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_documents release];
 	[_fullscreenController release];
 	[_exifPanel release];
+	[_timerPanel release];
 	[_activityPanel release];
 	[_classesByExtension release];
 	[super dealloc];

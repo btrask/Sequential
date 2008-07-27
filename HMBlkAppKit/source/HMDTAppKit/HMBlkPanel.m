@@ -24,175 +24,132 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-
 #import "HMBlkContentView.h"
 #import "HMBlkPanel.h"
 
 @implementation HMBlkPanel
 
-//--------------------------------------------------------------//
-#pragma mark -- Black image --
-//--------------------------------------------------------------//
+#pragma mark Class Methods
 
 + (NSImage*)contentBackgroundImage
 {
-    static NSImage* _contentBackgroundImage;
-    if (!_contentBackgroundImage) {
-        NSBundle*   bundle;
-        bundle = [NSBundle bundleForClass:self];
-        
-        _contentBackgroundImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkPanelMM"]];
-    }
-    
-    return _contentBackgroundImage;
+	static NSImage *_contentBackgroundImage;
+	if(!_contentBackgroundImage) _contentBackgroundImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle bundleForClass:self] pathForImageResource:@"blkPanelMM"]];
+	return _contentBackgroundImage;
 }
-
-//--------------------------------------------------------------//
-#pragma mark -- Colors --
-//--------------------------------------------------------------//
 
 + (NSColor*)highlighedCellColor
 {
-    static NSColor* _highlightCellColor = nil;
-    if (!_highlightCellColor) {
-        _highlightCellColor = [[NSColor colorWithCalibratedWhite:0.4f alpha:1.0f] retain];
-    }
-    
-    return _highlightCellColor;
+	static NSColor *_highlightCellColor = nil;
+	if (!_highlightCellColor) {
+		_highlightCellColor = [[NSColor colorWithCalibratedWhite:0.4f alpha:1.0f] retain];
+	}
+	
+	return _highlightCellColor;
 }
-
 + (NSArray*)alternatingRowBackgroundColors
 {
-    static NSArray* _altColors = nil;
-    if (!_altColors) {
-        _altColors = [[NSArray arrayWithObjects:
-                [NSColor colorWithCalibratedWhite:0.16f alpha:0.86f], 
-                [NSColor colorWithCalibratedWhite:0.15f alpha:0.8f], 
-                nil] retain];
-    }
-    
-    return _altColors;
+	static NSArray *_altColors = nil;
+	if(!_altColors) _altColors = [[NSArray alloc] initWithObjects:[NSColor colorWithCalibratedWhite:0.16f alpha:0.86f], [NSColor colorWithCalibratedWhite:0.15f alpha:0.8f], nil];
+	return _altColors;
 }
-
 + (NSColor*)majorGridColor
 {
-    static NSColor* _majorGridColor = nil;
-    if (!_majorGridColor) {
-        _majorGridColor = [[NSColor colorWithCalibratedRed:0.69f green:0.69 blue:0.69 alpha:1.0f] retain];
-    }
-    
-    return _majorGridColor;
+	static NSColor *_majorGridColor = nil;
+	if(!_majorGridColor) _majorGridColor = [[NSColor colorWithCalibratedRed:0.69f green:0.69 blue:0.69 alpha:1.0f] retain];
+	return _majorGridColor;
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- Initialize --
-//--------------------------------------------------------------//
+#pragma mark Instance Methods
+
+- (void)addMouseMoveListener:(id)listener
+{
+	[_mouseMoveListeners addObject:listener];
+}
+- (void)removeMouseMoveListener:(id)listener
+{
+	[_mouseMoveListeners removeObject:listener];
+}
+
+#pragma mark NSNibAwaking Protocol
+
+- (void)awakeFromNib
+{
+	// Convert the sizes set in IB to our new style mask.
+	[self setMinSize:[NSWindow frameRectForContentRect:[NSWindow contentRectForFrameRect:(NSRect){NSZeroPoint, [self minSize]} styleMask:NSTitledWindowMask] styleMask:NSBorderlessWindowMask].size];
+	[self setMaxSize:[NSWindow frameRectForContentRect:[NSWindow contentRectForFrameRect:(NSRect){NSZeroPoint, [self maxSize]} styleMask:NSTitledWindowMask] styleMask:NSBorderlessWindowMask].size];
+}
+
+#pragma mark NSScripting Protocol
+
+- (BOOL)isResizable
+{
+	return _resizable;
+}
+
+#pragma mark NSMenuValidation Protocol
+
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
+{
+	return [anItem action] == @selector(performClose:) ? YES : [super validateMenuItem:anItem]; // NSWindow doesn't like -performClose: for borderless windows.
+}
+
+#pragma mark NSWindow
 
 - (id)initWithContentRect:(NSRect)contentRect 
-        styleMask:(unsigned int)styleMask 
-        backing:(NSBackingStoreType)backingType 
-        defer:(BOOL)flag
+      styleMask:(unsigned int)styleMask 
+      backing:(NSBackingStoreType)backingType 
+      defer:(BOOL)flag
 {
-    // Invoke super without title bar
-    self = [super initWithContentRect:contentRect 
-            styleMask:NSBorderlessWindowMask
-            backing:backingType 
-            defer:flag];
-    
-    // Initialize instance variables
-    _mouseMoveListeners = [[NSMutableSet set] retain];
-    
-    // Configure itself
-    [self setLevel:NSFloatingWindowLevel];
-    [self setOpaque:NO];
-    [self setBecomesKeyOnlyIfNeeded:YES];
-    
-    // Set content view
-    _blkContentView = [[HMBlkContentView alloc] initWithFrame:contentRect];
-    [self setContentView:_blkContentView];
-    
-    // Create close button
-    NSBundle*   bundle;
-    NSImage*    closeButtonImage;
-    bundle = [NSBundle bundleForClass:[self class]];
-    closeButtonImage = [[[NSImage alloc] initWithContentsOfFile:
-            [bundle pathForImageResource:@"blkCloseButton"]] autorelease];
-    if (closeButtonImage) {
-        NSRect  buttonRect;
-        buttonRect.origin.x = 12;
-        buttonRect.origin.y = contentRect.size.height - 7 - [closeButtonImage size].height;
-        buttonRect.size = [closeButtonImage size];
-        
-        _closeButton = [[NSButton alloc] initWithFrame:buttonRect];
-        [_closeButton setButtonType:NSMomentaryChangeButton];
-        [_closeButton setBezelStyle:NSRegularSquareBezelStyle];
-        [_closeButton setBordered:NO];
-        [_closeButton setImage:closeButtonImage];
-        [_closeButton setAutoresizingMask:NSViewMaxXMargin | NSViewMinYMargin];
-        [_closeButton setTarget:self];
-        [_closeButton setAction:@selector(fadeOut)];
-        
-        [_blkContentView addSubview:_closeButton];
-    }
-    
-    // Set accepts mouse moved events
-    [self setAcceptsMouseMovedEvents:YES];
-    
-    return self;
+	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:backingType defer:flag];
+
+	_resizable = !!(NSWindowZoomButton & styleMask);
+	_mouseMoveListeners = [[NSMutableSet set] retain];
+
+	[self setLevel:NSFloatingWindowLevel];
+	[self setOpaque:NO];
+	[self setBecomesKeyOnlyIfNeeded:YES];
+
+	_blkContentView = [[HMBlkContentView alloc] initWithFrame:contentRect];
+	[self setContentView:_blkContentView];
+
+	NSImage *const closeButtonImage = [[[NSImage alloc] initWithContentsOfFile:[[NSBundle bundleForClass:[self class]] pathForImageResource:@"blkCloseButton"]] autorelease];
+	if(closeButtonImage) {
+		NSRect  buttonRect;
+		buttonRect.origin.x = 12;
+		buttonRect.origin.y = contentRect.size.height - 7 - [closeButtonImage size].height;
+		buttonRect.size = [closeButtonImage size];
+
+		_closeButton = [[NSButton alloc] initWithFrame:buttonRect];
+		[_closeButton setButtonType:NSMomentaryChangeButton];
+		[_closeButton setBezelStyle:NSRegularSquareBezelStyle];
+		[_closeButton setBordered:NO];
+		[_closeButton setImage:closeButtonImage];
+		[_closeButton setAutoresizingMask:NSViewMaxXMargin | NSViewMinYMargin];
+		[_closeButton setTarget:self];
+		[_closeButton setAction:@selector(fadeOut)];
+
+		[_blkContentView addSubview:_closeButton];
+	}
+
+	[self setAcceptsMouseMovedEvents:YES];
+
+	return self;
 }
 
-- (void)dealloc
+#pragma mark -
+
+- (IBAction)performClose:(id)sender
 {
-    [_blkContentView release];
-    [_closeButton release];
-    [_mouseMoveListeners release];
-    
-    [super dealloc];
+	[_closeButton performClick:sender];
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- Window attributes --
-//--------------------------------------------------------------//
-
-- (void)setContentView:(NSView*)contentView
-{
-    // Get current content view
-    NSView* oldContentView;
-    oldContentView = [self contentView];
-    
-    // Keep black content view
-    if (oldContentView == _blkContentView) {
-        // Remove old subviews
-        [[oldContentView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        
-        // Swap new subviews
-        NSEnumerator*   enumerator;
-        NSView*         view;
-        enumerator = [[[[contentView subviews] copy] autorelease] objectEnumerator];
-        while (view = [enumerator nextObject]) {
-		[view retain];
-		[view removeFromSuperview];
-		[oldContentView addSubview:view];
-		[view release];
-        }
-        
-        // Add close button
-        if (![[oldContentView subviews] containsObject:_closeButton]) {
-            [oldContentView addSubview:_closeButton];
-        }
-        
-        return;
-    }
-    
-    [super setContentView:contentView];
-}
+#pragma mark -
 
 - (BOOL)hasShadow
 {
-    return NO;
+	return NO;
 }
-
 - (BOOL)becomesKeyOnlyIfNeeded
 {
 	return YES;
@@ -206,32 +163,30 @@ POSSIBILITY OF SUCH DAMAGE.
 	return NO;
 }
 
-//--------------------------------------------------------------//
-#pragma mark -- Mouse move listener --
-//--------------------------------------------------------------//
-
-- (void)addMouseMoveListener:(id)listener
+- (void)setContentView:(NSView*)contentView
 {
-    [_mouseMoveListeners addObject:listener];
+	NSView *const oldContentView = [self contentView];
+	if(oldContentView != _blkContentView) return [super setContentView:contentView];
+	[[oldContentView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+	NSView *subview;
+	NSEnumerator *const subviewEnum = [[[[contentView subviews] copy] autorelease] objectEnumerator];
+	while((subview = [subviewEnum nextObject])) {
+		[subview retain];
+		[subview removeFromSuperview];
+		[oldContentView addSubview:subview];
+		[subview release];
+	}
+	if(![[oldContentView subviews] containsObject:_closeButton]) [oldContentView addSubview:_closeButton];
 }
 
-- (void)removeMouseMoveListener:(id)listener
+#pragma mark NSObject
+
+- (void)dealloc
 {
-    [_mouseMoveListeners removeObject:listener];
-}
-
-#pragma mark NSMenuValidation Protocol
-
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem
-{
-	return [anItem action] == @selector(performClose:) ? YES : [super validateMenuItem:anItem]; // NSWindow doesn't like -performClose: for borderless windows.
-}
-
-#pragma mark NSWindow
-
-- (IBAction)performClose:(id)sender
-{
-	[_closeButton performClick:sender];
+	[_blkContentView release];
+	[_closeButton release];
+	[_mouseMoveListeners release];
+	[super dealloc];
 }
 
 @end

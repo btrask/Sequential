@@ -29,6 +29,12 @@
 /* Bookmark menu item used when the file named %@ cannot be found. */
 "Missing File %@" = "Archivo no ncontrado “%@”";
 
+/* Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds.*/
+"%@ seconds" = "%@ seconds";
+
+/* Display string for no timer interval. */
+"---" = "---";
+
 /* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %u %@ was generated while loading the URL %@." = "El error “%u %@” se generó mientras se cargaba la URL “%@.”";
 

@@ -22,19 +22,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSMenuItem</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSMenuItem</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -178,6 +178,22 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>activateDocument</key>
@@ -225,6 +241,8 @@
 				<key>toggleActivity</key>
 				<string>id</string>
 				<key>toggleExif</key>
+				<string>id</string>
+				<key>toggleTimer</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -304,22 +322,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

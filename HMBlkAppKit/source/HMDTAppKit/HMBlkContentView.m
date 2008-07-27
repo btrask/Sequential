@@ -24,8 +24,8 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-
 #import "HMBlkContentView.h"
+#import "HMAppKitEx.h"
 
 @implementation HMBlkContentView
 
@@ -34,7 +34,6 @@ static NSImage* _leftMiddleImage = nil;
 static NSImage* _leftTopImage = nil;
 static NSImage* _middleBottomImage = nil;
 static NSImage* _middleTopImage = nil;
-static NSImage* _rightBottomImage = nil;
 static NSImage* _rightMiddleImage = nil;
 static NSImage* _rightTopImage = nil;
 
@@ -43,18 +42,14 @@ static NSRect   _leftMiddleRect = {{0, 0}, {0, 0}};
 static NSRect   _leftTopRect = {{0, 0}, {0, 0}};
 static NSRect   _middleBottomRect = {{0, 0}, {0, 0}};
 static NSRect   _middleTopRect = {{0, 0}, {0, 0}};
-static NSRect   _rightBottomRect = {{0, 0}, {0, 0}};
 static NSRect   _rightMiddleRect = {{0, 0}, {0, 0}};
 static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 
-//--------------------------------------------------------------//
-#pragma mark -- Initialize --
-//--------------------------------------------------------------//
+#pragma mark Class Methods
 
 + (void)load
 {
-	NSAutoreleasePool*  pool;
-	pool = [[NSAutoreleasePool alloc] init];
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	// Get resources
 	if (!_leftBottomImage) {
@@ -66,7 +61,6 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 		_leftTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLT"]];
 		_middleBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMB"]];
 		_middleTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMT"]];
-		_rightBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRB"]];
 		_rightMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRM"]];
 		_rightTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRT"]];
 		
@@ -75,7 +69,6 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 		_leftTopRect.size = [_leftTopImage size];
 		_middleBottomRect.size = [_middleBottomImage size];
 		_middleTopRect.size = [_middleTopImage size];
-		_rightBottomRect.size = [_rightBottomImage size];
 		_rightMiddleRect.size = [_rightMiddleImage size];
 		_rightTopRect.size = [_rightTopImage size];
 	}
@@ -83,183 +76,77 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	[pool release];
 }
 
-- (id)initWithFrame:(NSRect)frame
+#pragma mark Instance Methods
+
+- (void)trackResize:(BOOL)isResize
+        withEvent:(NSEvent *)firstEvent
 {
-	self = [super initWithFrame:frame];
-	if (!self) {
-		return nil;
+	NSWindow *const w = [self window];
+	NSRect const initialFrame = [w frame];
+	NSPoint const firstMousePoint = [w convertBaseToScreen:[firstEvent locationInWindow]];
+	NSScreen *boundingScreen = nil;
+	if(isResize) {
+		NSRect const f = [w frame];
+		NSScreen *const screen = [w screen];
+		if(screen && NSPointInRect(NSMakePoint(NSMaxX(f) - 9, NSMinY(f) + 12), [screen visibleFrame])) boundingScreen = screen;
 	}
-	
-	// Initialize instance variables
-	_isResizing = NO;
-	_startWindowFrame = NSZeroRect;
-	_startLocation = NSZeroPoint;
-	
-	return self;
-}
-- (void)dealloc
-{
-	[_boundingScreen release];
-	[super dealloc];
-}
 
-//--------------------------------------------------------------//
-#pragma mark -- Dragging --
-//--------------------------------------------------------------//
+	BOOL dragged = NO;
+	NSEvent *latestEvent;
+	while((latestEvent = [w nextEventMatchingMask:NSLeftMouseDraggedMask | NSLeftMouseUpMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) && [latestEvent type] != NSLeftMouseUp) {
+		dragged = YES;
+		NSPoint const mousePoint = [w convertBaseToScreen:[latestEvent locationInWindow]];
+		float const dx = mousePoint.x - firstMousePoint.x;
+		float const dy = firstMousePoint.y - mousePoint.y;
+		NSRect frame = initialFrame;
+		if(isResize) {
+			frame.size.width += dx;
+			frame.size.height += dy;
+			frame.origin.y -= dy;
 
-- (BOOL)acceptsFirstMouse:(NSEvent *)anEvent
-{
-	return YES;
-}
-- (void)mouseDown:(NSEvent*)event
-{
-	// Get window
-	NSWindow*   window;
-	window = [self window];
-	
-	// Store size information
-	NSPoint mouseLocation = [event locationInWindow];
+			// Constrain with min and max size
+			NSSize  minSize, maxSize;
+			minSize = [w minSize];
+			maxSize = [w maxSize];
+			if(minSize.width > 0 && frame.size.width < minSize.width) frame.size.width = minSize.width;
+			if(maxSize.width > 0 && frame.size.width > maxSize.width) frame.size.width = maxSize.width;
+			if(minSize.height > 0 && frame.size.height < minSize.height) {
+				frame.origin.y += frame.size.height - minSize.height;
+				frame.size.height = minSize.height;
+			}
+			if(maxSize.height > 0 && frame.size.height > maxSize.height) {
+				frame.origin.y += frame.size.height - minSize.height;
+				frame.size.height = maxSize.height;
+			}
 
-	// We can't make the shadow ignore mouse clicks, but at least we can not let the user drag by it.
-	if(![self mouse:mouseLocation inRect:NSMakeRect(8, 12, NSWidth([self bounds]) - 16, NSHeight([self bounds]) - 16)]) return;
+			// Constrain to the screen.
+			if(boundingScreen) {
+				NSRect const s = [boundingScreen visibleFrame];
+				if(NSMaxX(frame) - 8 > NSMaxX(s)) frame.size.width -= NSMaxX(frame) - 8 - NSMaxX(s);
+				if(NSMinY(frame) + 12 < NSMinY(s)) {
+					float const y = NSMinY(frame) + 12 - NSMinY(s);
+					frame.origin.y -= y;
+					frame.size.height += y;
+				}
+			}
+		} else {
+			frame.origin.x += dx;
+			frame.origin.y -= dy;
 
-	_startWindowFrame = [window frame];
-	_startLocation = [window convertBaseToScreen:mouseLocation];
-	
-	// Get frame
-	NSRect  frame;
-	frame = [self frame];
-	
-	// Decide grow box region
-	NSRect  growBoxRect = NSMakeRect(NSWidth(frame) - 30, 18, 16, 16);
-	
-	// When click in the grow box
-	NSPoint mousePoint;
-	mousePoint = [self convertPoint:mouseLocation fromView:nil];
-	if (NSPointInRect(mousePoint, growBoxRect)) {
-		// Start resizing
-		_isResizing = YES;
-
-		NSRect const f = [[self window] frame];
-		NSScreen *const screen = [[self window] screen];
-		if(screen && NSPointInRect(NSMakePoint(NSMaxX(f) - 9, NSMinY(f) + 12), [screen visibleFrame])) _boundingScreen = [screen retain];
-	}
-	// Other place
-	else {
-		// Start dragging
-		_isDragging = YES;
-		_dragged = NO;
-	}
-	
-	// Invoke super
-	[super mouseDown:event];
-}
-
-- (void)mouseDragged:(NSEvent*)event
-{
-	// Get window
-	NSWindow*   window;
-	window = [self window];
-	
-	// Get cuurent mouse location
-	NSPoint mouseLocation;
-	mouseLocation = [window convertBaseToScreen:[event locationInWindow]];
-	
-	// Calc delta
-	float   dx, dy;
-	dx = mouseLocation.x - _startLocation.x;
-	dy = _startLocation.y - mouseLocation.y;
-	
-	// For resizing
-	if (_isResizing) {
-		// Decide new window frame
-		NSRect  newWindowFrame;
-		newWindowFrame = _startWindowFrame;
-		newWindowFrame.size.width += dx;
-		newWindowFrame.size.height += dy;
-		newWindowFrame.origin.y -= dy;
-		
-		// Constrain with min and max size
-		NSSize  minSize, maxSize;
-		minSize = [window minSize];
-		maxSize = [window maxSize];
-		if (minSize.width > 0 && newWindowFrame.size.width < minSize.width) {
-			newWindowFrame.size.width = minSize.width;
-		}
-		if (maxSize.width > 0 && newWindowFrame.size.width > maxSize.width) {
-			newWindowFrame.size.width = maxSize.width;
-		}
-		if (minSize.height > 0 && newWindowFrame.size.height < minSize.height) {
-			newWindowFrame.origin.y += newWindowFrame.size.height - minSize.height;
-			newWindowFrame.size.height = minSize.height;
-		}
-		if (maxSize.height > 0 && newWindowFrame.size.height > maxSize.height) {
-			newWindowFrame.origin.y += newWindowFrame.size.height - minSize.height;
-			newWindowFrame.size.height = maxSize.height;
-		}
-
-		// Constrain to the screen.
-		if(_boundingScreen) {
-			NSRect const s = [_boundingScreen visibleFrame];
-			if(NSMaxX(newWindowFrame) - 8 > NSMaxX(s)) newWindowFrame.size.width -= NSMaxX(newWindowFrame) - 8 - NSMaxX(s);
-			if(NSMinY(newWindowFrame) + 12 < NSMinY(s)) {
-				float const y = NSMinY(newWindowFrame) + 12 - NSMinY(s);
-				newWindowFrame.origin.y -= y;
-				newWindowFrame.size.height += y;
+			// Constrain by menu bar
+			NSArray *const screens = [NSScreen screens];
+			if([screens count]) {
+				NSScreen *const mainScreen = [screens objectAtIndex:0];
+				if([w screen] == mainScreen && NSMaxY(frame) - 4 > NSMaxY([mainScreen visibleFrame])) frame.origin.y -= NSMaxY(frame) - 4 - NSMaxY([mainScreen visibleFrame]);
 			}
 		}
-
-		// Set window frame
-		if (!NSEqualRects(newWindowFrame, [window frame])) {
-			[window setFrame:newWindowFrame display:YES animate:NO];
-		}
+		[w setFrame:frame display:YES];
 	}
-	// For dragging
-	else if (_isDragging) {
-		// Decide new window frame
-		NSRect  newWindowFrame;
-		newWindowFrame = _startWindowFrame;
-		newWindowFrame.origin.x += dx;
-		newWindowFrame.origin.y -= dy;
-
-		// Constrain by menu bar
-		NSArray *const screens = [NSScreen screens];
-		if([screens count]) {
-			NSScreen *const mainScreen = [screens objectAtIndex:0];
-			if([[self window] screen] == mainScreen && NSMaxY(newWindowFrame) - 4 > NSMaxY([mainScreen visibleFrame])) newWindowFrame.origin.y -= NSMaxY(newWindowFrame) - 4 - NSMaxY([mainScreen visibleFrame]);
-		}
-
-		// Set window frame
-		if (!NSEqualRects(newWindowFrame, [window frame])) {
-			[window setFrame:newWindowFrame display:YES];
-			_dragged = YES;
-		}
-	}
+	[w discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
+	if(!isResize && !dragged) [w makeFirstResponder:self];
 }
 
-- (void)mouseUp:(NSEvent*)event
-{
-	// Clear size
-	_startWindowFrame = NSZeroRect;
-	_startLocation = NSZeroPoint;
-	
-	// For resizing
-	if (_isResizing) {
-		// Stop resizing
-		_isResizing = NO;
-		[_boundingScreen release];
-		_boundingScreen = nil;
-	}
-	// For dragging
-	else if (_isDragging) {
-		_isDragging = NO;
-		if(!_dragged) [[self window] makeFirstResponder:self];
-	}
-}
-
-//--------------------------------------------------------------//
-#pragma mark -- Drawing --
-//--------------------------------------------------------------//
+#pragma mark NSView
 
 - (BOOL)isOpaque
 {
@@ -267,49 +154,44 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 }
 - (void)drawRect:(NSRect)rect
 {
-	// Get frame
-	NSRect  frame;
-	frame = [self frame];
-	
-	NSRect  imageRect;
-	
-	//
-	// Draw background
-	//
-	
+	NSRect frame = [self frame];
+	NSRect imageRect;
+	NSImage *const rightBottomImage = [NSImage HM_imageNamed:([[self window] isResizable] ? @"blkPanelRBResizable" : @"blkPanelRB") for:self flipped:NO];
+	NSRect rightBottomRect = (NSRect){NSZeroPoint, [rightBottomImage size]};
+
 	// Draw left bottom
 	imageRect.origin = NSZeroPoint;
 	imageRect.size = _leftBottomRect.size;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_leftBottomImage drawInRect:imageRect fromRect:_leftBottomRect operation:NSCompositeCopy fraction:1.0f];
+		[_leftBottomImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw left middle
 	imageRect.origin.x = 0;
 	imageRect.origin.y = _leftBottomRect.size.height;
 	imageRect.size.width = _leftMiddleRect.size.width;
 	imageRect.size.height = frame.size.height - _leftBottomRect.size.height - _leftTopRect.size.height;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_leftMiddleImage drawInRect:imageRect fromRect:_leftMiddleRect operation:NSCompositeCopy fraction:1.0f];
+		[_leftMiddleImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw left top
 	imageRect.origin.x = 0;
 	imageRect.origin.y = frame.size.height - _leftTopRect.size.height;
 	imageRect.size = _leftTopRect.size;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_leftTopImage drawInRect:imageRect fromRect:_leftTopRect operation:NSCompositeCopy fraction:1.0f];
+		[_leftTopImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw middle bottom
 	imageRect.origin.x = _leftBottomRect.size.width;
 	imageRect.origin.y = 0;
-	imageRect.size.width = frame.size.width - _leftBottomRect.size.width - _rightBottomRect.size.width;
+	imageRect.size.width = frame.size.width - _leftBottomRect.size.width - rightBottomRect.size.width;
 	imageRect.size.height = _middleBottomRect.size.height;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_middleBottomImage drawInRect:imageRect fromRect:_middleBottomRect operation:NSCompositeCopy fraction:1.0f];
+		[_middleBottomImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw middle middle
 	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:(227.0f / 255.0f)] set];
 	NSRectFill(NSIntersectionRect(NSMakeRect(NSWidth(_leftMiddleRect), NSHeight(_middleBottomRect), NSWidth(frame) - NSWidth(_leftMiddleRect) - NSWidth(_rightMiddleRect), NSHeight(frame) - NSHeight(_middleBottomRect) - NSHeight(_middleTopRect)), rect));
@@ -320,72 +202,60 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	imageRect.size.width = frame.size.width - _leftTopRect.size.width - _rightTopRect.size.width;
 	imageRect.size.height = _middleTopRect.size.height;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_middleTopImage drawInRect:imageRect fromRect:_middleTopRect operation:NSCompositeCopy fraction:1.0f];
+		[_middleTopImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw right bottom
-	imageRect.origin.x = frame.size.width - _rightBottomRect.size.width;
+	imageRect.origin.x = frame.size.width - rightBottomRect.size.width;
 	imageRect.origin.y = 0;
-	imageRect.size.width = _rightBottomRect.size.width;
-	imageRect.size.height = _rightBottomRect.size.height;
-	if (NSIntersectsRect(imageRect, rect)) {
-		[_rightBottomImage drawInRect:imageRect fromRect:_rightBottomRect operation:NSCompositeCopy fraction:1.0f];
+	imageRect.size.width = rightBottomRect.size.width;
+	imageRect.size.height = rightBottomRect.size.height;
+	if(NSIntersectsRect(imageRect, rect)) {
+		[rightBottomImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw right middle
 	imageRect.origin.x = frame.size.width - _rightMiddleRect.size.width;
-	imageRect.origin.y = _rightBottomRect.size.height;
+	imageRect.origin.y = rightBottomRect.size.height;
 	imageRect.size.width = _rightMiddleRect.size.width;
-	imageRect.size.height = frame.size.height - _rightBottomRect.size.height - _rightTopRect.size.height;
+	imageRect.size.height = frame.size.height - rightBottomRect.size.height - _rightTopRect.size.height;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_rightMiddleImage drawInRect:imageRect fromRect:_rightMiddleRect operation:NSCompositeCopy fraction:1.0f];
+		[_rightMiddleImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
+
 	// Draw right top
 	imageRect.origin.x = frame.size.width - _rightTopRect.size.width;
 	imageRect.origin.y = frame.size.height - _rightTopRect.size.height;
 	imageRect.size.width = _rightTopRect.size.width;
 	imageRect.size.height = _rightTopRect.size.height;
 	if (NSIntersectsRect(imageRect, rect)) {
-		[_rightTopImage drawInRect:imageRect fromRect:_rightTopRect operation:NSCompositeCopy fraction:1.0f];
+		[_rightTopImage drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 	}
-	
-	//
-	// Draw title
-	//
-	
-	// Get title
-	NSString*   title;
-	title = [[self window] title];
-	
-	// Create attributed string
-	static NSDictionary*	_attrs = nil;
-	if (!_attrs) {
-		NSMutableParagraphStyle*	paragraph;
-		paragraph = [[NSMutableParagraphStyle alloc] init];
-		[paragraph setAlignment:NSCenterTextAlignment];
-		[paragraph setLineBreakMode:NSLineBreakByTruncatingTail];
-		
-		_attrs = [[NSDictionary dictionaryWithObjectsAndKeys:
-				[NSFont systemFontOfSize:11.0f], NSFontAttributeName, 
-				[NSColor colorWithCalibratedWhite:1.0f alpha:0.8f], NSForegroundColorAttributeName, 
-				paragraph, NSParagraphStyleAttributeName, 
-				nil] retain];
+
+	static NSDictionary *attrs = nil;
+	if(!attrs) {
+		NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+		[style setAlignment:NSCenterTextAlignment];
+		[style setLineBreakMode:NSLineBreakByTruncatingTail];
+		attrs = [[NSDictionary alloc] initWithObjectsAndKeys:
+			[NSFont systemFontOfSize:11.0f], NSFontAttributeName, 
+			[NSColor colorWithCalibratedWhite:1.0f alpha:0.8f], NSForegroundColorAttributeName, 
+			style, NSParagraphStyleAttributeName, nil];
 	}
-	
-	NSAttributedString* attrStr;
-	attrStr = [[NSAttributedString alloc] initWithString:title attributes:_attrs];
-	
-	// Decide title rect
-	NSRect  titleRect;
-	titleRect.origin.x = 36;
-	titleRect.origin.y = frame.size.height - 22;
-	titleRect.size.width = frame.size.width - 72;
-	titleRect.size.height = 16;
-	
-	// Draw title
-	[attrStr drawInRect:titleRect];
-	[attrStr release];
+	[[[self window] title] drawInRect:NSMakeRect(36, NSHeight(frame) - 22, NSWidth(frame) - 72, 16) withAttributes:attrs];
+}
+- (BOOL)acceptsFirstMouse:(NSEvent *)anEvent
+{
+	return YES;
+}
+
+#pragma mark NSResponder
+
+- (void)mouseDown:(NSEvent*)anEvent
+{
+	NSRect const b = [self bounds];
+	NSPoint const mousePoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
+	if([self mouse:mousePoint inRect:NSMakeRect(8, 12, NSWidth(b) - 16, NSHeight(b) - 16)]) [self trackResize:[[self window] isResizable] && NSPointInRect(mousePoint, NSMakeRect(NSWidth(b) - 30, 18, 16, 16)) withEvent:anEvent];
 }
 
 @end

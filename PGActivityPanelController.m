@@ -22,13 +22,13 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import "PGActivityPanel.h"
+#import "PGActivityPanelController.h"
 
 // Models
 #import "PGURLConnection.h"
 
 // Views
-#import "PGLevelIndicatorCell.h"
+#import "PGProgressIndicatorCell.h"
 
 // Controllers
 #import "PGDocumentController.h"
@@ -36,9 +36,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
+static NSString *const PGActivityPanelFrameKey = @"PGActivityPanelFrame";
 
-@implementation PGActivityPanel
+@implementation PGActivityPanelController
 
 #pragma mark Instance Methods
 
@@ -98,16 +98,11 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGActivityWindowFrameKey];
+	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:PGActivityPanelFrameKey];
 }
 - (void)windowDidMove:(NSNotification *)notification
 {
 	[self windowDidResize:nil];
-}
-
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	[[PGDocumentController sharedDocumentController] setActivityShown:NO];
 }
 
 #pragma mark NSWindowController
@@ -115,7 +110,7 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[progressColumn setDataCell:[[[PGLevelIndicatorCell alloc] init] autorelease]];
+	[progressColumn setDataCell:[[[PGProgressIndicatorCell alloc] init] autorelease]];
 
 	NSMutableDictionary *const buttonAttributes = [[[[cancelButton attributedTitle] attributesAtIndex:0 effectiveRange:NULL] mutableCopy] autorelease];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
@@ -127,7 +122,7 @@ static NSString *const PGActivityWindowFrameKey = @"PGActivityWindowFrame";
 
 	[self tableViewSelectionDidChange:nil];
 
-	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGActivityWindowFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
+	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGActivityPanelFrameKey]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
 	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }
 

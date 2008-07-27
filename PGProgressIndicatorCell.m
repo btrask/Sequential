@@ -22,22 +22,48 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
+#import "PGProgressIndicatorCell.h"
 
-// Models
-@class PGNode;
+// Categories
+#import "NSBezierPathAdditions.h"
 
-@interface PGFloatingPanel : NSWindowController
+@implementation PGProgressIndicatorCell
+
+#pragma mark Instance Methods
+
+- (BOOL)hidden
 {
-	@private
-	PGNode *_node;
+	return _hidden;
+}
+- (void)setHidden:(BOOL)flag
+{
+	_hidden = flag;
 }
 
-- (PGNode *)node;
-- (void)nodeChanged;
+#pragma mark NSCell
 
-- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif;
-- (void)windowDidBecomeMain:(NSNotification *)aNotif;
-- (void)windowDidResignMain:(NSNotification *)aNotif;
+- (void)drawWithFrame:(NSRect)aRect
+        inView:(NSView *)aView
+{
+	if([self hidden]) return;
+
+	[[NSColor colorWithDeviceWhite:0.9 alpha:0.8] set];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5, 0.5) cornerRadius:(NSHeight(aRect) - 1) / 2] stroke];
+
+	NSRect r = aRect;
+	r.size.width = ceilf(NSWidth(aRect) * [[self objectValue] floatValue]); // For some reason -[NSCell floatValue] doesn't work.
+	[NSGraphicsContext saveGraphicsState];
+	[[NSBezierPath bezierPathWithRect:r] addClip];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2, 2) cornerRadius:(NSHeight(aRect) - 4) / 2] addClip];
+	
+	r.size.height = ceilf(NSHeight(r) / 2);
+	[[NSColor colorWithDeviceWhite:0.95 alpha:0.8] set];
+	NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	r.origin.y += NSHeight(r);
+	[[NSColor colorWithDeviceWhite:0.85 alpha:0.8] set];
+	NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	
+	[NSGraphicsContext restoreGraphicsState];
+}
 
 @end

@@ -26,6 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSNumber (AEAdditions)
 
+- (NSString *)AE_localizedStringWithFractionDigits:(unsigned)placesAfterDecimal;
 - (NSString *)AE_localizedStringAsBytes;
 
 @end

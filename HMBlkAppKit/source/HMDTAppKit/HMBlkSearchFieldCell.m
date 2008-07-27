@@ -55,7 +55,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSRect const f = NSInsetRect(frame, 0.5, 0.5);
 	float const r = NSHeight(f) / 2;
-	NSBezierPath *const path = [[[NSBezierPath alloc] init] autorelease];
+	NSBezierPath *const path = [NSBezierPath bezierPath];
 	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(f) + r, NSMinY(f) + r) radius:r startAngle:90 endAngle:270];
 	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(f) - r, NSMinY(f) + r) radius:r startAngle:270 endAngle:90];
 	[path closePath];

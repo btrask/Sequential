@@ -30,6 +30,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>PGFloatingPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>NSTableColumn</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -43,30 +51,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>cancelLoad</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGActivityPanel</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>activityTable</key>
-				<string>NSTableView</string>
-				<key>cancelButton</key>
-				<string>NSButton</string>
-				<key>identifierColumn</key>
-				<string>NSTableColumn</string>
-				<key>progressColumn</key>
-				<string>NSTableColumn</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -148,6 +132,30 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSControl</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelLoad</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGActivityPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>activityTable</key>
+				<string>NSTableView</string>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>identifierColumn</key>
+				<string>NSTableColumn</string>
+				<key>progressColumn</key>
+				<string>NSTableColumn</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>PGFloatingPanelController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

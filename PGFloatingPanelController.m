@@ -22,7 +22,7 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import "PGFloatingPanel.h"
+#import "PGFloatingPanelController.h"
 
 // Models
 #import "PGNode.h"
@@ -33,46 +33,70 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGFloatingPanel (Private)
+@interface PGFloatingPanelController (Private)
 
-- (void)_updateNode:(PGDisplayController *)controller;
+- (void)_updateWithDisplayController:(PGDisplayController *)controller;
 
 @end
 
-@implementation PGFloatingPanel
+@implementation PGFloatingPanelController
 
-- (PGNode *)node
+#pragma mark Instance Methods
+
+- (BOOL)isShown
 {
-	return [[_node retain] autorelease];
+	return _shown;
 }
-- (void)nodeChanged {}
+- (void)setShown:(BOOL)flag
+{
+	if(flag == _shown) return;
+	_shown = flag;
+	if(flag) [super showWindow:self];
+	else [[self window] performClose:self];
+}
+- (void)toggleShown
+{
+	[self setShown:![self isShown]];
+}
 
 #pragma mark -
 
-- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
+- (PGDisplayController *)displayController
 {
-	[self _updateNode:nil];
+	return [[_displayController retain] autorelease];
 }
+- (BOOL)setDisplayController:(PGDisplayController *)controller
+{
+	if(controller == _displayController) return NO;
+	[_displayController release];
+	_displayController = [controller retain];
+	return YES;
+}
+
+#pragma mark -
+
 - (void)windowDidBecomeMain:(NSNotification *)aNotif
 {
-	PGDisplayController *const c = aNotif ? [[aNotif object] windowController] : [[NSApp mainWindow] windowController];
-	[c AE_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[self _updateNode:c];
+	[self _updateWithDisplayController:(aNotif ? [[aNotif object] windowController] : [[NSApp mainWindow] windowController])];
 }
 - (void)windowDidResignMain:(NSNotification *)aNotif
 {
-	[[[aNotif object] windowController] AE_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[self _updateNode:nil];
+	[self _updateWithDisplayController:nil];
 }
 
 #pragma mark Private Protocol
 
-- (void)_updateNode:(PGDisplayController *)controller
+- (void)_updateWithDisplayController:(PGDisplayController *)controller
 {
 	PGDisplayController *const c = controller ? controller : [[NSApp mainWindow] windowController];
-	[_node release];
-	_node = [c respondsToSelector:@selector(activeNode)] ? [[c activeNode] retain] : nil;
-	[self nodeChanged];
+	[self setDisplayController:[c isKindOfClass:[PGDisplayController class]] ? c : nil];
+}
+
+#pragma mark NSWindowNotifications Protocol
+
+- (void)windowWillClose:(NSNotification *)aNotif
+{
+	_shown = NO;
 }
 
 #pragma mark NSWindowController
@@ -85,6 +109,16 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	return self;
 }
+
+#pragma mark -
+
+- (IBAction)showWindow:(id)sender
+{
+	[self setShown:YES];
+}
+
+#pragma mark -
+
 - (BOOL)shouldCascadeWindows
 {
 	return NO;
@@ -100,7 +134,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
-	[_node release];
+	[_displayController release];
 	[super dealloc];
 }
 

@@ -46,12 +46,16 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGExtractAlert.h"
 #import "PGEncodingAlert.h"
 
+// Other
+#import "PGNonretainedObjectProxy.h"
+
 // Categories
 #import "NSControlAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
+NSString *const PGDisplayControllerTimerDidChangeNotification      = @"PGDisplayControllerTimerDidChange";
 
 #define PGScaleMax 16.0f
 #define PGScaleMin (1.0f / 8.0f)
@@ -182,13 +186,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	PGDocument *const doc = [self activeDocument];
 	[doc setImageScaleFactor:([doc imageScalingMode] == PGConstantFactorScaling ? MAX(PGScaleMin, [doc imageScaleFactor] / 2) : 0.5)];
 	[doc setImageScalingMode:PGConstantFactorScaling];
-}
-
-#pragma mark -
-
-- (IBAction)changeTimerInterval:(id)sender
-{
-	[self setTimerInterval:(NSTimeInterval)[sender tag]];
 }
 
 #pragma mark -
@@ -345,9 +342,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
 	_initialLocation = location;
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showLoadingIndicator) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
-	[self AE_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5];
+	[[self PG_nonretainedObjectProxy] AE_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
@@ -430,6 +427,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark -
 
+- (NSDate *)nextTimerFireDate
+{
+	return [[_nextTimerFireDate retain] autorelease];
+}
 - (NSTimeInterval)timerInterval
 {
 	return _timerInterval;
@@ -441,7 +442,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	_timerInterval = time;
 	[self _runTimer];
 }
-- (void)advanceOnTimer
+- (void)advanceOnTimer:(NSTimer *)timer
 {
 	if(![self tryToGoForward:YES allowAlerts:YES]) [self setTimerInterval:0];
 }
@@ -487,7 +488,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 		[[self window] makeFirstResponder:clipView];
 	}
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showLoadingIndicator) object:nil];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(showLoadingIndicator) object:nil];
 	[(PGAlertView *)[_graphicPanel contentView] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
@@ -619,8 +620,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)_runTimer
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(advanceOnTimer) object:nil];
-	if([self timerInterval]) [self performSelector:@selector(advanceOnTimer) withObject:nil afterDelay:[self timerInterval]]; // Don't use our AE_ variant of this because we don't want it to happen during NSEventTrackingRunLoopMode and friends.
+	[_nextTimerFireDate release];
+	[_timer invalidate];
+	[_timer release];
+	if([self timerInterval]) {
+		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[self timerInterval]];
+		_timer = [[NSTimer alloc] initWithFireDate:_nextTimerFireDate interval:0 target:[self PG_nonretainedObjectProxy] selector:@selector(advanceOnTimer:) userInfo:nil repeats:NO];
+		[[NSRunLoop currentRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
+	} else {
+		_nextTimerFireDate = nil;
+		_timer = nil;
+	}
+	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 
 #pragma mark NSMenuValidation Protocol
@@ -635,12 +646,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		else if([[self activeNode] isDescendantOfNode:node]) state = NSMixedState;
 		[anItem setState:state];
 		return [node isViewable] || [anItem submenu];
-	}
-	if(@selector(changeTimerInterval:) == action) {
-		int const tag = [anItem tag];
-		int const interval = (int)roundf([self timerInterval]);
-		[anItem setState:(0 != tag && tag == interval ? NSOnState : NSOffState)];
-		return tag != 0 || tag != interval;
 	}
 	if(![[self activeNode] isViewable]) {
 		if(@selector(revealInPathFinder:) == action) return NO;
@@ -960,7 +965,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy]];
 	[self AE_removeObserver];
 	[imageView unbind:@"animates"];
 	[imageView unbind:@"antialiasWhenUpscaling"];
@@ -974,6 +979,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_infoPanel release];
 	[_findPanel release];
 	[_findFieldEditor release];
+	[_nextTimerFireDate release];
+	[_timer invalidate];
+	[_timer release];
 	[super dealloc];
 }
 

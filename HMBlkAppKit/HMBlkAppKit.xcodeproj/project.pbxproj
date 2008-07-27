@@ -28,6 +28,9 @@
 		0B6BCABD0BB239500014D0BF /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0B6BCABA0BB239500014D0BF /* MainMenu.nib */; };
 		0B6BCB290BB23F0A0014D0BF /* AppController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B6BCB280BB23F0A0014D0BF /* AppController.m */; };
 		0B6BCB580BB243BF0014D0BF /* HMBlkAppKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* HMBlkAppKit.framework */; };
+		0E255C8C0E3AD09F00EDF04C /* HMBlkSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255C8B0E3AD09F00EDF04C /* HMBlkSlider.m */; };
+		0E255C8F0E3AD0D200EDF04C /* HMBlkSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255C8E0E3AD0D200EDF04C /* HMBlkSliderCell.m */; };
+		0E255E800E3BDC9B00EDF04C /* blkPanelRBResizable.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E255E7F0E3BDC9B00EDF04C /* blkPanelRBResizable.tiff */; };
 		0E2707350E2DD59C00D65876 /* blkCancelButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707040E2DD59C00D65876 /* blkCancelButton.tiff */; };
 		0E2707360E2DD59C00D65876 /* blkCloseButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707050E2DD59C00D65876 /* blkCloseButton.tiff */; };
 		0E2707370E2DD59C00D65876 /* blkContextButton.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707060E2DD59C00D65876 /* blkContextButton.tiff */; };
@@ -150,6 +153,11 @@
 		0B6BCABB0BB239500014D0BF /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
 		0B6BCB270BB23F0A0014D0BF /* AppController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppController.h; sourceTree = "<group>"; };
 		0B6BCB280BB23F0A0014D0BF /* AppController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppController.m; sourceTree = "<group>"; };
+		0E255C8A0E3AD09F00EDF04C /* HMBlkSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkSlider.h; sourceTree = "<group>"; };
+		0E255C8B0E3AD09F00EDF04C /* HMBlkSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkSlider.m; sourceTree = "<group>"; };
+		0E255C8D0E3AD0D200EDF04C /* HMBlkSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkSliderCell.h; sourceTree = "<group>"; };
+		0E255C8E0E3AD0D200EDF04C /* HMBlkSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkSliderCell.m; sourceTree = "<group>"; };
+		0E255E7F0E3BDC9B00EDF04C /* blkPanelRBResizable.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = blkPanelRBResizable.tiff; sourceTree = "<group>"; };
 		0E2707040E2DD59C00D65876 /* blkCancelButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = blkCancelButton.tiff; sourceTree = "<group>"; };
 		0E2707050E2DD59C00D65876 /* blkCloseButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = blkCloseButton.tiff; sourceTree = "<group>"; };
 		0E2707060E2DD59C00D65876 /* blkContextButton.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = blkContextButton.tiff; sourceTree = "<group>"; };
@@ -326,6 +334,10 @@
 				0B6BC9F90BB236390014D0BF /* HMBlkSegmentedCell.m */,
 				0B6BC9FA0BB236390014D0BF /* HMBlkSegmentedControl.h */,
 				0B6BC9FB0BB236390014D0BF /* HMBlkSegmentedControl.m */,
+				0E255C8A0E3AD09F00EDF04C /* HMBlkSlider.h */,
+				0E255C8B0E3AD09F00EDF04C /* HMBlkSlider.m */,
+				0E255C8D0E3AD0D200EDF04C /* HMBlkSliderCell.h */,
+				0E255C8E0E3AD0D200EDF04C /* HMBlkSliderCell.m */,
 				0B6BC9FC0BB236390014D0BF /* HMBlkTableHeaderCell.h */,
 				0B6BC9FD0BB236390014D0BF /* HMBlkTableHeaderCell.m */,
 				0B6BC9FE0BB236390014D0BF /* HMBlkTableView.h */,
@@ -364,6 +376,7 @@
 				0E27070F0E2DD59C00D65876 /* blkPanelMB.tiff */,
 				0E2707100E2DD59C00D65876 /* blkPanelMT.tiff */,
 				0E2707110E2DD59C00D65876 /* blkPanelRB.tiff */,
+				0E255E7F0E3BDC9B00EDF04C /* blkPanelRBResizable.tiff */,
 				0E2707120E2DD59C00D65876 /* blkPanelRM.tiff */,
 				0E2707130E2DD59C00D65876 /* blkPanelRT.tiff */,
 				0E2707140E2DD59C00D65876 /* blkProgressBack.tiff */,
@@ -564,6 +577,7 @@
 				0E27079A0E2DEA4E00D65876 /* button-middle.png in Resources */,
 				0E27079B0E2DEA4E00D65876 /* button-right-hilite.png in Resources */,
 				0E27079C0E2DEA4E00D65876 /* button-right.png in Resources */,
+				0E255E800E3BDC9B00EDF04C /* blkPanelRBResizable.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -599,6 +613,8 @@
 				0EEE5B9A0DB61620006E5B9C /* HMBlkSearchField.m in Sources */,
 				0EEE5B9E0DB61632006E5B9C /* HMBlkSearchFieldCell.m in Sources */,
 				0E50B1030DBE93FB0036CA3E /* PGFadeOutPanel.m in Sources */,
+				0E255C8C0E3AD09F00EDF04C /* HMBlkSlider.m in Sources */,
+				0E255C8F0E3AD0D200EDF04C /* HMBlkSliderCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

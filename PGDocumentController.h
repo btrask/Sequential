@@ -33,8 +33,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Controllers
 @class PGDisplayController;
 @class PGFullscreenController;
-@class PGExifPanel;
-@class PGActivityPanel;
+@class PGExifPanelController;
+@class PGTimerPanelController;
+@class PGActivityPanelController;
 
 extern NSString *const PGCFBundleTypeExtensionsKey;
 extern NSString *const PGCFBundleTypeOSTypesKey;
@@ -108,10 +109,9 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	         PGFullscreenController *_fullscreenController;
 	         BOOL                    _inFullscreen;
 
-	         BOOL                    _exifShown;
-	         PGExifPanel            *_exifPanel;
-	         BOOL                    _activityShown;
-	         PGActivityPanel        *_activityPanel;
+	         PGExifPanelController     *_exifPanel;
+	         PGTimerPanelController    *_timerPanel;
+	         PGActivityPanelController *_activityPanel;
 
 	         NSMutableDictionary    *_classesByExtension;
 }
@@ -141,6 +141,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)changeReadingDirection:(id)sender; // PGReadingDirection from [sender tag].
 
 - (IBAction)toggleExif:(id)sender;
+- (IBAction)toggleTimer:(id)sender;
 - (IBAction)toggleActivity:(id)sender;
 - (IBAction)selectPreviousDocument:(id)sender;
 - (IBAction)selectNextDocument:(id)sender;
@@ -155,11 +156,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (PGDisplayController *)displayControllerForNewDocument; // Returns either the shared fullscreen controller or a new regular window controller.
 - (BOOL)fullscreen;
 - (void)setFullscreen:(BOOL)flag;
-
-- (BOOL)exifShown;
-- (void)setExifShown:(BOOL)flag;
-- (BOOL)activityShown;
-- (void)setActivityShown:(BOOL)flag;
 
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;
