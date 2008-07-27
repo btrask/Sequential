@@ -212,19 +212,27 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (IBAction)skipBeforeFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) [self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
+	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) return;
+	[self prepareToLoop];
+	[self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) return;
+	[self prepareToLoop];
+	[self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) [self tryToLoopForward:NO toNode:[[[[[self activeDocument] node] sortedViewableNodeFirst:NO] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if([self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) return;
+	[self prepareToLoop];
+	[self tryToLoopForward:NO toNode:[[[[[self activeDocument] node] sortedViewableNodeFirst:NO] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
-	if(![self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) [self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	if([self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) return;
+	[self prepareToLoop];
+	[self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfFolder:(id)sender
 {
@@ -361,7 +369,16 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	PGPageLocation const l = forward ? PGHomeLocation : PGEndLocation;
 	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
+	[self prepareToLoop];
 	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l allowAlerts:flag];
+}
+- (void)prepareToLoop
+{
+	PGSortOrder const o = [[self activeDocument] sortOrder];
+	if(!(PGSortRepeatMask & o) || (PGSortOrderMask & o) != PGSortShuffle) return;
+	PGDocument *const doc = [self activeDocument];
+	[[doc node] noteSortOrderDidChange]; // Reshuffle.
+	[doc noteSortedChildrenDidChange];
 }
 - (BOOL)tryToLoopForward:(BOOL)forward
         toNode:(PGNode *)node
@@ -371,15 +388,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	PGDocument *const doc = [self activeDocument];
 	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !forward;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
-	if(PGSortRepeatMask & o) {
-		if((PGSortOrderMask & o) == PGSortShuffle) {
-			[[doc node] noteSortOrderDidChange]; // Reshuffle.
-			[doc noteSortedChildrenDidChange];
-		}
-		if([self tryToSetActiveNode:node initialLocation:loc]) {
-			if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
-			return YES;
-		}
+	if(PGSortRepeatMask & o && [self tryToSetActiveNode:node initialLocation:loc]) {
+		if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
+		return YES;
 	}
 	if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
 	return NO;
