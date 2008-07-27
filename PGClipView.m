@@ -514,18 +514,28 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) allowAnimation:YES];
 }
 
+#pragma mark -
+
 // Private, invoked by guestures on new laptop trackpads.
+- (void)beginGestureWithEvent:(NSEvent *)anEvent
+{
+	[NSCursor setHiddenUntilMouseMoves:YES];
+}
 - (void)swipeWithEvent:(NSEvent *)anEvent
 {
-	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint([anEvent deltaX], [anEvent deltaY]), 0.1)];
+	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint(-[anEvent deltaX], [anEvent deltaY]), 0.1)];
 }
 - (void)magnifyWithEvent:(NSEvent *)anEvent
 {
-	NSLog(@"-magnifyWithEvent: %@", anEvent);
+	[[self delegate] clipView:self magnifyBy:[anEvent deltaZ]];
 }
 - (void)rotateWithEvent:(NSEvent *)anEvent
 {
-	NSLog(@"-rotateWithEvent: %@", anEvent);
+	// TODO: Implement me.
+}
+- (void)endGestureWithEvent:(NSEvent *)anEvent
+{
+	[[self delegate] clipViewGestureDidEnd:self];
 }
 
 #pragma mark -
@@ -646,8 +656,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 
 @implementation NSObject (PGClipViewDelegate)
 
-- (void)clipViewWasClicked:(PGClipView *)sender
-        event:(NSEvent *)anEvent {}
+- (void)clipViewWasClicked:(PGClipView *)sender event:(NSEvent *)anEvent {}
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
 {
@@ -663,6 +672,8 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 {
 	return PGNoEdges;
 }
+- (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
+- (void)clipViewGestureDidEnd:(PGClipView *)sender {}
 
 @end
 

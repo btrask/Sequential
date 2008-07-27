@@ -688,14 +688,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark NSMenuValidation Protocol
 
+#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); ((__a) == (__b) ? NSOnState : ((__a) == round(__b) ? NSMixedState : NSOffState)); })
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
 	int const tag = [anItem tag];
 	if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
-	else if(@selector(changeImageScalingMode:) == action) [anItem setState:fabs([pref imageScaleFactor] - 1) < 0.01 && [pref imageScalingMode] == tag];
-	else if(@selector(changeImageScaleFactor:) == action) [anItem setState:(int)roundf(log2f([pref imageScaleFactor])) == tag];
+	else if(@selector(changeImageScalingMode:) == action) [anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+	else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
 	else if(@selector(changeImageScalingConstraint:) == action) [anItem setState:tag == [pref imageScalingConstraint]];
 	else if(@selector(changeSortOrder:) == action) [anItem setState:tag == (PGSortOrderMask & [pref sortOrder])];
 	else if(@selector(changeSortDirection:) == action) {

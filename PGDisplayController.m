@@ -178,13 +178,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (IBAction)zoomIn:(id)sender
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:([doc imageScalingMode] == PGConstantFactorScaling ? MIN(PGScaleMax, [doc imageScaleFactor] * 2) : 2)];
+	[doc setImageScaleFactor:MIN(PGScaleMax, [imageView averageScaleFactor] * 2)];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
 - (IBAction)zoomOut:(id)sender
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:([doc imageScalingMode] == PGConstantFactorScaling ? MAX(PGScaleMin, [doc imageScaleFactor] / 2) : 0.5)];
+	[doc setImageScaleFactor:MAX(PGScaleMin, [imageView averageScaleFactor] / 2)];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
 
@@ -688,8 +688,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScalingMode] == PGConstantFactorScaling) {
-		if(@selector(zoomIn:) == action && [doc imageScaleFactor] >= PGScaleMax) return NO;
-		if(@selector(zoomOut:) == action && [doc imageScaleFactor] <= PGScaleMin) return NO;
+		if(@selector(zoomIn:) == action && [imageView averageScaleFactor] >= PGScaleMax) return NO;
+		if(@selector(zoomOut:) == action && [imageView averageScaleFactor] <= PGScaleMin) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
 	if(!firstNode) { // We could use -hasViewableNodes, but we might have to get -firstNode anyway.
@@ -848,6 +848,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
                   directionFor:(PGPageLocation)nodeLocation
 {
 	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
+}
+- (void)clipView:(PGClipView *)sender
+        magnifyBy:(float)amount
+{
+	[imageView setUsesCaching:NO];
+	PGDocument *const doc = [self activeDocument];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [imageView averageScaleFactor] * (amount / 500 + 1)))];
+	[doc setImageScalingMode:PGConstantFactorScaling];
+}
+- (void)clipViewGestureDidEnd:(PGClipView *)sender
+{
+	[imageView setUsesCaching:YES];
 }
 
 #pragma mark NSServicesRequests Protocol

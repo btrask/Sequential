@@ -90,6 +90,8 @@ typedef int PGScrollType;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.
+- (void)clipView:(PGClipView *)sender magnifyBy:(float)amount;
+- (void)clipViewGestureDidEnd:(PGClipView *)sender;
 
 @end
 

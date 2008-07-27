@@ -33,8 +33,9 @@ DEALINGS WITH THE SOFTWARE. */
 	NSImage          *_image;
 	NSImageRep       *_rep;
 	NSCachedImageRep *_cache;
+	BOOL              _usesCaching;
 	BOOL              _cacheIsValid;
-	BOOL              _cheatedDuringLiveResize;
+	BOOL              _cacheIsOutOfDate;
 	BOOL              _isOpaque;
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
@@ -50,6 +51,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGOrientation)orientation;
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 
+- (BOOL)usesCaching;
+- (void)setUsesCaching:(BOOL)flag;
+
 - (BOOL)canAnimateRep;
 - (BOOL)animates;
 - (void)setAnimates:(BOOL)flag;
@@ -63,6 +67,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)drawsRoundedCorners;
 - (void)setDrawsRoundedCorners:(BOOL)flag;
 - (BOOL)usesOptimizedDrawing;
+
+- (float)averageScaleFactor;
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;

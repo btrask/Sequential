@@ -90,6 +90,21 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (BOOL)usesCaching
+{
+	return _usesCaching;
+}
+- (void)setUsesCaching:(BOOL)flag
+{
+	if(flag == _usesCaching) return;
+	_usesCaching = flag;
+	if(!flag || !_cacheIsOutOfDate) return;
+	_cacheIsOutOfDate = NO;
+	[self _cache];
+}
+
+#pragma mark -
+
 - (BOOL)canAnimateRep
 {
 	return _numberOfFrames > 1;
@@ -159,6 +174,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (float)averageScaleFactor
+{
+	return (NSWidth([self frame]) / [_rep pixelsWide] + NSHeight([self frame]) / [_rep pixelsHigh]) / 2.0;
+}
+
+#pragma mark -
+
 - (void)appDidHide:(NSNotification *)aNotif
 {
 	[self pauseAnimation];
@@ -200,9 +222,9 @@ DEALINGS WITH THE SOFTWARE. */
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if([self inLiveResize]) {
-		_cheatedDuringLiveResize = YES;
-		return; // Don't bother until we stop.
+	if(![self usesCaching] || [self inLiveResize]) {
+		_cacheIsOutOfDate = YES;
+		return;
 	}
 	NSSize const scaledSize = [self frame].size;
 	if(scaledSize.width > 10000 || scaledSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
@@ -331,8 +353,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)viewDidEndLiveResize
 {
 	[super viewDidEndLiveResize];
-	if(_cheatedDuringLiveResize) [self _cache];
-	_cheatedDuringLiveResize = NO;
+	if(!_cacheIsOutOfDate) return;
+	_cacheIsOutOfDate = NO;
+	[self _cache];
 }
 - (void)viewDidMoveToWindow
 {
