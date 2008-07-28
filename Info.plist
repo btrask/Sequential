@@ -28,9 +28,7 @@
 			<key>PGAdapterClass</key>
 			<string>PGArchiveAdapter</string>
 			<key>PGBundleTypeFourCC</key>
-			<data>
-			UEsDBA==
-			</data>
+			<data>UEsDBA==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -47,9 +45,7 @@
 			<key>PGAdapterClass</key>
 			<string>PGArchiveAdapter</string>
 			<key>PGBundleTypeFourCC</key>
-			<data>
-			UEsDBA==
-			</data>
+			<data>UEsDBA==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -73,9 +69,7 @@
 			<key>PGAdapterClass</key>
 			<string>PGArchiveAdapter</string>
 			<key>PGBundleTypeFourCC</key>
-			<data>
-			UmFyIQ==
-			</data>
+			<data>UmFyIQ==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -92,9 +86,7 @@
 			<key>PGAdapterClass</key>
 			<string>PGArchiveAdapter</string>
 			<key>PGBundleTypeFourCC</key>
-			<data>
-			UmFyIQ==
-			</data>
+			<data>UmFyIQ==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
@@ -148,9 +140,7 @@
 			<key>PGAdapterClass</key>
 			<string>PGPDFAdapter</string>
 			<key>PGBundleTypeFourCC</key>
-			<data>
-			JVBERg==
-			</data>
+			<data>JVBERg==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -721,7 +711,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Sequential</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.BenTrask.Sequential</string>
+	<string>com.SequentialX.Sequential</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
