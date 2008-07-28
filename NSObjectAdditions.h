@@ -41,3 +41,11 @@ extern BOOL PGIsTigerOrLater(void);
 - (void)AE_performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay; // Uses PGCommonRunLoopsMode.
 
 @end
+
+#if !defined(NS_BLOCK_ASSERTIONS)
+#define PGAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInMethod:_cmd object:self file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+#define PGCAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInFunction:[NSString stringWithUTF8String:__PRETTY_FUNCTION__] file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+#else
+#define PGAssertNotReached(desc)
+#define PGCAssertNotReached(desc)
+#endif

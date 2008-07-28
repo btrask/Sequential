@@ -40,6 +40,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_cache;
 - (void)_drawInRect:(NSRect)aRect;
 - (void)_drawCornersOnRect:(NSRect)r;
+- (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
+- (void)_updateFrameSize;
 
 @end
 
@@ -70,12 +72,13 @@ DEALINGS WITH THE SOFTWARE. */
         size:(NSSize)size
 {
 	_orientation = orientation;
-	[super setFrameSize:size];
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
 		_cacheIsValid = NO;
 		[_image removeRepresentation:_cache];
 		[_rep release];
+		_rep = nil;
+		[self setSize:size];
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
 		_isOpaque = _rep && ![_rep hasAlpha];
@@ -83,9 +86,26 @@ DEALINGS WITH THE SOFTWARE. */
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
 		[self _updateAnimationTimer];
-	}
+	} else [self setSize:size];
 	[self _cache];
 	[self setNeedsDisplay:YES];
+}
+
+#pragma mark -
+
+- (NSSize)size
+{
+	return _size;
+}
+- (void)setSize:(NSSize)size
+{
+	if(NSEqualSizes(size, _size)) return;
+	_size = size;
+	[self _updateFrameSize];
+}
+- (float)averageScaleFactor
+{
+	return (PGRotated90CC && _orientation ? [self size].height / [_rep pixelsWide] + [self size].width / [_rep pixelsHigh] : [self size].width / [_rep pixelsWide] + [self size].height / [_rep pixelsHigh]) / 2.0;
 }
 
 #pragma mark -
@@ -101,6 +121,31 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!flag || !_cacheIsOutOfDate) return;
 	_cacheIsOutOfDate = NO;
 	[self _cache];
+}
+
+#pragma mark -
+
+- (float)rotationInDegrees
+{
+	return _rotationInDegrees;
+}
+- (void)setRotationInDegrees:(float)val
+{
+	if(val == _rotationInDegrees) return;
+	_rotationInDegrees = remainderf(val, 360);
+	[self _updateFrameSize];
+	[self setNeedsDisplay:YES];
+}
+- (NSPoint)rotateByDegrees:(float)val
+{
+	NSRect const r = [self convertRect:[[self superview] bounds] fromView:[self superview]];
+	NSRect const b1 = [self bounds];
+	NSPoint screenCenter = NSMakePoint(NSMidX(r) - NSMidX(b1), NSMidY(r) - NSMidY(b1)); // Our bounds are going to change to fit the rotated image. Any point we want to remain constant relative to the image, we have to make relative to the bounds' center, since that's where the image is drawn.
+	[self setRotationInDegrees:[self rotationInDegrees] + val];
+	NSRect const b2 = [self bounds];
+	screenCenter.x += NSMidX(b2);
+	screenCenter.y += NSMidY(b2);
+	return [self convertPoint:[[self _transformWithRotationInDegrees:val] transformPoint:screenCenter] toView:[self superview]];
 }
 
 #pragma mark -
@@ -147,8 +192,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSImageInterpolation)interpolation
 {
 	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
-	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-	NSSize const viewSize = [self frame].size;
+	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
 	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
 }
 
@@ -157,7 +201,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)drawsRoundedCorners
 {
 	if(!_drawsRoundedCorners) return NO;
-	NSSize const s = [self frame].size;
+	NSSize const s = [self size];
 	return s.width >= 16 && s.height >= 16;
 }
 - (void)setDrawsRoundedCorners:(BOOL)flag
@@ -169,14 +213,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)usesOptimizedDrawing
 {
-	return _cacheIsValid  || PGUpright == _orientation;
-}
-
-#pragma mark -
-
-- (float)averageScaleFactor
-{
-	return (NSWidth([self frame]) / [_rep pixelsWide] + NSHeight([self frame]) / [_rep pixelsHigh]) / 2.0;
+	return _cacheIsValid || PGUpright == _orientation;
 }
 
 #pragma mark -
@@ -226,7 +263,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_cacheIsOutOfDate = YES;
 		return;
 	}
-	NSSize const scaledSize = [self frame].size;
+	NSSize const scaledSize = [self size];
 	if(scaledSize.width > 10000 || scaledSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
 
 	[_cache setSize:scaledSize];
@@ -253,18 +290,15 @@ DEALINGS WITH THE SOFTWARE. */
 	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
 	NSRect r = aRect;
 	if(PGUpright != _orientation) {
-		NSAffineTransform *const orient = [[[NSAffineTransform alloc] init] autorelease];
-		[orient translateXBy:NSWidth(r) / 2 yBy:NSHeight(r) / 2];
+		NSAffineTransform *const t = [NSAffineTransform transform];
+		[t translateXBy:NSMidX(r) yBy:NSMidY(r)];
 		if(_orientation & PGRotated90CC) {
-			float const swap = r.size.width;
-			r.size.width = r.size.height;
-			r.size.height = swap;
-			[orient rotateByDegrees:90];
+			r.size = NSMakeSize(NSHeight(r), NSWidth(r));
+			[t rotateByDegrees:90];
 		}
-		[orient scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
-		[orient concat];
-		r.origin.x = NSWidth(r) / -2;
-		r.origin.y = NSHeight(r) / -2;
+		[t scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
+		[t concat];
+		r.origin = NSMakePoint(NSWidth(r) / -2, NSHeight(r) / -2);
 	}
 	[_rep drawInRect:r];
 	[NSGraphicsContext restoreGraphicsState];
@@ -281,6 +315,24 @@ DEALINGS WITH THE SOFTWARE. */
 	[tr drawAtPoint:NSMakePoint(NSMaxX(r) - [tr size].width, NSMaxY(r) - [tr size].height) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 	[br drawAtPoint:NSMakePoint(NSMaxX(r) - [br size].width, NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 	[bl drawAtPoint:NSMakePoint(NSMinX(r), NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+}
+- (NSAffineTransform *)_transformWithRotationInDegrees:(float)val
+{
+	NSRect const b = [self bounds];
+	NSAffineTransform *const t = [NSAffineTransform transform];
+	[t translateXBy:NSMidX(b) yBy:NSMidY(b)];
+	[t rotateByDegrees:val];
+	[t translateXBy:-NSMidX(b) yBy:-NSMidY(b)];
+	return t;
+}
+- (void)_updateFrameSize
+{
+	NSSize s = [self size];
+	float const r = [self rotationInDegrees] / 180.0 * pi;
+	if(r) s = NSMakeSize(ceilf(fabs(cosf(r)) * s.width + fabs(sinf(r)) * s.height), ceilf(fabs(cosf(r)) * s.height + fabs(sinf(r)) * s.width));
+	if(NSEqualSizes(s, [self frame].size)) return;
+	[super setFrameSize:s];
+	[self _cache];
 }
 
 #pragma mark PGClipViewDocumentView Protocol
@@ -299,6 +351,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_image setScalesWhenResized:NO]; // NSImage seems to make copies of its reps when resizing despite this, so be careful..
 		[_image setCacheMode:NSImageCacheNever]; // We do our own caching.
 		[_image setDataRetained:YES]; // Seems appropriate.
+		_usesCaching = YES;
 		_antialias = YES;
 		_drawsRoundedCorners = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
@@ -309,46 +362,50 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)isOpaque
 {
-	return _isOpaque && ![self drawsRoundedCorners];
+	return _isOpaque && ![self drawsRoundedCorners] && ![self rotationInDegrees];
 }
 - (void)drawRect:(NSRect)aRect
 {
+	NSRect b = (NSRect){NSZeroPoint, [self size]};
+	b.origin.x = roundf(NSMidX([self bounds]) - NSWidth(b) / 2);
+	b.origin.y = roundf(NSMidY([self bounds]) - NSHeight(b) / 2);
+
+	float const deg = [self rotationInDegrees];
+	if(deg) {
+		[NSGraphicsContext saveGraphicsState];
+		[[self _transformWithRotationInDegrees:deg] concat];
+	}
 	BOOL const drawCorners = !_cacheIsValid && [self drawsRoundedCorners];
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	int count = 0;
 	NSRect const *rects = NULL;
 	if(_isPDF) {
-		[self getRectsBeingDrawn:&rects count:&count];
 		[[NSColor whiteColor] set];
-		NSRectFillList(rects, count);
+		if(deg) NSRectFill(b);
+		else {
+			[self getRectsBeingDrawn:&rects count:&count];
+			NSRectFillList(rects, count);
+		}
 	}
-	NSRect const b = [self bounds];
 	if([self usesOptimizedDrawing]) {
 		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
-		if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
-		float const horz = [_image size].width / b.size.width;
-		float const vert = [_image size].height / b.size.height;
-		int i = count;
-		while(i--) {
-			NSRect sourceRect = rects[i];
-			if(NSIsEmptyRect(sourceRect)) continue;
-			sourceRect.origin.x *= horz;
-			sourceRect.origin.y *= vert;
-			sourceRect.size.width *= horz;
-			sourceRect.size.height *= vert;
-			[_image drawInRect:rects[i] fromRect:sourceRect operation:operation fraction:1.0];
+		if(deg) [_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
+		else {
+			if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
+			NSPoint const scale = NSMakePoint([_image size].width / NSWidth(b), [_image size].height / NSHeight(b));
+			int i = count;
+			while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * scale.x, NSMinY(rects[i]) * scale.y, NSWidth(rects[i]) * scale.x, NSHeight(rects[i]) * scale.y) operation:operation fraction:1.0];
 		}
 	} else [self _drawInRect:b];
 	if(drawCorners) {
 		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
 	}
+	if(deg) [NSGraphicsContext restoreGraphicsState];
 }
 - (void)setFrameSize:(NSSize)aSize
 {
-	if(NSEqualSizes(aSize, [self frame].size)) return;
-	[super setFrameSize:aSize];
-	[self _cache];
+	NSLog(@"-[PGImageView setFrameSize:] should not be invoked directly. Use -setSize: instead.");
 }
 - (void)viewDidEndLiveResize
 {

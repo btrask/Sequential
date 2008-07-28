@@ -32,14 +32,18 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	NSImage          *_image;
 	NSImageRep       *_rep;
-	NSCachedImageRep *_cache;
-	BOOL              _usesCaching;
-	BOOL              _cacheIsValid;
-	BOOL              _cacheIsOutOfDate;
 	BOOL              _isOpaque;
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
 	unsigned          _numberOfFrames;
+	NSSize            _size;
+
+	NSCachedImageRep *_cache;
+	BOOL              _usesCaching;
+	BOOL              _cacheIsValid;
+	BOOL              _cacheIsOutOfDate;
+
+	float             _rotationInDegrees;
 	BOOL              _animates;
 	unsigned          _pauseCount;
 	NSTimer          *_animationTimer;
@@ -51,8 +55,16 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGOrientation)orientation;
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 
+- (NSSize)size; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.
+- (void)setSize:(NSSize)size;
+- (float)averageScaleFactor;
+
 - (BOOL)usesCaching;
 - (void)setUsesCaching:(BOOL)flag;
+
+- (float)rotationInDegrees;
+- (void)setRotationInDegrees:(float)val;
+- (NSPoint)rotateByDegrees:(float)val;
 
 - (BOOL)canAnimateRep;
 - (BOOL)animates;
@@ -67,8 +79,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)drawsRoundedCorners;
 - (void)setDrawsRoundedCorners:(BOOL)flag;
 - (BOOL)usesOptimizedDrawing;
-
-- (float)averageScaleFactor;
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;

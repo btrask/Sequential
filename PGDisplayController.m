@@ -603,7 +603,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)_updateImageViewSize
 {
-	[imageView setFrameSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]]];
+	[imageView setSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]]];
 }
 - (void)_updateNodeIndex
 {
@@ -857,9 +857,25 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [imageView averageScaleFactor] * (amount / 500 + 1)))];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
+- (void)clipView:(PGClipView *)sender
+        rotateByDegrees:(float)amount
+{
+	[clipView scrollToCenterAt:[imageView rotateByDegrees:amount] allowAnimation:NO];
+}
 - (void)clipViewGestureDidEnd:(PGClipView *)sender
 {
 	[imageView setUsesCaching:YES];
+	float const deg = [imageView rotationInDegrees];
+	[imageView setRotationInDegrees:0];
+	PGOrientation o;
+	switch((int)roundf((deg + 360) / 90) % 4) {
+		case 0: o = PGUpright; break;
+		case 1: o = PGRotated90CC; break;
+		case 2: o = PGUpsideDown; break;
+		case 3: o = PGRotated270CC; break;
+		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
+	}
+	[[self activeDocument] setOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
 #pragma mark NSServicesRequests Protocol

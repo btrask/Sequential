@@ -524,7 +524,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (void)rotateWithEvent:(NSEvent *)anEvent
 {
-	// TODO: Implement me.
+	[[self delegate] clipView:self rotateByDegrees:[anEvent rotation]];
 }
 - (void)endGestureWithEvent:(NSEvent *)anEvent
 {
@@ -666,6 +666,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	return PGNoEdges;
 }
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
+- (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}
 - (void)clipViewGestureDidEnd:(PGClipView *)sender {}
 
 @end
