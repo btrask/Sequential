@@ -108,9 +108,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)dealloc
 {
-	[_mainConnection cancel];
+	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
-	[_faviconConnection cancel];
+	[_faviconConnection cancelAndNotify:NO];
 	[_faviconConnection release];
 	[super dealloc];
 }

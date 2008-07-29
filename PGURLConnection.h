@@ -58,7 +58,8 @@ typedef unsigned PGLoadingStatus;
 - (PGLoadingStatus)status;
 - (float)progress;
 - (void)prioritize;
-- (void)cancel;
+- (void)cancelAndNotify:(BOOL)notify;
+- (void)cancel; // Sends -cancelAndNotify:YES.
 
 @end
 

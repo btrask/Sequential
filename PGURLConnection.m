@@ -160,14 +160,18 @@ static NSMutableArray *PGPendingConnections = nil;
 	[PGPendingConnections insertObject:value atIndex:0];
 	[PGURLConnection AE_postNotificationName:PGURLConnectionConnectionsDidChangeNotification];
 }
-- (void)cancel
+- (void)cancelAndNotify:(BOOL)notify
 {
 	if(PGLoading != [self status]) return;
 	[[self class] _stopConnection:self];
 	[_data release];
 	_data = nil;
 	_status = PGLoadCanceled;
-	[[self delegate] connectionDidClose:self];
+	if(notify) [[self delegate] connectionDidClose:self];
+}
+- (void)cancel
+{
+	[self cancelAndNotify:YES];
 }
 
 #pragma mark NSURLConnectionDelegate Protocol
