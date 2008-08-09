@@ -42,10 +42,10 @@ extern BOOL PGIsTigerOrLater(void);
 
 @end
 
-#if !defined(NS_BLOCK_ASSERTIONS)
-#define PGAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInMethod:_cmd object:self file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
-#define PGCAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInFunction:[NSString stringWithUTF8String:__PRETTY_FUNCTION__] file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+#if defined(NS_BLOCK_ASSERTIONS)
+	#define PGAssertNotReached(desc)
+	#define PGCAssertNotReached(desc)
 #else
-#define PGAssertNotReached(desc)
-#define PGCAssertNotReached(desc)
+	#define PGAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInMethod:_cmd object:self file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+	#define PGCAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInFunction:[NSString stringWithUTF8String:__PRETTY_FUNCTION__] file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
 #endif

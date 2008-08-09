@@ -35,6 +35,9 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	return self;
 }
+
+#pragma mark PGNonretainedObjectProxy Protocol
+
 - (id)PG_nonretainedObjectValue
 {
 	return _target;
@@ -49,6 +52,26 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)isEqual:(id)object
 {
 	return [object isEqual:_target]; // This works even if object is another proxy.
+}
+- (BOOL)isProxy
+{
+	return YES;
+}
+- (BOOL)isKindOfClass:(Class)aClass
+{
+	return [_target isKindOfClass:aClass];
+}
+- (BOOL)isMemberOfClass:(Class)aClass
+{
+	return [_target isMemberOfClass:aClass];
+}
+- (BOOL)conformsToProtocol:(Protocol *)aProtocol
+{
+	return [_target conformsToProtocol:aProtocol];
+}
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [_target description]];
 }
 
 #pragma mark NSObject

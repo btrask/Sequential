@@ -24,14 +24,13 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-@interface PGNonretainedObjectProxy : NSObject
+@interface PGNonretainedObjectProxy : NSObject // Must be an NSObject because it must implement our categories on NSObject.
 {
 	@private
 	id _target;
 }
 
 - (id)initWithTarget:(id)anObject;
-- (id)PG_nonretainedObjectValue;
 
 @end
 

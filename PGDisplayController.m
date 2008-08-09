@@ -247,7 +247,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (IBAction)jumpToPage:(id)sender
 {
-	PGNode *node = [[sender representedObject] nonretainedObjectValue];
+	PGNode *node = [[sender representedObject] PG_nonretainedObjectValue];
 	if(![node isViewable]) node = [node sortedViewableNodeFirst:YES];
 	if([self activeNode] == node || !node) return;
 	[self setActiveNode:node initialLocation:PGHomeLocation];
@@ -651,7 +651,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	SEL const action = [anItem action];
 	if(@selector(jumpToPage:) == action) {
-		PGNode *const node = [[anItem representedObject] nonretainedObjectValue];
+		PGNode *const node = [[anItem representedObject] PG_nonretainedObjectValue];
 		NSCellStateValue state = NSOffState;
 		if(node && node == [self activeNode]) state = NSOnState;
 		else if([[self activeNode] isDescendantOfNode:node]) state = NSMixedState;

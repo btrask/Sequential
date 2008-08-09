@@ -35,7 +35,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface PGImageView (Private)
 
-- (void)_updateAnimationTimer;
+- (void)_runAnimationTimer;
 - (void)_animate;
 - (void)_cache;
 - (void)_drawInRect:(NSRect)aRect;
@@ -85,7 +85,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
-		[self _updateAnimationTimer];
+		[self _runAnimationTimer];
 	} else [self setSize:size];
 	[self _cache];
 	[self setNeedsDisplay:YES];
@@ -162,18 +162,18 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _animates) return;
 	_animates = flag;
-	[self _updateAnimationTimer];
+	[self _runAnimationTimer];
 }
 - (void)pauseAnimation
 {
 	_pauseCount++;
-	[self _updateAnimationTimer];
+	[self _runAnimationTimer];
 }
 - (void)resumeAnimation
 {
 	NSParameterAssert(_pauseCount);
 	_pauseCount--;
-	[self _updateAnimationTimer];
+	[self _runAnimationTimer];
 }
 
 #pragma mark -
@@ -229,24 +229,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Private Protocol
 
-- (void)_updateAnimationTimer
+- (void)_runAnimationTimer
 {
-	if([self canAnimateRep] && _animates && !_pauseCount) {
-		if(_animationTimer) return;
-		_animationTimer = [NSTimer timerWithTimeInterval:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] target:[self autorelease] selector:@selector(_animate) userInfo:nil repeats:YES]; // The timer retains us.
-		[[NSRunLoop currentRunLoop] addTimer:_animationTimer forMode:PGCommonRunLoopsMode];
-	} else {
-		if(!_animationTimer) return;
-		[self retain];
-		[_animationTimer invalidate];
-		_animationTimer = nil;
-	}
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(_animate) object:nil];
+	if([self canAnimateRep] && _animates && !_pauseCount) [[self PG_nonretainedObjectProxy] AE_performSelector:@selector(_animate) withObject:nil afterDelay:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue]];
 }
 - (void)_animate
 {
 	unsigned const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntValue] + 1;
 	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInt:(i < _numberOfFrames ? i : 0)]];
 	[self setNeedsDisplay:YES];
+	[self _runAnimationTimer];
 }
 - (void)_cache
 {
@@ -405,7 +398,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setFrameSize:(NSSize)aSize
 {
-	NSLog(@"-[PGImageView setFrameSize:] should not be invoked directly. Use -setSize: instead.");
+	PGAssertNotReached(@"-[PGImageView setFrameSize:] should not be invoked directly. Use -setSize: instead.");
 }
 - (void)viewDidEndLiveResize
 {

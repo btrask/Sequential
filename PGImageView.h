@@ -46,7 +46,6 @@ DEALINGS WITH THE SOFTWARE. */
 	float             _rotationInDegrees;
 	BOOL              _animates;
 	unsigned          _pauseCount;
-	NSTimer          *_animationTimer;
 	BOOL              _antialias;
 	BOOL              _drawsRoundedCorners;
 }
