@@ -3,13 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>IBFramework Version</key>
-	<string>629</string>
+	<string>489.0</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
-	<key>IBOpenObjects</key>
-	<array>
-		<integer>2</integer>
-	</array>
 	<key>IBSystem Version</key>
 	<string>9E17</string>
 	<key>targetFramework</key>
