@@ -87,6 +87,8 @@
 		0E27079B0E2DEA4E00D65876 /* button-right-hilite.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707950E2DEA4E00D65876 /* button-right-hilite.png */; };
 		0E27079C0E2DEA4E00D65876 /* button-right.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E2707960E2DEA4E00D65876 /* button-right.png */; };
 		0E50B1030DBE93FB0036CA3E /* PGFadeOutPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E50B1010DBE93FB0036CA3E /* PGFadeOutPanel.m */; };
+		0E9DB3AF0E511FE000F6AD1C /* HMBlkButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E9DB3AE0E511FE000F6AD1C /* HMBlkButton.m */; };
+		0E9DB3B20E51201C00F6AD1C /* HMBlkButtonCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E9DB3B10E51201C00F6AD1C /* HMBlkButtonCell.m */; };
 		0EEE5B9A0DB61620006E5B9C /* HMBlkSearchField.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE5B980DB61620006E5B9C /* HMBlkSearchField.m */; };
 		0EEE5B9E0DB61632006E5B9C /* HMBlkSearchFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE5B9C0DB61632006E5B9C /* HMBlkSearchFieldCell.m */; };
 		8DC2EF570486A6940098B216 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */; };
@@ -215,6 +217,10 @@
 		0E2707960E2DEA4E00D65876 /* button-right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "button-right.png"; sourceTree = "<group>"; };
 		0E50B1010DBE93FB0036CA3E /* PGFadeOutPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFadeOutPanel.m; sourceTree = "<group>"; };
 		0E50B1020DBE93FB0036CA3E /* PGFadeOutPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFadeOutPanel.h; sourceTree = "<group>"; };
+		0E9DB3AD0E511FE000F6AD1C /* HMBlkButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkButton.h; sourceTree = "<group>"; };
+		0E9DB3AE0E511FE000F6AD1C /* HMBlkButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkButton.m; sourceTree = "<group>"; };
+		0E9DB3B00E51201C00F6AD1C /* HMBlkButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkButtonCell.h; sourceTree = "<group>"; };
+		0E9DB3B10E51201C00F6AD1C /* HMBlkButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkButtonCell.m; sourceTree = "<group>"; };
 		0EEE5B970DB61620006E5B9C /* HMBlkSearchField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkSearchField.h; sourceTree = "<group>"; };
 		0EEE5B980DB61620006E5B9C /* HMBlkSearchField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HMBlkSearchField.m; sourceTree = "<group>"; };
 		0EEE5B9B0DB61632006E5B9C /* HMBlkSearchFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HMBlkSearchFieldCell.h; sourceTree = "<group>"; };
@@ -314,6 +320,10 @@
 				0B6BC9E50BB236390014D0BF /* HMAppKitEx.m */,
 				0B6BC9E60BB236390014D0BF /* HMBlkBox.h */,
 				0B6BC9E70BB236390014D0BF /* HMBlkBox.m */,
+				0E9DB3AD0E511FE000F6AD1C /* HMBlkButton.h */,
+				0E9DB3AE0E511FE000F6AD1C /* HMBlkButton.m */,
+				0E9DB3B00E51201C00F6AD1C /* HMBlkButtonCell.h */,
+				0E9DB3B10E51201C00F6AD1C /* HMBlkButtonCell.m */,
 				0B6BC9EC0BB236390014D0BF /* HMBlkContentView.h */,
 				0B6BC9ED0BB236390014D0BF /* HMBlkContentView.m */,
 				0B6BC9EE0BB236390014D0BF /* HMBlkOutlineView.h */,
@@ -615,6 +625,8 @@
 				0E50B1030DBE93FB0036CA3E /* PGFadeOutPanel.m in Sources */,
 				0E255C8C0E3AD09F00EDF04C /* HMBlkSlider.m in Sources */,
 				0E255C8F0E3AD0D200EDF04C /* HMBlkSliderCell.m in Sources */,
+				0E9DB3AF0E511FE000F6AD1C /* HMBlkButton.m in Sources */,
+				0E9DB3B20E51201C00F6AD1C /* HMBlkButtonCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

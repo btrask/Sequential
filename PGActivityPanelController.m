@@ -105,15 +105,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[super windowDidLoad];
 	[progressColumn setDataCell:[[[PGProgressIndicatorCell alloc] init] autorelease]];
-
-	NSMutableDictionary *const buttonAttributes = [[[[cancelButton attributedTitle] attributesAtIndex:0 effectiveRange:NULL] mutableCopy] autorelease];
-	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowOffset:NSMakeSize(0, 1)];
-	[shadow setShadowBlurRadius:1];
-	[buttonAttributes setObject:shadow forKey:NSShadowAttributeName];
-	[buttonAttributes setObject:[NSColor whiteColor] forKey:NSForegroundColorAttributeName];
-	[cancelButton setAttributedTitle:[[[NSAttributedString alloc] initWithString:[cancelButton title] attributes:buttonAttributes] autorelease]];
-
 	[self tableViewSelectionDidChange:nil];
 }
 
