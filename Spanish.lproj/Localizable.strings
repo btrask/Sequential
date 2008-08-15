@@ -1,88 +1,84 @@
-﻿/* The primary screen. */
+﻿/* Screen names in the Use Screen menu. %d is replaced with the screen number.*/
 "Main Screen" = "Ventana principal";
 
 /* Non-primary screens. %u is replaced with the screen number. */
 "Screen %u" = "Pantalla %u";
 
-/* Clear the Open Recent menu. Should be the same as the standard text. */
+/* Clear the Open Recent menu. Should be the same as the standard text.*/
 "Clear Menu" = "Vaciar menú";
 
 /* Label for when no image is being displayed in the window. */
-"No image" = "No image";
+"No image" = "No hay imagen";
 
 /* Enter/exit full screen. Two states of the same item. */
-"Enter Full Screen" = "Enter Full Screen";
-"Exit Full Screen" = "Exit Full Screen";
-
-/* Lets the user toggle the on-screen display. Two states of the same item. */
-"Show Info" = "Mostrar información";
+"Enter Full Screen" = "Ir a pantalla completa";
+"Exit Full Screen" = "Salir de pantalla completa";
+"Show Info" = "Mostrar información";   /* Lets the user toggle the on-screen display. Two states of the same item.*/
 "Hide Info" = "Ocultar información";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Ajustar a pantalla";
-"Fit to Window" = "Fit to Window";
+"Fit to Window" = "Ajustar a ventana";
 
 /* The title of the bookmarks menu. Two states. */
 "Resume" = "Continuar";
-"Delete..." = "Delete…";
+"Delete..." = "Borrar…";
 
-/* Bookmark menu item used when the file named %@ cannot be found. */
+/* Bookmark menu item used when the file named %@ cannot be found.*/
 "Missing File %@" = "Archivo no ncontrado “%@”";
 
 /* Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds.*/
-"%@ seconds" = "%@ seconds";
+"%@ seconds" = "%@ segundos";
 
 /* Display string for no timer interval. */
 "---" = "---";
 
-/* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
+/* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL.*/
 "The error %u %@ was generated while loading the URL %@." = "El error “%u %@” se generó mientras se cargaba la URL “%@.”";
 
-/* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
+/* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL.*/
 "The URL %@ could not be loaded." = "La URL “%@” no pudo cargarse.";
 
-/* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+/* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name.*/
 "%@ already exists in %@. Do you want to replace it?" = "“%@” ya existe en “%@.” ¿Desea reemplazarla?";
 
-/* Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name. */
+/* Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name.*/
 "%u pages already exist in %@. Do you want to replace them?" = "%u páginas ya existen en “%@.” ¿Desea reemplazarlas?";
 
-/* Informative text for replacement alerts. */
+/* Informative text for replacement alerts.*/
 "Replacing a file overwrites its current contents." = "Reemplazar un archivo sobreescribe su contenido actual.";
 
 /* Extraction window title. */
 "Extract" = "Extraer";
 
-/* Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+/* Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name.*/
 "The page %@ could not be extracted to %@." = "La página “%@” no se pudo extraer en “%@.”";
 
-/* Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
+/* Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name.*/
 "%u pages could not be extracted to %@." = "%u páginas no pudieron extraerse en “%@.”";
 
-/* Informative text for extraction failure alerts. */
+/* Informative text for extraction failure alerts.*/
 "Make sure the volume is writable and has enough free space." = "Asegúrese de que se puede escribir en el volumen y hay espacio libre.";
 
-/* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder. */
+/* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder.*/
 "File already exists." = "El archivo ya existe.";
 
 /* Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name. */
-"Are you sure you want to delete the bookmark %@?" = "Are you sure you want to delete the bookmark “%@?”";
+"Are you sure you want to delete the bookmark %@?" = "¿Seguro que desea borrar el favorito “%@?”";
 
 /* Confirmation dialog informative text. */
-"This operation cannot be undone." = "This operation cannot be undone.";
+"This operation cannot be undone." = "Esta operación no puede deshacerse.";
 
-/* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
+/* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename.*/
 "The file referenced by the bookmark %@ could not be found." = "El archivo referenciado por el marcador “%@” no se encontró.";
-
-/* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Puede haber sido movido o borrado.";
 
 /* Informative string for secondary mouse button action. */
-"Secondary click goes to the previous page." = "Secondary click goes to the previous page.";
-"Secondary click goes right." = "Secondary click goes right.";
-"Secondary click goes left." = "Secondary click goes left.";
+"Secondary click goes to the previous page." = "El clic secundario va a la página anterior.";
+"Secondary click goes right." = "El clic secundario va hacia la derecha.";
+"Secondary click goes left." = "El clic secundario va hacia la izquierda.";
 
-/* Dialog button labels. */
+/* Dialog button labels.*/
 "OK" = "Aceptar";
 "Cancel" = "Cancelar";
 "Delete Bookmark" = "Borrar marcador";
