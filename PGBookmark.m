@@ -114,6 +114,17 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 	[aCoder encodeObject:_backupDisplayName forKey:@"BackupDisplayName"];
 }
 
+#pragma mark NSObject Protocol
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ [_documentIdentifier hash] ^ [_fileIdentifier hash];
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return [anObject isMemberOfClass:[self class]] && [[self documentIdentifier] isEqual:[anObject documentIdentifier]] && [[self fileIdentifier] isEqual:[anObject fileIdentifier]];
+}
+
 #pragma mark NSObject
 
 - (void)dealloc
@@ -125,17 +136,6 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 	[_fileSubscription release];
 	[_backupDisplayName release];
 	[super dealloc];
-}
-
-#pragma mark -
-
-- (unsigned)hash
-{
-	return [[self class] hash] ^ [_documentIdentifier hash] ^ [_fileIdentifier hash];
-}
-- (BOOL)isEqual:(id)anObject
-{
-	return [anObject isMemberOfClass:[self class]] && [[self documentIdentifier] isEqual:[anObject documentIdentifier]] && [[self fileIdentifier] isEqual:[anObject fileIdentifier]];
 }
 
 @end

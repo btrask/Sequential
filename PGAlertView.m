@@ -297,7 +297,7 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 {
 }
 
-#pragma mark NSObject
+#pragma mark NSObject Protocol
 
 - (unsigned)hash
 {
@@ -434,6 +434,17 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 	_progress = MIN(MAX(progress, 0), 1);
 }
 
+#pragma mark NSObject Protocol
+
+- (unsigned)hash
+{
+	return (unsigned)self;
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return anObject == self;
+}
+
 #pragma mark PGAlertGraphic
 
 - (void)drawInView:(PGAlertView *)anAlertView
@@ -482,17 +493,6 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(25, 50, 25, 200)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(50, 25, 200, 250)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(250, 50, 25, 200)];
-}
-
-#pragma mark NSObject
-
-- (unsigned)hash
-{
-	return (unsigned)self;
-}
-- (BOOL)isEqual:(id)anObject
-{
-	return anObject == self;
 }
 
 @end

@@ -54,6 +54,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGFindlessTextView
 
+#pragma mark NSObject Protocol
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+	return @selector(performFindPanelAction:) == aSelector ? NO : [super respondsToSelector:aSelector];
+}
+
 #pragma mark NSTextView
 
 - (IBAction)performFindPanelAction:(id)sender
@@ -66,10 +73,6 @@ DEALINGS WITH THE SOFTWARE. */
 + (BOOL)instancesRespondToSelector:(SEL)aSelector
 {
 	return @selector(performFindPanelAction:) == aSelector ? NO : [super instancesRespondToSelector:aSelector];
-}
-- (BOOL)respondsToSelector:(SEL)aSelector
-{
-	return @selector(performFindPanelAction:) == aSelector ? NO : [super respondsToSelector:aSelector];
 }
 
 @end

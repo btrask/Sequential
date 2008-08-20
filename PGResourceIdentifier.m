@@ -205,16 +205,14 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	[aCoder encodeObject:_displayName forKey:@"DisplayName"];
 }
 
-#pragma mark NSObject
+#pragma mark NSKeyedArchiverObjectSubstitution Protocol
 
-- (void)dealloc
+- (Class)classForKeyedArchiver
 {
-	[_icon release];
-	[_displayName release];
-	[super dealloc];
+	return [PGResourceIdentifier class];
 }
 
-#pragma mark -
+#pragma mark NSObject Protocol
 
 - (unsigned)hash
 {
@@ -227,13 +225,18 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 
 #pragma mark -
 
-- (Class)classForKeyedArchiver
-{
-	return [PGResourceIdentifier class];
-}
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"%@", [self URL]];
+}
+
+#pragma mark NSObject
+
+- (void)dealloc
+{
+	[_icon release];
+	[_displayName release];
+	[super dealloc];
 }
 
 @end
@@ -293,6 +296,21 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	if(_alias) [aCoder encodeBytes:(uint8_t const *)*_alias length:GetHandleSize((Handle)_alias) forKey:@"Alias"];
 }
 
+#pragma mark NSObject Protocol
+
+- (unsigned)hash
+{
+	return [[self class] hash];
+}
+- (BOOL)isEqual:(id)obj
+{
+	if(obj == self) return YES;
+	if(![obj isMemberOfClass:[self class]]) return NO;
+	FSRef ourRef, theirRef;
+	if(![self getRef:&ourRef] || ![obj getRef:&theirRef]) return NO;
+	return FSCompareFSRefs(&ourRef, &theirRef) == noErr;
+}
+
 #pragma mark PGResourceIdentifier
 
 - (NSURL *)URLByFollowingAliases:(BOOL)flag
@@ -319,21 +337,6 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	[self AE_removeObserver];
 	if(_alias) DisposeHandle((Handle)_alias);
 	[super dealloc];
-}
-
-#pragma mark -
-
-- (unsigned)hash
-{
-	return [[self class] hash];
-}
-- (BOOL)isEqual:(id)obj
-{
-	if(obj == self) return YES;
-	if(![obj isMemberOfClass:[self class]]) return NO;
-	FSRef ourRef, theirRef;
-	if(![self getRef:&ourRef] || ![obj getRef:&theirRef]) return NO;
-	return FSCompareFSRefs(&ourRef, &theirRef) == noErr;
 }
 
 @end
@@ -421,6 +424,24 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	[aCoder encodeInt:_index forKey:@"Index"];
 }
 
+#pragma mark NSObject Protocol
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ (unsigned)_index;
+}
+- (BOOL)isEqual:(id)obj
+{
+	return obj == self || ([obj isMemberOfClass:[self class]] && [(PGIndexIdentifier *)obj index] == [self index] && [[self superidentifier] isEqual:[obj superidentifier]]);
+}
+
+#pragma mark -
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@:%d", [self superidentifier], [self index]];
+}
+
 #pragma mark PGResourceIdentifier
 
 - (PGResourceIdentifier *)superidentifier
@@ -446,24 +467,6 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 {
 	[_superidentifier release];
 	[super dealloc];
-}
-
-#pragma mark -
-
-- (unsigned)hash
-{
-	return [[self class] hash] ^ (unsigned)_index;
-}
-- (BOOL)isEqual:(id)obj
-{
-	return obj == self || ([obj isMemberOfClass:[self class]] && [(PGIndexIdentifier *)obj index] == [self index] && [[self superidentifier] isEqual:[obj superidentifier]]);
-}
-
-#pragma mark -
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@:%d", [self superidentifier], [self index]];
 }
 
 @end

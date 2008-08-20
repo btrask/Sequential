@@ -107,6 +107,15 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 	[self doesNotRecognizeSelector:_cmd];
 }
 
+#pragma mark NSObject Protocol
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+	if(@selector(cancelOperation:) == aSelector) return NO;
+	if(@selector(performClose:) == aSelector) return NO;
+	return [super respondsToSelector:aSelector];
+}
+
 #pragma mark NSWindow
 
 - (IBAction)performClose:(id)sender
@@ -157,12 +166,6 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 #pragma mark NSObject
 
-- (BOOL)respondsToSelector:(SEL)aSelector
-{
-	if(@selector(cancelOperation:) == aSelector) return NO;
-	if(@selector(performClose:) == aSelector) return NO;
-	return [super respondsToSelector:aSelector];
-}
 - (void)dealloc
 {
 	[self AE_removeObserver];

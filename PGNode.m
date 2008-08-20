@@ -436,6 +436,31 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[[self document] noteNodeIsViewableDidChange:self];
 }
 
+#pragma mark NSObject Protocol
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ [[self identifier] hash];
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
+}
+
+#pragma mark -
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_resourceAdapter class], self, [self identifier]];
+}
+
+#pragma mark -
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? YES : [_resourceAdapter respondsToSelector:sel];
+}
+
 #pragma mark NSObject
 
 - (void)dealloc
@@ -454,10 +479,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (BOOL)respondsToSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? YES : [_resourceAdapter respondsToSelector:sel];
-}
 - (IMP)methodForSelector:(SEL)sel
 {
 	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_resourceAdapter methodForSelector:sel];
@@ -470,24 +491,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	[invocation setTarget:_resourceAdapter];
 	[invocation invoke];
-}
-
-#pragma mark -
-
-- (unsigned)hash
-{
-	return [[self class] hash] ^ [[self identifier] hash];
-}
-- (BOOL)isEqual:(id)anObject
-{
-	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
-}
-
-#pragma mark -
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_resourceAdapter class], self, [self identifier]];
 }
 
 @end

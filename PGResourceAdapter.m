@@ -321,7 +321,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[[self node] noteIsViewableDidChange];
 }
 
-#pragma mark NSObject
+#pragma mark NSObject Protocol
 
 - (NSString *)description
 {

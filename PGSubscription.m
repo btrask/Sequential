@@ -179,6 +179,13 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 	return [self retain];
 }
 
+#pragma mark NSObject Protocol
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self path]];
+}
+
 #pragma mark NSObject
 
 - (void)dealloc
@@ -186,13 +193,6 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 	[PGActiveSubscriptionValues removeObject:[NSValue valueWithNonretainedObject:self]];
 	if(-1 != _descriptor) close(_descriptor);
 	[super dealloc];
-}
-
-#pragma mark -
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self path]];
 }
 
 @end
