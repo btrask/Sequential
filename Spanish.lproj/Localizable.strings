@@ -33,6 +33,13 @@
 /* Display string for no timer interval. */
 "---" = "---";
 
+/* Units (bytes, kilobytes, etc). */
+"B" = "B";
+"KB" = "KB";
+"MB" = "MB";
+"GB" = "GB";
+"TB" = "TB";
+
 /* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL.*/
 "The error %u %@ was generated while loading the URL %@." = "El error “%u %@” se generó mientras se cargaba la URL “%@.”";
 

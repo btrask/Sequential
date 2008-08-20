@@ -54,7 +54,7 @@ DEALINGS WITH THE SOFTWARE. */
 		f = CFNumberFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), kCFNumberFormatterDecimalStyle);
 		CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)[NSNumber numberWithInt:1]);
 	}
-	return [NSString stringWithFormat:@"%@ %@", [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)[NSNumber numberWithDouble:b]) autorelease], NSLocalizedString(unit, nil)];
+	return [NSString stringWithFormat:@"%@ %@", [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)[NSNumber numberWithDouble:b]) autorelease], NSLocalizedString(unit, @"Units (bytes, kilobytes, etc).")];
 }
 
 @end

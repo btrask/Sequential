@@ -350,6 +350,18 @@
 		0E94F9CB0DAD37D000A23F73 /* PGPrefObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPrefObject.m; sourceTree = "<group>"; };
 		0E94FBAD0DAE739600A23F73 /* PGDisplayController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDisplayController.h; sourceTree = "<group>"; };
 		0E94FBAE0DAE739700A23F73 /* PGDisplayController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDisplayController.m; sourceTree = "<group>"; };
+		0E9B60AC0E5C0EAE002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0E9B60AD0E5C0EB7002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = zh_TW; path = zh_TW.lproj/Credits.rtf; sourceTree = "<group>"; };
+		0E9B60AE0E5C0EBD002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0E9B60AF0E5C0EC4002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGMenu.nib; sourceTree = "<group>"; };
+		0E9B60B00E5C0ECB002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0E9B60D40E5C0EDE002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGWindow.nib; sourceTree = "<group>"; };
+		0E9B60D70E5C0EE3002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGExif.nib; sourceTree = "<group>"; };
+		0E9B60D80E5C0EE8002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGTimer.nib; sourceTree = "<group>"; };
+		0E9B60D90E5C0EEF002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0E9B60DA0E5C0EF4002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGURL.nib; sourceTree = "<group>"; };
+		0E9B60DB0E5C0EFA002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGExtract.nib; sourceTree = "<group>"; };
+		0E9B60DC0E5C0EFF002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGEncoding.nib; sourceTree = "<group>"; };
 		0EA496310C6C7C9A00095184 /* PGBookmarkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBookmarkController.h; sourceTree = "<group>"; };
 		0EA496320C6C7C9A00095184 /* PGBookmarkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBookmarkController.m; sourceTree = "<group>"; };
 		0EA540970DB7067C00F60F0E /* NSScreenAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSScreenAdditions.h; sourceTree = "<group>"; };
@@ -902,6 +914,7 @@
 				Spanish,
 				it_IT,
 				Polish,
+				zh_TW,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Pornograph */;
 			projectDirPath = "";
@@ -1129,6 +1142,7 @@
 				0EA62C200CCE0AFB0047E83E /* it_IT */,
 				0E1211780D31A5A40055F587 /* Polish */,
 				0E5DD3520CAF91310085241E /* Spanish */,
+				0E9B60AC0E5C0EAE002D19FD /* zh_TW */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -1141,6 +1155,7 @@
 				0EA62C260CCE0B9C0047E83E /* it_IT */,
 				0E1211800D31A5E70055F587 /* Polish */,
 				0E5DD3580CAF91840085241E /* Spanish */,
+				0E9B60DC0E5C0EFF002D19FD /* zh_TW */,
 			);
 			name = PGEncoding.nib;
 			sourceTree = "<group>";
@@ -1153,6 +1168,7 @@
 				0E255F090E3C07D400EDF04C /* it_IT */,
 				0E255F0A0E3C07D700EDF04C /* Polish */,
 				0E255F0B0E3C07DA00EDF04C /* Spanish */,
+				0E9B60D80E5C0EE8002D19FD /* zh_TW */,
 			);
 			name = PGTimer.nib;
 			sourceTree = "<group>";
@@ -1165,6 +1181,7 @@
 				0EC1C5340E366FBA00E911E7 /* it_IT */,
 				0EC1C5350E366FBD00E911E7 /* Polish */,
 				0EC1C5360E366FBF00E911E7 /* Spanish */,
+				0E9B60D90E5C0EEF002D19FD /* zh_TW */,
 			);
 			name = PGActivity.nib;
 			sourceTree = "<group>";
@@ -1177,6 +1194,7 @@
 				0E81357A0D01998F001A5B60 /* it_IT */,
 				0E12117D0D31A5D10055F587 /* Polish */,
 				0E8135790D019987001A5B60 /* Spanish */,
+				0E9B60DA0E5C0EF4002D19FD /* zh_TW */,
 			);
 			name = PGURL.nib;
 			sourceTree = "<group>";
@@ -1189,6 +1207,7 @@
 				0EC1C5300E366FA200E911E7 /* it_IT */,
 				0EC1C5310E366FAA00E911E7 /* Polish */,
 				0EC1C5320E366FAD00E911E7 /* Spanish */,
+				0E9B60B00E5C0ECB002D19FD /* zh_TW */,
 			);
 			name = PGPreferences.nib;
 			sourceTree = "<group>";
@@ -1201,6 +1220,7 @@
 				0EA62C220CCE0B1A0047E83E /* it_IT */,
 				0E12117A0D31A5B90055F587 /* Polish */,
 				0E5DD3540CAF915A0085241E /* Spanish */,
+				0E9B60AE0E5C0EBD002D19FD /* zh_TW */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1213,6 +1233,7 @@
 				0E81357C0D019999001A5B60 /* it_IT */,
 				0E12117E0D31A5D70055F587 /* Polish */,
 				0E81357B0D019996001A5B60 /* Spanish */,
+				0E9B60DB0E5C0EFA002D19FD /* zh_TW */,
 			);
 			name = PGExtract.nib;
 			sourceTree = "<group>";
@@ -1225,6 +1246,7 @@
 				0EE98F8F0DEEB1510004F628 /* it_IT */,
 				0EE98F900DEEB1540004F628 /* Polish */,
 				0EE98F910DEEB1570004F628 /* Spanish */,
+				0E9B60D40E5C0EDE002D19FD /* zh_TW */,
 			);
 			name = PGWindow.nib;
 			sourceTree = "<group>";
@@ -1249,6 +1271,7 @@
 				0EA542620DB72C0F00F60F0E /* it_IT */,
 				0EA542650DB72C2D00F60F0E /* Polish */,
 				0EA542660DB72C3100F60F0E /* Spanish */,
+				0E9B60D70E5C0EE3002D19FD /* zh_TW */,
 			);
 			name = PGExif.nib;
 			sourceTree = "<group>";
@@ -1261,6 +1284,7 @@
 				0EA62C230CCE0B7C0047E83E /* it_IT */,
 				0E12117B0D31A5C00055F587 /* Polish */,
 				0E5DD3550CAF91640085241E /* Spanish */,
+				0E9B60AF0E5C0EC4002D19FD /* zh_TW */,
 			);
 			name = PGMenu.nib;
 			sourceTree = "<group>";
@@ -1273,6 +1297,7 @@
 				0EA62C210CCE0B0D0047E83E /* it_IT */,
 				0E1211790D31A5AF0055F587 /* Polish */,
 				0E5DD3530CAF913D0085241E /* Spanish */,
+				0E9B60AD0E5C0EB7002D19FD /* zh_TW */,
 			);
 			name = Credits.rtf;
 			sourceTree = "<group>";
