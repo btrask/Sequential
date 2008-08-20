@@ -333,10 +333,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = _dateModified; break;
 		case PGSortByDateCreated:  date = _dateCreated; break;
-		case PGSortBySize: {
-			NSLog(@"%@, %@", self, _dataLength);
-			info = [_dataLength AE_localizedStringAsBytes]; break;
-		}
+		case PGSortBySize: info = [_dataLength AE_localizedStringAsBytes]; break;
 	}
 	if(date && !info) info = [date AE_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
