@@ -58,6 +58,7 @@ enum {
 	BOOL                  _needsPassword;
 
 	NSMenuItem           *_menuItem;
+	BOOL                  _allowMenuItemUpdates; // Just an optimization.
 	BOOL                  _isViewable;
 	unsigned              _determiningTypeCount;
 

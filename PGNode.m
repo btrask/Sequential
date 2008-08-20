@@ -84,6 +84,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
+		_allowMenuItemUpdates = YES;
 		[self _updateMenuItem];
 	}
 	return self;
@@ -275,36 +276,40 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	[_dateModified release];
 	_dateModified = [[[self dataSource] dateModifiedForNode:self] retain];
-	if(_dateModified) return;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) _dateModified = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate] retain];
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+	if(_dateModified) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) _dateModified = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate] retain];
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+	}
 	[self _updateMenuItem];
 }
 - (void)noteDateCreatedDidChange
 {
 	[_dateCreated release];
 	_dateCreated = [[[self dataSource] dateCreatedForNode:self] retain];
-	if(_dateCreated) return;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) _dateCreated = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate] retain];
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+	if(_dateCreated) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) _dateCreated = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate] retain];
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+	}
 	[self _updateMenuItem];
 }
 - (void)noteDataLengthDidChange
 {
-	[_dataLength release];
-	_dataLength = [[[self dataSource] dataLengthForNode:self] retain];
-	if(_dataLength) return;
-	NSData *data;
-	if([self canGetData] && [self getData:&data] == PGDataReturned) _dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
-	if(_dataLength) return;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) {
-		NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
-		if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) _dataLength = [[attrs objectForKey:NSFileSize] retain]; // File size is meaningless for folders.
-	}
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+	do {
+		[_dataLength release];
+		_dataLength = [[[self dataSource] dataLengthForNode:self] retain];
+		if(_dataLength) break;
+		NSData *data;
+		if([self canGetData] && [self getData:&data] == PGDataReturned) _dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
+		if(_dataLength) break;
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) {
+			NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
+			if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) _dataLength = [[attrs objectForKey:NSFileSize] retain]; // File size is meaningless for folders.
+		}
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+	} while(NO);
 	[self _updateMenuItem];
 }
 
@@ -321,13 +326,17 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 - (void)_updateMenuItem
 {
+	if(!_allowMenuItemUpdates) return;
 	NSMutableAttributedString *const label = [[[[self identifier] attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
 	NSString *info = nil;
 	NSDate *date = nil;
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = _dateModified; break;
 		case PGSortByDateCreated:  date = _dateCreated; break;
-		case PGSortBySize: info = [_dataLength AE_localizedStringAsBytes]; break;
+		case PGSortBySize: {
+			NSLog(@"%@, %@", self, _dataLength);
+			info = [_dataLength AE_localizedStringAsBytes]; break;
+		}
 	}
 	if(date && !info) info = [date AE_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
