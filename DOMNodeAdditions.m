@@ -170,7 +170,7 @@ DEALINGS WITH THE SOFTWARE. */
 		result = [result substringFromIndex:whitespace];
 	}
 	if(AENoWhitespace != *trailing) result = [(AESpace == *trailing ? @" " : @"\n") stringByAppendingString:result];
-	for(whitespace = [result length]; whitespace-- && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[result characterAtIndex:whitespace]];);
+	for(whitespace = [result length]; whitespace && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[result characterAtIndex:--whitespace]];);
 	if(whitespace != [result length] - 1) {
 		result = [result substringToIndex:whitespace];
 		*trailing = AESpace;
