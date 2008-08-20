@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)_runAnimationTimer;
 - (void)_animate;
+- (BOOL)_drawsRoundedCorners;
 - (void)_cache;
 - (void)_drawInRect:(NSRect)aRect;
 - (void)_drawCornersOnRect:(NSRect)r;
@@ -200,9 +201,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)drawsRoundedCorners
 {
-	if(!_drawsRoundedCorners) return NO;
-	NSSize const s = [self size];
-	return s.width >= 16 && s.height >= 16;
+	return _drawsRoundedCorners;
 }
 - (void)setDrawsRoundedCorners:(BOOL)flag
 {
@@ -240,6 +239,12 @@ DEALINGS WITH THE SOFTWARE. */
 	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInt:(i < _numberOfFrames ? i : 0)]];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
+}
+- (BOOL)_drawsRoundedCorners
+{
+	if(!_drawsRoundedCorners) return NO;
+	NSSize const s = [self size];
+	return s.width >= 16 && s.height >= 16;
 }
 - (void)_cache
 {
@@ -298,7 +303,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_drawCornersOnRect:(NSRect)r
 {
-	if(!_rep || ![self drawsRoundedCorners]) return;
+	if(!_rep || ![self _drawsRoundedCorners]) return;
 	static NSImage *tl = nil, *tr = nil, *br = nil, *bl = nil;
 	if(!tl) tl = [[NSImage imageNamed:@"Corner-Top-Left"] retain];
 	if(!tr) tr = [[NSImage imageNamed:@"Corner-Top-Right"] retain];
@@ -355,7 +360,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)isOpaque
 {
-	return _isOpaque && ![self drawsRoundedCorners] && ![self rotationInDegrees];
+	return _isOpaque && ![self _drawsRoundedCorners] && ![self rotationInDegrees];
 }
 - (void)drawRect:(NSRect)aRect
 {
@@ -368,7 +373,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
-	BOOL const drawCorners = !_cacheIsValid && [self drawsRoundedCorners];
+	BOOL const drawCorners = !_cacheIsValid && [self _drawsRoundedCorners];
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	int count = 0;
 	NSRect const *rects = NULL;
@@ -429,6 +434,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self AE_removeObserver];
 	[self unbind:@"animates"];
 	[self unbind:@"antialiasWhenUpscaling"];
+	[self unbind:@"drawsRoundedCorners"];
 	[self setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	NSParameterAssert(!_rep);
 	[_cache release];
