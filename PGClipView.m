@@ -26,13 +26,15 @@ DEALINGS WITH THE SOFTWARE. */
 #import <IOKit/hidsystem/IOHIDLib.h>
 #import <IOKit/hidsystem/event_status_driver.h>
 
+// Other
+#import "PGNonretainedObjectProxy.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSWindowAdditions.h"
 
 #define PGMouseHiddenDraggingStyle true
 #define PGAnimateScrolling         true
-#define PGAnimationFrameRate       (1.0 / 30.0)
 #define PGCopiesOnScroll           false // Not much of a speedup.
 #define PGClickSlopDistance        3.0
 #define PGShowBorders              true
@@ -49,10 +51,6 @@ static NSCursor *PGPointingHandCursor(void)
 		cursor = image ? [[NSCursor alloc] initWithImage:image hotSpot:NSMakePoint(5, 0)] : [NSCursor pointingHandCursor];
 	}
 	return cursor;
-}
-static inline NSTimeInterval PGUpTime(void)
-{
-	return (NSTimeInterval)UnsignedWideToUInt64(AbsoluteToNanoseconds(UpTime())) * 1e-9;
 }
 static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
 {
@@ -222,7 +220,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	if(NSEqualPoints(newTargetPosition, [self position])) return NO;
 	_position = newTargetPosition;
 	if(!_scrollTimer) {
-		_scrollTimer = [NSTimer timerWithTimeInterval:PGAnimationFrameRate target:self selector:@selector(_scrollOneFrame:) userInfo:nil repeats:YES];
+		_scrollTimer = [NSTimer timerWithTimeInterval:PGAnimationFramerate target:[self PG_nonretainedObjectProxy] selector:@selector(_scrollOneFrame:) userInfo:nil repeats:YES];
 		[[NSRunLoop currentRunLoop] addTimer:_scrollTimer forMode:PGCommonRunLoopsMode];
 	}
 	return YES;
@@ -302,17 +300,17 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 - (void)arrowKeyDown:(NSEvent *)firstEvent
 {
 	NSParameterAssert(NSKeyDown == [firstEvent type]);
-	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFrameRate];
+	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGRectEdgeMask pressedDirections = PGNoEdges;
 	NSTimeInterval pageTurnTime = 0, lastScrollTime = 0;
 	do {
 		NSEventType const type = [latestEvent type];
 		if(NSPeriodic == type) {
-			NSTimeInterval const currentTime = PGUpTime();
+			NSTimeInterval const currentTime = PGUptime();
 			if(currentTime > pageTurnTime + PGPageTurnMovementDelay) {
 				NSSize const d = [self distanceInDirection:PGNonContradictoryRectEdges(pressedDirections) forScrollType:PGScrollByLine];
-				float const timeAdjustment = lastScrollTime ? PGAnimationFrameRate / (currentTime - lastScrollTime) : 1;
+				float const timeAdjustment = lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1;
 				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) allowAnimation:NO];
 			}
 			lastScrollTime = currentTime;
@@ -333,7 +331,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		if(NSKeyDown == type) {
 			pressedDirections |= direction;
 			PGRectEdgeMask const d = PGNonContradictoryRectEdges(pressedDirections);
-			if([self shouldExitForMovementInDirection:d] && [[self delegate] clipView:self shouldExitEdges:d]) pageTurnTime = PGUpTime();
+			if([self shouldExitForMovementInDirection:d] && [[self delegate] clipView:self shouldExitEdges:d]) pageTurnTime = PGUptime();
 		} else pressedDirections &= ~direction;
 	} while(pressedDirections && (latestEvent = [NSApp nextEventMatchingMask:NSKeyUpMask | NSKeyDownMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
@@ -418,12 +416,9 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (void)_scrollOneFrame:(NSTimer *)timer
 {
-	NSTimeInterval const currentTime = PGUpTime();
-	float const timeAdjustment = _lastScrollTime ? PGAnimationFrameRate / (currentTime - _lastScrollTime) : 1;
-	_lastScrollTime = currentTime;
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
-	float const dist = fabs(hypotf(r.width, r.height));
-	float const factor = MIN(1, MAX(0.25, 10 / dist) / timeAdjustment);
+	float const dist = hypotf(r.width, r.height);
+	float const factor = MIN(1, MAX(0.25, 10 / dist) / PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
 	if(![self _scrollTo:(dist < 1 ? _position : PGOffsetPoint(_immediatePosition, NSMakeSize(r.width * factor, r.height * factor)))]) [self stopAnimatedScrolling];
 }
 

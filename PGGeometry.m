@@ -78,3 +78,18 @@ PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
 	if(o1 & PGRotated90CC && o2 & PGRotated90CC) r ^= PGUpsideDown;
 	return r;
 }
+
+#pragma mark Other
+
+NSTimeInterval PGUptime(void)
+{
+	return (NSTimeInterval)UnsignedWideToUInt64(AbsoluteToNanoseconds(UpTime())) * 1e-9;
+}
+float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate)
+{
+	NSParameterAssert(timeOfFrame);
+	NSTimeInterval const currentTime = PGUptime();
+	float const speedup = *timeOfFrame ? desiredFramerate / (currentTime - *timeOfFrame) : 1;
+	*timeOfFrame = currentTime;
+	return speedup;
+}

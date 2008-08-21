@@ -75,3 +75,11 @@ enum {
 typedef unsigned PGOrientation;
 
 PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
+
+#pragma mark Other
+
+#define PGAnimationFramesPerSecond 30.0
+#define PGAnimationFramerate       (1.0 / PGAnimationFramesPerSecond)
+
+NSTimeInterval PGUptime(void);
+float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().

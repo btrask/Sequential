@@ -72,7 +72,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 @interface PGDisplayController (Private)
 
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
-- (void)_updateImageViewSize;
+- (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelLocationAnimate:(BOOL)flag;
 - (void)_updateInfoPanelText;
@@ -462,7 +462,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif
 {
-	[self _updateImageViewSize];
+	[self _updateImageViewSizeAllowAnimation:NO];
 }
 
 #pragma mark -
@@ -556,7 +556,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
-	[self _updateImageViewSize];
+	[self _updateImageViewSizeAllowAnimation:YES];
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
@@ -601,9 +601,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	}
 	return NSMakeSize(roundf(newSize.width), roundf(newSize.height));
 }
-- (void)_updateImageViewSize
+- (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
-	[imageView setSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]]];
+	[imageView setSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]] allowAnimation:flag];
 }
 - (void)_updateNodeIndex
 {

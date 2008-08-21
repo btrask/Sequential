@@ -36,7 +36,11 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
 	unsigned          _numberOfFrames;
+
 	NSSize            _size;
+	NSSize            _immediateSize;
+	NSTimeInterval    _lastSizeAnimationTime;
+	NSTimer          *_sizeTransitionTimer;
 
 	NSCachedImageRep *_cache;
 	BOOL              _usesCaching;
@@ -55,7 +59,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 
 - (NSSize)size; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.
-- (void)setSize:(NSSize)size;
+- (void)setSize:(NSSize)size allowAnimation:(BOOL)flag;
+- (void)stopAnimatedSizeTransition;
 - (float)averageScaleFactor;
 
 - (BOOL)usesCaching;

@@ -33,6 +33,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
+#define PGAnimateSizeChanges true
+
 @interface PGImageView (Private)
 
 - (void)_runAnimationTimer;
@@ -42,6 +44,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_drawInRect:(NSRect)aRect;
 - (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
+- (BOOL)_setSize:(NSSize)size;
+- (void)_sizeTransitionOneFrame:(NSTimer *)timer;
 - (void)_updateFrameSize;
 
 @end
@@ -79,7 +83,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_image removeRepresentation:_cache];
 		[_rep release];
 		_rep = nil;
-		[self setSize:size];
+		[self setSize:size allowAnimation:NO];
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
 		_isOpaque = _rep && ![_rep hasAlpha];
@@ -87,7 +91,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
 		[self _runAnimationTimer];
-	} else [self setSize:size];
+	} else [self setSize:size allowAnimation:NO];
 	[self _cache];
 	[self setNeedsDisplay:YES];
 }
@@ -96,13 +100,33 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSSize)size
 {
-	return _size;
+	return _sizeTransitionTimer ? _size : _immediateSize;
 }
 - (void)setSize:(NSSize)size
+        allowAnimation:(BOOL)flag
 {
-	if(NSEqualSizes(size, _size)) return;
+	if(!PGAnimateSizeChanges || !flag) {
+		_size = size;
+		return [self stopAnimatedSizeTransition];
+	}
+	if(NSEqualSizes(size, [self size])) return;
 	_size = size;
-	[self _updateFrameSize];
+	if(!_sizeTransitionTimer) {
+		_sizeTransitionTimer = [NSTimer timerWithTimeInterval:PGAnimationFramerate target:[self PG_nonretainedObjectProxy] selector:@selector(_sizeTransitionOneFrame:) userInfo:nil repeats:YES];
+		[[NSRunLoop currentRunLoop] addTimer:_sizeTransitionTimer forMode:PGCommonRunLoopsMode];
+	}
+}
+- (void)stopAnimatedSizeTransition
+{
+	[_sizeTransitionTimer invalidate];
+	_sizeTransitionTimer = nil;
+	_lastSizeAnimationTime = 0;
+	[self _setSize:_size];
+	if(_cacheIsOutOfDate) {
+		_cacheIsOutOfDate = NO;
+		[self _cache];
+	}
+	[self setNeedsDisplay:YES];
 }
 - (float)averageScaleFactor
 {
@@ -192,6 +216,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSImageInterpolation)interpolation
 {
+	if(_sizeTransitionTimer || [self inLiveResize]) return NSImageInterpolationNone;
 	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
 	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
 	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
@@ -243,7 +268,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)_drawsRoundedCorners
 {
 	if(!_drawsRoundedCorners) return NO;
-	NSSize const s = [self size];
+	NSSize const s = _immediateSize;
 	return s.width >= 16 && s.height >= 16;
 }
 - (void)_cache
@@ -257,11 +282,11 @@ DEALINGS WITH THE SOFTWARE. */
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if(![self usesCaching] || [self inLiveResize]) {
+	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) {
 		_cacheIsOutOfDate = YES;
 		return;
 	}
-	NSSize const scaledSize = [self size];
+	NSSize const scaledSize = _immediateSize;
 	if(scaledSize.width > 10000 || scaledSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
 
 	[_cache setSize:scaledSize];
@@ -273,10 +298,13 @@ DEALINGS WITH THE SOFTWARE. */
 	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), scaledSize.height);
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
+
 	if(![view lockFocusIfCanDraw]) return [[self PG_nonretainedObjectProxy] AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
-	[self _drawInRect:[_cache rect]];
-	[self _drawCornersOnRect:[_cache rect]];
+	NSRect const cacheRect = [_cache rect];
+	[self _drawInRect:cacheRect];
+	[self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
+
 	[_image removeRepresentation:_rep];
 	[_image setSize:scaledSize];
 	[_image addRepresentation:_cache];
@@ -323,9 +351,23 @@ DEALINGS WITH THE SOFTWARE. */
 	[t translateXBy:-NSMidX(b) yBy:-NSMidY(b)];
 	return t;
 }
+- (BOOL)_setSize:(NSSize)size
+{
+	if(NSEqualSizes(size, _immediateSize)) return NO;
+	_immediateSize = size;
+	[self _updateFrameSize];
+	return YES;
+}
+- (void)_sizeTransitionOneFrame:(NSTimer *)timer
+{
+	NSSize const r = NSMakeSize(_size.width - _immediateSize.width, _size.height - _immediateSize.height);
+	float const dist = hypotf(r.width, r.height);
+	float const factor = MIN(1, MAX(0.33, 20 / dist) / PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
+	if(dist < 1 || ![self _setSize:NSMakeSize(_immediateSize.width + r.width * factor, _immediateSize.height + r.height * factor)]) [self stopAnimatedSizeTransition];
+}
 - (void)_updateFrameSize
 {
-	NSSize s = [self size];
+	NSSize s = _immediateSize;
 	float const r = [self rotationInDegrees] / 180.0 * pi;
 	if(r) s = NSMakeSize(ceilf(fabs(cosf(r)) * s.width + fabs(sinf(r)) * s.height), ceilf(fabs(cosf(r)) * s.height + fabs(sinf(r)) * s.width));
 	if(NSEqualSizes(s, [self frame].size)) return;
@@ -364,7 +406,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	NSRect b = (NSRect){NSZeroPoint, [self size]};
+	NSRect b = (NSRect){NSZeroPoint, _immediateSize};
 	b.origin.x = roundf(NSMidX([self bounds]) - NSWidth(b) / 2);
 	b.origin.y = roundf(NSMidY([self bounds]) - NSHeight(b) / 2);
 
@@ -411,6 +453,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!_cacheIsOutOfDate) return;
 	_cacheIsOutOfDate = NO;
 	[self _cache];
+	[self setNeedsDisplay:YES];
 }
 - (void)viewDidMoveToWindow
 {
@@ -432,6 +475,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[self stopAnimatedSizeTransition];
 	[self unbind:@"animates"];
 	[self unbind:@"antialiasWhenUpscaling"];
 	[self unbind:@"drawsRoundedCorners"];
