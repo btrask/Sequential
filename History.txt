@@ -1,3 +1,11 @@
+2.0 (August 15th, 2008)
+- Windowed mode.
+- An Exif metadata display.
+- Support for any number of simultaneous open documents.
+- Multitouch support.
+- Dramatically improved 10.3.9 Panther support.
+- Too much more to list.
+
 1.3.2 (March 22nd, 2008)
 - Adds a “Move to Trash” command for local images.
 - It is now possible to zoom in and out from the keyboard.
