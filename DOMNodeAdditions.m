@@ -87,7 +87,7 @@ DEALINGS WITH THE SOFTWARE. */
 		if((!schemes || [schemes containsObject:[URL scheme]]) && (!exts || [exts containsObject:[[URL path] pathExtension]])) {
 			PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 			if(![array containsObject:ident]) {
-				[ident setDisplayName:[self AE_stringValue] notify:NO];
+				[ident setCustomDisplayName:[self AE_stringValue] notify:NO];
 				[array addObject:ident];
 			}
 		}
@@ -103,7 +103,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	PGResourceIdentifier *const ident = [[NSURL URLWithString:[self src]] AE_resourceIdentifier];
 	if(![array containsObject:ident]) {
-		[ident setDisplayName:[self alt] notify:NO];
+		[ident setCustomDisplayName:[self alt] notify:NO];
 		[array addObject:ident];
 	}
 	[super AE_getEmbeddedImageIdentifiers:array];

@@ -33,8 +33,8 @@ extern NSString *const PGResourceIdentifierDidChangeNotification;
 {
 	@private
 	NSImage  *_icon;
-	NSString *_displayName;
-	NSString *_previousName;
+	NSString *_naturalDisplayName;
+	NSString *_customDisplayName;
 }
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL;
@@ -54,8 +54,11 @@ extern NSString *const PGResourceIdentifierDidChangeNotification;
 
 - (NSImage *)icon;
 - (void)setIcon:(NSImage *)icon notify:(BOOL)flag;
+
 - (NSString *)displayName;
-- (void)setDisplayName:(NSString *)aString notify:(BOOL)flag;
+- (void)setNaturalDisplayName:(NSString *)aString notify:(BOOL)flag; // The name from the filesystem or raw address of the URL.
+- (void)setCustomDisplayName:(NSString *)aString notify:(BOOL)flag; // A custom name, like a webpage title.
+- (void)updateNaturalDisplayName;
 
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
 - (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;

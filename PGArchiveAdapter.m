@@ -74,7 +74,7 @@ DEALINGS WITH THE SOFTWARE. */
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : @"'fldr'")] notify:NO];
-		[identifier setDisplayName:[subpath lastPathComponent] notify:NO];
+		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
 		if(isFile) [node loadIfNecessaryWithURLResponse:nil];

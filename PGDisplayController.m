@@ -133,11 +133,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (IBAction)changeOrientation:(id)sender
 {
-	[[self activeDocument] setOrientation:PGAddOrientation([[self activeDocument] baseOrientation], [sender tag])];
+	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], [sender tag])];
 }
 - (IBAction)revertOrientation:(id)sender
 {
-	[[self activeDocument] setOrientation:PGUpright];
+	[[self activeDocument] setBaseOrientation:PGUpright];
 }
 - (IBAction)performFindPanelAction:(id)sender
 {
@@ -875,7 +875,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case 3: o = PGRotated270CC; break;
 		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
 	}
-	[[self activeDocument] setOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
+	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
 #pragma mark NSServicesRequests Protocol

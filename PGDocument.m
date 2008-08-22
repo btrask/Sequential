@@ -213,11 +213,24 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	return _baseOrientation;
 }
-- (void)setOrientation:(PGOrientation)anOrientation
+- (void)setBaseOrientation:(PGOrientation)anOrientation
 {
 	if(anOrientation == _baseOrientation) return;
 	_baseOrientation = anOrientation;
 	[self AE_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
+}
+
+#pragma mark -
+
+- (BOOL)isProcessingNodes
+{
+	return _processingNodeCount > 0;
+}
+- (void)setProcessingNodes:(BOOL)flag
+{
+	NSParameterAssert(flag || _processingNodeCount);
+	_processingNodeCount += flag ? 1 : -1;
+	if(!_processingNodeCount && _sortedChildrenChanged) [self noteSortedChildrenDidChange];
 }
 
 #pragma mark -
@@ -236,6 +249,10 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 }
 - (void)noteSortedChildrenDidChange
 {
+	if([self isProcessingNodes]) {
+		_sortedChildrenChanged = YES;
+		return;
+	}
 	int const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];

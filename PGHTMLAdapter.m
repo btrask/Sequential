@@ -61,7 +61,7 @@ DEALINGS WITH THE SOFTWARE. */
         didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setDisplayName:[[frame dataSource] pageTitle] notify:YES];
+	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	DOMDocument *const doc = [frame DOMDocument];
 	NSMutableArray *const identifiers = [NSMutableArray array];
 	[doc AE_getLinkedResourceIdentifiers:identifiers validSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensions]];

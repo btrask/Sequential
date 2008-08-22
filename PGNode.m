@@ -52,6 +52,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 @interface PGNode (Private)
 
 - (void)_updateMenuItem;
+- (void)_updateFileAttributes;
 
 @end
 
@@ -272,49 +273,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (void)noteDateModifiedDidChange
-{
-	[_dateModified release];
-	_dateModified = [[[self dataSource] dateModifiedForNode:self] retain];
-	if(_dateModified) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) _dateModified = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileModificationDate] retain];
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
-	}
-	[self _updateMenuItem];
-}
-- (void)noteDateCreatedDidChange
-{
-	[_dateCreated release];
-	_dateCreated = [[[self dataSource] dateCreatedForNode:self] retain];
-	if(_dateCreated) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) _dateCreated = [[[[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO] fileCreationDate] retain];
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
-	}
-	[self _updateMenuItem];
-}
-- (void)noteDataLengthDidChange
-{
-	do {
-		[_dataLength release];
-		_dataLength = [[[self dataSource] dataLengthForNode:self] retain];
-		if(_dataLength) break;
-		NSData *data;
-		if([self canGetData] && [self getData:&data] == PGDataReturned) _dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
-		if(_dataLength) break;
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) {
-			NSDictionary *const attrs = [[NSFileManager defaultManager] fileAttributesAtPath:[[identifier URL] path] traverseLink:NO];
-			if(![NSFileTypeDirectory isEqualToString:[attrs fileType]]) _dataLength = [[attrs objectForKey:NSFileSize] retain]; // File size is meaningless for folders.
-		}
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
-	} while(NO);
-	[self _updateMenuItem];
-}
-
-#pragma mark -
-
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
@@ -338,6 +296,62 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(date && !info) info = [date AE_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
 	[_menuItem setAttributedTitle:label];
+}
+- (void)_updateFileAttributes
+{
+	BOOL menuNeedsUpdate = NO;
+	NSString *path = nil;
+	NSDictionary *attributes = nil;
+	NSDate *dateModified = [[self dataSource] dateModifiedForNode:self];
+	if(!dateModified) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if(path || [identifier isFileIdentifier]) {
+			if(!path) path = [[identifier URL] path];
+			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			dateModified = [attributes fileModificationDate];
+		}
+	}
+	if(_dateModified != dateModified && (!_dateModified || !dateModified || ![_dateModified isEqualToDate:dateModified])) {
+		[_dateModified release];
+		_dateModified = [dateModified retain];
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
+		menuNeedsUpdate = YES;
+	}
+	NSDate *dateCreated = [[self dataSource] dateCreatedForNode:self];
+	if(!dateCreated) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if(path || [identifier isFileIdentifier]) {
+			if(!path) path = [[identifier URL] path];
+			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			dateCreated = [attributes fileCreationDate];
+		}
+	}
+	if(_dateCreated != dateCreated && (!_dateCreated || !dateCreated || ![_dateCreated isEqualToDate:dateCreated])) {
+		[_dateCreated release];
+		_dateCreated = [dateCreated retain];
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
+		menuNeedsUpdate = YES;
+	}
+	NSNumber *dataLength = [[self dataSource] dataLengthForNode:self];
+	do {
+		if(dataLength) break;
+		NSData *data;
+		if([self canGetData] && [self getData:&data] == PGDataReturned) dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
+		if(dataLength) break;
+		PGResourceIdentifier *const identifier = [self identifier];
+		if(path || [identifier isFileIdentifier]) {
+			if(!path) path = [[identifier URL] path];
+			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			if(![NSFileTypeDirectory isEqualToString:[attributes fileType]]) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
+		}
+	} while(NO);
+	if(_dataLength != dataLength && (!_dataLength || !dataLength || ![_dataLength isEqualToNumber:dataLength])) {
+		[_dataLength release];
+		_dataLength = [dataLength retain];
+		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
+		menuNeedsUpdate = YES;
+	}
+	if(menuNeedsUpdate) [self _updateMenuItem];
 }
 
 #pragma mark PGResourceAdapting Proxy
@@ -375,9 +389,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		[_resourceAdapter readIfNecessary];
 		[pool release];
 	}
-	[self noteDateModifiedDidChange];
-	[self noteDateCreatedDidChange];
-	[self noteDataLengthDidChange];
+	[self _updateFileAttributes];
 	[self setDeterminingType:NO];
 }
 
@@ -423,10 +435,8 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	[self identifierDidChange:nil];
-	[self noteDateModifiedDidChange];
-	[self noteDateCreatedDidChange];
-	[self noteDataLengthDidChange];
+	[[self identifier] updateNaturalDisplayName];
+	[self _updateFileAttributes];
 	[_resourceAdapter noteFileEventDidOccurDirect:flag];
 }
 - (void)noteSortOrderDidChange

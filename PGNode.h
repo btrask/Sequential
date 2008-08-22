@@ -105,10 +105,6 @@ enum {
 - (BOOL)canBookmark;
 - (PGBookmark *)bookmark;
 
-- (void)noteDateModifiedDidChange;
-- (void)noteDateCreatedDidChange;
-- (void)noteDataLengthDidChange;
-
 - (void)identifierDidChange:(NSNotification *)aNotif;
 
 @end

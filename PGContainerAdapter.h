@@ -43,7 +43,7 @@ extern NSString *const PGMaxDepthKey;
 - (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
 - (void)removeChild:(PGNode *)child;
 
-- (PGNode *)childForURL:(NSURL *)aURL;
+- (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent;
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode;
 - (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel context:(id)context;
 /*

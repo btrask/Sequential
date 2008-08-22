@@ -86,11 +86,11 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
-- (PGNode *)childForURL:(NSURL *)aURL
+- (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent
 {
 	PGNode *child;
 	NSEnumerator *const childEnum = [_unsortedChildren objectEnumerator];
-	while((child = [childEnum nextObject])) if([aURL isEqual:[[child identifier] URL]]) return child;
+	while((child = [childEnum nextObject])) if([anIdent isEqual:[child identifier]]) return child;
 	return nil;
 }
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode

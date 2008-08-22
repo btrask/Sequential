@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 		result = [[PGResourceIdentifier resourceIdentifierWithAliasData:data length:length] retain];
 	}
 	[result setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-	[result setDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
+	[result setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	return result;
 }
 
@@ -73,7 +73,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
 	PGResourceIdentifier *const fileIdent = [docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]];
 	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"] notify:NO];
-	[fileIdent setDisplayName:[aCoder decodeObjectForKey:@"PageName"] notify:NO];
+	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"] notify:NO];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
 }
 

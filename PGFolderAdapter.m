@@ -26,6 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import <sys/event.h>
 
 // Models
+#import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
@@ -40,6 +41,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(!response);
 	NSParameterAssert([self shouldLoad]);
+	[[self document] setProcessingNodes:YES];
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
@@ -55,17 +57,19 @@ DEALINGS WITH THE SOFTWARE. */
 		if([ignoredPaths containsObject:pagePath]) continue;
 		NSURL *const pageURL = [pagePath AE_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
-		PGNode *node = [self childForURL:pageURL];
+		PGResourceIdentifier *const pageIdent = [pageURL AE_resourceIdentifier];
+		PGNode *node = [self childForIdentifier:pageIdent];
 		if(node) {
 			[oldPages removeObjectIdenticalTo:node];
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
-			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[pageURL AE_resourceIdentifier]] autorelease];
+			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
 			[node loadIfNecessaryWithURLResponse:nil];
 		}
 		if(node) [newPages addObject:node];
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
+	[[self document] setProcessingNodes:NO];
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {

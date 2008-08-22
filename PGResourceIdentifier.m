@@ -45,7 +45,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
-- (BOOL)getRef:(out FSRef *)outRef;
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag;
 
 @end
 
@@ -144,23 +144,42 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	_icon = [icon retain];
 	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
 }
+
+#pragma mark -
+
 - (NSString *)displayName
 {
-	if(_displayName) return [[_displayName retain] autorelease];
-	NSURL *const URL = [self URL];
-	if(!URL) return @"";
-	NSString *displayName = nil;
-	if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&displayName) == noErr && displayName) return [displayName autorelease];
-	NSString *const path = [URL path];
-	return [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
+	if(_customDisplayName) return [[_customDisplayName retain] autorelease];
+	if(!_naturalDisplayName) [self updateNaturalDisplayName];
+	if(_naturalDisplayName) return [[_naturalDisplayName retain] autorelease];
+	return @"";
 }
-- (void)setDisplayName:(NSString *)aString
+- (void)setNaturalDisplayName:(NSString *)aString
         notify:(BOOL)flag
 {
-	if(aString == _displayName) return;
-	[_displayName release];
-	_displayName = [aString isEqual:@""] ? nil : [aString copy];
+	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
+	[_naturalDisplayName release];
+	_naturalDisplayName = [aString copy];
+	if(flag && !_customDisplayName) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
+}
+- (void)setCustomDisplayName:(NSString *)aString
+        notify:(BOOL)flag
+{
+	if(aString == _customDisplayName || [aString isEqualToString:_customDisplayName]) return;
+	[_customDisplayName release];
+	_customDisplayName = [aString copy];
 	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
+}
+- (void)updateNaturalDisplayName
+{
+	if(_customDisplayName) return [self setNaturalDisplayName:nil notify:YES];
+	NSString *name = nil;
+	NSURL *const URL = [self URL];
+	if(URL) {
+		if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&name) == noErr && name) [name autorelease];
+		else name = [URL isFileURL] ? [[URL path] lastPathComponent] : [URL absoluteString];
+	}
+	[self setNaturalDisplayName:name notify:YES];
 }
 
 #pragma mark -
@@ -194,7 +213,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	}
 	if((self = [super init])) {
 		[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-		[self setDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
+		[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	}
 	return self;
 }
@@ -202,7 +221,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 {
 	[aCoder encodeObject:NSStringFromClass([self class]) forKey:@"ClassName"];
 	[aCoder encodeObject:_icon forKey:@"Icon"];
-	[aCoder encodeObject:_displayName forKey:@"DisplayName"];
+	[aCoder encodeObject:_customDisplayName forKey:@"DisplayName"];
 }
 
 #pragma mark NSKeyedArchiverObjectSubstitution Protocol
@@ -220,7 +239,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 }
 - (BOOL)isEqual:(id)obj
 {
-	return obj == self || ([obj isMemberOfClass:[self class]] && [[obj URL] isEqual:[self URL]]);
+	return obj == self || ([obj isKindOfClass:[self class]] && [[obj URL] isEqual:[self URL]]);
 }
 
 #pragma mark -
@@ -235,7 +254,8 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 - (void)dealloc
 {
 	[_icon release];
-	[_displayName release];
+	[_naturalDisplayName release];
+	[_customDisplayName release];
 	[super dealloc];
 }
 
@@ -271,9 +291,11 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	return self;
 }
 - (BOOL)getRef:(out FSRef *)outRef
+        byFollowingAliases:(BOOL)flag
 {
-	Boolean dontCare;
-	return FSResolveAliasWithMountFlags(NULL, _alias, outRef, &dontCare, kResolveAliasFileNoUI) == noErr;
+	Boolean dontCare1, dontCare2;
+	if(FSResolveAliasWithMountFlags(NULL, _alias, outRef, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
+	return flag ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
 
 #pragma mark NSCoding Protocol
@@ -305,9 +327,9 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 - (BOOL)isEqual:(id)obj
 {
 	if(obj == self) return YES;
-	if(![obj isMemberOfClass:[self class]]) return NO;
+	if(![obj isKindOfClass:[PGAliasIdentifier class]]) return [super isEqual:obj];
 	FSRef ourRef, theirRef;
-	if(![self getRef:&ourRef] || ![obj getRef:&theirRef]) return NO;
+	if(![self getRef:&ourRef byFollowingAliases:NO] || ![obj getRef:&theirRef byFollowingAliases:NO]) return NO;
 	return FSCompareFSRefs(&ourRef, &theirRef) == noErr;
 }
 
@@ -316,9 +338,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 - (NSURL *)URLByFollowingAliases:(BOOL)flag
 {
 	FSRef ref;
-	Boolean dontCare1, dontCare2;
-	if(FSResolveAliasWithMountFlags(NULL, _alias, &ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return nil;
-	if(flag && FSResolveAliasFileWithMountFlags(&ref, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) != noErr) return nil;
+	if(![self getRef:&ref byFollowingAliases:flag]) return nil;
 	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
 }
 - (BOOL)hasTarget
@@ -432,7 +452,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 }
 - (BOOL)isEqual:(id)obj
 {
-	return obj == self || ([obj isMemberOfClass:[self class]] && [(PGIndexIdentifier *)obj index] == [self index] && [[self superidentifier] isEqual:[obj superidentifier]]);
+	return obj == self || ([obj isKindOfClass:[self class]] && [(PGIndexIdentifier *)obj index] == [self index] && [[self superidentifier] isEqual:[obj superidentifier]]);
 }
 
 #pragma mark -

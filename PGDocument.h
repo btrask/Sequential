@@ -53,14 +53,19 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 	PGNode               *_node;
 	PGSubscription       *_subscription;
 	NSMutableArray       *_cachedNodes;
+
 	PGNode               *_storedNode;
 	NSPoint               _storedCenter;
 	NSString             *_storedQuery;
 	NSRect                _storedFrame;
+
 	PGResourceIdentifier *_initialIdentifier;
 	PGDisplayController  *_displayController;
 	NSMenu               *_pageMenu;
 	PGOrientation         _baseOrientation;
+
+	unsigned              _processingNodeCount;
+	BOOL                  _sortedChildrenChanged;
 }
 
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident;
@@ -89,7 +94,10 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (NSMenu *)pageMenu;
 
 - (PGOrientation)baseOrientation;
-- (void)setOrientation:(PGOrientation)anOrientation;
+- (void)setBaseOrientation:(PGOrientation)anOrientation;
+
+- (BOOL)isProcessingNodes;
+- (void)setProcessingNodes:(BOOL)flag; // Batch changes for performance.
 
 - (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray;
 - (void)noteSortedChildrenDidChange;
