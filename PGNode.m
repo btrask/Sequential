@@ -207,6 +207,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(!flag) NSParameterAssert(_determiningTypeCount);
 	_determiningTypeCount += flag ? 1 : -1;
 	[self noteIsViewableDidChange];
+	[self readIfNecessary];
 }
 - (void)becomeViewed
 {
@@ -218,7 +219,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	_lastPassword = [pass copy];
 	if(_shouldRead) return;
 	_shouldRead = YES;
-	[_resourceAdapter read];
+	[self readIfNecessary];
 }
 
 #pragma mark -
@@ -418,7 +419,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 - (void)readIfNecessary
 {
-	if(_shouldRead) [_resourceAdapter read];
+	if(_shouldRead && !_determiningTypeCount) [_resourceAdapter read];
 }
 - (void)readReturnedImageRep:(NSImageRep *)aRep
         error:(NSError *)error
