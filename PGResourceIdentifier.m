@@ -177,7 +177,10 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	NSURL *const URL = [self URL];
 	if(URL) {
 		if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&name) == noErr && name) [name autorelease];
-		else name = [URL isFileURL] ? [[URL path] lastPathComponent] : [URL absoluteString];
+		else {
+			NSString *const path = [URL path];
+			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
+		}
 	}
 	[self setNaturalDisplayName:name notify:YES];
 }
