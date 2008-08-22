@@ -86,7 +86,6 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (PGDisplayController *)displayController;
 - (void)setDisplayController:(PGDisplayController *)controller;
 
-- (NSString *)displayName;
 - (void)createUI;
 - (void)close;
 

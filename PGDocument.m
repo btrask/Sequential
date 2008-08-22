@@ -179,10 +179,6 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 #pragma mark -
 
-- (NSString *)displayName
-{
-	return [[self identifier] displayName];
-}
 - (void)createUI
 {
 	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];

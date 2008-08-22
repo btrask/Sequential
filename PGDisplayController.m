@@ -970,9 +970,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	NSString *const path = [identifier isFileIdentifier] ? [[identifier URL] path] : nil;
 	[[self window] setRepresentedFilename:(path ? path : @"")];
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	NSString *const title = count ? [NSString stringWithFormat:@"%@ (%u/%u)", [identifier displayName], _displayImageIndex + 1, count] : [identifier displayName];
-	[[self window] setTitle:(title ? title : @"")];
-	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:[identifier attributedStringWithWithAncestory:NO]];
+	NSString *const title = [identifier displayName];
+	NSString *const titleDetails = count ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
+	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
+	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
+	[[menuLabel mutableString] appendString:titleDetails];
+	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:menuLabel];
 }
 - (void)close
 {
