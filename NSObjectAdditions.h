@@ -24,10 +24,10 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+#define PGCommonRunLoopsMode (NSString *)kCFRunLoopCommonModes
+
 extern BOOL PGIsLeopardOrLater(void);
 extern BOOL PGIsTigerOrLater(void);
-
-#define PGCommonRunLoopsMode (NSString *)kCFRunLoopCommonModes
 
 @interface NSObject (AEAdditions)
 
@@ -37,8 +37,6 @@ extern BOOL PGIsTigerOrLater(void);
 - (void)AE_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName;
 - (void)AE_removeObserver;
 - (void)AE_removeObserver:(id)observer name:(NSString *)aName;
-
-- (void)AE_performSelector:(SEL)aSelector withObject:(id)anArgument afterDelay:(NSTimeInterval)delay; // Uses PGCommonRunLoopsMode.
 
 @end
 

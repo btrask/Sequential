@@ -350,9 +350,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
 	_initialLocation = location;
-	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(showLoadingIndicator) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
-	[[self PG_nonretainedObjectProxy] AE_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5];
+	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5 retain:NO];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
@@ -499,7 +499,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 		[[self window] makeFirstResponder:clipView];
 	}
-	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(showLoadingIndicator) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	[(PGAlertView *)[_graphicPanel contentView] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
@@ -1007,7 +1007,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy]];
+	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
 	[imageView unbind:@"animates"];
 	[imageView unbind:@"antialiasWhenUpscaling"];

@@ -87,7 +87,7 @@ NSTimeInterval PGUptime(void)
 }
 float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate)
 {
-	NSParameterAssert(timeOfFrame);
+	NSCParameterAssert(timeOfFrame);
 	NSTimeInterval const currentTime = PGUptime();
 	float const speedup = *timeOfFrame ? desiredFramerate / (currentTime - *timeOfFrame) : 1;
 	*timeOfFrame = currentTime;

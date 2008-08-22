@@ -263,7 +263,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	[self stopAnimatedScrolling];
 	int const dragMask = flag ? NSRightMouseDraggedMask : NSLeftMouseDraggedMask;
 	NSEventType const stopType = flag ? NSRightMouseUp : NSLeftMouseUp;
-	[self performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode]];
+	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO];
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
 	NSPoint const dragPoint = PGOffsetPoint(originalPoint, NSMakeSize([self position].x, [self position].y));
@@ -276,13 +276,13 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 				[NSCursor hide];
 				CGAssociateMouseAndMouseCursorPosition(false); // Prevents the cursor from being moved over the dock, which makes it reappear when it shouldn't.
 			} else [[NSCursor closedHandCursor] push];
-			[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_beginPreliminaryDrag) object:nil];
+			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 		}
 		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) allowAnimation:NO];
 		else [self scrollTo:PGOffsetPoint(dragPoint, NSMakeSize(-[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y)) allowAnimation:NO];
 		finalPoint = PGPointInRect(PGOffsetPoint(finalPoint, NSMakeSize([latestEvent deltaX], -[latestEvent deltaY])), availableDragRect);
 	}
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_beginPreliminaryDrag) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 	if(PGNotDragging != _dragMode) {
 		[PGPointingHandCursor() set];

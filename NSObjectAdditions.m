@@ -65,15 +65,6 @@ BOOL PGIsTigerOrLater(void)
 	[[NSNotificationCenter defaultCenter] removeObserver:observer name:aName object:self];
 }
 
-#pragma mark -
-
-- (void)AE_performSelector:(SEL)aSelector
-        withObject:(id)anArgument
-	afterDelay:(NSTimeInterval)delay
-{
-	[self performSelector:aSelector withObject:anArgument afterDelay:delay inModes:[NSArray arrayWithObject:PGCommonRunLoopsMode]];
-}
-
 #pragma mark NSMenuValidation Protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem

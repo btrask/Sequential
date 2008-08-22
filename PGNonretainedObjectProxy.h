@@ -24,7 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-@interface PGNonretainedObjectProxy : NSObject // Must be an NSObject because it must implement our categories on NSObject.
+@interface PGNonretainedObjectProxy : NSObject // Only objects support NSDelayedPerforming.
 {
 	@private
 	id _target;
@@ -38,5 +38,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)PG_nonretainedObjectProxy;
 - (id)PG_nonretainedObjectValue;
+
+- (void)PG_performSelector:(SEL)aSel withObject:(id)anObject afterDelay:(NSTimeInterval)interval retain:(BOOL)flag;
+- (void)PG_performSelector:(SEL)aSel withObject:(id)anObject afterDelay:(NSTimeInterval)interval inModes:(NSArray *)runLoopModes retain:(BOOL)flag;
+
+- (void)PG_cancelPreviousPerformRequests;
+- (void)PG_cancelPreviousPerformRequestsWithSelector:(SEL)aSel object:(id)anObject;
 
 @end

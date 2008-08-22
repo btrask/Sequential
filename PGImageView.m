@@ -255,8 +255,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)_runAnimationTimer
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(_animate) object:nil];
-	if([self canAnimateRep] && _animates && !_pauseCount) [[self PG_nonretainedObjectProxy] AE_performSelector:@selector(_animate) withObject:nil afterDelay:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue]];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
+	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil afterDelay:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] retain:NO];
 }
 - (void)_animate
 {
@@ -273,7 +273,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_cache
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:@selector(_cache) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
 	if(!_cache || !_rep || _isPDF || [self canAnimateRep]) return;
 	if(_cacheIsValid) {
 		_cacheIsValid = NO;
@@ -299,7 +299,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 
-	if(![view lockFocusIfCanDraw]) return [[self PG_nonretainedObjectProxy] AE_performSelector:@selector(_cache) withObject:nil afterDelay:0];
+	if(![view lockFocusIfCanDraw]) return [self PG_performSelector:@selector(_cache) withObject:nil afterDelay:0 retain:NO];
 	NSRect const cacheRect = [_cache rect];
 	[self _drawInRect:cacheRect];
 	[self _drawCornersOnRect:cacheRect];
@@ -474,6 +474,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)dealloc
 {
+	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
 	[self stopAnimatedSizeTransition];
 	[self unbind:@"animates"];

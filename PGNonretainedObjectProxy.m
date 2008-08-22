@@ -24,6 +24,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGNonretainedObjectProxy.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 @implementation PGNonretainedObjectProxy
 
 #pragma mark Instance Methods
@@ -97,6 +100,38 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)PG_nonretainedObjectValue
 {
 	return self;
+}
+
+#pragma mark -
+
+- (void)PG_performSelector:(SEL)aSel
+        withObject:(id)anObject
+        afterDelay:(NSTimeInterval)interval
+        retain:(BOOL)flag
+{
+	[self PG_performSelector:aSel withObject:anObject afterDelay:interval inModes:[NSArray arrayWithObject:PGCommonRunLoopsMode] retain:flag];
+}
+- (void)PG_performSelector:(SEL)aSel
+        withObject:(id)anObject
+        afterDelay:(NSTimeInterval)interval
+        inModes:(NSArray *)runLoopModes
+        retain:(BOOL)flag
+{
+	[(flag ? self : [self PG_nonretainedObjectProxy]) performSelector:aSel withObject:anObject afterDelay:interval inModes:runLoopModes];
+}
+
+#pragma mark -
+
+- (void)PG_cancelPreviousPerformRequests
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy]];
+}
+- (void)PG_cancelPreviousPerformRequestsWithSelector:(SEL)aSel
+        object:(id)anObject
+{
+	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:aSel object:anObject];
+	[NSObject cancelPreviousPerformRequestsWithTarget:[self PG_nonretainedObjectProxy] selector:aSel object:anObject];
 }
 
 @end

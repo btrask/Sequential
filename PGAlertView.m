@@ -27,6 +27,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 #import "PGBezelPanel.h"
 
+// Other
+#import "PGNonretainedObjectProxy.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 
@@ -61,13 +64,13 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 	NSParameterAssert(aGraphic);
 	unsigned const i = [_graphicStack indexOfObject:aGraphic];
 	if(0 == i) {
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_delayed_popGraphic:) object:[NSValue valueWithNonretainedObject:_currentGraphic]];
+		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayed_popGraphic:) object:[NSValue valueWithNonretainedObject:_currentGraphic]];
 	} else {
 		[_graphicStack insertObject:aGraphic atIndex:0];
 		[self _updateCurrentGraphic];
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
-	if(fadeOutDelay) [self AE_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay];
+	if(fadeOutDelay) [self PG_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay retain:NO];
 	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
@@ -180,7 +183,7 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 
 - (void)dealloc
 {
-	[NSObject cancelPreviousPerformRequestsWithTarget:self];
+	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
 	[_graphicStack release];
 	[_currentGraphic release];

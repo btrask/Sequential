@@ -32,6 +32,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDocumentController.h"
 #import "PGPrefController.h"
 
+// Other
+#import "PGNonretainedObjectProxy.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSScreenAdditions.h"
@@ -101,12 +104,12 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
 {
-	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self AE_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0 retain:NO]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
 	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_hideMenuBar) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
 	SetSystemUIMode(kUIModeNormal, kNilOptions);
 }
 
@@ -193,6 +196,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)dealloc
 {
+	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
 	[super dealloc];
 }
