@@ -170,7 +170,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (void)setCurrentDocument:(PGDocument *)document;
 
 - (NSArray *)documentTypeDictionaries;
-- (NSArray *)supportedExtensions;
+- (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
 - (NSDictionary *)documentTypeDictionaryWhereAttribute:(NSString *)key matches:(id)value; // First tries -containsObject:, then -isEqual:. Returns the first applicable type. If 'key' is nil, returns the first type. If 'value' is nil, returns nil.
 - (Class)resourceAdapterClassWhereAttribute:(NSString *)key matches:(id)value;
 - (Class)resourceAdapterClassForExtension:(NSString *)ext;

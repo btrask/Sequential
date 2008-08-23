@@ -185,7 +185,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[openPanel setAllowsMultipleSelection:YES];
 	NSURL *const URL = [[[self currentDocument] identifier] URL];
 	NSString *const path = [URL isFileURL] ? [URL path] : nil;
-	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[self supportedExtensions]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
+	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[self supportedExtensionsWhichMustAlwaysLoad:NO]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
 }
 - (IBAction)openURL:(id)sender
 {
@@ -410,12 +410,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:PGCFBundleDocumentTypesKey];
 }
-- (NSArray *)supportedExtensions
+- (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag
 {
 	NSMutableArray *const exts = [NSMutableArray array];
 	NSDictionary *typeDict;
 	NSEnumerator *const typeDictEnum = [[self documentTypeDictionaries] objectEnumerator];
 	while((typeDict = [typeDictEnum nextObject])) {
+		id const adapterClass = NSClassFromString([typeDict objectForKey:PGAdapterClassKey]);
+		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
 		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
 		NSArray *const OSTypes = [typeDict objectForKey:PGCFBundleTypeOSTypesKey];
 		if(!OSTypes || ![OSTypes count]) continue;

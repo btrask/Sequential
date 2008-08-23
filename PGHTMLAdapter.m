@@ -64,7 +64,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	DOMDocument *const doc = [frame DOMDocument];
 	NSMutableArray *const identifiers = [NSMutableArray array];
-	[doc AE_getLinkedResourceIdentifiers:identifiers validSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensions]];
+	[doc AE_getLinkedResourceIdentifiers:identifiers validSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];
 	if(![identifiers count]) [doc AE_getEmbeddedImageIdentifiers:identifiers];
 	if([identifiers count]) {
 		NSMutableArray *const pages = [NSMutableArray array];
