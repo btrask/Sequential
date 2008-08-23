@@ -130,7 +130,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (float)averageScaleFactor
 {
-	return (PGRotated90CC && _orientation ? [self size].height / [_rep pixelsWide] + [self size].width / [_rep pixelsHigh] : [self size].width / [_rep pixelsWide] + [self size].height / [_rep pixelsHigh]) / 2.0;
+	return (PGRotated90CC & _orientation ? [self size].height / [_rep pixelsWide] + [self size].width / [_rep pixelsHigh] : [self size].width / [_rep pixelsWide] + [self size].height / [_rep pixelsHigh]) / 2.0;
 }
 
 #pragma mark -
