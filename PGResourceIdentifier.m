@@ -165,9 +165,10 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 - (void)setCustomDisplayName:(NSString *)aString
         notify:(BOOL)flag
 {
-	if(aString == _customDisplayName || [aString isEqualToString:_customDisplayName]) return;
+	NSString *const string = [@"" isEqualToString:aString] ? nil : aString;
+	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
 	[_customDisplayName release];
-	_customDisplayName = [aString copy];
+	_customDisplayName = [string copy];
 	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
 }
 - (void)updateNaturalDisplayName
