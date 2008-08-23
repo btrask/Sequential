@@ -12,6 +12,8 @@ New in 2.0.1
 - Fixes a bug that could cause some URLs to never finish loading.
 - Fixes a bug that prevented the "round image corners" option from staying off.
 - Fixes a bug where correct date or size information wouldn't show up in the Page menu.
+- Better performance when deleting files or noticing folders update.
+- Other minor improvements.
 
 A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
 
