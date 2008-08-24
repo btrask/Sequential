@@ -46,7 +46,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	if(!_shouldZoomOnNextImageLoad) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
+	if(_shouldSaveFrame) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
 }
 - (void)windowDidMove:(NSNotification *)notification
 {
@@ -87,8 +87,14 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 {
 	[super nodeReadyForViewing:aNotif];
 	if(!_shouldZoomOnNextImageLoad) return;
+	if([[NSUserDefaults standardUserDefaults] boolForKey:PGOnlyAutozoomsSingleImagesKey] && [[[self activeDocument] node] viewableNodeCount] != 1) {
+		_shouldZoomOnNextImageLoad = NO;
+		return;
+	}
 	if(![[aNotif userInfo] objectForKey:PGImageRepKey]) return;
+	_shouldSaveFrame = NO;
 	[[self window] setFrame:[[self window] PG_zoomedFrame] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
+	_shouldSaveFrame = YES;
 	[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 	_shouldZoomOnNextImageLoad = NO;
 }
@@ -105,7 +111,8 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 		[window setFrame:NSMakeRect(0, 0, 500, 500) display:NO];
 		[window center];
 	}
-	_shouldZoomOnNextImageLoad = [[[NSUserDefaults standardUserDefaults] objectForKey:PGAutozoomsWindowsKey] boolValue];
+	_shouldZoomOnNextImageLoad = [[NSUserDefaults standardUserDefaults] boolForKey:PGAutozoomsWindowsKey];
+	_shouldSaveFrame = YES;
 }
 
 @end

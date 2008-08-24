@@ -60,13 +60,14 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGLSTypeIsPackageKey        = @"LSTypeIsPackage";
 NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
 
-NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
-NSString *const PGAnimatesImagesKey         = @"PGAnimatesImages";
-NSString *const PGRoundsImageCornersKey     = @"PGRoundsImageCorners";
-NSString *const PGAutozoomsWindowsKey       = @"PGAutozoomsWindows";
-NSString *const PGBackgroundColorKey        = @"PGBackgroundColor";
-NSString *const PGBackgroundPatternKey      = @"PGBackgroundPattern";
-NSString *const PGMouseClickActionKey       = @"PGMouseClickAction";
+NSString *const PGAntialiasWhenUpscalingKey    = @"PGAntialiasWhenUpscaling";
+NSString *const PGAnimatesImagesKey            = @"PGAnimatesImages";
+NSString *const PGRoundsImageCornersKey        = @"PGRoundsImageCorners";
+NSString *const PGAutozoomsWindowsKey          = @"PGAutozoomsWindows";
+NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
+NSString *const PGBackgroundColorKey           = @"PGBackgroundColor";
+NSString *const PGBackgroundPatternKey         = @"PGBackgroundPattern";
+NSString *const PGMouseClickActionKey          = @"PGMouseClickAction";
 
 static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
 static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
@@ -128,16 +129,18 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[PGWindow poseAsClass:[NSWindow class]];
 	[PGView poseAsClass:[NSView class]];
 	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
+	NSNumber *const yes = [NSNumber numberWithBool:YES], *no = [NSNumber numberWithBool:NO];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithBool:YES], PGAntialiasWhenUpscalingKey,
-		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
-		[NSNumber numberWithBool:YES], PGRoundsImageCornersKey,
-		[NSNumber numberWithBool:YES], PGAutozoomsWindowsKey,
+		yes, PGAntialiasWhenUpscalingKey,
+		yes, PGAnimatesImagesKey,
+		yes, PGRoundsImageCornersKey,
+		yes, PGAutozoomsWindowsKey,
+		yes, PGOnlyAutozoomsSingleImagesKey,
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
 		[NSNumber numberWithInt:PGNextPreviousAction], PGMouseClickActionKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
-		[NSNumber numberWithBool:NO], PGFullscreenKey,
+		no, PGFullscreenKey,
 		nil]];
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l);

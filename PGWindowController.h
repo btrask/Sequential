@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	@private
 	BOOL _shouldZoomOnNextImageLoad;
+	BOOL _shouldSaveFrame;
 }
 
 @end
