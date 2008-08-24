@@ -9,6 +9,7 @@ Sequential has mature full screen support and can display images' Exif data.
 
 New in 2.0.1
 - Animates changes to the current image scale.
+- Adds a "grow window" command.
 - Fixes a bug that could cause some URLs to never finish loading.
 - Fixes a bug that prevented the "round image corners" option from staying off.
 - Fixes a bug where correct date or size information wouldn't show up in the Page menu.
