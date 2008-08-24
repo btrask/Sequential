@@ -38,7 +38,10 @@ DEALINGS WITH THE SOFTWARE. */
 	NSRect z = [[self delegate] respondsToSelector:@selector(windowWillUseStandardFrame:defaultFrame:)] ? [[self delegate] windowWillUseStandardFrame:self defaultFrame:s] : s;
 	NSRect const f = [self frame];
 	if(NSWidth(z) < NSWidth(f)) z.size.width = NSWidth(f);
-	if(NSHeight(z) < NSHeight(f)) z.size.height = NSHeight(f);
+	if(NSHeight(z) < NSHeight(f)) {
+		z.origin.y -= NSHeight(f) - NSHeight(z);
+		z.size.height = NSHeight(f);
+	}
 	[self setFrame:[self PG_constrainedFrameRect:z] display:YES];
 }
 
