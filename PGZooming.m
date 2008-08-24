@@ -29,6 +29,21 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSWindow (PGZooming)
 
+#pragma mark Instance Methods
+
+- (IBAction)PG_grow:(id)sender
+{
+	if(!([self styleMask] & NSResizableWindowMask)) return;
+	NSRect const s = [[self screen] visibleFrame];
+	NSRect z = [[self delegate] respondsToSelector:@selector(windowWillUseStandardFrame:defaultFrame:)] ? [[self delegate] windowWillUseStandardFrame:self defaultFrame:s] : s;
+	NSRect const f = [self frame];
+	if(NSWidth(z) < NSWidth(f)) z.size.width = NSWidth(f);
+	if(NSHeight(z) < NSHeight(f)) z.size.height = NSHeight(f);
+	[self setFrame:[self PG_constrainedFrameRect:z] display:YES];
+}
+
+#pragma mark -
+
 - (NSRect)PG_zoomedFrame
 {
 	NSRect f = [self contentRectForFrameRect:[self frame]];

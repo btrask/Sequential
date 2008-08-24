@@ -71,6 +71,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
 				<key>changeOrientation</key>
 				<string>id</string>
 				<key>changeTimerInterval</key>
@@ -301,6 +303,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
 				<key>performWindowClose</key>
 				<string>id</string>
 			</dict>

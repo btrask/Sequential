@@ -26,6 +26,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSWindow (PGZooming)
 
+- (IBAction)PG_grow:(id)sender; // Like zooming, but never makes the window smaller and has no concept of "user state". Due to shortcomings in Objective-C and Cocoa, we validate this method in PGWindow (in PGDocumentController.h).
+
 - (NSRect)PG_zoomedFrame;
 - (NSRect)PG_constrainedFrameRect:(NSRect)aRect;
 

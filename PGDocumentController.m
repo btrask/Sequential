@@ -895,6 +895,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super keyDown:anEvent];
 }
 
+// Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
+{
+	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask);
+	return [super validateMenuItem:anItem];
+}
+
 @end
 
 @implementation PGView
