@@ -179,6 +179,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)open:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	NSOpenPanel *const openPanel = [NSOpenPanel openPanel];
 	[openPanel setCanChooseDirectories:YES];
 	[openPanel setCanChooseFiles:YES];
@@ -189,6 +190,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)openURL:(id)sender
 {
+	[NSApp activateIgnoringOtherApps:YES];
 	NSURL *const URL = [(PGURLAlert *)[[[PGURLAlert alloc] init] autorelease] runModal];
 	if(URL) [self openDocumentWithContentsOfURL:URL display:YES];
 }
