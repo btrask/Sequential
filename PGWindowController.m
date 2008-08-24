@@ -46,7 +46,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 - (void)windowDidResize:(NSNotification *)notification
 {
-	[[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
+	if(!_shouldZoomOnNextImageLoad) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
 }
 - (void)windowDidMove:(NSNotification *)notification
 {
@@ -88,9 +88,9 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	[super nodeReadyForViewing:aNotif];
 	if(!_shouldZoomOnNextImageLoad) return;
 	if(![[aNotif userInfo] objectForKey:PGImageRepKey]) return;
-	_shouldZoomOnNextImageLoad = NO;
 	[[self window] setFrame:[[self window] PG_zoomedFrame] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
 	[clipView scrollToLocation:_initialLocation allowAnimation:NO];
+	_shouldZoomOnNextImageLoad = NO;
 }
 
 #pragma mark NSWindowController
