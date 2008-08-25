@@ -109,6 +109,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapting Protocol
 
+- (PGNode *)parentNode
+{
+	return [[self parentAdapter] node];
+}
 - (PGContainerAdapter *)parentAdapter
 {
 	return [_node parentAdapter];
@@ -117,6 +121,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [self parentAdapter];
 }
+- (PGNode *)rootNode
+{
+	return [[self node] rootNode];
+}
 - (PGContainerAdapter *)rootContainerAdapter
 {
 	return [[self parentAdapter] rootContainerAdapter];
@@ -124,14 +132,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGDocument *)document
 {
 	return [_node document];
-}
-- (PGNode *)parentNode
-{
-	return [[self parentAdapter] node];
-}
-- (PGNode *)rootNode
-{
-	return [[self node] rootNode];
 }
 
 #pragma mark -

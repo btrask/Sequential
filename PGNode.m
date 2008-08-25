@@ -483,6 +483,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[_resourceAdapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
 	[_data release];
 	[_identifier release];
 	[_menuItem release];
