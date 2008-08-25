@@ -168,7 +168,7 @@
 		1B5A80B50A27AA9900B189EB /* XADArchive.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = XADArchive.m; sourceTree = "<group>"; };
 		32DBCF5E0370ADEE00C91783 /* XADMaster_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XADMaster_Prefix.pch; sourceTree = "<group>"; };
 		56FBC8DC0A57531D00BE98CF /* UniversalDetector.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UniversalDetector.xcodeproj; path = ../../../UniversalDetector/UniversalDetector.xcodeproj; sourceTree = SOURCE_ROOT; };
-		56FBC92B0A57541300BE98CF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
+		56FBC92B0A57541300BE98CF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		8DC2EF5B0486A6940098B216 /* XADMaster.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = XADMaster.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 

@@ -24,7 +24,7 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-/* Copyright © 2007-2008 Ben Trask. All rights reserved.
+/* Copyright © 2007-2008 The Sequential Project. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -37,9 +37,9 @@ Software is furnished to do so, subject to the following conditions:
 2. Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimers in the
    documentation and/or other materials provided with the distribution.
-3. The names of its contributors may not be used to endorse or promote
-   products derived from this Software without specific prior written
-   permission.
+3. Neither the name of The Sequential Project nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this Software without specific prior written permission.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
