@@ -71,6 +71,79 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
+				<key>changeOrientation</key>
+				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
+				<key>extractImages</key>
+				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
+				<string>id</string>
+				<key>firstPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
+				<string>id</string>
+				<key>lastPage</key>
+				<string>id</string>
+				<key>moveToTrash</key>
+				<string>id</string>
+				<key>nextPage</key>
+				<string>id</string>
+				<key>nextTab</key>
+				<string>id</string>
+				<key>openURL</key>
+				<string>id</string>
+				<key>pauseAndCloseDocument</key>
+				<string>id</string>
+				<key>pauseDocument</key>
+				<string>id</string>
+				<key>previousPage</key>
+				<string>id</string>
+				<key>previousTab</key>
+				<string>id</string>
+				<key>revealInBrowser</key>
+				<string>id</string>
+				<key>revealInFinder</key>
+				<string>id</string>
+				<key>revealInPathFinder</key>
+				<string>id</string>
+				<key>revertOrientation</key>
+				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
+				<string>id</string>
+				<key>toggleFullscreen</key>
+				<string>id</string>
+				<key>toggleOnScreenDisplay</key>
+				<string>id</string>
+				<key>toggleTracksImageScalingMode</key>
+				<string>id</string>
+				<key>toggleTracksReadingDirection</key>
+				<string>id</string>
+				<key>toggleTracksSortDescriptor</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
 				<key>changeOrientation</key>
 				<string>id</string>
 				<key>chooseEncoding</key>
@@ -184,79 +257,6 @@
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>PG_grow</key>
-				<string>id</string>
-				<key>changeOrientation</key>
-				<string>id</string>
-				<key>changeTimerInterval</key>
-				<string>id</string>
-				<key>extractImages</key>
-				<string>id</string>
-				<key>firstOfFolder</key>
-				<string>id</string>
-				<key>firstOfNextFolder</key>
-				<string>id</string>
-				<key>firstOfPreviousFolder</key>
-				<string>id</string>
-				<key>firstPage</key>
-				<string>id</string>
-				<key>lastOfFolder</key>
-				<string>id</string>
-				<key>lastPage</key>
-				<string>id</string>
-				<key>moveToTrash</key>
-				<string>id</string>
-				<key>nextPage</key>
-				<string>id</string>
-				<key>nextTab</key>
-				<string>id</string>
-				<key>openURL</key>
-				<string>id</string>
-				<key>pauseAndCloseDocument</key>
-				<string>id</string>
-				<key>pauseDocument</key>
-				<string>id</string>
-				<key>previousPage</key>
-				<string>id</string>
-				<key>previousTab</key>
-				<string>id</string>
-				<key>revealInBrowser</key>
-				<string>id</string>
-				<key>revealInFinder</key>
-				<string>id</string>
-				<key>revealInPathFinder</key>
-				<string>id</string>
-				<key>revertOrientation</key>
-				<string>id</string>
-				<key>skipBeforeFolder</key>
-				<string>id</string>
-				<key>skipPastFolder</key>
-				<string>id</string>
-				<key>toggleFullscreen</key>
-				<string>id</string>
-				<key>toggleOnScreenDisplay</key>
-				<string>id</string>
-				<key>toggleTracksImageScalingMode</key>
-				<string>id</string>
-				<key>toggleTracksReadingDirection</key>
-				<string>id</string>
-				<key>toggleTracksSortDescriptor</key>
-				<string>id</string>
-				<key>zoomIn</key>
-				<string>id</string>
-				<key>zoomOut</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -377,6 +377,8 @@
 				<string>id</string>
 				<key>open</key>
 				<string>id</string>
+				<key>openDocument</key>
+				<string>id</string>
 				<key>openRecentDocument</key>
 				<string>id</string>
 				<key>openURL</key>
@@ -408,6 +410,10 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
+				<key>checkerboardBackground</key>
+				<string>NSButton</string>
+				<key>colorPanelAccessory</key>
+				<string>NSView</string>
 				<key>defaultPageMenu</key>
 				<string>NSMenu</string>
 				<key>firstPage</key>
@@ -444,6 +450,8 @@
 				<string>NSMenuItem</string>
 				<key>rotate90CC</key>
 				<string>NSMenuItem</string>
+				<key>screenMenu</key>
+				<string>NSMenu</string>
 				<key>selectNextDocument</key>
 				<string>NSMenuItem</string>
 				<key>selectPreviousDocument</key>
@@ -451,6 +459,14 @@
 				<key>switchToFinder</key>
 				<string>NSMenuItem</string>
 				<key>switchToPathFinder</key>
+				<string>NSMenuItem</string>
+				<key>tabsMenu</key>
+				<string>NSMenu</string>
+				<key>tabsMenuItem</key>
+				<string>NSMenuItem</string>
+				<key>tabsSeparator</key>
+				<string>NSMenuItem</string>
+				<key>toggleExif</key>
 				<string>NSMenuItem</string>
 				<key>toggleFullscreen</key>
 				<string>NSMenuItem</string>

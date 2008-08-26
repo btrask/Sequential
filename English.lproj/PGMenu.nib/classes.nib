@@ -377,8 +377,6 @@
 				<string>id</string>
 				<key>open</key>
 				<string>id</string>
-				<key>openDocument</key>
-				<string>id</string>
 				<key>openRecentDocument</key>
 				<string>id</string>
 				<key>openURL</key>
@@ -410,10 +408,6 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>checkerboardBackground</key>
-				<string>NSButton</string>
-				<key>colorPanelAccessory</key>
-				<string>NSView</string>
 				<key>defaultPageMenu</key>
 				<string>NSMenu</string>
 				<key>firstPage</key>
@@ -450,8 +444,6 @@
 				<string>NSMenuItem</string>
 				<key>rotate90CC</key>
 				<string>NSMenuItem</string>
-				<key>screenMenu</key>
-				<string>NSMenu</string>
 				<key>selectNextDocument</key>
 				<string>NSMenuItem</string>
 				<key>selectPreviousDocument</key>
@@ -459,14 +451,6 @@
 				<key>switchToFinder</key>
 				<string>NSMenuItem</string>
 				<key>switchToPathFinder</key>
-				<string>NSMenuItem</string>
-				<key>tabsMenu</key>
-				<string>NSMenu</string>
-				<key>tabsMenuItem</key>
-				<string>NSMenuItem</string>
-				<key>tabsSeparator</key>
-				<string>NSMenuItem</string>
-				<key>toggleExif</key>
 				<string>NSMenuItem</string>
 				<key>toggleFullscreen</key>
 				<string>NSMenuItem</string>

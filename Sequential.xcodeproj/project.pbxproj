@@ -451,6 +451,18 @@
 		0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLegacy.m; sourceTree = "<group>"; };
 		0EE7617F0DDB7F8A00ED8ABB /* NSURLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSURLAdditions.h; sourceTree = "<group>"; };
 		0EE761800DDB7F8A00ED8ABB /* NSURLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSURLAdditions.m; sourceTree = "<group>"; };
+		0EE935670E6455B9002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0EE9356A0E6455CE002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = de; path = de.lproj/Credits.rtf; sourceTree = "<group>"; };
+		0EE9356B0E6455D6002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0EE9356C0E6455E3002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGMenu.nib; sourceTree = "<group>"; };
+		0EE9356D0E6455EB002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0EE9356E0E6455F4002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGWindow.nib; sourceTree = "<group>"; };
+		0EE9356F0E6455FD002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGExif.nib; sourceTree = "<group>"; };
+		0EE935700E645608002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGTimer.nib; sourceTree = "<group>"; };
+		0EE935710E645610002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EE935720E64561A002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGURL.nib; sourceTree = "<group>"; };
+		0EE935730E645624002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGExtract.nib; sourceTree = "<group>"; };
+		0EE935740E645630002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGEncoding.nib; sourceTree = "<group>"; };
 		0EE98F8C0DEEB13F0004F628 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F8E0DEEB14C0004F628 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F8F0DEEB1510004F628 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGWindow.nib; sourceTree = "<group>"; };
@@ -915,6 +927,7 @@
 				it_IT,
 				Polish,
 				zh_TW,
+				de,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Pornograph */;
 			projectDirPath = "";
@@ -1137,6 +1150,7 @@
 		089C165FFE840EACC02AAC07 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935670E6455B9002A8F6E /* de */,
 				089C1660FE840EACC02AAC07 /* English */,
 				0EC999EB0D9762A60093187C /* French */,
 				0EA62C200CCE0AFB0047E83E /* it_IT */,
@@ -1150,6 +1164,7 @@
 		0E051D9B0C801B150041874F /* PGEncoding.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935740E645630002A8F6E /* de */,
 				0E051D9C0C801B150041874F /* English */,
 				0EC999F30D9762DB0093187C /* French */,
 				0EA62C260CCE0B9C0047E83E /* it_IT */,
@@ -1163,6 +1178,7 @@
 		0E255B940E3A99AA00EDF04C /* PGTimer.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935700E645608002A8F6E /* de */,
 				0E255B950E3A99AA00EDF04C /* English */,
 				0E255F080E3C07D100EDF04C /* French */,
 				0E255F090E3C07D400EDF04C /* it_IT */,
@@ -1176,6 +1192,7 @@
 		0E56B8D70E24917C00987F57 /* PGActivity.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935710E645610002A8F6E /* de */,
 				0E56B8D80E24917C00987F57 /* English */,
 				0EC1C5330E366FB700E911E7 /* French */,
 				0EC1C5340E366FBA00E911E7 /* it_IT */,
@@ -1189,6 +1206,7 @@
 		0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935720E64561A002A8F6E /* de */,
 				0E5EC1D80CEDFEED00E7FF9A /* English */,
 				0EC999F00D9762CE0093187C /* French */,
 				0E81357A0D01998F001A5B60 /* it_IT */,
@@ -1202,6 +1220,7 @@
 		0E90163F0DF44051004B6F69 /* PGPreferences.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356D0E6455EB002A8F6E /* de */,
 				0E9016400DF44051004B6F69 /* English */,
 				0EC1C52F0E366F9E00E911E7 /* French */,
 				0EC1C5300E366FA200E911E7 /* it_IT */,
@@ -1215,6 +1234,7 @@
 		0EB167DF0A82AD89001999E7 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356B0E6455D6002A8F6E /* de */,
 				0EB167CA0A82ACC0001999E7 /* English */,
 				0EC999ED0D9762B40093187C /* French */,
 				0EA62C220CCE0B1A0047E83E /* it_IT */,
@@ -1228,6 +1248,7 @@
 		0EE059AB0CF29F240080061B /* PGExtract.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE935730E645624002A8F6E /* de */,
 				0EE059AC0CF29F250080061B /* English */,
 				0EC999F10D9762D20093187C /* French */,
 				0E81357C0D019999001A5B60 /* it_IT */,
@@ -1241,6 +1262,7 @@
 		0EE98F8B0DEEB13F0004F628 /* PGWindow.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356E0E6455F4002A8F6E /* de */,
 				0EE98F8C0DEEB13F0004F628 /* English */,
 				0EE98F8E0DEEB14C0004F628 /* French */,
 				0EE98F8F0DEEB1510004F628 /* it_IT */,
@@ -1266,6 +1288,7 @@
 		0EEE55930DB0C3E2006E5B9C /* PGExif.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356F0E6455FD002A8F6E /* de */,
 				0EEE55940DB0C3E2006E5B9C /* English */,
 				0EA542610DB72C0A00F60F0E /* French */,
 				0EA542620DB72C0F00F60F0E /* it_IT */,
@@ -1279,6 +1302,7 @@
 		2A37F4B6FDCFA73011CA2CEA /* PGMenu.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356C0E6455E3002A8F6E /* de */,
 				2A37F4B7FDCFA73011CA2CEA /* English */,
 				0EC999EE0D9762B80093187C /* French */,
 				0EA62C230CCE0B7C0047E83E /* it_IT */,
@@ -1292,6 +1316,7 @@
 		2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0EE9356A0E6455CE002A8F6E /* de */,
 				2A37F4BAFDCFA73011CA2CEA /* English */,
 				0EC999EC0D9762AD0093187C /* French */,
 				0EA62C210CCE0B0D0047E83E /* it_IT */,
