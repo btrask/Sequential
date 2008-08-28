@@ -319,6 +319,7 @@
 		0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGURLAlert.m; sourceTree = "<group>"; };
 		0E5EC1D80CEDFEED00E7FF9A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		0E7A18280E66CE8B00BCA2AF /* de */ = {isa = PBXFileReference; lastKnownFileType = folder; name = de; path = de.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
 		0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDragHighlightView.m; sourceTree = "<group>"; };
 		0E808D670D7CC46A003C9DE1 /* NSArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSArrayAdditions.h; sourceTree = "<group>"; };
@@ -1276,6 +1277,7 @@
 		0EE991040DEFFBAA0004F628 /* SequentialHelp */ = {
 			isa = PBXVariantGroup;
 			children = (
+				0E7A18280E66CE8B00BCA2AF /* de */,
 				0EE991050DEFFBAA0004F628 /* English */,
 				0EC1C5380E366FD600E911E7 /* French */,
 				0EC1C5440E366FD900E911E7 /* it_IT */,
