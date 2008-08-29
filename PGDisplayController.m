@@ -315,6 +315,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	NSDisableScreenUpdates();
+	[self setActiveNode:nil initialLocation:PGHomeLocation]; // Clear the screen, because the new node might take a while to load.
 	[self documentSortedNodesDidChange:nil];
 	[self _updateInfoPanelLocationAnimate:NO];
 	if([_activeDocument showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
