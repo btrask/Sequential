@@ -149,7 +149,10 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 
 - (NSString *)displayName
 {
-	if(_customDisplayName) return [[_customDisplayName retain] autorelease];
+	return _customDisplayName ? [[_customDisplayName retain] autorelease] : [self naturalDisplayName];
+}
+- (NSString *)naturalDisplayName
+{
 	if(!_naturalDisplayName) [self updateNaturalDisplayName];
 	if(_naturalDisplayName) return [[_naturalDisplayName retain] autorelease];
 	return @"";
@@ -173,7 +176,6 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 }
 - (void)updateNaturalDisplayName
 {
-	if(_customDisplayName) return [self setNaturalDisplayName:nil notify:YES];
 	NSString *name = nil;
 	NSURL *const URL = [self URL];
 	if(URL) {

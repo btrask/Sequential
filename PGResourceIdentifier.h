@@ -56,6 +56,7 @@ extern NSString *const PGResourceIdentifierDidChangeNotification;
 - (void)setIcon:(NSImage *)icon notify:(BOOL)flag;
 
 - (NSString *)displayName;
+- (NSString *)naturalDisplayName;
 - (void)setNaturalDisplayName:(NSString *)aString notify:(BOOL)flag; // The name from the filesystem or raw address of the URL.
 - (void)setCustomDisplayName:(NSString *)aString notify:(BOOL)flag; // A custom name, like a webpage title.
 - (void)updateNaturalDisplayName;

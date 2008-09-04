@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGContainerAdapter.h"
 #import "PGGenericImageAdapter.h"
+#import "PGResourceIdentifier.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -79,7 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSString *)saveNameForNode:(PGNode *)node
 {
 	NSString *const modifiedName = [_saveNamesByNodePointer objectForKey:[NSValue valueWithNonretainedObject:node]];
-	return modifiedName ? [[modifiedName retain] autorelease] : [[node identifier] displayName];
+	return modifiedName ? [[modifiedName retain] autorelease] : [[node identifier] naturalDisplayName];
 }
 
 #pragma mark -
