@@ -64,7 +64,7 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 	[self setIgnoresMouseEvents:!_acceptsEvents];
 	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:[aWindow AE_contentRect] scale:[self AE_userSpaceScaleFactor]] display:NO];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
-	[self orderFront:self];
+	if(!PGIsTigerOrLater()) [self orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
 
 #pragma mark -
