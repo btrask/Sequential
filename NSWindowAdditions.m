@@ -23,6 +23,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSWindowAdditions.h"
+#import <Carbon/Carbon.h>
 
 @interface NSWindow (TigerOrLater)
 
@@ -42,7 +43,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSRect)AE_contentRect
 {
-	return [self contentRectForFrameRect:[self frame]];
+	Rect r;
+	GetWindowBounds([self windowRef], kWindowContentRgn, &r); // Updated in realtime, unlike -frame. See hxxp://rentzsch.com/cocoa/nswindowFrameLies.
+	return NSMakeRect(r.left, CGDisplayPixelsHigh(kCGDirectMainDisplay) - r.bottom, r.right - r.left, r.bottom - r.top);
 }
 - (void)AE_setContentRect:(NSRect)aRect
 {

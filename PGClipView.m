@@ -289,7 +289,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
-			IOHIDSetMouseLocation((io_connect_t)handle, (int)finalPoint.x, (int)(CGRectGetHeight(CGDisplayBounds(kCGDirectMainDisplay)) - finalPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
+			IOHIDSetMouseLocation((io_connect_t)handle, (int)finalPoint.x, (int)(CGDisplayPixelsHigh(kCGDirectMainDisplay) - finalPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
 		}
