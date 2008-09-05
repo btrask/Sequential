@@ -104,8 +104,8 @@ static void PGEnsureWindowCreatedHack(void)
 	[t translateXBy:NSMidX(aRect) yBy:NSMidY(aRect)];
 	[t rotateByDegrees:_angle];
 	[t concat];
-	NSColor *const color = [NSReadPixel(NSZeroPoint) colorUsingColorSpaceName:NSCalibratedWhiteColorSpace];
-	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:(!_item || [_item isEnabled]) highlighted:(color && [color whiteComponent] < 0.5)]; // Yes, we use NSReadPixel to determine whether or not we're highlighted or not. Believe me, I've tried a lot of things. It didn't even seem like Carbon menus could do it.
+	BOOL const highlighted = [_item respondsToSelector:@selector(isHighlighted)] ? [_item isHighlighted] : NO;
+	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:(!_item || [_item isEnabled]) highlighted:highlighted];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSSize)cellSize
