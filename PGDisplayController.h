@@ -130,6 +130,10 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)showNode:(PGNode *)node;
 
+- (PGImageView *)imageView;
+- (void)setImageView:(PGImageView *)aView;
+- (void)sendComponentsTo:(PGDisplayController *)controller;
+
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
 

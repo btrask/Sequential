@@ -84,7 +84,7 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (void)openBookmark:(PGBookmark *)aBookmark;
 
 - (PGDisplayController *)displayController;
-- (void)setDisplayController:(PGDisplayController *)controller;
+- (void)setDisplayController:(PGDisplayController *)controller keepComponents:(BOOL)flag;
 
 - (void)createUI;
 - (void)close;

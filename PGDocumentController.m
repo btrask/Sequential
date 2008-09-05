@@ -100,7 +100,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 @interface PGDocumentController (Private)
 
-- (void)_setInFullscreen:(BOOL)flag;
+- (void)_setFullscreen:(BOOL)flag;
 
 - (void)_setRevealsInBrowser:(BOOL)flag;
 - (void)_setPageMenu:(NSMenu *)aMenu;
@@ -322,7 +322,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGFullscreenKey];
 	[toggleFullscreen setTitle:NSLocalizedString((flag ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 	[fitToView setTitle:NSLocalizedString((flag ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-	[self _setInFullscreen:flag];
+	[self _setFullscreen:flag];
 }
 
 #pragma mark -
@@ -341,7 +341,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[item setAction:@selector(activateDocument:)];
 	[item setTarget:self];
 	[windowsMenu addItem:item];
-	[self _setInFullscreen:YES];
+	[self _setFullscreen:YES];
 }
 - (void)removeDocument:(PGDocument *)document
 {
@@ -352,7 +352,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	unsigned const i = [windowsMenu indexOfItemWithRepresentedObject:document];
 	if(NSNotFound != i) [windowsMenu removeItemAtIndex:i];
 	if(![_documents count]) [windowsMenuSeparator AE_removeFromMenu];
-	[self _setInFullscreen:[_documents count] > 0];
+	[self _setFullscreen:[_documents count] > 0];
 }
 - (PGDocument *)documentForResourceIdentifier:(PGResourceIdentifier *)ident
 {
@@ -540,7 +540,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark Private Protocol
 
-- (void)_setInFullscreen:(BOOL)flag
+- (void)_setFullscreen:(BOOL)flag
 {
 	if(flag == _inFullscreen) return;
 	NSDisableScreenUpdates();
@@ -556,7 +556,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		PGDocument *doc;
 		NSEnumerator *const docEnum = [docs objectEnumerator];
 		while((doc = [docEnum nextObject])) {
-			[doc setDisplayController:[self displayControllerForNewDocument]];
+			[doc setDisplayController:[self displayControllerForNewDocument] keepComponents:(currentDoc == doc)];
 			[[doc displayController] showWindow:self];
 		}
 		[[_fullscreenController window] close];
@@ -571,7 +571,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		while((doc = [docEnum nextObject])) {
 			PGDisplayController *const oldController = [doc displayController];
 			if(!oldController) continue;
-			[doc setDisplayController:_fullscreenController];
+			[doc setDisplayController:_fullscreenController keepComponents:(currentDoc == doc)];
 			[[oldController window] close];
 		}
 		[_fullscreenController setActiveDocument:currentDoc closeIfAppropriate:NO];

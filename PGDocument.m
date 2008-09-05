@@ -168,12 +168,14 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	return [[_displayController retain] autorelease];
 }
 - (void)setDisplayController:(PGDisplayController *)controller
+        keepComponents:(BOOL)flag
 {
 	if(controller == _displayController) return;
 	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
 	[_displayController release];
 	_displayController = [controller retain];
 	[_displayController setActiveDocument:self closeIfAppropriate:NO];
+	if(flag) [_displayController sendComponentsTo:controller];
 	[_displayController synchronizeWindowTitleWithDocumentName];
 }
 
@@ -181,14 +183,14 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 - (void)createUI
 {
-	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
+	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument] keepComponents:NO];
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
 }
 - (void)close
 {
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
-	[self setDisplayController:nil];
+	[self setDisplayController:nil keepComponents:NO];
 	[[PGDocumentController sharedDocumentController] removeDocument:self];
 }
 

@@ -457,12 +457,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)viewDidMoveToWindow
 {
-	if(_cacheIsValid) {
-		_cacheIsValid = NO;
-		[_image removeRepresentation:_cache];
-	}
-	[_cache release];
-	_cache = [self window] ? [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:[[self window] depthLimit] separate:YES alpha:YES] : nil;
+	if(![self window]) return; // Without a window to draw in, nothing else matters.
+	NSWindowDepth const depth = [[self window] depthLimit];
+	if(!_cache) _cache = [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:depth separate:YES alpha:YES];
+	else if([[_cache window] depthLimit] != depth) [[_cache window] setDepthLimit:depth];
+	else return;
 	[self _cache];
 }
 

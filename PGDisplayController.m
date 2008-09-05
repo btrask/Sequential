@@ -404,6 +404,31 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark -
 
+- (PGImageView *)imageView
+{
+	return [[imageView retain] autorelease];
+}
+- (void)setImageView:(PGImageView *)aView
+{
+	if(aView == imageView) return;
+	[imageView removeFromSuperview];
+	if(aView) [clipView addSubview:aView];
+	[imageView unbind:@"animates"];
+	[imageView unbind:@"antialiasWhenUpscaling"];
+	[imageView unbind:@"drawsRoundedCorners"];
+	[imageView release];
+	imageView = [aView retain];
+}
+- (void)sendComponentsTo:(PGDisplayController *)controller
+{
+	if(!controller) return;
+	PGImageView *ourImageView = [self imageView];
+	[self setImageView:nil];
+	[controller setImageView:ourImageView];
+}
+
+#pragma mark -
+
 - (BOOL)loadingIndicatorShown
 {
 	return _loadingGraphic != nil;
@@ -946,7 +971,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[imageView retain];
+	// We don't need to retain imageView because -setImageView: automatically gets called when the Nib is loaded.
 	[passwordView retain];
 	[encodingView retain];
 
@@ -1010,10 +1035,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
-	[imageView unbind:@"animates"];
-	[imageView unbind:@"antialiasWhenUpscaling"];
-	[imageView unbind:@"drawsRoundedCorners"];
-	[imageView release];
+	[self setImageView:nil];
 	[passwordView release];
 	[encodingView release];
 	[_activeNode release];
