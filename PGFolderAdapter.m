@@ -39,14 +39,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
+	[[self document] setProcessingNodes:YES];
 	NSParameterAssert(!response);
 	NSParameterAssert([self shouldLoad]);
-	[[self document] setProcessingNodes:YES];
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
 	LSItemInfoRecord info;
-	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) return; // Don't go into packages.
+	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
+		[[self document] setProcessingNodes:NO];
+		return; // Don't go into packages.
+	}
 	NSString *const path = [URL path];
 	NSString *pathComponent;
 	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];

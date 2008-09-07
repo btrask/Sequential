@@ -260,12 +260,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)selectPreviousDocument:(id)sender
 {
 	PGDocument *const doc = [self next:NO documentBeyond:[self currentDocument]];
-	if(doc) [[doc displayController] activateDocument:doc];
+	[[doc displayController] activateDocument:doc];
 }
 - (IBAction)selectNextDocument:(id)sender
 {
 	PGDocument *const doc = [self next:YES documentBeyond:[self currentDocument]];
-	if(doc) [[doc displayController] activateDocument:doc];
+	[[doc displayController] activateDocument:doc];
 }
 - (IBAction)activateDocument:(id)sender
 {
