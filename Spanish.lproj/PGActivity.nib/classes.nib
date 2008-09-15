@@ -87,6 +87,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clipViewGestureDidEnd</key>
+				<string>PGClipView</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
 				<key>connectionDidClose</key>
@@ -124,6 +126,21 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGClipView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>delegate</key>
+				<string>id</string>
+				<key>documentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -172,6 +189,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSScrollView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

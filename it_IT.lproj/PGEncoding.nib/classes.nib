@@ -34,6 +34,11 @@
             SUPERCLASS = NSResponder;
         },
                 {
+            CLASS = PGDocumentWindow;
+            LANGUAGE = ObjC;
+            SUPERCLASS = NSWindow;
+        },
+                {
             ACTIONS =             {
                 cancel = id;
                 ok = id;
@@ -50,17 +55,12 @@
                 {
             CLASS = PGFullscreenWindow;
             LANGUAGE = ObjC;
-            SUPERCLASS = PGWindow;
+            SUPERCLASS = PGDocumentWindow;
         },
                 {
             CLASS = PGURLConnection;
             LANGUAGE = ObjC;
             SUPERCLASS = NSObject;
-        },
-                {
-            CLASS = PGWindow;
-            LANGUAGE = ObjC;
-            SUPERCLASS = NSWindow;
         }
     );
     IBVersion = 1;

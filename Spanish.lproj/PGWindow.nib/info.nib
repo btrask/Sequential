@@ -11,9 +11,8 @@
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>100</integer>
+		<integer>49</integer>
 		<integer>107</integer>
-		<integer>158</integer>
-		<integer>5</integer>
 	</array>
 	<key>IBSystem Version</key>
 	<string>9E17</string>

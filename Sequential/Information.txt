@@ -8,6 +8,9 @@ Sequential can display folders and archives (ZIP, RAR, CBZ and CBR) of images (i
 Sequential has mature full screen support and can display images' Exif data.
 
 New in 2.0.1
+- Traditional Chinese localization by Jack Lin.
+- German localization by Christoph Schmitz.
+- Updated French localization by Thomas Audibert.
 - Animates changes to the current image scale.
 - Adds a "grow window" command.
 - Fixes a bug that could cause some URLs to never finish loading.

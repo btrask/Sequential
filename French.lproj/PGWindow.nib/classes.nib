@@ -228,66 +228,12 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>activateTab</key>
-				<string>id</string>
-				<key>copy</key>
-				<string>id</string>
-				<key>extractImage</key>
-				<string>id</string>
-				<key>firstPage</key>
-				<string>id</string>
-				<key>hideFindPanel</key>
-				<string>id</string>
-				<key>jumpToPage</key>
-				<string>id</string>
-				<key>lastPage</key>
-				<string>id</string>
-				<key>nextPage</key>
-				<string>id</string>
-				<key>nextTab</key>
-				<string>id</string>
-				<key>pauseAndCloseDocument</key>
-				<string>id</string>
-				<key>pauseDocument</key>
-				<string>id</string>
-				<key>performFindPanelAction</key>
-				<string>id</string>
-				<key>previousPage</key>
-				<string>id</string>
-				<key>previousTab</key>
-				<string>id</string>
-				<key>revealInFinder</key>
-				<string>id</string>
-				<key>revealInPathFinder</key>
-				<string>id</string>
-				<key>toggleOnScreenDisplay</key>
-				<string>id</string>
-				<key>toggleTracksImageScalingMode</key>
-				<string>id</string>
-				<key>toggleTracksReadingDirection</key>
-				<string>id</string>
-				<key>toggleTracksSortDescriptor</key>
-				<string>id</string>
-			</dict>
 			<key>CLASS</key>
-			<string>PGFullscreenController</string>
+			<string>PGRoundedBackgroundView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>clipView</key>
-				<string>PGClipView</string>
-				<key>findView</key>
-				<string>PGFindView</string>
-				<key>imageView</key>
-				<string>PGImageView</string>
-				<key>searchField</key>
-				<string>NSSearchField</string>
-			</dict>
 			<key>SUPERCLASS</key>
-			<string>PGDisplayController</string>
+			<string>NSView</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
