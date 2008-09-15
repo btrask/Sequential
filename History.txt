@@ -1,3 +1,15 @@
+2.0.1 (September 15, 2008)
+- Traditional Chinese localization by Jack Lin.
+- German localization by Christoph Schmitz.
+- Updated French localization by Thomas Audibert.
+- Animates changes to the current image scale.
+- Adds a "grow window" command.
+- Fixes a bug that could cause some URLs to never finish loading.
+- Fixes a bug that prevented the "round image corners" option from staying off.
+- Fixes a bug where correct date or size information wouldn't show up in the Page menu.
+- Better performance when deleting files or noticing folders update.
+- Other minor improvements.
+
 2.0 (August 15th, 2008)
 - Windowed mode.
 - An Exif metadata display.

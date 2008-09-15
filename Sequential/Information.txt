@@ -1,4 +1,4 @@
-Sequential 2.0.1
+Sequential 2.0.2
 Requires 10.3.9 or later.
 
 Sequential is an image viewer for Mac OS X. It was originally designed for opening a folder of images and displaying them in order. It works well for viewing comics and manga.
@@ -7,17 +7,8 @@ Sequential can display folders and archives (ZIP, RAR, CBZ and CBR) of images (i
 
 Sequential has mature full screen support and can display images' Exif data.
 
-New in 2.0.1
-- Traditional Chinese localization by Jack Lin.
-- German localization by Christoph Schmitz.
-- Updated French localization by Thomas Audibert.
-- Animates changes to the current image scale.
-- Adds a "grow window" command.
-- Fixes a bug that could cause some URLs to never finish loading.
-- Fixes a bug that prevented the "round image corners" option from staying off.
-- Fixes a bug where correct date or size information wouldn't show up in the Page menu.
-- Better performance when deleting files or noticing folders update.
-- Other minor improvements.
+New in 2.0.2
+- Improved searching.
 
 A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
 
