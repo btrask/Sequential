@@ -80,7 +80,6 @@ typedef int PGDataError;
 - (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent;
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;

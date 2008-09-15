@@ -91,6 +91,27 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGPDFPageAdapter
 
+#pragma mark PGResourceAdapting Protocol
+
+- (BOOL)isResolutionIndependent
+{
+	return YES;
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+            matchSearchTerms:(NSArray *)terms
+            stopAtNode:(PGNode *)descendent
+{
+	if(![[self node] isViewable] || [self node] == descendent) return nil;
+	int const index = [[self identifier] index];
+	if(NSNotFound == index) return nil;
+	id term;
+	NSEnumerator *const termEnum = [terms objectEnumerator];
+	while((term = [termEnum nextObject])) {
+		if(![term isKindOfClass:[NSNumber class]] || [term intValue] - 1 != index) return nil;
+	}
+	return [self node];
+}
+
 #pragma mark PGResourceAdapter
 
 - (void)read
@@ -100,10 +121,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
 	[rep setPixelsHigh:NSHeight([rep bounds])];
 	[self readReturnedImageRep:rep error:nil];
-}
-- (BOOL)isResolutionIndependent
-{
-	return YES;
 }
 
 #pragma mark NSObject

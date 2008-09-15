@@ -115,7 +115,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	int const max = [children count], increment = flag ? 1 : -1;
 	for(i += increment; i >= 0 && i < max; i += increment) {
 		PGNode *const child = [children objectAtIndex:i];
-		PGNode *const node = [child methodForSelector:sel](child, sel, flag, context);
+		PGNode *const node = [child methodForSelector:sel](child, sel, flag, context, nil);
 		if(node) return node;
 	}
 	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:sel context:context];

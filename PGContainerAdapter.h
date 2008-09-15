@@ -51,6 +51,7 @@ The selector 'sel' should have one of the following forms:
 - (PGNode *)selector;
 - (PGNode *)selectorForward:(BOOL)flag;
 - (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
+- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context ignored:(id)nil1;
 */
 - (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
 

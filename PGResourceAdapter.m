@@ -258,13 +258,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
 	    matchSearchTerms:(NSArray *)terms
 {
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:) context:terms];
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
 	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
-}
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            matchSearchTerms:(NSArray *)terms
-{
-	return [self sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:nil];
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
             matchSearchTerms:(NSArray *)terms

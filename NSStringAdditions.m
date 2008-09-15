@@ -69,15 +69,39 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSArray *)AE_searchTerms
 {
-	NSMutableArray *const terms = [[[self componentsSeparatedByString:@" "] mutableCopy] autorelease];
-	[terms removeObject:@""];
+	NSArray *const components = [self componentsSeparatedByString:@" "];
+	NSMutableArray *const terms = [NSMutableArray arrayWithCapacity:[components count]];
+	NSString *component;
+	NSEnumerator *const componentEnum = [components objectEnumerator];
+	while((component = [componentEnum nextObject])) {
+		if([component isEqualToString:@""]) continue;
+		NSScanner *const scanner = [NSScanner localizedScannerWithString:component];
+		int index;
+		if([scanner scanInt:&index] && [scanner isAtEnd] && index != INT_MAX && index != INT_MIN) [terms addObject:[NSNumber numberWithInt:index]];
+		else [terms addObject:component];
+	}
 	return terms;
 }
 - (BOOL)AE_matchesSearchTerms:(NSArray *)terms
 {
-	NSString *term;
+	NSScanner *const scanner = [NSScanner localizedScannerWithString:self];
+	[scanner setCharactersToBeSkipped:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
+	id term;
 	NSEnumerator *const termEnum = [terms objectEnumerator];
-	while((term = [termEnum nextObject])) if([self rangeOfString:term options:NSCaseInsensitiveSearch].location == NSNotFound) return NO;
+	while((term = [termEnum nextObject])) {
+		if([term isKindOfClass:[NSNumber class]]) {
+			[scanner setScanLocation:0];
+			BOOL foundNumber = NO;
+			while(!foundNumber && ![scanner isAtEnd]) {
+				int index;
+				if(![scanner scanInt:&index]) return NO;
+				if([term intValue] == index) foundNumber = YES;
+			}
+			if(!foundNumber) return NO;
+		} else {
+			if([self rangeOfString:term options:NSCaseInsensitiveSearch].location == NSNotFound) return NO;
+		}
+	}
 	return YES;
 }
 
