@@ -29,6 +29,18 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGResourceIdentifierDidChangeNotification;
 
+enum {
+	PGLabelNone   = 0,
+	PGLabelRed    = 6,
+	PGLabelOrange = 7,
+	PGLabelYellow = 5,
+	PGLabelGreen  = 2,
+	PGLabelBlue   = 4,
+	PGLabelPurple = 3,
+	PGLabelGray   = 1
+};
+typedef UInt8 PGLabelColor;
+
 @interface PGResourceIdentifier : NSObject <NSCoding>
 {
 	@private
@@ -47,6 +59,7 @@ extern NSString *const PGResourceIdentifierDidChangeNotification;
 - (NSURL *)superURLByFollowingAliases:(BOOL)flag; // Our URL, or our superidentifier's otherwise.
 - (NSURL *)URLByFollowingAliases:(BOOL)flag;
 - (NSURL *)URL; // Equivalent to -URLByFollowingAliases:NO.
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag;
 - (int)index;
 
 - (BOOL)hasTarget;
@@ -63,6 +76,7 @@ extern NSString *const PGResourceIdentifierDidChangeNotification;
 
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
 - (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;
+- (PGLabelColor)labelColor; // Currently unused.
 
 @end
 

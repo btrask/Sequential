@@ -45,7 +45,6 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
-- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag;
 
 @end
 
@@ -113,6 +112,11 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 - (NSURL *)URL
 {
 	return [self URLByFollowingAliases:NO];
+}
+- (BOOL)getRef:(out FSRef *)outRef
+        byFollowingAliases:(BOOL)flag
+{
+	return NO;
 }
 - (int)index
 {
@@ -207,6 +211,16 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 {
 	return [self isFileIdentifier] ? [PGSubscription subscriptionWithPath:[[self URL] path] descendents:flag] : nil;
 }
+- (PGLabelColor)labelColor
+{
+	FSRef ref;
+	FSCatalogInfo catalogInfo;
+	if(![self getRef:&ref byFollowingAliases:NO] || FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo | kFSCatInfoNodeFlags, &catalogInfo, NULL, NULL, NULL) != noErr) return PGLabelNone;
+	UInt16 finderFlags;
+	if(catalogInfo.nodeFlags & kFSNodeIsDirectoryMask) finderFlags = ((FolderInfo *)&catalogInfo.finderInfo)->finderFlags;
+	else finderFlags = ((FileInfo *)&catalogInfo.finderInfo)->finderFlags;
+	return (finderFlags & 0x0E) >> 1;
+}
 
 #pragma mark NSCoding Protocol
 
@@ -296,13 +310,6 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	}
 	return self;
 }
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)flag
-{
-	Boolean dontCare1, dontCare2;
-	if(FSResolveAliasWithMountFlags(NULL, _alias, outRef, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
-	return flag ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
-}
 
 #pragma mark NSCoding Protocol
 
@@ -346,6 +353,13 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	FSRef ref;
 	if(![self getRef:&ref byFollowingAliases:flag]) return nil;
 	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
+}
+- (BOOL)getRef:(out FSRef *)outRef
+        byFollowingAliases:(BOOL)flag
+{
+	Boolean dontCare1, dontCare2;
+	if(FSResolveAliasWithMountFlags(NULL, _alias, outRef, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
+	return flag ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
 - (BOOL)hasTarget
 {
