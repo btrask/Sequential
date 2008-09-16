@@ -817,6 +817,21 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark NSWindowDelegate Protocol
 
+- (BOOL)window:(NSWindow *)window
+        shouldDragDocumentWithEvent:(NSEvent *)event
+        from:(NSPoint)dragImageLocation
+        withPasteboard:(NSPasteboard *)pboard
+{
+	if([self window] != window) return YES;
+	PGResourceIdentifier *const ident = [[[self activeDocument] node] identifier];
+	if(![ident isFileIdentifier]) {
+		[pboard declareTypes:[NSArray arrayWithObject:NSURLPboardType] owner:nil];
+		[[ident URL] writeToPasteboard:pboard];
+	}
+	NSImage *const image = [ident icon];
+	[[self window] dragImage:image at:PGOffsetPointByXY(dragImageLocation, 24 - [image size].width / 2, 24 - [image size].height / 2) offset:NSZeroSize event:event pasteboard:pboard source:nil slideBack:YES]; // Left to its own devices, OS X will start the drag image 16 pixels down and to the left of the button, which looks bad at both 16x16 and at 32x32, so always do our own drags.
+	return NO;
+}
 - (id)windowWillReturnFieldEditor:(NSWindow *)window
       toObject:(id)anObject
 {
@@ -1005,8 +1020,21 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)synchronizeWindowTitleWithDocumentName
 {
 	PGResourceIdentifier *const identifier = [[[self activeDocument] node] identifier];
-	NSString *const path = [identifier isFileIdentifier] ? [[identifier URL] path] : nil;
-	[[self window] setRepresentedFilename:(path ? path : @"")];
+	NSURL *const URL = [identifier URL];
+	if(PGIsLeopardOrLater()) {
+		[[self window] setRepresentedURL:URL];
+		if(![identifier isFileIdentifier]) {
+			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
+			NSImage *const image = [[[identifier icon] copy] autorelease];
+			[image setFlipped:![docButton isFlipped]];
+			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
+			[image setSize:[docButton bounds].size];
+			[docButton setImage:image];
+		}
+	} else {
+		NSString *const path = [identifier isFileIdentifier] ? [URL path] : nil;
+		[[self window] setRepresentedFilename:(path ? path : @"")];
+	}
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = [identifier displayName];
 	NSString *const titleDetails = count ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";

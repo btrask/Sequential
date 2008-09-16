@@ -76,10 +76,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return NSMakePoint(MAX(MIN(aPoint.x, NSMaxX(aRect)), NSMinX(aRect)), MAX(MIN(aPoint.y, NSMaxY(aRect)), NSMinY(aRect)));
 }
-static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
-{
-	return NSMakePoint(aPoint.x + aSize.width, aPoint.y + aSize.height);
-}
 
 @interface PGClipView (Private)
 
@@ -206,7 +202,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 }
 - (NSPoint)center
 {
-	return [self convertPoint:PGOffsetPoint([self position], NSMakeSize(NSWidth([self bounds]) / 2, NSHeight([self bounds]) / 2)) toView:documentView];
+	return [self convertPoint:PGOffsetPointByXY([self position], NSWidth([self bounds]) / 2, NSHeight([self bounds]) / 2) toView:documentView];
 }
 
 - (BOOL)scrollTo:(NSPoint)aPoint
@@ -228,12 +224,12 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 - (BOOL)scrollToCenterAt:(NSPoint)aPoint
         allowAnimation:(BOOL)flag
 {
-	return [self scrollTo:[self convertPoint:PGOffsetPoint(aPoint, NSMakeSize(NSWidth([self bounds]) / -2, NSHeight([self bounds]) / -2)) fromView:documentView] allowAnimation:flag];
+	return [self scrollTo:[self convertPoint:PGOffsetPointByXY(aPoint, NSWidth([self bounds]) / -2, NSHeight([self bounds]) / -2) fromView:documentView] allowAnimation:flag];
 }
 - (BOOL)scrollBy:(NSSize)aSize
         allowAnimation:(BOOL)flag
 {
-	return [self scrollTo:PGOffsetPoint([self position], aSize) allowAnimation:flag];
+	return [self scrollTo:PGOffsetPointBySize([self position], aSize) allowAnimation:flag];
 }
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask
         allowAnimation:(BOOL)flag
@@ -266,7 +262,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO];
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
-	NSPoint const dragPoint = PGOffsetPoint(originalPoint, NSMakeSize([self position].x, [self position].y));
+	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
 	NSRect const availableDragRect = NSInsetRect([[self window] AE_contentRect], 4, 4);
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
@@ -279,8 +275,8 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 		}
 		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) allowAnimation:NO];
-		else [self scrollTo:PGOffsetPoint(dragPoint, NSMakeSize(-[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y)) allowAnimation:NO];
-		finalPoint = PGPointInRect(PGOffsetPoint(finalPoint, NSMakeSize([latestEvent deltaX], -[latestEvent deltaY])), availableDragRect);
+		else [self scrollTo:PGOffsetPointByXY(dragPoint, -[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y) allowAnimation:NO];
+		finalPoint = PGPointInRect(PGOffsetPointByXY(finalPoint, [latestEvent deltaX], -[latestEvent deltaY]), availableDragRect);
 	}
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
@@ -349,10 +345,10 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Delegate returned contradictory directions.");
 	NSPoint position = [self position];
 	PGRectEdgeMask const dir1 = mask & (across ? PGHorzEdgesMask : PGVertEdgesMask);
-	position = PGOffsetPoint(position, [self distanceInDirection:dir1 forScrollType:PGScrollByPage fromPosition:position]);
+	position = PGOffsetPointBySize(position, [self distanceInDirection:dir1 forScrollType:PGScrollByPage fromPosition:position]);
 	if([self shouldExitForMovementInDirection:dir1] || NSEqualPoints(PGPointInRect(position, [self scrollableRectWithBorder:YES]), [self position])) {
 		PGRectEdgeMask const dir2 = mask & (across ? PGVertEdgesMask : PGHorzEdgesMask);
-		position = PGOffsetPoint(position, [self distanceInDirection:dir2 forScrollType:PGScrollByPage fromPosition:position]);
+		position = PGOffsetPointBySize(position, [self distanceInDirection:dir2 forScrollType:PGScrollByPage fromPosition:position]);
 		if([self shouldExitForMovementInDirection:dir2]) {
 			if([[self delegate] clipView:self shouldExitEdges:mask]) return;
 			position = PGRectEdgeMaskToPointWithMagnitude(mask, FLT_MAX); // We can't exit, but make sure we're at the very end.
@@ -419,7 +415,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
 	float const dist = hypotf(r.width, r.height);
 	float const factor = MIN(1, MAX(0.25, 10 / dist) / PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
-	if(![self _scrollTo:(dist < 1 ? _position : PGOffsetPoint(_immediatePosition, NSMakeSize(r.width * factor, r.height * factor)))]) [self stopAnimatedScrolling];
+	if(![self _scrollTo:(dist < 1 ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
 }
 
 - (void)_beginPreliminaryDrag
@@ -477,7 +473,7 @@ static inline NSPoint PGOffsetPoint(NSPoint aPoint, NSSize aSize)
 {
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	[self _setPosition:PGOffsetPoint([self position], NSMakeSize(0, heightDiff)) markForRedisplayIfNeeded:YES];
+	[self _setPosition:PGOffsetPointByXY([self position], 0, heightDiff) markForRedisplayIfNeeded:YES];
 }
 
 #pragma mark NSResponder

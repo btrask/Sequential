@@ -24,6 +24,11 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+#pragma mark NSPoint
+
+NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
+NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
+
 #pragma mark PGRectEdgeMask
 
 enum {

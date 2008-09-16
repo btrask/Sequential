@@ -24,6 +24,17 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
+#pragma mark NSPoint
+
+NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize)
+{
+	return NSMakePoint(aPoint.x + aSize.width, aPoint.y + aSize.height);
+}
+NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y)
+{
+	return NSMakePoint(aPoint.x + x, aPoint.y + y);
+}
+
 #pragma mark PGRectEdgeMask
 
 NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
