@@ -10,6 +10,7 @@ Sequential has mature full screen support and can display images' Exif data.
 New in 2.0.2
 - When images fail to load, a reload button is displayed.
 - Improved searching.
+- Other minor improvements.
 
 A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
 
