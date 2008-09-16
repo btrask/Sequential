@@ -828,7 +828,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[pboard declareTypes:[NSArray arrayWithObject:NSURLPboardType] owner:nil];
 		[[ident URL] writeToPasteboard:pboard];
 	}
-	NSImage *const image = [ident icon];
+	NSImage *const image = [[[ident icon] copy] autorelease];
 	[[self window] dragImage:image at:PGOffsetPointByXY(dragImageLocation, 24 - [image size].width / 2, 24 - [image size].height / 2) offset:NSZeroSize event:event pasteboard:pboard source:nil slideBack:YES]; // Left to its own devices, OS X will start the drag image 16 pixels down and to the left of the button, which looks bad at both 16x16 and at 32x32, so always do our own drags.
 	return NO;
 }
@@ -1026,7 +1026,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(![identifier isFileIdentifier]) {
 			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
 			NSImage *const image = [[[identifier icon] copy] autorelease];
-			[image setDataRetained:NO]; // It seems like the "flipped" state of the image would sometimes get propogated back to the identifier's, even though we made a copy...
 			[image setFlipped:![docButton isFlipped]];
 			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
 			[image setSize:[docButton bounds].size];
