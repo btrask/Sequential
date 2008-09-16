@@ -51,8 +51,9 @@ typedef int PGDataError;
 - (PGDocument *)document;
 
 - (PGResourceIdentifier *)identifier;
-- (BOOL)shouldLoad;
 - (void)loadWithURLResponse:(NSURLResponse *)response;
+- (BOOL)reload;
+- (void)readReturnedImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (BOOL)isContainer;
 - (float)loadingProgress;
@@ -63,9 +64,6 @@ typedef int PGDataError;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;
 - (void)clearCache;
-
-- (void)readIfNecessary;
-- (void)readReturnedImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (BOOL)hasViewableNodes;
 - (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.

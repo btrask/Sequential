@@ -164,7 +164,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response
 {
-	if([self shouldLoad]) [self loadWithURLResponse:response];
+	if([_resourceAdapter shouldLoad]) [self loadWithURLResponse:response];
 }
 
 #pragma mark -
@@ -220,6 +220,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(_shouldRead) return;
 	_shouldRead = YES;
 	[self readIfNecessary];
+}
+- (void)readIfNecessary
+{
+	if(_shouldRead && !_determiningTypeCount) [_resourceAdapter read];
 }
 
 #pragma mark -
@@ -387,11 +391,21 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if([_resourceAdapter shouldLoad]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
 		[_resourceAdapter loadWithURLResponse:response];
-		[_resourceAdapter readIfNecessary];
+		[self readIfNecessary];
 		[pool release];
 	}
 	[self _updateFileAttributes];
 	[self setDeterminingType:NO];
+}
+- (void)readReturnedImageRep:(NSImageRep *)aRep
+        error:(NSError *)error
+{
+	NSParameterAssert(_shouldRead);
+	_shouldRead = NO;
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
+	if(error) [dict setObject:error forKey:PGErrorKey];
+	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -
@@ -413,23 +427,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	if(outData) *outData = data;
 	return data ? PGDataReturned : PGNoData;
-}
-
-#pragma mark -
-
-- (void)readIfNecessary
-{
-	if(_shouldRead && !_determiningTypeCount) [_resourceAdapter read];
-}
-- (void)readReturnedImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
-{
-	NSParameterAssert(_shouldRead);
-	_shouldRead = NO;
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
-	if(error) [dict setObject:error forKey:PGErrorKey];
-	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -

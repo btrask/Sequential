@@ -5,11 +5,13 @@
 	<key>IBFramework Version</key>
 	<string>670</string>
 	<key>IBLastKnownRelativeProjectPath</key>
-	<string>../../Sequential.xcodeproj</string>
+	<string>../Sequential.xcodeproj</string>
 	<key>IBOldestOS</key>
 	<integer>5</integer>
 	<key>IBOpenObjects</key>
-	<array/>
+	<array>
+		<integer>158</integer>
+	</array>
 	<key>IBSystem Version</key>
 	<string>9E17</string>
 	<key>targetFramework</key>

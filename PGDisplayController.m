@@ -71,6 +71,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 @interface PGDisplayController (Private)
 
+- (void)_loadActiveNode;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateNodeIndex;
@@ -267,6 +268,12 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark -
 
+- (IBAction)reload:(id)sender
+{
+	if(![[self activeNode] reload]) return;
+	[reloadButton setEnabled:NO];
+	[self _loadActiveNode];
+}
 - (IBAction)decrypt:(id)sender
 {
 	[[self activeNode] AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
@@ -351,12 +358,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
 	_initialLocation = location;
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
-	if(!_activeNode) return [self nodeReadyForViewing:nil];
-	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5 retain:NO];
-	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
-	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
-	[_activeNode becomeViewed];
+	[self _loadActiveNode];
 }
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode
         initialLocation:(PGPageLocation)location
@@ -506,6 +508,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[errorLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
 		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([errorMessage frame]), FLT_MAX)].height)];
+		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
 	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
 		[passwordLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
@@ -598,6 +601,15 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark Private Protocol
 
+- (void)_loadActiveNode
+{
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
+	if(!_activeNode) return [self nodeReadyForViewing:nil];
+	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5 retain:NO];
+	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
+	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
+	[_activeNode becomeViewed];
+}
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
 {

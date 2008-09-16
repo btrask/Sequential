@@ -64,6 +64,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	IBOutlet NSView              *errorView;
 	IBOutlet NSTextField         *errorLabel;
 	IBOutlet NSTextField         *errorMessage;
+	IBOutlet NSButton            *reloadButton;
 	IBOutlet NSView              *passwordView;
 	IBOutlet NSTextField         *passwordLabel;
 	IBOutlet NSTextField         *passwordField;
@@ -115,6 +116,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)pauseDocument:(id)sender;
 - (IBAction)pauseAndCloseDocument:(id)sender;
 
+- (IBAction)reload:(id)sender;
 - (IBAction)decrypt:(id)sender;
 - (IBAction)chooseEncoding:(id)sender;
 

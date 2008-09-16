@@ -94,6 +94,7 @@ enum {
 - (void)setDeterminingType:(BOOL)flag;
 - (void)becomeViewed;
 - (void)becomeViewedWithPassword:(NSString *)pass;
+- (void)readIfNecessary;
 
 - (void)removeFromDocument;
 

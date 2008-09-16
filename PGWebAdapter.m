@@ -41,7 +41,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender
 {
-	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
+	if(sender == _mainConnection) [[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
 - (void)connectionDidReceiveResponse:(PGURLConnection *)sender
 {
@@ -63,7 +63,7 @@ DEALINGS WITH THE SOFTWARE. */
 		}
 		_isDownloading = NO;
 		[self noteIsViewableDidChange];
-		[self readIfNecessary];
+		[[self node] readIfNecessary];
 	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
 }
 
@@ -87,8 +87,18 @@ DEALINGS WITH THE SOFTWARE. */
 	_encounteredLoadingError = NO;
 	[self noteIsViewableDidChange];
 	NSURL *const URL = [[self identifier] URL];
+	[_mainConnection cancelAndNotify:NO];
+	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
+	[_faviconConnection cancelAndNotify:NO];
+	[_faviconConnection release];
 	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
+}
+- (BOOL)reload
+{
+	if(!_encounteredLoadingError) return NO;
+	[self loadWithURLResponse:nil];
+	return YES;
 }
 - (void)read
 {

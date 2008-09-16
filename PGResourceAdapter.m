@@ -95,9 +95,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return MAX(PGLoadToMaxDepth, [[self parentAdapter] descendentLoadingPolicy]);
 }
-
-#pragma mark -
-
+- (BOOL)shouldLoad
+{
+	return [[self node] shouldLoadAdapterClass:[self class]];
+}
 - (void)read
 {
 	[self readReturnedImageRep:nil error:nil];
@@ -140,11 +141,16 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self node] identifier];
 }
-- (BOOL)shouldLoad
-{
-	return [[self node] shouldLoadAdapterClass:[self class]];
-}
 - (void)loadWithURLResponse:(NSURLResponse *)response {}
+- (BOOL)reload
+{
+	return NO;
+}
+- (void)readReturnedImageRep:(NSImageRep *)aRep
+        error:(NSError *)error
+{
+	[[self node] readReturnedImageRep:aRep error:error];
+}
 
 #pragma mark -
 
@@ -181,18 +187,6 @@ DEALINGS WITH THE SOFTWARE. */
 	return NO;
 }
 - (void)clearCache {}
-
-#pragma mark -
-
-- (void)readIfNecessary
-{
-	return [[self node] readIfNecessary];
-}
-- (void)readReturnedImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
-{
-	[[self node] readReturnedImageRep:aRep error:error];
-}
 
 #pragma mark -
 

@@ -46,6 +46,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSControl</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>FirstResponder</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -56,8 +64,6 @@
 			<key>ACTIONS</key>
 			<dict>
 				<key>changeOrientation</key>
-				<string>id</string>
-				<key>changeTimerInterval</key>
 				<string>id</string>
 				<key>chooseEncoding</key>
 				<string>id</string>
@@ -95,11 +101,15 @@
 				<string>id</string>
 				<key>previousPage</key>
 				<string>id</string>
+				<key>reload</key>
+				<string>id</string>
 				<key>revealInBrowser</key>
 				<string>id</string>
 				<key>revealInFinder</key>
 				<string>id</string>
 				<key>revealInPathFinder</key>
+				<string>id</string>
+				<key>revertOrientation</key>
 				<string>id</string>
 				<key>skipBeforeFolder</key>
 				<string>id</string>
@@ -142,6 +152,8 @@
 				<string>NSTextField</string>
 				<key>passwordView</key>
 				<string>NSView</string>
+				<key>reloadButton</key>
+				<string>NSButton</string>
 				<key>searchField</key>
 				<string>NSSearchField</string>
 			</dict>
@@ -151,6 +163,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clipViewGestureDidEnd</key>
+				<string>PGClipView</string>
 				<key>clipViewWasClicked</key>
 				<string>id</string>
 				<key>closeWindowContent</key>
@@ -186,6 +200,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
 				<key>performWindowClose</key>
 				<string>id</string>
 			</dict>
