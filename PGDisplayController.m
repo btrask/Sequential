@@ -1026,6 +1026,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(![identifier isFileIdentifier]) {
 			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
 			NSImage *const image = [[[identifier icon] copy] autorelease];
+			[image setDataRetained:NO]; // It seems like the "flipped" state of the image would sometimes get propogated back to the identifier's, even though we made a copy...
 			[image setFlipped:![docButton isFlipped]];
 			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
 			[image setSize:[docButton bounds].size];
