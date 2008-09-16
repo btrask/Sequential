@@ -64,7 +64,10 @@ DEALINGS WITH THE SOFTWARE. */
 		_isDownloading = NO;
 		[self noteIsViewableDidChange];
 		[[self node] readIfNecessary];
-	} else if(sender == _faviconConnection) [[self identifier] setIcon:[[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease] notify:YES];
+	} else if(sender == _faviconConnection) {
+		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
+		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
+	}
 }
 
 #pragma mark PGResourceAdapting
