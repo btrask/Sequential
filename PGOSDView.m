@@ -42,6 +42,7 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGIndicatorHeight         11.0
 #define PGIndicatorRadius         (PGIndicatorHeight / 2.0)
 #define PGIndicatorWidth          150.0
+#define PGCornerRadius            (PGPaddingSize + PGIndicatorRadius)
 
 @implementation PGOSDView
 
@@ -52,6 +53,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
 	[style setAlignment:([self origin] == PGMinXMinYCorner ? NSLeftTextAlignment : NSRightTextAlignment)];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
+	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
 	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%u/%u)", [self messageText], [self index] + 1, [self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0], NSFontAttributeName,
 		[NSColor whiteColor], NSForegroundColorAttributeName,
@@ -134,6 +136,7 @@ DEALINGS WITH THE SOFTWARE. */
 			ceilf(MAX(messageSize.width + PGTextTotalHorzPadding, ([self displaysProgressIndicator] ? PGIndicatorWidth : 0)) + PGTotalPaddingSize) * scaleFactor,
 			ceilf(messageSize.height + PGTextTotalVertPadding + ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
+	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
 	frame.size.width = MIN(NSWidth(frame), NSWidth(aRect) / 2 - scaledMarginSize); // Don't allow the panel to be more than half the width of the window.
 	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
 	return frame;
@@ -149,7 +152,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSRect const b = [self bounds];
 
-	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:(PGPaddingSize + PGIndicatorRadius)];
+	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
 	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
 	[bezel fill];
 
