@@ -51,6 +51,7 @@ enum {
 	PGDocument           *_document;
 
 	PGResourceIdentifier *_identifier;
+	NSMutableArray       *_URLs;
 	NSData               *_data;
 	id                    _dataSource;
 
@@ -73,9 +74,12 @@ enum {
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident;
 
+- (void)createAlternateURLs;
+- (void)addAlternateURL:(NSURL *)URL toTop:(BOOL)flag;
+
+- (void)setData:(NSData *)data;
 - (id)dataSource;
 - (void)setDataSource:(id)anObject;
-- (void)setData:(NSData *)data;
 
 - (PGResourceAdapter *)resourceAdapter;
 - (void)setResourceAdapterClass:(Class)aClass;

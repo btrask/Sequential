@@ -141,6 +141,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self node] identifier];
 }
+- (BOOL)hasAlternateURLs
+{
+	return [[self node] hasAlternateURLs];
+}
+- (NSURL *)nextAlternateURLAndRemove:(BOOL)flag
+{
+	return [[self node] nextAlternateURLAndRemove:flag];
+}
 - (void)loadWithURLResponse:(NSURLResponse *)response {}
 - (BOOL)reload
 {

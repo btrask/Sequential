@@ -89,8 +89,7 @@ DEALINGS WITH THE SOFTWARE. */
 	_isDownloading = YES;
 	_encounteredLoadingError = NO;
 	[self noteIsViewableDidChange];
-	NSURL *URL = [[self identifier] URL];
-	if([[URL host] hasSuffix:@"flickr.com"] && [[URL path] hasPrefix:@"/photos/"] && [[[URL path] pathComponents] count] >= 4) URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@", [URL absoluteString]]];
+	NSURL *const URL = [self hasAlternateURLs] ? [self nextAlternateURLAndRemove:YES] : [[self identifier] URL];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
@@ -101,7 +100,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)reload
 {
 	if(!_encounteredLoadingError) return NO;
-	[self loadWithURLResponse:nil];
+	[[self node] createAlternateURLs];
+	[[self node] loadWithURLResponse:nil];
 	return YES;
 }
 - (void)read
@@ -110,6 +110,7 @@ DEALINGS WITH THE SOFTWARE. */
 	id const resp = [_mainConnection response];
 	NSString *message = nil;
 	if(_encounteredLoadingError) {
+		if([self hasAlternateURLs]) return [[self node] loadWithURLResponse:nil]; // Try again from the beginning.
 		if([resp respondsToSelector:@selector(statusCode)]) {
 			int const code = [resp statusCode];
 			if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];

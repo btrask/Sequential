@@ -51,6 +51,8 @@ typedef int PGDataError;
 - (PGDocument *)document;
 
 - (PGResourceIdentifier *)identifier;
+- (BOOL)hasAlternateURLs;
+- (NSURL *)nextAlternateURLAndRemove:(BOOL)flag;
 - (void)loadWithURLResponse:(NSURLResponse *)response;
 - (BOOL)reload;
 - (void)readReturnedImageRep:(NSImageRep *)aRep error:(NSError *)error;

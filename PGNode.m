@@ -81,6 +81,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		_document = doc ? doc : [parent document];
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+		[self createAlternateURLs];
 		[self setResourceAdapterClass:[PGResourceAdapter class]];
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
@@ -89,6 +90,25 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		[self _updateMenuItem];
 	}
 	return self;
+}
+
+#pragma mark -
+
+- (void)createAlternateURLs
+{
+	if([_identifier isFileIdentifier]) return;
+	NSURL *const URL = [_identifier URL];
+	if([[URL host] hasSuffix:@"flickr.com"] && [[URL path] hasPrefix:@"/photos/"]) [self addAlternateURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] toTop:YES];
+}
+- (void)addAlternateURL:(NSURL *)URL
+        toTop:(BOOL)flag
+{
+	if(!URL) return;
+	NSParameterAssert(![URL isFileURL]);
+	if(_URLs) [_URLs removeObject:URL];
+	else _URLs = [[NSMutableArray alloc] init];
+	if(flag) [_URLs addObject:URL];
+	else [_URLs insertObject:URL atIndex:0];
 }
 
 #pragma mark -
@@ -133,7 +153,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		if(status < 200 || status >= 300) return Nil;
 	}
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
+	NSURL *const URL = [self hasAlternateURLs] ? [self nextAlternateURLAndRemove:NO] : [[self identifier] URLByFollowingAliases:YES];
 	NSData *data;
 	if([self getData:&data] == PGNoData && URL) {
 		if(![URL isFileURL]) return [PGWebAdapter class];
@@ -383,6 +403,21 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (PGResourceIdentifier *)identifier
 {
 	return [[_identifier retain] autorelease];
+}
+- (BOOL)hasAlternateURLs
+{
+	return [_URLs count] > 0;
+}
+- (NSURL *)nextAlternateURLAndRemove:(BOOL)flag
+{
+	NSParameterAssert([self hasAlternateURLs]);
+	NSParameterAssert(![_identifier isFileIdentifier]);
+	NSURL *const URL = [[[_URLs lastObject] retain] autorelease];
+	if(flag) {
+		[_URLs removeLastObject];
+		[self setData:nil]; // We've switched to a new URL, so any old data we might have loaded is now invalid.
+	}
+	return URL;
 }
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
