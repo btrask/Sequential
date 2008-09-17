@@ -94,6 +94,10 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[super AE_getLinkedResourceIdentifiers:array validSchemes:schemes extensions:exts];
 }
+- (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array
+{
+	// I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+}
 
 @end
 
@@ -103,7 +107,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	PGResourceIdentifier *const ident = [[NSURL URLWithString:[self src]] AE_resourceIdentifier];
 	if(![array containsObject:ident]) {
-		[ident setCustomDisplayName:[self alt] notify:NO];
+		NSString *const title = [self title]; // Prefer the title to the alt attribute.
+		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [self alt]) notify:NO];
 		[array addObject:ident];
 	}
 	[super AE_getEmbeddedImageIdentifiers:array];
