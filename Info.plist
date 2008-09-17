@@ -702,6 +702,11 @@
 			<string>PGHTMLAdapter</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xml</string>
+				<string>XML</string>
+			</array>
 			<key>PGAdapterClass</key>
 			<string>PGXMLAdapter</string>
 			<key>CFBundleTypeRole</key>
