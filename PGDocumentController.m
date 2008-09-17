@@ -732,13 +732,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (int)numberOfItemsInMenu:(NSMenu *)menu
 {
 	if(menu == recentMenu) {
+		[_recentMenuSeparatorItem AE_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
 		NSMutableArray *const identifiers = [NSMutableArray array];
 		PGResourceIdentifier *identifier;
 		NSEnumerator *const identifierEnum = [[self recentDocumentIdentifiers] objectEnumerator];
 		while((identifier = [identifierEnum nextObject])) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
 		[self setRecentDocumentIdentifiers:identifiers];
-		int const separatorIndex = [menu indexOfItem:_recentMenuSeparatorItem];
-		if(separatorIndex != -1) [menu removeItemAtIndex:separatorIndex]; // The separator gets moved around as we rebuild the menu.
 		return [identifiers count] + 1;
 	}
 	return -1;

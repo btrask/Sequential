@@ -89,7 +89,8 @@ DEALINGS WITH THE SOFTWARE. */
 	_isDownloading = YES;
 	_encounteredLoadingError = NO;
 	[self noteIsViewableDidChange];
-	NSURL *const URL = [[self identifier] URL];
+	NSURL *URL = [[self identifier] URL];
+	if([[URL host] hasSuffix:@"flickr.com"] && [[URL path] hasPrefix:@"/photos/"] && [[[URL path] pathComponents] count] >= 4) URL = [NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@", [URL absoluteString]]];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
