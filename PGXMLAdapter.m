@@ -98,16 +98,14 @@ DEALINGS WITH THE SOFTWARE. */
 		[_URL release];
 		_URL = nil;
 	}
-	if([_tagPath hasPrefix:@"/oembed/"] && _version && _title) {
-		[[self identifier] setCustomDisplayName:_title notify:YES];
-		if(_type && _URL) {
-			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_URL]];
-			[ident setCustomDisplayName:_title notify:NO];
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			[node loadIfNecessaryWithURLResponse:nil];
-			[self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
-			return [parser abortParsing];
-		}
+	if(_version && _title && ([@"/oembed/version" isEqualToString:_tagPath] || [@"/oembed/title" isEqualToString:_tagPath])) [[self identifier] setCustomDisplayName:_title notify:YES];
+	if(_version && _title && _type && _URL) {
+		PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_URL]];
+		[ident setCustomDisplayName:_title notify:NO];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+		[node loadIfNecessaryWithURLResponse:nil];
+		[self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
+		return [parser abortParsing];
 	}
 	NSString *const oldTagPath = _tagPath;
 	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
