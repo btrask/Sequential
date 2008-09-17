@@ -115,7 +115,6 @@ DEALINGS WITH THE SOFTWARE. */
 			}
 		}
 	}
-	if([path rangeOfString:@"//"].location != NSNotFound) return nil;
 	[URL appendString:path];
 	return [self URLWithString:[URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
 }
