@@ -105,6 +105,7 @@
 		0ED4A8DD0DD00E18007C5A77 /* PGURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A8DB0DD00E18007C5A77 /* PGURLConnection.m */; };
 		0ED4AAF80DD18538007C5A77 /* PGFloatingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */; };
 		0ED4AB170DD18730007C5A77 /* PGExifPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */; };
+		0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */; };
 		0EE059AD0CF29F250080061B /* PGExtract.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0EE059AB0CF29F240080061B /* PGExtract.nib */; };
 		0EE059B10CF29F380080061B /* PGExtractAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE059B00CF29F380080061B /* PGExtractAlert.m */; };
 		0EE5F8DA0DBA6786005A5F0B /* XADMaster.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EE5F8D90DBA6786005A5F0B /* XADMaster.framework */; };
@@ -426,6 +427,8 @@
 		0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFloatingPanelController.m; sourceTree = "<group>"; };
 		0ED4AB150DD18730007C5A77 /* PGExifPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGExifPanelController.h; sourceTree = "<group>"; };
 		0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGExifPanelController.m; sourceTree = "<group>"; };
+		0ED5F5A90E806F4E00715745 /* PGXMLAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLAdapter.h; sourceTree = "<group>"; };
+		0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLAdapter.m; sourceTree = "<group>"; };
 		0EE059AC0CF29F250080061B /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0EE059AF0CF29F380080061B /* PGExtractAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGExtractAlert.h; sourceTree = "<group>"; };
 		0EE059B00CF29F380080061B /* PGExtractAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGExtractAlert.m; sourceTree = "<group>"; };
@@ -815,6 +818,8 @@
 				0EF543230DC1291600905391 /* PGFolderAdapter.m */,
 				0EE646A80DC8416F00A90F86 /* PGHTMLAdapter.h */,
 				0EE646A90DC8416F00A90F86 /* PGHTMLAdapter.m */,
+				0ED5F5A90E806F4E00715745 /* PGXMLAdapter.h */,
+				0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */,
 				0ED4A4180DCBFDDA007C5A77 /* PGArchiveAdapter.h */,
 				0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */,
 				0ED4A44B0DCC628F007C5A77 /* PGPDFAdapter.h */,
@@ -1129,6 +1134,7 @@
 				0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */,
 				0E255BA70E3A9D2E00EDF04C /* PGCircleProgressIndicator.m in Sources */,
 				0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */,
+				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -689,6 +689,8 @@
 			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeName</key>
+			<string>HTML</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/html</string>
@@ -698,6 +700,19 @@
 			<string>Viewer</string>
 			<key>PGAdapterClass</key>
 			<string>PGHTMLAdapter</string>
+		</dict>
+		<dict>
+			<key>PGAdapterClass</key>
+			<string>PGXMLAdapter</string>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleTypeName</key>
+			<string>XML</string>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/xml</string>
+				<string>text/xml+oembed</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
