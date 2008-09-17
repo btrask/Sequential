@@ -25,26 +25,12 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 #import "PGContainerAdapter.h"
 
-enum {
-	PGParsingUnknownType = 0,
-	PGParsingOEmbedType  = 1
-};
-typedef unsigned PGParsingType;
-enum {
-	PGParsingUnknownTag = 0,
-	PGParsingVersionTag = 1,
-	PGParsingTitleTag   = 2,
-	PGParsingURLTag     = 3
-};
-typedef unsigned PGParsingTag;
-
 @interface PGXMLAdapter : PGContainerAdapter
 {
 	@private
-	PGParsingType    _type;
-	PGParsingTag     _tag;
-	unsigned         _depth;
+	NSString        *_tagPath;
 	NSMutableString *_version;
+	NSMutableString *_type;
 	NSMutableString *_title;
 	NSMutableString *_URL;
 }
