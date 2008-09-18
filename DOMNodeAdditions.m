@@ -27,160 +27,67 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGResourceIdentifier.h"
 
+@implementation DOMHTMLDocument (AEAdditions)
+
+- (NSURL *)AE_oEmbedURL
+{
+	DOMNodeList *const elements = [self getElementsByTagName:@"LINK"];
+	unsigned i = 0;
+	for(; i < [elements length]; i++) {
+		DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
+		if(![@"alternate" isEqualToString:[[link rel] lowercaseString]] || ![@"text/xml+oembed" isEqualToString:[[link type] lowercaseString]]) continue;
+		NSString *const href = [link href];
+		if(href && ![@"" isEqualToString:href]) return [NSURL URLWithString:[link href]];
+	}
+	return nil;
+}
+- (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes
+             extensions:(NSArray *)exts
+{
+	NSMutableArray *const results = [NSMutableArray array];
+	DOMHTMLCollection *const links = [self links];
+	unsigned i = 0;
+	unsigned const count = [links length];
+	for(; i < count; i++) {
+		DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
+		NSString *href = [a href];
+		unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
+		if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
+		if(!href || [@"" isEqualToString:href]) continue;
+		NSURL *const URL = [NSURL URLWithString:href];
+		if((schemes && ![schemes containsObject:[URL scheme]]) || (exts && ![exts containsObject:[[URL path] pathExtension]])) continue;
+		PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
+		if([results containsObject:ident]) continue;
+		[ident setCustomDisplayName:[a innerText] notify:NO];
+		[results addObject:ident];
+	}
+	return results;
+}
+- (NSArray *)AE_imageSrcIdentifiers
+{
+	NSMutableArray *const results = [NSMutableArray array];
+	DOMHTMLCollection *const images = [self images];
+	unsigned i = 0;
+	unsigned const count = [images length];
+	for(; i < count; i++) {
+		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
+		if([img AE_hasAncestorWithNodeName:@"A"]) continue;
+		PGResourceIdentifier *const ident = [[NSURL URLWithString:[img src]] AE_resourceIdentifier];
+		if([results containsObject:ident]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+		NSString *const title = [img title]; // Prefer the title to the alt attribute.
+		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
+		[results addObject:ident];
+	}
+	return results;
+}
+
+@end
+
 @implementation DOMNode (AEAdditions)
 
-- (void)AE_getLinkedResourceIdentifiers:(NSMutableArray *)array
-        validSchemes:(NSArray *)schemes
-        extensions:(NSArray *)exts
+- (BOOL)AE_hasAncestorWithNodeName:(NSString *)string
 {
-	DOMNodeList *const list = [self childNodes];
-	unsigned i = 0;
-	unsigned const count = [list length];
-	for(; i < count; i++) [[list item:i] AE_getLinkedResourceIdentifiers:array validSchemes:schemes extensions:exts];
-}
-- (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array
-{
-	DOMNodeList *const list = [self childNodes];
-	unsigned i = 0;
-	unsigned const count = [list length];
-	for(; i < count; i++) [[list item:i] AE_getEmbeddedImageIdentifiers:array];
-}
-- (NSString *)AE_stringValue
-{
-	AEWhitespace trailing = AENoWhitespace;
-	return [self AE_stringValue:&trailing];
-}
-- (id)AE_ancestorThatRespondsTo:(SEL)aSelector
-{
-	return [self respondsToSelector:aSelector] ? self : [[self parentNode] AE_ancestorThatRespondsTo:aSelector];
-}
-- (BOOL)AE_pre
-{
-	if([[self nodeName] isEqual:@"PRE"]) return YES;
-	return [[self parentNode] AE_pre];
-}
-- (NSString *)AE_stringValue:(inout AEWhitespace *)trailing
-{
-	return [self AE_stringValueOfChildren:trailing];
-}
-- (NSString *)AE_stringValueOfChildren:(inout AEWhitespace *)trailing
-{
-	NSMutableString *result = [NSMutableString string];
-	unsigned i = 0;
-	for(; i < [[self childNodes] length]; i++) [result appendString:[[[self childNodes] item:i] AE_stringValue:trailing]];
-	return result;
-}
-
-@end
-
-@implementation DOMHTMLAnchorElement (AEAdditions)
-
-- (void)AE_getLinkedResourceIdentifiers:(NSMutableArray *)array
-        validSchemes:(NSArray *)schemes
-        extensions:(NSArray *)exts
-{
-	NSString *href = [self href];
-	unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
-	if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
-	if(href && ![@"" isEqualToString:href]) {
-		NSURL *const URL = [NSURL URLWithString:href];
-		if((!schemes || [schemes containsObject:[URL scheme]]) && (!exts || [exts containsObject:[[URL path] pathExtension]])) {
-			PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
-			if(![array containsObject:ident]) {
-				[ident setCustomDisplayName:[self AE_stringValue] notify:NO];
-				[array addObject:ident];
-			}
-		}
-	}
-	[super AE_getLinkedResourceIdentifiers:array validSchemes:schemes extensions:exts];
-}
-- (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array
-{
-	// I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
-}
-
-@end
-
-@implementation DOMHTMLImageElement (AEAdditions)
-
-- (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array
-{
-	PGResourceIdentifier *const ident = [[NSURL URLWithString:[self src]] AE_resourceIdentifier];
-	if(![array containsObject:ident]) {
-		NSString *const title = [self title]; // Prefer the title to the alt attribute.
-		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [self alt]) notify:NO];
-		[array addObject:ident];
-	}
-	[super AE_getEmbeddedImageIdentifiers:array];
-}
-
-@end
-
-@implementation DOMElement (AEAdditions)
-
-- (BOOL)isNonCollapsingNewlineTag
-{
-	return [@"BR" isEqualToString:[self tagName]];
-}
-- (BOOL)isCollapsingNewlineTag
-{
-	return [[NSArray arrayWithObjects:@"OL", @"UL", @"BLOCKQUOTE", @"DD", @"DIV", @"DL", @"DT", @"HR", @"LISTING", @"PRE", @"TD", @"TH", @"H1", @"H2", @"H3", @"H4", @"H5", @"H6", @"P", @"TR", nil] containsObject:[self tagName]];
-}
-- (NSString *)AE_computedStylePropertyValue:(NSString *)aString
-{
-	return [[[self ownerDocument] getComputedStyle:self :@""] getPropertyValue:aString];
-}
-- (NSString *)AE_stringValue:(inout AEWhitespace *)trailing
-{
-	NSParameterAssert(trailing);
-	NSMutableString *result = [NSMutableString string];
-	if([self isNonCollapsingNewlineTag]) {
-		[result appendString:@"\n"];
-		*trailing = AENewline;
-	}
-	if([self isCollapsingNewlineTag]) *trailing = AENewline;
-	[result appendString:[self AE_stringValueOfChildren:trailing]];
-	if([self isCollapsingNewlineTag]) *trailing = AENewline;
-	return result;
-}
-
-@end
-
-@implementation DOMCharacterData (AEAdditions)
-
-- (NSString *)AE_stringValue
-{
-	if([self AE_pre] || [[[[self AE_ancestorThatRespondsTo:@selector(AE_computedStylePropertyValue:)] AE_computedStylePropertyValue:@"white-space"] lowercaseString] isEqualToString:@"pre"]) return [self data];
-	NSScanner *const scanner = [NSScanner scannerWithString:[self data]];
-	NSCharacterSet *const whitespaceCharacters = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-	[scanner setCharactersToBeSkipped:whitespaceCharacters];
-	NSCharacterSet *const goodCharacters = [whitespaceCharacters invertedSet];
-	NSMutableString *const collapsed = [NSMutableString string];
-	NSString *substring;
-	while([scanner scanCharactersFromSet:goodCharacters intoString:&substring]) {
-		[collapsed appendString:substring];
-		if(![scanner isAtEnd]) [collapsed appendString:@" "];
-	}
-	return collapsed;
-}
-- (NSString *)AE_stringValue:(inout AEWhitespace *)trailing
-{
-	NSParameterAssert(trailing);
-	NSString *result = [self AE_stringValue];
-	unsigned whitespace;
-	for(whitespace = 0; whitespace < [result length] && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[result characterAtIndex:whitespace]]; whitespace++);
-	if(whitespace) {
-		if(AENoWhitespace == *trailing) *trailing = AESpace;
-		if(whitespace == [result length]) return @"";
-		result = [result substringFromIndex:whitespace];
-	}
-	if(AENoWhitespace != *trailing) result = [(AESpace == *trailing ? @" " : @"\n") stringByAppendingString:result];
-	for(whitespace = [result length]; whitespace && [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[result characterAtIndex:--whitespace]];);
-	if(whitespace != [result length] - 1) {
-		result = [result substringToIndex:whitespace];
-		*trailing = AESpace;
-	} else *trailing = AENoWhitespace;
-	return result;
+	return [[self nodeName] isEqualToString:string] ? YES : [[self parentNode] AE_hasAncestorWithNodeName:string];
 }
 
 @end

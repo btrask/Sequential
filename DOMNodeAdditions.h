@@ -25,30 +25,16 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 
-enum {
-	AENoWhitespace = 0,
-	AESpace	       = 1,
-	AENewline      = 2
-};
-typedef int AEWhitespace;
+@interface DOMHTMLDocument (AEAdditions)
 
-@interface DOMNode (AEAdditions)
-
-- (void)AE_getLinkedResourceIdentifiers:(NSMutableArray *)array validSchemes:(NSArray *)schemes extensions:(NSArray *)exts;
-- (void)AE_getEmbeddedImageIdentifiers:(NSMutableArray *)array;
-- (NSString *)AE_stringValue;
-
-- (id)AE_ancestorThatRespondsTo:(SEL)aSelector;
-- (BOOL)AE_pre;
-- (NSString *)AE_stringValue:(inout AEWhitespace *)whitespace;
-- (NSString *)AE_stringValueOfChildren:(inout AEWhitespace *)whitespace;
+- (NSURL *)AE_oEmbedURL;
+- (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts;
+- (NSArray *)AE_imageSrcIdentifiers;
 
 @end
 
-@interface DOMElement (AEAdditions)
+@interface DOMNode (AEAdditions)
 
-- (BOOL)isNonCollapsingNewlineTag;
-- (BOOL)isCollapsingNewlineTag;
-- (NSString *)AE_computedStylePropertyValue:(NSString *)aString;
+- (BOOL)AE_hasAncestorWithNodeName:(NSString *)string;
 
 @end

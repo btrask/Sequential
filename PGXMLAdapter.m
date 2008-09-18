@@ -37,17 +37,13 @@ DEALINGS WITH THE SOFTWARE. */
 	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
 	[parser setDelegate:self];
 	_tagPath = [@"/" copy];
+	_children = [[NSMutableArray alloc] init];
 	(void)[parser parse];
 	[_tagPath release];
 	_tagPath = nil;
-	[_version release];
-	_version = nil;
-	[_type release];
-	_type = nil;
-	[_title release];
-	_title = nil;
-	[_URL release];
-	_URL = nil;
+	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
+	[_children release];
+	_children = nil;
 }
 
 - (void)parser:(NSXMLParser *)parser
@@ -60,27 +56,43 @@ DEALINGS WITH THE SOFTWARE. */
 	_tagPath = [[_tagPath stringByAppendingPathComponent:elementName] copy];
 	[oldTagPath release];
 	if([@"/oembed/version" isEqualToString:_tagPath]) {
-		[_version release];
-		_version = [[NSMutableString alloc] init];
+		[_.oEmbed.version release];
+		_.oEmbed.version = [[NSMutableString alloc] init];
 	} else if([@"/oembed/type" isEqualToString:_tagPath]) {
-		[_type release];
-		_type = [[NSMutableString alloc] init];
+		[_.oEmbed.type release];
+		_.oEmbed.type = [[NSMutableString alloc] init];
 	} else if([@"/oembed/title" isEqualToString:_tagPath]) {
-		[_title release];
-		_title = [[NSMutableString alloc] init];
+		[_.oEmbed.title release];
+		_.oEmbed.title = [[NSMutableString alloc] init];
 	} else if([@"/oembed/url" isEqualToString:_tagPath]) {
-		[_URL release];
-		_URL = [[NSMutableString alloc] init];
+		[_.oEmbed.URL release];
+		_.oEmbed.URL = [[NSMutableString alloc] init];
+	} else if([@"/rsp/sizes/size" isEqualToString:_tagPath]) {
+		NSString *const label = [attributeDict objectForKey:@"label"];
+		static NSArray *sizes = nil;
+		if(!sizes) sizes = [[NSArray alloc] initWithObjects:@"square", @"thumbnail", @"small", @"medium", @"large", @"original", nil];
+		unsigned const size = label ? [sizes indexOfObject:[label lowercaseString]] + 1 : NSNotFound;
+		if(NSNotFound != size && size > _.flickr.size) {
+			_.flickr.size = size;
+			[_.flickr.URL release];
+			_.flickr.URL = [[attributeDict objectForKey:@"source"] copy];
+		}
+	} else if([@"/rsp/err" isEqualToString:_tagPath]) {
+		[parser abortParsing];
+		_.flickr.size = 0;
+		[_.flickr.URL release];
+		_.flickr.URL = nil;
+		[[self node] loadWithURLResponse:nil];
 	}
 }
 - (void)parser:(NSXMLParser *)parser
         foundCharacters:(NSString *)string
 {
 	NSMutableString *dest = nil;
-	if([@"/oembed/version" isEqualToString:_tagPath]) dest = _version;
-	else if([@"/oembed/type" isEqualToString:_tagPath]) dest = _type;
-	else if([@"/oembed/title" isEqualToString:_tagPath]) dest = _title;
-	else if([@"/oembed/url" isEqualToString:_tagPath]) dest = _URL;
+	if([@"/oembed/version" isEqualToString:_tagPath]) dest = _.oEmbed.version;
+	else if([@"/oembed/type" isEqualToString:_tagPath]) dest = _.oEmbed.type;
+	else if([@"/oembed/title" isEqualToString:_tagPath]) dest = _.oEmbed.title;
+	else if([@"/oembed/url" isEqualToString:_tagPath]) dest = _.oEmbed.URL;
 	[dest appendString:string];
 }
 - (void)parser:(NSXMLParser *)parser
@@ -88,24 +100,42 @@ DEALINGS WITH THE SOFTWARE. */
         namespaceURI:(NSString *)namespaceURI
         qualifiedName:(NSString *)qName
 {
-	if(([@"/oembed/version" isEqualToString:_tagPath] && ![@"1.0" isEqualToString:_version]) || ([@"/oembed/type" isEqualToString:_tagPath] && ![@"photo" isEqualToString:_type])) {
-		[_version release];
-		_version = nil;
-		[_type release];
-		_type = nil;
-		[_title release];
-		_title = nil;
-		[_URL release];
-		_URL = nil;
+	if(([@"/oembed/version" isEqualToString:_tagPath] && ![@"1.0" isEqualToString:_.oEmbed.version]) || ([@"/oembed/type" isEqualToString:_tagPath] && ![@"photo" isEqualToString:_.oEmbed.type])) {
+		[_.oEmbed.version release];
+		_.oEmbed.version = nil;
+		[_.oEmbed.type release];
+		_.oEmbed.type = nil;
+		[_.oEmbed.title release];
+		_.oEmbed.title = nil;
+		[_.oEmbed.URL release];
+		_.oEmbed.URL = nil;
 	}
-	if(_version && _title && ([@"/oembed/version" isEqualToString:_tagPath] || [@"/oembed/title" isEqualToString:_tagPath])) [[self identifier] setCustomDisplayName:_title notify:YES];
-	if(_version && _title && _type && _URL) {
-		PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_URL]];
-		[ident setCustomDisplayName:_title notify:NO];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-		[node loadIfNecessaryWithURLResponse:nil];
-		[self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
-		return [parser abortParsing];
+	if(([@"/oembed/version" isEqualToString:_tagPath] || [@"/oembed/title" isEqualToString:_tagPath]) && _.oEmbed.version && _.oEmbed.title) [[self identifier] setCustomDisplayName:_.oEmbed.title notify:YES];
+	if([@"/oembed" isEqualToString:_tagPath]) {
+		if(_.oEmbed.version && _.oEmbed.title && _.oEmbed.type && _.oEmbed.URL) {
+			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.oEmbed.URL]];
+			[ident setCustomDisplayName:_.oEmbed.title notify:NO];
+			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+			[node loadIfNecessaryWithURLResponse:nil];
+			[_children addObject:node];
+		}
+		[_.oEmbed.version release];
+		_.oEmbed.version = nil;
+		[_.oEmbed.type release];
+		_.oEmbed.type = nil;
+		[_.oEmbed.title release];
+		_.oEmbed.title = nil;
+		[_.oEmbed.URL release];
+		_.oEmbed.URL = nil;
+	} else if([@"/rsp" isEqualToString:_tagPath]) {
+		if(_.flickr.URL) {
+			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.flickr.URL]]] autorelease];
+			[node loadIfNecessaryWithURLResponse:nil];
+			[_children addObject:node];
+		}
+		_.flickr.size = 0;
+		[_.flickr.URL release];
+		_.flickr.URL = nil;
 	}
 	NSString *const oldTagPath = _tagPath;
 	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];

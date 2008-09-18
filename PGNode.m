@@ -98,7 +98,11 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	if([_identifier isFileIdentifier]) return;
 	NSURL *const URL = [_identifier URL];
-	if([[URL host] hasSuffix:@"flickr.com"] && [[URL path] hasPrefix:@"/photos/"]) [self addAlternateURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] toTop:YES];
+	if([[URL host] isEqualToString:@"flickr.com"] || [[URL host] hasSuffix:@".flickr.com"]) { // Be careful not to allow domains like thisisnotflickr.com!
+		NSArray *const components = [[URL path] pathComponents];
+		static NSString *const flickrAPIKey = @"efba0200d782ae552a34fc78d18c02bc"; // This key is registered to me for use in Sequential. Using it for nefarious purposes will just make Flickr turn it off.
+		if([components count] >= 4 && [@"photos" isEqualToString:[components objectAtIndex:1]]) [self addAlternateURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getSizes&photo_id=%@&format=rest&api_key=%@", [components objectAtIndex:3], flickrAPIKey]] toTop:YES];
+	}
 }
 - (void)addAlternateURL:(NSURL *)URL
         toTop:(BOOL)flag

@@ -28,11 +28,20 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGXMLAdapter : PGContainerAdapter
 {
 	@private
-	NSString        *_tagPath;
-	NSMutableString *_version;
-	NSMutableString *_type;
-	NSMutableString *_title;
-	NSMutableString *_URL;
+	NSMutableArray *_children;
+	NSString       *_tagPath;
+	union {
+		struct {
+			NSMutableString *version;
+			NSMutableString *type;
+			NSMutableString *title;
+			NSMutableString *URL;
+		} oEmbed;
+		struct {
+			unsigned  size;
+			NSString *URL;
+		} flickr;
+	} _;
 }
 
 @end

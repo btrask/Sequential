@@ -35,6 +35,7 @@ DEALINGS WITH THE SOFTWARE. */
 	PGURLConnection *_faviconConnection;
 	BOOL             _isDownloading;
 	BOOL             _encounteredLoadingError;
+	BOOL             _loadedPrimaryURL;
 }
 
 @end

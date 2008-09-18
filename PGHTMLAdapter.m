@@ -61,11 +61,18 @@ DEALINGS WITH THE SOFTWARE. */
         didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
-	DOMDocument *const doc = [frame DOMDocument];
-	NSMutableArray *const identifiers = [NSMutableArray array];
-	[doc AE_getLinkedResourceIdentifiers:identifiers validSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];
-	if(![identifiers count]) [doc AE_getEmbeddedImageIdentifiers:identifiers];
+	NSArray *identifiers = nil;
+	DOMHTMLDocument *const doc = (DOMHTMLDocument *)[frame DOMDocument];
+	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
+		NSURL *const oEmbedURL = [doc AE_oEmbedURL];
+		if(oEmbedURL) {
+			[[self node] addAlternateURL:oEmbedURL toTop:YES];
+			[[self node] loadWithURLResponse:nil];
+			return;
+		}
+		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];
+		if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
+	}
 	if([identifiers count]) {
 		NSMutableArray *const pages = [NSMutableArray array];
 		PGResourceIdentifier *ident;
@@ -78,6 +85,7 @@ DEALINGS WITH THE SOFTWARE. */
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
 	}
+	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	[_webView stopLoading:self];
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
