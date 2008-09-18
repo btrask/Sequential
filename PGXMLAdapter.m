@@ -82,7 +82,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_.flickr.size = 0;
 		[_.flickr.URL release];
 		_.flickr.URL = nil;
-		[[self node] loadWithURLResponse:nil];
+		//[[self node] loadWithURLResponse:nil];
 	}
 }
 - (void)parser:(NSXMLParser *)parser
