@@ -26,36 +26,31 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 
-enum {
-	PGLoading      = 0,
-	PGLoaded       = 1,
-	PGLoadCanceled = 2
-};
-typedef unsigned PGLoadingStatus;
-
 @interface PGURLConnection : NSObject // Wraps NSURLConnection so only a few connections are active at a time.
 {
 	@private
+	id              _delegate;
+	BOOL            _loaded;
 	NSURLRequest   *_request;
 	NSURLResponse  *_response;
 	NSMutableData  *_data;
-	PGLoadingStatus _status;
-	id              _delegate;
 }
 
 + (NSString *)userAgent;
 + (void)setUserAgent:(NSString *)aString;
 
-+ (NSArray *)connectionValues; // Use -nonretainedObjectValue to get the actual connection.
-+ (NSArray *)activeConnectionValues;
-+ (NSArray *)pendingConnectionValues;
++ (NSArray *)connections;
++ (NSArray *)activeConnections;
++ (NSArray *)pendingConnections;
 
 - (id)initWithRequest:(NSURLRequest *)aRequest delegate:(id)anObject;
-- (NSURLRequest *)request;
+
 - (id)delegate;
+- (BOOL)loaded;
+- (NSURLRequest *)request;
 - (NSURLResponse *)response;
 - (NSMutableData *)data;
-- (PGLoadingStatus)status;
+
 - (float)progress;
 - (void)prioritize;
 - (void)cancelAndNotify:(BOOL)notify;
@@ -67,6 +62,8 @@ typedef unsigned PGLoadingStatus;
 
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender;
 - (void)connectionDidReceiveResponse:(PGURLConnection *)sender;
-- (void)connectionDidClose:(PGURLConnection *)sender;
+- (void)connectionDidSucceed:(PGURLConnection *)sender;
+- (void)connectionDidFail:(PGURLConnection *)sender;
+- (void)connectionDidCancel:(PGURLConnection *)sender;
 
 @end

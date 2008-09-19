@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSMutableArray *const canceledConnections = [NSMutableArray array];
 	NSIndexSet *const indexes = [activityTable selectedRowIndexes];
 	unsigned i = [indexes firstIndex];
-	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [canceledConnections addObject:[[[PGURLConnection connectionValues] objectAtIndex:i] nonretainedObjectValue]];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [canceledConnections addObject:[[PGURLConnection connections] objectAtIndex:i]];
 	[canceledConnections makeObjectsPerformSelector:@selector(cancel)];
 }
 
@@ -60,13 +60,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [[PGURLConnection connectionValues] count];
+	return [[PGURLConnection connections] count];
 }
 - (id)tableView:(NSTableView *)tableView
       objectValueForTableColumn:(NSTableColumn *)tableColumn
       row:(int)row
 {
-	PGURLConnection *const connection = [[[PGURLConnection connectionValues] objectAtIndex:row] nonretainedObjectValue];
+	PGURLConnection *const connection = [[PGURLConnection connections] objectAtIndex:row];
 	if(tableColumn == identifierColumn) {
 		return [[[connection request] URL] absoluteString];
 	} else if(tableColumn == progressColumn) {
@@ -82,7 +82,7 @@ DEALINGS WITH THE SOFTWARE. */
         forTableColumn:(NSTableColumn *)tableColumn
 	row:(NSInteger)row
 {
-	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnectionValues] count])];
+	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnections] count])];
 }
 
 #pragma mark NSTableViewNotifications Protocol
