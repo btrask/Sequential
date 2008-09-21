@@ -57,73 +57,59 @@ static NSDictionary*    _selectedLabelAttr = nil;
 #pragma mark -- Initialize --
 //--------------------------------------------------------------//
 
-+ (void)load
++ (void)initialize
 {
-    NSAutoreleasePool*  pool;
-    pool = [[NSAutoreleasePool alloc] init];
-    
-    // Get resources
-    if (!_segmentLeftImage) {
-        NSBundle*   bundle;
-        bundle = [NSBundle bundleForClass:[self class]];
-    
-        _segmentLeftImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentL"]];
-        _segmentMiddleImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentM"]];
-        _segmentRightImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentR"]];
-        _segmentSelectedLeftImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentSelectedL"]];
-        _segmentSelectedMiddleImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentSelectedM"]];
-        _segmentSelectedRightImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentSelectedR"]];
-        _segmentDividerImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkSegmentDivider"]];
-        
-        _segmentLeftRect.size = [_segmentLeftImage size];
-        _segmentMiddleRect.size = [_segmentMiddleImage size];
-        _segmentRightRect.size = [_segmentRightImage size];
-        _segmentSelectedLeftRect.size = [_segmentSelectedLeftImage size];
-        _segmentSelectedMiddleRect.size = [_segmentSelectedMiddleImage size];
-        _segmentSelectedRightRect.size = [_segmentSelectedRightImage size];
-        _segmentDividerRect.size = [_segmentDividerImage size];
-        
-        // Create attributes
-        NSShadow*   shadow;
-        shadow = [[NSShadow alloc] init];
-        [shadow setShadowColor:[NSColor blackColor]];
-        [shadow setShadowBlurRadius:0.0f];
-        [shadow setShadowOffset:NSMakeSize(0, 1.0)];
-        
-        NSMutableParagraphStyle*    paragraph;
-        paragraph = [[NSMutableParagraphStyle alloc] init];
-        [paragraph setLineBreakMode:NSLineBreakByTruncatingTail];
-        [paragraph setAlignment:NSCenterTextAlignment];
-        
-        _labelAttr = [[NSDictionary dictionaryWithObjectsAndKeys:
-                [NSFont systemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName, 
-                [NSColor whiteColor], NSForegroundColorAttributeName, 
-                //shadow, NSShadowAttributeName, 
-                paragraph, NSParagraphStyleAttributeName, nil] retain];
-        [shadow release];
-        
-        shadow = [[NSShadow alloc] init];
-        [shadow setShadowColor:[NSColor grayColor]];
-        [shadow setShadowBlurRadius:0.0f];
-        [shadow setShadowOffset:NSMakeSize(0, -1.0)];
-        
-        _selectedLabelAttr = [[NSDictionary dictionaryWithObjectsAndKeys:
-                [NSFont systemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName, 
-                [NSColor whiteColor], NSForegroundColorAttributeName, 
-                //shadow, NSShadowAttributeName, 
-                paragraph, NSParagraphStyleAttributeName, nil] retain];
-        [shadow release];
-        [paragraph release];
-    }
-    
-    [pool release];
+	if([HMBlkSegmentedCell class] != self) return;
+	NSBundle*   bundle;
+	bundle = [NSBundle bundleForClass:[self class]];
+
+	_segmentLeftImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentL"]];
+	_segmentMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentM"]];
+	_segmentRightImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentR"]];
+	_segmentSelectedLeftImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentSelectedL"]];
+	_segmentSelectedMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentSelectedM"]];
+	_segmentSelectedRightImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentSelectedR"]];
+	_segmentDividerImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkSegmentDivider"]];
+
+	_segmentLeftRect.size = [_segmentLeftImage size];
+	_segmentMiddleRect.size = [_segmentMiddleImage size];
+	_segmentRightRect.size = [_segmentRightImage size];
+	_segmentSelectedLeftRect.size = [_segmentSelectedLeftImage size];
+	_segmentSelectedMiddleRect.size = [_segmentSelectedMiddleImage size];
+	_segmentSelectedRightRect.size = [_segmentSelectedRightImage size];
+	_segmentDividerRect.size = [_segmentDividerImage size];
+
+	// Create attributes
+	NSShadow*   shadow;
+	shadow = [[NSShadow alloc] init];
+	[shadow setShadowColor:[NSColor blackColor]];
+	[shadow setShadowBlurRadius:0.0f];
+	[shadow setShadowOffset:NSMakeSize(0, 1.0)];
+
+	NSMutableParagraphStyle*    paragraph;
+	paragraph = [[NSMutableParagraphStyle alloc] init];
+	[paragraph setLineBreakMode:NSLineBreakByTruncatingTail];
+	[paragraph setAlignment:NSCenterTextAlignment];
+
+	_labelAttr = [[NSDictionary dictionaryWithObjectsAndKeys:
+		[NSFont systemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName, 
+		[NSColor whiteColor], NSForegroundColorAttributeName, 
+		//shadow, NSShadowAttributeName, 
+		paragraph, NSParagraphStyleAttributeName, nil] retain];
+	[shadow release];
+
+	shadow = [[NSShadow alloc] init];
+	[shadow setShadowColor:[NSColor grayColor]];
+	[shadow setShadowBlurRadius:0.0f];
+	[shadow setShadowOffset:NSMakeSize(0, -1.0)];
+
+	_selectedLabelAttr = [[NSDictionary dictionaryWithObjectsAndKeys:
+		[NSFont systemFontOfSize:[NSFont smallSystemFontSize]], NSFontAttributeName, 
+		[NSColor whiteColor], NSForegroundColorAttributeName, 
+		//shadow, NSShadowAttributeName, 
+		paragraph, NSParagraphStyleAttributeName, nil] retain];
+	[shadow release];
+	[paragraph release];
 }
 
 //--------------------------------------------------------------//

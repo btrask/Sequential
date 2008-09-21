@@ -45,29 +45,16 @@ static NSRect   _expandedRect = {{0, 0}, {0, 0}};
 #pragma mark -- Initialize --
 //--------------------------------------------------------------//
 
-+ (void)load
++ (void)initialize
 {
-    NSAutoreleasePool*  pool;
-    pool = [[NSAutoreleasePool alloc] init];
-    
-    // Get resources
-    if (!_collapsedImage) {
-        NSBundle*   bundle;
-        bundle = [NSBundle bundleForClass:self];
-        
-        _collapsedImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkDiscCollapsed"]];
-        _transientImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkDiscTransient"]];
-        _expandedImage = [[NSImage alloc] initWithContentsOfFile:
-                [bundle pathForImageResource:@"blkDiscExpanded"]];
-        
-        _collapsedRect.size = [_collapsedImage size];
-        _transientRect.size = [_transientImage size];
-        _expandedRect.size = [_expandedImage size];
-    }
-    
-    [pool release];
+	if([HMBlkOutlineView class] != self) return;
+	NSBundle *bundle = [NSBundle bundleForClass:self];
+	_collapsedImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkDiscCollapsed"]];
+	_transientImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkDiscTransient"]];
+	_expandedImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkDiscExpanded"]];
+	_collapsedRect.size = [_collapsedImage size];
+	_transientRect.size = [_transientImage size];
+	_expandedRect.size = [_expandedImage size];
 }
 
 - (void)_init

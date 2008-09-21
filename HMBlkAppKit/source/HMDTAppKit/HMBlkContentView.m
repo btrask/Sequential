@@ -47,33 +47,26 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 
 #pragma mark Class Methods
 
-+ (void)load
++ (void)initialize
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	
-	// Get resources
-	if (!_leftBottomImage) {
-		NSBundle*   bundle;
-		bundle = [NSBundle bundleForClass:self];
-		
-		_leftBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLB"]];
-		_leftMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLM"]];
-		_leftTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLT"]];
-		_middleBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMB"]];
-		_middleTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMT"]];
-		_rightMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRM"]];
-		_rightTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRT"]];
-		
-		_leftBottomRect.size = [_leftBottomImage size];
-		_leftMiddleRect.size = [_leftMiddleImage size];
-		_leftTopRect.size = [_leftTopImage size];
-		_middleBottomRect.size = [_middleBottomImage size];
-		_middleTopRect.size = [_middleTopImage size];
-		_rightMiddleRect.size = [_rightMiddleImage size];
-		_rightTopRect.size = [_rightTopImage size];
-	}
-	
-	[pool release];
+	if([HMBlkContentView class] != self) return;
+	NSBundle *const bundle = [NSBundle bundleForClass:self];
+
+	_leftBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLB"]];
+	_leftMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLM"]];
+	_leftTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelLT"]];
+	_middleBottomImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMB"]];
+	_middleTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelMT"]];
+	_rightMiddleImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRM"]];
+	_rightTopImage = [[NSImage alloc] initWithContentsOfFile:[bundle pathForImageResource:@"blkPanelRT"]];
+
+	_leftBottomRect.size = [_leftBottomImage size];
+	_leftMiddleRect.size = [_leftMiddleImage size];
+	_leftTopRect.size = [_leftTopImage size];
+	_middleBottomRect.size = [_middleBottomImage size];
+	_middleTopRect.size = [_middleTopImage size];
+	_rightMiddleRect.size = [_rightMiddleImage size];
+	_rightTopRect.size = [_rightTopImage size];
 }
 
 #pragma mark Instance Methods
