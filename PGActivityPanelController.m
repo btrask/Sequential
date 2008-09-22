@@ -80,7 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)tableView:(NSTableView *)tableView
         willDisplayCell:(id)cell
         forTableColumn:(NSTableColumn *)tableColumn
-	row:(NSInteger)row
+        row:(int)row
 {
 	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnections] count])];
 }

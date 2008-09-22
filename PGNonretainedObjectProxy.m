@@ -48,7 +48,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSObject Protocol
 
-- (NSUInteger)hash
+- (unsigned)hash
 {
 	return [_target hash];
 }
