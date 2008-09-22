@@ -276,9 +276,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (IBAction)decrypt:(id)sender
 {
-	[[self activeNode] AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
-	[[self activeNode] AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
-	[[self activeNode] becomeViewedWithPassword:[passwordField stringValue]];
+	PGNode *const activeNode = [self activeNode];
+	[activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
+	[activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
+	[activeNode setPassword:[passwordField stringValue]];
+	[activeNode becomeViewed];
 }
 - (IBAction)chooseEncoding:(id)sender
 {

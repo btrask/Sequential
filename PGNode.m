@@ -193,9 +193,15 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (NSString *)lastPassword
+- (NSString *)password
 {
-	return [[_lastPassword retain] autorelease];
+	return [[_password retain] autorelease];
+}
+- (void)setPassword:(NSString *)password
+{
+	if(password == _password) return;
+	[_password release];
+	_password = [password copy];
 }
 - (BOOL)needsPassword
 {
@@ -235,12 +241,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)becomeViewed
 {
-	[self becomeViewedWithPassword:nil];
-}
-- (void)becomeViewedWithPassword:(NSString *)pass
-{
-	[_lastPassword autorelease];
-	_lastPassword = [pass copy];
 	if(_shouldRead) return;
 	_shouldRead = YES;
 	[self readIfNecessary];
@@ -524,7 +524,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_identifier release];
 	[_menuItem release];
 	[_resourceAdapter release];
-	[_lastPassword release];
+	[_password release];
 	[_dateModified release];
 	[_dateCreated release];
 	[_dataLength release];

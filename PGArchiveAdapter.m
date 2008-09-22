@@ -157,7 +157,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return nil;
 	[_archive clearLastError];
-	if([sender lastPassword]) [_archive setPassword:[sender lastPassword]];
+	if([sender password]) [_archive setPassword:[sender password]];
 	NSData *const data = [_archive contentsOfEntry:i];
 	[sender setNeedsPassword:([_archive lastError] == XADERR_PASSWORD)];
 	return data;

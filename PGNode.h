@@ -55,7 +55,7 @@ enum {
 	NSData               *_data;
 	id                    _dataSource;
 
-	NSString             *_lastPassword;
+	NSString             *_password;
 	BOOL                  _needsPassword;
 
 	NSMenuItem           *_menuItem;
@@ -87,7 +87,8 @@ enum {
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
 - (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response;
 
-- (NSString *)lastPassword;
+- (NSString *)password;
+- (void)setPassword:(NSString *)password;
 - (BOOL)needsPassword;
 - (void)setNeedsPassword:(BOOL)flag;
 
@@ -97,7 +98,6 @@ enum {
 - (BOOL)isViewable;
 - (void)setDeterminingType:(BOOL)flag;
 - (void)becomeViewed;
-- (void)becomeViewedWithPassword:(NSString *)pass;
 - (void)readIfNecessary;
 
 - (void)removeFromDocument;
@@ -123,6 +123,6 @@ enum {
 - (NSDate *)dateModifiedForNode:(PGNode *)sender;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
-- (NSData *)dataForNode:(PGNode *)sender; // If a password is required, sends -lastPassword, then sends -setNeedsPassword: with whether the password worked.
+- (NSData *)dataForNode:(PGNode *)sender; // If a password is required, sends -password, then sends -setNeedsPassword: with whether the password worked.
 
 @end
