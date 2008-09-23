@@ -53,8 +53,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
-	_isRendering = NO;
-	[self noteIsViewableDidChange];
+	[[self node] loadFailedWithError:nil];
 }
 
 - (void)webView:(WebView *)sender
@@ -80,7 +79,7 @@ DEALINGS WITH THE SOFTWARE. */
 		while((ident = [identEnum nextObject])) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
 			if(!node) continue;
-			[node loadIfNecessaryWithURLResponse:nil];
+			[node loadWithURLResponse:nil];
 			[pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
@@ -90,16 +89,11 @@ DEALINGS WITH THE SOFTWARE. */
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
-	_isRendering = NO;
-	[self noteIsViewableDidChange];
+	[[self node] loadFailedWithError:nil];
 }
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)adapterIsViewable
-{
-	return _isRendering || [super adapterIsViewable];
-}
 - (float)loadingProgress
 {
 	return 1.0;
@@ -122,7 +116,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(!_webView);
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return;
+	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];
@@ -132,8 +126,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[prefs setLoadsImagesAutomatically:NO];
 	[_webView setPreferences:prefs];
 	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
-	_isRendering = YES;
-	[self noteIsViewableDidChange];
 }
 
 - (void)read {}

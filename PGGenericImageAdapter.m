@@ -106,6 +106,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self clearCache];
 	[self setIsImage:YES];
+	[[self node] loadSucceeded];
 }
 - (void)read
 {

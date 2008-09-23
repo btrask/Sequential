@@ -48,6 +48,7 @@ DEALINGS WITH THE SOFTWARE. */
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];
+		[[self node] loadSucceeded];
 		return; // Don't go into packages.
 	}
 	NSString *const path = [URL path];
@@ -67,12 +68,13 @@ DEALINGS WITH THE SOFTWARE. */
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
 			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
-			[node loadIfNecessaryWithURLResponse:nil];
+			[node loadWithURLResponse:nil];
 		}
 		if(node) [newPages addObject:node];
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
 	[[self document] setProcessingNodes:NO];
+	[[self node] loadSucceeded];
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {

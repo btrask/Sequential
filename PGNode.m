@@ -186,9 +186,17 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		default: return NO;
 	}
 }
-- (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response
+- (void)loadSucceeded
 {
-	if([_resourceAdapter shouldLoad]) [self loadWithURLResponse:response];
+	NSParameterAssert(_loading);
+	_loading = NO;
+	[self noteIsViewableDidChange];
+	[self _updateFileAttributes];
+	[self readIfNecessary];
+}
+- (void)loadFailedWithError:(NSError *)error
+{
+	[self loadSucceeded]; // TODO: Implement this properly.
 }
 
 #pragma mark -
@@ -230,14 +238,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (BOOL)isViewable
 {
-	return _isViewable;
-}
-- (void)setDeterminingType:(BOOL)flag
-{
-	if(!flag) NSParameterAssert(_determiningTypeCount);
-	_determiningTypeCount += flag ? 1 : -1;
-	[self noteIsViewableDidChange];
-	[self readIfNecessary];
+	return _viewable;
 }
 - (void)becomeViewed
 {
@@ -247,7 +248,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)readIfNecessary
 {
-	if(_shouldRead && !_determiningTypeCount) [_resourceAdapter read];
+	if(!_loading && _shouldRead) [_resourceAdapter read];
 }
 
 #pragma mark -
@@ -425,16 +426,15 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	[self setDeterminingType:YES];
 	[self setResourceAdapterClass:[self classWithURLResponse:response]];
-	if([_resourceAdapter shouldLoad]) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
-		[_resourceAdapter loadWithURLResponse:response];
-		[self readIfNecessary];
-		[pool release];
-	}
-	[self _updateFileAttributes];
-	[self setDeterminingType:NO];
+	if(![_resourceAdapter shouldLoad]) return;
+	_loading = YES;
+	[self noteIsViewableDidChange];
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
+	[_resourceAdapter loadWithURLResponse:response];
+	[self readIfNecessary];
+	[pool release];
+	// We set _loading to NO when the adapter calls back with -loadSucceeded or -loadFailedWithError:.
 }
 - (void)readReturnedImageRep:(NSImageRep *)aRep
         error:(NSError *)error
@@ -483,9 +483,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = _determiningTypeCount > 0 || _needsPassword || [_resourceAdapter adapterIsViewable];
-	if(flag == _isViewable) return;
-	_isViewable = flag;
+	BOOL const flag = _loading || _needsPassword || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	if(flag == _viewable) return;
+	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
 }
 

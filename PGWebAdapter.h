@@ -33,7 +33,6 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	PGURLConnection *_mainConnection;
 	PGURLConnection *_faviconConnection;
-	BOOL             _downloading;
 	BOOL             _encounteredLoadingError;
 	BOOL             _loadedPrimaryURL;
 }

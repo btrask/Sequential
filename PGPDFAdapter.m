@@ -59,10 +59,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return;
-	if(![NSPDFImageRep canInitWithData:data]) return;
+	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
+	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFailedWithError:nil];
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
-	if(!_rep) return;
+	if(!_rep) return [[self node] loadFailedWithError:nil];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
@@ -73,10 +73,11 @@ DEALINGS WITH THE SOFTWARE. */
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
 		[node setResourceAdapterClass:[PGPDFPageAdapter class]];
-		[node loadIfNecessaryWithURLResponse:nil];
+		[node loadWithURLResponse:nil];
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];
+	[[self node] loadSucceeded];
 }
 
 #pragma mark NSObject

@@ -60,8 +60,8 @@ enum {
 
 	NSMenuItem           *_menuItem;
 	BOOL                  _allowMenuItemUpdates; // Just an optimization.
-	BOOL                  _isViewable;
-	unsigned              _determiningTypeCount;
+	BOOL                  _viewable;
+	BOOL                  _loading;
 
 	BOOL                  _shouldRead;
 
@@ -85,7 +85,8 @@ enum {
 - (void)setResourceAdapterClass:(Class)aClass;
 - (Class)classWithURLResponse:(NSURLResponse *)response;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
-- (void)loadIfNecessaryWithURLResponse:(NSURLResponse *)response;
+- (void)loadSucceeded;
+- (void)loadFailedWithError:(NSError *)error;
 
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
@@ -96,7 +97,6 @@ enum {
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
 - (BOOL)isViewable;
-- (void)setDeterminingType:(BOOL)flag;
 - (void)becomeViewed;
 - (void)readIfNecessary;
 

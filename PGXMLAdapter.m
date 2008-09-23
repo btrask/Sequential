@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return;
+	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
 	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
 	[parser setDelegate:self];
 	_tagPath = [@"/" copy];
@@ -44,6 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
 	[_children release];
 	_children = nil;
+	[[self node] loadSucceeded];
 }
 
 - (void)parser:(NSXMLParser *)parser
@@ -116,7 +117,7 @@ DEALINGS WITH THE SOFTWARE. */
 			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.oEmbed.URL]];
 			[ident setCustomDisplayName:_.oEmbed.title notify:NO];
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			[node loadIfNecessaryWithURLResponse:nil];
+			[node loadWithURLResponse:nil];
 			[_children addObject:node];
 		}
 		[_.oEmbed.version release];
@@ -130,7 +131,7 @@ DEALINGS WITH THE SOFTWARE. */
 	} else if([@"/rsp" isEqualToString:_tagPath]) {
 		if(_.flickr.URL) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.flickr.URL]]] autorelease];
-			[node loadIfNecessaryWithURLResponse:nil];
+			[node loadWithURLResponse:nil];
 			[_children addObject:node];
 		}
 		_.flickr.size = 0;

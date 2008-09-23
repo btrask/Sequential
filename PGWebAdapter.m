@@ -35,23 +35,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGWebAdapter (Private)
-
-- (void)_setDownloading:(BOOL)flag;
-
-@end
-
 @implementation PGWebAdapter
-
-#pragma mark Private Protocol
-
-- (void)_setDownloading:(BOOL)flag
-{
-	if(flag == _downloading) return;
-	_downloading = flag;
-	[self noteIsViewableDidChange];
-	if(!flag) [[self node] readIfNecessary];
-}
 
 #pragma mark PGURLConnectionDelegate Protocol
 
@@ -73,7 +57,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(sender == _mainConnection) {
 		[[self node] setData:[_mainConnection data]];
 		[[self node] loadWithURLResponse:[_mainConnection response]];
-		[self _setDownloading:NO];
+		[[self node] loadFailedWithError:nil];
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
 		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
@@ -83,18 +67,18 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(sender != _mainConnection) return;
 	_encounteredLoadingError = YES;
-	[self _setDownloading:NO];
+	[[self node] loadFailedWithError:nil];
 }
 - (void)connectionDidCancel:(PGURLConnection *)sender
 {
-	if(sender == _mainConnection) [self _setDownloading:NO];
+	if(sender == _mainConnection) [[self node] loadSucceeded];
 }
 
 #pragma mark PGResourceAdapting
 
 - (BOOL)adapterIsViewable
 {
-	return _downloading || _encounteredLoadingError || [super adapterIsViewable];
+	return _encounteredLoadingError || [super adapterIsViewable];
 }
 - (float)loadingProgress
 {
@@ -105,10 +89,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	if(response || [self canGetData] || _downloading) return;
+	if(response || [self canGetData]) return [[self node] loadFailedWithError:nil];
 	_encounteredLoadingError = NO;
-	_downloading = YES;
-	[self noteIsViewableDidChange];
 	_loadedPrimaryURL = ![self hasAlternateURLs];
 	NSURL *const URL = _loadedPrimaryURL ? [[self identifier] URL] : [self nextAlternateURLAndRemove:YES];
 	[_mainConnection cancelAndNotify:NO];
@@ -127,7 +109,6 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)read
 {
-	if(_downloading) return;
 	id const resp = [_mainConnection response];
 	NSString *message = nil;
 	if(_encounteredLoadingError) {

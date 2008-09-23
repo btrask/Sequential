@@ -73,11 +73,11 @@ DEALINGS WITH THE SOFTWARE. */
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : @"'fldr'")] notify:NO];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : NSFileTypeForHFSTypeCode('fldr'))] notify:NO];
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
-		if(isFile) [node loadIfNecessaryWithURLResponse:nil];
+		if(isFile) [node loadWithURLResponse:nil];
 		else {
 			[node setResourceAdapterClass:[PGContainerAdapter class]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
@@ -180,13 +180,14 @@ DEALINGS WITH THE SOFTWARE. */
 			if([self getData:&data] == PGDataReturned) {
 				_archive = [[XADArchive alloc] initWithData:data error:&error];
 				[_archive setDelegate:self];
-			} else return;
+			} else return [[self node] loadFailedWithError:nil];
 		}
-		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return;
+		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFailedWithError:nil];
 	}
 	NSString *const root = [_archive commonTopDirectory];
 	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
+	[[self node] loadSucceeded];
 }
 
 #pragma mark NSObject
