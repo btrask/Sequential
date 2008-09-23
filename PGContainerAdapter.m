@@ -273,15 +273,6 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	while((child = [childEnum nextObject])) [child noteSortOrderDidChange];
 }
 
-#pragma mark PGResourceAdapter
-
-- (void)read
-{
-	NSError *error = nil;
-	if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
-	[[self node] readFinishedWithImageRep:nil error:error];
-}
-
 #pragma mark NSObject
 
 - (void)dealloc

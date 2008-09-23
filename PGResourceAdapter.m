@@ -60,7 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)adapterIsViewable
 {
-	return [self isImage] || [self needsEncoding] || _temporarilyViewableCount > 0;
+	return [self isImage] || _temporarilyViewableCount > 0;
 }
 - (BOOL)isImage
 {
@@ -70,16 +70,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _isImage) return;
 	_isImage = flag;
-	[self noteIsViewableDidChange];
-}
-- (BOOL)needsEncoding
-{
-	return _needsEncoding;
-}
-- (void)setNeedsEncoding:(BOOL)flag
-{
-	if(flag == _needsEncoding) return;
-	_needsEncoding = flag;
 	[self noteIsViewableDidChange];
 }
 - (void)setIsTemporarilyViewable:(BOOL)flag

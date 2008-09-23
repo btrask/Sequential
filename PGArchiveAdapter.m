@@ -64,7 +64,7 @@ DEALINGS WITH THE SOFTWARE. */
 	int i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
-		if([self needsEncoding]) return nil;
+		if(UINT_MAX != _guessedEncoding) return nil;
 		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
 		[indexes removeIndex:i];
 		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
@@ -96,9 +96,11 @@ DEALINGS WITH THE SOFTWARE. */
                     guess:(NSStringEncoding)guess
                     confidence:(float)confidence
 {
-	if(confidence >= 0.8) return guess;
-	_guessedEncoding = guess;
-	[self setNeedsEncoding:YES];
+	if(confidence < 0.8 && UINT_MAX == _guessedEncoding) {
+		_guessedEncoding = guess;
+		[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil]];
+		[[self node] loadFinished];
+	}
 	return guess;
 }
 
@@ -120,8 +122,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[_archive setNameEncoding:encoding];
 	[self setIsTemporarilyViewable:YES];
-	[self setNeedsEncoding:NO];
-	[self loadWithURLResponse:nil];
+	_guessedEncoding = UINT_MAX;
+	[[self node] loadWithURLResponse:nil];
 	[self setIsTemporarilyViewable:NO];
 }
 
@@ -185,9 +187,10 @@ DEALINGS WITH THE SOFTWARE. */
 		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
 	NSString *const root = [_archive commonTopDirectory];
+	_guessedEncoding = UINT_MAX;
 	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	[[self node] loadFinished];
+	if(UINT_MAX == _guessedEncoding) [[self node] loadFinished];
 }
 
 #pragma mark NSObject

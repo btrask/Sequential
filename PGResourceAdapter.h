@@ -40,7 +40,6 @@ typedef int PGLoadingPolicy;
 	@private
 	PGNode  *_node;
 	BOOL     _isImage;
-	BOOL     _needsEncoding;
 	unsigned _temporarilyViewableCount;
 }
 
@@ -52,8 +51,6 @@ typedef int PGLoadingPolicy;
 - (BOOL)adapterIsViewable;
 - (BOOL)isImage;
 - (void)setIsImage:(BOOL)flag;
-- (BOOL)needsEncoding;
-- (void)setNeedsEncoding:(BOOL)flag;
 - (void)setIsTemporarilyViewable:(BOOL)flag;
 
 - (PGLoadingPolicy)descendentLoadingPolicy; // Return MAX(preferredValue, [[self parentAdapter] descendentLoadingPolicy]).
