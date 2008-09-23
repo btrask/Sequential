@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGGenericImageAdapter (Private)
 
 - (void)_threaded_getImageRepWithData:(NSData *)data;
-- (void)_readReturnedImageRep:(NSImageRep *)aRep;
+- (void)_readFinishedWithImageRep:(NSImageRep *)aRep;
 
 @end
 
@@ -59,17 +59,17 @@ DEALINGS WITH THE SOFTWARE. */
 		bestRep = rep;
 		bestPixelCount = pixelCount;
 	}
-	[self performSelectorOnMainThread:@selector(_readReturnedImageRep:) withObject:bestRep waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:bestRep waitUntilDone:NO];
 	[pool release];
 }
-- (void)_readReturnedImageRep:(NSImageRep *)aRep
+- (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
 	_gettingImageRep = NO;
 	[self setIsImage:(aRep != nil)];
 	[_cachedRep release];
 	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
-	[self readReturnedImageRep:aRep error:nil];
+	[[self node] readFinishedWithImageRep:aRep error:nil];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -80,9 +80,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSArray *)exifEntries
 {
-	if(!_exifEntries && [self canGetData]) {
+	if(!_exifEntries && [[self node] canGetData]) {
 		NSData *data;
-		if(PGDataReturned == [self getData:&data]) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
+		if(PGDataReturned == [[self node] getData:&data]) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 		[_exifEntries retain];
 	}
 	return [[_exifEntries retain] autorelease];
@@ -106,23 +106,23 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self clearCache];
 	[self setIsImage:YES];
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 - (void)read
 {
 	if(_cachedRep) {
 		[[self document] noteNodeDidCache:[self node]];
-		[self readReturnedImageRep:_cachedRep error:nil];
+		[[self node] readFinishedWithImageRep:_cachedRep error:nil];
 		return;
 	}
-	NSParameterAssert([self canGetData]);
+	NSParameterAssert([[self node] canGetData]);
 	if(_gettingImageRep) return;
 	NSData *data = nil;
-	PGDataError const error = [self getData:&data];
-	if(PGWrongPassword == error) return [self readReturnedImageRep:nil error:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
+	PGDataError const error = [[self node] getData:&data];
+	if(PGLoadError == error) return [[self node] readFinishedWithImageRep:nil error:nil];
 	if(PGNoData == error) {
 		[self setIsImage:NO];
-		[self readReturnedImageRep:nil error:nil];
+		[[self node] readFinishedWithImageRep:nil error:nil];
 		return;
 	}
 	_gettingImageRep = YES;

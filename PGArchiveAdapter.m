@@ -159,7 +159,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_archive clearLastError];
 	if([sender password]) [_archive setPassword:[sender password]];
 	NSData *const data = [_archive contentsOfEntry:i];
-	[sender setNeedsPassword:([_archive lastError] == XADERR_PASSWORD)];
+	if([_archive lastError] == XADERR_PASSWORD) [sender setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
 	return data;
 }
 
@@ -177,17 +177,17 @@ DEALINGS WITH THE SOFTWARE. */
 		if([identifier isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error]; // -getData: will return data for file identifiers, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *data;
-			if([self getData:&data] == PGDataReturned) {
+			if([[self node] getData:&data] == PGDataReturned) {
 				_archive = [[XADArchive alloc] initWithData:data error:&error];
 				[_archive setDelegate:self];
-			} else return [[self node] loadFailedWithError:nil];
+			} else return [[self node] loadFinished];
 		}
-		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFailedWithError:nil];
+		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
 	NSString *const root = [_archive commonTopDirectory];
 	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 
 #pragma mark NSObject

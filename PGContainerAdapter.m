@@ -166,7 +166,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (BOOL)hasDataNodes
 {
-	if([self canGetData]) return YES;
+	if([[self node] canGetData]) return YES;
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) if([[child resourceAdapter] hasDataNodes]) return YES;
@@ -277,11 +277,9 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 - (void)read
 {
-	if([[self node] needsPassword]) [self loadWithURLResponse:nil];
 	NSError *error = nil;
-	if([[self node] needsPassword]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil];
-	else if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
-	[self readReturnedImageRep:nil error:error];
+	if([self needsEncoding]) error = [NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil];
+	[[self node] readFinishedWithImageRep:nil error:error];
 }
 
 #pragma mark NSObject

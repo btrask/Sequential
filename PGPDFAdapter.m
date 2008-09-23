@@ -59,10 +59,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
-	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFailedWithError:nil];
+	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
+	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFinished];
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
-	if(!_rep) return [[self node] loadFailedWithError:nil];
+	if(!_rep) return [[self node] loadFinished];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
@@ -77,7 +77,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 
 #pragma mark NSObject
@@ -121,7 +121,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[rep setCurrentPage:[[self identifier] index]];
 	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
 	[rep setPixelsHigh:NSHeight([rep bounds])];
-	[self readReturnedImageRep:rep error:nil];
+	[[self node] readFinishedWithImageRep:rep error:nil];
 }
 
 #pragma mark NSObject

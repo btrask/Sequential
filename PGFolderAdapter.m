@@ -48,7 +48,7 @@ DEALINGS WITH THE SOFTWARE. */
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];
-		[[self node] loadSucceeded];
+		[[self node] loadFinished];
 		return; // Don't go into packages.
 	}
 	NSString *const path = [URL path];
@@ -74,7 +74,7 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
 	[[self document] setProcessingNodes:NO];
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {

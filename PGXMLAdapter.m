@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
+	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
 	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
 	[parser setDelegate:self];
 	_tagPath = [@"/" copy];
@@ -44,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
 	[_children release];
 	_children = nil;
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 
 - (void)parser:(NSXMLParser *)parser

@@ -53,7 +53,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
-	[[self node] loadFailedWithError:nil];
+	[[self node] loadFinished];
 }
 
 - (void)webView:(WebView *)sender
@@ -89,7 +89,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
-	[[self node] loadFailedWithError:nil];
+	[[self node] loadFinished];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -116,7 +116,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(!_webView);
 	NSData *data;
-	if([self getData:&data] != PGDataReturned) return [[self node] loadFailedWithError:nil];
+	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];

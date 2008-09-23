@@ -48,16 +48,23 @@ DEALINGS WITH THE SOFTWARE. */
 	if(sender != _mainConnection) return;
 	id const resp = [sender response];
 	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[resp MIMEType]];
-	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) _encounteredLoadingError = YES;
-	else if(pendingClass && [[self node] shouldLoadAdapterClass:pendingClass]) return;
-	[_mainConnection cancel];
+	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
+		[_mainConnection cancelAndNotify:NO];
+		[_faviconConnection cancelAndNotify:NO];
+		[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
+		[[self node] loadFinished];
+	} else if(!pendingClass || ![[self node] shouldLoadAdapterClass:pendingClass]) {
+		[_mainConnection cancelAndNotify:YES];
+		[_faviconConnection cancelAndNotify:YES];
+	}
 }
 - (void)connectionDidSucceed:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
+		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setData:[_mainConnection data]];
 		[[self node] loadWithURLResponse:[_mainConnection response]];
-		[[self node] loadFailedWithError:nil];
+		[[self node] loadFinished]; // We've already passed on the node, so normally this doesn't do anything.
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
 		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
@@ -66,20 +73,19 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)connectionDidFail:(PGURLConnection *)sender
 {
 	if(sender != _mainConnection) return;
-	_encounteredLoadingError = YES;
-	[[self node] loadFailedWithError:nil];
+	[_faviconConnection cancelAndNotify:NO];
+	[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]] forKey:NSLocalizedDescriptionKey]]];
+	[[self node] loadFinished];
 }
 - (void)connectionDidCancel:(PGURLConnection *)sender
 {
-	if(sender == _mainConnection) [[self node] loadSucceeded];
+	if(sender != _mainConnection) return;
+	[_faviconConnection cancelAndNotify:NO];
+	[[self node] loadFinished];
 }
 
 #pragma mark PGResourceAdapting
 
-- (BOOL)adapterIsViewable
-{
-	return _encounteredLoadingError || [super adapterIsViewable];
-}
 - (float)loadingProgress
 {
 	return [_mainConnection progress];
@@ -89,8 +95,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	if(response || [self canGetData]) return [[self node] loadFailedWithError:nil];
-	_encounteredLoadingError = NO;
+	if(response || [[self node] canGetData]) return [[self node] loadFinished];
 	_loadedPrimaryURL = ![self hasAlternateURLs];
 	NSURL *const URL = _loadedPrimaryURL ? [[self identifier] URL] : [self nextAlternateURLAndRemove:YES];
 	[_mainConnection cancelAndNotify:NO];
@@ -102,23 +107,10 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)reload
 {
-	if(!_encounteredLoadingError) return NO;
+	// FIXME: This does not currently work correctly.
 	[[self node] createAlternateURLs];
 	[[self node] loadWithURLResponse:nil];
 	return YES;
-}
-- (void)read
-{
-	id const resp = [_mainConnection response];
-	NSString *message = nil;
-	if(_encounteredLoadingError) {
-		if(!_loadedPrimaryURL) return [[self node] loadWithURLResponse:nil]; // Try again from the beginning.
-		if([resp respondsToSelector:@selector(statusCode)]) {
-			int const code = [resp statusCode];
-			if(code < 200 || code >= 300) message = [NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), code, [NSHTTPURLResponse localizedStringForStatusCode:code], [resp URL]];
-		} else message = [NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]];
-	}
-	[self readReturnedImageRep:nil error:(message ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:message forKey:NSLocalizedDescriptionKey]] : nil)];
 }
 
 #pragma mark NSObject

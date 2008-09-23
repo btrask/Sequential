@@ -165,10 +165,6 @@ static NSMutableArray *PGPendingConnections = nil;
 	_data = nil;
 	if(notify) [[self delegate] connectionDidCancel:self];
 }
-- (void)cancel
-{
-	[self cancelAndNotify:YES];
-}
 
 #pragma mark Private Protocol
 

@@ -54,7 +54,6 @@ extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 - (float)progress;
 - (void)prioritize;
 - (void)cancelAndNotify:(BOOL)notify;
-- (void)cancel; // Sends -cancelAndNotify:YES.
 
 @end
 

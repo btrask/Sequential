@@ -101,7 +101,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)read
 {
-	[self readReturnedImageRep:nil error:nil];
+	[[self node] readFinishedWithImageRep:nil error:nil];
 }
 
 #pragma mark -
@@ -151,16 +151,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
-	[[self node] loadSucceeded];
+	[[self node] loadFinished];
 }
 - (BOOL)reload
 {
 	return NO;
-}
-- (void)readReturnedImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
-{
-	[[self node] readReturnedImageRep:aRep error:error];
 }
 
 #pragma mark -
@@ -173,17 +168,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return 0;
 }
-- (BOOL)canGetData
-{
-	return [[self node] canGetData];
-}
 - (BOOL)canExtractData
 {
 	return NO;
-}
-- (PGDataError)getData:(out NSData **)outData
-{
-	return [[self node] getData:outData];
 }
 - (NSArray *)exifEntries
 {
@@ -207,7 +194,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)hasDataNodes
 {
-	return [self canGetData];
+	return [[self node] canGetData];
 }
 - (unsigned)viewableNodeIndex
 {

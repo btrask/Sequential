@@ -56,12 +56,12 @@ enum {
 	id                    _dataSource;
 
 	NSString             *_password;
-	BOOL                  _needsPassword;
 
 	NSMenuItem           *_menuItem;
 	BOOL                  _allowMenuItemUpdates; // Just an optimization.
 	BOOL                  _viewable;
 	BOOL                  _loading;
+	NSError              *_loadError;
 
 	BOOL                  _shouldRead;
 
@@ -77,28 +77,29 @@ enum {
 - (void)createAlternateURLs;
 - (void)addAlternateURL:(NSURL *)URL toTop:(BOOL)flag;
 
+- (BOOL)canGetData;
 - (void)setData:(NSData *)data;
 - (id)dataSource;
 - (void)setDataSource:(id)anObject;
+- (PGDataError)getData:(out NSData **)outData;
 
 - (PGResourceAdapter *)resourceAdapter;
 - (void)setResourceAdapterClass:(Class)aClass;
 - (Class)classWithURLResponse:(NSURLResponse *)response;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
-- (void)loadSucceeded;
-- (void)loadFailedWithError:(NSError *)error;
+- (void)setLoadError:(NSError *)error;
+- (void)loadFinished;
+- (void)becomeViewed;
+- (void)readIfNecessary;
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
-- (BOOL)needsPassword;
-- (void)setNeedsPassword:(BOOL)flag;
 
 - (unsigned)depth;
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
 - (BOOL)isViewable;
-- (void)becomeViewed;
-- (void)readIfNecessary;
 
 - (void)removeFromDocument;
 
@@ -123,6 +124,6 @@ enum {
 - (NSDate *)dateModifiedForNode:(PGNode *)sender;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
-- (NSData *)dataForNode:(PGNode *)sender; // If a password is required, sends -password, then sends -setNeedsPassword: with whether the password worked.
+- (NSData *)dataForNode:(PGNode *)sender; // If a problem occurred, the data source should send -setLoadError: and return nil.
 
 @end

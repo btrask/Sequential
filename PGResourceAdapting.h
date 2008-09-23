@@ -35,9 +35,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 enum {
-	PGWrongPassword = -1,
-	PGNoData        = 0,
-	PGDataReturned  = 1
+	PGLoadError    = -1,
+	PGNoData       = 0,
+	PGDataReturned = 1
 };
 typedef int PGDataError;
 
@@ -55,13 +55,10 @@ typedef int PGDataError;
 - (NSURL *)nextAlternateURLAndRemove:(BOOL)flag;
 - (void)loadWithURLResponse:(NSURLResponse *)response;
 - (BOOL)reload;
-- (void)readReturnedImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (BOOL)isContainer;
 - (float)loadingProgress;
-- (BOOL)canGetData;
 - (BOOL)canExtractData;
-- (PGDataError)getData:(out NSData **)outData;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;

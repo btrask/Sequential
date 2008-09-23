@@ -117,6 +117,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
+- (BOOL)canGetData
+{
+	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
+}
 - (void)setData:(NSData *)data
 {
 	if(data == _data) return;
@@ -131,6 +135,20 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	if(anObject == _dataSource) return;
 	_dataSource = anObject;
+}
+- (PGDataError)getData:(out NSData **)outData
+{
+	NSData *data = [[_data retain] autorelease];
+	if(!data) {
+		data = [[self dataSource] dataForNode:self];
+		if(!data && _loadError) return PGLoadError;
+	}
+	if(!data) {
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+	}
+	if(outData) *outData = data;
+	return data ? PGDataReturned : PGNoData;
 }
 
 #pragma mark -
@@ -158,19 +176,16 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	NSURL *const URL = [self hasAlternateURLs] ? [self nextAlternateURLAndRemove:NO] : [[self identifier] URLByFollowingAliases:YES];
-	NSData *data;
+	NSData *data = nil;
 	if([self getData:&data] == PGNoData && URL) {
 		if(![URL isFileURL]) return [PGWebAdapter class];
 		BOOL isDir;
 		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
 		if(isDir) return [d resourceAdapterClassWhereAttribute:PGLSTypeIsPackageKey matches:[NSNumber numberWithBool:YES]];
 	}
-	if(data || [self canGetData]) {
-		NSData *realData = data;
-		if(realData || [self getData:&realData] == PGDataReturned) {
-			if([realData length] < 4) return Nil;
-			class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[realData subdataWithRange:NSMakeRange(0, 4)]];
-		}
+	if(data) {
+		if([data length] < 4) return Nil;
+		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[data subdataWithRange:NSMakeRange(0, 4)]];
 	}
 	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
@@ -186,7 +201,11 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		default: return NO;
 	}
 }
-- (void)loadSucceeded
+- (void)setLoadError:(NSError *)error
+{
+	if(!_loadError) _loadError = [error copy];
+}
+- (void)loadFinished
 {
 	NSParameterAssert(_loading);
 	_loading = NO;
@@ -194,9 +213,27 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[self _updateFileAttributes];
 	[self readIfNecessary];
 }
-- (void)loadFailedWithError:(NSError *)error
+- (void)becomeViewed
 {
-	[self loadSucceeded]; // TODO: Implement this properly.
+	if(_shouldRead) return;
+	_shouldRead = YES;
+	[self readIfNecessary];
+}
+- (void)readIfNecessary
+{
+	if(_loading || !_shouldRead) return;
+	if(_loadError) [self readFinishedWithImageRep:nil error:_loadError];
+	else [_resourceAdapter read];
+}
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep
+        error:(NSError *)error
+{
+	NSParameterAssert(_shouldRead);
+	_shouldRead = NO;
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
+	if(error) [dict setObject:(error ? error : _loadError) forKey:PGErrorKey];
+	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -
@@ -210,16 +247,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(password == _password) return;
 	[_password release];
 	_password = [password copy];
-}
-- (BOOL)needsPassword
-{
-	return _needsPassword;
-}
-- (void)setNeedsPassword:(BOOL)flag
-{
-	if(flag == _needsPassword) return;
-	_needsPassword = flag;
-	[self noteIsViewableDidChange];
 }
 
 #pragma mark -
@@ -239,16 +266,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (BOOL)isViewable
 {
 	return _viewable;
-}
-- (void)becomeViewed
-{
-	if(_shouldRead) return;
-	_shouldRead = YES;
-	[self readIfNecessary];
-}
-- (void)readIfNecessary
-{
-	if(!_loading && _shouldRead) [_resourceAdapter read];
 }
 
 #pragma mark -
@@ -427,45 +444,21 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)loadWithURLResponse:(NSURLResponse *)response
 {
 	[self setResourceAdapterClass:[self classWithURLResponse:response]];
-	if(![_resourceAdapter shouldLoad]) return;
+	if(!_loading) {
+		[_loadError release];
+		_loadError = nil;
+	}
+	if(![_resourceAdapter shouldLoad]) {
+		if(_loading) [self loadFinished];
+		return;
+	}
 	_loading = YES;
 	[self noteIsViewableDidChange];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
 	[_resourceAdapter loadWithURLResponse:response];
 	[self readIfNecessary];
 	[pool release];
-	// We set _loading to NO when the adapter calls back with -loadSucceeded or -loadFailedWithError:.
-}
-- (void)readReturnedImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
-{
-	NSParameterAssert(_shouldRead);
-	_shouldRead = NO;
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
-	if(error) [dict setObject:error forKey:PGErrorKey];
-	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
-}
-
-#pragma mark -
-
-- (BOOL)canGetData
-{
-	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
-}
-- (PGDataError)getData:(out NSData **)outData
-{
-	NSData *data = [[_data retain] autorelease];
-	if(!data) {
-		data = [[self dataSource] dataForNode:self];
-		if(!data && [self needsPassword]) return PGWrongPassword;
-	}
-	if(!data) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	}
-	if(outData) *outData = data;
-	return data ? PGDataReturned : PGNoData;
+	// We set _loading to NO when the adapter calls back with -loadFinished.
 }
 
 #pragma mark -
@@ -483,7 +476,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = _loading || _needsPassword || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = _loading || _loadError || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
@@ -525,6 +518,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_menuItem release];
 	[_resourceAdapter release];
 	[_password release];
+	[_loadError release];
 	[_dateModified release];
 	[_dateCreated release];
 	[_dataLength release];
