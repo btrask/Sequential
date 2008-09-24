@@ -74,11 +74,9 @@ enum {
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident;
 
-- (BOOL)canGetData;
-- (void)setData:(NSData *)data;
 - (id)dataSource;
 - (void)setDataSource:(id)anObject;
-- (PGDataError)getData:(out NSData **)outData;
+- (NSData *)dataWithInfo:(NSDictionary *)info;
 
 - (PGResourceAdapter *)resourceAdapter;
 - (void)setResourceAdapterClass:(Class)aClass;
@@ -121,6 +119,6 @@ enum {
 - (NSDate *)dateModifiedForNode:(PGNode *)sender;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
-- (NSData *)dataForNode:(PGNode *)sender; // If a problem occurred, the data source should send -setLoadError: and return nil.
+- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData; // Return NO if a problem occurred.
 
 @end

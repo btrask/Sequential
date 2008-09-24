@@ -61,9 +61,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)connectionDidSucceed:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
+		NSURLResponse *const resp = [_mainConnection response];
+		[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGURLDataKey, nil]];
 		[_faviconConnection cancelAndNotify:NO];
-		[[self node] setData:[_mainConnection data]];
-		[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[_mainConnection response], PGURLResponseKey, nil]];
 		[[self node] loadFinished]; // We've already passed on the node, so normally this doesn't do anything.
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
@@ -95,9 +95,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)loadWithInfo:(NSDictionary *)info
 {
-	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
-	if(response || [[self node] canGetData]) return [[self node] loadFinished];
-	NSURL *const URL = [[self identifier] URL];
+	NSParameterAssert(![self canGetData]);
+	NSURL *URL = [info objectForKey:PGURLKey];
+	if(!URL) URL = [[self identifier] URL];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];

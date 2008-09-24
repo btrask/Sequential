@@ -58,8 +58,8 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {
-	NSData *data;
-	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
+	NSData *const data = [self data];
+	if(!data) return [[self node] loadFinished];
 	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFinished];
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
 	if(!_rep) return [[self node] loadFinished];

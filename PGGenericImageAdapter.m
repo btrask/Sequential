@@ -80,9 +80,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSArray *)exifEntries
 {
-	if(!_exifEntries && [[self node] canGetData]) {
-		NSData *data;
-		if(PGDataReturned == [[self node] getData:&data]) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
+	if(!_exifEntries) {
+		NSData *const data = [self data];
+		if(data) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 		[_exifEntries retain];
 	}
 	return [[_exifEntries retain] autorelease];
@@ -115,12 +115,9 @@ DEALINGS WITH THE SOFTWARE. */
 		[[self node] readFinishedWithImageRep:_cachedRep error:nil];
 		return;
 	}
-	NSParameterAssert([[self node] canGetData]);
 	if(_gettingImageRep) return;
-	NSData *data = nil;
-	PGDataError const error = [[self node] getData:&data];
-	if(PGLoadError == error) return [[self node] readFinishedWithImageRep:nil error:nil];
-	if(PGNoData == error) {
+	NSData *const data = [self data];
+	if(!data) {
 		[self setIsImage:NO];
 		[[self node] readFinishedWithImageRep:nil error:nil];
 		return;

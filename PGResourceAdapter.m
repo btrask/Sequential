@@ -58,6 +58,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (NSMutableDictionary *)info
+{
+	return [[_info retain] autorelease];
+}
+
+#pragma mark -
+
 - (BOOL)adapterIsViewable
 {
 	return [self isImage] || _temporarilyViewableCount > 0;
@@ -131,6 +138,21 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self node] identifier];
 }
+- (NSData *)data
+{
+	return [[self node] dataWithInfo:_info];
+}
+- (BOOL)canGetData
+{
+	return [_info objectForKey:PGURLDataKey] || [[self node] dataSource] || [[self identifier] isFileIdentifier];
+}
+- (BOOL)canExtractData
+{
+	return NO;
+}
+
+#pragma mark -
+
 - (void)loadWithInfo:(NSDictionary *)info
 {
 	[[self node] loadFinished];
@@ -149,10 +171,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (float)loadingProgress
 {
 	return 0;
-}
-- (BOOL)canExtractData
-{
-	return NO;
 }
 - (NSArray *)exifEntries
 {
@@ -295,6 +313,21 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
+}
+
+#pragma mark NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		_info = [[NSMutableDictionary alloc] init];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[_info release];
+	[super dealloc];
 }
 
 @end

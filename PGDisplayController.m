@@ -961,8 +961,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(![types containsObject:NSRTFDPboardType] && ![types containsObject:NSFileContentsPboardType]) break;
 		wrote = YES;
 		if(!pboard) break;
-		NSData *data;
-		if(PGDataReturned != [[self activeNode] getData:&data] || !data) break;
+		NSData *const data = [[self activeNode] data];
+		if(!data) break;
 		if([types containsObject:NSRTFDPboardType]) {
 			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
 			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];

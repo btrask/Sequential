@@ -37,7 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGURLDataKey;
 extern NSString *const PGURLKey;
-extern NSString *const PGMIMETypeKey;
+extern NSString *const PGMIMETypeKey; // If PGURLResponseKey has a MIMEType, this must be set too.
 
 enum {
 	PGLoadError    = -1,
@@ -56,12 +56,15 @@ typedef int PGDataError;
 - (PGDocument *)document;
 
 - (PGResourceIdentifier *)identifier;
+- (NSData *)data;
+- (BOOL)canGetData;
+- (BOOL)canExtractData;
+
 - (void)loadWithInfo:(NSDictionary *)info;
 - (BOOL)reload;
 
 - (BOOL)isContainer;
 - (float)loadingProgress;
-- (BOOL)canExtractData;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;

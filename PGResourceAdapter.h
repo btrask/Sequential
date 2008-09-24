@@ -38,15 +38,18 @@ typedef int PGLoadingPolicy;
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
-	PGNode  *_node;
-	BOOL     _isImage;
-	unsigned _temporarilyViewableCount;
+	PGNode              *_node;
+	NSMutableDictionary *_info;
+	BOOL                 _isImage;
+	unsigned             _temporarilyViewableCount;
 }
 
 + (BOOL)alwaysLoads;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
+
+- (NSMutableDictionary *)info;
 
 - (BOOL)adapterIsViewable;
 - (BOOL)isImage;

@@ -93,16 +93,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
-- (BOOL)canGetData
-{
-	return _data != nil || [self dataSource] || [[self identifier] isFileIdentifier];
-}
-- (void)setData:(NSData *)data
-{
-	if(data == _data) return;
-	[_data release];
-	_data = [data retain];
-}
 - (id)dataSource
 {
 	return _dataSource;
@@ -112,19 +102,15 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	if(anObject == _dataSource) return;
 	_dataSource = anObject;
 }
-- (PGDataError)getData:(out NSData **)outData
+- (NSData *)dataWithInfo:(NSDictionary *)info
 {
-	NSData *data = [[_data retain] autorelease];
-	if(!data) {
-		data = [[self dataSource] dataForNode:self];
-		if(!data && _loadError) return PGLoadError;
-	}
-	if(!data) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	}
-	if(outData) *outData = data;
-	return data ? PGDataReturned : PGNoData;
+	NSData *data = [[[info objectForKey:PGURLDataKey] retain] autorelease];
+	if(data) return data;
+	if([self dataSource] && ![[self dataSource] node:self getData:&data]) return nil;
+	if(data) return data;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+	return data;
 }
 
 #pragma mark -
@@ -144,28 +130,27 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (Class)classWithInfo:(NSDictionary *)info
 {
-	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	Class class = [[self dataSource] classForNode:self];
 	if(class) return class;
+	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	if([response respondsToSelector:@selector(statusCode)]) {
 		int const status = [(NSHTTPURLResponse *)response statusCode];
 		if(status < 200 || status >= 300) return Nil;
 	}
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
-	NSData *data = nil;
-	if([self getData:&data] == PGNoData && URL) {
+	NSURL *URL = [info objectForKey:PGURLKey];
+	if(!URL) URL = [[self identifier] URLByFollowingAliases:YES];
+	NSData *const data = [self dataWithInfo:info];
+	if(data) {
+		if([data length] < 4) return Nil;
+		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[data subdataWithRange:NSMakeRange(0, 4)]];
+	} else if(URL) {
 		if(![URL isFileURL]) return [PGWebAdapter class];
 		BOOL isDir;
 		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
 		if(isDir) return [d resourceAdapterClassWhereAttribute:PGLSTypeIsPackageKey matches:[NSNumber numberWithBool:YES]];
 	}
-	if(data) {
-		if([data length] < 4) return Nil;
-		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[data subdataWithRange:NSMakeRange(0, 4)]];
-	}
-	NSString *MIMEType = [info objectForKey:PGMIMETypeKey];
-	if(!MIMEType && response) MIMEType = [response MIMEType];
+	NSString *const MIMEType = [info objectForKey:PGMIMETypeKey];
 	if(!class && MIMEType) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:MIMEType];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
 	if(!class) class = [PGResourceAdapter class];
@@ -361,8 +346,8 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	NSNumber *dataLength = [[self dataSource] dataLengthForNode:self];
 	do {
 		if(dataLength) break;
-		NSData *data;
-		if([self canGetData] && [self getData:&data] == PGDataReturned) dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
+		NSData *const data = [self data];
+		if(data) dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
 		if(dataLength) break;
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {
@@ -408,6 +393,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (void)loadWithInfo:(NSDictionary *)info
 {
 	[self setResourceAdapterClass:[self classWithInfo:info]];
+	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:info];
 	if(!_loading) {
 		[_loadError release];
 		_loadError = nil;
@@ -418,9 +404,8 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	_loading = YES;
 	[self noteIsViewableDidChange];
-	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
 	[_resourceAdapter loadWithInfo:info];
-	[self readIfNecessary];
 	[pool release];
 	// We set _loading to NO when the adapter calls back with -loadFinished.
 }
@@ -477,7 +462,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	[self AE_removeObserver];
 	[_resourceAdapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
-	[_data release];
 	[_identifier release];
 	[_menuItem release];
 	[_resourceAdapter release];
@@ -525,9 +509,11 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	return nil;
 }
-- (NSData *)dataForNode:(PGNode *)sender
+- (BOOL)node:(PGNode *)sender
+        getData:(out NSData **)outData
 {
-	return nil;
+	if(outData) *outData = nil;
+	return YES;
 }
 
 @end

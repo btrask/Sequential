@@ -115,8 +115,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(!_webView);
 	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
-	NSData *data;
-	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
+	NSData *const data = [self data];
+	if(!data) return [[self node] loadFinished];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];

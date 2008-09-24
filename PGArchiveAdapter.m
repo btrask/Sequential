@@ -154,15 +154,20 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned const i = [[sender identifier] index];
 	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive xadFileInfoForEntry:i]->xfi_Size];
 }
-- (NSData *)dataForNode:(PGNode *)sender
+- (BOOL)node:(PGNode *)sender
+        getData:(out NSData **)outData
 {
 	unsigned const i = [[sender identifier] index];
-	if(NSNotFound == i) return nil;
+	if(NSNotFound == i) return NO;
 	[_archive clearLastError];
 	if([sender password]) [_archive setPassword:[sender password]];
 	NSData *const data = [_archive contentsOfEntry:i];
-	if([_archive lastError] == XADERR_PASSWORD) [sender setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
-	return data;
+	if([_archive lastError] == XADERR_PASSWORD) {
+		[sender setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
+		return NO;
+	}
+	if(outData) *outData = data;
+	return YES;
 }
 
 #pragma mark PGResourceAdapter
@@ -178,11 +183,10 @@ DEALINGS WITH THE SOFTWARE. */
 		PGResourceIdentifier *const identifier = [self identifier];
 		if([identifier isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error]; // -getData: will return data for file identifiers, but it's worth using -[XADArchive initWithFile:...].
 		else {
-			NSData *data;
-			if([[self node] getData:&data] == PGDataReturned) {
-				_archive = [[XADArchive alloc] initWithData:data error:&error];
-				[_archive setDelegate:self];
-			} else return [[self node] loadFinished];
+			NSData *const data = [self data];
+			if(!data) return [[self node] loadFinished];
+			_archive = [[XADArchive alloc] initWithData:data error:&error];
+			[_archive setDelegate:self];
 		}
 		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
 	}

@@ -32,8 +32,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)loadWithInfo:(NSDictionary *)info
 {
-	NSData *data;
-	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
+	NSData *const data = [self data];
+	if(!data) return [[self node] loadFinished];
 	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
 	[parser setDelegate:self];
 	_tagPath = [@"/" copy];

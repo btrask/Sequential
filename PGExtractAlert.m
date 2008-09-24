@@ -117,8 +117,8 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned i = [rows firstIndex];
 	for(; NSNotFound != i; i = [rows indexGreaterThanIndex:i]) {
 		id const node = [nodesOutline itemAtRow:i];
-		NSData *data;
-		if(PGDataReturned == [node getData:&data] && [data writeToFile:[_destination stringByAppendingPathComponent:[self saveNameForNode:node]] atomically:NO]) continue;
+		NSData *const data = [node data];
+		if(data && [data writeToFile:[_destination stringByAppendingPathComponent:[self saveNameForNode:node]] atomically:NO]) continue;
 		[unsavedNodes addObject:node];
 		[unsavedRows addIndex:i];
 	}
