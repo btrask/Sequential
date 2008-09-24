@@ -30,7 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGXMLAdapter
 
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	NSData *data;
 	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
@@ -83,7 +83,7 @@ DEALINGS WITH THE SOFTWARE. */
 		_.flickr.size = 0;
 		[_.flickr.URL release];
 		_.flickr.URL = nil;
-		//[[self node] loadWithURLResponse:nil];
+		//[[self node] loadWithInfo:nil];
 	}
 }
 - (void)parser:(NSXMLParser *)parser
@@ -117,7 +117,7 @@ DEALINGS WITH THE SOFTWARE. */
 			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.oEmbed.URL]];
 			[ident setCustomDisplayName:_.oEmbed.title notify:NO];
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			[node loadWithURLResponse:nil];
+			[node loadWithInfo:nil];
 			[_children addObject:node];
 		}
 		[_.oEmbed.version release];
@@ -131,7 +131,7 @@ DEALINGS WITH THE SOFTWARE. */
 	} else if([@"/rsp" isEqualToString:_tagPath]) {
 		if(_.flickr.URL) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.flickr.URL]]] autorelease];
-			[node loadWithURLResponse:nil];
+			[node loadWithInfo:nil];
 			[_children addObject:node];
 		}
 		_.flickr.size = 0;

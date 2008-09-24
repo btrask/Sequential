@@ -85,7 +85,7 @@ enum {
 
 - (PGResourceAdapter *)resourceAdapter;
 - (void)setResourceAdapterClass:(Class)aClass;
-- (Class)classWithURLResponse:(NSURLResponse *)response;
+- (Class)classWithInfo:(NSDictionary *)info;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
 - (void)setLoadError:(NSError *)error;
 - (void)loadFinished;

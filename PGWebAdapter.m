@@ -63,7 +63,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(sender == _mainConnection) {
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setData:[_mainConnection data]];
-		[[self node] loadWithURLResponse:[_mainConnection response]];
+		[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[_mainConnection response], PGURLResponseKey, nil]];
 		[[self node] loadFinished]; // We've already passed on the node, so normally this doesn't do anything.
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
@@ -93,8 +93,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
+	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	if(response || [[self node] canGetData]) return [[self node] loadFinished];
 	_loadedPrimaryURL = ![self hasAlternateURLs];
 	NSURL *const URL = _loadedPrimaryURL ? [[self identifier] URL] : [self nextAlternateURLAndRemove:YES];
@@ -109,7 +110,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	// FIXME: This does not currently work correctly.
 	[[self node] createAlternateURLs];
-	[[self node] loadWithURLResponse:nil];
+	[[self node] loadWithInfo:nil];
 	return YES;
 }
 

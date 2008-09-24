@@ -56,7 +56,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	NSData *data;
 	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
@@ -73,7 +73,7 @@ DEALINGS WITH THE SOFTWARE. */
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
 		[node setResourceAdapterClass:[PGPDFPageAdapter class]];
-		[node loadWithURLResponse:nil];
+		[node loadWithInfo:nil];
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];

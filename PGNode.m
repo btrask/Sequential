@@ -166,8 +166,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_resourceAdapter setNode:self];
 	[self _updateMenuItem];
 }
-- (Class)classWithURLResponse:(NSURLResponse *)response
+- (Class)classWithInfo:(NSDictionary *)info
 {
+	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	Class class = [[self dataSource] classForNode:self];
 	if(class) return class;
 	if([response respondsToSelector:@selector(statusCode)]) {
@@ -441,9 +442,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	}
 	return URL;
 }
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
-	[self setResourceAdapterClass:[self classWithURLResponse:response]];
+	[self setResourceAdapterClass:[self classWithInfo:info]];
 	if(!_loading) {
 		[_loadError release];
 		_loadError = nil;
@@ -455,7 +456,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	_loading = YES;
 	[self noteIsViewableDidChange];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // This function gets recursively called for everything we open, so use an autorelease pool. But don't put it around the entire method because self might be autoreleased and the caller may still want us.
-	[_resourceAdapter loadWithURLResponse:response];
+	[_resourceAdapter loadWithInfo:info];
 	[self readIfNecessary];
 	[pool release];
 	// We set _loading to NO when the adapter calls back with -loadFinished.

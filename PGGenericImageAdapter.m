@@ -102,7 +102,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	[self clearCache];
 	[self setIsImage:YES];

@@ -77,7 +77,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
-		if(isFile) [node loadWithURLResponse:nil];
+		if(isFile) [node loadWithInfo:nil];
 		else {
 			[node setResourceAdapterClass:[PGContainerAdapter class]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
@@ -123,7 +123,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_archive setNameEncoding:encoding];
 	[self setIsTemporarilyViewable:YES];
 	_guessedEncoding = UINT_MAX;
-	[[self node] loadWithURLResponse:nil];
+	[[self node] loadWithInfo:nil];
 	[self setIsTemporarilyViewable:NO];
 }
 
@@ -171,7 +171,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	if(!_archive) {
 		XADError error;

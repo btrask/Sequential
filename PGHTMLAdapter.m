@@ -66,7 +66,7 @@ DEALINGS WITH THE SOFTWARE. */
 		NSURL *const oEmbedURL = [doc AE_oEmbedURL];
 		if(oEmbedURL) {
 			[[self node] addAlternateURL:oEmbedURL toTop:YES];
-			[[self node] loadWithURLResponse:nil];
+			[[self node] loadWithInfo:nil];
 			return;
 		}
 		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];
@@ -79,7 +79,7 @@ DEALINGS WITH THE SOFTWARE. */
 		while((ident = [identEnum nextObject])) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
 			if(!node) continue;
-			[node loadWithURLResponse:nil];
+			[node loadWithInfo:nil];
 			[pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
@@ -112,9 +112,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return MAX(PGLoadNone, [[self parentAdapter] descendentLoadingPolicy]);
 }
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	NSParameterAssert(!_webView);
+	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	NSData *data;
 	if([[self node] getData:&data] != PGDataReturned) return [[self node] loadFinished];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];

@@ -34,6 +34,10 @@ DEALINGS WITH THE SOFTWARE. */
 // Other
 #import "PGGeometry.h"
 
+extern NSString *const PGURLResponseKey;
+extern NSString *const PGURLDataKey;
+extern NSString *const PGURLKey;
+
 enum {
 	PGLoadError    = -1,
 	PGNoData       = 0,
@@ -53,7 +57,7 @@ typedef int PGDataError;
 - (PGResourceIdentifier *)identifier;
 - (BOOL)hasAlternateURLs;
 - (NSURL *)nextAlternateURLAndRemove:(BOOL)flag;
-- (void)loadWithURLResponse:(NSURLResponse *)response;
+- (void)loadWithInfo:(NSDictionary *)info;
 - (BOOL)reload;
 
 - (BOOL)isContainer;

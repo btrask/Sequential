@@ -37,16 +37,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	[[self document] setProcessingNodes:YES];
-	NSParameterAssert(!response);
 	NSParameterAssert([self shouldLoad]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
-	LSItemInfoRecord info;
-	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
+	LSItemInfoRecord fileInfo;
+	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &fileInfo) != noErr || fileInfo.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];
 		[[self node] loadFinished];
 		return; // Don't go into packages.
@@ -60,7 +59,7 @@ DEALINGS WITH THE SOFTWARE. */
 		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];
 		if([ignoredPaths containsObject:pagePath]) continue;
 		NSURL *const pageURL = [pagePath AE_fileURL];
-		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
+		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &fileInfo) != noErr || fileInfo.flags & kLSItemInfoIsInvisible) continue;
 		PGResourceIdentifier *const pageIdent = [pageURL AE_resourceIdentifier];
 		PGNode *node = [self childForIdentifier:pageIdent];
 		if(node) {
@@ -68,7 +67,7 @@ DEALINGS WITH THE SOFTWARE. */
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
 			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
-			[node loadWithURLResponse:nil];
+			[node loadWithInfo:nil];
 		}
 		if(node) [newPages addObject:node];
 	}

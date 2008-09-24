@@ -139,7 +139,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[self node] nextAlternateURLAndRemove:flag];
 }
-- (void)loadWithURLResponse:(NSURLResponse *)response
+- (void)loadWithInfo:(NSDictionary *)info
 {
 	[[self node] loadFinished];
 }
@@ -290,7 +290,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	[[self node] loadWithURLResponse:nil];
+	[[self node] loadWithInfo:nil];
 }
 - (void)noteSortOrderDidChange {}
 - (void)noteIsViewableDidChange
