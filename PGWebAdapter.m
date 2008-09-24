@@ -97,8 +97,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	if(response || [[self node] canGetData]) return [[self node] loadFinished];
-	_loadedPrimaryURL = ![self hasAlternateURLs];
-	NSURL *const URL = _loadedPrimaryURL ? [[self identifier] URL] : [self nextAlternateURLAndRemove:YES];
+	NSURL *const URL = [[self identifier] URL];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
@@ -109,7 +108,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)reload
 {
 	// FIXME: This does not currently work correctly.
-	[[self node] createAlternateURLs];
 	[[self node] loadWithInfo:nil];
 	return YES;
 }

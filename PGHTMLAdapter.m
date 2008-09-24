@@ -65,8 +65,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
 		NSURL *const oEmbedURL = [doc AE_oEmbedURL];
 		if(oEmbedURL) {
-			[[self node] addAlternateURL:oEmbedURL toTop:YES];
-			[[self node] loadWithInfo:nil];
+			[[self node] loadWithInfo:nil]; // TODO: Send the oEmbed URL and some kind of hint that its an oEmbed endpoint.
 			return;
 		}
 		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];

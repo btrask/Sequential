@@ -74,9 +74,6 @@ enum {
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident;
 
-- (void)createAlternateURLs;
-- (void)addAlternateURL:(NSURL *)URL toTop:(BOOL)flag;
-
 - (BOOL)canGetData;
 - (void)setData:(NSData *)data;
 - (id)dataSource;
