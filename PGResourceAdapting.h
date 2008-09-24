@@ -39,13 +39,6 @@ extern NSString *const PGURLDataKey;
 extern NSString *const PGURLKey;
 extern NSString *const PGMIMETypeKey; // If PGURLResponseKey has a MIMEType, this must be set too.
 
-enum {
-	PGLoadError    = -1,
-	PGNoData       = 0,
-	PGDataReturned = 1
-};
-typedef int PGDataError;
-
 @protocol PGResourceAdapting
 
 - (PGNode *)parentNode;
