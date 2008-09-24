@@ -27,3 +27,4 @@ DEALINGS WITH THE SOFTWARE. */
 NSString *const PGURLResponseKey = @"PGURLResponse";
 NSString *const PGURLDataKey     = @"PGURLData";
 NSString *const PGURLKey         = @"PGURL";
+NSString *const PGMIMETypeKey    = @"PGMIMEType";

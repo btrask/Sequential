@@ -164,7 +164,9 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		if([data length] < 4) return Nil;
 		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[data subdataWithRange:NSMakeRange(0, 4)]];
 	}
-	if(!class && response) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[response MIMEType]];
+	NSString *MIMEType = [info objectForKey:PGMIMETypeKey];
+	if(!MIMEType && response) MIMEType = [response MIMEType];
+	if(!class && MIMEType) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:MIMEType];
 	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
 	if(!class) class = [PGResourceAdapter class];
 	return class;

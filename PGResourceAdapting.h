@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGURLDataKey;
 extern NSString *const PGURLKey;
+extern NSString *const PGMIMETypeKey;
 
 enum {
 	PGLoadError    = -1,
