@@ -410,11 +410,11 @@ enum {
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {
-	NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
+	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
 	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
 	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
 	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
-	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLKey] pathExtension] forKey:PGExtensionKey];
+	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
 	[self setResourceAdapterClass:[self classWithInfo:mutableInfo]];
 	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:mutableInfo];
 	if(!(PGNodeLoading & _status)) {
