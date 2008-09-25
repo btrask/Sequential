@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Categories
 #import "NSDateAdditions.h"
+#import "NSMutableDictionaryAdditions.h"
 #import "NSNumberAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
@@ -135,7 +136,7 @@ enum {
 	[_resourceAdapter setNode:self];
 	[self _updateMenuItem];
 }
-- (Class)classWithInfo:(NSDictionary *)info
+- (Class)classWithInfo:(NSMutableDictionary *)info
 {
 	Class class = [[self dataSource] classForNode:self];
 	if(class) return class;
@@ -409,8 +410,13 @@ enum {
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {
-	[self setResourceAdapterClass:[self classWithInfo:info]];
-	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:info];
+	NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
+	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
+	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
+	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
+	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLKey] pathExtension] forKey:PGExtensionKey];
+	[self setResourceAdapterClass:[self classWithInfo:mutableInfo]];
+	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:mutableInfo];
 	if(!(PGNodeLoading & _status)) {
 		[_error release];
 		_error = nil;
@@ -422,7 +428,7 @@ enum {
 	_status |= PGNodeLoading;
 	[self noteIsViewableDidChange];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
-	[_resourceAdapter loadWithInfo:info];
+	[_resourceAdapter loadWithInfo:mutableInfo];
 	[pool release];
 }
 
@@ -525,6 +531,7 @@ enum {
 {
 	return nil;
 }
+- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info {}
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
 {

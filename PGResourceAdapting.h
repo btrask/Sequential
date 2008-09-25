@@ -37,7 +37,9 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGURLDataKey;
 extern NSString *const PGURLKey;
-extern NSString *const PGMIMETypeKey; // If PGURLResponseKey has a MIMEType, this must be set too.
+extern NSString *const PGMIMETypeKey;
+extern NSString *const PGOSTypeKey; // Uses the pseudo-OS-type that doesn't include single quotes around it.
+extern NSString *const PGExtensionKey;
 
 enum {
 	PGLoadToMaxDepth = 0,

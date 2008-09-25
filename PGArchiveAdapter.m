@@ -32,12 +32,13 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDocumentController.h"
 
 // Categories
+#import "NSMutableDictionaryAdditions.h"
 #import "NSStringAdditions.h"
 
 @interface XADArchive (PGAdditions)
 
-- (NSString *)HFSTypeCodeForEntry:(int)index standardFormat:(BOOL)flag;
-- (NSString *)typeForEntry:(int)index preferHFSTypeCode:(BOOL)flag;
+- (NSString *)OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
+- (NSString *)typeForEntry:(int)index preferOSType:(BOOL)flag;
 
 @end
 
@@ -73,7 +74,7 @@ DEALINGS WITH THE SOFTWARE. */
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferHFSTypeCode:YES] : NSFileTypeForHFSTypeCode('fldr'))] notify:NO];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferOSType:YES] : NSFileTypeForHFSTypeCode('fldr'))] notify:NO];
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
@@ -134,8 +135,8 @@ DEALINGS WITH THE SOFTWARE. */
 	NSParameterAssert(NSNotFound != index);
 	Class class = Nil;
 	if([_archive entryIsArchive:index]) class = [PGArchiveAdapter class];
-	if(!class) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeOSTypesKey matches:[_archive HFSTypeCodeForEntry:index standardFormat:NO]];
-	if(!class) class = [d resourceAdapterClassForExtension:[_archive typeForEntry:index preferHFSTypeCode:NO]];
+	if(!class) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeOSTypesKey matches:[_archive OSTypeForEntry:index standardFormat:NO]];
+	if(!class) class = [d resourceAdapterClassForExtension:[_archive typeForEntry:index preferOSType:NO]];
 	return class;
 }
 - (NSDate *)dateCreatedForNode:(PGNode *)sender
@@ -151,6 +152,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	unsigned const i = [[sender identifier] index];
 	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive xadFileInfoForEntry:i]->xfi_Size];
+}
+- (void)node:(PGNode *)sender
+        willLoadWithInfo:(NSMutableDictionary *)info
+{
+	unsigned const i = [[sender identifier] index];
+	if(NSNotFound == i) return;
+	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
+	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
@@ -207,7 +216,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation XADArchive (PGAdditions)
 
-- (NSString *)HFSTypeCodeForEntry:(int)index
+- (NSString *)OSTypeForEntry:(int)index
               standardFormat:(BOOL)flag
 {
 	OSType value;
@@ -220,10 +229,10 @@ DEALINGS WITH THE SOFTWARE. */
 	return flag ? NSFileTypeForHFSTypeCode(value) : PGPseudoFileTypeForHFSTypeCode(value);
 }
 - (NSString *)typeForEntry:(int)index
-              preferHFSTypeCode:(BOOL)flag
+              preferOSType:(BOOL)flag
 {
-	NSString *const HFSType = flag ? [self HFSTypeCodeForEntry:index standardFormat:YES] : nil;
-	return HFSType ? HFSType : [[self nameOfEntry:index] pathExtension];
+	NSString *const osType = flag ? [self OSTypeForEntry:index standardFormat:YES] : nil;
+	return osType ? osType : [[self nameOfEntry:index] pathExtension];
 }
 
 @end

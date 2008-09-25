@@ -69,6 +69,7 @@
 		0E5EC04B0CEB850300E7FF9A /* PGMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */; };
 		0E5EC1D60CEDFBBC00E7FF9A /* PGURLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */; };
 		0E5EC1D90CEDFEED00E7FF9A /* PGURL.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */; };
+		0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
 		0E808D690D7CC46A003C9DE1 /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */; };
@@ -319,6 +320,8 @@
 		0E5EC1D40CEDFBBC00E7FF9A /* PGURLAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGURLAlert.h; sourceTree = "<group>"; };
 		0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGURLAlert.m; sourceTree = "<group>"; };
 		0E5EC1D80CEDFEED00E7FF9A /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGURL.nib; sourceTree = "<group>"; };
+		0E675E390E8BA38D008C57C9 /* NSMutableDictionaryAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMutableDictionaryAdditions.h; sourceTree = "<group>"; };
+		0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMutableDictionaryAdditions.m; sourceTree = "<group>"; };
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		0E7A18280E66CE8B00BCA2AF /* de */ = {isa = PBXFileReference; lastKnownFileType = folder; name = de; path = de.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
@@ -625,6 +628,8 @@
 				0E5B552E0D0B7FCF0094938A /* NSDateAdditions.m */,
 				0EBF5A140C44DF56004584D2 /* NSMenuItemAdditions.h */,
 				0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */,
+				0E675E390E8BA38D008C57C9 /* NSMutableDictionaryAdditions.h */,
+				0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */,
 				0E503A770DE0CFBF0067FF6A /* NSNumberAdditions.h */,
 				0E503A780DE0CFBF0067FF6A /* NSNumberAdditions.m */,
 				0E47C0AE0B93AF510060E8A8 /* NSObjectAdditions.h */,
@@ -1135,6 +1140,7 @@
 				0E255BA70E3A9D2E00EDF04C /* PGCircleProgressIndicator.m in Sources */,
 				0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */,
 				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
+				0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

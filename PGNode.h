@@ -79,7 +79,7 @@ typedef unsigned PGNodeStatus;
 
 - (PGResourceAdapter *)resourceAdapter;
 - (void)setResourceAdapterClass:(Class)aClass;
-- (Class)classWithInfo:(NSDictionary *)info;
+- (Class)classWithInfo:(NSMutableDictionary *)info;
 - (PGLoadPolicy)ancestorLoadPolicy;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
 - (void)loadFinished;
@@ -119,6 +119,7 @@ typedef unsigned PGNodeStatus;
 - (NSDate *)dateModifiedForNode:(PGNode *)sender;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
+- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info;
 - (BOOL)node:(PGNode *)sender getData:(out NSData **)outData; // Return NO if a problem occurred.
 
 @end
