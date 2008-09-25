@@ -98,7 +98,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)read
 {
-	[[self node] readFinishedWithImageRep:nil error:nil];
+	[[self node] readFinishedWithImageRep:nil];
 }
 
 #pragma mark -

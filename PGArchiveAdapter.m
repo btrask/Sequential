@@ -98,7 +98,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(confidence < 0.8 && UINT_MAX == _guessedEncoding) {
 		_guessedEncoding = guess;
-		[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil]];
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil]];
 		[[self node] loadFinished];
 	}
 	return guess;
@@ -163,7 +163,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if([sender password]) [_archive setPassword:[sender password]];
 	NSData *const data = [_archive contentsOfEntry:i];
 	if([_archive lastError] == XADERR_PASSWORD) {
-		[sender setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
+		[sender setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
 		return NO;
 	}
 	if(outData) *outData = data;

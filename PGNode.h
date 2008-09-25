@@ -44,6 +44,8 @@ enum {
 	PGEncodingError = 3
 };
 
+typedef unsigned PGNodeStatus;
+
 @interface PGNode : NSObject
 {
 	@private
@@ -51,21 +53,18 @@ enum {
 	PGDocument           *_document;
 
 	PGResourceIdentifier *_identifier;
-	NSMutableArray       *_URLs;
 	NSData               *_data;
 	id                    _dataSource;
 
+	PGResourceAdapter    *_resourceAdapter;
+	PGNodeStatus          _status;
+	NSError              *_error;
+	PGNodeStatus          _errorPhase;
 	NSString             *_password;
 
+	BOOL                  _viewable;
 	NSMenuItem           *_menuItem;
 	BOOL                  _allowMenuItemUpdates; // Just an optimization.
-	BOOL                  _viewable;
-	BOOL                  _loading;
-	NSError              *_loadError;
-
-	BOOL                  _shouldRead;
-
-	PGResourceAdapter    *_resourceAdapter;
 
 	NSDate               *_dateModified;
 	NSDate               *_dateCreated;
@@ -82,19 +81,19 @@ enum {
 - (void)setResourceAdapterClass:(Class)aClass;
 - (Class)classWithInfo:(NSDictionary *)info;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
-- (void)setLoadError:(NSError *)error;
 - (void)loadFinished;
 - (void)becomeViewed;
 - (void)readIfNecessary;
-- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep;
 
+- (void)setError:(NSError *)error;
 - (NSString *)password;
 - (void)setPassword:(NSString *)password;
 
+- (BOOL)isViewable;
 - (unsigned)depth;
 - (BOOL)isRooted;
 - (NSMenuItem *)menuItem;
-- (BOOL)isViewable;
 
 - (void)removeFromDocument;
 

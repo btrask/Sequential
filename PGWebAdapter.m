@@ -51,7 +51,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
 		[_mainConnection cancelAndNotify:NO];
 		[_faviconConnection cancelAndNotify:NO];
-		[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 		[[self node] loadFinished];
 	} else if(!pendingClass || ![[self node] shouldLoadAdapterClass:pendingClass]) {
 		[_mainConnection cancelAndNotify:YES];
@@ -74,7 +74,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(sender != _mainConnection) return;
 	[_faviconConnection cancelAndNotify:NO];
-	[[self node] setLoadError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]] forKey:NSLocalizedDescriptionKey]]];
+	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]] forKey:NSLocalizedDescriptionKey]]];
 	[[self node] loadFinished];
 }
 - (void)connectionDidCancel:(PGURLConnection *)sender

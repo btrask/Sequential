@@ -49,6 +49,13 @@ NSString *const PGErrorKey = @"PGError";
 
 NSString *const PGNodeErrorDomain = @"PGNodeError";
 
+enum {
+	PGNodeNothing = 0,
+	PGNodeLoading = 1 << 0,
+	PGNodeReading = 1 << 1,
+	PGNodeLoadingWillRead = PGNodeLoading | PGNodeReading
+};
+
 @interface PGNode (Private)
 
 - (void)_updateMenuItem;
@@ -165,43 +172,48 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 		default: return NO;
 	}
 }
-- (void)setLoadError:(NSError *)error
-{
-	if(!_loadError) _loadError = [error copy];
-}
 - (void)loadFinished
 {
-	NSParameterAssert(_loading);
-	_loading = NO;
+	NSParameterAssert(PGNodeLoading & _status);
+	_status = ~PGNodeLoading & _status;
 	[self noteIsViewableDidChange];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
 }
 - (void)becomeViewed
 {
-	if(_shouldRead) return;
-	_shouldRead = YES;
+	if(PGNodeReading & _status) return;
+	_status |= PGNodeReading;
 	[self readIfNecessary];
 }
 - (void)readIfNecessary
 {
-	if(_loading || !_shouldRead) return;
-	if(_loadError) [self readFinishedWithImageRep:nil error:_loadError];
+	if(PGNodeReading != _status) return;
+	if(_error && PGNodeLoading & _errorPhase) [self readFinishedWithImageRep:nil];
 	else [_resourceAdapter read];
 }
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
 {
-	NSParameterAssert(_shouldRead);
-	_shouldRead = NO;
+	NSParameterAssert(PGNodeReading == _status);
+	_status = ~PGNodeReading & _status;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
 	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
-	if(error) [dict setObject:(error ? error : _loadError) forKey:PGErrorKey];
+	if(_error) [dict setObject:_error forKey:PGErrorKey];
+	if(PGNodeReading == _errorPhase) {
+		[_error release];
+		_error = nil;
+	}
 	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -
 
+- (void)setError:(NSError *)error
+{
+	if(_error || PGNodeNothing == _status) return;
+	_error = [error copy];
+	_errorPhase = _status;
+}
 - (NSString *)password
 {
 	return [[_password retain] autorelease];
@@ -215,6 +227,10 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 
 #pragma mark -
 
+- (BOOL)isViewable
+{
+	return _viewable;
+}
 - (unsigned)depth
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
@@ -226,10 +242,6 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 - (NSMenuItem *)menuItem
 {
 	return [[_menuItem retain] autorelease];
-}
-- (BOOL)isViewable
-{
-	return _viewable;
 }
 
 #pragma mark -
@@ -394,20 +406,19 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 {
 	[self setResourceAdapterClass:[self classWithInfo:info]];
 	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:info];
-	if(!_loading) {
-		[_loadError release];
-		_loadError = nil;
+	if(!(PGNodeLoading & _status)) {
+		[_error release];
+		_error = nil;
 	}
 	if(![_resourceAdapter shouldLoad]) {
-		if(_loading) [self loadFinished];
+		if(PGNodeLoading & _status) [self loadFinished];
 		return;
 	}
-	_loading = YES;
+	_status |= PGNodeLoading;
 	[self noteIsViewableDidChange];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
 	[_resourceAdapter loadWithInfo:info];
 	[pool release];
-	// We set _loading to NO when the adapter calls back with -loadFinished.
 }
 
 #pragma mark -
@@ -425,7 +436,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = _loading || _loadError || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = PGNodeLoading & _status || _error || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
@@ -466,7 +477,7 @@ NSString *const PGNodeErrorDomain = @"PGNodeError";
 	[_menuItem release];
 	[_resourceAdapter release];
 	[_password release];
-	[_loadError release];
+	[_error release];
 	[_dateModified release];
 	[_dateCreated release];
 	[_dataLength release];
