@@ -280,7 +280,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[activeNode setPassword:[passwordField stringValue]];
-	[activeNode loadWithInfo:nil];
 	[activeNode becomeViewed];
 }
 - (IBAction)chooseEncoding:(id)sender
