@@ -163,10 +163,15 @@ enum {
 	if(!class) class = [PGResourceAdapter class];
 	return class;
 }
+- (PGLoadPolicy)ancestorLoadPolicy
+{
+	PGContainerAdapter *const p = [self parentAdapter];
+	return p ? MAX([[p node] ancestorLoadPolicy], [p descendentLoadPolicy]) : PGLoadToMaxDepth;
+}
 - (BOOL)shouldLoadAdapterClass:(Class)aClass
 {
 	if([aClass alwaysLoads]) return YES;
-	switch([[self parentAdapter] descendentLoadingPolicy]) {
+	switch([self ancestorLoadPolicy]) {
 		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntValue];
 		case PGLoadAll: return YES;
 		default: return NO;

@@ -28,20 +28,11 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 
-enum {
-	PGLoadToMaxDepth = 0,
-	PGLoadAll        = 1,
-	PGLoadNone       = 2
-};
-typedef int PGLoadingPolicy;
-
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
 	PGNode              *_node;
 	NSMutableDictionary *_info;
-	BOOL                 _isImage;
-	unsigned             _temporarilyViewableCount;
 }
 
 + (BOOL)alwaysLoads;
@@ -49,15 +40,12 @@ typedef int PGLoadingPolicy;
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
 
-- (NSMutableDictionary *)info;
+- (BOOL)shouldLoad;
+- (PGLoadPolicy)descendentLoadPolicy;
 
 - (BOOL)adapterIsViewable;
-- (BOOL)isImage;
-- (void)setIsImage:(BOOL)flag;
-- (void)setIsTemporarilyViewable:(BOOL)flag;
+- (NSMutableDictionary *)info;
 
-- (PGLoadingPolicy)descendentLoadingPolicy; // Return MAX(preferredValue, [[self parentAdapter] descendentLoadingPolicy]).
-- (BOOL)shouldLoad;
 - (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -returnImageRep:error must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;

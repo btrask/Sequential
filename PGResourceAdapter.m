@@ -58,6 +58,21 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (BOOL)shouldLoad
+{
+	return [[self node] shouldLoadAdapterClass:[self class]];
+}
+- (PGLoadPolicy)descendentLoadPolicy
+{
+	return PGLoadToMaxDepth;
+}
+
+#pragma mark -
+
+- (BOOL)adapterIsViewable
+{
+	return NO;
+}
 - (NSMutableDictionary *)info
 {
 	return [[_info retain] autorelease];
@@ -65,37 +80,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (BOOL)adapterIsViewable
-{
-	return [self isImage] || _temporarilyViewableCount > 0;
-}
-- (BOOL)isImage
-{
-	return _isImage;
-}
-- (void)setIsImage:(BOOL)flag
-{
-	if(flag == _isImage) return;
-	_isImage = flag;
-	[self noteIsViewableDidChange];
-}
-- (void)setIsTemporarilyViewable:(BOOL)flag
-{
-	if(!flag) NSParameterAssert(_temporarilyViewableCount);
-	_temporarilyViewableCount += flag ? 1 : -1;
-	[self noteIsViewableDidChange];
-}
-
-#pragma mark -
-
-- (PGLoadingPolicy)descendentLoadingPolicy
-{
-	return MAX(PGLoadToMaxDepth, [[self parentAdapter] descendentLoadingPolicy]);
-}
-- (BOOL)shouldLoad
-{
-	return [[self node] shouldLoadAdapterClass:[self class]];
-}
 - (void)read
 {
 	[[self node] readFinishedWithImageRep:nil];

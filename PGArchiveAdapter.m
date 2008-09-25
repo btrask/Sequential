@@ -121,10 +121,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setEncoding:(NSStringEncoding)encoding
 {
 	[_archive setNameEncoding:encoding];
-	[self setIsTemporarilyViewable:YES];
 	_guessedEncoding = UINT_MAX;
 	[[self node] loadWithInfo:nil];
-	[self setIsTemporarilyViewable:NO];
 }
 
 #pragma mark PGNodeDataSource Protocol
@@ -172,9 +170,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGLoadingPolicy)descendentLoadingPolicy
+- (PGLoadPolicy)descendentLoadPolicy
 {
-	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
+	return PGLoadAll;
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {

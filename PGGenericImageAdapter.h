@@ -28,10 +28,11 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGGenericImageAdapter : PGResourceAdapter
 {
 	@private
+	BOOL          _reading;
+	BOOL          _readFailed;
 	NSArray      *_exifEntries;
 	PGOrientation _orientation;
 	NSImageRep   *_cachedRep;
-	BOOL          _gettingImageRep;
 }
 
 @end

@@ -52,9 +52,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGLoadingPolicy)descendentLoadingPolicy
+- (PGLoadPolicy)descendentLoadPolicy
 {
-	return MAX(PGLoadAll, [[self parentAdapter] descendentLoadingPolicy]);
+	return PGLoadAll;
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {
@@ -115,6 +115,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
+- (BOOL)adapterIsViewable
+{
+	return YES;
+}
 - (void)read
 {
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
@@ -122,16 +126,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
 	[rep setPixelsHigh:NSHeight([rep bounds])];
 	[[self node] readFinishedWithImageRep:rep];
-}
-
-#pragma mark NSObject
-
-- (id)init
-{
-	if((self = [super init])) {
-		[self setIsImage:YES];
-	}
-	return self;
 }
 
 @end

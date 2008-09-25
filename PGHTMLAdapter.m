@@ -107,9 +107,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (PGLoadingPolicy)descendentLoadingPolicy
+- (PGLoadPolicy)descendentLoadPolicy
 {
-	return MAX(PGLoadNone, [[self parentAdapter] descendentLoadingPolicy]);
+	return PGLoadNone;
 }
 - (void)loadWithInfo:(NSDictionary *)info
 {

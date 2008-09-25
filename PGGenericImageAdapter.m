@@ -64,8 +64,8 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
-	_gettingImageRep = NO;
-	[self setIsImage:(aRep != nil)];
+	_reading = NO;
+	_readFailed = !aRep;
 	[_cachedRep release];
 	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
@@ -78,6 +78,18 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return YES;
 }
+
+#pragma mark -
+
+- (void)loadWithInfo:(NSDictionary *)info
+{
+	[self clearCache];
+	_readFailed = NO;
+	[[self node] loadFinished];
+}
+
+#pragma mark -
+
 - (NSArray *)exifEntries
 {
 	if(!_exifEntries) {
@@ -102,11 +114,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)loadWithInfo:(NSDictionary *)info
+- (BOOL)adapterIsViewable
 {
-	[self clearCache];
-	[self setIsImage:YES];
-	[[self node] loadFinished];
+	return !_readFailed;
 }
 - (void)read
 {
@@ -115,14 +125,14 @@ DEALINGS WITH THE SOFTWARE. */
 		[[self node] readFinishedWithImageRep:_cachedRep];
 		return;
 	}
-	if(_gettingImageRep) return;
+	if(_reading) return;
 	NSData *const data = [self data];
 	if(!data) {
-		[self setIsImage:NO];
+		_readFailed = YES;
 		[[self node] readFinishedWithImageRep:nil];
 		return;
 	}
-	_gettingImageRep = YES;
+	_reading = YES;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
 }
 
