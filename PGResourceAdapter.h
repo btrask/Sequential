@@ -46,7 +46,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)adapterIsViewable;
 - (NSMutableDictionary *)info;
 
-- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -returnImageRep:error must be sent sometime hereafter.
+- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -returnImageRep: must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;
 

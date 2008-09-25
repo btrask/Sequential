@@ -66,6 +66,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	_reading = NO;
 	_readFailed = !aRep;
+	[[self node] noteIsViewableDidChange];
 	[_cachedRep release];
 	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
@@ -85,6 +86,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self clearCache];
 	_readFailed = NO;
+	[[self node] noteIsViewableDidChange];
 	[[self node] loadFinished];
 }
 
@@ -129,6 +131,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSData *const data = [self data];
 	if(!data) {
 		_readFailed = YES;
+		[[self node] noteIsViewableDidChange];
 		[[self node] readFinishedWithImageRep:nil];
 		return;
 	}
