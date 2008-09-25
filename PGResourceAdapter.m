@@ -93,13 +93,10 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
 	NSData *const data = [node dataWithInfo:info];
-	if(data) {
-		if([data length] < 4) return PGNotAMatch;
-		if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[data subdataWithRange:NSMakeRange(0, 4)]]) return PGMatchByFourCC;
-	}
+	if(data && [data length] >= 4 && [[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[data subdataWithRange:NSMakeRange(0, 4)]]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
 	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
-	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[[info objectForKey:PGURLKey] path] pathExtension]]) return PGMatchByExtension;
+	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
 	return [PGResourceAdapter class] == self ? PGMatchGeneric : PGNotAMatch;
 }
 + (BOOL)alwaysLoads
