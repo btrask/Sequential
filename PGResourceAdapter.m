@@ -141,10 +141,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[self node] loadFinished];
 }
-- (BOOL)reload
-{
-	return NO;
-}
 
 #pragma mark -
 

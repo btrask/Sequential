@@ -105,12 +105,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[_faviconConnection release];
 	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
 }
-- (BOOL)reload
-{
-	// FIXME: This does not currently work correctly.
-	[[self node] loadWithInfo:nil];
-	return YES;
-}
 
 #pragma mark NSObject
 
