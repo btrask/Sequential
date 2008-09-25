@@ -68,7 +68,7 @@ DEALINGS WITH THE SOFTWARE. */
 			[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:oEmbedURL, PGURLKey, @"text/xml+oembed", PGMIMETypeKey, nil]];
 			return;
 		}
-		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[[PGDocumentController sharedDocumentController] supportedExtensionsWhichMustAlwaysLoad:YES]];
+		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
 		if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
 	}
 	if([identifiers count]) {

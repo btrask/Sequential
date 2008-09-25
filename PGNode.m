@@ -89,7 +89,7 @@ enum {
 		_document = doc ? doc : [parent document];
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
-		[self setResourceAdapterClass:[PGResourceAdapter class]];
+		[self setResourceAdapter:[[[PGResourceAdapter alloc] init] autorelease]];
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
@@ -127,42 +127,14 @@ enum {
 {
 	return [[_resourceAdapter retain] autorelease];
 }
-- (void)setResourceAdapterClass:(Class)aClass
+- (void)setResourceAdapter:(PGResourceAdapter *)adapter
 {
-	if(!aClass || [_resourceAdapter isKindOfClass:aClass]) return;
+	if(!adapter || [_resourceAdapter isKindOfClass:[adapter class]]) return;
 	if([_resourceAdapter node] == self) [_resourceAdapter setNode:nil];
 	[_resourceAdapter autorelease]; // Don't let it get deallocated immediately.
-	_resourceAdapter = [[aClass alloc] init];
+	_resourceAdapter = [adapter retain];
 	[_resourceAdapter setNode:self];
 	[self _updateMenuItem];
-}
-- (Class)classWithInfo:(NSMutableDictionary *)info
-{
-	Class class = [[self dataSource] classForNode:self];
-	if(class) return class;
-	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
-	if([response respondsToSelector:@selector(statusCode)]) {
-		int const status = [(NSHTTPURLResponse *)response statusCode];
-		if(status < 200 || status >= 300) return Nil;
-	}
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	NSURL *URL = [info objectForKey:PGURLKey];
-	if(!URL) URL = [[self identifier] URLByFollowingAliases:YES];
-	NSData *const data = [self dataWithInfo:info];
-	if(data) {
-		if([data length] < 4) return Nil;
-		class = [d resourceAdapterClassWhereAttribute:PGBundleTypeFourCCKey matches:[data subdataWithRange:NSMakeRange(0, 4)]];
-	} else if(URL) {
-		if(![URL isFileURL]) return [PGWebAdapter class];
-		BOOL isDir;
-		if(![[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&isDir]) return Nil;
-		if(isDir) return [d resourceAdapterClassWhereAttribute:PGLSTypeIsPackageKey matches:[NSNumber numberWithBool:YES]];
-	}
-	NSString *const MIMEType = [info objectForKey:PGMIMETypeKey];
-	if(!class && MIMEType) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:MIMEType];
-	if(!class && URL) class = [d resourceAdapterClassForExtension:[[URL path] pathExtension]];
-	if(!class) class = [PGResourceAdapter class];
-	return class;
 }
 - (PGLoadPolicy)ancestorLoadPolicy
 {
@@ -415,7 +387,7 @@ enum {
 	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
 	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
 	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
-	[self setResourceAdapterClass:[self classWithInfo:mutableInfo]];
+	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:mutableInfo] objectAtIndex:0]];
 	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:mutableInfo];
 	if(!(PGNodeLoading & _status)) {
 		[_error release];
@@ -515,10 +487,6 @@ enum {
 
 @implementation NSObject (PGNodeDataSource)
 
-- (Class)classForNode:(PGNode *)sender
-{
-	return Nil;
-}
 - (NSDate *)dateModifiedForNode:(PGNode *)sender
 {
 	return nil;

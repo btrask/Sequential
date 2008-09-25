@@ -21,14 +21,8 @@
 				<string>application/x-zip-compressed</string>
 				<string>multipart/x-zip</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>ZIP Archive</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGArchiveAdapter</string>
-			<key>PGBundleTypeFourCC</key>
-			<data>UEsDBA==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -38,14 +32,8 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-CBZ</string>
-			<key>CFBundleTypeName</key>
-			<string>CBZ Archive</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGArchiveAdapter</string>
-			<key>PGBundleTypeFourCC</key>
-			<data>UEsDBA==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -62,14 +50,8 @@
 				<string>application/x-rar-compressed</string>
 				<string>compressed/rar</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>RAR Archive</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGArchiveAdapter</string>
-			<key>PGBundleTypeFourCC</key>
-			<data>UmFyIQ==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -79,18 +61,10 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-CBR</string>
-			<key>CFBundleTypeName</key>
-			<string>CBR Archive</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGArchiveAdapter</string>
-			<key>PGBundleTypeFourCC</key>
-			<data>UmFyIQ==</data>
 		</dict>
 		<dict>
-			<key>CFBundleTypeName</key>
-			<string>Image Folder</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>fold</string>
@@ -105,8 +79,6 @@
 			</array>
 			<key>LSTypeIsPackage</key>
 			<true/>
-			<key>PGAdapterClass</key>
-			<string>PGFolderAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -125,8 +97,6 @@
 				<string>text/pdf</string>
 				<string>text/x-pdf</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>PDF File</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>PDF </string>
@@ -137,10 +107,6 @@
 			<array>
 				<string>com.adobe.pdf</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGPDFAdapter</string>
-			<key>PGBundleTypeFourCC</key>
-			<data>JVBERg==</data>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -160,12 +126,8 @@
 			<array>
 				<string>application/postscript</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>PostScript Image</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -181,8 +143,6 @@
 			<array>
 				<string>image/tiff</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>TIFF Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>TIFF</string>
@@ -193,8 +153,6 @@
 			<array>
 				<string>public.tiff</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -230,8 +188,6 @@
 			<array>
 				<string>image/raw</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Camera Raw Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>CRW </string>
@@ -241,8 +197,6 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -252,16 +206,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-XBM</string>
-			<key>CFBundleTypeName</key>
-			<string>XBM Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>XBM </string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -275,8 +225,6 @@
 			<array>
 				<string>image/exr</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>OpenEXR Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>exr </string>
@@ -288,8 +236,6 @@
 			<array>
 				<string>com.ilm.openexr-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -308,8 +254,6 @@
 				<string>image/x-ms-bmp</string>
 				<string>application/bmp</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Windows Bitmap Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>BMP </string>
@@ -321,8 +265,6 @@
 			<array>
 				<string>com.microsoft.bmp</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -336,8 +278,6 @@
 			<array>
 				<string>image/gif</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Graphics Interchange Format Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>GIFf</string>
@@ -348,8 +288,6 @@
 			<array>
 				<string>com.compuserve.gif</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -359,16 +297,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-ICO</string>
-			<key>CFBundleTypeName</key>
-			<string>Windows Icon Image</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.microsoft.ico</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -389,8 +323,6 @@
 				<string>image/jpeg</string>
 				<string>image/jpg</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>JPEG Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>JPEG</string>
@@ -402,8 +334,6 @@
 			<array>
 				<string>public.jpeg</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -420,8 +350,6 @@
 				<string>image/pict</string>
 				<string>image/x-pict</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>PICT Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>PICT</string>
@@ -432,8 +360,6 @@
 			<array>
 				<string>com.apple.pict</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -449,8 +375,6 @@
 				<string>application/png</string>
 				<string>application/x-png</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Portable Network Graphics Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>PNGf</string>
@@ -461,8 +385,6 @@
 			<array>
 				<string>public.png</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -472,8 +394,6 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-QTIF</string>
-			<key>CFBundleTypeName</key>
-			<string>Apple QuickTime Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>qtif</string>
@@ -484,8 +404,6 @@
 			<array>
 				<string>com.apple.quicktime-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -495,8 +413,6 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-TGA</string>
-			<key>CFBundleTypeName</key>
-			<string>Targa Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>TPIC</string>
@@ -507,8 +423,6 @@
 			<array>
 				<string>com.truevision.tga-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -518,8 +432,6 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-SGI</string>
-			<key>CFBundleTypeName</key>
-			<string>Silicon Graphics Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>.SGI</string>
@@ -530,8 +442,6 @@
 			<array>
 				<string>com.sgi.sgi-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -549,8 +459,6 @@
 				<string>application/photoshop</string>
 				<string>application/psd</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Adobe Photoshop Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>8BPS</string>
@@ -561,8 +469,6 @@
 			<array>
 				<string>com.adobe.photoshop-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -572,8 +478,6 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-PNTG</string>
-			<key>CFBundleTypeName</key>
-			<string>Apple MacPaint Image</string>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>PNTG</string>
@@ -584,8 +488,6 @@
 			<array>
 				<string>com.apple.macpaint-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -595,16 +497,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-FPX</string>
-			<key>CFBundleTypeName</key>
-			<string>FlashPix Image</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.kodak.flashpix-image</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -618,16 +516,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-FAX</string>
-			<key>CFBundleTypeName</key>
-			<string>Fax Document</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.fax</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -637,16 +531,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-ICNS</string>
-			<key>CFBundleTypeName</key>
-			<string>Apple Icon Image</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>com.apple.icns</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -656,16 +546,12 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-JP2</string>
-			<key>CFBundleTypeName</key>
-			<string>JPEG 2000 Image</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.jpeg-2000</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -677,20 +563,14 @@
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>Document-PIC</string>
-			<key>CFBundleTypeName</key>
-			<string>Radiance</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>public.radiance</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGGenericImageAdapter</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeName</key>
-			<string>HTML</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/html</string>
@@ -698,8 +578,6 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-			<key>PGAdapterClass</key>
-			<string>PGHTMLAdapter</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -707,17 +585,13 @@
 				<string>xml</string>
 				<string>XML</string>
 			</array>
-			<key>PGAdapterClass</key>
-			<string>PGXMLAdapter</string>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
-			<key>CFBundleTypeName</key>
-			<string>XML</string>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/xml</string>
 				<string>text/xml+oembed</string>
 			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -761,5 +635,215 @@
 	<string>PGMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>PGApplication</string>
+	<key>PGResourceAdapterClasses</key>
+	<dict>
+		<key>PGArchiveAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>zip</string>
+				<string>cbz</string>
+				<string>rar</string>
+				<string>cbr</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/zip</string>
+				<string>application/x-zip</string>
+				<string>application/x-zip-compressed</string>
+				<string>multipart/x-zip</string>
+				<string>application/rar</string>
+				<string>application/x-rar</string>
+				<string>application/x-rar-compressed</string>
+				<string>compressed/rar</string>
+			</array>
+			<key>PGBundleTypeFourCCs</key>
+			<array>
+				<data>
+				UEsDBA==
+				</data>
+				<data>
+				UmFyIQ==
+				</data>
+			</array>
+		</dict>
+		<key>PGFlickrAdapter</key>
+		<dict/>
+		<key>PGFolderAdapter</key>
+		<dict/>
+		<key>PGGenericImageAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>epi</string>
+				<string>eps</string>
+				<string>epsf</string>
+				<string>epsi</string>
+				<string>tiff</string>
+				<string>tif</string>
+				<string>crw</string>
+				<string>cr2</string>
+				<string>nef</string>
+				<string>raf</string>
+				<string>orf</string>
+				<string>mrw</string>
+				<string>srf</string>
+				<string>dcr</string>
+				<string>arw</string>
+				<string>pef</string>
+				<string>raw</string>
+				<string>dng</string>
+				<string>xbm</string>
+				<string>exr</string>
+				<string>bmp</string>
+				<string>gif</string>
+				<string>ico</string>
+				<string>jpg</string>
+				<string>jpeg</string>
+				<string>jpe</string>
+				<string>thm</string>
+				<string>pict</string>
+				<string>pct</string>
+				<string>png</string>
+				<string>qtif</string>
+				<string>tga</string>
+				<string>sgi</string>
+				<string>psd</string>
+				<string>pntg</string>
+				<string>fpx</string>
+				<string>fax</string>
+				<string>jfx</string>
+				<string>jfax</string>
+				<string>icns</string>
+				<string>jp2</string>
+				<string>pic</string>
+				<string>PIC</string>
+				<string>hdr</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/postscript</string>
+				<string>image/tiff</string>
+				<string>image/raw</string>
+				<string>image/exr</string>
+				<string>image/bmp</string>
+				<string>image/x-bmp</string>
+				<string>image/x-windows-bmp</string>
+				<string>image/ms-bmp</string>
+				<string>image/x-ms-bmp</string>
+				<string>application/bmp</string>
+				<string>image/gif</string>
+				<string>image/jpeg</string>
+				<string>image/jpg</string>
+				<string>image/pict</string>
+				<string>image/x-pict</string>
+				<string>image/png</string>
+				<string>application/png</string>
+				<string>application/x-png</string>
+				<string>image/photoshop</string>
+				<string>image/x-photoshop</string>
+				<string>image/psd</string>
+				<string>application/photoshop</string>
+				<string>application/psd</string>
+			</array>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>TIFF</string>
+				<string>CRW </string>
+				<string>CR2 </string>
+				<string>NEF </string>
+				<string>DNG </string>
+				<string>XBM </string>
+				<string>exr </string>
+				<string>EXR </string>
+				<string>BMP </string>
+				<string>BMPf</string>
+				<string>GIFf</string>
+				<string>JPEG</string>
+				<string>PICT</string>
+				<string>PNGf</string>
+				<string>qtif</string>
+				<string>TPIC</string>
+				<string>.SGI</string>
+				<string>8BPS</string>
+				<string>PNTG</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.tiff</string>
+				<string>com.ilm.openexr-image</string>
+				<string>com.microsoft.bmp</string>
+				<string>com.compuserve.gif</string>
+				<string>com.microsoft.ico</string>
+				<string>public.jpeg</string>
+				<string>com.apple.pict</string>
+				<string>public.png</string>
+				<string>com.apple.quicktime-image</string>
+				<string>com.truevision.tga-image</string>
+				<string>com.sgi.sgi-image</string>
+				<string>com.adobe.photoshop-image</string>
+				<string>com.apple.macpaint-image</string>
+				<string>com.kodak.flashpix-image</string>
+				<string>public.fax</string>
+				<string>com.apple.icns</string>
+				<string>public.jpeg-2000</string>
+				<string>public.radiance</string>
+			</array>
+		</dict>
+		<key>PGHTMLAdapter</key>
+		<dict>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/html</string>
+				<string>application/xhtml+xml</string>
+			</array>
+		</dict>
+		<key>PGPDFAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>pdf</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/pdf</string>
+				<string>application/x-pdf</string>
+				<string>application/acrobat</string>
+				<string>applications/vnd.pdf</string>
+				<string>text/pdf</string>
+				<string>text/x-pdf</string>
+			</array>
+			<key>CFBundleTypeOSTypes</key>
+			<array>
+				<string>PDF </string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+			</array>
+			<key>PGBundleTypeFourCC</key>
+			<array>
+				<data>
+				JVBERg==
+				</data>
+			</array>
+		</dict>
+		<key>PGResourceAdapter</key>
+		<dict/>
+		<key>PGWebAdapter</key>
+		<dict/>
+		<key>PGXMLAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xml</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>text/xml</string>
+				<string>text/xml+oembed</string>
+			</array>
+		</dict>
+	</dict>
 </dict>
 </plist>

@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGDocument.h"
+#import "PGResourceAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
@@ -54,12 +55,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSStringAdditions.h"
 #import "NSUserDefaultsAdditions.h"
 
-NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
-NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
-NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
-NSString *const PGLSTypeIsPackageKey        = @"LSTypeIsPackage";
-NSString *const PGBundleTypeFourCCKey       = @"PGBundleTypeFourCC";
-
 NSString *const PGAntialiasWhenUpscalingKey    = @"PGAntialiasWhenUpscaling";
 NSString *const PGAnimatesImagesKey            = @"PGAnimatesImages";
 NSString *const PGRoundsImageCornersKey        = @"PGRoundsImageCorners";
@@ -68,9 +63,6 @@ NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
 NSString *const PGBackgroundColorKey           = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey         = @"PGBackgroundPattern";
 NSString *const PGMouseClickActionKey          = @"PGMouseClickAction";
-
-static NSString *const PGCFBundleDocumentTypesKey = @"CFBundleDocumentTypes";
-static NSString *const PGAdapterClassKey          = @"PGAdapterClass";
 
 static NSString *const PGRecentItemsKey            = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
@@ -189,7 +181,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[openPanel setAllowsMultipleSelection:YES];
 	NSURL *const URL = [[[self currentDocument] identifier] URL];
 	NSString *const path = [URL isFileURL] ? [URL path] : nil;
-	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[self supportedExtensionsWhichMustAlwaysLoad:NO]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
+	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:NO]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
 }
 - (IBAction)openURL:(id)sender
 {
@@ -407,59 +399,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsOnScreenDisplayDidChange:) name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
 	[self readingDirectionDidChange:nil];
 	[self showsOnScreenDisplayDidChange:nil];
-}
-
-#pragma mark -
-
-- (NSArray *)documentTypeDictionaries
-{
-	return [[[NSBundle mainBundle] infoDictionary] objectForKey:PGCFBundleDocumentTypesKey];
-}
-- (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag
-{
-	NSMutableArray *const exts = [NSMutableArray array];
-	NSDictionary *typeDict;
-	NSEnumerator *const typeDictEnum = [[self documentTypeDictionaries] objectEnumerator];
-	while((typeDict = [typeDictEnum nextObject])) {
-		id const adapterClass = NSClassFromString([typeDict objectForKey:PGAdapterClassKey]);
-		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
-		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
-		NSArray *const OSTypes = [typeDict objectForKey:PGCFBundleTypeOSTypesKey];
-		if(!OSTypes || ![OSTypes count]) continue;
-		NSString *type;
-		NSEnumerator *const typeEnum = [OSTypes objectEnumerator];
-		while((type = [typeEnum nextObject])) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
-	}
-	return exts;
-}
-- (NSDictionary *)documentTypeDictionaryWhereAttribute:(NSString *)key
-                  matches:(id)value
-{
-	NSArray *const dictionaries = [self documentTypeDictionaries];
-	if(![dictionaries count]) return nil;
-	if(!key) return [dictionaries objectAtIndex:0];
-	if(!value) return nil;
-	NSDictionary *typeDict;
-	NSEnumerator *const typeDictEnum = [dictionaries objectEnumerator];
-	while((typeDict = [typeDictEnum nextObject])) {
-		id const obj = [typeDict objectForKey:key];
-		if(([obj respondsToSelector:@selector(containsObject:)] && [obj containsObject:value]) || [obj isEqual:value]) return typeDict;
-	}
-	return nil;
-}
-- (Class)resourceAdapterClassWhereAttribute:(NSString *)key
-         matches:(id)value
-{
-	return NSClassFromString([[self documentTypeDictionaryWhereAttribute:key matches:value] objectForKey:PGAdapterClassKey]);
-}
-- (Class)resourceAdapterClassForExtension:(NSString *)ext
-{
-	Class class = [_classesByExtension objectForKey:ext];
-	if(!class) {
-		class = [self resourceAdapterClassWhereAttribute:PGCFBundleTypeExtensionsKey matches:[ext lowercaseString]];
-		if(class) [_classesByExtension setObject:class forKey:ext];
-	}
-	return class;
 }
 
 #pragma mark -

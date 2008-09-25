@@ -37,12 +37,6 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGTimerPanelController;
 @class PGActivityPanelController;
 
-extern NSString *const PGCFBundleTypeExtensionsKey;
-extern NSString *const PGCFBundleTypeOSTypesKey;
-extern NSString *const PGCFBundleTypeMIMETypesKey;
-extern NSString *const PGLSTypeIsPackageKey;
-extern NSString *const PGBundleTypeFourCCKey;
-
 extern NSString *const PGAntialiasWhenUpscalingKey;
 extern NSString *const PGAnimatesImagesKey;
 extern NSString *const PGRoundsImageCornersKey;
@@ -169,12 +163,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (PGPrefObject *)currentPrefObject; // Current doc or +[PGPrefObject globalPrefObject].
 - (PGDocument *)currentDocument;
 - (void)setCurrentDocument:(PGDocument *)document;
-
-- (NSArray *)documentTypeDictionaries;
-- (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
-- (NSDictionary *)documentTypeDictionaryWhereAttribute:(NSString *)key matches:(id)value; // First tries -containsObject:, then -isEqual:. Returns the first applicable type. If 'key' is nil, returns the first type. If 'value' is nil, returns nil.
-- (Class)resourceAdapterClassWhereAttribute:(NSString *)key matches:(id)value;
-- (Class)resourceAdapterClassForExtension:(NSString *)ext;
 
 - (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)display;
 - (id)openDocumentWithBookmark:(PGBookmark *)aBookmark display:(BOOL)display;

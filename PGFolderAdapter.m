@@ -37,6 +37,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
+                   withInfo:(NSMutableDictionary *)info
+{
+	NSURL *const URL = [info objectForKey:PGURLKey];
+	if(![URL isFileURL]) return PGNotAMatch;
+	BOOL flag = NO;
+	return [[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
+}
+
+#pragma mark PGResourceAdapter
+
 - (void)loadWithInfo:(NSDictionary *)info
 {
 	[[self document] setProcessingNodes:YES];

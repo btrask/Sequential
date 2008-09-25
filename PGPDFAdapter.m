@@ -72,7 +72,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[identifier setCustomDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
-		[node setResourceAdapterClass:[PGPDFPageAdapter class]];
+		[node setResourceAdapter:[[[PGPDFPageAdapter alloc] init] autorelease]];
 		[node loadWithInfo:nil];
 		[nodes addObject:node];
 	}

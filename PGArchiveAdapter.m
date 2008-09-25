@@ -35,6 +35,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSMutableDictionaryAdditions.h"
 #import "NSStringAdditions.h"
 
+static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
+
 @interface XADArchive (PGAdditions)
 
 - (NSString *)OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
@@ -80,7 +82,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[node setDataSource:self];
 		if(isFile) [node loadWithInfo:nil];
 		else {
-			[node setResourceAdapterClass:[PGContainerAdapter class]];
+			[node setResourceAdapter:[[[PGContainerAdapter alloc] init] autorelease]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
@@ -128,17 +130,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGNodeDataSource Protocol
 
-- (Class)classForNode:(PGNode *)sender
-{
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	unsigned const index = [[sender identifier] index];
-	NSParameterAssert(NSNotFound != index);
-	Class class = Nil;
-	if([_archive entryIsArchive:index]) class = [PGArchiveAdapter class];
-	if(!class) class = [d resourceAdapterClassWhereAttribute:PGCFBundleTypeOSTypesKey matches:[_archive OSTypeForEntry:index standardFormat:NO]];
-	if(!class) class = [d resourceAdapterClassForExtension:[_archive typeForEntry:index preferOSType:NO]];
-	return class;
-}
 - (NSDate *)dateCreatedForNode:(PGNode *)sender
 {
 	unsigned const i = [[sender identifier] index];
@@ -158,6 +149,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
+	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey]; // TODO: Check this when matching.
 	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
 	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }

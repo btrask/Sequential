@@ -34,13 +34,77 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSMenuItemAdditions.h"
 #import "NSStringAdditions.h"
 
+NSString *const PGBundleTypeFourCCsKey      = @"PGBundleTypeFourCCs";
+NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
+NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
+NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
+
+@interface PGResourceAdapter (Private)
+
+- (id)_initWithPriority:(PGMatchPriority)priority;
+- (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter;
+
+@end
+
 @implementation PGResourceAdapter
 
 #pragma mark Class Methods
 
++ (NSDictionary *)resourceAdapterTypesDictionary
+{
+	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"PGResourceAdapterClasses"];
+}
++ (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag
+{
+	NSMutableArray *const exts = [NSMutableArray array];
+	NSDictionary *const types = [self resourceAdapterTypesDictionary];
+	NSString *classString;
+	NSEnumerator *const classStringEnum = [types keyEnumerator];
+	while((classString = [classStringEnum nextObject])) {
+		id const adapterClass = NSClassFromString(classString);
+		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
+		NSDictionary *const typeDict = [types objectForKey:classString];
+		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
+		NSArray *const OSTypes = [typeDict objectForKey:PGCFBundleTypeOSTypesKey];
+		if(!OSTypes || ![OSTypes count]) continue;
+		NSString *type;
+		NSEnumerator *const typeEnum = [OSTypes objectEnumerator];
+		while((type = [typeEnum nextObject])) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
+	}
+	return exts;
+}
++ (NSArray *)adapterClassesInstantiated:(BOOL)flag
+             forNode:(PGNode *)node
+             withInfo:(NSMutableDictionary *)info
+{
+	NSMutableArray *const adapters = [NSMutableArray array];
+	NSString *classString;
+	NSEnumerator *const classStringEnum = [[self resourceAdapterTypesDictionary] keyEnumerator];
+	while((classString = [classStringEnum nextObject])) {
+		Class const class = NSClassFromString(classString);
+		PGMatchPriority const p = [class matchPriorityForNode:node withInfo:info];
+		if(p) [adapters addObject:(flag ? [[[class alloc] _initWithPriority:p] autorelease] : class)];
+	}
+	if(flag) [adapters sortUsingSelector:@selector(_matchPriorityCompare:)];
+	return adapters;
+}
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
+                   withInfo:(NSMutableDictionary *)info
+{
+	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
+	NSData *const data = [node dataWithInfo:info];
+	if(data) {
+		if([data length] < 4) return PGNotAMatch;
+		if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[data subdataWithRange:NSMakeRange(0, 4)]]) return PGMatchByFourCC;
+	}
+	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
+	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
+	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[[info objectForKey:PGURLKey] path] pathExtension]]) return PGMatchByExtension;
+	return [PGResourceAdapter class] == self ? PGMatchGeneric : PGNotAMatch;
+}
 + (BOOL)alwaysLoads
 {
-	return YES;
+	return [PGResourceAdapter class] != self;
 }
 
 #pragma mark Instance Methods
@@ -88,6 +152,23 @@ DEALINGS WITH THE SOFTWARE. */
 #pragma mark -
 
 - (void)noteResourceDidChange {}
+
+#pragma mark Private Protocol
+
+- (id)_initWithPriority:(PGMatchPriority)priority
+{
+	if((self = [self init])) {
+		_priority = priority;
+	}
+	return self;
+}
+- (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter
+{
+	NSParameterAssert([adapter isKindOfClass:[PGResourceAdapter class]]);
+	if(_priority > adapter->_priority) return NSOrderedAscending;
+	if(_priority < adapter->_priority) return NSOrderedDescending;
+	return NSOrderedSame;
+}
 
 #pragma mark PGResourceAdapting Protocol
 

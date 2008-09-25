@@ -28,13 +28,35 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 
+extern NSString *const PGBundleTypeFourCCsKey;
+extern NSString *const PGCFBundleTypeMIMETypesKey;
+extern NSString *const PGCFBundleTypeOSTypesKey;
+extern NSString *const PGCFBundleTypeExtensionsKey;
+
+enum {
+	PGMatchByPriorAgreement     = 6000,
+	PGMatchByIntrinsicAttribute = 5000,
+	PGMatchByFourCC             = 4000,
+	PGMatchByMIMEType           = 3000,
+	PGMatchByOSType             = 2000,
+	PGMatchByExtension          = 1000,
+	PGMatchGeneric              = 1,
+	PGNotAMatch                 = 0
+};
+typedef unsigned PGMatchPriority;
+
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
+	PGMatchPriority      _priority;
 	PGNode              *_node;
 	NSMutableDictionary *_info;
 }
 
++ (NSDictionary *)resourceAdapterTypesDictionary;
++ (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
++ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
 - (PGNode *)node;

@@ -37,6 +37,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGWebAdapter
 
+#pragma mark PGResourceAdapter
+
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
+                   withInfo:(NSMutableDictionary *)info
+{
+	NSURL *const URL = [info objectForKey:PGURLKey];
+	return !URL || [URL isFileURL] || [info objectForKey:PGURLResponseKey] || [node dataWithInfo:info] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
+}
+
 #pragma mark PGURLConnectionDelegate Protocol
 
 - (void)connectionLoadingDidProgress:(PGURLConnection *)sender
@@ -47,16 +56,20 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(sender != _mainConnection) return;
 	id const resp = [sender response];
-	Class pendingClass = [[PGDocumentController sharedDocumentController] resourceAdapterClassWhereAttribute:PGCFBundleTypeMIMETypesKey matches:[resp MIMEType]];
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
 		[_mainConnection cancelAndNotify:NO];
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 		[[self node] loadFinished];
-	} else if(!pendingClass || ![[self node] shouldLoadAdapterClass:pendingClass]) {
-		[_mainConnection cancelAndNotify:YES];
-		[_faviconConnection cancelAndNotify:YES];
+		return;
 	}
+	NSArray *const potentials = [PGResourceAdapter adapterClassesInstantiated:NO forNode:nil withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, nil]];
+	if([potentials count]) return;
+	Class potential;
+	NSEnumerator *const potentialEnum = [potentials objectEnumerator];
+	while((potential = [potentialEnum nextObject])) if([[self node] shouldLoadAdapterClass:potential]) return;
+	[_mainConnection cancelAndNotify:YES];
+	[_faviconConnection cancelAndNotify:YES];
 }
 - (void)connectionDidSucceed:(PGURLConnection *)sender
 {
