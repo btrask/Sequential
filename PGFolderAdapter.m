@@ -43,7 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSParameterAssert([self shouldLoad]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
-	NSURL *const URL = [[self identifier] URLByFollowingAliases:YES];
+	NSURL *const URL = [info objectForKey:PGURLKey];
 	LSItemInfoRecord fileInfo;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &fileInfo) != noErr || fileInfo.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];

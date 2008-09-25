@@ -96,8 +96,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)loadWithInfo:(NSDictionary *)info
 {
 	NSParameterAssert(![self canGetData]);
-	NSURL *URL = [info objectForKey:PGURLKey];
-	if(!URL) URL = [[self identifier] URL];
+	NSURL *const URL = [info objectForKey:PGURLKey];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];

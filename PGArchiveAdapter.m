@@ -187,8 +187,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(!_archive) {
 		XADError error;
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[identifier URLByFollowingAliases:YES] path] delegate:self error:&error]; // -getData: will return data for file identifiers, but it's worth using -[XADArchive initWithFile:...].
+		NSURL *const URL = [info objectForKey:PGURLKey];
+		if([URL isFileURL]) _archive = [[XADArchive alloc] initWithFile:[URL path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *const data = [self data];
 			if(!data) return [[self node] loadFinished];
