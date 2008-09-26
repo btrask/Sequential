@@ -139,10 +139,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	return PGLoadToMaxDepth;
 }
-- (NSMutableDictionary *)info
-{
-	return [[_info retain] autorelease];
-}
 - (void)loadIfNecessary
 {
 	if(![self shouldLoad]) return [[self node] loadFinished];
@@ -216,6 +212,10 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (PGResourceIdentifier *)identifier
 {
 	return [[self node] identifier];
+}
+- (NSMutableDictionary *)info
+{
+	return [[_info retain] autorelease];
 }
 - (NSData *)data
 {
@@ -351,18 +351,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 	[[[self node] menuItem] AE_removeFromMenu];
 	[aMenu addItem:[[self node] menuItem]];
 }
-
-#pragma mark -
-
-- (char const *)unencodedSampleString
-{
-	return NULL;
-}
-- (NSStringEncoding)defaultEncoding
-{
-	return 0;
-}
-- (void)setEncoding:(NSStringEncoding)encoding {}
 
 #pragma mark -
 

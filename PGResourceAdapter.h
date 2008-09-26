@@ -64,7 +64,6 @@ typedef unsigned PGMatchPriority;
 - (BOOL)adapterIsViewable;
 - (BOOL)shouldLoad;
 - (PGLoadPolicy)descendentLoadPolicy;
-- (NSMutableDictionary *)info;
 - (void)loadIfNecessary;
 - (void)load; // Abstract method. Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
 - (void)resumeLoad; // Abstract method. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.

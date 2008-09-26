@@ -31,8 +31,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Instance Methods
 
-- (id)initWithString:(char const *)bytes
-      guess:(NSStringEncoding)guess
+- (id)initWithStringData:(NSData *)data
+      guess:(NSStringEncoding)guess;
 {
 	if(!(self = [self initWithWindowNibName:@"PGEncoding"])) return nil;
 	(void)[self window]; // Just load it.
@@ -42,7 +42,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSMutableArray *const samples = [[NSMutableArray alloc] init];
 	unsigned i = 0, defaultRow = 0;
 	for(; encodings[i]; i++) {
-		NSString *const sample = [[[NSString alloc] initWithBytesNoCopy:(void *)bytes length:strlen(bytes) encoding:encodings[i] freeWhenDone:NO] autorelease];
+		NSString *const sample = [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:encodings[i]] autorelease];
 		if(!sample) continue;
 		if(encodings[i] == guess) defaultRow = [encodingNames count];
 		[encodingNames addObject:[NSString localizedNameOfStringEncoding:encodings[i]]];

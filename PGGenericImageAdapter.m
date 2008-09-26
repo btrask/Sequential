@@ -129,12 +129,9 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	if(_reading) return;
 	NSData *const data = [self data];
-	if(!data) {
-		_readFailed = YES;
-		[[self node] noteIsViewableDidChange];
-		[[self node] readFinishedWithImageRep:nil];
-		return;
-	}
+	_readFailed = !data;
+	[[self node] noteIsViewableDidChange];
+	if(!data) return [[self node] readFinishedWithImageRep:nil];
 	_reading = YES;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
 }

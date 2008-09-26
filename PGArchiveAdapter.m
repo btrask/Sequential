@@ -60,10 +60,6 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 {
 	return [[_archive retain] autorelease];
 }
-- (void)setIsSubarchive:(BOOL)flag
-{
-	_isSubarchive = flag;
-}
 - (NSArray *)nodesUnderPath:(NSString *)path
              parentAdapter:(PGContainerAdapter *)parent
              remainingIndexes:(NSMutableIndexSet *)indexes
@@ -75,7 +71,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 	int i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
-		if(UINT_MAX != _guessedEncoding) return nil;
+		if(_encodingError) return nil;
 		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
 		[indexes removeIndex:i];
 		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
@@ -107,9 +103,9 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
                     guess:(NSStringEncoding)guess
                     confidence:(float)confidence
 {
-	if(confidence < 0.8 && UINT_MAX == _guessedEncoding) {
-		_guessedEncoding = guess;
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:nil]];
+	if(confidence < 0.8 && !_encodingError) {
+		_encodingError = YES;
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSData dataWithBytes:bytes length:strlen(bytes)], PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]]];
 		[[self node] loadFinished];
 	}
 	return guess;
@@ -120,20 +116,6 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 - (BOOL)canExtractData
 {
 	return YES;
-}
-- (char const *)unencodedSampleString
-{
-	return [_archive numberOfEntries] ? [_archive _undecodedNameOfEntry:0] : NULL;
-}
-- (NSStringEncoding)defaultEncoding
-{
-	return _guessedEncoding;
-}
-- (void)setEncoding:(NSStringEncoding)encoding
-{
-	[_archive setNameEncoding:encoding];
-	_guessedEncoding = UINT_MAX;
-	[[self node] startLoadWithInfo:nil]; // FIXME: This reloads the node entirely, meaning redownloading if it's online.
 }
 
 #pragma mark PGNodeDataSource Protocol
@@ -167,7 +149,8 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return NO;
 	[_archive clearLastError];
-	if([sender password]) [_archive setPassword:[sender password]];
+	NSString *const pass = [[sender info] objectForKey:PGPasswordKey];
+	if(pass) [_archive setPassword:pass];
 	NSData *const data = [_archive contentsOfEntry:i];
 	if([_archive lastError] == XADERR_PASSWORD) {
 		[sender setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
@@ -197,11 +180,12 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		}
 		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
+	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
+	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
 	NSString *const root = [_archive commonTopDirectory];
-	_guessedEncoding = UINT_MAX;
 	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	if(UINT_MAX == _guessedEncoding) [[self node] loadFinished];
+	if(!_encodingError) [[self node] loadFinished];
 }
 
 #pragma mark NSObject

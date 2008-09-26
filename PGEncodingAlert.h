@@ -37,7 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 	         id               _delegate;
 }
 
-- (id)initWithString:(char const *)bytes guess:(NSStringEncoding)guess;
+- (id)initWithStringData:(NSData *)data guess:(NSStringEncoding)guess;
 
 - (IBAction)ok:(id)sender;
 - (IBAction)cancel:(id)sender;

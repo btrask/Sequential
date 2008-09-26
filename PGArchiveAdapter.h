@@ -29,13 +29,11 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGArchiveAdapter : PGContainerAdapter
 {
 	@private
-	XADArchive        *_archive;
-	NSStringEncoding   _guessedEncoding;
-	BOOL               _isSubarchive;
+	XADArchive      *_archive;
+	NSStringEncoding _encodingError;
 }
 
 - (XADArchive *)archive;
 - (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes;
-- (void)setIsSubarchive:(BOOL)flag;
 
 @end

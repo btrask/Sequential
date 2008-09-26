@@ -42,6 +42,8 @@ extern NSString *const PGFourCCDataKey;
 extern NSString *const PGMIMETypeKey;
 extern NSString *const PGOSTypeKey; // Uses the pseudo-OS-type that doesn't include single quotes around it.
 extern NSString *const PGExtensionKey;
+extern NSString *const PGPasswordKey;
+extern NSString *const PGStringEncodingKey;
 
 enum {
 	PGLoadToMaxDepth = 0,
@@ -60,6 +62,7 @@ typedef int PGLoadPolicy;
 - (PGDocument *)document;
 
 - (PGResourceIdentifier *)identifier;
+- (NSMutableDictionary *)info;
 - (NSData *)data;
 - (BOOL)canGetData;
 - (BOOL)canExtractData;
@@ -91,10 +94,6 @@ typedef int PGLoadPolicy;
 - (BOOL)isDescendantOfNode:(PGNode *)aNode;
 
 - (void)addMenuItemsToMenu:(NSMenu *)aMenu;
-
-- (char const *)unencodedSampleString;
-- (NSStringEncoding)defaultEncoding;
-- (void)setEncoding:(NSStringEncoding)encoding;
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag;
 - (void)noteSortOrderDidChange;

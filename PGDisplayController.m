@@ -279,12 +279,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	PGNode *const activeNode = [self activeNode];
 	[activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
-	[activeNode setPassword:[passwordField stringValue]];
+	[[activeNode info] setObject:[passwordField stringValue] forKey:PGPasswordKey];
 	[activeNode becomeViewed];
 }
 - (IBAction)chooseEncoding:(id)sender
 {
-	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithString:[[self activeNode] unencodedSampleString] guess:[[self activeNode] defaultEncoding]] autorelease];
+	NSDictionary *const errInfo = [[[self activeNode] error] userInfo];
+	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntValue]] autorelease];
 	[alert beginSheetForWindow:nil withDelegate:self];
 }
 
@@ -983,7 +984,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender
         selectedEncoding:(NSStringEncoding)encoding
 {
-	if(encoding) [[self activeNode] setEncoding:encoding];
+	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:encoding], PGStringEncodingKey, nil]];
 }
 
 #pragma mark NSWindowController

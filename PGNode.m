@@ -46,9 +46,11 @@ NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgres
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
 
 NSString *const PGImageRepKey = @"PGImageRep";
-NSString *const PGErrorKey = @"PGError";
+NSString *const PGErrorKey    = @"PGError";
 
-NSString *const PGNodeErrorDomain = @"PGNodeError";
+NSString *const PGNodeErrorDomain        = @"PGNodeError";
+NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
+NSString *const PGDefaultEncodingKey     = @"PGDefaultEncoding";
 
 enum {
 	PGNodeNothing = 0,
@@ -61,6 +63,7 @@ enum {
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
 - (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info;
+- (void)_readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 
@@ -148,14 +151,14 @@ enum {
 - (void)startLoadWithInfo:(NSDictionary *)info
 {
 	NSParameterAssert(!(PGNodeLoading & _status));
-	_status |= PGNodeLoading;
-	[self noteIsViewableDidChange];
-	[_error release];
-	_error = nil;
 	[_adapters autorelease];
 	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
 	[_adapters insertObject:[[[PGResourceAdapter alloc] init] autorelease] atIndex:0];
 	[self _setResourceAdapter:[_adapters lastObject]];
+	_status |= PGNodeLoading;
+	[self noteIsViewableDidChange];
+	[_error release];
+	_error = nil;
 	[_adapter loadIfNecessary];
 }
 - (void)continueLoadWithInfo:(NSDictionary *)info
@@ -204,40 +207,33 @@ enum {
 - (void)readIfNecessary
 {
 	if(PGNodeReading != _status) return;
-	if(_error && PGNodeLoading & _errorPhase) [self readFinishedWithImageRep:nil];
+	if(_error && PGNodeLoading & _errorPhase && [_adapters count] <= 1) [self _readFinishedWithImageRep:nil error:_error];
 	else [_adapter read];
 }
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep
 {
-	NSParameterAssert(PGNodeReading == _status);
-	_status = ~PGNodeReading & _status;
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
-	if(_error) [dict setObject:_error forKey:PGErrorKey];
-	if(PGNodeReading == _errorPhase) {
-		[_error release];
-		_error = nil;
-	}
-	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
+	[self _readFinishedWithImageRep:aRep error:(PGNodeReading == _errorPhase ? _error : nil)];
+	[_error release];
+	_error = nil;
 }
 
 #pragma mark -
 
+- (NSError *)error
+{
+	return [[_error retain] autorelease];
+}
 - (void)setError:(NSError *)error
 {
 	if(_error || PGNodeNothing == _status) return;
 	_error = [error copy];
 	_errorPhase = _status;
-}
-- (NSString *)password
-{
-	return [[_password retain] autorelease];
-}
-- (void)setPassword:(NSString *)password
-{
-	if(password == _password) return;
-	[_password release];
-	_password = [password copy];
+	if(PGNodeLoading & _status && [_adapters count] > 1) {
+		[[[_adapters lastObject] retain] autorelease];
+		[_adapters removeLastObject];
+		[self _setResourceAdapter:[_adapters lastObject]];
+		[_adapter resumeLoad];
+	}
 }
 
 #pragma mark -
@@ -342,6 +338,16 @@ enum {
 		[pool release]; // Dispose of the data ASAP.
 	}
 	return mutableInfo;
+}
+- (void)_readFinishedWithImageRep:(NSImageRep *)aRep
+        error:(NSError *)error
+{
+	NSParameterAssert(PGNodeReading == _status);
+	_status = ~PGNodeReading & _status;
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
+	if(error) [dict setObject:error forKey:PGErrorKey];
+	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 - (void)_updateMenuItem
 {
@@ -496,7 +502,6 @@ enum {
 	[_identifier release];
 	[_menuItem release];
 	[_adapters release];
-	[_password release];
 	[_error release];
 	[_dateModified release];
 	[_dateCreated release];

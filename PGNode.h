@@ -43,6 +43,8 @@ enum {
 	PGPasswordError = 2,
 	PGEncodingError = 3
 };
+extern NSString *const PGUnencodedStringDataKey;
+extern NSString *const PGDefaultEncodingKey;
 
 typedef unsigned PGNodeStatus;
 
@@ -61,7 +63,6 @@ typedef unsigned PGNodeStatus;
 	PGNodeStatus          _status;
 	NSError              *_error;
 	PGNodeStatus          _errorPhase;
-	NSString             *_password;
 
 	BOOL                  _viewable;
 	NSMenuItem           *_menuItem;
@@ -88,9 +89,8 @@ typedef unsigned PGNodeStatus;
 - (void)readIfNecessary;
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep;
 
+- (NSError *)error;
 - (void)setError:(NSError *)error;
-- (NSString *)password;
-- (void)setPassword:(NSString *)password;
 
 - (BOOL)isViewable;
 - (unsigned)depth;
