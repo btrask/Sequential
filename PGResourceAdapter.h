@@ -40,7 +40,6 @@ enum {
 	PGMatchByMIMEType           = 3000,
 	PGMatchByOSType             = 2000,
 	PGMatchByExtension          = 1000,
-	PGMatchGeneric              = 1,
 	PGNotAMatch                 = 0
 };
 typedef unsigned PGMatchPriority;
@@ -55,20 +54,19 @@ typedef unsigned PGMatchPriority;
 
 + (NSDictionary *)resourceAdapterTypesDictionary;
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
-+ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
++ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSDictionary *)info;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
 
+- (BOOL)adapterIsViewable;
 - (BOOL)shouldLoad;
 - (PGLoadPolicy)descendentLoadPolicy;
-
-- (BOOL)adapterIsViewable;
 - (NSMutableDictionary *)info;
-
-- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -returnImageRep: must be sent sometime hereafter.
+- (void)load; // Abstract method. Sent by -[PGNode loadWithInfo:], never call it directly. -loadFinished must be sent sometime hereafter.
+- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep: must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;
 

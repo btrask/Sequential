@@ -81,6 +81,7 @@ typedef unsigned PGNodeStatus;
 - (void)setResourceAdapter:(PGResourceAdapter *)adapter;
 - (PGLoadPolicy)ancestorLoadPolicy;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
+- (void)loadWithInfo:(NSDictionary *)info;
 - (void)loadFinished;
 - (void)becomeViewed;
 - (void)readIfNecessary;

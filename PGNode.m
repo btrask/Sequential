@@ -59,6 +59,7 @@ enum {
 
 @interface PGNode (Private)
 
+- (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 
@@ -149,6 +150,24 @@ enum {
 		case PGLoadAll: return YES;
 		default: return NO;
 	}
+}
+- (void)loadWithInfo:(NSDictionary *)info
+{
+	NSDictionary *const standardizedInfo = [self _standardizedInfoWithInfo:info];
+	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:standardizedInfo] objectAtIndex:0]];
+	if(!(PGNodeLoading & _status)) {
+		[_error release];
+		_error = nil;
+	}
+	if(![_resourceAdapter shouldLoad]) {
+		if(PGNodeLoading & _status) [self loadFinished];
+		return;
+	}
+	_status |= PGNodeLoading;
+	[self noteIsViewableDidChange];
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
+	[_resourceAdapter load];
+	[pool release];
 }
 - (void)loadFinished
 {
@@ -283,6 +302,21 @@ enum {
 
 #pragma mark Private Protocol
 
+- (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info
+{
+	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
+	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
+	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
+	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
+	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+		NSData *const data = [self dataWithInfo:mutableInfo];
+		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
+		[pool release]; // Dispose of the data ASAP.
+	}
+	return mutableInfo;
+}
 - (void)_updateMenuItem
 {
 	if(!_allowMenuItemUpdates) return;
@@ -379,35 +413,6 @@ enum {
 - (PGResourceIdentifier *)identifier
 {
 	return [[_identifier retain] autorelease];
-}
-- (void)loadWithInfo:(NSDictionary *)info
-{
-	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
-	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
-	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
-	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
-	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
-	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		NSData *const data = [self dataWithInfo:mutableInfo];
-		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
-		[pool release]; // Dispose of the data ASAP.
-	}
-	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:mutableInfo] objectAtIndex:0]];
-	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:mutableInfo];
-	if(!(PGNodeLoading & _status)) {
-		[_error release];
-		_error = nil;
-	}
-	if(![_resourceAdapter shouldLoad]) {
-		if(PGNodeLoading & _status) [self loadFinished];
-		return;
-	}
-	_status |= PGNodeLoading;
-	[self noteIsViewableDidChange];
-	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
-	[_resourceAdapter loadWithInfo:mutableInfo];
-	[pool release];
 }
 
 #pragma mark -

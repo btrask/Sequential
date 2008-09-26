@@ -63,8 +63,6 @@ typedef int PGLoadPolicy;
 - (BOOL)canGetData;
 - (BOOL)canExtractData;
 
-- (void)loadWithInfo:(NSDictionary *)info;
-
 - (BOOL)isContainer;
 - (float)loadingProgress;
 - (NSArray *)exifEntries;

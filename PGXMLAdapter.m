@@ -30,7 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGXMLAdapter
 
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];

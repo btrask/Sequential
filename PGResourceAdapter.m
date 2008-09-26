@@ -75,15 +75,22 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 + (NSArray *)adapterClassesInstantiated:(BOOL)flag
              forNode:(PGNode *)node
-             withInfo:(NSMutableDictionary *)info
+             withInfo:(NSDictionary *)info
 {
 	NSMutableArray *const adapters = [NSMutableArray array];
 	NSString *classString;
 	NSEnumerator *const classStringEnum = [[self resourceAdapterTypesDictionary] keyEnumerator];
 	while((classString = [classStringEnum nextObject])) {
 		Class const class = NSClassFromString(classString);
-		PGMatchPriority const p = [class matchPriorityForNode:node withInfo:info];
-		if(p) [adapters addObject:(flag ? [[[class alloc] _initWithPriority:p] autorelease] : class)];
+		if(![node shouldLoadAdapterClass:class]) continue; // Don't even bother.
+		NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
+		PGMatchPriority const p = [class matchPriorityForNode:node withInfo:mutableInfo];
+		if(!p) continue;
+		if(flag) {
+			PGResourceAdapter *const adapter = [[[class alloc] _initWithPriority:p] autorelease];
+			[[adapter info] addEntriesFromDictionary:mutableInfo];
+			[adapters addObject:adapter];
+		} else [adapters addObject:class];
 	}
 	if(flag) [adapters sortUsingSelector:@selector(_matchPriorityCompare:)];
 	return adapters;
@@ -96,7 +103,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
 	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
 	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
-	return [PGResourceAdapter class] == self ? PGMatchGeneric : PGNotAMatch;
+	return PGNotAMatch;
 }
 + (BOOL)alwaysLoads
 {
@@ -118,6 +125,10 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
 #pragma mark -
 
+- (BOOL)adapterIsViewable
+{
+	return NO;
+}
 - (BOOL)shouldLoad
 {
 	return [[self node] shouldLoadAdapterClass:[self class]];
@@ -126,20 +137,14 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	return PGLoadToMaxDepth;
 }
-
-#pragma mark -
-
-- (BOOL)adapterIsViewable
-{
-	return NO;
-}
 - (NSMutableDictionary *)info
 {
 	return [[_info retain] autorelease];
 }
-
-#pragma mark -
-
+- (void)load
+{
+	[[self node] loadFinished];
+}
 - (void)read
 {
 	[[self node] readFinishedWithImageRep:nil];
@@ -210,13 +215,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (BOOL)canExtractData
 {
 	return NO;
-}
-
-#pragma mark -
-
-- (void)loadWithInfo:(NSDictionary *)info
-{
-	[[self node] loadFinished];
 }
 
 #pragma mark -

@@ -183,11 +183,11 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 {
 	return PGLoadAll;
 }
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	if(!_archive) {
 		XADError error;
-		NSURL *const URL = [info objectForKey:PGURLKey];
+		NSURL *const URL = [[self info] objectForKey:PGURLKey];
 		if([URL isFileURL]) _archive = [[XADArchive alloc] initWithFile:[URL path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *const data = [self data];

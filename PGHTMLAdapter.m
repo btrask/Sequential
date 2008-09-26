@@ -111,10 +111,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return PGLoadNone;
 }
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	NSParameterAssert(!_webView);
-	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
+	NSURLResponse *const response = [[self info] objectForKey:PGURLResponseKey];
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];

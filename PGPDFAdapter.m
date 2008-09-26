@@ -56,7 +56,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return PGLoadAll;
 }
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];

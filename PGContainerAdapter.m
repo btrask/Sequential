@@ -262,7 +262,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(flag && [self shouldLoad]) [self loadWithInfo:nil];
+	if(flag && [self shouldLoad]) [self load];
 }
 - (void)noteSortOrderDidChange
 {

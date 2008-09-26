@@ -82,7 +82,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	[self clearCache];
 	_readFailed = NO;

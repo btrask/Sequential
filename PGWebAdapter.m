@@ -61,15 +61,10 @@ DEALINGS WITH THE SOFTWARE. */
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 		[[self node] loadFinished];
-		return;
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:nil withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, nil]] count]) {
+		[_mainConnection cancelAndNotify:YES];
+		[_faviconConnection cancelAndNotify:YES];
 	}
-	NSArray *const potentials = [PGResourceAdapter adapterClassesInstantiated:NO forNode:nil withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, nil]];
-	if([potentials count]) return;
-	Class potential;
-	NSEnumerator *const potentialEnum = [potentials objectEnumerator];
-	while((potential = [potentialEnum nextObject])) if([[self node] shouldLoadAdapterClass:potential]) return;
-	[_mainConnection cancelAndNotify:YES];
-	[_faviconConnection cancelAndNotify:YES];
 }
 - (void)connectionDidSucceed:(PGURLConnection *)sender
 {
@@ -106,10 +101,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGResourceAdapter
 
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)load
 {
 	NSParameterAssert(![self canGetData]);
-	NSURL *const URL = [info objectForKey:PGURLKey];
+	NSURL *const URL = [[self info] objectForKey:PGURLKey];
 	[_mainConnection cancelAndNotify:NO];
 	[_mainConnection release];
 	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
