@@ -30,22 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGXMLAdapter
 
-- (void)load
-{
-	NSData *const data = [self data];
-	if(!data) return [[self node] loadFinished];
-	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
-	[parser setDelegate:self];
-	_tagPath = [@"/" copy];
-	_children = [[NSMutableArray alloc] init];
-	(void)[parser parse];
-	[_tagPath release];
-	_tagPath = nil;
-	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
-	[_children release];
-	_children = nil;
-	[[self node] loadFinished];
-}
+#pragma mark NSXMLParserDelegateEventAdditions Protocol
 
 - (void)parser:(NSXMLParser *)parser
         didStartElement:(NSString *)elementName
@@ -141,6 +126,25 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *const oldTagPath = _tagPath;
 	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
 	[oldTagPath release];
+}
+
+#pragma mark PGResourceAdapter
+
+- (void)load
+{
+	NSData *const data = [self data];
+	if(!data) return [[self node] loadFinished];
+	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
+	[parser setDelegate:self];
+	_tagPath = [@"/" copy];
+	_children = [[NSMutableArray alloc] init];
+	(void)[parser parse];
+	[_tagPath release];
+	_tagPath = nil;
+	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
+	[_children release];
+	_children = nil;
+	[[self node] loadFinished];
 }
 
 @end
