@@ -65,7 +65,9 @@ typedef unsigned PGMatchPriority;
 - (BOOL)shouldLoad;
 - (PGLoadPolicy)descendentLoadPolicy;
 - (NSMutableDictionary *)info;
-- (void)load; // Abstract method. Sent by -[PGNode loadWithInfo:], never call it directly. -loadFinished must be sent sometime hereafter.
+- (void)loadIfNecessary;
+- (void)load; // Abstract method. Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
+- (void)resumeLoad; // Abstract method. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
 - (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep: must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;

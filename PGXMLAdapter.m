@@ -117,7 +117,7 @@ DEALINGS WITH THE SOFTWARE. */
 			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.oEmbed.URL]];
 			[ident setCustomDisplayName:_.oEmbed.title notify:NO];
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			[node loadWithInfo:nil];
+			[node startLoadWithInfo:nil];
 			[_children addObject:node];
 		}
 		[_.oEmbed.version release];
@@ -131,7 +131,7 @@ DEALINGS WITH THE SOFTWARE. */
 	} else if([@"/rsp" isEqualToString:_tagPath]) {
 		if(_.flickr.URL) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.flickr.URL]]] autorelease];
-			[node loadWithInfo:nil];
+			[node startLoadWithInfo:nil];
 			[_children addObject:node];
 		}
 		_.flickr.size = 0;

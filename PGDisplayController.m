@@ -271,7 +271,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (IBAction)reload:(id)sender
 {
 	[reloadButton setEnabled:NO];
-	[[self activeNode] loadWithInfo:nil];
+	[[self activeNode] startLoadWithInfo:nil];
 	[self _loadActiveNode];
 }
 - (IBAction)decrypt:(id)sender

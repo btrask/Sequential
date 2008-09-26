@@ -70,9 +70,8 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(sender == _mainConnection) {
 		NSURLResponse *const resp = [_mainConnection response];
-		[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGURLDataKey, nil]];
 		[_faviconConnection cancelAndNotify:NO];
-		[[self node] loadFinished]; // We've already passed on the node, so normally this doesn't do anything.
+		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGURLDataKey, nil]];
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
 		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.

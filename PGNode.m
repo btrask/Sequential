@@ -59,6 +59,7 @@ enum {
 
 @interface PGNode (Private)
 
+- (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
 - (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
@@ -90,7 +91,9 @@ enum {
 		_document = doc ? doc : [parent document];
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
-		[self setResourceAdapter:[[[PGResourceAdapter alloc] init] autorelease]];
+		PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
+		_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
+		[self _setResourceAdapter:adapter];
 		_menuItem = [[NSMenuItem alloc] init];
 		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 		[_menuItem setAction:@selector(jumpToPage:)];
@@ -126,16 +129,7 @@ enum {
 
 - (PGResourceAdapter *)resourceAdapter
 {
-	return [[_resourceAdapter retain] autorelease];
-}
-- (void)setResourceAdapter:(PGResourceAdapter *)adapter
-{
-	if(!adapter || [_resourceAdapter isKindOfClass:[adapter class]]) return;
-	if([_resourceAdapter node] == self) [_resourceAdapter setNode:nil];
-	[_resourceAdapter autorelease]; // Don't let it get deallocated immediately.
-	_resourceAdapter = [adapter retain];
-	[_resourceAdapter setNode:self];
-	[self _updateMenuItem];
+	return [[_adapter retain] autorelease];
 }
 - (PGLoadPolicy)ancestorLoadPolicy
 {
@@ -151,7 +145,31 @@ enum {
 		default: return NO;
 	}
 }
-- (void)loadWithInfo:(NSDictionary *)info
+- (void)startLoadWithInfo:(NSDictionary *)info
+{
+	NSParameterAssert(!(PGNodeLoading & _status));
+	_status |= PGNodeLoading;
+	[self noteIsViewableDidChange];
+	[_error release];
+	_error = nil;
+	[_adapters autorelease];
+	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
+	[_adapters insertObject:[[[PGResourceAdapter alloc] init] autorelease] atIndex:0];
+	[self _setResourceAdapter:[_adapters lastObject]];
+	[_adapter loadIfNecessary];
+}
+- (void)continueLoadWithInfo:(NSDictionary *)info
+{
+	NSParameterAssert(PGNodeLoading & _status);
+	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]];
+	if(![newAdapters count]) return [_adapter resumeLoad];
+	[_adapters addObjectsFromArray:newAdapters];
+	NSParameterAssert([_adapters count]);
+	[self _setResourceAdapter:[_adapters lastObject]];
+	[_adapter loadIfNecessary];
+}
+// TODO: Remove this once we have the new -startLoadWithInfo: and -continueLoadWithInfo: working completely.
+/*- (void)loadWithInfo:(NSDictionary *)info
 {
 	NSDictionary *const standardizedInfo = [self _standardizedInfoWithInfo:info];
 	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:standardizedInfo] objectAtIndex:0]];
@@ -168,7 +186,7 @@ enum {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
 	[_resourceAdapter load];
 	[pool release];
-}
+}*/
 - (void)loadFinished
 {
 	NSParameterAssert(PGNodeLoading & _status);
@@ -187,7 +205,7 @@ enum {
 {
 	if(PGNodeReading != _status) return;
 	if(_error && PGNodeLoading & _errorPhase) [self readFinishedWithImageRep:nil];
-	else [_resourceAdapter read];
+	else [_adapter read];
 }
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep
 {
@@ -302,6 +320,14 @@ enum {
 
 #pragma mark Private Protocol
 
+- (void)_setResourceAdapter:(PGResourceAdapter *)adapter
+{
+	if(adapter == _adapter) return;
+	if([_adapter node] == self) [_adapter setNode:nil];
+	_adapter = adapter;
+	[_adapter setNode:self];
+	[self _updateMenuItem];
+}
 - (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info
 {
 	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
@@ -421,16 +447,16 @@ enum {
 {
 	[[self identifier] updateNaturalDisplayName];
 	[self _updateFileAttributes];
-	[_resourceAdapter noteFileEventDidOccurDirect:flag];
+	[_adapter noteFileEventDidOccurDirect:flag];
 }
 - (void)noteSortOrderDidChange
 {
 	[self _updateMenuItem];
-	[_resourceAdapter noteSortOrderDidChange];
+	[_adapter noteSortOrderDidChange];
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = PGNodeLoading & _status || _error || [_resourceAdapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = PGNodeLoading & _status || _error || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
@@ -451,14 +477,14 @@ enum {
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_resourceAdapter class], self, [self identifier]];
+	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
 }
 
 #pragma mark -
 
 - (BOOL)respondsToSelector:(SEL)sel
 {
-	return [super respondsToSelector:sel] ? YES : [_resourceAdapter respondsToSelector:sel];
+	return [super respondsToSelector:sel] ? YES : [_adapter respondsToSelector:sel];
 }
 
 #pragma mark NSObject
@@ -466,10 +492,10 @@ enum {
 - (void)dealloc
 {
 	[self AE_removeObserver];
-	[_resourceAdapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
+	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
 	[_identifier release];
 	[_menuItem release];
-	[_resourceAdapter release];
+	[_adapters release];
 	[_password release];
 	[_error release];
 	[_dateModified release];
@@ -482,15 +508,15 @@ enum {
 
 - (IMP)methodForSelector:(SEL)sel
 {
-	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_resourceAdapter methodForSelector:sel];
+	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_adapter methodForSelector:sel];
 }
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
 {
-	return [_resourceAdapter methodSignatureForSelector:sel];
+	return [_adapter methodSignatureForSelector:sel];
 }
 - (void)forwardInvocation:(NSInvocation *)invocation
 {
-	[invocation setTarget:_resourceAdapter];
+	[invocation setTarget:_adapter];
 	[invocation invoke];
 }
 

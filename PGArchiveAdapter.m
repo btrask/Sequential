@@ -88,9 +88,9 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
-		if(isFile) [node loadWithInfo:nil];
+		if(isFile) [node startLoadWithInfo:nil];
 		else {
-			[node setResourceAdapter:[[[PGContainerAdapter alloc] init] autorelease]];
+			[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGContainerAdapter class], PGAdapterClassKey, nil]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
@@ -133,7 +133,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 {
 	[_archive setNameEncoding:encoding];
 	_guessedEncoding = UINT_MAX;
-	[[self node] loadWithInfo:nil];
+	[[self node] startLoadWithInfo:nil]; // FIXME: This reloads the node entirely, meaning redownloading if it's online.
 }
 
 #pragma mark PGNodeDataSource Protocol

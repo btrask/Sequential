@@ -65,7 +65,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
 		NSURL *const oEmbedURL = [doc AE_oEmbedURL];
 		if(oEmbedURL) {
-			[[self node] loadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:oEmbedURL, PGURLKey, @"text/xml+oembed", PGMIMETypeKey, nil]];
+			[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:oEmbedURL, PGURLKey, @"text/xml+oembed", PGMIMETypeKey, nil]];
 			return;
 		}
 		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
@@ -78,7 +78,7 @@ DEALINGS WITH THE SOFTWARE. */
 		while((ident = [identEnum nextObject])) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
 			if(!node) continue;
-			[node loadWithInfo:nil];
+			[node startLoadWithInfo:nil];
 			[pages addObject:node];
 		}
 		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];

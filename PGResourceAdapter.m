@@ -77,6 +77,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
              forNode:(PGNode *)node
              withInfo:(NSDictionary *)info
 {
+	NSParameterAssert(node);
 	NSMutableArray *const adapters = [NSMutableArray array];
 	NSString *classString;
 	NSEnumerator *const classStringEnum = [[self resourceAdapterTypesDictionary] keyEnumerator];
@@ -98,6 +99,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
+	if([info objectForKey:PGAdapterClassKey] == self) return PGMatchByPriorAgreement;
 	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
 	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
@@ -141,7 +143,18 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	return [[_info retain] autorelease];
 }
+- (void)loadIfNecessary
+{
+	if(![self shouldLoad]) return [[self node] loadFinished];
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // We load recursively, so memory use can be a problem.
+	[self load];
+	[pool release];
+}
 - (void)load
+{
+	[[self node] loadFinished];
+}
+- (void)resumeLoad
 {
 	[[self node] loadFinished];
 }
@@ -355,7 +368,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	[[self node] loadWithInfo:nil];
+	[[self node] startLoadWithInfo:nil];
 }
 - (void)noteSortOrderDidChange {}
 - (void)noteIsViewableDidChange

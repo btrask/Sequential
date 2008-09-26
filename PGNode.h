@@ -56,7 +56,8 @@ typedef unsigned PGNodeStatus;
 	NSData               *_data;
 	id                    _dataSource;
 
-	PGResourceAdapter    *_resourceAdapter;
+	NSMutableArray       *_adapters;
+	PGResourceAdapter    *_adapter;
 	PGNodeStatus          _status;
 	NSError              *_error;
 	PGNodeStatus          _errorPhase;
@@ -78,10 +79,10 @@ typedef unsigned PGNodeStatus;
 - (NSData *)dataWithInfo:(NSDictionary *)info;
 
 - (PGResourceAdapter *)resourceAdapter;
-- (void)setResourceAdapter:(PGResourceAdapter *)adapter;
 - (PGLoadPolicy)ancestorLoadPolicy;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
-- (void)loadWithInfo:(NSDictionary *)info;
+- (void)startLoadWithInfo:(NSDictionary *)info;
+- (void)continueLoadWithInfo:(NSDictionary *)info;
 - (void)loadFinished;
 - (void)becomeViewed;
 - (void)readIfNecessary;
