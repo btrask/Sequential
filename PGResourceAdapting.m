@@ -24,14 +24,14 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceAdapting.h"
 
-NSString *const PGURLResponseKey     = @"PGURLResponse";
-NSString *const PGURLDataKey         = @"PGURLData";
-NSString *const PGPromisesURLDataKey = @"PGPromisesURLData";
-NSString *const PGURLKey             = @"PGURL";
-NSString *const PGAdapterClassKey    = @"PGAdapterClass";
-NSString *const PGFourCCDataKey      = @"PGFourCCData";
-NSString *const PGMIMETypeKey        = @"PGMIMEType";
-NSString *const PGOSTypeKey          = @"PGOSType";
-NSString *const PGExtensionKey       = @"PGExtension";
-NSString *const PGPasswordKey        = @"PGPassword";
-NSString *const PGStringEncodingKey  = @"PGStringEncoding";
+NSString *const PGURLKey            = @"PGURL";
+NSString *const PGDataKey           = @"PGURLData";
+NSString *const PGHasDataKey        = @"PGHasData";
+NSString *const PGURLResponseKey    = @"PGURLResponse";
+NSString *const PGAdapterClassKey   = @"PGAdapterClass";
+NSString *const PGFourCCDataKey     = @"PGFourCCData";
+NSString *const PGMIMETypeKey       = @"PGMIMEType";
+NSString *const PGOSTypeKey         = @"PGOSType";
+NSString *const PGExtensionKey      = @"PGExtension";
+NSString *const PGPasswordKey       = @"PGPassword";
+NSString *const PGStringEncodingKey = @"PGStringEncoding";

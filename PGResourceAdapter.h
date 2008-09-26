@@ -56,6 +56,7 @@ typedef unsigned PGMatchPriority;
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
 + (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSDictionary *)info;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
++ (Class)adapterClassForInfo:(NSDictionary *)info;
 + (BOOL)alwaysLoads;
 
 - (PGNode *)node;
@@ -66,7 +67,7 @@ typedef unsigned PGMatchPriority;
 - (PGLoadPolicy)descendentLoadPolicy;
 - (void)loadIfNecessary;
 - (void)load; // Abstract method. Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
-- (void)resumeLoad; // Abstract method. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
+- (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
 - (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep: must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;

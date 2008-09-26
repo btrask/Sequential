@@ -78,6 +78,7 @@ typedef unsigned PGNodeStatus;
 - (id)dataSource;
 - (void)setDataSource:(id)anObject;
 - (NSData *)dataWithInfo:(NSDictionary *)info;
+- (BOOL)canGetDataWithInfo:(NSDictionary *)info;
 
 - (PGResourceAdapter *)resourceAdapter;
 - (PGLoadPolicy)ancestorLoadPolicy;

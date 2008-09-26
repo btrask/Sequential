@@ -119,13 +119,17 @@ enum {
 }
 - (NSData *)dataWithInfo:(NSDictionary *)info
 {
-	NSData *data = [[[info objectForKey:PGURLDataKey] retain] autorelease];
+	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
 	if(data) return data;
 	if([self dataSource] && ![[self dataSource] node:self getData:&data]) return nil;
 	if(data) return data;
 	PGResourceIdentifier *const identifier = [self identifier];
 	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
 	return data;
+}
+- (BOOL)canGetDataWithInfo:(NSDictionary *)info
+{
+	return [self dataSource] || [info objectForKey:PGFourCCDataKey] || [info objectForKey:PGDataKey] || [[self identifier] isFileIdentifier];
 }
 
 #pragma mark -
@@ -165,7 +169,7 @@ enum {
 {
 	NSParameterAssert(PGNodeLoading & _status);
 	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]];
-	if(![newAdapters count]) return [_adapter resumeLoad];
+	if(![newAdapters count]) return [_adapter fallbackLoad];
 	[_adapters addObjectsFromArray:newAdapters];
 	NSParameterAssert([_adapters count]);
 	[self _setResourceAdapter:[_adapters lastObject]];
@@ -213,7 +217,7 @@ enum {
 		[[[_adapters lastObject] retain] autorelease];
 		[_adapters removeLastObject];
 		[self _setResourceAdapter:[_adapters lastObject]];
-		[_adapter resumeLoad];
+		[_adapter fallbackLoad];
 	}
 }
 
@@ -318,6 +322,7 @@ enum {
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
+	if([self canGetDataWithInfo:mutableInfo]) [mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGHasDataKey];
 	return mutableInfo;
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep

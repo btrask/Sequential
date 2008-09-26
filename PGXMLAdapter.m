@@ -26,9 +26,32 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGNode.h"
+#import "PGWebAdapter.h"
 #import "PGResourceIdentifier.h"
 
+static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter";
+
 @implementation PGXMLAdapter
+
+#pragma mark PGResourceAdapter
+
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
+                   withInfo:(NSMutableDictionary *)info
+{
+	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
+	if(p) return p;
+	if([[info objectForKey:PGHasDataKey] boolValue]) return PGNotAMatch;
+	NSURL *const URL = [info objectForKey:PGURLKey];
+	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch;
+	if(![[URL path] hasPrefix:@"/photos"]) return PGNotAMatch;
+	[info setObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] forKey:PGURLKey];
+	[info setObject:[NSNumber numberWithBool:YES] forKey:PGShouldLoadInWebAdapterKey];
+	return PGMatchByIntrinsicAttribute + 300;
+}
++ (Class)adapterClassForInfo:(NSDictionary *)info
+{
+	return [[info objectForKey:PGShouldLoadInWebAdapterKey] boolValue] ? [PGWebAdapter class] : self;
+}
 
 #pragma mark NSXMLParserDelegateEventAdditions Protocol
 

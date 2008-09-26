@@ -60,8 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_mainConnection cancelAndNotify:NO];
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
-		[[self node] loadFinished];
-	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGPromisesURLDataKey, nil]] count]) {
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGHasDataKey, nil]] count]) {
 		[_mainConnection cancelAndNotify:YES];
 		[_faviconConnection cancelAndNotify:YES];
 	}
@@ -71,7 +70,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(sender == _mainConnection) {
 		[_faviconConnection cancelAndNotify:NO];
 		NSURLResponse *const resp = [_mainConnection response];
-		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGURLDataKey, nil]];
+		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGDataKey, nil]];
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
 		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.

@@ -34,10 +34,10 @@ DEALINGS WITH THE SOFTWARE. */
 // Other
 #import "PGGeometry.h"
 
-extern NSString *const PGURLResponseKey;
-extern NSString *const PGURLDataKey;
-extern NSString *const PGPromisesURLDataKey;
 extern NSString *const PGURLKey;
+extern NSString *const PGDataKey;
+extern NSString *const PGHasDataKey; // Even if PGDataKey isn't set.
+extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;
 extern NSString *const PGMIMETypeKey;

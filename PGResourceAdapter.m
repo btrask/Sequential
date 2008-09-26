@@ -87,11 +87,12 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 		NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
 		PGMatchPriority const p = [class matchPriorityForNode:node withInfo:mutableInfo];
 		if(!p) continue;
+		Class const altClass = [class adapterClassForInfo:mutableInfo];
 		if(flag) {
-			PGResourceAdapter *const adapter = [[[class alloc] _initWithPriority:p] autorelease];
+			PGResourceAdapter *const adapter = [[[altClass alloc] _initWithPriority:p] autorelease];
 			[[adapter info] addEntriesFromDictionary:mutableInfo];
 			[adapters addObject:adapter];
-		} else [adapters addObject:class];
+		} else [adapters addObject:altClass];
 	}
 	if(flag) [adapters sortUsingSelector:@selector(_matchPriorityCompare:)];
 	return adapters;
@@ -100,17 +101,20 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
                    withInfo:(NSMutableDictionary *)info
 {
 	if([info objectForKey:PGAdapterClassKey] == self) return PGMatchByPriorAgreement;
-	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
-	NSData *const fourCC = [info objectForKey:PGFourCCDataKey];
-	if(!fourCC && ![[info objectForKey:PGPromisesURLDataKey] boolValue]) {
+	if(![[info objectForKey:PGHasDataKey] boolValue]) {
 		NSURL *const URL = [info objectForKey:PGURLKey];
 		if(!URL || ![URL isFileURL]) return PGNotAMatch; // We won't be able to get the data.
 	}
-	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:fourCC]) return PGMatchByFourCC;
+	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
+	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
 	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
 	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
 	return PGNotAMatch;
+}
++ (Class)adapterClassForInfo:(NSDictionary *)info
+{
+	return self;
 }
 + (BOOL)alwaysLoads
 {
@@ -155,9 +159,9 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	[[self node] loadFinished];
 }
-- (void)resumeLoad
+- (void)fallbackLoad
 {
-	[[self node] loadFinished];
+	[self load];
 }
 - (void)read
 {
@@ -228,7 +232,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 - (BOOL)canGetData
 {
-	return [_info objectForKey:PGURLDataKey] || [[self node] dataSource] || [[self identifier] isFileIdentifier];
+	return [[self node] canGetDataWithInfo:_info];
 }
 - (BOOL)canExtractData
 {
