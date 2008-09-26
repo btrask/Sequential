@@ -171,25 +171,6 @@ enum {
 	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter loadIfNecessary];
 }
-// TODO: Remove this once we have the new -startLoadWithInfo: and -continueLoadWithInfo: working completely.
-/*- (void)loadWithInfo:(NSDictionary *)info
-{
-	NSDictionary *const standardizedInfo = [self _standardizedInfoWithInfo:info];
-	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:standardizedInfo] objectAtIndex:0]];
-	if(!(PGNodeLoading & _status)) {
-		[_error release];
-		_error = nil;
-	}
-	if(![_resourceAdapter shouldLoad]) {
-		if(PGNodeLoading & _status) [self loadFinished];
-		return;
-	}
-	_status |= PGNodeLoading;
-	[self noteIsViewableDidChange];
-	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // Since we recursively load the entire tree.
-	[_resourceAdapter load];
-	[pool release];
-}*/
 - (void)loadFinished
 {
 	NSParameterAssert(PGNodeLoading & _status);

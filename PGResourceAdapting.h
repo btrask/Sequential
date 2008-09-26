@@ -36,6 +36,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGURLDataKey;
+extern NSString *const PGPromisesURLDataKey;
 extern NSString *const PGURLKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;

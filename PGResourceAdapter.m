@@ -101,7 +101,12 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	if([info objectForKey:PGAdapterClassKey] == self) return PGMatchByPriorAgreement;
 	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
-	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
+	NSData *const fourCC = [info objectForKey:PGFourCCDataKey];
+	if(!fourCC && ![[info objectForKey:PGPromisesURLDataKey] boolValue]) {
+		NSURL *const URL = [info objectForKey:PGURLKey];
+		if(!URL || ![URL isFileURL]) return PGNotAMatch; // We won't be able to get the data.
+	}
+	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:fourCC]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
 	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
 	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
@@ -175,8 +180,8 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter
 {
 	NSParameterAssert([adapter isKindOfClass:[PGResourceAdapter class]]);
-	if(_priority > adapter->_priority) return NSOrderedAscending;
-	if(_priority < adapter->_priority) return NSOrderedDescending;
+	if(_priority < adapter->_priority) return NSOrderedAscending;
+	if(_priority > adapter->_priority) return NSOrderedDescending;
 	return NSOrderedSame;
 }
 

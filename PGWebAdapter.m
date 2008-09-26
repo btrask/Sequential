@@ -61,7 +61,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 		[[self node] loadFinished];
-	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, nil]] count]) {
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGPromisesURLDataKey, nil]] count]) {
 		[_mainConnection cancelAndNotify:YES];
 		[_faviconConnection cancelAndNotify:YES];
 	}
@@ -69,8 +69,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)connectionDidSucceed:(PGURLConnection *)sender
 {
 	if(sender == _mainConnection) {
-		NSURLResponse *const resp = [_mainConnection response];
 		[_faviconConnection cancelAndNotify:NO];
+		NSURLResponse *const resp = [_mainConnection response];
 		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGURLDataKey, nil]];
 	} else if(sender == _faviconConnection) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
