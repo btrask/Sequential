@@ -46,6 +46,14 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 
 @implementation PGArchiveAdapter
 
+#pragma mark PGResourceAdapter
+
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
+                   withInfo:(NSMutableDictionary *)info
+{
+	return [[info objectForKey:PGKnownToBeArchiveKey] boolValue] ? PGMatchByIntrinsicAttribute : [super matchPriorityForNode:node withInfo:info];
+}
+
 #pragma mark Instance Methods
 
 - (XADArchive *)archive
@@ -76,7 +84,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isFile ? [_archive typeForEntry:i preferOSType:YES] : NSFileTypeForHFSTypeCode('fldr'))] notify:NO];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:[_archive typeForEntry:i preferOSType:YES]] notify:NO];
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
