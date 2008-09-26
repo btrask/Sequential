@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGURLDataKey;
 extern NSString *const PGURLKey;
+extern NSString *const PGFourCCDataKey;
 extern NSString *const PGMIMETypeKey;
 extern NSString *const PGOSTypeKey; // Uses the pseudo-OS-type that doesn't include single quotes around it.
 extern NSString *const PGExtensionKey;

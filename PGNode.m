@@ -387,6 +387,12 @@ enum {
 	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
 	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
 	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
+	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+		NSData *const data = [self dataWithInfo:mutableInfo];
+		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
+		[pool release]; // Dispose of the data ASAP.
+	}
 	[self setResourceAdapter:[[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:mutableInfo] objectAtIndex:0]];
 	if(info) [[[self resourceAdapter] info] addEntriesFromDictionary:mutableInfo];
 	if(!(PGNodeLoading & _status)) {
