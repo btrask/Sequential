@@ -77,7 +77,7 @@ typedef unsigned PGNodeStatus;
 
 - (id)dataSource;
 - (void)setDataSource:(id)anObject;
-- (NSData *)dataWithInfo:(NSDictionary *)info;
+- (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info;
 
 - (PGResourceAdapter *)resourceAdapter;
@@ -121,6 +121,6 @@ typedef unsigned PGNodeStatus;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info;
-- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData; // Return NO if a problem occurred.
+- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData fast:(BOOL)flag; // Return NO if a problem occurred.
 
 @end

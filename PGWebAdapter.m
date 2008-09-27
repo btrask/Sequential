@@ -43,7 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
                    withInfo:(NSMutableDictionary *)info
 {
 	NSURL *const URL = [info objectForKey:PGURLKey];
-	return !URL || [URL isFileURL] || [info objectForKey:PGURLResponseKey] || [node dataWithInfo:info] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
+	return !URL || [info objectForKey:PGHasDataKey] || [info objectForKey:PGURLResponseKey] || [URL isFileURL] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
 #pragma mark PGURLConnectionDelegate Protocol

@@ -228,7 +228,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 - (NSData *)data
 {
-	return [[self node] dataWithInfo:_info];
+	return [[self node] dataWithInfo:_info fast:NO];
 }
 - (BOOL)canGetData
 {

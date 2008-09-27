@@ -145,9 +145,14 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 }
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
+        fast:(BOOL)flag
 {
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return NO;
+	if(flag) {
+		if(outData) *outData = nil;
+		return YES;
+	}
 	[_archive clearLastError];
 	NSString *const pass = [[sender info] objectForKey:PGPasswordKey];
 	if(pass) [_archive setPassword:pass];

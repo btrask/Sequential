@@ -118,10 +118,11 @@ enum {
 	_dataSource = anObject;
 }
 - (NSData *)dataWithInfo:(NSDictionary *)info
+            fast:(BOOL)flag
 {
 	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
 	if(data) return data;
-	if([self dataSource] && ![[self dataSource] node:self getData:&data]) return nil;
+	if([self dataSource] && ![[self dataSource] node:self getData:&data fast:flag]) return nil;
 	if(data) return data;
 	PGResourceIdentifier *const identifier = [self identifier];
 	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
@@ -318,7 +319,7 @@ enum {
 	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
 	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		NSData *const data = [self dataWithInfo:mutableInfo];
+		NSData *const data = [self dataWithInfo:mutableInfo fast:YES];
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
@@ -530,6 +531,7 @@ enum {
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info {}
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
+        fast:(BOOL)flag
 {
 	if(outData) *outData = nil;
 	return YES;
