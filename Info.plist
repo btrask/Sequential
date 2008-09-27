@@ -828,6 +828,8 @@
 				</data>
 			</array>
 		</dict>
+		<key>PGFlickrAdapter</key>
+		<dict/>
 		<key>PGResourceAdapter</key>
 		<dict/>
 		<key>PGWebAdapter</key>

@@ -90,7 +90,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[[self node] loadFinished];
 }
 
-#pragma mark PGResourceAdapting
+#pragma mark PGResourceAdapting Protocol
 
 - (float)loadingProgress
 {

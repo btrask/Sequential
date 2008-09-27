@@ -71,6 +71,7 @@
 		0E5EC1D90CEDFEED00E7FF9A /* PGURL.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */; };
 		0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
+		0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
 		0E808D690D7CC46A003C9DE1 /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */; };
 		0E82626C0CA950770041FA9D /* Sequential.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E82626B0CA950770041FA9D /* Sequential.icns */; };
@@ -324,6 +325,8 @@
 		0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMutableDictionaryAdditions.m; sourceTree = "<group>"; };
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		0E7A18280E66CE8B00BCA2AF /* de */ = {isa = PBXFileReference; lastKnownFileType = folder; name = de; path = de.lproj/SequentialHelp; sourceTree = "<group>"; };
+		0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFlickrAdapter.h; sourceTree = "<group>"; };
+		0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFlickrAdapter.m; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
 		0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDragHighlightView.m; sourceTree = "<group>"; };
 		0E808D670D7CC46A003C9DE1 /* NSArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSArrayAdditions.h; sourceTree = "<group>"; };
@@ -829,6 +832,8 @@
 				0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */,
 				0ED4A44B0DCC628F007C5A77 /* PGPDFAdapter.h */,
 				0ED4A44C0DCC628F007C5A77 /* PGPDFAdapter.m */,
+				0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */,
+				0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */,
 				0EE6476D0DC8F96C00A90F86 /* PGGenericImageAdapter.h */,
 				0EE6476E0DC8F96C00A90F86 /* PGGenericImageAdapter.m */,
 				0EE761790DDB7BDE00ED8ABB /* PGResourceIdentifier.h */,
@@ -1141,6 +1146,7 @@
 				0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */,
 				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
 				0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */,
+				0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
