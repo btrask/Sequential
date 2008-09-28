@@ -47,7 +47,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	@protected
 	IBOutlet PGClipView          *clipView;
 	IBOutlet PGImageView         *imageView;
-	         PGPageLocation  _initialLocation;
+	         PGPageLocation      _initialLocation;
 
 	@private
 	         unsigned            _displayImageIndex;

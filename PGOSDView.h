@@ -49,6 +49,7 @@ typedef int PGOSDCorner;
 - (void)setIndex:(unsigned)anInt;
 - (unsigned)count;
 - (void)setCount:(unsigned)anInt;
+- (BOOL)shouldAutohide;
 - (BOOL)displaysProgressIndicator;
 
 - (PGOSDCorner)origin;

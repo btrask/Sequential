@@ -39,6 +39,8 @@ extern NSString *const PGBezelPanelShouldAnimateKey;
 - (id)initWithContentView:(NSView *)aView;
 - (void)displayOverWindow:(NSWindow *)aWindow;
 
+- (id)content; // Returns the content view, but as type id so you don't have to cast it.
+
 - (BOOL)acceptsEvents;
 - (void)setAcceptsEvents:(BOOL)flag;
 

@@ -32,7 +32,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 
 #define PGGraphicalIndicatorStyle YES
-#define PGMarginSize              7.0 // Outside the window.
+#define PGAutohides               YES
+#define PGMarginSize              4.0 // Outside the window.
 #define PGPaddingSize             3.0 // Inside the window.
 #define PGTotalPaddingSize        (PGPaddingSize * 2.0)
 #define PGTextBottomPadding       (PGPaddingSize - 1.0)
@@ -99,6 +100,10 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!showedIndicator != ![self displaysProgressIndicator]) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 	else [self setNeedsDisplay:YES];
 }
+- (BOOL)shouldAutohide
+{
+	return PGAutohides && [self count] <= 1;
+}
 - (BOOL)displaysProgressIndicator
 {
 	return PGGraphicalIndicatorStyle && [self count] > 1;
@@ -127,6 +132,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
+	if([self shouldAutohide]) return NSZeroRect;
 	NSSize const messageSize = [[self displayText] size];
 	float const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
@@ -150,12 +156,11 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
+	if([self shouldAutohide]) return;
 	NSRect const b = [self bounds];
-
 	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
 	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
 	[bezel fill];
-
 	if([self displaysProgressIndicator]) {
 		[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
 		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5 + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5), 0.5 + PGPaddingSize, PGIndicatorWidth - 1, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
@@ -171,7 +176,6 @@ DEALINGS WITH THE SOFTWARE. */
 		[indicator lineToPoint:NSMakePoint(x + 5, 1.5 + PGPaddingSize)];
 		[indicator fill];
 	}
-
 	float const indicatorHeight = [self displaysProgressIndicator] ? PGIndicatorHeight : 0;
 	[[self displayText] drawInRect:NSMakeRect(PGPaddingSize + PGTextHorzPadding, PGTextBottomPadding + indicatorHeight, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding, NSHeight(b) - PGTextTotalVertPadding - indicatorHeight)];
 }

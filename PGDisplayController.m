@@ -395,10 +395,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !forward;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
 	if(PGSortRepeatMask & o && [self tryToSetActiveNode:node initialLocation:loc]) {
-		if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
+		if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
 		return YES;
 	}
-	if(flag) [(PGAlertView *)[_graphicPanel contentView] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
+	if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
 	return NO;
 }
 - (void)showNode:(PGNode *)node
@@ -443,7 +443,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
 	[_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
-	[(PGAlertView *)[_graphicPanel contentView] pushGraphic:_loadingGraphic window:[self window]];
+	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
 }
 
 #pragma mark -
@@ -532,7 +532,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[[self window] makeFirstResponder:clipView];
 	}
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
-	[(PGAlertView *)[_graphicPanel contentView] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
+	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
 	[[self activeNode] AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
@@ -554,7 +554,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	[(PGOSDView *)[_infoPanel contentView] setCount:count];
+	[[_infoPanel content] setCount:count];
 	if(![self activeNode] && count) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
 }
@@ -574,7 +574,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
 	[self _updateNodeIndex];
-	[(PGOSDView *)[_infoPanel contentView] setCount:[[[self activeDocument] node] viewableNodeCount]];
+	[[_infoPanel content] setCount:[[[self activeDocument] node] viewableNodeCount]];
 }
 
 - (void)documentShowsOnScreenDisplayDidChange:(NSNotification *)aNotif
@@ -649,14 +649,14 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)_updateNodeIndex
 {
 	_displayImageIndex = [[self activeNode] viewableNodeIndex];
-	[(PGOSDView *)[_infoPanel contentView] setIndex:_displayImageIndex];
+	[[_infoPanel content] setIndex:_displayImageIndex];
 	[self synchronizeWindowTitleWithDocumentName];
 }
 - (void)_updateInfoPanelLocationAnimate:(BOOL)flag
 {
 	if(![self activeDocument]) return; // If we're closing, don't bother.
 	PGOSDCorner const corner = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGMinXMinYCorner : PGMaxXMinYCorner;
-	[[_infoPanel contentView] setOrigin:corner offset:NSMakeSize(0, (PGMinXMinYCorner == corner && [self findPanelShown] ? NSHeight([_findPanel frame]) : 0))];
+	[[_infoPanel content] setOrigin:corner offset:NSMakeSize(0, (PGMinXMinYCorner == corner && [self findPanelShown] ? NSHeight([_findPanel frame]) : 0))];
 	[_infoPanel changeFrameAnimate:flag];
 }
 - (void)_updateInfoPanelText
@@ -668,7 +668,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		PGNode *const parent = [node parentNode];
 		if([parent parentNode]) text = [NSString stringWithFormat:@"%@\n%@", [[parent identifier] displayName], text];
 	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
-	[[_infoPanel contentView] setMessageText:text];
+	[[_infoPanel content] setMessageText:text];
 }
 - (void)_runTimer
 {
@@ -723,6 +723,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case NSFindPanelActionNext:
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
+	}
+	if([[_infoPanel content] shouldAutohide]) {
+		if(@selector(toggleOnScreenDisplay:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
 		if(@selector(revertOrientation:) == action) return NO;
@@ -881,7 +884,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case '\e': [self toggleFullscreen:self]; return YES;
 		case 'i':
 		{
-			if(NSCommandKeyMask & modifiers) {
+			if(NSCommandKeyMask & modifiers && ![[_infoPanel content] shouldAutohide]) {
 				[self toggleOnScreenDisplay:self];
 				return YES;
 			}

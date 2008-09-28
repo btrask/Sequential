@@ -69,6 +69,13 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 #pragma mark -
 
+- (id)content
+{
+	return [self contentView];
+}
+
+#pragma mark -
+
 - (BOOL)acceptsEvents
 {
 	return _acceptsEvents;
