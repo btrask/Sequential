@@ -1040,7 +1040,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	}
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = [identifier displayName];
-	NSString *const titleDetails = count ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
+	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
 	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
 	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
 	[[menuLabel mutableString] appendString:titleDetails];
