@@ -81,7 +81,6 @@ DEALINGS WITH THE SOFTWARE. */
 	if(sender != _mainConnection) return;
 	[_faviconConnection cancelAndNotify:NO];
 	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]] forKey:NSLocalizedDescriptionKey]]];
-	[[self node] loadFinished];
 }
 - (void)connectionDidCancel:(PGURLConnection *)sender
 {

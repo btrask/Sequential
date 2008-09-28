@@ -70,7 +70,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_cachedRep release];
 	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
-	[[self node] readFinishedWithImageRep:aRep];
+	[[self node] readFinishedWithImageRep:aRep error:nil];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -124,14 +124,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(_cachedRep) {
 		[[self document] noteNodeDidCache:[self node]];
-		[[self node] readFinishedWithImageRep:_cachedRep];
+		[[self node] readFinishedWithImageRep:_cachedRep error:nil];
 		return;
 	}
 	if(_reading) return;
 	NSData *const data = [self data];
 	_readFailed = !data;
 	[[self node] noteIsViewableDidChange];
-	if(!data) return [[self node] readFinishedWithImageRep:nil];
+	if(!data) return [[self node] readFinishedWithImageRep:nil error:nil];
 	_reading = YES;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
 }

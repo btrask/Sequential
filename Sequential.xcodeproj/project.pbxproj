@@ -72,6 +72,8 @@
 		0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
 		0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */; };
+		0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */; };
+		0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
 		0E808D690D7CC46A003C9DE1 /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */; };
 		0E82626C0CA950770041FA9D /* Sequential.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E82626B0CA950770041FA9D /* Sequential.icns */; };
@@ -327,6 +329,10 @@
 		0E7A18280E66CE8B00BCA2AF /* de */ = {isa = PBXFileReference; lastKnownFileType = folder; name = de; path = de.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFlickrAdapter.h; sourceTree = "<group>"; };
 		0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFlickrAdapter.m; sourceTree = "<group>"; };
+		0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParser.h; sourceTree = "<group>"; };
+		0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLParser.m; sourceTree = "<group>"; };
+		0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGErrorAdapter.h; sourceTree = "<group>"; };
+		0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGErrorAdapter.m; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
 		0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDragHighlightView.m; sourceTree = "<group>"; };
 		0E808D670D7CC46A003C9DE1 /* NSArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSArrayAdditions.h; sourceTree = "<group>"; };
@@ -818,6 +824,8 @@
 				0EF5431D0DC128B600905391 /* PGNode.m */,
 				0EE646040DC7C6E100A90F86 /* PGResourceAdapter.h */,
 				0EE646050DC7C6E100A90F86 /* PGResourceAdapter.m */,
+				0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */,
+				0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */,
 				0EE645A90DC6508C00A90F86 /* PGWebAdapter.h */,
 				0EE645AA0DC6508C00A90F86 /* PGWebAdapter.m */,
 				0EE647700DC8FA3A00A90F86 /* PGContainerAdapter.h */,
@@ -842,6 +850,8 @@
 				0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */,
 				0ED4A8DC0DD00E18007C5A77 /* PGURLConnection.h */,
 				0ED4A8DB0DD00E18007C5A77 /* PGURLConnection.m */,
+				0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */,
+				0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */,
 				0EA540FD0DB717C300F60F0E /* PGExifEntry.h */,
 				0EA540FE0DB717C300F60F0E /* PGExifEntry.m */,
 				0EE645930DC63C4700A90F86 /* PGBookmark.h */,
@@ -1147,6 +1157,8 @@
 				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
 				0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */,
 				0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */,
+				0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */,
+				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

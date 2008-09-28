@@ -88,7 +88,7 @@ typedef unsigned PGNodeStatus;
 - (void)loadFinished;
 - (void)becomeViewed;
 - (void)readIfNecessary;
-- (void)readFinishedWithImageRep:(NSImageRep *)aRep;
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
 - (NSError *)error;
 - (void)setError:(NSError *)error;

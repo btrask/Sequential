@@ -124,7 +124,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[rep setCurrentPage:[[self identifier] index]];
 	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
 	[rep setPixelsHigh:NSHeight([rep bounds])];
-	[[self node] readFinishedWithImageRep:rep];
+	[[self node] readFinishedWithImageRep:rep error:nil];
 }
 
 @end

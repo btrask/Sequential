@@ -68,7 +68,7 @@ typedef unsigned PGMatchPriority;
 - (void)loadIfNecessary;
 - (void)load; // Abstract method. Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
 - (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
-- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep: must be sent sometime hereafter.
+- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
 
 - (void)noteResourceDidChange;
 

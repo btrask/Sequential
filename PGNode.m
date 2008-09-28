@@ -27,13 +27,10 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGDocument.h"
 #import "PGResourceAdapter.h"
-#import "PGWebAdapter.h"
+#import "PGErrorAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
-
-// Controllers
-#import "PGDocumentController.h"
 
 // Categories
 #import "NSDateAdditions.h"
@@ -63,7 +60,6 @@ enum {
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
 - (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info;
-- (void)_readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 
@@ -158,7 +154,7 @@ enum {
 	NSParameterAssert(!(PGNodeLoading & _status));
 	[_adapters autorelease];
 	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
-	[_adapters insertObject:[[[PGResourceAdapter alloc] init] autorelease] atIndex:0];
+	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
 	[self _setResourceAdapter:[_adapters lastObject]];
 	_status |= PGNodeLoading;
 	[self noteIsViewableDidChange];
@@ -192,15 +188,22 @@ enum {
 }
 - (void)readIfNecessary
 {
-	if(PGNodeReading != _status) return;
-	if(_error && PGNodeLoading & _errorPhase && [_adapters count] <= 1) [self _readFinishedWithImageRep:nil error:_error];
-	else [_adapter read];
+	if(PGNodeReading == _status) [_adapter read];
 }
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep
+        error:(NSError *)error
 {
-	[self _readFinishedWithImageRep:aRep error:(PGNodeReading == _errorPhase ? _error : nil)];
-	[_error release];
-	_error = nil;
+	NSParameterAssert(PGNodeReading == _status);
+	_status = ~PGNodeReading & _status;
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	[dict AE_setObject:aRep forKey:PGImageRepKey];
+	if(error) [dict setObject:error forKey:PGErrorKey];
+	else {
+		[dict AE_setObject:_error forKey:PGErrorKey];
+		[_error release];
+		_error = nil;
+	}
+	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -
@@ -211,11 +214,12 @@ enum {
 }
 - (void)setError:(NSError *)error
 {
-	if(_error || PGNodeNothing == _status) return;
-	_error = [error copy];
-	_errorPhase = _status;
+	if(!_error) {
+		_error = [error copy];
+		_errorPhase = _status;
+	}
 	if(PGNodeLoading & _status && [_adapters count] > 1) {
-		[[[_adapters lastObject] retain] autorelease];
+		(void)[[[_adapters lastObject] retain] autorelease];
 		[_adapters removeLastObject];
 		[self _setResourceAdapter:[_adapters lastObject]];
 		[_adapter fallbackLoad];
@@ -325,16 +329,6 @@ enum {
 	}
 	if([self canGetDataWithInfo:mutableInfo]) [mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGHasDataKey];
 	return mutableInfo;
-}
-- (void)_readFinishedWithImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
-{
-	NSParameterAssert(PGNodeReading == _status);
-	_status = ~PGNodeReading & _status;
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	if(aRep) [dict setObject:aRep forKey:PGImageRepKey];
-	if(error) [dict setObject:error forKey:PGErrorKey];
-	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 - (void)_updateMenuItem
 {
@@ -449,7 +443,7 @@ enum {
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = PGNodeLoading & _status || _error || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = PGNodeLoading & _status || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];

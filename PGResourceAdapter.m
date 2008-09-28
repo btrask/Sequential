@@ -165,7 +165,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 - (void)read
 {
-	[[self node] readFinishedWithImageRep:nil];
+	[[self node] readFinishedWithImageRep:nil error:nil];
 }
 
 #pragma mark -
