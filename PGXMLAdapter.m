@@ -28,8 +28,23 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGWebAdapter.h"
 #import "PGResourceIdentifier.h"
+#import "PGXMLParser.h"
 
 static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter";
+
+@interface PGOEmbedParser : PGXMLParser
+{
+	@private
+	NSMutableString *_version;
+	NSMutableString *_type;
+	NSMutableString *_title;
+	NSMutableString *_URL;
+}
+
+- (NSString *)title;
+- (NSURL *)URL;
+
+@end
 
 @implementation PGXMLAdapter
 
@@ -53,121 +68,67 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 	return [[info objectForKey:PGShouldLoadInWebAdapterKey] boolValue] ? [PGWebAdapter class] : self;
 }
 
-#pragma mark NSXMLParserDelegateEventAdditions Protocol
-
-- (void)parser:(NSXMLParser *)parser
-        didStartElement:(NSString *)elementName
-        namespaceURI:(NSString *)namespaceURI
-        qualifiedName:(NSString *)qName
-        attributes:(NSDictionary *)attributeDict
-{
-	NSString *const oldTagPath = _tagPath;
-	_tagPath = [[_tagPath stringByAppendingPathComponent:elementName] copy];
-	[oldTagPath release];
-	if([@"/oembed/version" isEqualToString:_tagPath]) {
-		[_.oEmbed.version release];
-		_.oEmbed.version = [[NSMutableString alloc] init];
-	} else if([@"/oembed/type" isEqualToString:_tagPath]) {
-		[_.oEmbed.type release];
-		_.oEmbed.type = [[NSMutableString alloc] init];
-	} else if([@"/oembed/title" isEqualToString:_tagPath]) {
-		[_.oEmbed.title release];
-		_.oEmbed.title = [[NSMutableString alloc] init];
-	} else if([@"/oembed/url" isEqualToString:_tagPath]) {
-		[_.oEmbed.URL release];
-		_.oEmbed.URL = [[NSMutableString alloc] init];
-	} else if([@"/rsp/sizes/size" isEqualToString:_tagPath]) {
-		NSString *const label = [attributeDict objectForKey:@"label"];
-		static NSArray *sizes = nil;
-		if(!sizes) sizes = [[NSArray alloc] initWithObjects:@"square", @"thumbnail", @"small", @"medium", @"large", @"original", nil];
-		unsigned const size = label ? [sizes indexOfObject:[label lowercaseString]] + 1 : NSNotFound;
-		if(NSNotFound != size && size > _.flickr.size) {
-			_.flickr.size = size;
-			[_.flickr.URL release];
-			_.flickr.URL = [[attributeDict objectForKey:@"source"] copy];
-		}
-	} else if([@"/rsp/err" isEqualToString:_tagPath]) {
-		[parser abortParsing];
-		_.flickr.size = 0;
-		[_.flickr.URL release];
-		_.flickr.URL = nil;
-		//[[self node] loadWithInfo:nil];
-	}
-}
-- (void)parser:(NSXMLParser *)parser
-        foundCharacters:(NSString *)string
-{
-	NSMutableString *dest = nil;
-	if([@"/oembed/version" isEqualToString:_tagPath]) dest = _.oEmbed.version;
-	else if([@"/oembed/type" isEqualToString:_tagPath]) dest = _.oEmbed.type;
-	else if([@"/oembed/title" isEqualToString:_tagPath]) dest = _.oEmbed.title;
-	else if([@"/oembed/url" isEqualToString:_tagPath]) dest = _.oEmbed.URL;
-	[dest appendString:string];
-}
-- (void)parser:(NSXMLParser *)parser
-        didEndElement:(NSString *)elementName
-        namespaceURI:(NSString *)namespaceURI
-        qualifiedName:(NSString *)qName
-{
-	if(([@"/oembed/version" isEqualToString:_tagPath] && ![@"1.0" isEqualToString:_.oEmbed.version]) || ([@"/oembed/type" isEqualToString:_tagPath] && ![@"photo" isEqualToString:_.oEmbed.type])) {
-		[_.oEmbed.version release];
-		_.oEmbed.version = nil;
-		[_.oEmbed.type release];
-		_.oEmbed.type = nil;
-		[_.oEmbed.title release];
-		_.oEmbed.title = nil;
-		[_.oEmbed.URL release];
-		_.oEmbed.URL = nil;
-	}
-	if(([@"/oembed/version" isEqualToString:_tagPath] || [@"/oembed/title" isEqualToString:_tagPath]) && _.oEmbed.version && _.oEmbed.title) [[self identifier] setCustomDisplayName:_.oEmbed.title notify:YES];
-	if([@"/oembed" isEqualToString:_tagPath]) {
-		if(_.oEmbed.version && _.oEmbed.title && _.oEmbed.type && _.oEmbed.URL) {
-			PGResourceIdentifier *const ident = [PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.oEmbed.URL]];
-			[ident setCustomDisplayName:_.oEmbed.title notify:NO];
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			[node startLoadWithInfo:nil];
-			[_children addObject:node];
-		}
-		[_.oEmbed.version release];
-		_.oEmbed.version = nil;
-		[_.oEmbed.type release];
-		_.oEmbed.type = nil;
-		[_.oEmbed.title release];
-		_.oEmbed.title = nil;
-		[_.oEmbed.URL release];
-		_.oEmbed.URL = nil;
-	} else if([@"/rsp" isEqualToString:_tagPath]) {
-		if(_.flickr.URL) {
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[PGResourceIdentifier resourceIdentifierWithURL:[NSURL URLWithString:_.flickr.URL]]] autorelease];
-			[node startLoadWithInfo:nil];
-			[_children addObject:node];
-		}
-		_.flickr.size = 0;
-		[_.flickr.URL release];
-		_.flickr.URL = nil;
-	}
-	NSString *const oldTagPath = _tagPath;
-	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
-	[oldTagPath release];
-}
-
 #pragma mark PGResourceAdapter
 
 - (void)load
 {
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
-	NSXMLParser *const parser = [[[NSXMLParser alloc] initWithData:data] autorelease];
-	[parser setDelegate:self];
-	_tagPath = [@"/" copy];
-	_children = [[NSMutableArray alloc] init];
-	(void)[parser parse];
-	[_tagPath release];
-	_tagPath = nil;
-	[self setUnsortedChildren:_children presortedOrder:PGUnsorted];
-	[_children release];
-	_children = nil;
+	PGOEmbedParser *const p = [PGOEmbedParser parserWithData:data];
+	PGResourceIdentifier *const ident = [[p URL] AE_resourceIdentifier];
+	[ident setCustomDisplayName:[p title] notify:NO];
+	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+	[node startLoadWithInfo:nil];
+	if(node) [self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
 	[[self node] loadFinished];
+}
+
+@end
+
+@implementation PGOEmbedParser
+
+#pragma mark Instance Methods
+
+- (NSString *)title
+{
+	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _title : nil;
+}
+- (NSURL *)URL
+{
+	if(![@"1.0" isEqualToString:_version] || ![@"photo" isEqualToString:_type]) return nil;
+	return _URL ? [NSURL URLWithString:_URL] : nil;
+}
+
+#pragma mark PGXMLParser
+
+- (NSMutableString *)contentStringForTagPath:(NSString *)p
+{
+	if([@"/oembed/version" isEqualToString:p]) return _version;
+	if([@"/oembed/type" isEqualToString:p]) return _type;
+	if([@"/oembed/title" isEqualToString:p]) return _title;
+	if([@"/oembed/url" isEqualToString:p]) return _URL;
+	return [super contentStringForTagPath:p];
+}
+
+#pragma mark NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		_version = [[NSMutableString alloc] init];
+		_type = [[NSMutableString alloc] init];
+		_title = [[NSMutableString alloc] init];
+		_URL = [[NSMutableString alloc] init];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[_version release];
+	[_type release];
+	[_title release];
+	[_URL release];
+	[super dealloc];
 }
 
 @end

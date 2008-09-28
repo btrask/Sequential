@@ -26,22 +26,5 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGContainerAdapter.h"
 
 @interface PGXMLAdapter : PGContainerAdapter
-{
-	@private
-	NSMutableArray *_children;
-	NSString       *_tagPath;
-	union {
-		struct {
-			NSMutableString *version;
-			NSMutableString *type;
-			NSMutableString *title;
-			NSMutableString *URL;
-		} oEmbed;
-		struct {
-			unsigned  size;
-			NSString *URL;
-		} flickr;
-	} _;
-}
 
 @end
