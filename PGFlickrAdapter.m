@@ -105,6 +105,7 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeConnection data]];
 	NSURL *const URL = [sizeParser URL];
 	NSString *const title = [[PGFlickrInfoParser parserWithData:[_infoConnection data]] title];
+	[[self identifier] setCustomDisplayName:title notify:YES];
 	PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 	[ident setCustomDisplayName:title notify:NO];
 	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
