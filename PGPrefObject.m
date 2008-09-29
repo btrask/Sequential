@@ -27,13 +27,13 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-NSString *const PGPrefObjectShowsOnScreenDisplayDidChangeNotification = @"PGPrefObjectShowsOnScreenDisplayDidChange";
-NSString *const PGPrefObjectReadingDirectionDidChangeNotification     = @"PGPrefObjectReadingDirectionDidChange";
-NSString *const PGPrefObjectImageScaleDidChangeNotification           = @"PGPrefObjectImageScaleDidChange";
-NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification  = @"PGPrefObjectUpscalesToFitScreenDidChange";
-NSString *const PGPrefObjectSortOrderDidChangeNotification            = @"PGPrefObjectSortOrderDidChange";
+NSString *const PGPrefObjectShowsInfoDidChangeNotification           = @"PGPrefObjectShowsInfoDidChange";
+NSString *const PGPrefObjectReadingDirectionDidChangeNotification    = @"PGPrefObjectReadingDirectionDidChange";
+NSString *const PGPrefObjectImageScaleDidChangeNotification          = @"PGPrefObjectImageScaleDidChange";
+NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification = @"PGPrefObjectUpscalesToFitScreenDidChange";
+NSString *const PGPrefObjectSortOrderDidChangeNotification           = @"PGPrefObjectSortOrderDidChange";
 
-static NSString *const PGShowsOnScreenDisplayKey        = @"PGShowsOnScreenDisplay";
+static NSString *const PGShowsInfoKey                   = @"PGShowsInfo";
 static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRightToLeft";
 static NSString *const PGImageScalingModeKey            = @"PGImageScalingMode";
 static NSString *const PGImageScaleFactorKey            = @"PGImageScaleFactor";
@@ -58,7 +58,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 {
 	if([PGPrefObject class] != self) return;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithBool:YES], PGShowsOnScreenDisplayKey,
+		[NSNumber numberWithBool:YES], PGShowsInfoKey,
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
 		[NSNumber numberWithInt:PGConstantFactorScaling], PGImageScalingModeKey,
 		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
@@ -69,16 +69,16 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 
 #pragma mark Instance Methods
 
-- (BOOL)showsOnScreenDisplay
+- (BOOL)showsInfo
 {
-	return _showsOnScreenDisplay;
+	return _showsInfo;
 }
-- (void)setShowsOnScreenDisplay:(BOOL)flag
+- (void)setShowsInfo:(BOOL)flag
 {
-	if(!flag == !_showsOnScreenDisplay) return;
-	_showsOnScreenDisplay = flag;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsOnScreenDisplayKey];
-	[self AE_postNotificationName:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
+	if(!flag == !_showsInfo) return;
+	_showsInfo = flag;
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsInfoKey];
+	[self AE_postNotificationName:PGPrefObjectShowsInfoDidChangeNotification];
 }
 
 #pragma mark -
@@ -154,7 +154,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 {
 	if((self = [super init])) {
 		NSUserDefaults *const d = [NSUserDefaults standardUserDefaults];
-		_showsOnScreenDisplay = [[d objectForKey:PGShowsOnScreenDisplayKey] boolValue];
+		_showsInfo = [[d objectForKey:PGShowsInfoKey] boolValue];
 		_readingDirection = [[d objectForKey:PGReadingDirectionRightToLeftKey] boolValue] ? PGReadingDirectionRightToLeft : PGReadingDirectionLeftToRight;
 		_imageScalingMode = [[d objectForKey:PGImageScalingModeKey] intValue];
 		if(_imageScalingMode < 0 || _imageScalingMode > 4) _imageScalingMode = PGConstantFactorScaling;

@@ -389,16 +389,16 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)setCurrentDocument:(PGDocument *)document
 {
 	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
+	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
 
 	_currentDocument = document;
 	[self _setRevealsInBrowser:[_currentDocument isOnline]];
 	[self _setPageMenu:(_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu])];
 
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsOnScreenDisplayDidChange:) name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
+	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[self readingDirectionDidChange:nil];
-	[self showsOnScreenDisplayDidChange:nil];
+	[self showsInfoDidChange:nil];
 }
 
 #pragma mark -
@@ -472,9 +472,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[previousPage setKeyEquivalentModifierMask:0];
 	[nextPage setKeyEquivalentModifierMask:0];
 }
-- (void)showsOnScreenDisplayDidChange:(NSNotification *)aNotif
+- (void)showsInfoDidChange:(NSNotification *)aNotif
 {
-	[toggleInfo setTitle:NSLocalizedString(([[self currentPrefObject] showsOnScreenDisplay] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
+	[toggleInfo setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 }
 
 #pragma mark Private Protocol
@@ -629,7 +629,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	[self workspaceDidLaunchApplication:nil];
 	[self readingDirectionDidChange:nil];
-	[self showsOnScreenDisplayDidChange:nil];
+	[self showsInfoDidChange:nil];
 }
 
 #pragma mark NSMenuValidation Protocol

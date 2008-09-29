@@ -22,7 +22,7 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import "PGOSDView.h"
+#import "PGInfoView.h"
 
 // Views
 #import "PGBezelPanel.h"
@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGIndicatorWidth          150.0
 #define PGCornerRadius            (PGPaddingSize + PGIndicatorRadius)
 
-@implementation PGOSDView
+@implementation PGInfoView
 
 #pragma mark Instance Methods
 
@@ -100,10 +100,20 @@ DEALINGS WITH THE SOFTWARE. */
 	if(!showedIndicator != ![self displaysProgressIndicator]) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 	else [self setNeedsDisplay:YES];
 }
+
+#pragma mark -
+
 - (BOOL)shouldAutohide
 {
-	return PGAutohides && [self count] <= 1;
+	return PGAutohides && _allowsAutohide && [self count] <= 1;
 }
+- (void)setAllowsAutohide:(BOOL)flag
+{
+	_allowsAutohide = flag;
+}
+
+#pragma mark -
+
 - (BOOL)displaysProgressIndicator
 {
 	return PGGraphicalIndicatorStyle && [self count] > 1;
@@ -111,7 +121,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (PGOSDCorner)origin
+- (PGInfoCorner)origin
 {
 	return _origin;
 }
@@ -119,7 +129,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return _originOffset;
 }
-- (void)setOrigin:(PGOSDCorner)aSide
+- (void)setOrigin:(PGInfoCorner)aSide
         offset:(NSSize)aSize
 {
 	_origin = aSide;

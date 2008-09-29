@@ -28,6 +28,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDocument.h"
 #import "PGNode.h"
 
+// Views
+#import "PGInfoView.h"
+
 // Controllers
 #import "PGDocumentController.h"
 
@@ -113,6 +116,16 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	}
 	_shouldZoomOnNextImageLoad = [[NSUserDefaults standardUserDefaults] boolForKey:PGAutozoomsWindowsKey];
 	_shouldSaveFrame = YES;
+}
+
+#pragma mark NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		[[_infoPanel content] setAllowsAutohide:YES];
+	}
+	return self;
 }
 
 @end

@@ -297,10 +297,10 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 #pragma mark PGPrefObject
 
-- (void)setShowsOnScreenDisplay:(BOOL)flag
+- (void)setShowsInfo:(BOOL)flag
 {
-	[super setShowsOnScreenDisplay:flag];
-	[[PGPrefObject globalPrefObject] setShowsOnScreenDisplay:flag];
+	[super setShowsInfo:flag];
+	[[PGPrefObject globalPrefObject] setShowsInfo:flag];
 }
 - (void)setReadingDirection:(PGReadingDirection)aDirection
 {

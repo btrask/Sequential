@@ -48,13 +48,13 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	IBOutlet PGClipView          *clipView;
 	IBOutlet PGImageView         *imageView;
 	         PGPageLocation      _initialLocation;
+	         PGBezelPanel       *_infoPanel;
 
 	@private
 	         unsigned            _displayImageIndex;
 
 	         PGBezelPanel       *_graphicPanel;
 	         PGLoadingGraphic   *_loadingGraphic;
-	         PGBezelPanel       *_infoPanel;
 
 	IBOutlet PGFindView          *findView;
 	IBOutlet NSSearchField       *searchField;
@@ -94,7 +94,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)hideFindPanel:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
-- (IBAction)toggleOnScreenDisplay:(id)sender;
+- (IBAction)toggleInfo:(id)sender;
 
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
@@ -156,7 +156,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
-- (void)documentShowsOnScreenDisplayDidChange:(NSNotification *)aNotif;
+- (void)documentShowsInfoDidChange:(NSNotification *)aNotif;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;

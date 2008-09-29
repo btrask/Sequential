@@ -36,7 +36,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGImageView.h"
 #import "PGBezelPanel.h"
 #import "PGAlertView.h"
-#import "PGOSDView.h"
+#import "PGInfoView.h"
 #import "PGFindView.h"
 
 // Controllers
@@ -169,9 +169,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
 }
-- (IBAction)toggleOnScreenDisplay:(id)sender
+- (IBAction)toggleInfo:(id)sender
 {
-	[[self activeDocument] setShowsOnScreenDisplay:![[self activeDocument] showsOnScreenDisplay]];
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
 }
 
 #pragma mark -
@@ -305,7 +305,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
+	[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
 	if(flag && !document && _activeDocument) {
@@ -321,14 +321,14 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentShowsOnScreenDisplayDidChange:) name:PGPrefObjectShowsOnScreenDisplayDidChangeNotification];
+	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	NSDisableScreenUpdates();
 	[self setActiveNode:nil initialLocation:PGHomeLocation]; // Clear the screen, because the new node might take a while to load.
 	[self documentSortedNodesDidChange:nil];
 	[self _updateInfoPanelLocationAnimate:NO];
-	if([_activeDocument showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
+	if([_activeDocument showsInfo]) [_infoPanel displayOverWindow:[self window]];
 	else [_infoPanel close];
 	PGNode *node;
 	NSPoint center;
@@ -577,9 +577,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[[_infoPanel content] setCount:[[[self activeDocument] node] viewableNodeCount]];
 }
 
-- (void)documentShowsOnScreenDisplayDidChange:(NSNotification *)aNotif
+- (void)documentShowsInfoDidChange:(NSNotification *)aNotif
 {
-	if([[self activeDocument] showsOnScreenDisplay]) [_infoPanel displayOverWindow:[self window]];
+	if([[self activeDocument] showsInfo]) [_infoPanel displayOverWindow:[self window]];
 	else [_infoPanel fadeOut];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
@@ -655,7 +655,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)_updateInfoPanelLocationAnimate:(BOOL)flag
 {
 	if(![self activeDocument]) return; // If we're closing, don't bother.
-	PGOSDCorner const corner = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGMinXMinYCorner : PGMaxXMinYCorner;
+	PGInfoCorner const corner = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGMinXMinYCorner : PGMaxXMinYCorner;
 	[[_infoPanel content] setOrigin:corner offset:NSMakeSize(0, (PGMinXMinYCorner == corner && [self findPanelShown] ? NSHeight([_findPanel frame]) : 0))];
 	[_infoPanel changeFrameAnimate:flag];
 }
@@ -725,7 +725,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		default: return NO;
 	}
 	if([[_infoPanel content] shouldAutohide]) {
-		if(@selector(toggleOnScreenDisplay:) == action) return NO;
+		if(@selector(toggleInfo:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
 		if(@selector(revertOrientation:) == action) return NO;
@@ -885,7 +885,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case 'i':
 		{
 			if(NSCommandKeyMask & modifiers && ![[_infoPanel content] shouldAutohide]) {
-				[self toggleOnScreenDisplay:self];
+				[self toggleInfo:self];
 				return YES;
 			}
 		}
@@ -996,7 +996,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[super showWindow:sender];
 	[self _updateInfoPanelLocationAnimate:NO];
-	[self documentShowsOnScreenDisplayDidChange:nil];
+	[self documentShowsInfoDidChange:nil];
 }
 
 #pragma mark -
@@ -1070,7 +1070,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		(void)[self window]; // Just load the window so we don't have to worry about it.
 
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
-		_infoPanel = [[PGOSDView PG_bezelPanel] retain];
+		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
 
 		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];

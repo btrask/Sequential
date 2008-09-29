@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0E04E98E0C23BA7100078EC2 /* PGBezelPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */; };
 		0E04EBD00C253BB100078EC2 /* PGAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCD0C253BB000078EC2 /* PGAlertView.m */; };
-		0E04EBD10C253BB100078EC2 /* PGOSDView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCF0C253BB000078EC2 /* PGOSDView.m */; };
+		0E04EBD10C253BB100078EC2 /* PGInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCF0C253BB000078EC2 /* PGInfoView.m */; };
 		0E04EC0A0C254C1300078EC2 /* NSBezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */; };
 		0E051D9D0C801B160041874F /* PGEncoding.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E051D9B0C801B150041874F /* PGEncoding.nib */; };
 		0E06CBA60CF9A8C2004124B0 /* URL.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CB8B0CF9A8C2004124B0 /* URL.png */; };
@@ -224,8 +224,8 @@
 		0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBezelPanel.m; sourceTree = "<group>"; };
 		0E04EBCC0C253BB000078EC2 /* PGAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAlertView.h; sourceTree = "<group>"; };
 		0E04EBCD0C253BB000078EC2 /* PGAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGAlertView.m; sourceTree = "<group>"; };
-		0E04EBCE0C253BB000078EC2 /* PGOSDView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGOSDView.h; sourceTree = "<group>"; };
-		0E04EBCF0C253BB000078EC2 /* PGOSDView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGOSDView.m; sourceTree = "<group>"; };
+		0E04EBCE0C253BB000078EC2 /* PGInfoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInfoView.h; sourceTree = "<group>"; };
+		0E04EBCF0C253BB000078EC2 /* PGInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInfoView.m; sourceTree = "<group>"; };
 		0E04EC080C254C1300078EC2 /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSBezierPathAdditions.h; sourceTree = "<group>"; };
 		0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSBezierPathAdditions.m; sourceTree = "<group>"; };
 		0E051D9C0C801B150041874F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGEncoding.nib; sourceTree = "<group>"; };
@@ -562,8 +562,8 @@
 				0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */,
 				0E04EBCC0C253BB000078EC2 /* PGAlertView.h */,
 				0E04EBCD0C253BB000078EC2 /* PGAlertView.m */,
-				0E04EBCE0C253BB000078EC2 /* PGOSDView.h */,
-				0E04EBCF0C253BB000078EC2 /* PGOSDView.m */,
+				0E04EBCE0C253BB000078EC2 /* PGInfoView.h */,
+				0E04EBCF0C253BB000078EC2 /* PGInfoView.m */,
 				0ECD9FFC0CB3961B0059C754 /* PGFindView.h */,
 				0ECD9FFD0CB3961B0059C754 /* PGFindView.m */,
 				0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */,
@@ -1083,7 +1083,7 @@
 				0EC614F50BE43B1100D04615 /* NSWindowAdditions.m in Sources */,
 				0E04E98E0C23BA7100078EC2 /* PGBezelPanel.m in Sources */,
 				0E04EBD00C253BB100078EC2 /* PGAlertView.m in Sources */,
-				0E04EBD10C253BB100078EC2 /* PGOSDView.m in Sources */,
+				0E04EBD10C253BB100078EC2 /* PGInfoView.m in Sources */,
 				0E04EC0A0C254C1300078EC2 /* NSBezierPathAdditions.m in Sources */,
 				0EBF5A160C44DF56004584D2 /* NSMenuItemAdditions.m in Sources */,
 				0EA496330C6C7C9A00095184 /* PGBookmarkController.m in Sources */,

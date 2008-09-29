@@ -28,15 +28,16 @@ enum {
 	PGMinXMinYCorner = 0,
 	PGMaxXMinYCorner = 1
 };
-typedef int PGOSDCorner;
+typedef int PGInfoCorner;
 
-@interface PGOSDView : NSView
+@interface PGInfoView : NSView
 {
 	@private
 	NSString   *_messageText;
 	unsigned    _index;
 	unsigned    _count;
-	PGOSDCorner _origin;
+	BOOL        _allowsAutohide;
+	PGInfoCorner _origin;
 	NSSize      _originOffset;
 }
 
@@ -49,11 +50,14 @@ typedef int PGOSDCorner;
 - (void)setIndex:(unsigned)anInt;
 - (unsigned)count;
 - (void)setCount:(unsigned)anInt;
+
 - (BOOL)shouldAutohide;
+- (void)setAllowsAutohide:(BOOL)flag;
+
 - (BOOL)displaysProgressIndicator;
 
-- (PGOSDCorner)origin;
+- (PGInfoCorner)origin;
 - (NSSize)originOffset;
-- (void)setOrigin:(PGOSDCorner)aSide offset:(NSSize)aSize; // Does NOT actually move the window.
+- (void)setOrigin:(PGInfoCorner)aSide offset:(NSSize)aSize; // Does NOT actually move the window.
 
 @end
