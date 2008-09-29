@@ -121,7 +121,7 @@
 				<string>id</string>
 				<key>toggleFullscreen</key>
 				<string>id</string>
-				<key>toggleOnScreenDisplay</key>
+				<key>toggleInfo</key>
 				<string>id</string>
 				<key>toggleTracksImageScalingMode</key>
 				<string>id</string>
@@ -182,6 +182,8 @@
 				<string>id</string>
 				<key>previousPage</key>
 				<string>id</string>
+				<key>reload</key>
+				<string>id</string>
 				<key>revealInBrowser</key>
 				<string>id</string>
 				<key>revealInFinder</key>
@@ -195,6 +197,8 @@
 				<key>skipPastFolder</key>
 				<string>id</string>
 				<key>toggleFullscreen</key>
+				<string>id</string>
+				<key>toggleInfo</key>
 				<string>id</string>
 				<key>toggleOnScreenDisplay</key>
 				<string>id</string>
@@ -231,6 +235,8 @@
 				<string>NSTextField</string>
 				<key>passwordView</key>
 				<string>NSView</string>
+				<key>reloadButton</key>
+				<string>NSButton</string>
 				<key>searchField</key>
 				<string>NSSearchField</string>
 			</dict>
@@ -246,9 +252,15 @@
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidCancel</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidClose</key>
 				<string>PGURLConnection</string>
+				<key>connectionDidFail</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidSucceed</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
@@ -468,19 +480,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSResponder</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

@@ -32,8 +32,8 @@ extern NSString *const PGBezelPanelShouldAnimateKey;
 @interface PGBezelPanel : PGFadeOutPanel
 {
 	@private
-	BOOL      _acceptsEvents;
 	NSWindow *_parentWindow; // -[NSWindow parentWindow] apparently retains and autoreleases the window before returning it, which is not good when that window is being deallocated and we call it while it's removing us.
+	BOOL      _acceptsEvents;
 }
 
 - (id)initWithContentView:(NSView *)aView;

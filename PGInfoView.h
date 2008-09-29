@@ -33,12 +33,11 @@ typedef int PGInfoCorner;
 @interface PGInfoView : NSView
 {
 	@private
-	NSString   *_messageText;
-	unsigned    _index;
-	unsigned    _count;
-	BOOL        _allowsAutohide;
+	NSString    *_messageText;
+	unsigned     _index;
+	unsigned     _count;
 	PGInfoCorner _origin;
-	NSSize      _originOffset;
+	NSSize       _originOffset;
 }
 
 - (NSAttributedString *)displayText;
@@ -50,10 +49,6 @@ typedef int PGInfoCorner;
 - (void)setIndex:(unsigned)anInt;
 - (unsigned)count;
 - (void)setCount:(unsigned)anInt;
-
-- (BOOL)shouldAutohide;
-- (void)setAllowsAutohide:(BOOL)flag;
-
 - (BOOL)displaysProgressIndicator;
 
 - (PGInfoCorner)origin;

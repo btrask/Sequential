@@ -74,6 +74,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)_loadActiveNode;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
+- (void)_updateInfoWithNodeCount;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelLocationAnimate:(BOOL)flag;
 - (void)_updateInfoPanelText;
@@ -328,7 +329,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self setActiveNode:nil initialLocation:PGHomeLocation]; // Clear the screen, because the new node might take a while to load.
 	[self documentSortedNodesDidChange:nil];
 	[self _updateInfoPanelLocationAnimate:NO];
-	if([_activeDocument showsInfo]) [_infoPanel displayOverWindow:[self window]];
+	if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
 	else [_infoPanel close];
 	PGNode *node;
 	NSPoint center;
@@ -430,6 +431,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	PGImageView *ourImageView = [self imageView];
 	[self setImageView:nil];
 	[controller setImageView:ourImageView];
+}
+
+#pragma mark -
+
+- (BOOL)shouldShowInfoWithNodeCount:(unsigned)count
+{
+	return YES;
 }
 
 #pragma mark -
@@ -553,9 +561,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
-	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	[[_infoPanel content] setCount:count];
-	if(![self activeNode] && count) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+	[self _updateInfoWithNodeCount];
+	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
@@ -573,13 +580,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	} else if([self activeNode] == node) {
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
+	[self _updateInfoWithNodeCount];
 	[self _updateNodeIndex];
-	[[_infoPanel content] setCount:[[[self activeDocument] node] viewableNodeCount]];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
 {
-	if([[self activeDocument] showsInfo]) [_infoPanel displayOverWindow:[self window]];
+	if([[self activeDocument] showsInfo]) [self _updateInfoWithNodeCount];
 	else [_infoPanel fadeOut];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
@@ -645,6 +652,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
 	[imageView setSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]] allowAnimation:flag];
+}
+- (void)_updateInfoWithNodeCount
+{
+	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
+	[[_infoPanel content] setCount:count];
+	if([self shouldShowInfoWithNodeCount:count]) [_infoPanel displayOverWindow:[self window]];
+	else [_infoPanel close];
 }
 - (void)_updateNodeIndex
 {
@@ -724,7 +738,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
 	}
-	if([[_infoPanel content] shouldAutohide]) {
+	if(![self shouldShowInfoWithNodeCount:[[_infoPanel content] count]]) {
 		if(@selector(toggleInfo:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
@@ -884,7 +898,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case '\e': [self toggleFullscreen:self]; return YES;
 		case 'i':
 		{
-			if(NSCommandKeyMask & modifiers && ![[_infoPanel content] shouldAutohide]) {
+			if(NSCommandKeyMask & modifiers && [self shouldShowInfoWithNodeCount:[[_infoPanel content] count]]) {
 				[self toggleInfo:self];
 				return YES;
 			}

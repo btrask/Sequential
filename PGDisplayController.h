@@ -48,13 +48,13 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	IBOutlet PGClipView          *clipView;
 	IBOutlet PGImageView         *imageView;
 	         PGPageLocation      _initialLocation;
-	         PGBezelPanel       *_infoPanel;
 
 	@private
 	         unsigned            _displayImageIndex;
 
 	         PGBezelPanel       *_graphicPanel;
 	         PGLoadingGraphic   *_loadingGraphic;
+	         PGBezelPanel       *_infoPanel;
 
 	IBOutlet PGFindView          *findView;
 	IBOutlet NSSearchField       *searchField;
@@ -135,6 +135,8 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (PGImageView *)imageView;
 - (void)setImageView:(PGImageView *)aView;
 - (void)sendComponentsTo:(PGDisplayController *)controller;
+
+- (BOOL)shouldShowInfoWithNodeCount:(unsigned)count;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;

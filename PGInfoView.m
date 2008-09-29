@@ -32,7 +32,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 
 #define PGGraphicalIndicatorStyle YES
-#define PGAutohides               YES
 #define PGMarginSize              4.0 // Outside the window.
 #define PGPaddingSize             3.0 // Inside the window.
 #define PGTotalPaddingSize        (PGPaddingSize * 2.0)
@@ -103,17 +102,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (BOOL)shouldAutohide
-{
-	return PGAutohides && _allowsAutohide && [self count] <= 1;
-}
-- (void)setAllowsAutohide:(BOOL)flag
-{
-	_allowsAutohide = flag;
-}
-
-#pragma mark -
-
 - (BOOL)displaysProgressIndicator
 {
 	return PGGraphicalIndicatorStyle && [self count] > 1;
@@ -142,7 +130,6 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	if([self shouldAutohide]) return NSZeroRect;
 	NSSize const messageSize = [[self displayText] size];
 	float const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
@@ -166,7 +153,6 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	if([self shouldAutohide]) return;
 	NSRect const b = [self bounds];
 	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
 	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
