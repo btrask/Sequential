@@ -37,6 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGURLKey;
 extern NSString *const PGDataKey;
 extern NSString *const PGHasDataKey; // Even if PGDataKey isn't set.
+extern NSString *const PGMayHaveDataKey; // It can't be loaded because it would take too long but it may be there.
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;

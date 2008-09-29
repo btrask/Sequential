@@ -101,10 +101,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
                    withInfo:(NSMutableDictionary *)info
 {
 	if([info objectForKey:PGAdapterClassKey] == self) return PGMatchByPriorAgreement;
-	if(![[info objectForKey:PGHasDataKey] boolValue]) {
-		NSURL *const URL = [info objectForKey:PGURLKey];
-		if(!URL || ![URL isFileURL]) return PGNotAMatch; // We won't be able to get the data.
-	}
+	if(![[info objectForKey:PGMayHaveDataKey] boolValue]) return PGNotAMatch;
 	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
 	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;

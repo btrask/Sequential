@@ -152,14 +152,14 @@ enum {
 - (void)startLoadWithInfo:(NSDictionary *)info
 {
 	NSParameterAssert(!(PGNodeLoading & _status));
+	_status |= PGNodeLoading;
+	[_error release];
+	_error = nil;
+	[self noteIsViewableDidChange];
 	[_adapters autorelease];
 	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
 	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
 	[self _setResourceAdapter:[_adapters lastObject]];
-	_status |= PGNodeLoading;
-	[self noteIsViewableDidChange];
-	[_error release];
-	_error = nil;
 	[_adapter loadIfNecessary];
 }
 - (void)continueLoadWithInfo:(NSDictionary *)info
@@ -214,6 +214,7 @@ enum {
 }
 - (void)setError:(NSError *)error
 {
+	if(PGNodeNothing == _status) return;
 	if(!_error) {
 		_error = [error copy];
 		_errorPhase = _status;
@@ -327,7 +328,10 @@ enum {
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
-	if([self canGetDataWithInfo:mutableInfo]) [mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGHasDataKey];
+	if([self canGetDataWithInfo:mutableInfo]) {
+		[mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGHasDataKey];
+		[mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGMayHaveDataKey];
+	}
 	return mutableInfo;
 }
 - (void)_updateMenuItem
@@ -443,7 +447,7 @@ enum {
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = PGNodeLoading & _status || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = PGNodeLoading & _status || (_error && PGNodeReading == _errorPhase) || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];

@@ -60,7 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_mainConnection cancelAndNotify:NO];
 		[_faviconConnection cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
-	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGHasDataKey, nil]] count]) {
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGMayHaveDataKey, nil]] count]) {
 		[_mainConnection cancelAndNotify:YES];
 		[_faviconConnection cancelAndNotify:YES];
 	}

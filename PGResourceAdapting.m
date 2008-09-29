@@ -27,6 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 NSString *const PGURLKey            = @"PGURL";
 NSString *const PGDataKey           = @"PGURLData";
 NSString *const PGHasDataKey        = @"PGHasData";
+NSString *const PGMayHaveDataKey    = @"PGMayHaveData";
 NSString *const PGURLResponseKey    = @"PGURLResponse";
 NSString *const PGAdapterClassKey   = @"PGAdapterClass";
 NSString *const PGFourCCDataKey     = @"PGFourCCData";
