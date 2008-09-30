@@ -687,13 +687,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
         atIndex:(int)index
         shouldCancel:(BOOL)shouldCancel
 {
-	NSCellStateValue state = NSOffState;
 	NSString *title = @"";
 	NSAttributedString *attributedTitle = nil;
-	id target = self;
 	SEL action = NULL;
 	id representedObject = nil;
-	int tag = -1;
 	if(menu == recentMenu) {
 		NSArray *const identifiers = [self recentDocumentIdentifiers];
 		if((unsigned)index < [identifiers count]) {
@@ -708,7 +705,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			attributedTitle = [identifier attributedStringWithWithAncestory:!uniqueName];
 			action = @selector(openRecentDocument:);
 			representedObject = identifier;
-		} else if([identifiers count] == (unsigned)index) {
+		} else {
 			title = NSLocalizedString(@"Clear Menu", @"Clear the Open Recent menu. Should be the same as the standard text.");
 			if(index) {
 				if(!_recentMenuSeparatorItem) _recentMenuSeparatorItem = [[NSMenuItem separatorItem] retain];
@@ -717,13 +714,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			}
 		}
 	}
-	[item setState:state];
 	[item setTitle:title];
 	[item setAttributedTitle:attributedTitle];
-	[item setTarget:target];
 	[item setAction:action];
 	[item setRepresentedObject:representedObject];
-	[item setTag:tag];
 	return YES;
 }
 
