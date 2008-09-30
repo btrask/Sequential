@@ -80,7 +80,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:[_archive typeForEntry:i preferOSType:YES]] notify:NO];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode('fldr') : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
 		[identifier setCustomDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
 		[node setDataSource:self];
@@ -148,8 +148,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
         fast:(BOOL)flag
 {
 	unsigned const i = [[sender identifier] index];
-	if(NSNotFound == i) return NO;
-	if(flag) {
+	if(NSNotFound == i || flag) {
 		if(outData) *outData = nil;
 		return YES;
 	}

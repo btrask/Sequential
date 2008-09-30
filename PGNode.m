@@ -319,8 +319,12 @@ enum {
 {
 	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
 	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
-	if(![mutableInfo objectForKey:PGURLKey]) [mutableInfo AE_setObject:[[self identifier] URLByFollowingAliases:YES] forKey:PGURLKey];
-	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[[mutableInfo objectForKey:PGURLResponseKey] MIMEType] forKey:PGMIMETypeKey];
+	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
+	if(![mutableInfo objectForKey:PGURLKey]) {
+		NSURL *const responseURL = [response URL];
+		[mutableInfo AE_setObject:(responseURL ? responseURL : [[self identifier] URLByFollowingAliases:YES]) forKey:PGURLKey];
+	}
+	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[response MIMEType] forKey:PGMIMETypeKey];
 	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
 	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];

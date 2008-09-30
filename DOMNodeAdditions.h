@@ -27,7 +27,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface DOMHTMLDocument (AEAdditions)
 
-- (NSURL *)AE_oEmbedURL;
 - (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts;
 - (NSArray *)AE_imageSrcIdentifiers;
 

@@ -23,14 +23,14 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGXMLAdapter.h"
+#import <WebKit/WebKit.h>
 
 // Models
 #import "PGNode.h"
 #import "PGWebAdapter.h"
+#import "PGHTMLAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGXMLParser.h"
-
-static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter";
 
 @interface PGOEmbedParser : PGXMLParser
 {
@@ -38,11 +38,11 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 	NSMutableString *_version;
 	NSMutableString *_type;
 	NSMutableString *_title;
-	NSMutableString *_URL;
+	NSMutableString *_URLString;
 }
 
 - (NSString *)title;
-- (NSURL *)URL;
+- (NSString *)URLString;
 
 @end
 
@@ -55,17 +55,31 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 {
 	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
 	if(p) return p;
-	if([[info objectForKey:PGHasDataKey] boolValue]) return PGNotAMatch;
-	NSURL *const URL = [info objectForKey:PGURLKey];
-	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch;
-	if(![[URL path] hasPrefix:@"/photos"]) return PGNotAMatch;
-	[info setObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] forKey:PGURLKey];
-	[info setObject:[NSNumber numberWithBool:YES] forKey:PGShouldLoadInWebAdapterKey];
-	return PGMatchByIntrinsicAttribute + 300;
-}
-+ (Class)adapterClassForInfo:(NSDictionary *)info
-{
-	return [[info objectForKey:PGShouldLoadInWebAdapterKey] boolValue] ? [PGWebAdapter class] : self;
+	do {
+		if([[info objectForKey:PGHasDataKey] boolValue]) break;
+		NSURL *const URL = [info objectForKey:PGURLKey];
+		if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) break;
+		if(![[URL path] hasPrefix:@"/photos"]) break;
+		[info setObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] forKey:PGURLKey];
+		[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
+		return PGMatchByIntrinsicAttribute + 300;
+	} while(NO);
+	do {
+		DOMHTMLDocument *const doc = [info objectForKey:PGDOMDocumentKey];
+		if(!doc || ![doc isKindOfClass:[DOMHTMLDocument class]]) break;
+		DOMNodeList *const elements = [doc getElementsByTagName:@"LINK"];
+		unsigned i = 0;
+		for(; i < [elements length]; i++) {
+			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
+			if(![@"alternate" isEqualToString:[[link rel] lowercaseString]] || ![@"text/xml+oembed" isEqualToString:[[link type] lowercaseString]]) continue;
+			NSString *const href = [link href];
+			if(!href || [@"" isEqualToString:href]) continue;
+			[info setObject:[NSURL URLWithString:[link href] relativeToURL:[info objectForKey:PGURLKey]] forKey:PGURLKey];
+			[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
+			return PGMatchByIntrinsicAttribute + 300;
+		}
+	} while(NO);
+	return PGNotAMatch;
 }
 
 #pragma mark PGResourceAdapter
@@ -74,13 +88,15 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 {
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
+	_triedLoading = YES;
 	PGOEmbedParser *const p = [PGOEmbedParser parserWithData:data];
-	PGResourceIdentifier *const ident = [[p URL] AE_resourceIdentifier];
-	[ident setCustomDisplayName:[p title] notify:NO];
-	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-	[node startLoadWithInfo:nil];
-	if(node) [self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
-	[[self node] loadFinished];
+	[[self identifier] setCustomDisplayName:[p title] notify:YES];
+	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSURL URLWithString:[p URLString] relativeToURL:[[self info] objectForKey:PGURLKey]], PGURLKey, nil]];
+}
+- (void)fallbackLoad
+{
+	if(_triedLoading) [[self node] setError:nil];
+	else [self load];
 }
 
 @end
@@ -93,10 +109,9 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 {
 	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _title : nil;
 }
-- (NSURL *)URL
+- (NSString *)URLString
 {
-	if(![@"1.0" isEqualToString:_version] || ![@"photo" isEqualToString:_type]) return nil;
-	return _URL ? [NSURL URLWithString:_URL] : nil;
+	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _URLString : nil;
 }
 
 #pragma mark PGXMLParser
@@ -106,7 +121,7 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 	if([@"/oembed/version" isEqualToString:p]) return _version;
 	if([@"/oembed/type" isEqualToString:p]) return _type;
 	if([@"/oembed/title" isEqualToString:p]) return _title;
-	if([@"/oembed/url" isEqualToString:p]) return _URL;
+	if([@"/oembed/url" isEqualToString:p]) return _URLString;
 	return [super contentStringForTagPath:p];
 }
 
@@ -118,7 +133,7 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 		_version = [[NSMutableString alloc] init];
 		_type = [[NSMutableString alloc] init];
 		_title = [[NSMutableString alloc] init];
-		_URL = [[NSMutableString alloc] init];
+		_URLString = [[NSMutableString alloc] init];
 	}
 	return self;
 }
@@ -127,7 +142,7 @@ static NSString *const PGShouldLoadInWebAdapterKey = @"PGShouldLoadInWebAdapter"
 	[_version release];
 	[_type release];
 	[_title release];
-	[_URL release];
+	[_URLString release];
 	[super dealloc];
 }
 

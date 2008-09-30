@@ -23,8 +23,12 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGContainerAdapter.h"
+#import "PGResourceAdapter.h"
 
-@interface PGXMLAdapter : PGContainerAdapter
+@interface PGXMLAdapter : PGResourceAdapter
+{
+	@private
+	BOOL _triedLoading;
+}
 
 @end

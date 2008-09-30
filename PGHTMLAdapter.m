@@ -34,6 +34,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "DOMNodeAdditions.h"
 
+NSString *const PGDOMDocumentKey = @"PGDOMDocument";
+
 @implementation PGHTMLAdapter
 
 #pragma mark WebFrameLoadDelegate Protocol
@@ -60,35 +62,13 @@ DEALINGS WITH THE SOFTWARE. */
         didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	NSArray *identifiers = nil;
-	DOMHTMLDocument *const doc = (DOMHTMLDocument *)[frame DOMDocument];
-	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
-		NSURL *const oEmbedURL = [doc AE_oEmbedURL];
-		if(oEmbedURL) {
-			[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:oEmbedURL, PGURLKey, @"text/xml+oembed", PGMIMETypeKey, nil]];
-			return;
-		}
-		identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
-		if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
-	}
-	if([identifiers count]) {
-		NSMutableArray *const pages = [NSMutableArray array];
-		PGResourceIdentifier *ident;
-		NSEnumerator *const identEnum = [identifiers objectEnumerator];
-		while((ident = [identEnum nextObject])) {
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-			if(!node) continue;
-			[node startLoadWithInfo:nil];
-			[pages addObject:node];
-		}
-		[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
-	}
 	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
+	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
+	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithBool:YES], PGHasDataKey, nil]];
 	[_webView stopLoading:self];
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
-	[[self node] loadFinished];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -126,6 +106,24 @@ DEALINGS WITH THE SOFTWARE. */
 	[prefs setLoadsImagesAutomatically:NO];
 	[_webView setPreferences:prefs];
 	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
+}
+- (void)fallbackLoad
+{
+	DOMHTMLDocument *const doc = [[self info] objectForKey:PGDOMDocumentKey];
+	if(!doc) return [self load];
+	NSArray *identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
+	if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
+	NSMutableArray *const pages = [NSMutableArray array];
+	PGResourceIdentifier *ident;
+	NSEnumerator *const identEnum = [identifiers objectEnumerator];
+	while((ident = [identEnum nextObject])) {
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+		if(!node) continue;
+		[node startLoadWithInfo:nil];
+		[pages addObject:node];
+	}
+	[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
+	[[self node] loadFinished];
 }
 
 - (void)read {}

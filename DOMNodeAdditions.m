@@ -29,18 +29,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation DOMHTMLDocument (AEAdditions)
 
-- (NSURL *)AE_oEmbedURL
-{
-	DOMNodeList *const elements = [self getElementsByTagName:@"LINK"];
-	unsigned i = 0;
-	for(; i < [elements length]; i++) {
-		DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
-		if(![@"alternate" isEqualToString:[[link rel] lowercaseString]] || ![@"text/xml+oembed" isEqualToString:[[link type] lowercaseString]]) continue;
-		NSString *const href = [link href];
-		if(href && ![@"" isEqualToString:href]) return [NSURL URLWithString:[link href]];
-	}
-	return nil;
-}
 - (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes
              extensions:(NSArray *)exts
 {

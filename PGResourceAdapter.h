@@ -28,6 +28,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGNode;
 
+extern NSString *const PGSubstitutedClassKey;
+
 extern NSString *const PGBundleTypeFourCCsKey;
 extern NSString *const PGCFBundleTypeMIMETypesKey;
 extern NSString *const PGCFBundleTypeOSTypesKey;
@@ -56,7 +58,6 @@ typedef unsigned PGMatchPriority;
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
 + (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSDictionary *)info;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
-+ (Class)adapterClassForInfo:(NSDictionary *)info;
 + (BOOL)alwaysLoads;
 
 - (PGNode *)node;

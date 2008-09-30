@@ -34,6 +34,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSMenuItemAdditions.h"
 #import "NSStringAdditions.h"
 
+NSString *const PGSubstitutedClassKey = @"PGSubstitutedClass";
+
 NSString *const PGBundleTypeFourCCsKey      = @"PGBundleTypeFourCCs";
 NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
@@ -78,6 +80,15 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
              withInfo:(NSDictionary *)info
 {
 	NSParameterAssert(node);
+	NSParameterAssert(info);
+	NSParameterAssert(![info objectForKey:PGSubstitutedClassKey]);
+	Class const agreedClass = [info objectForKey:PGAdapterClassKey];
+	if(agreedClass) {
+		if(!flag) return [NSArray arrayWithObject:agreedClass];
+		PGResourceAdapter *const adapter = [[[agreedClass alloc] _initWithPriority:PGMatchByPriorAgreement] autorelease];
+		[[adapter info] addEntriesFromDictionary:info];
+		return [NSArray arrayWithObject:adapter];
+	}
 	NSMutableArray *const adapters = [NSMutableArray array];
 	NSString *classString;
 	NSEnumerator *const classStringEnum = [[self resourceAdapterTypesDictionary] keyEnumerator];
@@ -87,7 +98,8 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 		NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
 		PGMatchPriority const p = [class matchPriorityForNode:node withInfo:mutableInfo];
 		if(!p) continue;
-		Class const altClass = [class adapterClassForInfo:mutableInfo];
+		Class altClass = [mutableInfo objectForKey:PGSubstitutedClassKey];
+		if(!altClass) altClass = class;
 		if(flag) {
 			PGResourceAdapter *const adapter = [[[altClass alloc] _initWithPriority:p] autorelease];
 			[[adapter info] addEntriesFromDictionary:mutableInfo];
@@ -100,7 +112,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
-	if([info objectForKey:PGAdapterClassKey] == self) return PGMatchByPriorAgreement;
 	if(![[info objectForKey:PGMayHaveDataKey] boolValue]) return PGNotAMatch;
 	NSDictionary *const type = [[self resourceAdapterTypesDictionary] objectForKey:NSStringFromClass(self)];
 	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
@@ -108,10 +119,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
 	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
 	return PGNotAMatch;
-}
-+ (Class)adapterClassForInfo:(NSDictionary *)info
-{
-	return self;
 }
 + (BOOL)alwaysLoads
 {

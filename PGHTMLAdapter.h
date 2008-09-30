@@ -26,6 +26,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import <WebKit/WebKit.h>
 #import "PGContainerAdapter.h"
 
+extern NSString *const PGDOMDocumentKey;
+
 @interface PGHTMLAdapter : PGContainerAdapter
 {
 	@private
