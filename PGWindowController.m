@@ -88,7 +88,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 - (BOOL)shouldShowInfoWithNodeCount:(unsigned)count
 {
-	return count > 1;
+	return [self activeNode] != [[self activeDocument] node];
 }
 
 #pragma mark -
