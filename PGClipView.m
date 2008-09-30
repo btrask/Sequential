@@ -27,6 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import <IOKit/hidsystem/event_status_driver.h>
 
 // Other
+#import "PGKeyboardLayout.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
@@ -532,40 +533,38 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	if([[self delegate] clipView:self handleKeyDown:anEvent]) return;
-	NSString *const characters = [anEvent charactersIgnoringModifiers];
-	if(1 != [characters length]) return;
-	unichar const character = [characters characterAtIndex:0];
 	unsigned const modifiers = [anEvent modifierFlags];
 	if(modifiers & NSCommandKeyMask) return [super keyDown:anEvent]; // Ignore all command key equivalents.
 	BOOL const forward = !(NSShiftKeyMask & modifiers);
-	switch(character) {
+	switch([anEvent keyCode]) {
 #if PGGameStyleArrowScrolling
-		case NSUpArrowFunctionKey:
-		case NSLeftArrowFunctionKey:
-		case NSDownArrowFunctionKey:
-		case NSRightArrowFunctionKey:
+		case PGKeyArrowUp:
+		case PGKeyArrowDown:
+		case PGKeyArrowLeft:
+		case PGKeyArrowRight:
 			return [self arrowKeyDown:anEvent];
 #endif
-		case ' ': [self magicPanForward:forward acrossFirst:YES]; return;
-		case 'v': [self magicPanForward:YES acrossFirst:NO]; return;
-		case 'V': [self magicPanForward:NO acrossFirst:NO]; return;
-		case 'b': [self magicPanForward:NO acrossFirst:YES]; return;
-		case 'c': [self magicPanForward:NO acrossFirst:NO]; return;
-		case NSCarriageReturnCharacter: [super keyDown:anEvent]; return; // Pass on the return key so the default button can be pressed.
-		case 'q': [super keyDown:anEvent]; return;
-	}
-	if(NSNumericPadKeyMask & modifiers) switch(character) {
-		case '1': [self scrollInDirection:PGMinXEdgeMask | PGMinYEdgeMask type:PGScrollByPage]; return;
-		case '2': [self scrollInDirection:PGMinYEdgeMask type:PGScrollByPage]; return;
-		case '3': [self scrollInDirection:PGMaxXEdgeMask | PGMinYEdgeMask type:PGScrollByPage]; return;
-		case '4': [self scrollInDirection:PGMinXEdgeMask type:PGScrollByPage]; return;
-		case '5': [self scrollInDirection:PGMinYEdgeMask type:PGScrollByPage]; return;
-		case '6': [self scrollInDirection:PGMaxXEdgeMask type:PGScrollByPage]; return;
-		case '7': [self scrollInDirection:PGMinXEdgeMask | PGMaxYEdgeMask type:PGScrollByPage]; return;
-		case '8': [self scrollInDirection:PGMaxYEdgeMask type:PGScrollByPage]; return;
-		case '9': [self scrollInDirection:PGMaxXEdgeMask | PGMaxYEdgeMask type:PGScrollByPage]; return;
-		case '0': [self magicPanForward:forward acrossFirst:YES]; return;
-		case NSEnterCharacter: [self magicPanForward:forward acrossFirst:NO]; return;
+
+		case PGKeySpace: return [self magicPanForward:forward acrossFirst:YES];
+		case PGKeyV: return [self magicPanForward:forward acrossFirst:NO];
+		case PGKeyB: return [self magicPanForward:NO acrossFirst:YES];
+		case PGKeyC: return [self magicPanForward:NO acrossFirst:NO];
+
+		case PGKeyPad1: return [self scrollInDirection:PGMinXEdgeMask | PGMinYEdgeMask type:PGScrollByPage];
+		case PGKeyPad2: return [self scrollInDirection:PGMinYEdgeMask type:PGScrollByPage];
+		case PGKeyPad3: return [self scrollInDirection:PGMaxXEdgeMask | PGMinYEdgeMask type:PGScrollByPage];
+		case PGKeyPad4: return [self scrollInDirection:PGMinXEdgeMask type:PGScrollByPage];
+		case PGKeyPad5: return [self scrollInDirection:PGMinYEdgeMask type:PGScrollByPage];
+		case PGKeyPad6: return [self scrollInDirection:PGMaxXEdgeMask type:PGScrollByPage];
+		case PGKeyPad7: return [self scrollInDirection:PGMinXEdgeMask | PGMaxYEdgeMask type:PGScrollByPage];
+		case PGKeyPad8: return [self scrollInDirection:PGMaxYEdgeMask type:PGScrollByPage];
+		case PGKeyPad9: return [self scrollInDirection:PGMaxXEdgeMask | PGMaxYEdgeMask type:PGScrollByPage];
+		case PGKeyPad0: return [self magicPanForward:forward acrossFirst:YES];
+		case PGKeyPadEnter: return [self magicPanForward:forward acrossFirst:NO];
+
+		case PGKeyReturn:
+		case PGKeyQ:
+			return [super keyDown:anEvent]; // Pass these keys on.
 	}
 	if(![[NSApp mainMenu] performKeyEquivalent:anEvent]) [self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
 }

@@ -74,6 +74,7 @@
 		0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */; };
 		0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */; };
 		0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */; };
+		0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
 		0E808D690D7CC46A003C9DE1 /* NSArrayAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */; };
 		0E82626C0CA950770041FA9D /* Sequential.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E82626B0CA950770041FA9D /* Sequential.icns */; };
@@ -333,6 +334,8 @@
 		0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLParser.m; sourceTree = "<group>"; };
 		0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGErrorAdapter.h; sourceTree = "<group>"; };
 		0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGErrorAdapter.m; sourceTree = "<group>"; };
+		0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGKeyboardLayout.h; sourceTree = "<group>"; };
+		0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGKeyboardLayout.m; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
 		0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDragHighlightView.m; sourceTree = "<group>"; };
 		0E808D670D7CC46A003C9DE1 /* NSArrayAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSArrayAdditions.h; sourceTree = "<group>"; };
@@ -700,6 +703,8 @@
 				0EC11DF20CA02B98003E492C /* PGByteOrdering.m */,
 				0E92E1340E2CA88400276801 /* PGGeometry.h */,
 				0E92E1350E2CA88400276801 /* PGGeometry.m */,
+				0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */,
+				0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */,
 				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
 				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
 				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
@@ -802,8 +807,8 @@
 				0E1D37360A7E1A5800C542A6 /* Controllers */,
 				0EC11DED0CA028E1003E492C /* Other */,
 				0E47C0A70B93AE3A0060E8A8 /* Categories */,
-				0EEE57B10DB55837006E5B9C /* External */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
+				0EEE57B10DB55837006E5B9C /* External */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
 				2A37F4C3FDCFA73011CA2CEA /* Frameworks */,
 				19C28FB0FE9D524F11CA2CBB /* Products */,
@@ -1159,6 +1164,7 @@
 				0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */,
 				0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */,
 				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
+				0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

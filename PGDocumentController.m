@@ -45,6 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Other
 #import "PGAttachments.h"
+#import "PGKeyboardLayout.h"
 #import "PGLegacy.h"
 
 // Categories
@@ -746,7 +747,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	if([[anEvent charactersIgnoringModifiers] isEqualToString:@"q"] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
+	if(PGKeyQ == [anEvent keyCode] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
 		[NSApp terminate:self];
 		return YES;
 	}

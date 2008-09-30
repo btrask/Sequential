@@ -47,6 +47,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGEncodingAlert.h"
 
 // Other
+#import "PGKeyboardLayout.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
@@ -884,24 +885,30 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
         handleKeyDown:(NSEvent *)anEvent
 {
 	unsigned const modifiers = [anEvent modifierFlags];
-	NSString *const characters = [anEvent charactersIgnoringModifiers];
-	if([characters length] != 1) return NO;
-	unichar const key = [characters characterAtIndex:0];
-	if(modifiers & NSNumericPadKeyMask) switch(key) {
-		case '=':
-		case '+': [self nextPage:self]; return YES;
-		case '-': [self previousPage:self]; return YES;
-	} else if(key >= '0' && key <= '9') {
-		[self setTimerInterval:(modifiers & NSAlternateKeyMask ? 10.0 : 1.0) * (key - '0')];
-		return YES;
-	} else switch(key) {
-		case '\e': [self toggleFullscreen:self]; return YES;
-		case 'i':
+	float const timerFactor = modifiers & NSAlternateKeyMask ? 10.0 : 1.0;
+	switch([anEvent keyCode]) {
+		case PGKeyPadPlus: [self nextPage:self]; return YES;
+		case PGKeyPadMinus: [self previousPage:self]; return YES;
+
+		case PGKey0: [self setTimerInterval:0]; return YES;
+		case PGKey1: [self setTimerInterval:1 * timerFactor]; return YES;
+		case PGKey2: [self setTimerInterval:2 * timerFactor]; return YES;
+		case PGKey3: [self setTimerInterval:3 * timerFactor]; return YES;
+		case PGKey4: [self setTimerInterval:4 * timerFactor]; return YES;
+		case PGKey5: [self setTimerInterval:5 * timerFactor]; return YES;
+		case PGKey6: [self setTimerInterval:6 * timerFactor]; return YES;
+		case PGKey7: [self setTimerInterval:7 * timerFactor]; return YES;
+		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
+		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
+
+		case PGKeyEscape: [self toggleFullscreen:self]; return YES;
+		case PGKeyI:
 		{
 			if(NSCommandKeyMask & modifiers && [self shouldShowInfoWithNodeCount:[[_infoPanel content] count]]) {
 				[self toggleInfo:self];
 				return YES;
 			}
+			return NO;
 		}
 	}
 	return NO;
