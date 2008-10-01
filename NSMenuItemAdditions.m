@@ -24,6 +24,18 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSMenuItemAdditions.h"
 
+@interface NSMenu (AEUndocumented)
+
+- (id)_menuImpl;
+
+@end
+
+@protocol AECarbonMenuImpl
+
+- (void)performActionWithHighlightingForItemAtIndex:(int)integer;
+
+@end
+
 @implementation NSMenuItem (AEAdditions)
 
 - (void)AE_addAfterItem:(NSMenuItem *)anItem
@@ -35,6 +47,21 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)AE_removeFromMenu
 {
 	[[self menu] removeItem:self];
+}
+- (BOOL)AE_performAction
+{
+	if(![self isEnabled]) return NO;
+	NSMenu *const menu = [self menu];
+	int const i = [menu indexOfItem:self];
+	if([menu respondsToSelector:@selector(_menuImpl)]) {
+		id const menuImpl = [menu _menuImpl];
+		if([menuImpl respondsToSelector:@selector(performActionWithHighlightingForItemAtIndex:)]) {
+			[menuImpl performActionWithHighlightingForItemAtIndex:i];
+			return YES;
+		}
+	}
+	[menu performActionForItemAtIndex:i];
+	return YES;
 }
 
 @end

@@ -56,5 +56,9 @@ enum {
 	PGKeyPadPeriod = 65,
 	PGKeyPadEnter = 76,
 	PGKeyPadPlus = 69,
-	PGKeyPadMinus = 78
+	PGKeyPadMinus = 78,
+
+	PGKeyUnknown = USHRT_MAX
 };
+
+extern unsigned short PGKeyCodeFromUnichar(unichar);

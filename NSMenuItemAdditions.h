@@ -28,5 +28,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)AE_addAfterItem:(NSMenuItem *)anItem;
 - (void)AE_removeFromMenu;
+- (BOOL)AE_performAction; // Uses undocumented calls to highlight the item appropriately. Returns whether the item was enabled (and the action was performed).
 
 @end

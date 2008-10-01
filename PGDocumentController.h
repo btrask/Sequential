@@ -144,6 +144,9 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (IBAction)showKeyboardShortcuts:(id)sender;
 
+- (BOOL)performToggleFullscreen;
+- (BOOL)performToggleInfo;
+
 - (NSArray *)recentDocumentIdentifiers;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray;
 - (unsigned)maximumRecentDocumentCount;

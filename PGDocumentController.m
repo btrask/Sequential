@@ -86,11 +86,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type)
 
 static PGDocumentController *PGSharedDocumentController = nil;
 
-@interface PGWindow : NSWindow
-@end
-@interface PGView : NSView
-@end
-
 @interface PGDocumentController (Private)
 
 - (void)_setFullscreen:(BOOL)flag;
@@ -119,9 +114,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 + (void)initialize
 {
 	if([PGDocumentController class] != self) return;
-	[PGWindow poseAsClass:[NSWindow class]];
-	[PGView poseAsClass:[NSView class]];
-	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
 	NSNumber *const yes = [NSNumber numberWithBool:YES], *no = [NSNumber numberWithBool:NO];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		yes, PGAntialiasWhenUpscalingKey,
@@ -135,8 +127,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
 		nil]];
-	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
-	(void)setrlimit(RLIMIT_NOFILE, &l);
 }
 
 #pragma mark Instance Methods
@@ -271,6 +261,17 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)showKeyboardShortcuts:(id)sender
 {
 	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts" inBook:@"Sequential Help"];
+}
+
+#pragma mark -
+
+- (BOOL)performToggleFullscreen
+{
+	return [toggleFullscreen AE_performAction];
+}
+- (BOOL)performToggleInfo
+{
+	return [toggleInfo AE_performAction];
 }
 
 #pragma mark -
@@ -813,9 +814,27 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 @interface PGApplication : NSApplication
 @end
+@interface PGWindow : NSWindow
+@end
+@interface PGView : NSView
+@end
+@interface PGMenu : NSMenu
+@end
 
 @implementation PGApplication
 
++ (void)initialize
+{
+	if([PGApplication class] != self) return;
+	[PGWindow poseAsClass:[NSWindow class]];
+	[PGView poseAsClass:[NSView class]];
+	[PGMenu poseAsClass:[NSMenu class]];
+	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
+	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
+	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
+}
+
+// Allow our document controller to catch key equivalents.
 - (void)sendEvent:(NSEvent *)anEvent
 {
 	if([anEvent window] || [anEvent type] != NSKeyDown || (![[self mainMenu] performKeyEquivalent:anEvent] && ![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent])) [super sendEvent:anEvent];
@@ -852,6 +871,27 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSView *const view = [super previousValidKeyView];
 	return view ? view : self;
+}
+
+@end
+
+@implementation PGMenu
+
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	// Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
+	int i = 0;
+	for(; i < [self numberOfItems]; i++) {
+		NSMenuItem *const item = [self itemAtIndex:i];
+		NSString *const equiv = [item keyEquivalent];
+		unsigned short keyCode;
+		if([equiv length] == 1
+		&& (keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0])) != PGKeyUnknown
+		&& [anEvent keyCode] == keyCode
+		&& ([anEvent modifierFlags] & (NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask)) == [item keyEquivalentModifierMask]) return [item AE_performAction];
+		else if([[item submenu] performKeyEquivalent:anEvent]) return YES;
+	}
+	return [super performKeyEquivalent:anEvent];
 }
 
 @end

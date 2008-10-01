@@ -886,7 +886,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	unsigned const modifiers = [anEvent modifierFlags];
 	float const timerFactor = modifiers & NSAlternateKeyMask ? 10.0 : 1.0;
-	switch([anEvent keyCode]) {
+	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
+	unsigned short const keyCode = [anEvent keyCode];
+	if(!(modifiers & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask))) switch(keyCode) {
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
 
@@ -901,15 +903,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
 		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
 
-		case PGKeyEscape: [self toggleFullscreen:self]; return YES;
-		case PGKeyI:
-		{
-			if(NSCommandKeyMask & modifiers && [self shouldShowInfoWithNodeCount:[[_infoPanel content] count]]) {
-				[self toggleInfo:self];
-				return YES;
-			}
-			return NO;
-		}
+		case PGKeyEscape: return [d performToggleFullscreen];
+	} else switch(keyCode) {
+		case PGKeyI: return NSCommandKeyMask & modifiers && [d performToggleInfo];
 	}
 	return NO;
 }
