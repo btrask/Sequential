@@ -152,11 +152,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[super setActiveDocument:nextDoc closeIfAppropriate:NO]; // PGDocumentController knows when to close us, so don't close ourselves.
 	return NO;
 }
-- (void)activateDocument:(PGDocument *)document
-{
-	[self setActiveDocument:document closeIfAppropriate:NO];
-	[[self window] makeKeyAndOrderFront:self];
-}
 
 #pragma mark NSWindowController
 

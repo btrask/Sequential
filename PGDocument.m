@@ -156,7 +156,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	[self setInitialIdentifier:[aBookmark fileIdentifier]];
 	PGNode *const initialNode = [self initialNode];
 	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
-		[[self displayController] showNode:initialNode];
+		[[self displayController] activateNode:initialNode];
 		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
 	} else NSBeep();
 }
@@ -171,11 +171,11 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
         keepComponents:(BOOL)flag
 {
 	if(controller == _displayController) return;
+	if(flag) [_displayController sendComponentsTo:controller];
 	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
 	[_displayController release];
 	_displayController = [controller retain];
 	[_displayController setActiveDocument:self closeIfAppropriate:NO];
-	if(flag) [_displayController sendComponentsTo:controller];
 	[_displayController synchronizeWindowTitleWithDocumentName];
 }
 

@@ -31,7 +31,6 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL _isExitingFullscreen;
 }
 
-- (void)activateDocument:(PGDocument *)document;
 - (void)prepareToExitFullscreen;
 
 - (void)displayScreenDidChange:(NSNotification *)aNotif;

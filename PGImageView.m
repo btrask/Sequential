@@ -76,6 +76,7 @@ DEALINGS WITH THE SOFTWARE. */
         orientation:(PGOrientation)orientation
         size:(NSSize)size
 {
+	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
 	_orientation = orientation;
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
@@ -454,8 +455,15 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(![self window]) return; // Without a window to draw in, nothing else matters.
 	NSWindowDepth const depth = [[self window] depthLimit];
-	if(!_cache) _cache = [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:depth separate:YES alpha:YES];
-	else if([[_cache window] depthLimit] != depth) [[_cache window] setDepthLimit:depth];
+	if(!_cache) {
+		_cache = [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:depth separate:YES alpha:YES];
+		NSView *const contentView = [[self window] contentView];
+		if([contentView lockFocusIfCanDraw]) {
+			[_cache drawInRect:NSMakeRect(0, 0, 1, 1)]; // This may look like voodoo, but somehow drawing the cache when it's small dramatically improves the speed of the initial draw when it's large.
+			[contentView unlockFocus];
+			[contentView setNeedsDisplayInRect:NSMakeRect(0, 0, 1, 1)]; // We didn't actually want to do that, so redraw it back to normal.
+		}
+	} else if([[_cache window] depthLimit] != depth) [[_cache window] setDepthLimit:depth];
 	else return;
 	[self _cache];
 }

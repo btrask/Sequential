@@ -122,7 +122,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 - (PGDocument *)activeDocument;
 - (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag; // Returns YES if the window was closed.
-- (void)activateDocument:(PGDocument *)document; // Abstract.
+- (void)activateDocument:(PGDocument *)document;
 
 - (PGNode *)activeNode;
 - (void)setActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
@@ -130,7 +130,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
 - (void)prepareToLoop; // Call this before sending -tryToLoop….
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
-- (void)showNode:(PGNode *)node;
+- (void)activateNode:(PGNode *)node;
 
 - (PGImageView *)imageView;
 - (void)setImageView:(PGImageView *)aView;

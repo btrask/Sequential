@@ -328,10 +328,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	NSDisableScreenUpdates();
 	[self setActiveNode:nil initialLocation:PGHomeLocation]; // Clear the screen, because the new node might take a while to load.
-	[self documentSortedNodesDidChange:nil];
-	[self _updateInfoPanelLocationAnimate:NO];
-	if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
-	else [_infoPanel close];
 	PGNode *node;
 	NSPoint center;
 	NSString *query;
@@ -340,11 +336,18 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[clipView scrollToCenterAt:center allowAnimation:NO];
 		[searchField setStringValue:query];
 	} else [self setActiveNode:[_activeDocument initialNode] initialLocation:PGHomeLocation];
+	[self _updateInfoPanelLocationAnimate:NO];
+	if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
+	else [_infoPanel close];
 	NSEnableScreenUpdates();
 	[self setTimerInterval:0];
 	return NO;
 }
-- (void)activateDocument:(PGDocument *)document {}
+- (void)activateDocument:(PGDocument *)document
+{
+	[self setActiveDocument:document closeIfAppropriate:NO];
+	[[self window] makeKeyAndOrderFront:self];
+}
 
 #pragma mark -
 
@@ -403,7 +406,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
 	return NO;
 }
-- (void)showNode:(PGNode *)node
+- (void)activateNode:(PGNode *)node
 {
 	[self setActiveDocument:[node document] closeIfAppropriate:NO];
 	[self setActiveNode:node initialLocation:PGHomeLocation];
