@@ -69,7 +69,7 @@ DEALINGS WITH THE SOFTWARE. */
 	int i = 0;
 	for(; i < [_rep pageCount]; i++) {
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:i];
-		[identifier setCustomDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
+		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
 		[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGPDFPageAdapter class], PGAdapterClassKey, nil]];
