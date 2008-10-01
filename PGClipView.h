@@ -45,9 +45,9 @@ typedef int PGScrollType;
 	         NSTimeInterval _lastScrollTime;
 	         NSPoint        _immediatePosition;
 	         enum {
-			 	PGNotDragging,
-			 	PGPreliminaryDragging,
-			 	PGDragging
+	                        PGNotDragging,
+	                        PGPreliminaryDragging,
+	                        PGDragging
 	         }              _dragMode;
 	         BOOL           _firstMouse;
 }
@@ -98,6 +98,6 @@ typedef int PGScrollType;
 
 @interface NSView (PGClipViewDocumentView)
 
-- (BOOL)isSolidForClipView:(PGClipView *)sender;
+- (BOOL)acceptsClicksInClipView:(PGClipView *)sender;
 
 @end

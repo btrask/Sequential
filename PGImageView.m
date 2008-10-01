@@ -374,7 +374,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGClipViewDocumentView Protocol
 
-- (BOOL)isSolidForClipView:(PGClipView *)sender
+- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
 	return NO;
 }

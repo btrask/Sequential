@@ -452,7 +452,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (NSView *)hitTest:(NSPoint)aPoint
 {
 	NSView *const subview = [super hitTest:aPoint];
-	return [subview isSolidForClipView:self] ? subview : self;
+	return [subview acceptsClicksInClipView:self] ? subview : self;
 }
 - (void)resetCursorRects
 {
@@ -460,13 +460,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect rects[4];
 	NSRect b = [self bounds];
 	if([[self window] styleMask] & NSResizableWindowMask) {
-		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] isSolidForClipView:self] ? _documentFrame : NSZeroRect));
+		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
 		while(i--) [self addCursorRect:rects[i] cursor:PGPointingHandCursor()];
 
 		b.origin.y += 15;
 		b.size.height -= 15;
 	}
-	PGGetRectDifference(rects, &i, b, ([[self documentView] isSolidForClipView:self] ? _documentFrame : NSZeroRect));
+	PGGetRectDifference(rects, &i, b, ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
 	while(i--) [self addCursorRect:rects[i] cursor:PGPointingHandCursor()];
 }
 
@@ -663,7 +663,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 @implementation NSView (PGClipViewDocumentView)
 
-- (BOOL)isSolidForClipView:(PGClipView *)sender
+- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
 	return YES;
 }
