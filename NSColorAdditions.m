@@ -24,7 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSColorAdditions.h"
 
-#define PGCheckerboardSquareSize 8
+#define PGCheckerboardSquareSize 12
 #define PGCheckerboardSize (PGCheckerboardSquareSize * 2)
 
 @implementation NSColor (AEAdditions)
@@ -35,10 +35,10 @@ DEALINGS WITH THE SOFTWARE. */
 	[checkerboard lockFocus];
 	[self set];
 	NSRectFill(NSMakeRect(0, 0, PGCheckerboardSize, PGCheckerboardSize));
-	[[NSColor colorWithDeviceWhite:1 alpha:0.1] set];
+	[[NSColor colorWithDeviceWhite:1 alpha:0.07] set];
 	NSRectFillUsingOperation(NSMakeRect(0, 0, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
 	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	[[NSColor colorWithDeviceWhite:0 alpha:0.1] set];
+	[[NSColor colorWithDeviceWhite:0 alpha:0.07] set];
 	NSRectFillUsingOperation(NSMakeRect(0, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
 	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, 0, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
 	[checkerboard unlockFocus];
