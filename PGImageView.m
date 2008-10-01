@@ -235,10 +235,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[self _cache];
 	[self setNeedsDisplay:YES];
 }
-- (BOOL)usesOptimizedDrawing
-{
-	return _cacheIsValid || PGUpright == _orientation;
-}
 
 #pragma mark -
 
@@ -427,14 +423,13 @@ DEALINGS WITH THE SOFTWARE. */
 			NSRectFillList(rects, count);
 		}
 	}
-	if([self usesOptimizedDrawing]) {
+	if(_cacheIsValid) {
 		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
 		if(deg) [_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
 		else {
 			if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
-			NSPoint const scale = NSMakePoint([_image size].width / NSWidth(b), [_image size].height / NSHeight(b));
 			int i = count;
-			while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * scale.x, NSMinY(rects[i]) * scale.y, NSWidth(rects[i]) * scale.x, NSHeight(rects[i]) * scale.y) operation:operation fraction:1.0];
+			while(i--) [_image drawInRect:rects[i] fromRect:rects[i] operation:operation fraction:1.0];
 		}
 	} else [self _drawInRect:b];
 	if(drawCorners) {

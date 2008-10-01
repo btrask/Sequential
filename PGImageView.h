@@ -82,7 +82,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)drawsRoundedCorners;
 - (void)setDrawsRoundedCorners:(BOOL)flag;
-- (BOOL)usesOptimizedDrawing;
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;
