@@ -31,6 +31,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGSubscription.h"
 #import "PGBookmark.h"
 
+// Views
+#import "PGImageView.h"
+
 // Controllers
 #import "PGDocumentController.h"
 #import "PGBookmarkController.h"
@@ -51,6 +54,13 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 #define PGDocumentMaxCachedNodes 3
 
+@interface PGDocument (Private)
+
+- (PGNode *)_initialNode;
+- (void)_setInitialIdentifier:(PGResourceIdentifier *)ident;
+
+@end
+
 @implementation PGDocument
 
 #pragma mark Instance Methods
@@ -68,7 +78,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
 			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier];
 			[_node startLoadWithInfo:nil];
-			[self setInitialIdentifier:ident];
+			[self _setInitialIdentifier:ident];
 		}
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
@@ -95,31 +105,46 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	return [[_node retain] autorelease];
 }
+- (void)openBookmark:(PGBookmark *)aBookmark
+{
+	[self _setInitialIdentifier:[aBookmark fileIdentifier]];
+	PGNode *const initialNode = [self _initialNode];
+	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
+		[[self displayController] activateNode:initialNode];
+		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
+	} else NSBeep();
+}
 
 #pragma mark -
 
-- (BOOL)getStoredNode:(out PGNode **)outNode
+- (void)getStoredNode:(out PGNode **)outNode
+        imageView:(out PGImageView **)outImageView
         center:(out NSPoint *)outCenter
         query:(out NSString **)outQuery
 {
-	if(outNode) *outNode = _storedNode;
-	if(outCenter) *outCenter = _storedCenter;
-	if(outQuery) *outQuery = _storedQuery;
-	[_storedNode autorelease];
-	[_storedQuery autorelease];
-	_storedQuery = nil;
 	if(_storedNode) {
+		*outNode = [_storedNode autorelease];
 		_storedNode = nil;
-		return YES;
+		*outImageView = [_storedImageView autorelease];
+		_storedImageView = nil;
+		*outCenter = _storedCenter;
+		*outQuery = [_storedQuery autorelease];
+		_storedQuery = nil;
+	} else {
+		*outNode = [self _initialNode];
+		*outImageView = [[[PGImageView alloc] init] autorelease];
+		*outQuery = @"";
 	}
-	return NO;
 }
 - (void)storeNode:(PGNode *)node
+        imageView:(PGImageView *)imageView
         center:(NSPoint)center
         query:(NSString *)query
 {
 	[_storedNode autorelease];
 	_storedNode = [node retain];
+	[_storedImageView autorelease];
+	_storedImageView = [imageView retain];
 	_storedCenter = center;
 	[_storedQuery autorelease];
 	_storedQuery = [query copy];
@@ -140,38 +165,13 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 #pragma mark -
 
-- (PGNode *)initialNode
-{
-	PGNode *const node = [[self node] nodeForIdentifier:_initialIdentifier];
-	return node ? node : [[self node] sortedViewableNodeFirst:YES];
-}
-- (void)setInitialIdentifier:(PGResourceIdentifier *)ident
-{
-	if(ident == _initialIdentifier) return;
-	[_initialIdentifier release];
-	_initialIdentifier = [ident retain];
-}
-- (void)openBookmark:(PGBookmark *)aBookmark
-{
-	[self setInitialIdentifier:[aBookmark fileIdentifier]];
-	PGNode *const initialNode = [self initialNode];
-	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
-		[[self displayController] activateNode:initialNode];
-		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
-	} else NSBeep();
-}
-
-#pragma mark -
-
 - (PGDisplayController *)displayController
 {
 	return [[_displayController retain] autorelease];
 }
 - (void)setDisplayController:(PGDisplayController *)controller
-        keepComponents:(BOOL)flag
 {
 	if(controller == _displayController) return;
-	if(flag) [_displayController sendComponentsTo:controller];
 	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
 	[_displayController release];
 	_displayController = [controller retain];
@@ -183,14 +183,14 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 - (void)createUI
 {
-	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument] keepComponents:NO];
+	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
 }
 - (void)close
 {
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
-	[self setDisplayController:nil keepComponents:NO];
+	[self setDisplayController:nil];
 	[[PGDocumentController sharedDocumentController] removeDocument:self];
 }
 
@@ -295,6 +295,20 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 
+#pragma mark Private Protocol
+
+- (PGNode *)_initialNode
+{
+	PGNode *const node = [[self node] nodeForIdentifier:_initialIdentifier];
+	return node ? node : [[self node] sortedViewableNodeFirst:YES];
+}
+- (void)_setInitialIdentifier:(PGResourceIdentifier *)ident
+{
+	if(ident == _initialIdentifier) return;
+	[_initialIdentifier release];
+	_initialIdentifier = [ident retain];
+}
+
 #pragma mark PGPrefObject
 
 - (void)setShowsInfo:(BOOL)flag
@@ -351,6 +365,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	[_subscription release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
 	[_storedNode release];
+	[_storedImageView release];
 	[_storedQuery release];
 	[_initialIdentifier release];
 	[_displayController release];

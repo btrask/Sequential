@@ -72,7 +72,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 @interface PGDisplayController (Private)
 
-- (void)_loadActiveNode;
+- (void)_setImageView:(PGImageView *)aView;
+- (BOOL)_setActiveNode:(PGNode *)aNode;
+- (void)_readActiveNode;
+- (void)_readFinished;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateInfoWithNodeCount;
@@ -181,13 +184,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (IBAction)zoomIn:(id)sender
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MIN(PGScaleMax, [imageView averageScaleFactor] * 2)];
+	[doc setImageScaleFactor:MIN(PGScaleMax, [_imageView averageScaleFactor] * 2)];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
 - (IBAction)zoomOut:(id)sender
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, [imageView averageScaleFactor] / 2)];
+	[doc setImageScaleFactor:MAX(PGScaleMin, [_imageView averageScaleFactor] / 2)];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
 
@@ -274,7 +277,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[reloadButton setEnabled:NO];
 	[[self activeNode] startLoadWithInfo:nil];
-	[self _loadActiveNode];
+	[self _readActiveNode];
 }
 - (IBAction)decrypt:(id)sender
 {
@@ -301,15 +304,19 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
         closeIfAppropriate:(BOOL)flag
 {
 	if(document == _activeDocument) return NO;
-	[_activeDocument storeNode:[self activeNode] center:[clipView center] query:[searchField stringValue]];
-	[_activeDocument AE_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
-	[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
+	if(_activeDocument) {
+		if(_reading) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
+		[_activeDocument storeNode:[self activeNode] imageView:_imageView center:[clipView center] query:[searchField stringValue]];
+		[self _setImageView:nil];
+		[_activeDocument AE_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
+		[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
+	}
 	if(flag && !document && _activeDocument) {
 		_activeDocument = nil;
 		[[self retain] autorelease]; // Necessary if the find panel is open.
@@ -326,21 +333,27 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
-	NSDisableScreenUpdates();
-	[self setActiveNode:nil initialLocation:PGHomeLocation]; // Clear the screen, because the new node might take a while to load.
-	PGNode *node;
-	NSPoint center;
-	NSString *query;
-	if([_activeDocument getStoredNode:&node center:&center query:&query]) {
-		[self setActiveNode:node initialLocation:PGHomeLocation];
-		[clipView scrollToCenterAt:center allowAnimation:NO];
-		[searchField setStringValue:query];
-	} else [self setActiveNode:[_activeDocument initialNode] initialLocation:PGHomeLocation];
-	[self _updateInfoPanelLocationAnimate:NO];
-	if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
-	else [_infoPanel close];
-	NSEnableScreenUpdates();
 	[self setTimerInterval:0];
+	if(_activeDocument) {
+		NSDisableScreenUpdates();
+		PGNode *node;
+		PGImageView *view;
+		NSPoint center;
+		NSString *query;
+		[_activeDocument getStoredNode:&node imageView:&view center:&center query:&query];
+		[self _setImageView:view];
+		if([view rep]) {
+			[self _setActiveNode:node];
+			[clipView setDocumentView:view];
+			[clipView scrollToCenterAt:center allowAnimation:NO];
+			[self _readFinished];
+		} else [self setActiveNode:node initialLocation:PGHomeLocation];
+		[searchField setStringValue:query];
+		[self _updateInfoPanelLocationAnimate:NO];
+		if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
+		else [_infoPanel close];
+		NSEnableScreenUpdates();
+	}
 	return NO;
 }
 - (void)activateDocument:(PGDocument *)document
@@ -358,15 +371,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)setActiveNode:(PGNode *)aNode
         initialLocation:(PGPageLocation)location
 {
-	if(aNode == _activeNode) return;
-	[_activeNode AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
-	[_activeNode AE_removeObserver:self name:PGNodeReadyForViewingNotification];
-	[_activeNode release];
-	_activeNode = [aNode retain];
-	[self _updateNodeIndex];
-	[self _updateInfoPanelText];
+	if(![self _setActiveNode:aNode]) return;
 	_initialLocation = location;
-	[self _loadActiveNode];
+	[self _readActiveNode];
 }
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode
         initialLocation:(PGPageLocation)location
@@ -414,32 +421,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark -
 
-- (PGImageView *)imageView
-{
-	return [[imageView retain] autorelease];
-}
-- (void)setImageView:(PGImageView *)aView
-{
-	if(aView == imageView) return;
-	[imageView removeFromSuperview];
-	if(aView) [clipView addSubview:aView];
-	[imageView unbind:@"animates"];
-	[imageView unbind:@"antialiasWhenUpscaling"];
-	[imageView unbind:@"drawsRoundedCorners"];
-	[imageView release];
-	imageView = [aView retain];
-}
-- (void)sendComponentsTo:(PGDisplayController *)controller
-{
-	if(!controller) return;
-	PGImageView *ourImageView = [self imageView];
-	[self setImageView:nil];
-	[controller setImageView:ourImageView];
-}
-
-#pragma mark -
-
-- (BOOL)shouldShowInfoWithNodeCount:(unsigned)count
+- (BOOL)shouldShowInfo
 {
 	return YES;
 }
@@ -538,19 +520,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	} else {
 		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
 		PGOrientation const orientation = [[self activeNode] orientation];
-		[imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
-		[clipView setDocumentView:imageView];
+		[_imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
+		[clipView setDocumentView:_imageView];
 		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
 		[[self window] makeFirstResponder:clipView];
 	}
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
-	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
-	[_loadingGraphic release];
-	_loadingGraphic = nil;
-	[[self activeNode] AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
-	[[self activeNode] AE_removeObserver:self name:PGNodeReadyForViewingNotification];
-	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
-	[self _runTimer];
+	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
+	[self _readFinished];
 }
 
 #pragma mark -
@@ -603,7 +579,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
-	[imageView setImageRep:[imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[imageView rep] orientation:[[self activeNode] orientation]]];
+	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientation]]];
 }
 
 #pragma mark -
@@ -615,14 +591,48 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark Private Protocol
 
-- (void)_loadActiveNode
+- (void)_setImageView:(PGImageView *)aView
+{
+	if(aView == _imageView) return;
+	[_imageView unbind:@"animates"];
+	[_imageView unbind:@"antialiasWhenUpscaling"];
+	[_imageView unbind:@"drawsRoundedCorners"];
+	[_imageView release];
+	_imageView = [aView retain];
+	[_imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
+	[_imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
+	[_imageView bind:@"drawsRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
+}
+- (BOOL)_setActiveNode:(PGNode *)aNode
+{
+	if(aNode == _activeNode) return NO;
+	[_activeNode AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
+	[_activeNode AE_removeObserver:self name:PGNodeReadyForViewingNotification];
+	[_activeNode release];
+	_activeNode = [aNode retain];
+	[self _updateNodeIndex];
+	[self _updateInfoPanelText];
+	return YES;
+}
+- (void)_readActiveNode
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
+	_reading = YES;
 	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5 retain:NO];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
+}
+- (void)_readFinished
+{
+	_reading = NO;
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
+	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
+	[_loadingGraphic release];
+	_loadingGraphic = nil;
+	[self _runTimer];
+	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
@@ -655,13 +665,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
-	[imageView setSize:[self _sizeForImageRep:[imageView rep] orientation:[imageView orientation]] allowAnimation:flag];
+	[_imageView setSize:[self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation]] allowAnimation:flag];
 }
 - (void)_updateInfoWithNodeCount
 {
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	[[_infoPanel content] setCount:count];
-	if([self shouldShowInfoWithNodeCount:count]) [_infoPanel displayOverWindow:[self window]];
+	if([self shouldShowInfo]) [_infoPanel displayOverWindow:[self window]];
 	else [_infoPanel close];
 }
 - (void)_updateNodeIndex
@@ -742,7 +752,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
 	}
-	if(![self shouldShowInfoWithNodeCount:[[_infoPanel content] count]]) {
+	if(![self shouldShowInfo]) {
 		if(@selector(toggleInfo:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
@@ -750,8 +760,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScalingMode] == PGConstantFactorScaling) {
-		if(@selector(zoomIn:) == action && [imageView averageScaleFactor] >= PGScaleMax) return NO;
-		if(@selector(zoomOut:) == action && [imageView averageScaleFactor] <= PGScaleMin) return NO;
+		if(@selector(zoomIn:) == action && [_imageView averageScaleFactor] >= PGScaleMax) return NO;
+		if(@selector(zoomOut:) == action && [_imageView averageScaleFactor] <= PGScaleMin) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
 	if(!firstNode) { // We could use -hasViewableNodes, but we might have to get -firstNode anyway.
@@ -931,21 +941,21 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)clipView:(PGClipView *)sender
         magnifyBy:(float)amount
 {
-	[imageView setUsesCaching:NO];
+	[_imageView setUsesCaching:NO];
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [imageView averageScaleFactor] * (amount / 500 + 1)))];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [_imageView averageScaleFactor] * (amount / 500 + 1)))];
 	[doc setImageScalingMode:PGConstantFactorScaling];
 }
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount
 {
-	[clipView scrollToCenterAt:[imageView rotateByDegrees:amount] allowAnimation:NO];
+	[clipView scrollToCenterAt:[_imageView rotateByDegrees:amount] allowAnimation:NO];
 }
 - (void)clipViewGestureDidEnd:(PGClipView *)sender
 {
-	[imageView setUsesCaching:YES];
-	float const deg = [imageView rotationInDegrees];
-	[imageView setRotationInDegrees:0];
+	[_imageView setUsesCaching:YES];
+	float const deg = [_imageView rotationInDegrees];
+	[_imageView setRotationInDegrees:0];
 	PGOrientation o;
 	switch((int)roundf((deg + 360) / 90) % 4) {
 		case 0: o = PGUpright; break;
@@ -972,8 +982,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[pboard setString:[[[self activeNode] identifier] displayName] forType:NSStringPboardType];
 	} while(NO);
 	do {
-		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != imageView) break;
-		NSImageRep *const rep = [imageView rep];
+		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != _imageView) break;
+		NSImageRep *const rep = [_imageView rep];
 		if(!rep || ![rep respondsToSelector:@selector(TIFFRepresentation)]) break;
 		wrote = YES;
 		if(!pboard) break;
@@ -1024,7 +1034,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	// We don't need to retain imageView because -setImageView: automatically gets called when the Nib is loaded.
 	[passwordView retain];
 	[encodingView retain];
 
@@ -1038,9 +1047,6 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_findPanel setDelegate:self];
 	[_findPanel setAcceptsEvents:YES];
 
-	[imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
-	[imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
-	[imageView bind:@"drawsRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
 	[self prefControllerBackgroundPatternColorDidChange:nil];
 }
 - (void)synchronizeWindowTitleWithDocumentName
@@ -1101,7 +1107,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
-	[self setImageView:nil];
+	[self _setImageView:nil];
 	[passwordView release];
 	[encodingView release];
 	[_activeNode release];

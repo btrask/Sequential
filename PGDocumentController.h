@@ -92,8 +92,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 	IBOutlet NSMenu                  *windowsMenu;
 	IBOutlet NSMenuItem              *windowsMenuSeparator;
-	IBOutlet NSMenuItem              *selectNextDocument;
 	IBOutlet NSMenuItem              *selectPreviousDocument;
+	IBOutlet NSMenuItem              *selectNextDocument;
 
 	         BOOL                    _prefsLoaded;
 	         NSArray                *_recentDocumentIdentifiers;

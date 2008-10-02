@@ -83,6 +83,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setIndex:(unsigned)anInt
 {
+	if(anInt == _index) return;
 	_index = anInt;
 	[self setNeedsDisplay:YES];
 }

@@ -46,10 +46,11 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 {
 	@protected
 	IBOutlet PGClipView          *clipView;
-	IBOutlet PGImageView         *imageView;
 	         PGPageLocation      _initialLocation;
 
 	@private
+	         PGImageView        *_imageView;
+	         BOOL                _reading;
 	         unsigned            _displayImageIndex;
 
 	         PGBezelPanel       *_graphicPanel;
@@ -132,11 +133,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
-- (PGImageView *)imageView;
-- (void)setImageView:(PGImageView *)aView;
-- (void)sendComponentsTo:(PGDisplayController *)controller;
-
-- (BOOL)shouldShowInfoWithNodeCount:(unsigned)count;
+- (BOOL)shouldShowInfo;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;

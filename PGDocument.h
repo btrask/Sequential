@@ -31,6 +31,9 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGSubscription;
 @class PGBookmark;
 
+// Views
+@class PGImageView;
+
 // Controllers
 @class PGDisplayController;
 
@@ -55,6 +58,7 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 	NSMutableArray       *_cachedNodes;
 
 	PGNode               *_storedNode;
+	PGImageView          *_storedImageView;
 	NSPoint               _storedCenter;
 	NSString             *_storedQuery;
 	NSRect                _storedFrame;
@@ -73,18 +77,15 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (id)initWithBookmark:(PGBookmark *)aBookmark;
 - (PGResourceIdentifier *)identifier;
 - (PGNode *)node;
+- (void)openBookmark:(PGBookmark *)aBookmark;
 
-- (BOOL)getStoredNode:(out PGNode **)outNode center:(out NSPoint *)outCenter query:(out NSString **)outQuery;
-- (void)storeNode:(PGNode *)node center:(NSPoint)center query:(NSString *)query;
+- (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView center:(out NSPoint *)outCenter query:(out NSString **)outQuery; // No arguments may be NULL.
+- (void)storeNode:(PGNode *)node imageView:(PGImageView *)imageView center:(NSPoint)center query:(NSString *)query;
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame;
 - (void)storeWindowFrame:(NSRect)frame;
 
-- (PGNode *)initialNode;
-- (void)setInitialIdentifier:(PGResourceIdentifier *)ident;
-- (void)openBookmark:(PGBookmark *)aBookmark;
-
 - (PGDisplayController *)displayController;
-- (void)setDisplayController:(PGDisplayController *)controller keepComponents:(BOOL)flag;
+- (void)setDisplayController:(PGDisplayController *)controller;
 
 - (void)createUI;
 - (void)close;

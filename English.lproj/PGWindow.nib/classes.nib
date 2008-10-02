@@ -117,6 +117,8 @@
 				<string>id</string>
 				<key>toggleFullscreen</key>
 				<string>id</string>
+				<key>toggleInfo</key>
+				<string>id</string>
 				<key>toggleOnScreenDisplay</key>
 				<string>id</string>
 				<key>zoomIn</key>
@@ -169,9 +171,15 @@
 				<string>id</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidCancel</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidClose</key>
 				<string>PGURLConnection</string>
+				<key>connectionDidFail</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidSucceed</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>

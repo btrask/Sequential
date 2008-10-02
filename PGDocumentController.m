@@ -497,7 +497,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		PGDocument *doc;
 		NSEnumerator *const docEnum = [docs objectEnumerator];
 		while((doc = [docEnum nextObject])) {
-			[doc setDisplayController:[self displayControllerForNewDocument] keepComponents:(currentDoc == doc)];
+			[doc setDisplayController:[self displayControllerForNewDocument]];
 			[[doc displayController] showWindow:self];
 		}
 		[[_fullscreenController window] close];
@@ -512,7 +512,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		while((doc = [docEnum nextObject])) {
 			PGDisplayController *const oldController = [doc displayController];
 			if(!oldController) continue;
-			[doc setDisplayController:_fullscreenController keepComponents:(currentDoc == doc)];
+			[doc setDisplayController:_fullscreenController];
 			[[oldController window] close];
 		}
 		[_fullscreenController setActiveDocument:currentDoc closeIfAppropriate:NO];
@@ -618,10 +618,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[zoomIn setKeyEquivalent:(PGIsLeopardOrLater() ? @"+" : @"=")]; // Leopard is smart about this.
 	[zoomIn setKeyEquivalentModifierMask:NSCommandKeyMask];
 
-	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E2]];
-	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask | NSShiftKeyMask];
-	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E0]];
-	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask | NSShiftKeyMask];
+	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E1]];
+	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
+	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E3]];
+	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
 
 	NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
 	[self setFullscreen:[[defaults objectForKey:PGFullscreenKey] boolValue]];
