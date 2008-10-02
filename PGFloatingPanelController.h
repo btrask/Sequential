@@ -41,6 +41,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setShown:(BOOL)flag;
 - (void)toggleShown;
 
+- (void)windowWillShow;
+- (void)windowDidClose;
+
 - (PGDisplayController *)displayController;
 - (BOOL)setDisplayController:(PGDisplayController *)controller; // Don't call this, but go ahead and override it. Returns whether it changed.
 

@@ -32,10 +32,9 @@ DEALINGS WITH THE SOFTWARE. */
 	IBOutlet NSTableColumn *identifierColumn;
 	IBOutlet NSTableColumn *progressColumn;
 	IBOutlet NSButton      *cancelButton;
+	         NSTimer      *_updateTimer;
 }
 
 - (IBAction)cancelLoad:(id)sender;
-
-- (void)connectionsDidChange:(NSNotification *)aNotif;
 
 @end

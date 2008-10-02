@@ -36,6 +36,12 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
+@interface PGActivityPanelController (Private)
+
+- (void)_updateOnTimer:(NSTimer *)timer;
+
+@end
+
 @implementation PGActivityPanelController
 
 #pragma mark Instance Methods
@@ -49,9 +55,9 @@ DEALINGS WITH THE SOFTWARE. */
 	[canceledConnections makeObjectsPerformSelector:@selector(cancel)];
 }
 
-#pragma mark -
+#pragma mark Private Protocol
 
-- (void)connectionsDidChange:(NSNotification *)aNotif
+- (void)_updateOnTimer:(NSTimer *)timer
 {
 	[activityTable reloadData];
 }
@@ -68,7 +74,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	PGURLConnection *const connection = [[PGURLConnection connections] objectAtIndex:row];
 	if(tableColumn == identifierColumn) {
-		return [[[connection request] URL] absoluteString];
+		static NSDictionary *attrs = nil;
+		if(!attrs) {
+			NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+			[style setTighteningFactorForTruncation:0.3];
+			[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
+			attrs = [[NSDictionary alloc] initWithObjectsAndKeys:style, NSParagraphStyleAttributeName, nil];
+		}
+		return [[[NSAttributedString alloc] initWithString:[[[connection request] URL] absoluteString] attributes:attrs] autorelease];
 	} else if(tableColumn == progressColumn) {
 		return [NSNumber numberWithFloat:[connection progress]];
 	}
@@ -94,6 +107,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGFloatingPanelController
 
+- (void)windowWillShow
+{
+	_updateTimer = [NSTimer timerWithTimeInterval:(1.0 / 12.0) target:self selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES];
+	[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
+}
+- (void)windowDidClose
+{
+	[_updateTimer invalidate];
+	_updateTimer = nil;
+}
+
 - (NSString *)nibName
 {
 	return @"PGActivity";
@@ -110,16 +134,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSObject
 
-- (id)init
-{
-	if((self = [super init])) {
-		[PGURLConnection AE_addObserver:self selector:@selector(connectionsDidChange:) name:PGURLConnectionConnectionsDidChangeNotification];
-	}
-	return self;
-}
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self windowDidClose];
 	[super dealloc];
 }
 

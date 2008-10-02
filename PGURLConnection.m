@@ -30,8 +30,6 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-NSString *const PGURLConnectionConnectionsDidChangeNotification = @"PGURLConnectionConnectionsDidChange";
-
 static NSString       *PGUserAgent          = nil;
 static NSMutableArray *PGConnections        = nil;
 static NSMutableArray *PGActiveConnections  = nil;
@@ -80,23 +78,21 @@ static NSMutableArray *PGPendingConnections = nil;
 
 + (void)_startConnection
 {
-	if([PGActiveConnections count] < PGMaxSimultaneousConnections && [PGPendingConnections count]) {
-		if(!PGConnections) PGConnections = [[NSMutableArray alloc] init];
-		if(!PGActiveConnections) PGActiveConnections = [[NSMutableArray alloc] init];
-		PGURLConnection *const connection = [PGPendingConnections objectAtIndex:0];
-		NSMutableURLRequest *const request = [[[connection request] mutableCopy] autorelease];
-		if([self userAgent]) [request setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
-		NSURLConnection *underlyingConnection = nil;
-		if(PGIsLeopardOrLater()) { // Ensure the connections keep loading in the various run loop modes on Leopard.
-			underlyingConnection = [[NSURLConnection alloc] initWithRequest:request delegate:[connection PG_nonretainedObjectValue] startImmediately:NO];
-			[underlyingConnection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:PGCommonRunLoopsMode];
-			[underlyingConnection start];
-		} else underlyingConnection = [[NSURLConnection alloc] initWithRequest:request delegate:[connection PG_nonretainedObjectValue]];
-		[PGConnections addObject:[underlyingConnection autorelease]];
-		[PGActiveConnections addObject:connection];
-		[PGPendingConnections removeObjectAtIndex:0];
-	}
-	[PGURLConnection AE_postNotificationName:PGURLConnectionConnectionsDidChangeNotification];
+	if([PGActiveConnections count] >= PGMaxSimultaneousConnections || ![PGPendingConnections count]) return;
+	if(!PGConnections) PGConnections = [[NSMutableArray alloc] init];
+	if(!PGActiveConnections) PGActiveConnections = [[NSMutableArray alloc] init];
+	PGURLConnection *const connection = [PGPendingConnections objectAtIndex:0];
+	NSMutableURLRequest *const request = [[[connection request] mutableCopy] autorelease];
+	if([self userAgent]) [request setValue:[self userAgent] forHTTPHeaderField:@"User-Agent"];
+	NSURLConnection *underlyingConnection = nil;
+	if(PGIsLeopardOrLater()) { // Ensure the connections keep loading in the various run loop modes on Leopard.
+		underlyingConnection = [[NSURLConnection alloc] initWithRequest:request delegate:[connection PG_nonretainedObjectValue] startImmediately:NO];
+		[underlyingConnection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:PGCommonRunLoopsMode];
+		[underlyingConnection start];
+	} else underlyingConnection = [[NSURLConnection alloc] initWithRequest:request delegate:[connection PG_nonretainedObjectValue]];
+	[PGConnections addObject:[underlyingConnection autorelease]];
+	[PGActiveConnections addObject:connection];
+	[PGPendingConnections removeObjectAtIndex:0];
 }
 
 #pragma mark Instance Methods
@@ -155,7 +151,6 @@ static NSMutableArray *PGPendingConnections = nil;
 	if(![PGPendingConnections containsObject:self]) return;
 	[PGPendingConnections removeObject:self];
 	[PGPendingConnections insertObject:[self PG_nonretainedObjectProxy] atIndex:0];
-	[PGURLConnection AE_postNotificationName:PGURLConnectionConnectionsDidChangeNotification];
 }
 - (void)cancelAndNotify:(BOOL)notify
 {
@@ -164,6 +159,10 @@ static NSMutableArray *PGPendingConnections = nil;
 	[_data release];
 	_data = nil;
 	if(notify) [[self delegate] connectionDidCancel:self];
+}
+- (void)cancel
+{
+	[self cancelAndNotify:YES];
 }
 
 #pragma mark Private Protocol
@@ -193,7 +192,6 @@ static NSMutableArray *PGPendingConnections = nil;
 {
 	[_data appendData:data];
 	[[self delegate] connectionLoadingDidProgress:self];
-	[PGURLConnection AE_postNotificationName:PGURLConnectionConnectionsDidChangeNotification];
 }
 - (void)connection:(NSURLConnection *)connection
 	didFailWithError:(NSError *)error

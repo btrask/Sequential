@@ -102,12 +102,17 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(![self canGetData]);
 	NSURL *const URL = [[self info] objectForKey:PGURLKey];
-	[_mainConnection cancelAndNotify:NO];
-	[_mainConnection release];
-	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
 	[_faviconConnection cancelAndNotify:NO];
 	[_faviconConnection release];
 	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
+	[_mainConnection cancelAndNotify:NO];
+	[_mainConnection release];
+	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
+}
+- (void)didBecomeViewed
+{
+	[_mainConnection prioritize];
+	[_faviconConnection prioritize];
 }
 
 #pragma mark NSObject

@@ -167,6 +167,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	[self load];
 }
+- (void)didBecomeViewed {}
 - (void)read
 {
 	[[self node] readFinishedWithImageRep:nil error:nil];

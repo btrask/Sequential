@@ -91,9 +91,15 @@
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidCancel</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidClose</key>
 				<string>PGURLConnection</string>
+				<key>connectionDidFail</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidSucceed</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
@@ -120,6 +126,11 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>NSWindow</string>
 			<key>LANGUAGE</key>

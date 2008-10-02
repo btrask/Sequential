@@ -51,13 +51,23 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _shown) return;
 	_shown = flag;
-	if(flag) [super showWindow:self];
-	else [[self window] performClose:self];
+	if(flag) {
+		[self windowWillShow];
+		[super showWindow:self];
+	} else {
+		[[self window] performClose:self];
+		[self windowDidClose];
+	}
 }
 - (void)toggleShown
 {
 	[self setShown:![self isShown]];
 }
+
+#pragma mark -
+
+- (void)windowWillShow {}
+- (void)windowDidClose {}
 
 #pragma mark -
 

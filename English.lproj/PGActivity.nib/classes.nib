@@ -91,9 +91,15 @@
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidCancel</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidClose</key>
 				<string>PGURLConnection</string>
+				<key>connectionDidFail</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidReceiveResponse</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidSucceed</key>
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
@@ -120,6 +126,11 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
+			</dict>
 			<key>CLASS</key>
 			<string>NSWindow</string>
 			<key>LANGUAGE</key>
@@ -151,22 +162,6 @@
 			<string>NSControl</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>HMBlkScrollView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSScrollView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>cancelLoad</key>
@@ -189,6 +184,22 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGFloatingPanelController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkScrollView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSScrollView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

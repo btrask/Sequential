@@ -24,8 +24,6 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
-
 @interface PGURLConnection : NSObject // Wraps NSURLConnection so only a few connections are active at a time.
 {
 	@private
@@ -54,6 +52,7 @@ extern NSString *const PGURLConnectionConnectionsDidChangeNotification;
 - (float)progress;
 - (void)prioritize;
 - (void)cancelAndNotify:(BOOL)notify;
+- (void)cancel;
 
 @end
 

@@ -182,6 +182,7 @@ enum {
 }
 - (void)becomeViewed
 {
+	[[self resourceAdapter] didBecomeViewed];
 	if(PGNodeReading & _status) return;
 	_status |= PGNodeReading;
 	[self readIfNecessary];
