@@ -111,6 +111,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	_updateTimer = [NSTimer timerWithTimeInterval:(1.0 / 12.0) target:self selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES];
 	[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
+	[self _updateOnTimer:nil];
 }
 - (void)windowDidClose
 {
