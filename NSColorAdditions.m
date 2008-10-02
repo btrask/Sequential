@@ -24,7 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "NSColorAdditions.h"
 
-#define PGCheckerboardSquareSize 12
+#define PGCheckerboardSquareSize 8
 #define PGCheckerboardSize (PGCheckerboardSquareSize * 2)
 
 @implementation NSColor (AEAdditions)
