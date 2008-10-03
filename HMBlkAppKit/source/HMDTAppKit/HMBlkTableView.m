@@ -111,7 +111,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 - (id)_highlightColorForCell:(id)cell
 {
-    return [HMBlkPanel highlighedCellColor];
+	return [HMBlkPanel highlightColorForView:self];
 }
 
 //--------------------------------------------------------------//

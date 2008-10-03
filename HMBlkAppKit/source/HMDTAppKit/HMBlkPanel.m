@@ -24,8 +24,9 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-#import "HMBlkContentView.h"
 #import "HMBlkPanel.h"
+#import "HMAppKitEx.h"
+#import "HMBlkContentView.h"
 
 @implementation HMBlkPanel
 
@@ -38,14 +39,9 @@ POSSIBILITY OF SUCH DAMAGE.
 	return _contentBackgroundImage;
 }
 
-+ (NSColor*)highlighedCellColor
++ (NSColor *)highlightColorForView:(NSView *)view
 {
-	static NSColor *_highlightCellColor = nil;
-	if (!_highlightCellColor) {
-		_highlightCellColor = [[NSColor colorWithCalibratedWhite:0.4f alpha:1.0f] retain];
-	}
-	
-	return _highlightCellColor;
+	return [view HM_isActive] ? [NSColor alternateSelectedControlColor] : [NSColor colorWithCalibratedWhite:0.6f alpha:1.0f];
 }
 + (NSArray*)alternatingRowBackgroundColors
 {

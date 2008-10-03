@@ -153,7 +153,7 @@ static NSRect   _expandedRect = {{0, 0}, {0, 0}};
 
 - (id)_highlightColorForCell:(id)cell
 {
-    return [HMBlkPanel highlighedCellColor];
+	return [HMBlkPanel highlightColorForView:self];
 }
 
 //--------------------------------------------------------------//

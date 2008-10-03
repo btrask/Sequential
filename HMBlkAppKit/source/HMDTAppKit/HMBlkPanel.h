@@ -37,7 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 }
 
 + (NSImage *)contentBackgroundImage;
-+ (NSColor *)highlighedCellColor;
++ (NSColor*)highlightColorForView:(NSView *)view;
 + (NSArray *)alternatingRowBackgroundColors;
 + (NSColor *)majorGridColor;
 

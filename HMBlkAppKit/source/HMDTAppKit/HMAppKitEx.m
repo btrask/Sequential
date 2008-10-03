@@ -246,17 +246,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-@implementation NSNextStepFrame (appearance)
-
-- (float)contentAlpha
-{
-    return 1.0f;
-}
-
-@end
-
-#pragma mark -
-
 @implementation NSTableView (ContextMenu)
 
 - (NSMenu*)menuForEvent:(NSEvent*)event
@@ -340,6 +329,20 @@ DEALINGS WITH THE SOFTWARE. */
     }
     
     return nil;
+}
+
+@end
+
+#pragma mark -
+
+@implementation NSView (HMAdditions)
+
+- (BOOL)HM_isActive
+{
+	if(![[self window] isKeyWindow]) return NO;
+	NSResponder *const fr = [[self window] firstResponder];
+	if(fr == self) return YES;
+	return [fr isKindOfClass:[NSView class]] && [(NSView *)fr isDescendantOf:self];
 }
 
 @end
