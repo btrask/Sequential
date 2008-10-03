@@ -26,13 +26,13 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGContainerAdapter.h"
 
 // Models
-@class PGURLConnection;
+@class PGURLLoad;
 
 @interface PGFlickrAdapter : PGContainerAdapter
 {
 	@private
-	PGURLConnection *_sizeConnection;
-	PGURLConnection *_infoConnection;
+	PGURLLoad *_sizeLoad;
+	PGURLLoad *_infoLoad;
 }
 
 @end

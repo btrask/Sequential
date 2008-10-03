@@ -6,6 +6,14 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>HMBlkOutlineView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSOutlineView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGFadeOutPanel</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -59,14 +67,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>HMBlkTableView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSTableView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -162,6 +162,30 @@
 			<string>NSControl</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelLoad</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGActivityPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>activityOutline</key>
+				<string>NSOutlineView</string>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>identifierColumn</key>
+				<string>NSTableColumn</string>
+				<key>progressColumn</key>
+				<string>NSTableColumn</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>PGFloatingPanelController</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>PGDocumentWindow</string>
 			<key>LANGUAGE</key>
@@ -176,30 +200,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSScrollView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>cancelLoad</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGActivityPanelController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>activityTable</key>
-				<string>NSTableView</string>
-				<key>cancelButton</key>
-				<string>NSButton</string>
-				<key>identifierColumn</key>
-				<string>NSTableColumn</string>
-				<key>progressColumn</key>
-				<string>NSTableColumn</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>PGFloatingPanelController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

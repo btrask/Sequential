@@ -23,34 +23,43 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGResourceAdapter.h"
 
 // Models
-#import "PGPrefObject.h"
+#import "PGLoading.h"
 
-extern NSString *const PGMaxDepthKey;
-
-@interface PGContainerAdapter : PGResourceAdapter
+@interface PGURLLoad : NSObject <PGLoading>
 {
 	@private
-	NSArray        *_sortedChildren;
-	NSArray        *_unsortedChildren;
-	PGSortOrder     _unsortedOrder;
+	id<PGLoading>    _parentLoad;
+	id               _delegate;
+	BOOL             _loaded;
+	NSURLConnection *_connection;
+	NSURLRequest    *_request;
+	NSURLResponse   *_response;
+	NSMutableData   *_data;
 }
 
-- (NSArray *)sortedChildren;
-- (NSArray *)unsortedChildren;
-- (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
-- (void)removeChild:(PGNode *)child;
++ (NSString *)userAgent;
++ (void)setUserAgent:(NSString *)aString;
 
-- (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent;
-- (unsigned)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel context:(id)context;
-/* The selector 'sel' should have one of the following forms:
-- (PGNode *)selector;
-- (PGNode *)selectorForward:(BOOL)flag;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context ignored:(id)nil1; */
-- (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
+- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(id)anObject;
+
+- (id)delegate;
+- (NSURLRequest *)request;
+- (NSURLResponse *)response;
+- (NSMutableData *)data;
+
+- (void)cancelAndNotify:(BOOL)notify;
+- (BOOL)loaded;
+
+@end
+
+@interface NSObject (PGURLLoadDelegate)
+
+- (void)loadLoadingDidProgress:(PGURLLoad *)sender;
+- (void)loadDidReceiveResponse:(PGURLLoad *)sender;
+- (void)loadDidSucceed:(PGURLLoad *)sender;
+- (void)loadDidFail:(PGURLLoad *)sender;
+- (void)loadDidCancel:(PGURLLoad *)sender;
 
 @end

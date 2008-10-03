@@ -26,13 +26,13 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceAdapter.h"
 
 // Models
-@class PGURLConnection;
+@class PGURLLoad;
 
 @interface PGWebAdapter : PGResourceAdapter
 {
 	@private
-	PGURLConnection *_mainConnection;
-	PGURLConnection *_faviconConnection;
+	PGURLLoad *_mainLoad;
+	PGURLLoad *_faviconLoad;
 }
 
 @end

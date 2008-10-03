@@ -167,7 +167,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	[self load];
 }
-- (void)didBecomeViewed {}
 - (void)read
 {
 	[[self node] readFinishedWithImageRep:nil error:nil];
@@ -249,10 +248,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (BOOL)isContainer
 {
 	return NO;
-}
-- (float)loadingProgress
-{
-	return 0;
 }
 - (NSArray *)exifEntries
 {
@@ -378,6 +373,48 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 	[[self node] noteIsViewableDidChange];
 }
 
+#pragma mark PGLoading Protocol
+
+- (NSString *)loadDescription
+{
+	return [[self identifier] displayName];
+}
+- (float)loadProgress
+{
+	return 0;
+}
+- (id<PGLoading>)parentLoad
+{
+	if(![[self node] isRooted]) return nil;
+	return [self parentAdapter] ? [self parentAdapter] : [PGLoadManager sharedLoadManager];
+}
+- (NSArray *)subloads
+{
+	return [[_subloads retain] autorelease];
+}
+- (void)setSubload:(id<PGLoading>)obj
+        isLoading:(BOOL)flag
+{
+	if(flag) {
+		if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
+	} else {
+		if(![[obj subloads] count]) [_subloads removeObjectIdenticalTo:obj];
+	}
+	[[self parentLoad] setSubload:[self node] isLoading:flag];
+}
+- (void)prioritizeSubload:(id<PGLoading>)obj
+{
+	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
+	if(NSNotFound == i) return;
+	[_subloads removeObjectAtIndex:i];
+	[_subloads insertObject:obj atIndex:0];
+	[[self parentLoad] prioritizeSubload:[self node]];
+}
+- (void)cancelLoad
+{
+	[_subloads makeObjectsPerformSelector:@selector(cancelLoad)];
+}
+
 #pragma mark NSObject Protocol
 
 - (NSString *)description
@@ -391,12 +428,14 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	if((self = [super init])) {
 		_info = [[NSMutableDictionary alloc] init];
+		_subloads = [[NSMutableArray alloc] init];
 	}
 	return self;
 }
 - (void)dealloc
 {
 	[_info release];
+	[_subloads release];
 	[super dealloc];
 }
 

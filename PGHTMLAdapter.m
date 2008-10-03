@@ -73,7 +73,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 #pragma mark PGResourceAdapting Protocol
 
-- (float)loadingProgress
+- (float)loadProgress
 {
 	return 1.0;
 }

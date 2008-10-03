@@ -156,6 +156,7 @@ enum {
 	[_error release];
 	_error = nil;
 	[self noteIsViewableDidChange];
+	[[self parentLoad] setSubload:self isLoading:YES];
 	[_adapters autorelease];
 	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
 	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
@@ -177,12 +178,13 @@ enum {
 	NSParameterAssert(PGNodeLoading & _status);
 	_status = ~PGNodeLoading & _status;
 	[self noteIsViewableDidChange];
+	[[self parentLoad] setSubload:self isLoading:NO];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
 }
 - (void)becomeViewed
 {
-	[[self resourceAdapter] didBecomeViewed];
+	[[self parentLoad] prioritizeSubload:self];
 	if(PGNodeReading & _status) return;
 	_status |= PGNodeReading;
 	[self readIfNecessary];

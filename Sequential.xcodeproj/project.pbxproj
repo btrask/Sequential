@@ -107,7 +107,7 @@
 		0ECF36E80C7DC4FC0009EB00 /* PGSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */; };
 		0ED4A41A0DCBFDDA007C5A77 /* PGArchiveAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */; };
 		0ED4A44D0DCC628F007C5A77 /* PGPDFAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A44C0DCC628F007C5A77 /* PGPDFAdapter.m */; };
-		0ED4A8DD0DD00E18007C5A77 /* PGURLConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A8DB0DD00E18007C5A77 /* PGURLConnection.m */; };
+		0ED4A8DD0DD00E18007C5A77 /* PGURLLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */; };
 		0ED4AAF80DD18538007C5A77 /* PGFloatingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */; };
 		0ED4AB170DD18730007C5A77 /* PGExifPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */; };
 		0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */; };
@@ -127,6 +127,7 @@
 		0EE7617B0DDB7BDE00ED8ABB /* PGResourceIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */; };
 		0EE7617E0DDB7C4900ED8ABB /* PGLegacy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */; };
 		0EE761810DDB7F8A00ED8ABB /* NSURLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE761800DDB7F8A00ED8ABB /* NSURLAdditions.m */; };
+		0EE968130E95A2C500CE2891 /* PGLoading.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE968120E95A2C500CE2891 /* PGLoading.m */; };
 		0EE98F8D0DEEB13F0004F628 /* PGWindow.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0EE98F8B0DEEB13F0004F628 /* PGWindow.nib */; };
 		0EE991060DEFFBAA0004F628 /* SequentialHelp in Resources */ = {isa = PBXBuildFile; fileRef = 0EE991040DEFFBAA0004F628 /* SequentialHelp */; };
 		0EEE55950DB0C3E2006E5B9C /* PGExif.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0EEE55930DB0C3E2006E5B9C /* PGExif.nib */; };
@@ -436,8 +437,8 @@
 		0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGArchiveAdapter.m; sourceTree = "<group>"; };
 		0ED4A44B0DCC628F007C5A77 /* PGPDFAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGPDFAdapter.h; sourceTree = "<group>"; };
 		0ED4A44C0DCC628F007C5A77 /* PGPDFAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGPDFAdapter.m; sourceTree = "<group>"; };
-		0ED4A8DB0DD00E18007C5A77 /* PGURLConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGURLConnection.m; sourceTree = "<group>"; };
-		0ED4A8DC0DD00E18007C5A77 /* PGURLConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGURLConnection.h; sourceTree = "<group>"; };
+		0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGURLLoad.m; sourceTree = "<group>"; };
+		0ED4A8DC0DD00E18007C5A77 /* PGURLLoad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGURLLoad.h; sourceTree = "<group>"; };
 		0ED4AAF60DD18538007C5A77 /* PGFloatingPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFloatingPanelController.h; sourceTree = "<group>"; };
 		0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFloatingPanelController.m; sourceTree = "<group>"; };
 		0ED4AB150DD18730007C5A77 /* PGExifPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGExifPanelController.h; sourceTree = "<group>"; };
@@ -482,6 +483,8 @@
 		0EE935720E64561A002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0EE935730E645624002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0EE935740E645630002A8F6E /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/PGEncoding.nib; sourceTree = "<group>"; };
+		0EE968110E95A2C500CE2891 /* PGLoading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLoading.h; sourceTree = "<group>"; };
+		0EE968120E95A2C500CE2891 /* PGLoading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLoading.m; sourceTree = "<group>"; };
 		0EE98F8C0DEEB13F0004F628 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F8E0DEEB14C0004F628 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGWindow.nib; sourceTree = "<group>"; };
 		0EE98F8F0DEEB1510004F628 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGWindow.nib; sourceTree = "<group>"; };
@@ -853,8 +856,10 @@
 				0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */,
 				0ECF36E60C7DC4FC0009EB00 /* PGSubscription.h */,
 				0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */,
-				0ED4A8DC0DD00E18007C5A77 /* PGURLConnection.h */,
-				0ED4A8DB0DD00E18007C5A77 /* PGURLConnection.m */,
+				0EE968110E95A2C500CE2891 /* PGLoading.h */,
+				0EE968120E95A2C500CE2891 /* PGLoading.m */,
+				0ED4A8DC0DD00E18007C5A77 /* PGURLLoad.h */,
+				0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */,
 				0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */,
 				0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */,
 				0EA540FD0DB717C300F60F0E /* PGExifEntry.h */,
@@ -1138,7 +1143,7 @@
 				0EE647720DC8FA3A00A90F86 /* PGContainerAdapter.m in Sources */,
 				0ED4A41A0DCBFDDA007C5A77 /* PGArchiveAdapter.m in Sources */,
 				0ED4A44D0DCC628F007C5A77 /* PGPDFAdapter.m in Sources */,
-				0ED4A8DD0DD00E18007C5A77 /* PGURLConnection.m in Sources */,
+				0ED4A8DD0DD00E18007C5A77 /* PGURLLoad.m in Sources */,
 				0ED4AAF80DD18538007C5A77 /* PGFloatingPanelController.m in Sources */,
 				0ED4AB170DD18730007C5A77 /* PGExifPanelController.m in Sources */,
 				0E2D08790DD2B4F800EC128A /* PGRoundedBackgroundView.m in Sources */,
@@ -1165,6 +1170,7 @@
 				0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */,
 				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
 				0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */,
+				0EE968130E95A2C500CE2891 /* PGLoading.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

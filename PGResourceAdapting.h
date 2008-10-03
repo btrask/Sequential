@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 @class PGContainerAdapter;
 @class PGResourceIdentifier;
+#import "PGLoading.h"
 @class PGBookmark;
 
 // Other
@@ -54,7 +55,7 @@ enum {
 };
 typedef int PGLoadPolicy;
 
-@protocol PGResourceAdapting
+@protocol PGResourceAdapting <PGLoading>
 
 - (PGNode *)parentNode;
 - (PGContainerAdapter *)parentAdapter;
@@ -70,7 +71,6 @@ typedef int PGLoadPolicy;
 - (BOOL)canExtractData;
 
 - (BOOL)isContainer;
-- (float)loadingProgress;
 - (NSArray *)exifEntries;
 - (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
 - (BOOL)isResolutionIndependent;

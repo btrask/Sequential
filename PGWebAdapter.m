@@ -26,7 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Models
 #import "PGNode.h"
-#import "PGURLConnection.h"
+#import "PGURLLoad.h"
 #import "PGResourceIdentifier.h"
 
 // Controllers
@@ -46,54 +46,54 @@ DEALINGS WITH THE SOFTWARE. */
 	return !URL || [info objectForKey:PGHasDataKey] || [info objectForKey:PGURLResponseKey] || [URL isFileURL] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
-#pragma mark PGURLConnectionDelegate Protocol
+#pragma mark PGURLLoadDelegate Protocol
 
-- (void)connectionLoadingDidProgress:(PGURLConnection *)sender
+- (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
-	if(sender == _mainConnection) [[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
+	if(sender == _mainLoad) [[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender
+- (void)loadDidReceiveResponse:(PGURLLoad *)sender
 {
-	if(sender != _mainConnection) return;
+	if(sender != _mainLoad) return;
 	id const resp = [sender response];
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
-		[_mainConnection cancelAndNotify:NO];
-		[_faviconConnection cancelAndNotify:NO];
+		[_mainLoad cancelAndNotify:NO];
+		[_faviconLoad cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGMayHaveDataKey, nil]] count]) {
-		[_mainConnection cancelAndNotify:YES];
-		[_faviconConnection cancelAndNotify:YES];
+		[_mainLoad cancelAndNotify:YES];
+		[_faviconLoad cancelAndNotify:YES];
 	}
 }
-- (void)connectionDidSucceed:(PGURLConnection *)sender
+- (void)loadDidSucceed:(PGURLLoad *)sender
 {
-	if(sender == _mainConnection) {
-		[_faviconConnection cancelAndNotify:NO];
-		NSURLResponse *const resp = [_mainConnection response];
-		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainConnection data], PGDataKey, nil]];
-	} else if(sender == _faviconConnection) {
-		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconConnection data]] autorelease];
+	if(sender == _mainLoad) {
+		[_faviconLoad cancelAndNotify:NO];
+		NSURLResponse *const resp = [_mainLoad response];
+		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainLoad data], PGDataKey, nil]];
+	} else if(sender == _faviconLoad) {
+		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconLoad data]] autorelease];
 		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
 	}
 }
-- (void)connectionDidFail:(PGURLConnection *)sender
+- (void)loadDidFail:(PGURLLoad *)sender
 {
-	if(sender != _mainConnection) return;
-	[_faviconConnection cancelAndNotify:NO];
-	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainConnection request] URL]] forKey:NSLocalizedDescriptionKey]]];
+	if(sender != _mainLoad) return;
+	[_faviconLoad cancelAndNotify:NO];
+	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainLoad request] URL]] forKey:NSLocalizedDescriptionKey]]];
 }
-- (void)connectionDidCancel:(PGURLConnection *)sender
+- (void)loadDidCancel:(PGURLLoad *)sender
 {
-	if(sender != _mainConnection) return;
-	[_faviconConnection cancelAndNotify:NO];
+	if(sender != _mainLoad) return;
+	[_faviconLoad cancelAndNotify:NO];
 	[[self node] loadFinished];
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark PGLoading Protocol
 
-- (float)loadingProgress
+- (float)loadProgress
 {
-	return [_mainConnection progress];
+	return [_mainLoad loadProgress];
 }
 
 #pragma mark PGResourceAdapter
@@ -102,27 +102,22 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSParameterAssert(![self canGetData]);
 	NSURL *const URL = [[self info] objectForKey:PGURLKey];
-	[_faviconConnection cancelAndNotify:NO];
-	[_faviconConnection release];
-	_faviconConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] delegate:self];
-	[_mainConnection cancelAndNotify:NO];
-	[_mainConnection release];
-	_mainConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] delegate:self];
-}
-- (void)didBecomeViewed
-{
-	[_mainConnection prioritize];
-	[_faviconConnection prioritize];
+	[_faviconLoad cancelAndNotify:NO];
+	[_faviconLoad release];
+	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] parentLoad:self delegate:self];
+	[_mainLoad cancelAndNotify:NO];
+	[_mainLoad release];
+	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] parentLoad:self delegate:self];
 }
 
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[_mainConnection cancelAndNotify:NO];
-	[_mainConnection release];
-	[_faviconConnection cancelAndNotify:NO];
-	[_faviconConnection release];
+	[_mainLoad cancelAndNotify:NO];
+	[_mainLoad release];
+	[_faviconLoad cancelAndNotify:NO];
+	[_faviconLoad release];
 	[super dealloc];
 }
 

@@ -23,34 +23,25 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGResourceAdapter.h"
 
-// Models
-#import "PGPrefObject.h"
+@protocol PGLoading <NSObject>
 
-extern NSString *const PGMaxDepthKey;
+- (NSString *)loadDescription;
+- (float)loadProgress;
+- (id<PGLoading>)parentLoad;
+- (NSArray *)subloads;
+- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag;
+- (void)prioritizeSubload:(id<PGLoading>)obj;
+- (void)cancelLoad;
 
-@interface PGContainerAdapter : PGResourceAdapter
+@end
+
+@interface PGLoadManager : NSObject <PGLoading>
 {
 	@private
-	NSArray        *_sortedChildren;
-	NSArray        *_unsortedChildren;
-	PGSortOrder     _unsortedOrder;
+	NSMutableArray *_subloads;
 }
 
-- (NSArray *)sortedChildren;
-- (NSArray *)unsortedChildren;
-- (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
-- (void)removeChild:(PGNode *)child;
-
-- (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent;
-- (unsigned)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel context:(id)context;
-/* The selector 'sel' should have one of the following forms:
-- (PGNode *)selector;
-- (PGNode *)selectorForward:(BOOL)flag;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context ignored:(id)nil1; */
-- (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
++ (id)sharedLoadManager;
 
 @end

@@ -28,7 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGActivityPanelController : PGFloatingPanelController
 {
 	@private
-	IBOutlet NSTableView   *activityTable;
+	IBOutlet NSOutlineView *activityOutline;
 	IBOutlet NSTableColumn *identifierColumn;
 	IBOutlet NSTableColumn *progressColumn;
 	IBOutlet NSButton      *cancelButton;

@@ -434,9 +434,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)showLoadingIndicator
 {
-	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
+	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
-	[_loadingGraphic setProgress:[[self activeNode] loadingProgress]];
+	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
 }
 

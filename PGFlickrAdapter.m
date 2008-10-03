@@ -27,7 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
-#import "PGURLConnection.h"
+#import "PGURLLoad.h"
 #import "PGXMLParser.h"
 
 // Categories
@@ -79,32 +79,32 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 	return PGMatchByIntrinsicAttribute + 700;
 }
 
-#pragma mark PGURLConnectionDelegate Protocol
+#pragma mark PGURLLoadDelegate Protocol
 
-- (void)connectionLoadingDidProgress:(PGURLConnection *)sender
+- (void)connectionLoadingDidProgress:(PGURLLoad *)sender
 {
 	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender
+- (void)connectionDidReceiveResponse:(PGURLLoad *)sender
 {
-	if(sender != _sizeConnection && sender != _infoConnection) return;
+	if(sender != _sizeLoad && sender != _infoLoad) return;
 	NSHTTPURLResponse *const resp = (NSHTTPURLResponse *)[sender response];
 	if(![@"text/xml" isEqualToString:[resp MIMEType]]) {
-		[_sizeConnection cancelAndNotify:NO];
-		[_infoConnection cancelAndNotify:NO];
+		[_sizeLoad cancelAndNotify:NO];
+		[_infoLoad cancelAndNotify:NO];
 		[[self node] loadFinished];
 	} else if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] > 300)) {
-		[_sizeConnection cancelAndNotify:NO];
-		[_infoConnection cancelAndNotify:NO];
+		[_sizeLoad cancelAndNotify:NO];
+		[_infoLoad cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 	}
 }
-- (void)connectionDidSucceed:(PGURLConnection *)sender
+- (void)connectionDidSucceed:(PGURLLoad *)sender
 {
-	if(![_sizeConnection loaded] || ![_infoConnection loaded]) return;
-	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeConnection data]];
+	if(![_sizeLoad loaded] || ![_infoLoad loaded]) return;
+	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data]];
 	NSURL *const URL = [sizeParser URL];
-	NSString *const title = [[PGFlickrInfoParser parserWithData:[_infoConnection data]] title];
+	NSString *const title = [[PGFlickrInfoParser parserWithData:[_infoLoad data]] title];
 	[[self identifier] setCustomDisplayName:title notify:YES];
 	PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 	[ident setCustomDisplayName:title notify:NO];
@@ -114,27 +114,27 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 	else if([sizeParser error]) return [[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[sizeParser error] forKey:NSLocalizedDescriptionKey]]];
 	[[self node] loadFinished];
 }
-- (void)connectionDidFail:(PGURLConnection *)sender
+- (void)connectionDidFail:(PGURLLoad *)sender
 {
-	if(sender != _sizeConnection && sender != _infoConnection) return;
-	[_sizeConnection cancelAndNotify:NO];
-	[_infoConnection cancelAndNotify:NO];
+	if(sender != _sizeLoad && sender != _infoLoad) return;
+	[_sizeLoad cancelAndNotify:NO];
+	[_infoLoad cancelAndNotify:NO];
 	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[sender request] URL]] forKey:NSLocalizedDescriptionKey]]];
 }
-- (void)connectionDidCancel:(PGURLConnection *)sender
+- (void)connectionDidCancel:(PGURLLoad *)sender
 {
-	if(sender == _sizeConnection || sender == _infoConnection) {
-		[_sizeConnection cancelAndNotify:NO];
-		[_infoConnection cancelAndNotify:NO];
+	if(sender == _sizeLoad || sender == _infoLoad) {
+		[_sizeLoad cancelAndNotify:NO];
+		[_infoLoad cancelAndNotify:NO];
 		[[self node] loadFinished];
 	}
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark PGLoading Protocol
 
-- (float)loadingProgress
+- (float)loadProgress
 {
-	return ([_sizeConnection progress] + [_infoConnection progress]) / 2.0;
+	return ([_sizeLoad loadProgress] + [_infoLoad loadProgress]) / 2.0;
 }
 
 #pragma mark PGResourceAdapter
@@ -143,22 +143,22 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 {
 	NSString *const name = [[self info] objectForKey:PGFlickrImageNameKey];
 	if(!name) return [[self node] loadFinished];
-	[_sizeConnection cancelAndNotify:NO];
-	[_sizeConnection release];
-	_sizeConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getSizes&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] delegate:self];
-	[_infoConnection cancelAndNotify:NO];
-	[_infoConnection release];
-	_infoConnection = [[PGURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getInfo&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] delegate:self];
+	[_sizeLoad cancelAndNotify:NO];
+	[_sizeLoad release];
+	_sizeLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getSizes&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] parentLoad:self delegate:self];
+	[_infoLoad cancelAndNotify:NO];
+	[_infoLoad release];
+	_infoLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getInfo&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] parentLoad:self delegate:self];
 }
 
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[_sizeConnection cancelAndNotify:NO];
-	[_sizeConnection release];
-	[_infoConnection cancelAndNotify:NO];
-	[_infoConnection release];
+	[_sizeLoad cancelAndNotify:NO];
+	[_sizeLoad release];
+	[_infoLoad cancelAndNotify:NO];
+	[_infoLoad release];
 	[super dealloc];
 }
 

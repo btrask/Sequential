@@ -22,46 +22,68 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
+#import "PGLoading.h"
 
-@interface PGURLConnection : NSObject // Wraps NSURLConnection so only a few connections are active at a time.
+@implementation PGLoadManager
+
+#pragma mark Class Methods
+
++ (id)sharedLoadManager
 {
-	@private
-	id              _delegate;
-	BOOL            _loaded;
-	NSURLRequest   *_request;
-	NSURLResponse  *_response;
-	NSMutableData  *_data;
+	static PGLoadManager *m = nil;
+	if(!m) m = [[self alloc] init];
+	return m;
 }
 
-+ (NSString *)userAgent;
-+ (void)setUserAgent:(NSString *)aString;
+#pragma mark Instance Methods
 
-+ (NSArray *)connections;
-+ (NSArray *)activeConnections;
-+ (NSArray *)pendingConnections;
+- (NSString *)loadDescription
+{
+	return nil;
+}
+- (float)loadProgress
+{
+	return 0;
+}
+- (id<PGLoading>)parentLoad
+{
+	return nil;
+}
+- (NSArray *)subloads
+{
+	return [[_subloads retain] autorelease];
+}
+- (void)setSubload:(id<PGLoading>)obj
+        isLoading:(BOOL)flag
+{
+	if(flag) {
+		if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
+	} else {
+		if(![[obj subloads] count]) [_subloads removeObjectIdenticalTo:obj];
+	}
+}
+- (void)prioritizeSubload:(id<PGLoading>)obj
+{
+	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
+	if(NSNotFound == i) return;
+	[_subloads removeObjectAtIndex:i];
+	[_subloads insertObject:obj atIndex:0];
+}
+- (void)cancelLoad {}
 
-- (id)initWithRequest:(NSURLRequest *)aRequest delegate:(id)anObject;
+#pragma mark NSObject
 
-- (id)delegate;
-- (BOOL)loaded;
-- (NSURLRequest *)request;
-- (NSURLResponse *)response;
-- (NSMutableData *)data;
-
-- (float)progress;
-- (void)prioritize;
-- (void)cancelAndNotify:(BOOL)notify;
-- (void)cancel;
-
-@end
-
-@interface NSObject (PGURLConnectionDelegate)
-
-- (void)connectionLoadingDidProgress:(PGURLConnection *)sender;
-- (void)connectionDidReceiveResponse:(PGURLConnection *)sender;
-- (void)connectionDidSucceed:(PGURLConnection *)sender;
-- (void)connectionDidFail:(PGURLConnection *)sender;
-- (void)connectionDidCancel:(PGURLConnection *)sender;
+- (id)init
+{
+	if((self = [super init])) {
+		_subloads = [[NSMutableArray alloc] init];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[_subloads release];
+	[super dealloc];
+}
 
 @end

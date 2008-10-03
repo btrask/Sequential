@@ -25,13 +25,10 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGActivityPanelController.h"
 
 // Models
-#import "PGURLConnection.h"
+#import "PGLoading.h"
 
 // Views
 #import "PGProgressIndicatorCell.h"
-
-// Controllers
-#import "PGDocumentController.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -48,31 +45,46 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (IBAction)cancelLoad:(id)sender
 {
-	NSMutableArray *const canceledConnections = [NSMutableArray array];
-	NSIndexSet *const indexes = [activityTable selectedRowIndexes];
+	NSIndexSet *const indexes = [activityOutline selectedRowIndexes];
 	unsigned i = [indexes firstIndex];
-	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [canceledConnections addObject:[[PGURLConnection connections] objectAtIndex:i]];
-	[canceledConnections makeObjectsPerformSelector:@selector(cancel)];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [[activityOutline itemAtRow:i] cancelLoad];
 }
 
 #pragma mark Private Protocol
 
 - (void)_updateOnTimer:(NSTimer *)timer
 {
-	[activityTable reloadData];
+	[activityOutline reloadData];
+	if(PGIsLeopardOrLater()) [activityOutline expandItem:nil expandChildren:YES];
+	else {
+		id load;
+		NSEnumerator *const loadEnum = [[[PGLoadManager sharedLoadManager] subloads] objectEnumerator];
+		while((load = [loadEnum nextObject])) [activityOutline expandItem:load expandChildren:YES];
+	}
 }
 
-#pragma mark NSTableDataSource Protocol
+#pragma mark NSOutlineView Protocol
 
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (BOOL)outlineView:(NSOutlineView *)outlineView
+        isItemExpandable:(id)item
 {
-	return [[PGURLConnection connections] count];
+	return item ? [[item subloads] count] > 0 : YES;
 }
-- (id)tableView:(NSTableView *)tableView
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
+             numberOfChildrenOfItem:(id)item
+{
+	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] count];
+}
+- (id)outlineView:(NSOutlineView *)outlineView
+      child:(NSInteger)index
+      ofItem:(id)item
+{
+	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] objectAtIndex:index];
+}
+- (id)outlineView:(NSOutlineView *)outlineView
       objectValueForTableColumn:(NSTableColumn *)tableColumn
-      row:(int)row
+      byItem:(id)item
 {
-	PGURLConnection *const connection = [[PGURLConnection connections] objectAtIndex:row];
 	if(tableColumn == identifierColumn) {
 		static NSDictionary *attrs = nil;
 		if(!attrs) {
@@ -81,28 +93,28 @@ DEALINGS WITH THE SOFTWARE. */
 			[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 			attrs = [[NSDictionary alloc] initWithObjectsAndKeys:style, NSParagraphStyleAttributeName, nil];
 		}
-		return [[[NSAttributedString alloc] initWithString:[[[connection request] URL] absoluteString] attributes:attrs] autorelease];
+		return [[[NSAttributedString alloc] initWithString:[item loadDescription] attributes:attrs] autorelease];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithFloat:[connection progress]];
+		return [NSNumber numberWithFloat:[item loadProgress]];
 	}
 	return nil;
 }
 
-#pragma mark NSTableViewDelegate Protocol
+#pragma mark NSOutlineViewDelegate Protocol
 
-- (void)tableView:(NSTableView *)tableView
+- (void)outlineView:(NSOutlineView *)outlineView
         willDisplayCell:(id)cell
         forTableColumn:(NSTableColumn *)tableColumn
-        row:(int)row
+        item:(id)item
 {
-	if(tableColumn == progressColumn) [cell setHidden:((unsigned)row >= [[PGURLConnection activeConnections] count])];
+	if(tableColumn == progressColumn) [cell setHidden:(![item loadProgress] || [[item subloads] count])];
 }
 
-#pragma mark NSTableViewNotifications Protocol
+#pragma mark NSOutlineViewNotifications Protocol
 
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotif
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
-	[cancelButton setEnabled:[[activityTable selectedRowIndexes] count] > 0];
+	[cancelButton setEnabled:[[activityOutline selectedRowIndexes] count] > 0];
 }
 
 #pragma mark PGFloatingPanelController
@@ -130,7 +142,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[super windowDidLoad];
 	[progressColumn setDataCell:[[[PGProgressIndicatorCell alloc] init] autorelease]];
-	[self tableViewSelectionDidChange:nil];
+	[self outlineViewSelectionDidChange:nil];
 }
 
 #pragma mark NSObject
