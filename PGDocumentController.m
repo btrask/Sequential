@@ -64,6 +64,7 @@ NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
 NSString *const PGBackgroundColorKey           = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey         = @"PGBackgroundPattern";
 NSString *const PGMouseClickActionKey          = @"PGMouseClickAction";
+NSString *const PGEscapeKeyMappingKey          = @"PGEscapeKeyMapping";
 
 static NSString *const PGRecentItemsKey            = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
@@ -126,6 +127,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithInt:PGNextPreviousAction], PGMouseClickActionKey,
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
+		[NSNumber numberWithInt:PGFullscreenMapping], PGEscapeKeyMappingKey,
 		nil]];
 }
 
@@ -265,6 +267,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
+- (BOOL)performEscapeKeyAction
+{
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGEscapeKeyMappingKey] intValue]) {
+		case PGFullscreenMapping: return [self performToggleFullscreen];
+		case PGQuitMapping: [NSApp terminate:self]; return YES;
+	}
+	return NO;
+}
 - (BOOL)performToggleFullscreen
 {
 	return [toggleFullscreen AE_performAction];
@@ -742,9 +752,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	if(PGKeyQ == [anEvent keyCode] && !([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) {
-		[NSApp terminate:self];
-		return YES;
+	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
+		case PGKeyEscape: [self performEscapeKeyAction];
+		case PGKeyQ: [NSApp terminate:self]; return YES;
 	}
 	return NO;
 }

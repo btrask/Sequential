@@ -916,7 +916,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
 		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
 
-		case PGKeyEscape: return [d performToggleFullscreen];
+		case PGKeyEscape: return [d performEscapeKeyAction];
 	} else switch(keyCode) {
 		case PGKeyI: return NSCommandKeyMask & modifiers && [d performToggleInfo];
 	}

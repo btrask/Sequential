@@ -86,6 +86,16 @@
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
+				<key>loadDidCancel</key>
+				<string>PGURLLoad</string>
+				<key>loadDidFail</key>
+				<string>PGURLLoad</string>
+				<key>loadDidReceiveResponse</key>
+				<string>PGURLLoad</string>
+				<key>loadDidSucceed</key>
+				<string>PGURLLoad</string>
+				<key>loadLoadingDidProgress</key>
+				<string>PGURLLoad</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
@@ -112,6 +122,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

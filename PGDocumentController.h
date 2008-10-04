@@ -45,11 +45,16 @@ extern NSString *const PGOnlyAutozoomsSingleImagesKey;
 extern NSString *const PGBackgroundColorKey;
 extern NSString *const PGBackgroundPatternKey;
 extern NSString *const PGMouseClickActionKey;
+extern NSString *const PGEscapeKeyMappingKey;
 
 enum {
 	PGNextPreviousAction = 0,
-	PGLeftRightAction = 1,
-	PGRightLeftAction = 2
+	PGLeftRightAction    = 1,
+	PGRightLeftAction    = 2
+};
+enum {
+	PGFullscreenMapping = 0,
+	PGQuitMapping       = 1
 };
 
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
@@ -144,6 +149,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (IBAction)showKeyboardShortcuts:(id)sender;
 
+- (BOOL)performEscapeKeyAction;
 - (BOOL)performToggleFullscreen;
 - (BOOL)performToggleInfo;
 
