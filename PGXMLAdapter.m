@@ -97,7 +97,7 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	NSArray *const nodes = [p nodesWithParentAdapter:self];
 	if(![nodes count]) return [[self node] setError:[p error]];
-	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];
+	[self setUnsortedChildren:nodes presortedOrder:PGSortInnateOrder];
 	[[self node] loadFinished];
 }
 - (void)fallbackLoad

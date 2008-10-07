@@ -75,7 +75,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGPDFPageAdapter class], PGAdapterClassKey, nil]];
 		[nodes addObject:node];
 	}
-	[self setUnsortedChildren:nodes presortedOrder:PGUnsorted];
+	[self setUnsortedChildren:nodes presortedOrder:PGSortInnateOrder];
 	[[self node] loadFinished];
 }
 

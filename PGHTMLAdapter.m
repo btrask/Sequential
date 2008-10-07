@@ -78,13 +78,6 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	return 1.0;
 }
 
-#pragma mark PGContainerAdapter
-
-- (NSArray *)sortedChildren
-{
-	return [self unsortedChildren];
-}
-
 #pragma mark PGResourceAdapter
 
 - (PGLoadPolicy)descendentLoadPolicy
@@ -122,7 +115,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 		[node startLoadWithInfo:nil];
 		[pages addObject:node];
 	}
-	[self setUnsortedChildren:pages presortedOrder:PGUnsorted];
+	[self setUnsortedChildren:pages presortedOrder:PGSortInnateOrder];
 	[[self node] loadFinished];
 }
 

@@ -45,7 +45,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	if(!_sortedChildren) {
 		PGSortOrder const order = [[self document] sortOrder];
-		_sortedChildren = [(order == _unsortedOrder ? _unsortedChildren : [_unsortedChildren sortedArrayUsingSelector:@selector(compare:)]) retain];
+		_sortedChildren = [(order == _unsortedOrder || PGSortInnateOrder == _unsortedOrder ? _unsortedChildren : [_unsortedChildren sortedArrayUsingSelector:@selector(compare:)]) retain];
 	}
 	return [[_sortedChildren retain] autorelease];
 }

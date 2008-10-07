@@ -63,6 +63,7 @@ enum {
 	PGSortByDateCreated  = 3,
 	PGSortBySize         = 4,
 	PGSortShuffle        = 100,
+	PGSortInnateOrder    = 200,
 	PGSortOptionsMask    = 0x7FFF0000,
 	PGSortDescendingMask = 1 << 16,
 	PGSortRepeatMask     = 1 << 17,
