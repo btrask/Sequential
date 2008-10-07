@@ -65,11 +65,27 @@ BOOL PGIsTigerOrLater(void)
 	[[NSNotificationCenter defaultCenter] removeObserver:observer name:aName object:self];
 }
 
+#pragma mark -
+
+- (NSArray *)AE_asArray
+{
+	return [NSArray arrayWithObject:self];
+}
+
 #pragma mark NSMenuValidation Protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	return [self respondsToSelector:[anItem action]];
+}
+
+@end
+
+@implementation NSArray (AEArrayCreation)
+
+- (NSArray *)AE_asArray
+{
+	return self;
 }
 
 @end

@@ -43,7 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
                    withInfo:(NSMutableDictionary *)info
 {
 	NSURL *const URL = [info objectForKey:PGURLKey];
-	return !URL || [info objectForKey:PGHasDataKey] || [info objectForKey:PGURLResponseKey] || [URL isFileURL] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
+	return !URL || [[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [URL isFileURL] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
 #pragma mark PGURLLoadDelegate Protocol
@@ -60,7 +60,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_mainLoad cancelAndNotify:NO];
 		[_faviconLoad cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
-	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfo:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithBool:YES], PGMayHaveDataKey, nil]] count]) {
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfoDicts:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithInt:PGWillSoonExist], PGDataExistenceKey, nil]]] count]) {
 		[_mainLoad cancelAndNotify:YES];
 		[_faviconLoad cancelAndNotify:YES];
 	}
@@ -101,6 +101,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)load
 {
 	NSParameterAssert(![self canGetData]);
+	_triedLoad = YES;
 	NSURL *const URL = [[self info] objectForKey:PGURLKey];
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
@@ -108,6 +109,11 @@ DEALINGS WITH THE SOFTWARE. */
 	[_mainLoad cancelAndNotify:NO];
 	[_mainLoad release];
 	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] parentLoad:self delegate:self];
+}
+- (void)fallbackLoad
+{
+	if(_triedLoad) [[self node] setError:nil];
+	else [self load];
 }
 
 #pragma mark NSObject

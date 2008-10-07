@@ -76,6 +76,7 @@ DEALINGS WITH THE SOFTWARE. */
         orientation:(PGOrientation)orientation
         size:(NSSize)size
 {
+	[self setNeedsDisplay:YES]; // Always redisplay in case rep is a PDF.
 	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
 	_orientation = orientation;
 	if(rep != _rep) {
@@ -94,7 +95,6 @@ DEALINGS WITH THE SOFTWARE. */
 		[self _runAnimationTimer];
 	} else [self setSize:size allowAnimation:NO];
 	[self _cache];
-	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -

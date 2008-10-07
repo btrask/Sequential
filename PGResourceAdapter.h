@@ -55,9 +55,10 @@ typedef unsigned PGMatchPriority;
 	NSMutableArray      *_subloads;
 }
 
-+ (NSDictionary *)resourceAdapterTypesDictionary;
++ (NSDictionary *)typesDictionary; // For all resource adapters.
++ (NSDictionary *)typeDictionary; // For this class.
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
-+ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfo:(NSDictionary *)info;
++ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfoDicts:(NSArray *)dicts;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 

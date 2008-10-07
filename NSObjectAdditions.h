@@ -38,6 +38,8 @@ extern BOOL PGIsTigerOrLater(void);
 - (void)AE_removeObserver;
 - (void)AE_removeObserver:(id)observer name:(NSString *)aName;
 
+- (NSArray *)AE_asArray;
+
 @end
 
 #if defined(NS_BLOCK_ASSERTIONS)

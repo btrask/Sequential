@@ -33,6 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	PGURLLoad *_mainLoad;
 	PGURLLoad *_faviconLoad;
+	BOOL       _triedLoad;
 }
 
 @end

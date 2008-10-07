@@ -24,18 +24,49 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+// Models
+@class PGNode;
+@class PGContainerAdapter;
+
 @interface PGXMLParser : NSObject
 {
 	@private
-	NSString *_tagPath;
+	NSXMLParser    *_parser;
+	PGXMLParser    *_parent;
+	NSMutableArray *_subparsers;
+	NSString       *_initialTagPath;
+	NSString       *_tagPath;
+	NSDictionary   *_attributes;
 }
 
 + (id)parserWithData:(NSData *)data;
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
 
 - (void)parseWithData:(NSData *)data;
+
+- (PGXMLParser *)parentParser;
+- (NSArray *)subparsers;
+- (void)useSubparser:(PGXMLParser *)parser;
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
 - (NSMutableString *)contentStringForTagPath:(NSString *)p;
 - (void)endedTagPath:(NSString *)p;
+
+@end
+
+@interface PGXMLParser (PGXMLParserNodeCreation)
+
+- (BOOL)createsMultipleNodes;
+
+- (NSString *)title;
+- (NSURL *)URL;
+- (NSError *)error;
+- (id)info;
+
+- (NSString *)URLString;
+- (NSString *)errorString;
+
+- (NSArray *)nodesWithParentAdapter:(PGContainerAdapter *)parent;
+- (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent;
 
 @end

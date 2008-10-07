@@ -593,6 +593,20 @@
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>rss</string>
+				<string>RSS</string>
+			</array>
+			<key>CFBundleMIMETypes</key>
+			<array>
+				<string>text/rss+xml</string>
+				<string>application/rss+xml</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
@@ -839,15 +853,23 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>xml</string>
+				<string>rss</string>
 			</array>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
 				<string>text/xml</string>
-				<string>text/xml+oembed</string>
 				<string>application/xml</string>
+				<string>text/xml+oembed</string>
 				<string>application/xml+oembed</string>
+				<string>text/rss+xml</string>
+				<string>application/rss+xml</string>
 			</array>
 		</dict>
 	</dict>
+	<key>PGXMLParsers</key>
+	<array>
+		<string>PGOEmbedParser</string>
+		<string>PGMediaRSSParser</string>
+	</array>
 </dict>
 </plist>

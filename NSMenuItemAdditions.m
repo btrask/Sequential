@@ -50,8 +50,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (BOOL)AE_performAction
 {
-	if(![self isEnabled]) return NO;
 	NSMenu *const menu = [self menu];
+	[menu update];
+	if(![self isEnabled]) return NO;
 	int const i = [menu indexOfItem:self];
 	if([menu respondsToSelector:@selector(_menuImpl)]) {
 		id const menuImpl = [menu _menuImpl];

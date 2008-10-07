@@ -59,7 +59,8 @@ enum {
 @interface PGNode (Private)
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
-- (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info;
+- (NSArray *)_standardizedInfo:(id)info;
+- (NSDictionary *)_standardizedInfoDictionary:(NSDictionary *)info;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 
@@ -149,7 +150,7 @@ enum {
 		default: return NO;
 	}
 }
-- (void)startLoadWithInfo:(NSDictionary *)info
+- (void)startLoadWithInfo:(id)info
 {
 	NSParameterAssert(!(PGNodeLoading & _status));
 	_status |= PGNodeLoading;
@@ -158,15 +159,15 @@ enum {
 	[self noteIsViewableDidChange];
 	[[self parentLoad] setSubload:self isLoading:YES];
 	[_adapters autorelease];
-	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]] mutableCopy];
+	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]] mutableCopy];
 	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
 	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter loadIfNecessary];
 }
-- (void)continueLoadWithInfo:(NSDictionary *)info
+- (void)continueLoadWithInfo:(id)info
 {
 	NSParameterAssert(PGNodeLoading & _status);
-	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfo:[self _standardizedInfoWithInfo:info]];
+	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]];
 	if(![newAdapters count]) return [_adapter fallbackLoad];
 	[_adapters addObjectsFromArray:newAdapters];
 	NSParameterAssert([_adapters count]);
@@ -318,7 +319,16 @@ enum {
 	[_adapter setNode:self];
 	[self _updateMenuItem];
 }
-- (NSDictionary *)_standardizedInfoWithInfo:(NSDictionary *)info
+- (NSArray *)_standardizedInfo:(id)info
+{
+	NSMutableArray *const results = [NSMutableArray array];
+	NSDictionary *dict;
+	NSEnumerator *const dictEnum = [[info AE_asArray] objectEnumerator];
+	while((dict = [dictEnum nextObject])) [results addObject:[self _standardizedInfoDictionary:dict]];
+	if(![results count]) [results addObject:[self _standardizedInfoDictionary:nil]];
+	return results;
+}
+- (NSDictionary *)_standardizedInfoDictionary:(NSDictionary *)info
 {
 	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
 	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
@@ -335,10 +345,7 @@ enum {
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
-	if([self canGetDataWithInfo:mutableInfo]) {
-		[mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGHasDataKey];
-		[mutableInfo setObject:[NSNumber numberWithBool:YES] forKey:PGMayHaveDataKey];
-	}
+	[mutableInfo setObject:[NSNumber numberWithInt:([self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist)] forKey:PGDataExistenceKey];
 	return mutableInfo;
 }
 - (void)_updateMenuItem

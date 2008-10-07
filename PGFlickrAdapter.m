@@ -40,12 +40,9 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 {
 	@private
 	unsigned  _size;
-	NSString *_URL;
-	NSString *_error;
+	NSString *_URLString;
+	NSString *_errorString;
 }
-
-- (NSURL *)URL;
-- (NSString *)error;
 
 @end
 
@@ -54,8 +51,6 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 	@private
 	NSMutableString *_title;
 }
-
-- (NSString *)title;
 
 @end
 
@@ -68,7 +63,7 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 {
 	NSURL *const URL = [info objectForKey:PGURLKey];
 	if(!URL || [URL isFileURL]) return PGNotAMatch;
-	if([info objectForKey:PGHasDataKey] || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
+	if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
 	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@"com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
 	NSArray *const components = [[URL path] pathComponents];
 	if([components count] < 4) return PGNotAMatch; // Flickr image paths should be /photos/USER_NAME/IMAGE_NAME.
@@ -102,17 +97,11 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 - (void)connectionDidSucceed:(PGURLLoad *)sender
 {
 	if(![_sizeLoad loaded] || ![_infoLoad loaded]) return;
+	[[self identifier] setCustomDisplayName:[[PGFlickrInfoParser parserWithData:[_infoLoad data]] title] notify:YES];
 	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data]];
-	NSURL *const URL = [sizeParser URL];
-	NSString *const title = [[PGFlickrInfoParser parserWithData:[_infoLoad data]] title];
-	[[self identifier] setCustomDisplayName:title notify:YES];
-	PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
-	[ident setCustomDisplayName:title notify:NO];
-	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
-	[node startLoadWithInfo:nil];
-	if(node) [self setUnsortedChildren:[NSArray arrayWithObject:node] presortedOrder:PGUnsorted];
-	else if([sizeParser error]) return [[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[sizeParser error] forKey:NSLocalizedDescriptionKey]]];
-	[[self node] loadFinished];
+	NSError *const error = [sizeParser error];
+	if(error) return [[self node] setError:error];
+	[[self node] continueLoadWithInfo:[sizeParser info]];
 }
 - (void)connectionDidFail:(PGURLLoad *)sender
 {
@@ -166,20 +155,21 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 @implementation PGFlickrSizeParser
 
-#pragma mark Instance Methods
+#pragma mark PGXMLParserNodeCreation Protocol
 
-- (NSURL *)URL
+- (NSString *)URLString
 {
-	return _URL ? [NSURL URLWithString:_URL] : nil;
+	return [[_URLString retain] autorelease];
 }
-- (NSString *)error
+- (NSString *)errorString
 {
-	return [[_error retain] autorelease];
+	return [[_errorString retain] autorelease];
 }
 
 #pragma mark NSXMLParserDelegateEventAdditions Protocol
 
-- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
 {
 	if([@"/rsp/sizes/size" isEqualToString:p]) {
 		NSString *const label = [attrs objectForKey:@"label"];
@@ -188,12 +178,12 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 		unsigned const size = label ? [sizes indexOfObject:[label lowercaseString]] + 1 : NSNotFound;
 		if(NSNotFound != size && size > _size) {
 			_size = size;
-			[_URL release];
-			_URL = [[attrs objectForKey:@"source"] copy];
+			[_URLString release];
+			_URLString = [[attrs objectForKey:@"source"] copy];
 		}
 	} else if([@"/rsp/err" isEqualToString:p]) {
-		[_error release];
-		_error = [[attrs objectForKey:@"msg"] copy];
+		[_errorString release];
+		_errorString = [[attrs objectForKey:@"msg"] copy];
 	}
 }
 
@@ -201,8 +191,8 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 - (void)dealloc
 {
-	[_URL release];
-	[_error release];
+	[_URLString release];
+	[_errorString release];
 	[super dealloc];
 }
 
@@ -210,7 +200,7 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 @implementation PGFlickrInfoParser
 
-#pragma mark Instance Methods
+#pragma mark PGXMLParserNodeCreation Protocol
 
 - (NSString *)title
 {

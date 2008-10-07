@@ -64,7 +64,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	if(frame != [_webView mainFrame]) return;
 	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
-	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithBool:YES], PGHasDataKey, nil]];
+	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
 	[_webView stopLoading:self];
 	[_webView setFrameLoadDelegate:nil];
 	[_webView autorelease];

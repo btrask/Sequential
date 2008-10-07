@@ -37,8 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGURLKey;
 extern NSString *const PGDataKey;
-extern NSString *const PGHasDataKey; // Even if PGDataKey isn't set.
-extern NSString *const PGMayHaveDataKey; // It can't be loaded because it would take too long but it may be there.
+extern NSString *const PGDataExistenceKey;
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;
@@ -47,6 +46,12 @@ extern NSString *const PGOSTypeKey; // Uses the pseudo-OS-type that doesn't incl
 extern NSString *const PGExtensionKey;
 extern NSString *const PGPasswordKey;
 extern NSString *const PGStringEncodingKey;
+
+enum {
+	PGDoesNotExist  = -1,
+	PGWillSoonExist = 0,
+	PGExists        = 1
+};
 
 enum {
 	PGLoadToMaxDepth = 0,

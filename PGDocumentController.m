@@ -753,7 +753,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
 	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
-		case PGKeyEscape: [self performEscapeKeyAction];
+		case PGKeyEscape: [self performEscapeKeyAction]; break;
 		case PGKeyQ: [NSApp terminate:self]; return YES;
 	}
 	return NO;
