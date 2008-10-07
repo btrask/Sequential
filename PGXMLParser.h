@@ -33,14 +33,18 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	NSXMLParser    *_parser;
 	PGXMLParser    *_parent;
+	NSURL          *_baseURL;
 	NSMutableArray *_subparsers;
 	NSString       *_initialTagPath;
 	NSString       *_tagPath;
 	NSDictionary   *_attributes;
 }
 
-+ (id)parserWithData:(NSData *)data;
++ (id)parserWithData:(NSData *)data baseURL:(NSURL *)URL;
 + (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
+
+- (NSURL *)baseURL;
+- (void)setBaseURL:(NSURL *)URL;
 
 - (void)parseWithData:(NSData *)data;
 

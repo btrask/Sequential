@@ -97,8 +97,9 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 - (void)connectionDidSucceed:(PGURLLoad *)sender
 {
 	if(![_sizeLoad loaded] || ![_infoLoad loaded]) return;
-	[[self identifier] setCustomDisplayName:[[PGFlickrInfoParser parserWithData:[_infoLoad data]] title] notify:YES];
-	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data]];
+	NSURL *const URL = [[self info] objectForKey:PGURLKey];
+	[[self identifier] setCustomDisplayName:[[PGFlickrInfoParser parserWithData:[_infoLoad data] baseURL:URL] title] notify:YES];
+	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data] baseURL:URL];
 	NSError *const error = [sizeParser error];
 	if(error) return [[self node] setError:error];
 	[[self node] continueLoadWithInfo:[sizeParser info]];

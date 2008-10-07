@@ -68,8 +68,8 @@ DEALINGS WITH THE SOFTWARE. */
 		unsigned i = 0;
 		for(; i < [elements length]; i++) {
 			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
-			if(![@"alternate" isEqualToString:[link rel]]) continue;
-			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[link type]]) continue;
+			if(![@"alternate" isEqualToString:[[link rel] lowercaseString]]) continue;
+			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
 			NSURL *const linkURL = [link absoluteLinkURL];
 			if(!linkURL) continue;
 			[info setObject:linkURL forKey:PGURLKey];
@@ -87,11 +87,11 @@ DEALINGS WITH THE SOFTWARE. */
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
 	_triedLoading = YES;
-	PGXMLParser *const p = [PGXMLParser parserWithData:data];
+	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[self info] objectForKey:PGURLKey]];
 	NSString *const title = [p title];
 	if(title) [[self identifier] setCustomDisplayName:title notify:YES];
-	id const info = [p info];
 	if(![p createsMultipleNodes]) {
+		id const info = [p info];
 		if(info) return [[self node] continueLoadWithInfo:info];
 		return [[self node] loadFinished];
 	}
@@ -198,18 +198,15 @@ DEALINGS WITH THE SOFTWARE. */
 	return [p hasPrefix:@"/rss"] && [[attrs objectForKey:@"xmlns:media"] hasPrefix:@"http://search.yahoo.com/mrss"];
 }
 
-#pragma mark Instance Methods
-
-- (NSString *)title
-{
-	return [[_title copy] autorelease];
-}
-
 #pragma mark PGXMLParserNodeCreation Protocol
 
 - (BOOL)createsMultipleNodes
 {
 	return YES;
+}
+- (NSString *)title
+{
+	return [[_title copy] autorelease];
 }
 
 #pragma mark PGXMLParser
@@ -243,18 +240,20 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation PGMediaRSSItemParser
 
-#pragma mark Instance Methods
-
-- (NSString *)title
-{
-	return [[_title copy] autorelease];
-}
-
 #pragma mark PGXMLParserNodeCreation Protocol
 
 - (BOOL)createsMultipleNodes
 {
 	return NO;
+}
+- (NSString *)title
+{
+	return [[_title copy] autorelease];
+}
+- (NSURL *)URL
+{
+	NSArray *const subparsers = [self subparsers];
+	return [subparsers count] ? [[subparsers objectAtIndex:0] URL] : nil;
 }
 
 #pragma mark PGXMLParser
@@ -291,16 +290,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGXMLParserNodeCreation Protocol
 
-- (id)info
-{
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSURL URLWithString:_URLString], _MIMEType, PGMIMETypeKey, [NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, nil];
-}
-
-#pragma mark PGXMLParserNodeCreation Protocol
-
 - (BOOL)createsMultipleNodes
 {
 	return NO;
+}
+- (NSString *)URLString
+{
+	return [[_URLString retain] autorelease];
+}
+- (id)info
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, [self URL], PGURLKey, _MIMEType, PGMIMETypeKey, nil];
 }
 
 #pragma mark PGXMLParser
@@ -309,9 +309,9 @@ DEALINGS WITH THE SOFTWARE. */
         attributes:(NSDictionary *)attrs
 {
 	[_URLString autorelease];
-	_URLString = [attrs objectForKey:@"url"];
-	[_MIMEType release];
-	_MIMEType = [attrs objectForKey:@"type"];
+	_URLString = [[attrs objectForKey:@"url"] copy];
+	[_MIMEType autorelease];
+	_MIMEType = [[attrs objectForKey:@"type"] copy];
 }
 
 #pragma mark NSObject

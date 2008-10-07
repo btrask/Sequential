@@ -28,7 +28,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
-@class PGMediaRSSParser, PGOEmbedParser; // FIXME: Hack.
+// Categories
+#import "NSObjectAdditions.h"
 
 static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
@@ -37,8 +38,10 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 #pragma mark Class Methods
 
 + (id)parserWithData:(NSData *)data
+      baseURL:(NSURL *)URL
 {
 	PGXMLParser *const p = [[[self alloc] init] autorelease];
+	[p setBaseURL:URL];
 	[p parseWithData:data];
 	return p;
 }
@@ -49,6 +52,20 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 
 #pragma mark Instance Methods
+
+- (NSURL *)baseURL
+{
+	if(!_baseURL) return [_parent baseURL];
+	return [[_baseURL retain] autorelease];
+}
+- (void)setBaseURL:(NSURL *)URL
+{
+	if(URL == _baseURL) return;
+	[_baseURL release];
+	_baseURL = [URL copy];
+}
+
+#pragma mark -
 
 - (void)parseWithData:(NSData *)data
 {
@@ -126,7 +143,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 - (NSURL *)URL
 {
 	NSString *const URLString = [self URLString];
-	return URLString ? [NSURL URLWithString:URLString] : nil;
+	return URLString ? [NSURL URLWithString:URLString relativeToURL:[self baseURL]] : nil;
 }
 - (NSError *)error
 {
@@ -135,15 +152,15 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (id)info
 {
-	if([self createsMultipleNodes]) return nil;
+	if([self createsMultipleNodes]) {
+		//NSLog(@"%@ creates multiple nodes", self);
+		return nil;
+	}
 	NSMutableArray *const dicts = [NSMutableArray array];
 	PGXMLParser *parser;
 	NSEnumerator *const parserEnum = [[self subparsers] objectEnumerator];
-	while((parser = [parserEnum nextObject])) {
-		id const info = [parser info];
-		if([info isKindOfClass:[NSArray class]]) [dicts addObjectsFromArray:info];
-		else [dicts addObject:info];
-	}
+	while((parser = [parserEnum nextObject])) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
+	//NSLog(@"%@, %@", self, dicts);
 	return dicts;
 }
 
@@ -162,6 +179,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
 - (NSArray *)nodesWithParentAdapter:(PGContainerAdapter *)parent
 {
+	//NSLog(@"nodes of %@", self);
 	if(![self createsMultipleNodes]) {
 		PGNode *const node = [self nodeWithParentAdapter:parent];
 		return node ? [NSArray arrayWithObject:node] : nil;
@@ -174,6 +192,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent
 {
+	NSLog(@"%@ node with parent: %@, %@", self, [self URL], [self title]);
 	PGResourceIdentifier *const ident = [[self URL] AE_resourceIdentifier];
 	if(!ident) return nil;
 	[ident setCustomDisplayName:[self title] notify:NO];
@@ -215,12 +234,12 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[self endedTagPath:_tagPath];
-	[_tagPath autorelease];
-	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
 	if([_initialTagPath isEqualToString:_tagPath]) {
 		[_parser setDelegate:_parent];
 		[_parent parser:parser didEndElement:elementName namespaceURI:namespaceURI qualifiedName:qName];
 	}
+	[_tagPath autorelease];
+	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
 	[pool release];
 }
 
@@ -235,6 +254,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (void)dealloc
 {
+	[_baseURL release];
 	[_subparsers release];
 	[_initialTagPath release];
 	[_tagPath release];
