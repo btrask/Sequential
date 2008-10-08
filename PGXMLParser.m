@@ -152,15 +152,11 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (id)info
 {
-	if([self createsMultipleNodes]) {
-		//NSLog(@"%@ creates multiple nodes", self);
-		return nil;
-	}
+	if([self createsMultipleNodes]) return nil;
 	NSMutableArray *const dicts = [NSMutableArray array];
 	PGXMLParser *parser;
 	NSEnumerator *const parserEnum = [[self subparsers] objectEnumerator];
 	while((parser = [parserEnum nextObject])) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
-	//NSLog(@"%@, %@", self, dicts);
 	return dicts;
 }
 
@@ -179,7 +175,6 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
 - (NSArray *)nodesWithParentAdapter:(PGContainerAdapter *)parent
 {
-	//NSLog(@"nodes of %@", self);
 	if(![self createsMultipleNodes]) {
 		PGNode *const node = [self nodeWithParentAdapter:parent];
 		return node ? [NSArray arrayWithObject:node] : nil;
@@ -192,7 +187,6 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent
 {
-	NSLog(@"%@ node with parent: %@, %@", self, [self URL], [self title]);
 	PGResourceIdentifier *const ident = [[self URL] AE_resourceIdentifier];
 	if(!ident) return nil;
 	[ident setCustomDisplayName:[self title] notify:NO];

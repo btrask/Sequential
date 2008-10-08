@@ -39,6 +39,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 @implementation PGContainerAdapter
 
+#pragma mark PGResourceAdapter
+
++ (BOOL)alwaysLoads
+{
+	return NO;
+}
+
 #pragma mark Instance Methods
 
 - (NSArray *)sortedChildren
