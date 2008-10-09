@@ -347,7 +347,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 			[clipView setDocumentView:view];
 			[clipView scrollToCenterAt:center allowAnimation:NO];
 			[self _readFinished];
-		} else [self setActiveNode:node initialLocation:PGHomeLocation];
+		} else {
+			[clipView setDocumentView:view];
+			[self setActiveNode:node initialLocation:PGHomeLocation];
+		}
 		[searchField setStringValue:query];
 		[self _updateInfoPanelLocationAnimate:NO];
 		if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
@@ -434,7 +437,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 }
 - (void)showLoadingIndicator
 {
-	if(_loadingGraphic) return [_loadingGraphic setProgress:[[self activeNode] loadProgress]];
+	if(_loadingGraphic) return;
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
 	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
@@ -495,7 +498,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (void)nodeLoadingDidProgress:(NSNotification *)aNotif
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
-	[self showLoadingIndicator];
+	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 }
 - (void)nodeReadyForViewing:(NSNotification *)aNotif
 {
