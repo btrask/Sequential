@@ -56,11 +56,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setSubload:(id<PGLoading>)obj
         isLoading:(BOOL)flag
 {
-	if(flag) {
-		if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
-	} else {
-		if(![[obj subloads] count]) [_subloads removeObjectIdenticalTo:obj];
-	}
+	if(!flag) [_subloads removeObjectIdenticalTo:obj];
+	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
 }
 - (void)prioritizeSubload:(id<PGLoading>)obj
 {
@@ -76,7 +73,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)init
 {
 	if((self = [super init])) {
-		_subloads = [[NSMutableArray alloc] init];
+		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 	}
 	return self;
 }

@@ -360,6 +360,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 - (void)dealloc
 {
 	[self AE_removeObserver];
+	[_node cancelLoad];
 	[_identifier release];
 	[_node release];
 	[_subscription release];

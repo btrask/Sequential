@@ -389,7 +389,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 - (id<PGLoading>)parentLoad
 {
-	if(![[self node] isRooted]) return nil;
 	return [self parentAdapter] ? [self parentAdapter] : [PGLoadManager sharedLoadManager];
 }
 - (NSArray *)subloads
@@ -399,12 +398,9 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (void)setSubload:(id<PGLoading>)obj
         isLoading:(BOOL)flag
 {
-	if(flag) {
-		if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
-	} else {
-		if(![[obj subloads] count]) [_subloads removeObjectIdenticalTo:obj];
-	}
-	[[self parentLoad] setSubload:[self node] isLoading:flag];
+	if(!flag) [_subloads removeObjectIdenticalTo:obj];
+	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
+	[[self parentLoad] setSubload:[self node] isLoading:[_subloads count] != 0];
 }
 - (void)prioritizeSubload:(id<PGLoading>)obj
 {
@@ -432,7 +428,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 {
 	if((self = [super init])) {
 		_info = [[NSMutableDictionary alloc] init];
-		_subloads = [[NSMutableArray alloc] init];
+		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 	}
 	return self;
 }

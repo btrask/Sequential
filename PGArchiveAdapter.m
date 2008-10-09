@@ -139,7 +139,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 {
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
-	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey]; // TODO: Check this when matching.
+	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
 	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
 	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }

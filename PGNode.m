@@ -157,7 +157,6 @@ enum {
 	[_error release];
 	_error = nil;
 	[self noteIsViewableDidChange];
-	[[self parentLoad] setSubload:self isLoading:YES];
 	[_adapters autorelease];
 	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]] mutableCopy];
 	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
@@ -179,7 +178,6 @@ enum {
 	NSParameterAssert(PGNodeLoading & _status);
 	_status = ~PGNodeLoading & _status;
 	[self noteIsViewableDidChange];
-	[[self parentLoad] setSubload:self isLoading:NO];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
 }
@@ -240,10 +238,6 @@ enum {
 - (unsigned)depth
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
-}
-- (BOOL)isRooted
-{
-	return [[self document] node] == self || ([[[self parentAdapter] unsortedChildren] indexOfObjectIdenticalTo:self] != NSNotFound && [[self parentNode] isRooted]);
 }
 - (NSMenuItem *)menuItem
 {

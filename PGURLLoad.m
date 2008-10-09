@@ -178,6 +178,7 @@ static unsigned PGSimultaneousConnections = 0;
 - (void)connection:(NSURLConnection *)connection
         didReceiveResponse:(NSURLResponse *)response
 {
+	NSParameterAssert(connection == _connection);
 	[_response autorelease];
 	_response = [response copy];
 	[[self delegate] loadDidReceiveResponse:self];
@@ -185,12 +186,14 @@ static unsigned PGSimultaneousConnections = 0;
 - (void)connection:(NSURLConnection *)connection
 	didReceiveData:(NSData *)data
 {
+	NSParameterAssert(connection == _connection);
 	[_data appendData:data];
 	[[self delegate] loadLoadingDidProgress:self];
 }
 - (void)connection:(NSURLConnection *)connection
 	didFailWithError:(NSError *)error
 {
+	NSParameterAssert(connection == _connection);
 	[self _stop];
 	[_data release];
 	_data = nil;
@@ -198,6 +201,7 @@ static unsigned PGSimultaneousConnections = 0;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
+	NSParameterAssert(connection == _connection);
 	_loaded = YES;
 	[self _stop];
 	[[self delegate] loadDidSucceed:self];
