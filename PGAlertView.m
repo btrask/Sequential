@@ -474,11 +474,11 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 			NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 			[shadow setShadowColor:nil];
 			[shadow set];
+			[[NSColor colorWithDeviceWhite:1.0 alpha:0.25] set];
 			switched = YES;
 		}
-		NSRect const r = NSMakeRect(51 + i * 9, 30, 7, 9);
-		if(switched) NSFrameRect(r);
-		else NSRectFill(r);
+		if(switched) [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(52 + i * 9, 32, 5, 5)] fill];
+		else NSRectFill(NSMakeRect(51 + i * 9, 30, 7, 9));
 	}
 }
 
