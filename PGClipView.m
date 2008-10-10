@@ -377,11 +377,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)viewFrameDidChange:(NSNotification *)aNotif
 {
 	[self stopAnimatedScrolling];
-	NSRect const newFrame = [documentView frame];
 	NSPoint center = [self center];
-	center.x *= NSWidth(newFrame) / NSWidth(_documentFrame);
-	center.y *= NSHeight(newFrame) / NSHeight(_documentFrame);
-	_documentFrame = newFrame;
+	_documentFrame = [documentView frame];
 	[self scrollToCenterAt:center allowAnimation:NO];
 }
 
