@@ -55,7 +55,10 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
 		_fileSubscription = [[_fileIdentifier subscriptionWithDescendents:NO] retain];
 		[_fileSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
-		_backupDisplayName = [(aString ? aString : [fileIdent displayName]) copy];
+		if(aString) {
+			[_fileIdentifier setNaturalDisplayName:aString notify:YES];
+			[_fileIdentifier updateNaturalDisplayName];
+		}
 	}
 	return self;
 }
@@ -70,14 +73,6 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	return [[_fileIdentifier retain] autorelease];
 }
-
-#pragma mark -
-
-- (NSString *)displayName
-{
-	NSString *const name = [_fileIdentifier displayName];
-	return name && ![@"" isEqualToString:name] ? name : [[_backupDisplayName retain] autorelease];
-}
 - (BOOL)isValid
 {
 	if(![_documentIdentifier hasTarget] || ![_fileIdentifier hasTarget]) return NO;
@@ -89,11 +84,6 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 - (void)eventDidOccur:(NSNotification *)aNotif
 {
-	NSString *const displayName = [_fileIdentifier displayName];
-	if(displayName && ![@"" isEqualToString:displayName]) {
-		[_backupDisplayName release];
-		_backupDisplayName = [displayName copy];
-	}
 	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
 }
 - (void)identifierDidChange:(NSNotification *)aNotif
@@ -111,7 +101,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	[aCoder encodeObject:_documentIdentifier forKey:@"DocumentIdentifier"];
 	[aCoder encodeObject:_fileIdentifier forKey:@"FileIdentifier"];
-	[aCoder encodeObject:_backupDisplayName forKey:@"BackupDisplayName"];
+	[aCoder encodeObject:[_fileIdentifier naturalDisplayName] forKey:@"BackupDisplayName"];
 }
 
 #pragma mark NSObject Protocol
@@ -134,7 +124,6 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 	[_documentSubscription release];
 	[_fileIdentifier release];
 	[_fileSubscription release];
-	[_backupDisplayName release];
 	[super dealloc];
 }
 

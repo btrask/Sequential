@@ -38,7 +38,6 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 	PGSubscription       *_documentSubscription;
 	PGResourceIdentifier *_fileIdentifier;
 	PGSubscription       *_fileSubscription;
-	NSString             *_backupDisplayName;
 }
 
 - (id)initWithNode:(PGNode *)aNode;
@@ -46,8 +45,6 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 
 - (PGResourceIdentifier *)documentIdentifier;
 - (PGResourceIdentifier *)fileIdentifier;
-
-- (NSString *)displayName;
 - (BOOL)isValid;
 
 - (void)eventDidOccur:(NSNotification *)aNotif;

@@ -77,11 +77,11 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	NSButton *const deleteButton = [alert addButtonWithTitle:NSLocalizedString(@"Delete Bookmark", nil)];
 	NSButton *const cancelButton = [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
 	if(_deletesBookmarks) {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to delete the bookmark %@?", @"Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name."), [bookmark displayName]]];
+		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to delete the bookmark %@?", @"Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name."), [[bookmark fileIdentifier] displayName]]];
 		[alert setInformativeText:NSLocalizedString(@"This operation cannot be undone.", @"Confirmation dialog informative text.")];
 		[deleteButton setKeyEquivalent:@"\r"];
 	} else {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [bookmark displayName]]];
+		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [[bookmark fileIdentifier] displayName]]];
 		[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", @"Bookmarked file could not be found error informative text.")];
 		[deleteButton setKeyEquivalent:@""];
 		[cancelButton setKeyEquivalent:@"\r"];
@@ -151,7 +151,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	NSMenuItem *const item = [bookmarkMenu itemAtIndex:index];
 	if(![aBookmark isValid]) {
 		[item setAttributedTitle:nil];
-		[item setTitle:[NSString stringWithFormat:NSLocalizedString(@"Missing File %@", @"Bookmark menu item used when the file named %@ cannot be found."), [aBookmark displayName]]];
+		[item setTitle:[NSString stringWithFormat:NSLocalizedString(@"Missing File %@", @"Bookmark menu item used when the file named %@ cannot be found."), [[aBookmark fileIdentifier] displayName]]];
 		return;
 	}
 	NSMutableAttributedString *const title = [[[NSMutableAttributedString alloc] init] autorelease];
