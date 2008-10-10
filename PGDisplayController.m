@@ -345,6 +345,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		if([view rep]) {
 			[self _setActiveNode:node];
 			[clipView setDocumentView:view];
+			[view setImageRep:[view rep] orientation:[view orientation] size:[self _sizeForImageRep:[view rep] orientation:[view orientation]]];
 			[clipView scrollToCenterAt:center allowAnimation:NO];
 			[self _readFinished];
 		} else {
@@ -660,8 +661,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
 		float scaleX = NSWidth([clipView bounds]) / roundf(newSize.width);
 		float scaleY = NSHeight([clipView bounds]) / roundf(newSize.height);
-		if(PGAutomaticScaling == scalingMode) scaleX = scaleY = MAX(scaleX, scaleY);
-		else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
+		if(PGAutomaticScaling == scalingMode) {
+			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
+			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, (floorf(newSize.height * scaleX / scrollMax.height) * scrollMax.height) / newSize.height);
+			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, (floorf(newSize.width * scaleY / scrollMax.width) * scrollMax.width) / newSize.width);
+		} else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSize(newSize, scaleX, scaleY), maxSize);
 	}
 	return NSMakeSize(roundf(newSize.width), roundf(newSize.height));

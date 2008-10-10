@@ -163,10 +163,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
           fromPosition:(NSPoint)position
 {
 	NSSize s = NSZeroSize;
+	NSSize const max = [self maximumDistanceForScrollType:scrollType];
 	switch(scrollType) {
 		case PGScrollByLine:
-			if(PGHorzEdgesMask & direction) s.width = PGLineScrollDistance;
-			if(PGVertEdgesMask & direction) s.height = PGLineScrollDistance;
+			if(PGHorzEdgesMask & direction) s.width = max.width;
+			if(PGVertEdgesMask & direction) s.height = max.height;
 			break;
 		case PGScrollByPage:
 		{
@@ -175,13 +176,21 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			else if(PGMaxXEdgeMask & direction) s.width = NSMaxX(scrollableRect) - position.x;
 			if(PGMinYEdgeMask & direction) s.height = position.y - NSMinY(scrollableRect);
 			else if(PGMaxYEdgeMask & direction) s.height = NSMaxY(scrollableRect) - position.y;
-			if(s.width) s.width = ceilf(s.width / ceilf(s.width / (NSWidth([self bounds]) - PGLineScrollDistance)));
-			if(s.height) s.height = ceilf(s.height / ceilf(s.height / (NSHeight([self bounds]) - PGLineScrollDistance)));
+			if(s.width) s.width = ceilf(s.width / ceilf(s.width / max.width));
+			if(s.height) s.height = ceilf(s.height / ceilf(s.height / max.height));
 		}
 	}
 	if(PGMinXEdgeMask & direction) s.width *= -1;
 	if(PGMinYEdgeMask & direction) s.height *= -1;
 	return s;
+}
+- (NSSize)maximumDistanceForScrollType:(PGScrollType)scrollType
+{
+	switch(scrollType) {
+		case PGScrollByLine: return NSMakeSize(PGLineScrollDistance, PGLineScrollDistance);
+		case PGScrollByPage: return NSMakeSize(NSWidth([self bounds]) - PGLineScrollDistance, NSHeight([self bounds]) - PGLineScrollDistance);
+		default: return NSZeroSize;
+	}
 }
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask
 {
@@ -203,7 +212,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (NSPoint)center
 {
-	return [self convertPoint:PGOffsetPointByXY([self position], NSWidth([self bounds]) / 2, NSHeight([self bounds]) / 2) toView:documentView];
+	if(NSIsEmptyRect(_documentFrame)) return NSZeroPoint;
+	NSRect const b = [self bounds];
+	NSPoint const p = PGOffsetPointByXY([self position], NSWidth(b) / 2 - NSMinX(_documentFrame), NSHeight(b) / 2 - NSMinY(_documentFrame));
+	return NSMakePoint(p.x / NSWidth(_documentFrame), p.y / NSHeight(_documentFrame));
 }
 
 - (BOOL)scrollTo:(NSPoint)aPoint
@@ -225,7 +237,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)scrollToCenterAt:(NSPoint)aPoint
         allowAnimation:(BOOL)flag
 {
-	return [self scrollTo:[self convertPoint:PGOffsetPointByXY(aPoint, NSWidth([self bounds]) / -2, NSHeight([self bounds]) / -2) fromView:documentView] allowAnimation:flag];
+	NSRect const b = [self bounds];
+	return [self scrollTo:PGOffsetPointByXY(NSMakePoint(aPoint.x * NSWidth(_documentFrame), aPoint.y * NSHeight(_documentFrame)), NSWidth(b) / -2 + NSMinX(_documentFrame), NSHeight(b) / -2 + NSMinY(_documentFrame)) allowAnimation:flag];
 }
 - (BOOL)scrollBy:(NSSize)aSize
         allowAnimation:(BOOL)flag

@@ -64,6 +64,7 @@ typedef int PGScrollType;
 - (NSRect)scrollableRectWithBorder:(BOOL)flag;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType fromPosition:(NSPoint)position;
+- (NSSize)maximumDistanceForScrollType:(PGScrollType)scrollType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
 - (NSPoint)position;
