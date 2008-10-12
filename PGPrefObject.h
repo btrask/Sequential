@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 extern NSString *const PGPrefObjectShowsInfoDidChangeNotification;
+extern NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification;
 extern NSString *const PGPrefObjectReadingDirectionDidChangeNotification;
 extern NSString *const PGPrefObjectImageScaleDidChangeNotification;
 extern NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification;
@@ -74,6 +75,7 @@ typedef int PGSortOrder;
 {
 	@private
 	BOOL                     _showsInfo;
+	BOOL                     _showsThumbnails;
 	PGReadingDirection       _readingDirection;
 	PGImageScalingMode       _imageScalingMode;
 	float                    _imageScaleFactor;
@@ -85,6 +87,8 @@ typedef int PGSortOrder;
 
 - (BOOL)showsInfo;
 - (void)setShowsInfo:(BOOL)flag;
+- (BOOL)showsThumbnails;
+- (void)setShowsThumbnails:(BOOL)flag;
 
 - (PGReadingDirection)readingDirection;
 - (void)setReadingDirection:(PGReadingDirection)aDirection;

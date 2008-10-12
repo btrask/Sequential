@@ -40,6 +40,7 @@ typedef int PGScrollType;
 	IBOutlet NSView         *documentView;
 	         NSRect         _documentFrame;
 	         NSColor       *_backgroundColor;
+	         BOOL           _showsBorder;
 	         NSPoint        _position;
 	         NSTimer       *_scrollTimer;
 	         NSTimeInterval _lastScrollTime;
@@ -60,6 +61,8 @@ typedef int PGScrollType;
 
 - (NSColor *)backgroundColor;
 - (void)setBackgroundColor:(NSColor *)aColor;
+- (BOOL)showsBorder;
+- (void)setShowsBorder:(BOOL)flag;
 
 - (NSRect)scrollableRectWithBorder:(BOOL)flag;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;
@@ -100,5 +103,12 @@ typedef int PGScrollType;
 @interface NSView (PGClipViewDocumentView)
 
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender;
+
+@end
+
+@interface NSView (PGClipViewAdditions)
+
+- (PGClipView *)PG_enclosingClipView;
+- (PGClipView *)PG_clipView;
 
 @end

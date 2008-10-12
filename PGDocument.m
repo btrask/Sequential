@@ -316,6 +316,11 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	[super setShowsInfo:flag];
 	[[PGPrefObject globalPrefObject] setShowsInfo:flag];
 }
+- (void)setShowsThumbnails:(BOOL)flag
+{
+	[super setShowsThumbnails:flag];
+	[[PGPrefObject globalPrefObject] setShowsThumbnails:flag];
+}
 - (void)setReadingDirection:(PGReadingDirection)aDirection
 {
 	[super setReadingDirection:aDirection];

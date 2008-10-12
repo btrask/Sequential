@@ -38,7 +38,6 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGAnimateScrolling         true
 #define PGCopiesOnScroll           false // Not much of a speedup.
 #define PGClickSlopDistance        3.0
-#define PGShowBorders              true
 #define PGPageTurnMovementDelay    0.5
 #define PGGameStyleArrowScrolling  true
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
@@ -128,7 +127,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)setBackgroundColor:(NSColor *)aColor
 {
-	if([aColor isEqual:_backgroundColor]) return;
+	if(aColor == _backgroundColor || (aColor && _backgroundColor && [aColor isEqual:_backgroundColor])) return;
 	[_backgroundColor release];
 	_backgroundColor = [aColor copy];
 	if([[self documentView] isOpaque]) {
@@ -138,6 +137,14 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		while(i--) [self setNeedsDisplayInRect:rects[i]];
 	} else [self setNeedsDisplay:YES];
 }
+- (BOOL)showsBorder
+{
+	return _showsBorder;
+}
+- (void)setShowsBorder:(BOOL)flag
+{
+	_showsBorder = flag;
+}
 
 #pragma mark -
 
@@ -145,7 +152,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSSize const boundsSize = [self bounds].size;
 	NSSize diff = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2, (boundsSize.height - NSHeight(_documentFrame)) / 2);
-	NSSize const borderSize = PGShowBorders && flag ? NSMakeSize(PGBorderPadding, PGBorderPadding) : NSZeroSize;
+	NSSize const borderSize = _showsBorder && flag ? NSMakeSize(PGBorderPadding, PGBorderPadding) : NSZeroSize;
 	if(diff.width < 0) diff.width = borderSize.width;
 	if(diff.height < 0) diff.height = borderSize.height;
 	NSRect scrollableRect = NSInsetRect(_documentFrame, -diff.width, -diff.height);
@@ -388,6 +395,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         markForRedisplayIfNeeded:(BOOL)flag
 {
 	NSPoint const newPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
+	[[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) allowAnimation:NO];
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
 	_immediatePosition = newPosition;
 	[self setBoundsOrigin:NSMakePoint(floorf(_immediatePosition.x), floorf(_immediatePosition.y))];
@@ -436,11 +444,28 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[[NSCursor closedHandCursor] push];
 }
 
+#pragma mark PGClipViewAdditions Protocol
+
+- (PGClipView *)PG_clipView
+{
+	return self;
+}
+
 #pragma mark NSView
+
+- (id)initWithFrame:(NSRect)aRect
+{
+	if((self = [super initWithFrame:aRect])) {
+		[self setShowsBorder:YES];
+	}
+	return self;
+}
+
+#pragma mark -
 
 - (BOOL)isOpaque
 {
-	return YES;
+	return !!_backgroundColor;
 }
 - (BOOL)isFlipped
 {
@@ -452,16 +477,19 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)drawRect:(NSRect)aRect
 {
+	NSColor *const color = [self backgroundColor];
+	if(!color) return;
 	int count;
 	NSRect const *rects;
 	[self getRectsBeingDrawn:&rects count:&count];
-	[[self backgroundColor] set];
+	[color set];
 	NSRectFillList(rects, count);
 }
 
 - (NSView *)hitTest:(NSPoint)aPoint
 {
 	NSView *const subview = [super hitTest:aPoint];
+	if(!subview) return nil;
 	return [subview acceptsClicksInClipView:self] ? subview : self;
 }
 - (void)resetCursorRects
@@ -676,6 +704,19 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
 	return YES;
+}
+
+@end
+
+@implementation NSView (PGClipViewAdditions)
+
+- (PGClipView *)PG_enclosingClipView
+{
+	return [[self superview] PG_clipView];
+}
+- (PGClipView *)PG_clipView
+{
+	return [self PG_enclosingClipView];
 }
 
 @end

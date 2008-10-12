@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 #import "PGDocument.h"
 #import "PGNode.h"
+#import "PGContainerAdapter.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
 
@@ -38,6 +39,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGAlertView.h"
 #import "PGInfoView.h"
 #import "PGFindView.h"
+#import "PGThumbnailBrowser.h"
 
 // Controllers
 #import "PGDocumentController.h"
@@ -178,6 +180,10 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
 }
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
+}
 
 #pragma mark -
 
@@ -314,6 +320,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
 	}
@@ -331,6 +338,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
+	[_activeDocument AE_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	[self setTimerInterval:0];
@@ -354,8 +362,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		}
 		[searchField setStringValue:query];
 		[self _updateInfoPanelLocationAnimate:NO];
-		if([_activeDocument showsInfo]) [self _updateInfoWithNodeCount];
-		else [_infoPanel close];
+		[self documentShowsInfoDidChange:nil];
+		[self documentShowsThumbnailsDidChange:nil];
 		NSEnableScreenUpdates();
 	}
 	return NO;
@@ -548,6 +556,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[self _updateInfoWithNodeCount];
 	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
+	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadData];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
 {
@@ -572,6 +581,13 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 {
 	if([[self activeDocument] showsInfo]) [self _updateInfoWithNodeCount];
 	else [_infoPanel fadeOut];
+}
+- (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif
+{
+	if([[self activeDocument] showsThumbnails]) {
+		[_thumbnailPanel displayOverWindow:[self window]];
+		[[_thumbnailPanel content] reloadData]; // TODO: Make sure the current document is selected.
+	} else [_thumbnailPanel fadeOut];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
@@ -974,6 +990,34 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
+#pragma mark PGThumbnailBrowserDataSource Protocol
+
+- (unsigned)browser:(PGThumbnailBrowser *)sender
+            numberOfChildrenOfItem:(id)item;
+{
+	if(item) return [item isContainer] ? [[item unsortedChildren] count] : 0;
+	PGNode *const node = [[self activeDocument] node];
+	return [node isContainer] ? [[(PGContainerAdapter *)node unsortedChildren] count] : 1;
+}
+- (id)browser:(PGThumbnailBrowser *)sender
+      childOfItem:(id)item
+      atIndex:(unsigned)index;
+{
+	return [[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index];
+}
+- (NSImage *)browser:(PGThumbnailBrowser *)sender
+             thumbnailForChildOfItem:(id)item
+             atIndex:(unsigned)index;
+{
+	return [[[[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index] identifier] icon];
+}
+- (BOOL)browser:(PGThumbnailBrowser *)sender
+        canSelectorChildOfItem:(id)item
+        atIndex:(unsigned)index
+{
+	return [[[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index] isViewable];
+}
+
 #pragma mark NSServicesRequests Protocol
 
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
@@ -1034,6 +1078,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[super showWindow:sender];
 	[self _updateInfoPanelLocationAnimate:NO];
 	[self documentShowsInfoDidChange:nil];
+	[self documentShowsThumbnailsDidChange:nil];
 }
 
 #pragma mark -
@@ -1053,6 +1098,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_findPanel setInitialFirstResponder:searchField];
 	[_findPanel setDelegate:self];
 	[_findPanel setAcceptsEvents:YES];
+	[_findPanel setCanBecomeKey:YES];
 
 	[self prefControllerBackgroundPatternColorDidChange:nil];
 }
@@ -1105,6 +1151,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
 		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
+		_thumbnailPanel = [[PGThumbnailBrowser PG_bezelPanel] retain];
+		[_thumbnailPanel setAcceptsEvents:YES];
+		[[_thumbnailPanel content] setDataSource:self];
 
 		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 	}
@@ -1123,6 +1172,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[_infoPanel release];
 	[_findPanel release];
 	[_findFieldEditor release];
+	[_thumbnailPanel release];
 	[_nextTimerFireDate release];
 	[_timer invalidate];
 	[_timer release];

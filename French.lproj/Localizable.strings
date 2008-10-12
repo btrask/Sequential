@@ -18,6 +18,10 @@
 "Show Info" = "Afficher les infos";
 "Hide Info" = "Cacher les infos";
 
+/* Lets the user toggle whether thumbnails are shown. Two states of the same item. */
+"Show Thumbnails" = "Show Thumbnails";
+"Hide Thumbnails" = "Hide Thumbnails";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Ajuster à l'écran";
 "Fit to Window" = "Ajuster à la fenêtre";

@@ -84,6 +84,10 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 {
 	_acceptsEvents = flag;
 }
+- (void)setCanBecomeKey:(BOOL)flag
+{
+	_canBecomeKey = flag;
+}
 
 #pragma mark -
 
@@ -134,7 +138,8 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 - (BOOL)canBecomeKeyWindow
 {
-	return [self isFadingOut] ? NO : _acceptsEvents;
+	if([self isFadingOut]) return NO;
+	return _acceptsEvents && _canBecomeKey;
 }
 - (void)setContentView:(NSView *)aView
 {

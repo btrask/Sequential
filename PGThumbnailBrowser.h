@@ -23,41 +23,28 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import <HMDTAppKit/PGFadeOutPanel.h>
+#import "PGColumnView.h"
 
-extern NSString *const PGBezelPanelFrameShouldChangeNotification;
-
-extern NSString *const PGBezelPanelShouldAnimateKey;
-
-@interface PGBezelPanel : PGFadeOutPanel
+@interface PGThumbnailBrowser : PGColumnView
 {
 	@private
-	NSWindow *_parentWindow; // -[NSWindow parentWindow] apparently retains and autoreleases the window before returning it, which is not good when that window is being deallocated and we call it while it's removing us.
-	BOOL      _acceptsEvents;
-	BOOL      _canBecomeKey;
+	IBOutlet id dataSource;
 }
 
-- (id)initWithContentView:(NSView *)aView;
-- (void)displayOverWindow:(NSWindow *)aWindow;
+- (id)dataSource;
+- (void)setDataSource:(id)obj;
 
-- (id)content; // Returns the content view, but as type id so you don't have to cast it.
-
-- (BOOL)acceptsEvents;
-- (void)setAcceptsEvents:(BOOL)flag;
-- (void)setCanBecomeKey:(BOOL)flag;
-
-- (void)changeFrameAnimate:(BOOL)flag;
-
-- (void)frameShouldChange:(NSNotification *)aNotif; // Calls -changeFrameAnimate:.
-- (void)windowDidResize:(NSNotification *)aNotif;
+- (void)reloadData;
+- (void)reloadChildrenOfItem:(id)item;
+- (void)reloadChildOfItem:(id)item atIndex:(unsigned)index;
 
 @end
 
-@interface NSView (PGBezelPanelContentView)
+@interface NSObject (PGThumbnailBrowserDataSource)
 
-+ (id)PG_bezelPanel; // Returns a bezel panel with an instance of the receiver as the content view.
-
-// To be overridden.
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(float)scaleFactor; // By default, returns aRect.
+- (unsigned)browser:(PGThumbnailBrowser *)sender numberOfChildrenOfItem:(id)item;
+- (id)browser:(PGThumbnailBrowser *)sender childOfItem:(id)item atIndex:(unsigned)index;
+- (NSImage *)browser:(PGThumbnailBrowser *)sender thumbnailForChildOfItem:(id)item atIndex:(unsigned)index;
+- (BOOL)browser:(PGThumbnailBrowser *)sender canSelectorChildOfItem:(id)item atIndex:(unsigned)index;
 
 @end

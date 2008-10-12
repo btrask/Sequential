@@ -56,6 +56,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	         PGBezelPanel       *_graphicPanel;
 	         PGLoadingGraphic   *_loadingGraphic;
 	         PGBezelPanel       *_infoPanel;
+	         PGBezelPanel       *_thumbnailPanel;
 
 	IBOutlet PGFindView          *findView;
 	IBOutlet NSSearchField       *searchField;
@@ -96,6 +97,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)toggleInfo:(id)sender;
+- (IBAction)toggleThumbnails:(id)sender;
 
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
@@ -156,6 +158,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif;
+- (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;

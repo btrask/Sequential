@@ -23,41 +23,24 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import <HMDTAppKit/PGFadeOutPanel.h>
 
-extern NSString *const PGBezelPanelFrameShouldChangeNotification;
+// Views
+@class PGClipView;
 
-extern NSString *const PGBezelPanelShouldAnimateKey;
-
-@interface PGBezelPanel : PGFadeOutPanel
+@interface PGColumnView : NSView
 {
 	@private
-	NSWindow *_parentWindow; // -[NSWindow parentWindow] apparently retains and autoreleases the window before returning it, which is not good when that window is being deallocated and we call it while it's removing us.
-	BOOL      _acceptsEvents;
-	BOOL      _canBecomeKey;
+	PGClipView     *_clipView;
+	NSView         *_view;
+	NSMutableArray *_clipViews;
+	NSMutableArray *_views;
 }
 
-- (id)initWithContentView:(NSView *)aView;
-- (void)displayOverWindow:(NSWindow *)aWindow;
+- (NSArray *)views;
+- (void)insertColumnWithView:(NSView *)aView atIndex:(unsigned)index;
+- (void)removeColumnWithView:(NSView *)aView;
+- (void)removeAllColumns;
 
-- (id)content; // Returns the content view, but as type id so you don't have to cast it.
-
-- (BOOL)acceptsEvents;
-- (void)setAcceptsEvents:(BOOL)flag;
-- (void)setCanBecomeKey:(BOOL)flag;
-
-- (void)changeFrameAnimate:(BOOL)flag;
-
-- (void)frameShouldChange:(NSNotification *)aNotif; // Calls -changeFrameAnimate:.
-- (void)windowDidResize:(NSNotification *)aNotif;
-
-@end
-
-@interface NSView (PGBezelPanelContentView)
-
-+ (id)PG_bezelPanel; // Returns a bezel panel with an instance of the receiver as the content view.
-
-// To be overridden.
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(float)scaleFactor; // By default, returns aRect.
+- (void)layout;
 
 @end

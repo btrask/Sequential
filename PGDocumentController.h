@@ -78,6 +78,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 	IBOutlet NSMenuItem              *toggleFullscreen;
 	IBOutlet NSMenuItem              *toggleInfo;
+	IBOutlet NSMenuItem              *toggleThumbnails;
 
 	IBOutlet NSMenuItem              *rotate90CC;
 	IBOutlet NSMenuItem              *rotate270CC;
@@ -184,5 +185,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (void)workspaceDidTerminateApplication:(NSNotification *)aNotif;
 - (void)readingDirectionDidChange:(NSNotification *)aNotif;
 - (void)showsInfoDidChange:(NSNotification *)aNotif;
+- (void)showsThumbnailsDidChange:(NSNotification *)aNotif;
 
 @end

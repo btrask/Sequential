@@ -123,6 +123,8 @@
 				<string>id</string>
 				<key>toggleInfo</key>
 				<string>id</string>
+				<key>toggleThumbnails</key>
+				<string>id</string>
 				<key>toggleTracksImageScalingMode</key>
 				<string>id</string>
 				<key>toggleTracksReadingDirection</key>
@@ -200,6 +202,8 @@
 				<string>id</string>
 				<key>toggleInfo</key>
 				<string>id</string>
+				<key>toggleThumbnails</key>
+				<string>id</string>
 				<key>zoomIn</key>
 				<string>id</string>
 				<key>zoomOut</key>
@@ -262,6 +266,16 @@
 				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
+				<key>loadDidCancel</key>
+				<string>PGURLLoad</string>
+				<key>loadDidFail</key>
+				<string>PGURLLoad</string>
+				<key>loadDidReceiveResponse</key>
+				<string>PGURLLoad</string>
+				<key>loadDidSucceed</key>
+				<string>PGURLLoad</string>
+				<key>loadLoadingDidProgress</key>
+				<string>PGURLLoad</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
@@ -324,6 +338,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -465,6 +487,8 @@
 				<key>toggleFullscreen</key>
 				<string>NSMenuItem</string>
 				<key>toggleInfo</key>
+				<string>NSMenuItem</string>
+				<key>toggleThumbnails</key>
 				<string>NSMenuItem</string>
 				<key>windowsMenu</key>
 				<string>NSMenu</string>

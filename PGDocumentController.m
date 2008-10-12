@@ -402,6 +402,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
+	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 
 	_currentDocument = document;
 	[self _setRevealsInBrowser:[_currentDocument isOnline]];
@@ -409,8 +410,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
+	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 	[self readingDirectionDidChange:nil];
 	[self showsInfoDidChange:nil];
+	[self showsThumbnailsDidChange:nil];
 }
 
 #pragma mark -
@@ -487,6 +490,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)showsInfoDidChange:(NSNotification *)aNotif
 {
 	[toggleInfo setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
+}
+- (void)showsThumbnailsDidChange:(NSNotification *)aNotif
+{
+	[toggleThumbnails setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
 }
 
 #pragma mark Private Protocol
@@ -642,6 +649,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[self workspaceDidLaunchApplication:nil];
 	[self readingDirectionDidChange:nil];
 	[self showsInfoDidChange:nil];
+	[self showsThumbnailsDidChange:nil];
 }
 
 #pragma mark NSMenuValidation Protocol

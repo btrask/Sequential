@@ -28,12 +28,14 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 
 NSString *const PGPrefObjectShowsInfoDidChangeNotification           = @"PGPrefObjectShowsInfoDidChange";
+NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification     = @"PGPrefObjectShowsThumbnailsDidChange";
 NSString *const PGPrefObjectReadingDirectionDidChangeNotification    = @"PGPrefObjectReadingDirectionDidChange";
 NSString *const PGPrefObjectImageScaleDidChangeNotification          = @"PGPrefObjectImageScaleDidChange";
 NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification = @"PGPrefObjectUpscalesToFitScreenDidChange";
 NSString *const PGPrefObjectSortOrderDidChangeNotification           = @"PGPrefObjectSortOrderDidChange";
 
 static NSString *const PGShowsInfoKey                   = @"PGShowsInfo";
+static NSString *const PGShowsThumbnailsKey             = @"PGShowsThumbnails";
 static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRightToLeft";
 static NSString *const PGImageScalingModeKey            = @"PGImageScalingMode";
 static NSString *const PGImageScaleFactorKey            = @"PGImageScaleFactor";
@@ -59,6 +61,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 	if([PGPrefObject class] != self) return;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSNumber numberWithBool:YES], PGShowsInfoKey,
+		[NSNumber numberWithBool:NO], PGShowsThumbnailsKey,
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
 		[NSNumber numberWithInt:PGConstantFactorScaling], PGImageScalingModeKey,
 		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
@@ -79,6 +82,17 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 	_showsInfo = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsInfoKey];
 	[self AE_postNotificationName:PGPrefObjectShowsInfoDidChangeNotification];
+}
+- (BOOL)showsThumbnails
+{
+	return _showsThumbnails;
+}
+- (void)setShowsThumbnails:(BOOL)flag
+{
+	if(!flag == !_showsThumbnails) return;
+	_showsThumbnails = flag;
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsThumbnailsKey];
+	[self AE_postNotificationName:PGPrefObjectShowsThumbnailsDidChangeNotification];
 }
 
 #pragma mark -
@@ -155,6 +169,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 	if((self = [super init])) {
 		NSUserDefaults *const d = [NSUserDefaults standardUserDefaults];
 		_showsInfo = [[d objectForKey:PGShowsInfoKey] boolValue];
+		_showsThumbnails = [[d objectForKey:PGShowsThumbnailsKey] boolValue];
 		_readingDirection = [[d objectForKey:PGReadingDirectionRightToLeftKey] boolValue] ? PGReadingDirectionRightToLeft : PGReadingDirectionLeftToRight;
 		_imageScalingMode = [[d objectForKey:PGImageScalingModeKey] intValue];
 		if(_imageScalingMode < 0 || _imageScalingMode > 4) _imageScalingMode = PGConstantFactorScaling;
