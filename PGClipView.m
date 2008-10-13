@@ -125,9 +125,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)setBoundsInset:(PGInset)inset
 {
-	NSPoint const p = [self center];
+	NSPoint const p = [self position];
 	_boundsInset = inset;
-	[self scrollToCenterAt:p allowAnimation:NO];
+	[self scrollTo:p allowAnimation:NO];
 }
 - (NSRect)insetBounds
 {

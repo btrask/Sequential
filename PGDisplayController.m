@@ -592,6 +592,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		[_thumbnailPanel fadeOut];
 		[clipView setBoundsInset:PGZeroInset];
 	}
+	[self _updateImageViewSizeAllowAnimation:NO];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
