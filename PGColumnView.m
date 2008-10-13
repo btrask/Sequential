@@ -46,7 +46,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_clipViews insertObject:clip atIndex:index];
 	[_views insertObject:aView atIndex:index];
 	[_view addSubview:clip];
-	[clip setBackgroundColor:nil];
+	[clip setBackgroundColor:[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f]];
 	[clip setShowsBorder:NO];
 	[clip setDocumentView:aView];
 	[self layout];
@@ -80,11 +80,15 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)layout
 {
 	NSRect const b = [self bounds];
-	float const colWidth = MAX(NSWidth(b) / [_views count], PGMinColumnWidth);
+	float const colWidth = MAX(floorf(NSWidth(b) / [_views count]), PGMinColumnWidth);
 	[_view setFrameSize:NSMakeSize(colWidth * [_views count], NSHeight(b))];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
-	for(; i < [_clipViews count]; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + colWidth * i, NSMinY(vb), colWidth, NSHeight(vb))];
+	unsigned const count = [_clipViews count];
+	for(; i < count; i++) {
+		float const min = NSMinX(vb) + colWidth * i;
+		[[_clipViews objectAtIndex:i] setFrame:NSMakeRect(min, NSMinY(vb) + 1, (count - 1 == i ? NSWidth(b) - min : colWidth - 1), NSHeight(vb) - 1)];
+	}
 }
 
 #pragma mark NSView
@@ -106,17 +110,8 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	[[NSColor redColor] set];
-	unsigned i;
-	for(i = 0; i < [_clipViews count]; i++) {
-		PGClipView *const clip = [_clipViews objectAtIndex:i];
-		NSFrameRect([[clip superview] convertRect:[clip frame] toView:self]);
-	}
-	[[NSColor greenColor] set];
-	for(i = 0; i < [_views count]; i++) {
-		NSView *const view = [_views objectAtIndex:i];
-		NSFrameRect([[view superview] convertRect:[view frame] toView:self]);
-	}
+	[[NSColor whiteColor] set];
+	NSRectFill(aRect);
 }
 - (void)setFrameSize:(NSSize)aSize
 {
