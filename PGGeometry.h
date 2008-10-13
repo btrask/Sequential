@@ -26,8 +26,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark NSPoint
 
-NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
-NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
+extern NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
+extern NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
 
 #pragma mark PGRectEdgeMask
 
@@ -44,8 +44,8 @@ enum {
 };
 typedef unsigned PGRectEdgeMask;
 
-NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
-PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
+extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
+extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
 extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
 
@@ -65,7 +65,7 @@ enum {
 };
 typedef int PGPageLocation;
 
-PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir);
+extern PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir);
 
 #pragma mark PGOrientation
 
@@ -79,12 +79,28 @@ enum {
 };
 typedef unsigned PGOrientation;
 
-PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
+extern PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
+
+#pragma mark PGInset
+
+typedef struct {
+	float minX;
+	float minY;
+	float maxX;
+	float maxY;
+} PGInset;
+
+extern PGInset const PGZeroInset;
+
+extern PGInset PGMakeInset(float minX, float minY, float maxX, float maxY);
+extern PGInset PGInvertInset(PGInset inset);
+extern NSRect PGInsetRect(NSRect r, PGInset i);
+extern NSSize PGInsetSize(NSSize s, PGInset i);
 
 #pragma mark Other
 
 #define PGAnimationFramesPerSecond 30.0
 #define PGAnimationFramerate       (1.0 / PGAnimationFramesPerSecond)
 
-NSTimeInterval PGUptime(void);
-float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().
+extern NSTimeInterval PGUptime(void);
+extern float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().

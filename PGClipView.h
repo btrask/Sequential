@@ -39,6 +39,7 @@ typedef int PGScrollType;
 	IBOutlet id              delegate;
 	IBOutlet NSView         *documentView;
 	         NSRect         _documentFrame;
+	         PGInset        _boundsInset;
 	         NSColor       *_backgroundColor;
 	         BOOL           _showsBorder;
 	         NSPoint        _position;
@@ -58,6 +59,9 @@ typedef int PGScrollType;
 
 - (NSView *)documentView;
 - (void)setDocumentView:(NSView *)aView;
+- (PGInset)boundsInset;
+- (void)setBoundsInset:(PGInset)inset;
+- (NSRect)insetBounds;
 
 - (NSColor *)backgroundColor;
 - (void)setBackgroundColor:(NSColor *)aColor;

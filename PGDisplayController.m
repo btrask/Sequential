@@ -587,7 +587,11 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if([[self activeDocument] showsThumbnails]) {
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData]; // TODO: Make sure the current document is selected.
-	} else [_thumbnailPanel fadeOut];
+		[clipView setBoundsInset:PGMakeInset(0, 0, 0, NSHeight([_thumbnailPanel frame]))];
+	} else {
+		[_thumbnailPanel fadeOut];
+		[clipView setBoundsInset:PGZeroInset];
+	}
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
@@ -675,8 +679,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
 		NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
 		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
-		float scaleX = NSWidth([clipView bounds]) / roundf(newSize.width);
-		float scaleY = NSHeight([clipView bounds]) / roundf(newSize.height);
+		NSRect const bounds = [clipView insetBounds];
+		float scaleX = NSWidth(bounds) / roundf(newSize.width);
+		float scaleY = NSHeight(bounds) / roundf(newSize.height);
 		if(PGAutomaticScaling == scalingMode) {
 			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
 			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, (floorf(newSize.height * scaleX / scrollMax.height) * scrollMax.height) / newSize.height);

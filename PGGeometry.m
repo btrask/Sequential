@@ -90,6 +90,27 @@ PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
 	return r;
 }
 
+#pragma mark PGInset
+
+PGInset const PGZeroInset = {0, 0, 0, 0};
+
+PGInset PGMakeInset(float minX, float minY, float maxX, float maxY)
+{
+	return (PGInset){minX, minY, maxX, maxY};
+}
+extern PGInset PGInvertInset(PGInset inset)
+{
+	return PGMakeInset(-inset.minX, -inset.minY, -inset.maxX, -inset.maxY);
+}
+NSRect PGInsetRect(NSRect r, PGInset i)
+{
+	return NSMakeRect(NSMinX(r) + i.minX, NSMinY(r) + i.minY, NSWidth(r) - i.minX - i.maxX, NSHeight(r) - i.minY - i.maxY);
+}
+extern NSSize PGInsetSize(NSSize s, PGInset i)
+{
+	return NSMakeSize(s.width - i.minX - i.maxX, s.height - i.minY - i.maxY);
+}
+
 #pragma mark Other
 
 NSTimeInterval PGUptime(void)

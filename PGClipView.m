@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Other
 #import "PGKeyboardLayout.h"
 #import "PGNonretainedObjectProxy.h"
+#import "PGZooming.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -118,6 +119,20 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self viewFrameDidChange:nil];
 	[documentView setPostsFrameChangedNotifications:YES];
 }
+- (PGInset)boundsInset
+{
+	return _boundsInset;
+}
+- (void)setBoundsInset:(PGInset)inset
+{
+	NSPoint const p = [self center];
+	_boundsInset = inset;
+	[self scrollToCenterAt:p allowAnimation:NO];
+}
+- (NSRect)insetBounds
+{
+	return PGInsetRect([self bounds], _boundsInset);
+}
 
 #pragma mark -
 
@@ -150,7 +165,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (NSRect)scrollableRectWithBorder:(BOOL)flag
 {
-	NSSize const boundsSize = [self bounds].size;
+	NSSize const boundsSize = [self insetBounds].size;
 	NSSize diff = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2, (boundsSize.height - NSHeight(_documentFrame)) / 2);
 	NSSize const borderSize = _showsBorder && flag ? NSMakeSize(PGBorderPadding, PGBorderPadding) : NSZeroSize;
 	if(diff.width < 0) diff.width = borderSize.width;
@@ -195,7 +210,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	switch(scrollType) {
 		case PGScrollByLine: return NSMakeSize(PGLineScrollDistance, PGLineScrollDistance);
-		case PGScrollByPage: return NSMakeSize(NSWidth([self bounds]) - PGLineScrollDistance, NSHeight([self bounds]) - PGLineScrollDistance);
+		case PGScrollByPage: return NSMakeSize(NSWidth([self insetBounds]) - PGLineScrollDistance, NSHeight([self insetBounds]) - PGLineScrollDistance);
 		default: return NSZeroSize;
 	}
 }
@@ -220,7 +235,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (NSPoint)center
 {
 	if(NSIsEmptyRect(_documentFrame)) return NSZeroPoint;
-	NSRect const b = [self bounds];
+	NSRect const b = [self insetBounds];
 	NSPoint const p = PGOffsetPointByXY([self position], NSWidth(b) / 2 - NSMinX(_documentFrame), NSHeight(b) / 2 - NSMinY(_documentFrame));
 	return NSMakePoint(p.x / NSWidth(_documentFrame), p.y / NSHeight(_documentFrame));
 }
@@ -244,7 +259,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)scrollToCenterAt:(NSPoint)aPoint
         allowAnimation:(BOOL)flag
 {
-	NSRect const b = [self bounds];
+	NSRect const b = [self insetBounds];
 	return [self scrollTo:PGOffsetPointByXY(NSMakePoint(aPoint.x * NSWidth(_documentFrame), aPoint.y * NSHeight(_documentFrame)), NSWidth(b) / -2 + NSMinX(_documentFrame), NSHeight(b) / -2 + NSMinY(_documentFrame)) allowAnimation:flag];
 }
 - (BOOL)scrollBy:(NSSize)aSize
@@ -449,6 +464,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (PGClipView *)PG_clipView
 {
 	return self;
+}
+
+#pragma mark PGZooming Protocol
+
+- (NSSize)PG_zoomedBoundsSize
+{
+	return PGInsetSize([super PG_zoomedBoundsSize], PGInvertInset([self boundsInset]));
 }
 
 #pragma mark NSView
