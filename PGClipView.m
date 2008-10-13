@@ -288,13 +288,25 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark -
 
-- (void)mouseDown:(NSEvent *)firstEvent
-        secondaryButton:(BOOL)flag
+- (BOOL)handleMouseDown:(NSEvent *)firstEvent
 {
+	NSParameterAssert(firstEvent);
 	NSParameterAssert(PGNotDragging == _dragMode);
 	[self stopAnimatedScrolling];
-	int const dragMask = flag ? NSRightMouseDraggedMask : NSLeftMouseDraggedMask;
-	NSEventType const stopType = flag ? NSRightMouseUp : NSLeftMouseUp;
+	BOOL handled = NO;
+	unsigned dragMask = 0;
+	NSEventType stopType = 0;
+	switch([firstEvent type]) {
+		case NSLeftMouseDown:
+			dragMask = NSLeftMouseDraggedMask;
+			stopType = NSLeftMouseUp;
+			break;
+		case NSRightMouseDown:
+			dragMask = NSRightMouseDraggedMask;
+			stopType = NSRightMouseUp;
+			break;
+		default: return NO;
+	}
 	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO];
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
@@ -317,6 +329,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 	if(PGNotDragging != _dragMode) {
+		handled = YES;
 		[PGPointingHandCursor() set];
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
@@ -326,8 +339,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			[NSCursor unhide];
 		}
 		_dragMode = PGNotDragging;
-	} else if(!_firstMouse) [[self delegate] clipViewWasClicked:self event:firstEvent];
+	} else if(_firstMouse) handled = YES;
+	else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent];
 	_firstMouse = NO;
+	return handled;
 }
 - (void)arrowKeyDown:(NSEvent *)firstEvent
 {
@@ -546,11 +561,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)mouseDown:(NSEvent *)anEvent
 {
-	[self mouseDown:anEvent secondaryButton:NO];
+	[self handleMouseDown:anEvent];
 }
 - (void)rightMouseDown:(NSEvent *)anEvent
 {
-	[self mouseDown:anEvent secondaryButton:YES];
+	[self handleMouseDown:anEvent];
 }
 - (void)scrollWheel:(NSEvent *)anEvent
 {
@@ -699,7 +714,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 @implementation NSObject (PGClipViewDelegate)
 
-- (void)clipViewWasClicked:(PGClipView *)sender event:(NSEvent *)anEvent {}
+- (BOOL)clipView:(PGClipView *)sender
+        handleMouseEvent:(NSEvent *)anEvent
+{
+	return NO;
+}
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
 {

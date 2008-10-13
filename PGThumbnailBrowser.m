@@ -38,7 +38,9 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setDataSource:(id)obj
 {
+	if(obj == dataSource) return;
 	dataSource = obj;
+	[[self views] makeObjectsPerformSelector:@selector(setDataSource:) withObject:obj];
 }
 
 #pragma mark -
@@ -47,10 +49,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self removeAllColumns];
 	PGThumbnailView *const thumbnailView = [[[PGThumbnailView alloc] init] autorelease];
-	[thumbnailView setDataSource:self];
+	[thumbnailView setDataSource:[self dataSource]];
 	[thumbnailView setDelegate:self];
 	[thumbnailView setRepresentedObject:nil];
-	[self insertColumnWithView:thumbnailView atIndex:0];
+	[self addColumnWithView:thumbnailView];
 	[thumbnailView reloadData];
 }
 - (void)reloadChildrenOfItem:(id)item
@@ -61,21 +63,19 @@ DEALINGS WITH THE SOFTWARE. */
 {
 }
 
-#pragma mark PGThumbnailViewDataSource Protocol
+#pragma mark PGThumbnailViewDelegate Protocol
 
-- (unsigned)numberOfItemsForThumbnailView:(PGThumbnailView *)sender
+- (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
-	return [[self dataSource] browser:self numberOfChildrenOfItem:[sender representedObject]];
-}
-- (NSImage *)thumbnailView:(PGThumbnailView *)sender
-             thumbnailAtIndex:(unsigned)index
-{
-	return [[self dataSource] browser:self thumbnailForChildOfItem:[sender representedObject] atIndex:index];
-}
-- (BOOL)thumbnailView:(PGThumbnailView *)sender
-        canSelectThumbnailAtIndex:(unsigned)index
-{
-	return [[self dataSource] browser:self canSelectorChildOfItem:[sender representedObject] atIndex:index];
+	NSSet *const newSelection = [sender selection];
+	if([newSelection count] == 1) {
+		PGThumbnailView *const thumbnailView = [[[PGThumbnailView alloc] init] autorelease];
+		[thumbnailView setDataSource:[self dataSource]];
+		[thumbnailView setDelegate:self];
+		[thumbnailView setRepresentedObject:[newSelection anyObject]];
+		[self addColumnWithView:thumbnailView];
+		[thumbnailView reloadData];
+	} else [self removeColumnsAfterView:sender];
 }
 
 #pragma mark PGBezelPanelContentView Protocol

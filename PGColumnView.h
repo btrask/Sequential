@@ -37,8 +37,10 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 - (NSArray *)views;
+- (void)addColumnWithView:(NSView *)aView;
 - (void)insertColumnWithView:(NSView *)aView atIndex:(unsigned)index;
 - (void)removeColumnWithView:(NSView *)aView;
+- (void)removeColumnsAfterView:(NSView *)aView;
 - (void)removeAllColumns;
 
 - (void)layout;

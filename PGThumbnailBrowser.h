@@ -25,6 +25,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 #import "PGColumnView.h"
 
+// Views
+#import "PGThumbnailView.h"
+
 @interface PGThumbnailBrowser : PGColumnView
 {
 	@private
@@ -32,19 +35,10 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 - (id)dataSource;
-- (void)setDataSource:(id)obj;
+- (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
 
 - (void)reloadData;
 - (void)reloadChildrenOfItem:(id)item;
 - (void)reloadChildOfItem:(id)item atIndex:(unsigned)index;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDataSource)
-
-- (unsigned)browser:(PGThumbnailBrowser *)sender numberOfChildrenOfItem:(id)item;
-- (id)browser:(PGThumbnailBrowser *)sender childOfItem:(id)item atIndex:(unsigned)index;
-- (NSImage *)browser:(PGThumbnailBrowser *)sender thumbnailForChildOfItem:(id)item atIndex:(unsigned)index;
-- (BOOL)browser:(PGThumbnailBrowser *)sender canSelectorChildOfItem:(id)item atIndex:(unsigned)index;
 
 @end

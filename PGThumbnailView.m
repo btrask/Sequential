@@ -24,6 +24,12 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGThumbnailView.h"
 
+// Views
+#import "PGClipView.h"
+
+// Categories
+#import "NSBezierPathAdditions.h"
+
 #define PGThumbnailSize      48.0
 #define PGThumbnailMargin    8.0
 #define PGThumbnailSizeTotal (PGThumbnailSize + PGThumbnailMargin)
@@ -61,24 +67,57 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (NSSet *)selection
+{
+	return [[_selection copy] autorelease];
+}
+
+#pragma mark -
+
 - (unsigned)numberOfColumns
 {
-	return [self numberOfColumnsWithWidth:NSWidth([self bounds])];
+	return _numberOfColumns;
 }
-- (unsigned)numberOfColumnsWithWidth:(unsigned)width
+- (unsigned)indexOfItemAtPoint:(NSPoint)p
 {
-	return (width - PGThumbnailMargin) / PGThumbnailSizeTotal;
+	return floorf(p.y / PGThumbnailSizeTotal) * _numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
+}
+- (NSRect)frameOfItemAtIndex:(unsigned)index
+          withMargin:(BOOL)flag
+{
+	NSRect const frame = NSMakeRect((index % _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, (index / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize);
+	return flag ? NSInsetRect(frame, -PGThumbnailMargin, -PGThumbnailMargin) : frame;
 }
 
 #pragma mark -
 
 - (void)reloadData
 {
+	[_selection removeAllObjects]; // TODO: Maintain the selection as much as possible.
+	[_items release];
+	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
 	[self setFrameSize:NSMakeSize(NSWidth([self frame]), 0)];
 	[self setNeedsDisplay:YES];
 }
 
+#pragma mark PGClipViewDocumentView Protocol
+
+- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
+{
+	return YES;
+}
+
 #pragma mark NSView
+
+- (id)initWithFrame:(NSRect)aRect
+{
+	if((self = [super initWithFrame:aRect])) {
+		_selection = (NSMutableSet *)CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
+	}
+	return self;
+}
+
+#pragma mark -
 
 - (BOOL)isFlipped
 {
@@ -86,19 +125,50 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	[[NSColor blueColor] set];
-	unsigned i = 0;
-	unsigned const count = [[self dataSource] numberOfItemsForThumbnailView:self];
-	unsigned const col = [self numberOfColumns];
-	for(; i < count; i++) {
-		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailAtIndex:i];
+	unsigned i = [self indexOfItemAtPoint:aRect.origin];
+	unsigned const max = MIN([_items count], [self indexOfItemAtPoint:NSMakePoint(NSMaxX(aRect), NSMaxY(aRect))] + 1);
+	for(; i < max; i++) {
+		id const item = [_items objectAtIndex:i];
+		if([_selection containsObject:item]) {
+			[[NSColor alternateSelectedControlColor] set];
+			NSBezierPath *const path = [NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -3, -3) cornerRadius:4.0];
+			[path setLineWidth:2.0];
+			[path stroke];
+		}
+		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		[thumb setFlipped:[self isFlipped]];
-		[thumb drawInRect:NSMakeRect((i % col) * PGThumbnailSizeTotal + PGThumbnailMargin, (i / col) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectThumbnailAtIndex:i] ? 1.0 : 0.5)];
+		[thumb drawInRect:[self frameOfItemAtIndex:i withMargin:NO] fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0 : 0.5)];
 	}
 }
+
+#pragma mark -
+
 - (void)setFrameSize:(NSSize)aSize
 {
-	[super setFrameSize:NSMakeSize(aSize.width, ceilf((float)[[self dataSource] numberOfItemsForThumbnailView:self] / [self numberOfColumnsWithWidth:aSize.width]) * PGThumbnailSizeTotal + PGThumbnailMargin)];
+	_numberOfColumns = (aSize.width - PGThumbnailMargin) / PGThumbnailSizeTotal;
+	[super setFrameSize:NSMakeSize(aSize.width, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin)];
+}
+
+#pragma mark NSResponder
+
+- (void)mouseDown:(NSEvent *)anEvent
+{
+	if([[self PG_enclosingClipView] handleMouseDown:anEvent]) return;
+	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
+	unsigned const numberOfColumns = [self numberOfColumns];
+	unsigned const i = floorf(p.y / PGThumbnailSizeTotal) * numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
+	if(i >= [_items count]) return;
+	id const item = [_items objectAtIndex:i];
+	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
+	if([_selection containsObject:item]) {
+		if(!modifyExistingSelection) return;
+		[_selection removeObject:item];
+	} else {
+		if(!modifyExistingSelection) [_selection removeAllObjects];
+		[_selection addObject:item];
+	}
+	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:i withMargin:YES]];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
 #pragma mark NSObject
@@ -106,6 +176,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[_representedObject release];
+	[_selection release];
 	[super dealloc];
 }
 
@@ -113,17 +184,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSObject (PGThumbnailViewDataSource)
 
-- (unsigned)numberOfItemsForThumbnailView:(PGThumbnailView *)sender
+- (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
-	return 0;
+	return nil;
 }
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender
-             thumbnailAtIndex:(unsigned)index
+             thumbnailForItem:(id)item
 {
 	return nil;
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
-        canSelectThumbnailAtIndex:(unsigned)index
+        canSelectItem:(id)item;
 {
 	return NO;
 }

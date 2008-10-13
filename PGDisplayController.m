@@ -908,8 +908,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 #pragma mark PGClipViewDelegate Protocol
 
-- (void)clipViewWasClicked:(PGClipView *)sender
-        event:(NSEvent *)anEvent
+- (BOOL)clipView:(PGClipView *)sender
+        handleMouseEvent:(NSEvent *)anEvent
 {
 	BOOL const primary = [anEvent type] == NSLeftMouseDown;
 	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
@@ -922,6 +922,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	if([anEvent modifierFlags] & NSShiftKeyMask) forward = !forward;
 	if(forward) [self nextPage:self];
 	else [self previousPage:self];
+	return YES;
 }
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
@@ -996,32 +997,23 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
-#pragma mark PGThumbnailBrowserDataSource Protocol
+#pragma mark PGThumbnailViewDataSource Protocol
 
-- (unsigned)browser:(PGThumbnailBrowser *)sender
-            numberOfChildrenOfItem:(id)item;
+- (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
-	if(item) return [item isContainer] ? [[item unsortedChildren] count] : 0;
-	PGNode *const node = [[self activeDocument] node];
-	return [node isContainer] ? [[(PGContainerAdapter *)node unsortedChildren] count] : 1;
+	id const item = [sender representedObject];
+	if(!item) return [[[self activeDocument] node] AE_asArray];
+	return [item isContainer] ? [item sortedChildren] : nil;
 }
-- (id)browser:(PGThumbnailBrowser *)sender
-      childOfItem:(id)item
-      atIndex:(unsigned)index;
+- (NSImage *)thumbnailView:(PGThumbnailView *)sender
+             thumbnailForItem:(id)item
 {
-	return [[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index];
+	return [[item identifier] icon];
 }
-- (NSImage *)browser:(PGThumbnailBrowser *)sender
-             thumbnailForChildOfItem:(id)item
-             atIndex:(unsigned)index;
+- (BOOL)thumbnailView:(PGThumbnailView *)sender
+        canSelectItem:(id)item;
 {
-	return [[[[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index] identifier] icon];
-}
-- (BOOL)browser:(PGThumbnailBrowser *)sender
-        canSelectorChildOfItem:(id)item
-        atIndex:(unsigned)index
-{
-	return [[[(item ? item : [[self activeDocument] node]) sortedChildren] objectAtIndex:index] isViewable];
+	return [item hasViewableNodes];
 }
 
 #pragma mark NSServicesRequests Protocol

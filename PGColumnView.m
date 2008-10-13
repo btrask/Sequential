@@ -37,6 +37,11 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[_views copy] autorelease];
 }
+- (void)addColumnWithView:(NSView *)aView
+{
+	[self insertColumnWithView:aView atIndex:[_views count]];
+	[_clipView scrollToEdge:PGMaxXEdgeMask allowAnimation:YES];
+}
 - (void)insertColumnWithView:(NSView *)aView
         atIndex:(unsigned)index
 {
@@ -66,6 +71,19 @@ DEALINGS WITH THE SOFTWARE. */
 	[_views removeObjectAtIndex:i];
 	[self layout];
 }
+- (void)removeColumnsAfterView:(NSView *)aView
+{
+	unsigned const i = [_views indexOfObject:aView];
+	NSParameterAssert(NSNotFound != i);
+	while([_views count] > i + 1) {
+		PGClipView *const clip = [_clipViews lastObject];
+		[clip setDocumentView:nil];
+		[clip removeFromSuperview];
+		[_clipViews removeLastObject];
+		[_views removeLastObject];
+	}
+	[self layout];
+}
 - (void)removeAllColumns
 {
 	[_clipViews makeObjectsPerformSelector:@selector(setDocumentView:) withObject:nil];
@@ -81,13 +99,13 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSRect const b = [self bounds];
 	float const colWidth = MAX(floorf(NSWidth(b) / [_views count]), PGMinColumnWidth);
-	[_view setFrameSize:NSMakeSize(colWidth * [_views count], NSHeight(b))];
+	[_view setFrameSize:NSMakeSize(MAX(colWidth * [_views count], NSWidth(b)), NSHeight(b))];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
 	for(; i < count; i++) {
 		float const min = NSMinX(vb) + colWidth * i;
-		[[_clipViews objectAtIndex:i] setFrame:NSMakeRect(min, NSMinY(vb) + 1, (count - 1 == i ? NSWidth(b) - min : colWidth - 1), NSHeight(vb) - 1)];
+		[[_clipViews objectAtIndex:i] setFrame:NSMakeRect(min, NSMinY(vb) + 1, (count == i + 1 ? NSWidth(b) - min : colWidth - 1), NSHeight(vb) - 1)];
 	}
 }
 

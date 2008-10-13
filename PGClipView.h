@@ -83,7 +83,7 @@ typedef int PGScrollType;
 - (BOOL)scrollToLocation:(PGPageLocation)location allowAnimation:(BOOL)flag;
 - (void)stopAnimatedScrolling;
 
-- (void)mouseDown:(NSEvent *)firstEvent secondaryButton:(BOOL)flag;
+- (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
 - (void)scrollInDirection:(PGRectEdgeMask)direction type:(PGScrollType)scrollType;
 - (void)magicPanForward:(BOOL)forward acrossFirst:(BOOL)across;
@@ -94,7 +94,7 @@ typedef int PGScrollType;
 
 @interface NSObject (PGClipViewDelegate)
 
-- (void)clipViewWasClicked:(PGClipView *)sender event:(NSEvent *)anEvent;
+- (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.

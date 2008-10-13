@@ -27,9 +27,12 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGThumbnailView : NSView
 {
 	@private
-	IBOutlet id  dataSource;
-	IBOutlet id  delegate;
-	         id _representedObject;
+	IBOutlet id             dataSource;
+	IBOutlet id             delegate;
+	         id            _representedObject;
+	         NSArray      *_items;
+	         NSMutableSet *_selection;
+	         unsigned      _numberOfColumns;
 }
 
 - (id)dataSource;
@@ -39,8 +42,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)representedObject;
 - (void)setRepresentedObject:(id)obj;
 
+- (NSSet *)selection;
+
 - (unsigned)numberOfColumns;
-- (unsigned)numberOfColumnsWithWidth:(unsigned)width;
+- (unsigned)indexOfItemAtPoint:(NSPoint)p;
+- (NSRect)frameOfItemAtIndex:(unsigned)index withMargin:(BOOL)flag;
 
 - (void)reloadData;
 
@@ -48,9 +54,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSObject (PGThumbnailViewDataSource)
 
-- (unsigned)numberOfItemsForThumbnailView:(PGThumbnailView *)sender;
-- (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailAtIndex:(unsigned)index;
-- (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectThumbnailAtIndex:(unsigned)index;
+- (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender;
+- (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item;
+- (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 
 @end
 
