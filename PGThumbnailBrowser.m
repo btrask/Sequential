@@ -48,6 +48,14 @@ DEALINGS WITH THE SOFTWARE. */
 	dataSource = obj;
 	[[self views] makeObjectsPerformSelector:@selector(setDataSource:) withObject:obj];
 }
+- (id)delegate
+{
+	return delegate;
+}
+- (void)setDelegate:(id)obj
+{
+	delegate = obj;
+}
 
 #pragma mark -
 
@@ -82,7 +90,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
 	NSSet *const newSelection = [sender selection];
-	if([newSelection count] != 1) return [self removeColumnsAfterView:sender];
+	if([newSelection count] != 1) {
+		[self removeColumnsAfterView:sender];
+		[[self delegate] thumbnailViewSelectionDidChange:self];
+		return;
+	}
 	id const selectedItem = [newSelection anyObject];
 	NSArray *const views = [self views];
 	unsigned const col = [views indexOfObjectIdenticalTo:sender];
@@ -96,6 +108,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[self removeColumnsAfterView:sender];
 	}
 	[self _addColumnWithItem:selectedItem];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
 #pragma mark PGBezelPanelContentView Protocol
@@ -116,5 +129,11 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return YES;
 }
+
+@end
+
+@implementation NSObject (PGThumbnailBrowserDelegate)
+
+- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender {}
 
 @end

@@ -162,6 +162,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned const i = floorf(p.y / PGThumbnailSizeTotal) * numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
 	if(i >= [_items count]) return;
 	id const item = [_items objectAtIndex:i];
+	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
 	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
 	if([_selection containsObject:item]) {
 		if(!modifyExistingSelection) return;
@@ -171,7 +172,7 @@ DEALINGS WITH THE SOFTWARE. */
 			[_selection removeAllObjects];
 			[self setNeedsDisplay:YES];
 		}
-		[_selection addObject:item];
+		if(canSelect) [_selection addObject:item];
 	}
 	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:i withMargin:YES]];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
@@ -202,7 +203,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;
 {
-	return NO;
+	return YES;
 }
 
 @end

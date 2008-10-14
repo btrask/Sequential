@@ -32,10 +32,13 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	@private
 	IBOutlet id dataSource;
+	IBOutlet id delegate;
 }
 
 - (id)dataSource;
 - (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
+- (id)delegate;
+- (void)setDelegate:(id)obj;
 
 - (void)reloadData;
 - (void)reloadChildrenOfItem:(id)item;
@@ -46,5 +49,11 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSObject (PGThumbnailBrowserDataSource)
 
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
+
+@end
+
+@interface NSObject (PGThumbnailBrowserDelegate)
+
+- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
 
 @end
