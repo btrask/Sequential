@@ -42,6 +42,7 @@ typedef int PGScrollType;
 	         PGInset        _boundsInset;
 	         NSColor       *_backgroundColor;
 	         BOOL           _showsBorder;
+	         NSCursor      *_cursor;
 	         NSPoint        _position;
 	         NSTimer       *_scrollTimer;
 	         NSTimeInterval _lastScrollTime;
@@ -67,6 +68,8 @@ typedef int PGScrollType;
 - (void)setBackgroundColor:(NSColor *)aColor;
 - (BOOL)showsBorder;
 - (void)setShowsBorder:(BOOL)flag;
+- (NSCursor *)cursor;
+- (void)setCursor:(NSCursor *)cursor;
 
 - (NSRect)scrollableRectWithBorder:(BOOL)flag;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;

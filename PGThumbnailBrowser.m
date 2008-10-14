@@ -28,6 +28,12 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGBezelPanel;
 #import "PGThumbnailView.h"
 
+@interface PGThumbnailBrowser (Private)
+
+- (void)_addColumnWithItem:(id)item;
+
+@end
+
 @implementation PGThumbnailBrowser
 
 #pragma mark Instance Methods
@@ -48,12 +54,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)reloadData
 {
 	[self removeAllColumns];
-	PGThumbnailView *const thumbnailView = [[[PGThumbnailView alloc] init] autorelease];
-	[thumbnailView setDataSource:[self dataSource]];
-	[thumbnailView setDelegate:self];
-	[thumbnailView setRepresentedObject:nil];
-	[self addColumnWithView:thumbnailView];
-	[thumbnailView reloadData];
+	[self _addColumnWithItem:nil];
 }
 - (void)reloadChildrenOfItem:(id)item
 {
@@ -63,19 +64,38 @@ DEALINGS WITH THE SOFTWARE. */
 {
 }
 
+#pragma mark Private Protocol
+
+- (void)_addColumnWithItem:(id)item
+{
+	if(item && dataSource && ![dataSource thumbnailBrowser:self itemCanHaveChildren:item]) return;
+	PGThumbnailView *const thumbnailView = [[[PGThumbnailView alloc] init] autorelease];
+	[thumbnailView setDataSource:[self dataSource]];
+	[thumbnailView setDelegate:self];
+	[thumbnailView setRepresentedObject:item];
+	[thumbnailView reloadData];
+	[self addColumnWithView:thumbnailView];
+}
+
 #pragma mark PGThumbnailViewDelegate Protocol
 
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
 	NSSet *const newSelection = [sender selection];
-	if([newSelection count] == 1) {
-		PGThumbnailView *const thumbnailView = [[[PGThumbnailView alloc] init] autorelease];
-		[thumbnailView setDataSource:[self dataSource]];
-		[thumbnailView setDelegate:self];
-		[thumbnailView setRepresentedObject:[newSelection anyObject]];
-		[self addColumnWithView:thumbnailView];
-		[thumbnailView reloadData];
-	} else [self removeColumnsAfterView:sender];
+	if([newSelection count] != 1) return [self removeColumnsAfterView:sender];
+	id const selectedItem = [newSelection anyObject];
+	NSArray *const views = [self views];
+	unsigned const col = [views indexOfObjectIdenticalTo:sender];
+	NSParameterAssert(NSNotFound != col);
+	if(col + 1 < [views count]) {
+		PGThumbnailView *const nextView = [views objectAtIndex:col + 1];
+		if([nextView representedObject] == selectedItem) {
+			// TODO: Deselect everything in nextView.
+			return;
+		}
+		[self removeColumnsAfterView:sender];
+	}
+	[self _addColumnWithItem:selectedItem];
 }
 
 #pragma mark PGBezelPanelContentView Protocol
@@ -91,28 +111,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSObject (PGThumbnailBrowserDataSource)
 
-- (unsigned)browser:(PGThumbnailBrowser *)sender
-            numberOfChildrenOfItem:(id)item
+- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
+        itemCanHaveChildren:(id)item
 {
-	return 0;
-}
-- (id)browser:(PGThumbnailBrowser *)sender
-      childOfItem:(id)item
-      atIndex:(unsigned)index
-{
-	return nil;
-}
-- (NSImage *)browser:(PGThumbnailBrowser *)sender
-             thumbnailForChildOfItem:(id)item
-             atIndex:(unsigned)index
-{
-	return nil;
-}
-- (BOOL)browser:(PGThumbnailBrowser *)sender
-        canSelectorChildOfItem:(id)item
-        atIndex:(unsigned)index
-{
-	return NO;
+	return YES;
 }
 
 @end

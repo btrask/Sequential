@@ -42,3 +42,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)reloadChildOfItem:(id)item atIndex:(unsigned)index;
 
 @end
+
+@interface NSObject (PGThumbnailBrowserDataSource)
+
+- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
+
+@end

@@ -997,6 +997,14 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
+#pragma mark PGThumbnailBrowserDataSource Protocol
+
+- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
+        itemCanHaveChildren:(id)item
+{
+	return [item isContainer];
+}
+
 #pragma mark PGThumbnailViewDataSource Protocol
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
@@ -1089,6 +1097,8 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 	[[self window] useOptimizedDrawing:YES];
 
+	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
+	[clipView setCursor:(cursorImage ? [[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] : [NSCursor pointingHandCursor])];
 	[clipView setPostsFrameChangedNotifications:YES];
 	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 

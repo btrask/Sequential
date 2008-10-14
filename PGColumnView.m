@@ -27,7 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 #import "PGClipView.h"
 
-#define PGMinColumnWidth 200
+#define PGColumnWidth ((48.0 + 8.0) * 5 + 8.0)
 
 @implementation PGColumnView
 
@@ -51,12 +51,13 @@ DEALINGS WITH THE SOFTWARE. */
 	[_clipViews insertObject:clip atIndex:index];
 	[_views insertObject:aView atIndex:index];
 	[_view addSubview:clip];
-	[clip setBackgroundColor:[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f]];
+	[clip setBackgroundColor:nil];
 	[clip setShowsBorder:NO];
 	[clip setDocumentView:aView];
 	[self layout];
 	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[aView setAutoresizingMask:NSViewWidthSizable];
+	[clip scrollToLocation:PGHomeLocation allowAnimation:NO];
 }
 - (void)removeColumnWithView:(NSView *)aView
 {
@@ -98,15 +99,12 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)layout
 {
 	NSRect const b = [self bounds];
-	float const colWidth = MAX(floorf(NSWidth(b) / [_views count]), PGMinColumnWidth);
-	[_view setFrameSize:NSMakeSize(MAX(colWidth * [_views count], NSWidth(b)), NSHeight(b))];
+	[_view setFrameSize:NSMakeSize(MAX(PGColumnWidth * [_views count], NSWidth(b)), NSHeight(b))];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
-	for(; i < count; i++) {
-		float const min = NSMinX(vb) + colWidth * i;
-		[[_clipViews objectAtIndex:i] setFrame:NSMakeRect(min, NSMinY(vb) + 1, (count == i + 1 ? NSWidth(b) - min : colWidth - 1), NSHeight(vb) - 1)];
-	}
+	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + (PGColumnWidth + 1) * i, NSMinY(vb), PGColumnWidth, NSHeight(vb))];
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark NSView
@@ -128,8 +126,14 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	[[NSColor whiteColor] set];
+	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
 	NSRectFill(aRect);
+	NSRect const vb = [_view bounds];
+	[[NSColor whiteColor] set];
+	unsigned i = 0;
+	unsigned const count = [_clipViews count];
+	[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
+	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + (PGColumnWidth + 1) * i + PGColumnWidth, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
 }
 - (void)setFrameSize:(NSSize)aSize
 {

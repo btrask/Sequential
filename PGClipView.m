@@ -44,15 +44,6 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
 #define PGLineScrollDistance       (PGBorderPadding * 3)
 
-static NSCursor *PGPointingHandCursor(void)
-{
-	static NSCursor *cursor = nil;
-	if(!cursor) {
-		NSImage *const image = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
-		cursor = image ? [[NSCursor alloc] initWithImage:image hotSpot:NSMakePoint(5, 0)] : [NSCursor pointingHandCursor];
-	}
-	return cursor;
-}
 static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
 {
 	if(NSIsEmptyRect(subtrahend)) {
@@ -159,6 +150,17 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)setShowsBorder:(BOOL)flag
 {
 	_showsBorder = flag;
+}
+- (NSCursor *)cursor
+{
+	return [[_cursor retain] autorelease];
+}
+- (void)setCursor:(NSCursor *)cursor
+{
+	if(cursor == _cursor) return;
+	[_cursor release];
+	_cursor = [cursor retain];
+	[[self window] invalidateCursorRectsForView:self];
 }
 
 #pragma mark -
@@ -276,7 +278,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)scrollToLocation:(PGPageLocation)location
         allowAnimation:(BOOL)flag
 {
-	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] allowAnimation:flag];
+	return [self scrollToEdge:(delegate ? [delegate clipView:self directionFor:location] : PGMinXEdgeMask | PGMaxYEdgeMask) allowAnimation:flag];
 }
 
 - (void)stopAnimatedScrolling
@@ -330,7 +332,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 	if(PGNotDragging != _dragMode) {
 		handled = YES;
-		[PGPointingHandCursor() set];
+		[_cursor set];
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
@@ -392,7 +394,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)magicPanForward:(BOOL)forward
         acrossFirst:(BOOL)across
 {
-	PGRectEdgeMask const mask = [[self delegate] clipView:self directionFor:(forward ? PGEndLocation : PGHomeLocation)];
+	PGRectEdgeMask const mask = delegate ? [delegate clipView:self directionFor:(forward ? PGEndLocation : PGHomeLocation)] : PGMinXEdgeMask | PGMaxYEdgeMask;
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Delegate returned contradictory directions.");
 	NSPoint position = [self position];
 	PGRectEdgeMask const dir1 = mask & (across ? PGHorzEdgesMask : PGVertEdgesMask);
@@ -494,6 +496,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	if((self = [super initWithFrame:aRect])) {
 		[self setShowsBorder:YES];
+		[self setCursor:[NSCursor arrowCursor]];
 	}
 	return self;
 }
@@ -536,13 +539,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect b = [self bounds];
 	if([[self window] styleMask] & NSResizableWindowMask) {
 		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
-		while(i--) [self addCursorRect:rects[i] cursor:PGPointingHandCursor()];
+		while(i--) [self addCursorRect:rects[i] cursor:_cursor];
 
 		b.origin.y += 15;
 		b.size.height -= 15;
 	}
 	PGGetRectDifference(rects, &i, b, ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
-	while(i--) [self addCursorRect:rects[i] cursor:PGPointingHandCursor()];
+	while(i--) [self addCursorRect:rects[i] cursor:_cursor];
 }
 
 - (void)setFrameSize:(NSSize)newSize
@@ -707,6 +710,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self stopAnimatedScrolling];
 	[documentView release];
 	[_backgroundColor release];
+	[_cursor release];
 	[super dealloc];
 }
 
@@ -732,7 +736,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (PGRectEdgeMask)clipView:(PGClipView *)sender
                   directionFor:(PGPageLocation)pageLocation
 {
-	return PGNoEdges;
+	return PGMinXEdgeMask | PGMaxYEdgeMask;
 }
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}

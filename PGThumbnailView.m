@@ -80,7 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (unsigned)indexOfItemAtPoint:(NSPoint)p
 {
-	return floorf(p.y / PGThumbnailSizeTotal) * _numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
+	return floorf((p.y - PGThumbnailMargin) / PGThumbnailSizeTotal) * _numberOfColumns + floorf((p.x - PGThumbnailMargin) / PGThumbnailSizeTotal);
 }
 - (NSRect)frameOfItemAtIndex:(unsigned)index
           withMargin:(BOOL)flag
@@ -96,7 +96,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_selection removeAllObjects]; // TODO: Maintain the selection as much as possible.
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
-	[self setFrameSize:NSMakeSize(NSWidth([self frame]), 0)];
+	[self setFrameSize:NSZeroSize];
 	[self setNeedsDisplay:YES];
 }
 
@@ -131,7 +131,7 @@ DEALINGS WITH THE SOFTWARE. */
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[[NSColor alternateSelectedControlColor] set];
-			NSBezierPath *const path = [NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -3, -3) cornerRadius:4.0];
+			NSBezierPath *const path = [NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -2, -2) cornerRadius:4.0];
 			[path setLineWidth:2.0];
 			[path stroke];
 		}
@@ -143,10 +143,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (void)setFrameSize:(NSSize)aSize
+- (void)setFrameSize:(NSSize)oldSize
 {
-	_numberOfColumns = (aSize.width - PGThumbnailMargin) / PGThumbnailSizeTotal;
-	[super setFrameSize:NSMakeSize(aSize.width, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin)];
+	NSView *const superview = [self superview];
+	if(!superview) return;
+	unsigned const maxCols = (NSWidth([superview bounds]) - PGThumbnailMargin) / PGThumbnailSizeTotal;
+	_numberOfColumns = MAX(MIN(ceilf(sqrt([_items count])), maxCols), 1);
+	[super setFrameSize:NSMakeSize(_numberOfColumns * PGThumbnailSizeTotal + PGThumbnailMargin, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin)];
 }
 
 #pragma mark NSResponder
@@ -164,7 +167,10 @@ DEALINGS WITH THE SOFTWARE. */
 		if(!modifyExistingSelection) return;
 		[_selection removeObject:item];
 	} else {
-		if(!modifyExistingSelection) [_selection removeAllObjects];
+		if(!modifyExistingSelection) {
+			[_selection removeAllObjects];
+			[self setNeedsDisplay:YES];
+		}
 		[_selection addObject:item];
 	}
 	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:i withMargin:YES]];
