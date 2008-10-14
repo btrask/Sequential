@@ -246,7 +246,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         allowAnimation:(BOOL)flag
 {
 	if(!PGAnimateScrolling || !flag) {
-		NSLog(@"scroll to %@", NSStringFromPoint(aPoint));
 		[self stopAnimatedScrolling];
 		return [self _scrollTo:aPoint];
 	}
@@ -342,8 +341,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			[NSCursor unhide];
 		}
 		_dragMode = PGNotDragging;
-	} else if(_firstMouse) handled = YES;
-	else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent];
+	} else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent first:_firstMouse];
 	_firstMouse = NO;
 	return handled;
 }
@@ -721,6 +719,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (BOOL)clipView:(PGClipView *)sender
         handleMouseEvent:(NSEvent *)anEvent
+        first:(BOOL)flag
 {
 	return NO;
 }

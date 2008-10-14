@@ -910,7 +910,9 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 
 - (BOOL)clipView:(PGClipView *)sender
         handleMouseEvent:(NSEvent *)anEvent
+        first:(BOOL)flag
 {
+	if(flag) return;
 	BOOL const primary = [anEvent type] == NSLeftMouseDown;
 	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
 	BOOL forward;

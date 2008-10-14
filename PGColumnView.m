@@ -51,6 +51,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_clipViews insertObject:clip atIndex:index];
 	[_views insertObject:aView atIndex:index];
 	[_view addSubview:clip];
+	[clip setDelegate:self];
 	[clip setBackgroundColor:nil];
 	[clip setShowsBorder:NO];
 	[clip setDocumentView:aView];
@@ -107,6 +108,18 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned const count = [_clipViews count];
 	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + (PGColumnWidth + 1) * i, NSMinY(vb), PGColumnWidth, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
+}
+
+#pragma mark PGClipViewDelegate Protocol
+
+- (BOOL)clipView:(PGClipView *)sender
+        handleMouseEvent:(NSEvent *)anEvent
+        first:(BOOL)flag
+{
+	unsigned const i = [_clipViews indexOfObjectIdenticalTo:sender];
+	if(NSNotFound == i) return NO;
+	[[_views objectAtIndex:i] mouseDown:anEvent];
+	return YES;
 }
 
 #pragma mark NSView

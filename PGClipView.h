@@ -97,7 +97,7 @@ typedef int PGScrollType;
 
 @interface NSObject (PGClipViewDelegate)
 
-- (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent;
+- (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent first:(BOOL)flag;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.

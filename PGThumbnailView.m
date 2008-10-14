@@ -25,7 +25,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGThumbnailView.h"
 
 // Views
-#import "PGClipView.h"
+@class PGClipView;
 
 // Categories
 #import "NSBezierPathAdditions.h"
@@ -104,7 +104,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
-	return YES;
+	return NO;
 }
 
 #pragma mark NSView
@@ -156,23 +156,21 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)mouseDown:(NSEvent *)anEvent
 {
-	if([[self PG_enclosingClipView] handleMouseDown:anEvent]) return;
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	unsigned const numberOfColumns = [self numberOfColumns];
 	unsigned const i = floorf(p.y / PGThumbnailSizeTotal) * numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
-	if(i >= [_items count]) return;
-	id const item = [_items objectAtIndex:i];
+	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
 	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
 	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
 	if([_selection containsObject:item]) {
 		if(!modifyExistingSelection) return;
-		[_selection removeObject:item];
+		if(item) [_selection removeObject:item];
 	} else {
 		if(!modifyExistingSelection) {
 			[_selection removeAllObjects];
 			[self setNeedsDisplay:YES];
 		}
-		if(canSelect) [_selection addObject:item];
+		if(canSelect && item) [_selection addObject:item];
 	}
 	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:i withMargin:YES]];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
