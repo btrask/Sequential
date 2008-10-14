@@ -43,6 +43,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)removeColumnsAfterView:(NSView *)aView;
 - (void)removeAllColumns;
 
+- (void)scrollToTopOfColumnWithView:(NSView *)aView;
+
 - (void)layout;
 
 @end

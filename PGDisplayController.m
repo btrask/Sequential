@@ -912,7 +912,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
         handleMouseEvent:(NSEvent *)anEvent
         first:(BOOL)flag
 {
-	if(flag) return;
+	if(flag) return NO;
 	BOOL const primary = [anEvent type] == NSLeftMouseDown;
 	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
 	BOOL forward;

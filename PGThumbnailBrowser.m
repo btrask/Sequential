@@ -108,6 +108,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[nextView setRepresentedObject:selectedItem];
 		[nextView reloadData];
 		[self removeColumnsAfterView:nextView];
+		[self scrollToTopOfColumnWithView:nextView];
 	} else [self _addColumnWithItem:selectedItem];
 	[[self delegate] thumbnailBrowserSelectionDidChange:self];
 }

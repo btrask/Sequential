@@ -27,7 +27,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 #import "PGClipView.h"
 
-#define PGColumnWidth ((48.0 + 8.0) * 5 + 8.0)
+#define PGColumnContentWidth ((48.0 + 8.0) * 5 + 8.0)
+#define PGColumnWidth        (PGColumnContentWidth + 1.0)
 
 @implementation PGColumnView
 
@@ -58,7 +59,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self layout];
 	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[aView setAutoresizingMask:NSViewWidthSizable];
-	[clip scrollToEdge:PGMaxYEdgeMask allowAnimation:NO];
+	[self scrollToTopOfColumnWithView:aView];
 }
 - (void)removeColumnWithView:(NSView *)aView
 {
@@ -97,6 +98,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (void)scrollToTopOfColumnWithView:(NSView *)aView
+{
+	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask allowAnimation:NO];
+}
+
+#pragma mark -
+
 - (void)layout
 {
 	NSRect const b = [self bounds];
@@ -106,7 +114,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
-	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + (PGColumnWidth + 1) * i, NSMinY(vb), PGColumnWidth, NSHeight(vb))];
+	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + PGColumnWidth * i, NSMinY(vb), PGColumnContentWidth, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
 }
 
@@ -148,7 +156,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
 	[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
-	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + (PGColumnWidth + 1) * i + PGColumnWidth, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
+	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + PGColumnWidth * i + PGColumnWidth, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
 }
 - (void)setFrameSize:(NSSize)aSize
 {
