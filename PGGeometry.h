@@ -44,6 +44,7 @@ enum {
 };
 typedef unsigned PGRectEdgeMask;
 
+extern NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude);
 extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
 extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);

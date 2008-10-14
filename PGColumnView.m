@@ -57,7 +57,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self layout];
 	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[aView setAutoresizingMask:NSViewWidthSizable];
-	[clip scrollToLocation:PGHomeLocation allowAnimation:NO];
+	[clip scrollToEdge:PGMaxYEdgeMask allowAnimation:NO];
 }
 - (void)removeColumnWithView:(NSView *)aView
 {
@@ -99,7 +99,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)layout
 {
 	NSRect const b = [self bounds];
+	NSPoint const p = [_clipView position];
 	[_view setFrameSize:NSMakeSize(MAX(PGColumnWidth * [_views count], NSWidth(b)), NSHeight(b))];
+	[_clipView scrollTo:p allowAnimation:NO];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];

@@ -37,16 +37,21 @@ NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y)
 
 #pragma mark PGRectEdgeMask
 
-NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
+NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude)
 {
 	float const m = fabs(magnitude);
 	NSCParameterAssert(!PGHasContradictoryRectEdges(mask));
-	NSPoint location = NSZeroPoint;
-	if(mask & PGMinXEdgeMask) location.x = -m;
-	else if(mask & PGMaxXEdgeMask) location.x = m;
-	if(mask & PGMinYEdgeMask) location.y = -m;
-	else if(mask & PGMaxYEdgeMask) location.y = m;
-	return location;
+	NSSize size = NSZeroSize;
+	if(mask & PGMinXEdgeMask) size.width = -m;
+	else if(mask & PGMaxXEdgeMask) size.width = m;
+	if(mask & PGMinYEdgeMask) size.height = -m;
+	else if(mask & PGMaxYEdgeMask) size.height = m;
+	return size;
+}
+NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
+{
+	NSSize const s = PGRectEdgeMaskToSizeWithMagnitude(mask, magnitude);
+	return NSMakePoint(s.width, s.height);
 }
 PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold)
 {

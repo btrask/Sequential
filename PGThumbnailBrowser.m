@@ -92,7 +92,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSSet *const newSelection = [sender selection];
 	if([newSelection count] != 1) {
 		[self removeColumnsAfterView:sender];
-		[[self delegate] thumbnailViewSelectionDidChange:self];
+		[[self delegate] thumbnailBrowserSelectionDidChange:self];
 		return;
 	}
 	id const selectedItem = [newSelection anyObject];
@@ -105,10 +105,11 @@ DEALINGS WITH THE SOFTWARE. */
 			// TODO: Deselect everything in nextView.
 			return;
 		}
-		[self removeColumnsAfterView:sender];
-	}
-	[self _addColumnWithItem:selectedItem];
-	[[self delegate] thumbnailViewSelectionDidChange:self];
+		[nextView setRepresentedObject:selectedItem];
+		[nextView reloadData];
+		[self removeColumnsAfterView:nextView];
+	} else [self _addColumnWithItem:selectedItem];
+	[[self delegate] thumbnailBrowserSelectionDidChange:self];
 }
 
 #pragma mark PGBezelPanelContentView Protocol

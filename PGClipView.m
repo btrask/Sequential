@@ -246,6 +246,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         allowAnimation:(BOOL)flag
 {
 	if(!PGAnimateScrolling || !flag) {
+		NSLog(@"scroll to %@", NSStringFromPoint(aPoint));
 		[self stopAnimatedScrolling];
 		return [self _scrollTo:aPoint];
 	}
@@ -273,12 +274,12 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         allowAnimation:(BOOL)flag
 {
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
-	return PGNoEdges == mask ? NO : [self scrollTo:PGRectEdgeMaskToPointWithMagnitude(mask, FLT_MAX) allowAnimation:flag];
+	return PGNoEdges == mask ? NO : [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) allowAnimation:flag];
 }
 - (BOOL)scrollToLocation:(PGPageLocation)location
         allowAnimation:(BOOL)flag
 {
-	return [self scrollToEdge:(delegate ? [delegate clipView:self directionFor:location] : PGMinXEdgeMask | PGMaxYEdgeMask) allowAnimation:flag];
+	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] allowAnimation:flag];
 }
 
 - (void)stopAnimatedScrolling
@@ -394,7 +395,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)magicPanForward:(BOOL)forward
         acrossFirst:(BOOL)across
 {
-	PGRectEdgeMask const mask = delegate ? [delegate clipView:self directionFor:(forward ? PGEndLocation : PGHomeLocation)] : PGMinXEdgeMask | PGMaxYEdgeMask;
+	PGRectEdgeMask const mask = [[self delegate] clipView:self directionFor:(forward ? PGEndLocation : PGHomeLocation)];
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Delegate returned contradictory directions.");
 	NSPoint position = [self position];
 	PGRectEdgeMask const dir1 = mask & (across ? PGHorzEdgesMask : PGVertEdgesMask);
@@ -736,7 +737,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (PGRectEdgeMask)clipView:(PGClipView *)sender
                   directionFor:(PGPageLocation)pageLocation
 {
-	return PGMinXEdgeMask | PGMaxYEdgeMask;
+	return PGNoEdges;
 }
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}
