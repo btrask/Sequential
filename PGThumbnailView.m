@@ -147,8 +147,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSView *const superview = [self superview];
 	if(!superview) return;
-	unsigned const maxCols = NSWidth([superview bounds]) / PGThumbnailSizeTotal;
+	NSRect const sb = [superview bounds];
+	unsigned const maxCols = NSWidth(sb) / PGThumbnailSizeTotal;
 	_numberOfColumns = MAX(MIN(ceilf(sqrt([_items count])), maxCols), 1);
+	if(ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal > NSHeight(sb)) _numberOfColumns = MIN(ceilf((NSHeight(sb) / PGThumbnailSizeTotal) * [_items count]), maxCols);
 	[super setFrameSize:NSMakeSize(_numberOfColumns * PGThumbnailSizeTotal, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal)];
 }
 
