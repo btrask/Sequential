@@ -31,8 +31,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSBezierPathAdditions.h"
 
 #define PGThumbnailSize      48.0
-#define PGThumbnailMargin    8.0
-#define PGThumbnailSizeTotal (PGThumbnailSize + PGThumbnailMargin)
+#define PGThumbnailMargin    4.0
+#define PGThumbnailSizeTotal (PGThumbnailSize + PGThumbnailMargin * 2)
 
 @implementation PGThumbnailView
 
@@ -80,7 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (unsigned)indexOfItemAtPoint:(NSPoint)p
 {
-	return floorf((p.y - PGThumbnailMargin) / PGThumbnailSizeTotal) * _numberOfColumns + floorf((p.x - PGThumbnailMargin) / PGThumbnailSizeTotal);
+	return floorf(p.y / PGThumbnailSizeTotal) * _numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
 }
 - (NSRect)frameOfItemAtIndex:(unsigned)index
           withMargin:(BOOL)flag
@@ -147,9 +147,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSView *const superview = [self superview];
 	if(!superview) return;
-	unsigned const maxCols = (NSWidth([superview bounds]) - PGThumbnailMargin) / PGThumbnailSizeTotal;
+	unsigned const maxCols = NSWidth([superview bounds]) / PGThumbnailSizeTotal;
 	_numberOfColumns = MAX(MIN(ceilf(sqrt([_items count])), maxCols), 1);
-	[super setFrameSize:NSMakeSize(_numberOfColumns * PGThumbnailSizeTotal + PGThumbnailMargin, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin)];
+	[super setFrameSize:NSMakeSize(_numberOfColumns * PGThumbnailSizeTotal, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal)];
 }
 
 #pragma mark NSResponder
@@ -157,8 +157,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)mouseDown:(NSEvent *)anEvent
 {
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
-	unsigned const numberOfColumns = [self numberOfColumns];
-	unsigned const i = floorf(p.y / PGThumbnailSizeTotal) * numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
+	unsigned const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
 	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
 	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
