@@ -59,10 +59,24 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 }
 
 - (void)webView:(WebView *)sender
+        didReceiveTitle:(NSString *)title
+        forFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[[self identifier] setCustomDisplayName:title notify:YES];
+}
+- (void)webView:(WebView *)sender
+        didReceiveIcon:(NSImage *)image
+        forFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[[self identifier] setIcon:image notify:YES];
+}
+
+- (void)webView:(WebView *)sender
         didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setCustomDisplayName:[[frame dataSource] pageTitle] notify:YES];
 	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
 	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
 	[_webView stopLoading:self];
@@ -79,7 +93,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
         frame:(WebFrame *)frame
         decisionListener:(id<WebPolicyDecisionListener>)listener
 {
-	if([_webView mainFrame] == frame) [listener use];
+	if(frame == [_webView mainFrame]) [listener use];
 	else [listener ignore];
 }
 
