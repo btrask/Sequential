@@ -107,7 +107,6 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (PGOrientation)orientation
 {
-	(void)[self exifEntries];
 	return PGAddOrientation(_orientation, [super orientation]);
 }
 - (void)clearCache
