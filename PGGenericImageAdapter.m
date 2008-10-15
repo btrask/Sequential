@@ -45,7 +45,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_threaded_getImageRepWithInfo:(NSDictionary *)info
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-	NSData *const data = [[self node] dataWithInfo:info fast:NO];
+	NSData *data;
+	@synchronized(self) {
+		data = [[self node] dataWithInfo:info fast:NO];
+	}
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
 	int bestPixelCount = 0;
 	NSBitmapImageRep *rep, *bestRep = nil;

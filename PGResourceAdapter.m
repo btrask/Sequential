@@ -135,9 +135,11 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 }
 - (void)setNode:(PGNode *)aNode
 {
-	if(aNode == _node) return;
-	_node = aNode;
-	[self noteIsViewableDidChange];
+	@synchronized(self) {
+		if(aNode == _node) return;
+		_node = aNode;
+		[self noteIsViewableDidChange];
+	}
 }
 
 #pragma mark -
