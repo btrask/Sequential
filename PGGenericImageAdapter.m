@@ -135,6 +135,10 @@ DEALINGS WITH THE SOFTWARE. */
 	_readFailed = NO;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
 }
+- (NSImage *)thumbnail
+{
+	return [[[NSImage alloc] initWithData:[self data]] autorelease]; // FIXME: Obviously this isn't threaded, so it's unbelievably slow.
+}
 
 #pragma mark NSObject
 

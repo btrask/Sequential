@@ -35,6 +35,24 @@ NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y)
 	return NSMakePoint(aPoint.x + x, aPoint.y + y);
 }
 
+#pragma mark NSSize
+
+NSSize PGScaleSizeByXY(NSSize size, float scaleX, float scaleY)
+{
+	return NSMakeSize(size.width * scaleX, size.height * scaleY);
+}
+NSSize PGScaleSizeByFloat(NSSize size, float scale)
+{
+	return PGScaleSizeByXY(size, scale, scale);
+}
+
+#pragma mark NSRect
+
+NSRect PGCenteredSizeInRect(NSSize s, NSRect r)
+{
+	return NSMakeRect(NSMidX(r) - s.width / 2, NSMidY(r) - s.height / 2, s.width, s.height);
+}
+
 #pragma mark PGRectEdgeMask
 
 NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude)
@@ -116,7 +134,7 @@ extern NSSize PGInsetSize(NSSize s, PGInset i)
 	return NSMakeSize(s.width - i.minX - i.maxX, s.height - i.minY - i.maxY);
 }
 
-#pragma mark Other
+#pragma mark Animation
 
 NSTimeInterval PGUptime(void)
 {

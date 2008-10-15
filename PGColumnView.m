@@ -27,7 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 #import "PGClipView.h"
 
-#define PGColumnContentWidth ((48.0 + 8.0) * 5)
+#define PGColumnContentWidth ((48.0 + 12.0) * 5)
 #define PGColumnWidth        (PGColumnContentWidth + 1.0)
 
 @implementation PGColumnView

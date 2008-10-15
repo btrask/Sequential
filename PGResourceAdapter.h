@@ -52,6 +52,7 @@ typedef unsigned PGMatchPriority;
 	PGMatchPriority      _priority;
 	PGNode              *_node;
 	NSMutableDictionary *_info;
+	NSImage             *_thumbnail; // TODO: Currently unused, remove if it stays that way.
 	NSMutableArray      *_subloads;
 }
 
@@ -69,9 +70,11 @@ typedef unsigned PGMatchPriority;
 - (BOOL)shouldLoad;
 - (PGLoadPolicy)descendentLoadPolicy;
 - (void)loadIfNecessary;
-- (void)load; // Abstract method. Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
+- (void)load; // Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
 - (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
-- (void)read; // Abstract method. Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
+- (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
+
+- (NSImage *)thumbnail;
 
 - (void)noteResourceDidChange;
 

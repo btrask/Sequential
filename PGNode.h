@@ -33,9 +33,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGNodeLoadingDidProgressNotification;
 extern NSString *const PGNodeReadyForViewingNotification;
+extern NSString *const PGNodeThumbnailReadyNotification;
 
 extern NSString *const PGImageRepKey;
 extern NSString *const PGErrorKey;
+extern NSString *const PGThumbnailImageKey;
 
 extern NSString *const PGNodeErrorDomain;
 enum {
@@ -85,6 +87,7 @@ typedef unsigned PGNodeStatus;
 - (void)startLoadWithInfo:(id)info;
 - (void)continueLoadWithInfo:(id)info;
 - (void)loadFinished;
+
 - (void)becomeViewed;
 - (void)readIfNecessary;
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;

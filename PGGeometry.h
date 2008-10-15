@@ -29,6 +29,15 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
 extern NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
 
+#pragma mark NSSize
+
+extern NSSize PGScaleSizeByXY(NSSize size, float scaleX, float scaleY);
+extern NSSize PGScaleSizeByFloat(NSSize size, float scale);
+
+#pragma mark NSRect
+
+extern NSRect PGCenteredSizeInRect(NSSize s, NSRect r);
+
 #pragma mark PGRectEdgeMask
 
 enum {
@@ -98,7 +107,7 @@ extern PGInset PGInvertInset(PGInset inset);
 extern NSRect PGInsetRect(NSRect r, PGInset i);
 extern NSSize PGInsetSize(NSSize s, PGInset i);
 
-#pragma mark Other
+#pragma mark Animation
 
 #define PGAnimationFramesPerSecond 30.0
 #define PGAnimationFramerate       (1.0 / PGAnimationFramesPerSecond)

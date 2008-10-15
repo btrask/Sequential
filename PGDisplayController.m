@@ -67,10 +67,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return NSMakeSize(MIN(MAX(min.width, size.width), max.width), MIN(MAX(min.height, size.height), max.height));
 }
-static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
-{
-	return NSMakeSize(size.width * scaleX, size.height * scaleY);
-}
 
 @interface PGDisplayController (Private)
 
@@ -688,7 +684,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, (floorf(newSize.height * scaleX / scrollMax.height) * scrollMax.height) / newSize.height);
 			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, (floorf(newSize.width * scaleY / scrollMax.width) * scrollMax.width) / newSize.width);
 		} else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
-		newSize = PGConstrainSize(minSize, PGScaleSize(newSize, scaleX, scaleY), maxSize);
+		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
 	return NSMakeSize(roundf(newSize.width), roundf(newSize.height));
 }
@@ -1018,7 +1014,7 @@ static inline NSSize PGScaleSize(NSSize size, float scaleX, float scaleY)
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender
              thumbnailForItem:(id)item
 {
-	return [[item identifier] icon];
+	return [[item resourceAdapter] thumbnail];
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;

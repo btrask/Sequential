@@ -174,6 +174,11 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 	[[self node] readFinishedWithImageRep:nil error:nil];
 }
 
+- (NSImage *)thumbnail
+{
+	return [[self identifier] icon];
+}
+
 #pragma mark -
 
 - (void)noteResourceDidChange {}
@@ -435,6 +440,7 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 - (void)dealloc
 {
 	[_info release];
+	[_thumbnail release];
 	[_subloads release];
 	[super dealloc];
 }

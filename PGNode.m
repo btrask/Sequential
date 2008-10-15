@@ -41,20 +41,24 @@ DEALINGS WITH THE SOFTWARE. */
 
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
+NSString *const PGNodeThumbnailReadyNotification     = @"PGNodeThumbnailReady";
 
-NSString *const PGImageRepKey = @"PGImageRep";
-NSString *const PGErrorKey    = @"PGError";
+NSString *const PGImageRepKey       = @"PGImageRep";
+NSString *const PGErrorKey          = @"PGError";
+NSString *const PGThumbnailImageKey = @"PGThumbnailImage";
 
 NSString *const PGNodeErrorDomain        = @"PGNodeError";
 NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
 NSString *const PGDefaultEncodingKey     = @"PGDefaultEncoding";
 
 enum {
-	PGNodeNothing = 0,
-	PGNodeLoading = 1 << 0,
-	PGNodeReading = 1 << 1,
-	PGNodeLoadingWillRead = PGNodeLoading | PGNodeReading
-};
+	PGNodeNothing               = 0,
+	PGNodeLoading               = 1 << 0,
+	PGNodeReading               = 1 << 1,
+	PGNodeThumbnailing          = 1 << 2, // TODO: Currently unused, remove if it stays that way.
+	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading,
+	PGNodeLoadingOrThumbnailing = PGNodeLoading | PGNodeThumbnailing
+}; // PGNodeStatus.
 
 @interface PGNode (Private)
 
@@ -181,6 +185,9 @@ enum {
 	[self _updateFileAttributes];
 	[self readIfNecessary];
 }
+
+#pragma mark -
+
 - (void)becomeViewed
 {
 	[[self parentLoad] prioritizeSubload:self];
@@ -190,12 +197,12 @@ enum {
 }
 - (void)readIfNecessary
 {
-	if(PGNodeReading == _status) [_adapter read];
+	if((PGNodeLoadingOrReading & _status) == PGNodeReading) [_adapter read];
 }
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep
         error:(NSError *)error
 {
-	NSParameterAssert(PGNodeReading == _status);
+	NSParameterAssert((PGNodeLoadingOrReading & _status) == PGNodeReading);
 	_status = ~PGNodeReading & _status;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
 	[dict AE_setObject:aRep forKey:PGImageRepKey];
@@ -463,7 +470,7 @@ enum {
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = PGNodeLoading & _status || (_error && PGNodeReading == _errorPhase) || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
+	BOOL const flag = PGNodeLoading & _status || (_error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading) || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
 	if(flag == _viewable) return;
 	_viewable = flag;
 	[[self document] noteNodeIsViewableDidChange:self];
