@@ -32,7 +32,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface PGGenericImageAdapter (Private)
 
-- (void)_threaded_getImageRepWithData:(NSData *)data;
+- (void)_threaded_getImageRepWithInfo:(NSDictionary *)info;
+- (void)_readExifWithData:(NSData *)data;
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep;
 
 @end
@@ -41,12 +42,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Private Protocol
 
-- (void)_threaded_getImageRepWithData:(NSData *)data
+- (void)_threaded_getImageRepWithInfo:(NSDictionary *)info
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+	NSData *const data = [[self node] dataWithInfo:info fast:NO];
+	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
 	int bestPixelCount = 0;
 	NSBitmapImageRep *rep, *bestRep = nil;
-	NSEnumerator *const repEnum = [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator];
+	NSEnumerator *const repEnum = data ? [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator] : nil;
 	while((rep = [repEnum nextObject])) {
 		int const w = [rep pixelsWide], h = [rep pixelsHigh];
 		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
@@ -61,6 +64,12 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:bestRep waitUntilDone:NO];
 	[pool release];
+}
+- (void)_readExifWithData:(NSData *)data
+{
+	if(_exifEntries || !data) return;
+	[PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
+	[_exifEntries retain];
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
@@ -94,11 +103,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSArray *)exifEntries
 {
-	if(!_exifEntries) {
-		NSData *const data = [self data];
-		if(data) [PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
-		[_exifEntries retain];
-	}
 	return [[_exifEntries retain] autorelease];
 }
 - (PGOrientation)orientation
@@ -128,12 +132,9 @@ DEALINGS WITH THE SOFTWARE. */
 		return;
 	}
 	if(_reading) return;
-	NSData *const data = [self data];
-	_readFailed = !data;
-	[[self node] noteIsViewableDidChange];
-	if(!data) return [[self node] readFinishedWithImageRep:nil error:nil];
 	_reading = YES;
-	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithData:) toTarget:self withObject:data];
+	_readFailed = NO;
+	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
 }
 
 #pragma mark NSObject

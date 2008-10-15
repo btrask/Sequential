@@ -86,10 +86,10 @@ enum {
 		[self release];
 		return nil;
 	}
-	NSParameterAssert(parent || doc);
+	NSParameterAssert(!parent != !doc);
 	if((self = [super init])) {
 		_parentAdapter = parent;
-		_document = doc ? doc : [parent document];
+		_document = doc;
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
 		_dataSource = dataSource;
@@ -114,13 +114,16 @@ enum {
 - (NSData *)dataWithInfo:(NSDictionary *)info
             fast:(BOOL)flag
 {
-	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
-	if(data) return data;
-	if([self dataSource] && ![[self dataSource] node:self getData:&data fast:flag]) return nil;
-	if(data) return data;
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-	return data;
+	@synchronized(self) {
+		NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
+		if(data) return data;
+		if([self dataSource] && ![[self dataSource] node:self getData:&data info:info fast:flag]) return nil;
+		if(data) return data;
+		PGResourceIdentifier *const identifier = [self identifier];
+		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+		return data;
+	}
+	return nil;
 }
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info
 {
@@ -247,6 +250,14 @@ enum {
 {
 	if([[self document] node] == self) [[self document] close];
 	else [[self parentAdapter] removeChild:self];
+}
+- (void)detachFromTree
+{
+	@synchronized(self) {
+		_parentAdapter = nil;
+		_document = nil;
+		_dataSource = nil;
+	}
 }
 
 #pragma mark -
@@ -427,7 +438,7 @@ enum {
 }
 - (PGDocument *)document
 {
-	return _document;
+	return _document ? _document : [_parentAdapter document];
 }
 
 #pragma mark -
@@ -534,6 +545,7 @@ enum {
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info {}
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
+        info:(NSDictionary *)info
         fast:(BOOL)flag
 {
 	if(outData) *outData = nil;

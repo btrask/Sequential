@@ -366,6 +366,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	[self AE_removeObserver];
 	[_node cancelLoad];
+	[_node detachFromTree];
 	[_identifier release];
 	[_node release];
 	[_subscription release];

@@ -144,6 +144,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 }
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
+        info:(NSDictionary *)info
         fast:(BOOL)flag
 {
 	unsigned const i = [[sender identifier] index];
@@ -152,12 +153,13 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		return YES;
 	}
 	[_archive clearLastError];
-	NSString *const pass = [[sender info] objectForKey:PGPasswordKey];
+	NSString *const pass = [info objectForKey:PGPasswordKey];
 	if(pass) [_archive setPassword:pass];
 	NSData *const data = [_archive contentsOfEntry:i];
-	if([_archive lastError] == XADERR_PASSWORD) {
-		[sender setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil]];
-		return NO;
+	switch([_archive lastError]) {
+		case XADERR_OK: break;
+		case XADERR_PASSWORD: [sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:YES];
+		default: return NO;
 	}
 	if(outData) *outData = data;
 	return YES;

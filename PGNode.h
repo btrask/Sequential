@@ -97,6 +97,7 @@ typedef unsigned PGNodeStatus;
 - (NSMenuItem *)menuItem;
 
 - (void)removeFromDocument;
+- (void)detachFromTree;
 
 - (NSDate *)dateModified;
 - (NSDate *)dateCreated;
@@ -119,6 +120,6 @@ typedef unsigned PGNodeStatus;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info;
-- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData fast:(BOOL)flag; // Return NO if a problem occurred.
+- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag; // Return NO if a problem occurred. Implementations must be thread-safe.
 
 @end
