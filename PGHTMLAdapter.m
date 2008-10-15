@@ -36,7 +36,24 @@ DEALINGS WITH THE SOFTWARE. */
 
 NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
+@interface PGHTMLAdapter (Private)
+
+- (void)_clearWebView;
+
+@end
+
 @implementation PGHTMLAdapter
+
+#pragma mark Private Protocol
+
+- (void)_clearWebView
+{
+	[_webView stopLoading:self];
+	[_webView setFrameLoadDelegate:nil];
+	[_webView setPolicyDelegate:nil];
+	[_webView autorelease];
+	_webView = nil;
+}
 
 #pragma mark WebFrameLoadDelegate Protocol
 
@@ -51,10 +68,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
         forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[_webView stopLoading:self];
-	[_webView setFrameLoadDelegate:nil];
-	[_webView autorelease];
-	_webView = nil;
+	[self _clearWebView];
 	[[self node] loadFinished];
 }
 
@@ -79,10 +93,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	if(frame != [_webView mainFrame]) return;
 	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
 	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
-	[_webView stopLoading:self];
-	[_webView setFrameLoadDelegate:nil];
-	[_webView autorelease];
-	_webView = nil;
+	[self _clearWebView];
 }
 
 #pragma mark WebPolicyDelegate Protocol
@@ -151,10 +162,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 - (void)dealloc
 {
-	[_webView stopLoading:self];
-	[_webView setFrameLoadDelegate:nil];
-	[_webView setPolicyDelegate:nil];
-	[_webView autorelease];
+	[self _clearWebView];
 	[super dealloc];
 }
 
