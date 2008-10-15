@@ -80,6 +80,7 @@ enum {
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent
       document:(PGDocument *)doc
       identifier:(PGResourceIdentifier *)ident
+      dataSource:(id)dataSource
 {
 	if(!ident) {
 		[self release];
@@ -91,6 +92,7 @@ enum {
 		_document = doc ? doc : [parent document];
 		_identifier = [ident retain];
 		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+		_dataSource = dataSource;
 		PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
 		_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
 		[self _setResourceAdapter:adapter];
@@ -108,11 +110,6 @@ enum {
 - (id)dataSource
 {
 	return _dataSource;
-}
-- (void)setDataSource:(id)anObject
-{
-	if(anObject == _dataSource) return;
-	_dataSource = anObject;
 }
 - (NSData *)dataWithInfo:(NSDictionary *)info
             fast:(BOOL)flag

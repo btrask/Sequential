@@ -69,14 +69,14 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 {
 	if((self = [self init])) {
 		_identifier = [ident retain];
-		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident];
+		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident dataSource:nil];
 		[_node startLoadWithInfo:nil];
 		PGResourceIdentifier *rootIdentifier = ident;
 		if([_identifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
 			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
-			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier];
+			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier dataSource:nil];
 			[_node startLoadWithInfo:nil];
 			[self _setInitialIdentifier:ident];
 		}

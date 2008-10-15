@@ -82,8 +82,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode('fldr') : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent] notify:NO];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
-		[node setDataSource:self];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
 		if(isFile) [node startLoadWithInfo:nil];
 		else {
 			[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGContainerAdapter class], PGAdapterClassKey, nil]];

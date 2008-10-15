@@ -190,7 +190,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 	PGResourceIdentifier *const ident = [[self URL] AE_resourceIdentifier];
 	if(!ident) return nil;
 	[ident setCustomDisplayName:[self title] notify:NO];
-	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:ident] autorelease];
+	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:ident dataSource:nil] autorelease];
 	[node startLoadWithInfo:[self info]];
 	return node;
 }

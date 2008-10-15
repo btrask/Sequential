@@ -73,10 +73,9 @@ typedef unsigned PGNodeStatus;
 	NSNumber             *_dataLength;
 }
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident;
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident dataSource:(id)dataSource;
 
 - (id)dataSource;
-- (void)setDataSource:(id)anObject;
 - (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info;
 

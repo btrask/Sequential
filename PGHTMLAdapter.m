@@ -148,7 +148,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	PGResourceIdentifier *ident;
 	NSEnumerator *const identEnum = [identifiers objectEnumerator];
 	while((ident = [identEnum nextObject])) {
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident dataSource:nil] autorelease];
 		if(!node) continue;
 		[node startLoadWithInfo:nil];
 		[pages addObject:node];

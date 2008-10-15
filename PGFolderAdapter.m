@@ -77,7 +77,7 @@ DEALINGS WITH THE SOFTWARE. */
 			[oldPages removeObjectIdenticalTo:node];
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
-			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
+			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent dataSource:nil] autorelease];
 			[node startLoadWithInfo:nil];
 		}
 		if(node) [newPages addObject:node];
