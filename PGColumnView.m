@@ -111,6 +111,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask allowAnimation:NO];
 }
+- (void)scrollToLastColumn
+{
+	[_clipView scrollToEdge:PGMaxXEdgeMask allowAnimation:YES];
+}
 
 #pragma mark -
 

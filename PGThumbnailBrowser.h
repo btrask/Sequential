@@ -41,6 +41,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setDelegate:(id)obj;
 
 - (NSSet *)selection;
+- (void)setSelection:(NSSet *)items;
+- (void)setSelectedItem:(id)item;
 
 - (void)reloadData;
 - (void)reloadItem:(id)item reloadChildren:(BOOL)flag;
@@ -49,6 +51,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSObject (PGThumbnailBrowserDataSource)
 
+- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item;
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
 
 @end

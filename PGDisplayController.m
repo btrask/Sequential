@@ -573,11 +573,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	[self _updateInfoWithNodeCount];
 	[self _updateNodeIndex];
-	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
+	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
+	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
@@ -589,7 +589,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if([[self activeDocument] showsThumbnails]) {
 		[_thumbnailPanel displayOverWindow:[self window]];
-		[[_thumbnailPanel content] reloadData]; // TODO: Make sure the current document is selected.
+		[[_thumbnailPanel content] reloadData];
+		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
 		[clipView setBoundsInset:PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0)];
 	} else {
 		[_thumbnailPanel fadeOut];
@@ -640,6 +641,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
+	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] setSelectedItem:aNode];
 	return YES;
 }
 - (void)_readActiveNode
@@ -1004,6 +1006,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark PGThumbnailBrowserDataSource Protocol
 
+- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
+      parentOfItem:(id)item
+{
+	return [item parentNode];
+}
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
         itemCanHaveChildren:(id)item
 {

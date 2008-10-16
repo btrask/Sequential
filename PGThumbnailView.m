@@ -78,6 +78,17 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[_selection copy] autorelease];
 }
+- (void)setSelection:(NSSet *)items
+{
+	NSMutableSet *const removedItems = [[_selection mutableCopy] autorelease];
+	[removedItems minusSet:items];
+	id removedItem;
+	NSEnumerator *const removedItemEnum = [removedItems objectEnumerator];
+	while((removedItem = [removedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
+	[_selection setSet:items];
+	[_selection intersectSet:[NSSet setWithArray:_items]];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
 
 #pragma mark -
 

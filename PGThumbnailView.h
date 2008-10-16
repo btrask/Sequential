@@ -44,6 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSArray *)items;
 - (NSSet *)selection;
+- (void)setSelection:(NSSet *)items;
 
 - (unsigned)numberOfColumns;
 - (unsigned)indexOfItemAtPoint:(NSPoint)p;

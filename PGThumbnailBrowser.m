@@ -59,6 +59,16 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (unsigned)indexOfColumnForItem:(id)item
+{
+	NSArray *const views = [self views];
+	unsigned i = 0;
+	for(; i < [views count]; i++) if([[views objectAtIndex:i] representedObject] == item) return i;
+	return NSNotFound;
+}
+
+#pragma mark -
+
 - (NSSet *)selection
 {
 	PGThumbnailView *const lastView = [[self views] lastObject];
@@ -66,6 +76,31 @@ DEALINGS WITH THE SOFTWARE. */
 	if([selection count]) return selection;
 	id const item = [lastView representedObject];
 	return item ? [NSSet setWithObject:item] : nil;
+}
+- (void)setSelection:(NSSet *)items
+{
+	if(![[self views] count]) [self _addColumnWithItem:nil];
+	if(![items count]) return [self removeColumnsAfterView:[[self views] objectAtIndex:0]];
+	id ancestor = [items anyObject];
+	NSMutableArray *const path = [NSMutableArray array];
+	do {
+		ancestor = [[self dataSource] thumbnailBrowser:self parentOfItem:ancestor];
+		unsigned const i = [self indexOfColumnForItem:ancestor];
+		if(NSNotFound != i) {
+			[self removeColumnsAfterView:[[self views] objectAtIndex:i]];
+			break;
+		}
+		[path addObject:ancestor];
+	} while(ancestor);
+	id pathItem;
+	NSEnumerator *const pathItemEnum = [path objectEnumerator];
+	while((pathItem = [pathItemEnum nextObject])) [[[self views] lastObject] setSelection:[NSSet setWithObject:pathItem]];
+	[[[self views] lastObject] setSelection:items];
+	[self scrollToLastColumn];
+}
+- (void)setSelectedItem:(id)item
+{
+	[self setSelection:[NSSet setWithObject:item]];
 }
 
 #pragma mark -
@@ -125,6 +160,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[nextView reloadData];
 		[self removeColumnsAfterView:nextView];
 		[self scrollToTopOfColumnWithView:nextView];
+		[self scrollToLastColumn];
 	} else [self _addColumnWithItem:selectedItem];
 	[[self delegate] thumbnailBrowserSelectionDidChange:self];
 }
@@ -142,6 +178,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSObject (PGThumbnailBrowserDataSource)
 
+- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
+      parentOfItem:(id)item
+{
+	return nil;
+}
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
         itemCanHaveChildren:(id)item
 {
