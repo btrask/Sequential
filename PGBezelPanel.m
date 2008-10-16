@@ -62,7 +62,7 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 	[self cancelFadeOut];
 	if(aWindow != _parentWindow) [_parentWindow removeChildWindow:self];
 	[self setIgnoresMouseEvents:!_acceptsEvents];
-	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:[aWindow AE_contentRect] scale:[self AE_userSpaceScaleFactor]] display:NO];
+	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], _frameInset) scale:[self AE_userSpaceScaleFactor]] display:NO];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
 	if(!PGIsTigerOrLater()) [self orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
@@ -91,10 +91,21 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 #pragma mark -
 
+- (PGInset)frameInset
+{
+	return _frameInset;
+}
+- (void)setFrameInset:(PGInset)inset
+{
+	_frameInset = inset;
+}
+
+#pragma mark -
+
 - (void)changeFrameAnimate:(BOOL)flag
 {
 	if(!flag) NSDisableScreenUpdates();
-	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:[_parentWindow AE_contentRect] scale:[self AE_userSpaceScaleFactor]] display:YES animate:flag];
+	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([_parentWindow AE_contentRect], _frameInset) scale:[self AE_userSpaceScaleFactor]] display:YES animate:flag];
 	[self display];
 	if(!flag) NSEnableScreenUpdates();
 }

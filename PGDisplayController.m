@@ -78,7 +78,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateInfoWithNodeCount;
 - (void)_updateNodeIndex;
-- (void)_updateInfoPanelLocationAnimate:(BOOL)flag;
+- (void)_updateInfoPanelLocation;
 - (void)_updateInfoPanelText;
 - (void)_runTimer;
 
@@ -359,7 +359,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[self setActiveNode:node initialLocation:PGHomeLocation];
 		}
 		[searchField setStringValue:query];
-		[self _updateInfoPanelLocationAnimate:NO];
+		[self _updateInfoPanelLocation];
 		[self documentShowsInfoDidChange:nil];
 		[self documentShowsThumbnailsDidChange:nil];
 		NSEnableScreenUpdates();
@@ -463,7 +463,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[self window] orderFront:self];
 		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
 		[_findPanel makeKeyWindow];
-		[self _updateInfoPanelLocationAnimate:NO];
+		[self _updateInfoPanelLocation];
 		NSEnableScreenUpdates();
 	} else {
 		[_findPanel fadeOut];
@@ -588,19 +588,34 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif
 {
 	if([[self activeDocument] showsThumbnails]) {
+		NSDisableScreenUpdates();
 		[_thumbnailPanel displayOverWindow:[self window]];
-		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
-		[clipView setBoundsInset:PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0)];
+		PGInset const inset = PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0);
+		[clipView setBoundsInset:inset];
+		[_findPanel setFrameInset:inset];
+		[_graphicPanel setFrameInset:inset];
+		[self _updateImageViewSizeAllowAnimation:NO];
+		[self _updateInfoPanelLocation];
+		[_findPanel changeFrameAnimate:NO];
+		[_graphicPanel changeFrameAnimate:NO];
+		NSEnableScreenUpdates();
 	} else {
 		[_thumbnailPanel fadeOut];
 		[clipView setBoundsInset:PGZeroInset];
+		[_findPanel setFrameInset:PGZeroInset];
+		[_graphicPanel setFrameInset:PGZeroInset];
+		NSDisableScreenUpdates();
+		[self _updateImageViewSizeAllowAnimation:NO];
+		[self _updateInfoPanelLocation];
+		[_findPanel changeFrameAnimate:NO];
+		[_graphicPanel changeFrameAnimate:NO];
+		NSEnableScreenUpdates();
 	}
-	[self _updateImageViewSizeAllowAnimation:NO];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
-	[self _updateInfoPanelLocationAnimate:NO];
+	[self _updateInfoPanelLocation];
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
@@ -714,12 +729,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[_infoPanel content] setIndex:_displayImageIndex];
 	[self synchronizeWindowTitleWithDocumentName];
 }
-- (void)_updateInfoPanelLocationAnimate:(BOOL)flag
+- (void)_updateInfoPanelLocation
 {
 	if(![self activeDocument]) return; // If we're closing, don't bother.
 	PGInfoCorner const corner = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGMinXMinYCorner : PGMaxXMinYCorner;
-	[[_infoPanel content] setOrigin:corner offset:NSMakeSize(0, (PGMinXMinYCorner == corner && [self findPanelShown] ? NSHeight([_findPanel frame]) : 0))];
-	[_infoPanel changeFrameAnimate:flag];
+	PGInset inset = PGZeroInset;
+	switch(corner) {
+		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
+		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
+	}
+	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) inset.minX += NSWidth([_thumbnailPanel frame]);
+	[_infoPanel setFrameInset:inset];
+	[[_infoPanel content] setOrigin:corner];
+	[_infoPanel changeFrameAnimate:NO];
 }
 - (void)_updateInfoPanelText
 {
@@ -876,7 +898,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)windowWillClose:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	if([aNotif object] == _findPanel) [self _updateInfoPanelLocationAnimate:YES];
+	if([aNotif object] == _findPanel) [self _updateInfoPanelLocation];
 	else if([aNotif object] == [self window]) {
 		if([_findPanel parentWindow]) [_findPanel close];
 		[self close];
@@ -1105,7 +1127,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)showWindow:(id)sender
 {
 	[super showWindow:sender];
-	[self _updateInfoPanelLocationAnimate:NO];
+	[self _updateInfoPanelLocation];
 	[self documentShowsInfoDidChange:nil];
 	[self documentShowsThumbnailsDidChange:nil];
 }
@@ -1184,6 +1206,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self _updateInfoPanelText];
 		_thumbnailPanel = [[PGThumbnailBrowser PG_bezelPanel] retain];
 		[_thumbnailPanel setAcceptsEvents:YES];
+		[_thumbnailPanel setDelegate:self];
 		[[_thumbnailPanel content] setDataSource:self];
 		[[_thumbnailPanel content] setDelegate:self];
 

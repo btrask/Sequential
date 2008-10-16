@@ -25,6 +25,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 #import <HMDTAppKit/PGFadeOutPanel.h>
 
+// Other
+#import "PGGeometry.h"
+
 extern NSString *const PGBezelPanelFrameShouldChangeNotification;
 
 extern NSString *const PGBezelPanelShouldAnimateKey;
@@ -35,6 +38,7 @@ extern NSString *const PGBezelPanelShouldAnimateKey;
 	NSWindow *_parentWindow; // -[NSWindow parentWindow] apparently retains and autoreleases the window before returning it, which is not good when that window is being deallocated and we call it while it's removing us.
 	BOOL      _acceptsEvents;
 	BOOL      _canBecomeKey;
+	PGInset   _frameInset;
 }
 
 - (id)initWithContentView:(NSView *)aView;
@@ -45,6 +49,9 @@ extern NSString *const PGBezelPanelShouldAnimateKey;
 - (BOOL)acceptsEvents;
 - (void)setAcceptsEvents:(BOOL)flag;
 - (void)setCanBecomeKey:(BOOL)flag;
+
+- (PGInset)frameInset;
+- (void)setFrameInset:(PGInset)inset;
 
 - (void)changeFrameAnimate:(BOOL)flag;
 

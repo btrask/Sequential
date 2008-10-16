@@ -114,15 +114,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return _origin;
 }
-- (NSSize)originOffset
-{
-	return _originOffset;
-}
 - (void)setOrigin:(PGInfoCorner)aSide
-        offset:(NSSize)aSize
 {
 	_origin = aSide;
-	_originOffset = aSize;
 }
 
 #pragma mark PGBezelPanelContentView Protocol
@@ -135,13 +129,12 @@ DEALINGS WITH THE SOFTWARE. */
 	float const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
 		NSMakeRect(
-			NSMinX(aRect) + MAX(scaledMarginSize, _originOffset.width),
-			NSMinY(aRect) + MAX(scaledMarginSize, _originOffset.height),
+			NSMinX(aRect) + scaledMarginSize,
+			NSMinY(aRect) + scaledMarginSize,
 			ceilf(MAX(messageSize.width + PGTextTotalHorzPadding, ([self displaysProgressIndicator] ? PGIndicatorWidth : 0)) + PGTotalPaddingSize) * scaleFactor,
 			ceilf(messageSize.height + PGTextTotalVertPadding + ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
-	frame.size.width = MIN(NSWidth(frame), NSWidth(aRect) / 2 - scaledMarginSize); // Don't allow the panel to be more than half the width of the window.
 	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
 	return frame;
 }

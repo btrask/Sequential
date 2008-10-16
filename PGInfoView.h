@@ -37,7 +37,6 @@ typedef int PGInfoCorner;
 	unsigned     _index;
 	unsigned     _count;
 	PGInfoCorner _origin;
-	NSSize       _originOffset;
 }
 
 - (NSAttributedString *)displayText;
@@ -52,7 +51,6 @@ typedef int PGInfoCorner;
 - (BOOL)displaysProgressIndicator;
 
 - (PGInfoCorner)origin;
-- (NSSize)originOffset;
-- (void)setOrigin:(PGInfoCorner)aSide offset:(NSSize)aSize; // Does NOT actually move the window.
+- (void)setOrigin:(PGInfoCorner)aSide; // Does NOT actually move the window.
 
 @end
