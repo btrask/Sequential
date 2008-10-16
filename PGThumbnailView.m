@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSBezierPathAdditions.h"
 
-#define PGThumbnailSize      48.0
+#define PGThumbnailSize      96.0
 #define PGThumbnailMargin    6.0
 #define PGThumbnailSizeTotal (PGThumbnailSize + PGThumbnailMargin * 2)
 

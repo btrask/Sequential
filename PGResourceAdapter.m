@@ -45,12 +45,12 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
-#define PGThumbnailSize 48.0
+#define PGThumbnailSize 96.0
 
-static NSConditionLock *PGThumbnailsNeededLock      = nil;
-static NSMutableArray  *PGValidAdapters             = nil;
-static NSMutableArray  *PGAdaptersNeedingThumbnails = nil;
-static NSMutableArray  *PGInfoDictionaries          = nil;
+static NSConditionLock *PGThumbnailsNeededLock            = nil;
+static NSMutableArray  *PGAdaptersThatRequestedThumbnails = nil;
+static NSMutableArray  *PGAdaptersWaitingForThumbnails    = nil;
+static NSMutableArray  *PGInfoDictionaries                = nil;
 
 @interface PGResourceAdapter (Private)
 
@@ -59,6 +59,8 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 
 - (id)_initWithPriority:(PGMatchPriority)priority info:(NSDictionary *)info;
 - (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter;
+
+- (void)_threaded_requestThumbnailGenerationWithInfo:(NSDictionary *)info; // Request on a separate thread so the main one doesn't have to block.
 
 @end
 
@@ -149,12 +151,12 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 	for(;;) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		[PGThumbnailsNeededLock lockWhenCondition:YES];
-		PGResourceAdapter *const adapter = [PGAdaptersNeedingThumbnails objectAtIndex:0];
-		[PGAdaptersNeedingThumbnails removeObjectAtIndex:0];
+		PGResourceAdapter *const adapter = [PGAdaptersThatRequestedThumbnails objectAtIndex:0];
+		[PGAdaptersThatRequestedThumbnails removeObjectAtIndex:0];
 		NSDictionary *const info = [[[PGInfoDictionaries objectAtIndex:0] retain] autorelease];
 		[PGInfoDictionaries removeObjectAtIndex:0];
 		NSImage *const thumbnail = [adapter threaded_generateThumbnailWithInfo:info];
-		[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersNeedingThumbnails count]];
+		[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
 		[self performSelectorOnMainThread:@selector(_setThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:thumbnail, @"Thumbnail", [NSValue valueWithNonretainedObject:adapter], @"AdapterValue", nil] waitUntilDone:NO];
 		[pool release];
 	}
@@ -162,7 +164,9 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 + (void)_setThumbnailWithDictionary:(NSDictionary *)aDict
 {
 	PGResourceAdapter *const adapter = [[aDict objectForKey:@"AdapterValue"] nonretainedObjectValue];
-	if([PGValidAdapters containsObject:adapter]) [adapter setThumbnail:[aDict objectForKey:@"Thumbnail"]];
+	if(![PGAdaptersWaitingForThumbnails containsObject:adapter]) return;
+	[PGAdaptersWaitingForThumbnails removeObject:adapter];
+	[adapter setThumbnail:[aDict objectForKey:@"Thumbnail"]];
 }
 
 #pragma mark Instance Methods
@@ -219,19 +223,16 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 - (NSImage *)thumbnail
 {
 	if(_thumbnail) return [[_thumbnail retain] autorelease];
-	if([self canGenerateThumbnail]) {
+	if([self canGenerateThumbnail] && ![PGAdaptersWaitingForThumbnails containsObject:self]) {
 		if(!PGThumbnailsNeededLock) {
 			PGThumbnailsNeededLock = [[NSConditionLock alloc] initWithCondition:NO];
-			PGValidAdapters = [[NSMutableArray alloc] initWithCallbacks:NULL];
-			PGAdaptersNeedingThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
+			PGAdaptersThatRequestedThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
+			PGAdaptersWaitingForThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
 			PGInfoDictionaries = [[NSMutableArray alloc] init];
 			[NSApplication detachDrawingThread:@selector(_threaded_generateThumbnails) toTarget:[PGResourceAdapter class] withObject:nil];
 		}
-		[PGThumbnailsNeededLock lock];
-		[PGAdaptersNeedingThumbnails addObject:self];
-		[PGInfoDictionaries addObject:[[[self info] copy] autorelease]];
-		[PGThumbnailsNeededLock unlockWithCondition:YES];
-		[PGValidAdapters addObject:self];
+		[PGAdaptersWaitingForThumbnails addObject:self];
+		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
 	}
 	return [[self identifier] icon];
 }
@@ -272,13 +273,14 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 }
 - (void)cancelThumbnailGeneration
 {
+	[PGAdaptersWaitingForThumbnails removeObject:self];
 	[PGThumbnailsNeededLock lock];
-	unsigned const i = [PGAdaptersNeedingThumbnails indexOfObject:self];
+	unsigned const i = [PGAdaptersThatRequestedThumbnails indexOfObject:self];
 	if(NSNotFound != i) {
-		[PGAdaptersNeedingThumbnails removeObjectAtIndex:i];
+		[PGAdaptersThatRequestedThumbnails removeObjectAtIndex:i];
 		[PGInfoDictionaries removeObjectAtIndex:i];
 	}
-	[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersNeedingThumbnails count]];
+	[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
 }
 
 #pragma mark -
@@ -302,6 +304,18 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 	if(_priority < adapter->_priority) return NSOrderedAscending;
 	if(_priority > adapter->_priority) return NSOrderedDescending;
 	return NSOrderedSame;
+}
+
+#pragma mark -
+
+- (void)_threaded_requestThumbnailGenerationWithInfo:(NSDictionary *)info
+{
+	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
+	[PGThumbnailsNeededLock lock];
+	[PGAdaptersThatRequestedThumbnails addObject:self];
+	[PGInfoDictionaries addObject:info];
+	[PGThumbnailsNeededLock unlockWithCondition:YES];
+	[pool release];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -535,14 +549,13 @@ static NSMutableArray  *PGInfoDictionaries          = nil;
 {
 	if((self = [super init])) {
 		_info = [[NSMutableDictionary alloc] init];
-		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+		_subloads = [[NSMutableArray alloc] initWithCallbacks:NULL];
 	}
 	return self;
 }
 - (void)dealloc
 {
 	[self cancelThumbnailGeneration];
-	[PGValidAdapters removeObject:self];
 	[_info release];
 	[_thumbnail release];
 	[_subloads release];
