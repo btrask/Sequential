@@ -61,8 +61,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)reloadData
 {
-	[self removeAllColumns];
-	[self _addColumnWithItem:nil];
+	if(![[self views] count]) return [self _addColumnWithItem:nil];
+	unsigned i = 0;
+	for(; i < [[self views] count]; i++) [[[self views] objectAtIndex:i] reloadData];
 }
 - (void)reloadItem:(id)item
         reloadChildren:(BOOL)flag

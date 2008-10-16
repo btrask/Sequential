@@ -101,9 +101,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)reloadData
 {
 	BOOL const hadSelection = !![_selection count];
-	[_selection removeAllObjects]; // TODO: Maintain the selection as much as possible.
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
+	[_selection intersectSet:[NSSet setWithArray:_items]];
 	[self setFrameSize:NSZeroSize];
 	[self setNeedsDisplay:YES];
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
