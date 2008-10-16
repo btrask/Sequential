@@ -70,6 +70,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (NSArray *)items
+{
+	return [[_items retain] autorelease];
+}
 - (NSSet *)selection
 {
 	return [[_selection copy] autorelease];
@@ -96,11 +100,13 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)reloadData
 {
+	BOOL const hadSelection = !![_selection count];
 	[_selection removeAllObjects]; // TODO: Maintain the selection as much as possible.
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
 	[self setFrameSize:NSZeroSize];
 	[self setNeedsDisplay:YES];
+	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
 #pragma mark PGClipViewDocumentView Protocol

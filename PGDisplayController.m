@@ -314,6 +314,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
@@ -332,6 +333,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeDocument AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
+	[_activeDocument AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
@@ -571,6 +573,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	[self _updateInfoWithNodeCount];
 	[self _updateNodeIndex];
+}
+- (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
+{
+	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif

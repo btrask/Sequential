@@ -33,11 +33,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGNodeLoadingDidProgressNotification;
 extern NSString *const PGNodeReadyForViewingNotification;
-extern NSString *const PGNodeThumbnailReadyNotification;
 
 extern NSString *const PGImageRepKey;
 extern NSString *const PGErrorKey;
-extern NSString *const PGThumbnailImageKey;
 
 extern NSString *const PGNodeErrorDomain;
 enum {

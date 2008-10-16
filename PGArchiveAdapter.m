@@ -152,14 +152,17 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		if(outData) *outData = nil;
 		return YES;
 	}
-	[_archive clearLastError];
-	NSString *const pass = [info objectForKey:PGPasswordKey];
-	if(pass) [_archive setPassword:pass];
-	NSData *const data = [_archive contentsOfEntry:i];
-	switch([_archive lastError]) {
-		case XADERR_OK: break;
-		case XADERR_PASSWORD: [sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:YES];
-		default: return NO;
+	NSData *data = nil;
+	@synchronized(_archive) {
+		[_archive clearLastError];
+		NSString *const pass = [info objectForKey:PGPasswordKey];
+		if(pass) [_archive setPassword:pass];
+		data = [_archive contentsOfEntry:i];
+		switch([_archive lastError]) {
+			case XADERR_OK: break;
+			case XADERR_PASSWORD: [sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
+			default: return NO;
+		}
 	}
 	if(outData) *outData = data;
 	return YES;

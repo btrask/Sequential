@@ -64,12 +64,16 @@ DEALINGS WITH THE SOFTWARE. */
 	[self removeAllColumns];
 	[self _addColumnWithItem:nil];
 }
-- (void)reloadChildrenOfItem:(id)item
+- (void)reloadItem:(id)item
+        reloadChildren:(BOOL)flag
 {
-}
-- (void)reloadChildOfItem:(id)item
-        atIndex:(unsigned)index
-{
+	PGThumbnailView *view;
+	NSEnumerator *const viewEnum = [[self views] objectEnumerator];
+	while((view = [viewEnum nextObject])) {
+		unsigned const i = [[view items] indexOfObjectIdenticalTo:item];
+		if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
+		else if(flag && [view representedObject] == item) [view reloadData];
+	}
 }
 
 #pragma mark Private Protocol

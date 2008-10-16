@@ -42,6 +42,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)representedObject;
 - (void)setRepresentedObject:(id)obj;
 
+- (NSArray *)items;
 - (NSSet *)selection;
 
 - (unsigned)numberOfColumns;

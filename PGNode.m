@@ -41,11 +41,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
-NSString *const PGNodeThumbnailReadyNotification     = @"PGNodeThumbnailReady";
 
 NSString *const PGImageRepKey       = @"PGImageRep";
 NSString *const PGErrorKey          = @"PGError";
-NSString *const PGThumbnailImageKey = @"PGThumbnailImage";
 
 NSString *const PGNodeErrorDomain        = @"PGNodeError";
 NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";

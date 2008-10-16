@@ -23,36 +23,9 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGColumnView.h"
 
-// Views
-#import "PGThumbnailView.h"
+@interface NSImageRep (AEAdditions)
 
-@interface PGThumbnailBrowser : PGColumnView
-{
-	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
-}
-
-- (id)dataSource;
-- (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
-- (id)delegate;
-- (void)setDelegate:(id)obj;
-
-- (void)reloadData;
-- (void)reloadItem:(id)item reloadChildren:(BOOL)flag;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDataSource)
-
-- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDelegate)
-
-- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
++ (id)AE_bestImageRepWithData:(NSData *)data;
 
 @end

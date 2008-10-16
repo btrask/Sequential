@@ -52,7 +52,7 @@ typedef unsigned PGMatchPriority;
 	PGMatchPriority      _priority;
 	PGNode              *_node;
 	NSMutableDictionary *_info;
-	NSImage             *_thumbnail; // TODO: Currently unused, remove if it stays that way.
+	NSImage             *_thumbnail;
 	NSMutableArray      *_subloads;
 }
 
@@ -75,6 +75,11 @@ typedef unsigned PGMatchPriority;
 - (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
 
 - (NSImage *)thumbnail;
+- (void)setThumbnail:(NSImage *)anImage;
+- (BOOL)canGenerateThumbnail;
+- (NSImage *)threaded_generateThumbnailWithInfo:(NSDictionary *)info;
+- (NSImage *)threaded_generateThumbnailWithData:(NSData *)data;
+- (void)cancelThumbnailGeneration;
 
 - (void)noteResourceDidChange;
 

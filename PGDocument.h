@@ -43,6 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGDocumentWillRemoveNodesNotification;
 extern NSString *const PGDocumentSortedNodesDidChangeNotification;
 extern NSString *const PGDocumentNodeIsViewableDidChangeNotification;
+extern NSString *const PGDocumentNodeThumbnailDidChangeNotification;
 extern NSString *const PGDocumentNodeDisplayNameDidChangeNotification;
 extern NSString *const PGDocumentBaseOrientationDidChangeNotification;
 
@@ -102,6 +103,7 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray;
 - (void)noteSortedChildrenDidChange;
 - (void)noteNodeIsViewableDidChange:(PGNode *)node;
+- (void)noteNodeThumbnailDidChange:(PGNode *)node;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;
 

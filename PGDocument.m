@@ -46,6 +46,7 @@ DEALINGS WITH THE SOFTWARE. */
 NSString *const PGDocumentWillRemoveNodesNotification          = @"PGDocumentWillRemoveNodes";
 NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSortedNodesDidChange";
 NSString *const PGDocumentNodeIsViewableDidChangeNotification  = @"PGDocumentNodeIsViewableDidChange";
+NSString *const PGDocumentNodeThumbnailDidChangeNotification   = @"PGDocumentNodeThumbnailDidChange";
 NSString *const PGDocumentNodeDisplayNameDidChangeNotification = @"PGDocumentNodeDisplayNameDidChange";
 NSString *const PGDocumentBaseOrientationDidChangeNotification = @"PGDocumentBaseOrientationDidChange";
 
@@ -260,21 +261,21 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
 {
-	if(!_node) return;
-	NSParameterAssert(node);
-	[self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	if(_node) [self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+}
+- (void)noteNodeThumbnailDidChange:(PGNode *)node
+{
+	if(node) [self AE_postNotificationName:PGDocumentNodeThumbnailDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {
 	if(!_node) return;
-	NSParameterAssert(node);
 	if([self node] == node) [[self displayController] synchronizeWindowTitleWithDocumentName];
 	[self AE_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDidCache:(PGNode *)node
 {
 	if(!_node) return;
-	NSParameterAssert(node);
 	[_cachedNodes removeObjectIdenticalTo:node];
 	[_cachedNodes insertObject:node atIndex:0];
 	while([_cachedNodes count] > PGDocumentMaxCachedNodes) {

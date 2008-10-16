@@ -157,6 +157,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
+- (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif;
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif;
 - (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;

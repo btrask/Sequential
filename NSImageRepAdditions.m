@@ -22,37 +22,28 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
-#import "PGColumnView.h"
+#import "NSImageRepAdditions.h"
 
-// Views
-#import "PGThumbnailView.h"
+@implementation NSImageRep (AEAdditions)
 
-@interface PGThumbnailBrowser : PGColumnView
++ (id)AE_bestImageRepWithData:(NSData *)data
 {
-	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
+	int bestPixelCount = 0;
+	NSBitmapImageRep *rep, *bestRep = nil;
+	NSEnumerator *const repEnum = data ? [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator] : nil;
+	while((rep = [repEnum nextObject])) {
+		int const w = [rep pixelsWide], h = [rep pixelsHigh];
+		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
+			bestRep = rep;
+			break;
+		}
+		int const pixelCount = w * h;
+		if(pixelCount < bestPixelCount) continue;
+		if(pixelCount == bestPixelCount && [bestRep bitsPerPixel] > [rep bitsPerPixel]) continue;
+		bestRep = rep;
+		bestPixelCount = pixelCount;
+	}
+	return bestRep;
 }
-
-- (id)dataSource;
-- (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
-- (id)delegate;
-- (void)setDelegate:(id)obj;
-
-- (void)reloadData;
-- (void)reloadItem:(id)item reloadChildren:(BOOL)flag;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDataSource)
-
-- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDelegate)
-
-- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
 
 @end

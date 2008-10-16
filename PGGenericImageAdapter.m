@@ -30,6 +30,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceIdentifier.h"
 #import "PGExifEntry.h"
 
+// Categories
+#import "NSImageRepAdditions.h"
+
 @interface PGGenericImageAdapter (Private)
 
 - (void)_threaded_getImageRepWithInfo:(NSDictionary *)info;
@@ -50,22 +53,7 @@ DEALINGS WITH THE SOFTWARE. */
 		data = [[self node] dataWithInfo:info fast:NO];
 	}
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
-	int bestPixelCount = 0;
-	NSBitmapImageRep *rep, *bestRep = nil;
-	NSEnumerator *const repEnum = data ? [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator] : nil;
-	while((rep = [repEnum nextObject])) {
-		int const w = [rep pixelsWide], h = [rep pixelsHigh];
-		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
-			bestRep = rep;
-			break;
-		}
-		int const pixelCount = w * h;
-		if(pixelCount < bestPixelCount) continue;
-		if(pixelCount == bestPixelCount && [bestRep bitsPerPixel] > [rep bitsPerPixel]) continue;
-		bestRep = rep;
-		bestPixelCount = pixelCount;
-	}
-	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:bestRep waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:[NSImageRep AE_bestImageRepWithData:data] waitUntilDone:NO];
 	[pool release];
 }
 - (void)_readExifWithData:(NSData *)data
@@ -138,9 +126,9 @@ DEALINGS WITH THE SOFTWARE. */
 	_readFailed = NO;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
 }
-- (NSImage *)thumbnail
+- (BOOL)canGenerateThumbnail
 {
-	return [[[NSImage alloc] initWithData:[self data]] autorelease]; // FIXME: Obviously this isn't threaded, so it's unbelievably slow.
+	return YES;
 }
 
 #pragma mark NSObject
