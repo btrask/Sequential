@@ -34,6 +34,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSView         *_view;
 	NSMutableArray *_clipViews;
 	NSMutableArray *_views;
+	float           _columnWidth;
 }
 
 - (NSArray *)views;
@@ -42,6 +43,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)removeColumnWithView:(NSView *)aView;
 - (void)removeColumnsAfterView:(NSView *)aView;
 - (void)removeAllColumns;
+
+- (float)columnWidth;
+- (void)setColumnWidth:(float)width;
 
 - (void)scrollToTopOfColumnWithView:(NSView *)aView;
 

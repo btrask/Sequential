@@ -244,6 +244,10 @@ enum {
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
 }
+- (PGNode *)viewableAncestor
+{
+	return _viewable ? self : [[self parentNode] viewableAncestor];
+}
 - (NSMenuItem *)menuItem
 {
 	return [[_menuItem retain] autorelease];

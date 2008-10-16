@@ -95,6 +95,7 @@ typedef unsigned PGNodeStatus;
 
 - (BOOL)isViewable;
 - (unsigned)depth;
+- (PGNode *)viewableAncestor;
 - (NSMenuItem *)menuItem;
 
 - (void)removeFromDocument;

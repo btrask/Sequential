@@ -59,6 +59,17 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (NSSet *)selection
+{
+	PGThumbnailView *const lastView = [[self views] lastObject];
+	NSSet *const selection = [lastView selection];
+	if([selection count]) return selection;
+	id const item = [lastView representedObject];
+	return item ? [NSSet setWithObject:item] : nil;
+}
+
+#pragma mark -
+
 - (void)reloadData
 {
 	if(![[self views] count]) return [self _addColumnWithItem:nil];
@@ -124,7 +135,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMaxY(aRect) - 300, NSWidth(aRect), 300);
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), [self columnWidth] - 1, NSHeight(aRect));
 }
 
 @end

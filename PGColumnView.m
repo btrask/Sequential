@@ -27,9 +27,6 @@ DEALINGS WITH THE SOFTWARE. */
 // Views
 #import "PGClipView.h"
 
-#define PGColumnContentWidth ((96.0 + 12.0) * 4)
-#define PGColumnWidth        (PGColumnContentWidth + 1.0)
-
 @implementation PGColumnView
 
 #pragma mark Instance Methods
@@ -98,6 +95,18 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
+- (float)columnWidth
+{
+	return _columnWidth;
+}
+- (void)setColumnWidth:(float)width
+{
+	_columnWidth = roundf(width);
+	[self layout];
+}
+
+#pragma mark -
+
 - (void)scrollToTopOfColumnWithView:(NSView *)aView
 {
 	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask allowAnimation:NO];
@@ -109,12 +118,12 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSRect const b = [self bounds];
 	NSPoint const p = [_clipView position];
-	[_view setFrameSize:NSMakeSize(MAX(PGColumnWidth * [_views count] - 1, NSWidth(b)), NSHeight(b))];
+	[_view setFrameSize:NSMakeSize(MAX(_columnWidth * [_views count] - 1, NSWidth(b)), NSHeight(b))];
 	[_clipView scrollTo:p allowAnimation:NO];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
-	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + PGColumnWidth * i, NSMinY(vb), PGColumnContentWidth, NSHeight(vb))];
+	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth - 1, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
 }
 
@@ -144,6 +153,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_clipView setDocumentView:_view];
 		_clipViews = [[NSMutableArray alloc] init];
 		_views = [[NSMutableArray alloc] init];
+		_columnWidth = (96 + 12) * 3 + 1;
 	}
 	return self;
 }
@@ -156,7 +166,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
 	[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
-	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + PGColumnWidth * i + PGColumnContentWidth, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
+	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + _columnWidth * (i + 1) - 1, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
 }
 - (void)setFrameSize:(NSSize)aSize
 {

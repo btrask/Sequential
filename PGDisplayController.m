@@ -573,6 +573,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	[self _updateInfoWithNodeCount];
 	[self _updateNodeIndex];
+	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
@@ -589,7 +590,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([[self activeDocument] showsThumbnails]) {
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData]; // TODO: Make sure the current document is selected.
-		[clipView setBoundsInset:PGMakeInset(0, 0, 0, NSHeight([_thumbnailPanel frame]))];
+		[clipView setBoundsInset:PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0)];
 	} else {
 		[_thumbnailPanel fadeOut];
 		[clipView setBoundsInset:PGZeroInset];
@@ -1009,13 +1010,24 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return [item isContainer];
 }
 
+#pragma mark PGThumbnailBrowserDelegate Protocol
+
+- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender
+{
+	NSSet *const selection = [sender selection];
+	id const item = [selection anyObject];
+	(void)[self tryToSetActiveNode:[([selection count] == 1 ? item : [item parentNode]) viewableAncestor] initialLocation:PGHomeLocation];
+}
+
 #pragma mark PGThumbnailViewDataSource Protocol
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
 	id const item = [sender representedObject];
-	if(!item) return [[[self activeDocument] node] AE_asArray];
-	return [item isContainer] ? [item sortedChildren] : nil;
+	if(item) return [item isContainer] ? [item sortedChildren] : nil;
+	PGNode *const root = [[self activeDocument] node];
+	if([root isViewable]) return [root AE_asArray];
+	return [root isContainer] ? [(PGContainerAdapter *)root sortedChildren] : nil;
 }
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender
              thumbnailForItem:(id)item
@@ -1166,6 +1178,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_thumbnailPanel = [[PGThumbnailBrowser PG_bezelPanel] retain];
 		[_thumbnailPanel setAcceptsEvents:YES];
 		[[_thumbnailPanel content] setDataSource:self];
+		[[_thumbnailPanel content] setDelegate:self];
 
 		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 	}

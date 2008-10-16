@@ -175,7 +175,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect scrollableRect = NSInsetRect(_documentFrame, -diff.width, -diff.height);
 	scrollableRect.size.width -= boundsSize.width;
 	scrollableRect.size.height -= boundsSize.height;
-	return scrollableRect;
+	return NSOffsetRect(scrollableRect, -[self boundsInset].minX, -[self boundsInset].minY);
 }
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction
           forScrollType:(PGScrollType)scrollType

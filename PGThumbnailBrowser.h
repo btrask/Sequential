@@ -40,6 +40,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (id)delegate;
 - (void)setDelegate:(id)obj;
 
+- (NSSet *)selection;
+
 - (void)reloadData;
 - (void)reloadItem:(id)item reloadChildren:(BOOL)flag;
 
