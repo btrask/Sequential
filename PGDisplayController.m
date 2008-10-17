@@ -705,8 +705,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		float scaleY = NSHeight(bounds) / roundf(newSize.height);
 		if(PGAutomaticScaling == scalingMode) {
 			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
-			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, (floorf(newSize.height * scaleX / scrollMax.height) * scrollMax.height) / newSize.height);
-			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, (floorf(newSize.width * scaleY / scrollMax.width) * scrollMax.width) / newSize.width);
+			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floorf(newSize.height * scaleX / scrollMax.height + 0.1) * scrollMax.height) / newSize.height));
+			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floorf(newSize.width * scaleY / scrollMax.width + 0.1) * scrollMax.width) / newSize.width));
 		} else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
