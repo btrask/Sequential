@@ -35,10 +35,21 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[_views copy] autorelease];
 }
+- (id)lastView
+{
+	return [_views lastObject];
+}
+- (id)viewAtIndex:(unsigned)index
+{
+	return [_views objectAtIndex:index];
+}
+
+#pragma mark -
+
 - (void)addColumnWithView:(NSView *)aView
 {
 	[self insertColumnWithView:aView atIndex:[_views count]];
-	[_clipView scrollToEdge:PGMaxXEdgeMask allowAnimation:YES];
+	[self scrollToLastColumn];
 }
 - (void)insertColumnWithView:(NSView *)aView
         atIndex:(unsigned)index
@@ -121,9 +132,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)layout
 {
 	NSRect const b = [self bounds];
-	NSPoint const p = [_clipView position];
 	[_view setFrameSize:NSMakeSize(MAX(_columnWidth * [_views count] - 1, NSWidth(b)), NSHeight(b))];
-	[_clipView scrollTo:p allowAnimation:NO];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
@@ -152,6 +161,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_clipView setBackgroundColor:nil];
 		[_clipView setShowsBorder:NO];
 		[_clipView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+		[_clipView setPinLocation:PGMinXEdgeMask];
 		[self addSubview:_clipView];
 		_view = [[NSView alloc] initWithFrame:NSZeroRect];
 		[_clipView setDocumentView:_view];

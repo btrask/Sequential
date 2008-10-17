@@ -34,6 +34,10 @@ NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y)
 {
 	return NSMakePoint(aPoint.x + x, aPoint.y + y);
 }
+NSSize PGPointDiff(NSPoint p1, NSPoint p2)
+{
+	return NSMakeSize(p1.x - p2.x, p1.y - p2.y);
+}
 
 #pragma mark NSSize
 
@@ -57,19 +61,35 @@ NSRect PGCenteredSizeInRect(NSSize s, NSRect r)
 
 NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude)
 {
-	float const m = fabs(magnitude);
 	NSCParameterAssert(!PGHasContradictoryRectEdges(mask));
 	NSSize size = NSZeroSize;
-	if(mask & PGMinXEdgeMask) size.width = -m;
-	else if(mask & PGMaxXEdgeMask) size.width = m;
-	if(mask & PGMinYEdgeMask) size.height = -m;
-	else if(mask & PGMaxYEdgeMask) size.height = m;
+	if(mask & PGMinXEdgeMask) size.width = -magnitude;
+	else if(mask & PGMaxXEdgeMask) size.width = magnitude;
+	if(mask & PGMinYEdgeMask) size.height = -magnitude;
+	else if(mask & PGMaxYEdgeMask) size.height = magnitude;
 	return size;
 }
 NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
 {
 	NSSize const s = PGRectEdgeMaskToSizeWithMagnitude(mask, magnitude);
 	return NSMakePoint(s.width, s.height);
+}
+NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask)
+{
+	NSPoint p;
+	switch(PGHorzEdgesMask & mask) {
+		case PGHorzEdgesMask:
+		case PGNoEdges:      p.x = NSMidX(r); break;
+		case PGMinXEdgeMask: p.x = NSMinX(r); break;
+		case PGMaxXEdgeMask: p.x = NSMaxX(r); break;
+	}
+	switch(PGVertEdgesMask & mask) {
+		case PGVertEdgesMask:
+		case PGNoEdges:      p.y = NSMidY(r); break;
+		case PGMinYEdgeMask: p.y = NSMinY(r); break;
+		case PGMaxYEdgeMask: p.y = NSMaxY(r); break;
+	}
+	return p;
 }
 PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold)
 {

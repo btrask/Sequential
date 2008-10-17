@@ -80,6 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setSelection:(NSSet *)items
 {
+	if(items == _selection || (items && [_selection isEqualToSet:items])) return;
 	NSMutableSet *const removedItems = [[_selection mutableCopy] autorelease];
 	[removedItems minusSet:items];
 	id removedItem;

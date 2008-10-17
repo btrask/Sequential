@@ -80,22 +80,22 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setSelection:(NSSet *)items
 {
 	if(![[self views] count]) [self _addColumnWithItem:nil];
-	if(![items count]) return [self removeColumnsAfterView:[[self views] objectAtIndex:0]];
+	if(![items count]) return [self removeColumnsAfterView:[self viewAtIndex:0]];
 	id ancestor = [items anyObject];
 	NSMutableArray *const path = [NSMutableArray array];
 	do {
 		ancestor = [[self dataSource] thumbnailBrowser:self parentOfItem:ancestor];
 		unsigned const i = [self indexOfColumnForItem:ancestor];
 		if(NSNotFound != i) {
-			[self removeColumnsAfterView:[[self views] objectAtIndex:i]];
+			[self removeColumnsAfterView:[self viewAtIndex:i]];
 			break;
 		}
 		[path addObject:ancestor];
 	} while(ancestor);
 	id pathItem;
 	NSEnumerator *const pathItemEnum = [path objectEnumerator];
-	while((pathItem = [pathItemEnum nextObject])) [[[self views] lastObject] setSelection:[NSSet setWithObject:pathItem]];
-	[[[self views] lastObject] setSelection:items];
+	while((pathItem = [pathItemEnum nextObject])) [[self lastView] setSelection:[NSSet setWithObject:pathItem]];
+	[[self lastView] setSelection:items];
 	[self scrollToLastColumn];
 }
 - (void)setSelectedItem:(id)item
@@ -109,7 +109,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(![[self views] count]) return [self _addColumnWithItem:nil];
 	unsigned i = 0;
-	for(; i < [[self views] count]; i++) [[[self views] objectAtIndex:i] reloadData];
+	for(; i < [[self views] count]; i++) [[self viewAtIndex:i] reloadData];
 }
 - (void)reloadItem:(id)item
         reloadChildren:(BOOL)flag
@@ -141,21 +141,18 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
 	NSSet *const newSelection = [sender selection];
-	if([newSelection count] != 1) {
+	id const selectedItem = [newSelection anyObject];
+	if([newSelection count] != 1 || (dataSource && ![dataSource thumbnailBrowser:self itemCanHaveChildren:selectedItem])) {
 		[self removeColumnsAfterView:sender];
 		[[self delegate] thumbnailBrowserSelectionDidChange:self];
 		return;
 	}
-	id const selectedItem = [newSelection anyObject];
 	NSArray *const views = [self views];
 	unsigned const col = [views indexOfObjectIdenticalTo:sender];
 	NSParameterAssert(NSNotFound != col);
 	if(col + 1 < [views count]) {
 		PGThumbnailView *const nextView = [views objectAtIndex:col + 1];
-		if([nextView representedObject] == selectedItem) {
-			// TODO: Deselect everything in nextView.
-			return;
-		}
+		if([nextView representedObject] == selectedItem) return [nextView setSelection:nil];
 		[nextView setRepresentedObject:selectedItem];
 		[nextView reloadData];
 		[self removeColumnsAfterView:nextView];

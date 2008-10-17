@@ -234,13 +234,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return _scrollTimer ? _position : _immediatePosition;
 }
-- (NSPoint)center
-{
-	if(NSIsEmptyRect(_documentFrame)) return NSZeroPoint;
-	NSRect const b = [self insetBounds];
-	NSPoint const p = PGOffsetPointByXY([self position], NSWidth(b) / 2 - NSMinX(_documentFrame), NSHeight(b) / 2 - NSMinY(_documentFrame));
-	return NSMakePoint(p.x / NSWidth(_documentFrame), p.y / NSHeight(_documentFrame));
-}
 
 - (BOOL)scrollTo:(NSPoint)aPoint
         allowAnimation:(BOOL)flag
@@ -258,12 +251,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	}
 	return YES;
 }
-- (BOOL)scrollToCenterAt:(NSPoint)aPoint
-        allowAnimation:(BOOL)flag
-{
-	NSRect const b = [self insetBounds];
-	return [self scrollTo:PGOffsetPointByXY(NSMakePoint(aPoint.x * NSWidth(_documentFrame), aPoint.y * NSHeight(_documentFrame)), NSWidth(b) / -2 + NSMinX(_documentFrame), NSHeight(b) / -2 + NSMinY(_documentFrame)) allowAnimation:flag];
-}
 - (BOOL)scrollBy:(NSSize)aSize
         allowAnimation:(BOOL)flag
 {
@@ -273,7 +260,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         allowAnimation:(BOOL)flag
 {
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
-	return PGNoEdges == mask ? NO : [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) allowAnimation:flag];
+	return [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) allowAnimation:flag];
 }
 - (BOOL)scrollToLocation:(PGPageLocation)location
         allowAnimation:(BOOL)flag
@@ -286,6 +273,51 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[_scrollTimer invalidate];
 	_scrollTimer = nil;
 	_lastScrollTime = 0;
+}
+
+#pragma mark -
+
+- (PGRectEdgeMask)pinLocation
+{
+	return _pinLocation;
+}
+- (void)setPinLocation:(PGRectEdgeMask)mask
+{
+	_pinLocation = PGNonContradictoryRectEdges(mask);
+}
+- (NSSize)pinLocationOffset
+{
+	if(NSIsEmptyRect(_documentFrame)) return NSZeroSize;
+	NSRect const b = [self insetBounds];
+	PGRectEdgeMask const pin = [self pinLocation];
+	NSSize const diff = PGPointDiff(PGPointOfPartOfRect(b, pin), PGPointOfPartOfRect(_documentFrame, pin));
+	if(![[self documentView] scalesContentWithFrameSizeInClipView:self]) return diff;
+	return NSMakeSize(diff.width * 2.0f / NSWidth(_documentFrame), diff.height * 2.0f / NSHeight(_documentFrame));
+}
+- (BOOL)scrollPinLocationToOffset:(NSSize)aSize
+        allowAnimation:(BOOL)flag
+{
+	NSSize o = aSize;
+	NSRect const b = [self insetBounds];
+	PGRectEdgeMask const pin = [self pinLocation];
+	if([[self documentView] scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
+	return [self scrollTo:PGOffsetPointBySize([self position], PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin))) allowAnimation:flag];
+}
+
+#pragma mark -
+
+- (NSPoint)center
+{
+	NSRect const b = [self insetBounds];
+	PGInset const inset = [self boundsInset];
+	return PGOffsetPointByXY([self position], inset.minX + NSWidth(b) / 2, inset.minY + NSHeight(b) / 2);
+}
+- (BOOL)scrollCenterTo:(NSPoint)aPoint
+        allowAnimation:(BOOL)flag
+{
+	NSRect const b = [self insetBounds];
+	PGInset const inset = [self boundsInset];
+	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2, -inset.minY - NSHeight(b) / 2) allowAnimation:flag];
 }
 
 #pragma mark -
@@ -415,9 +447,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)viewFrameDidChange:(NSNotification *)aNotif
 {
 	[self stopAnimatedScrolling];
-	NSPoint center = [self center];
+	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
-	[self scrollToCenterAt:center allowAnimation:NO];
+	[self scrollPinLocationToOffset:offset allowAnimation:NO];
 }
 
 #pragma mark Private Protocol
@@ -749,6 +781,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
 	return YES;
+}
+- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender
+{
+	return NO;
 }
 
 @end

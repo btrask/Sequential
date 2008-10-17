@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
 extern NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
+extern NSSize PGPointDiff(NSPoint p1, NSPoint p2);
 
 #pragma mark NSSize
 
@@ -55,6 +56,7 @@ typedef unsigned PGRectEdgeMask;
 
 extern NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude);
 extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
+extern NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask);
 extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
 extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);

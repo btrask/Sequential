@@ -60,7 +60,7 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 
 	PGNode               *_storedNode;
 	PGImageView          *_storedImageView;
-	NSPoint               _storedCenter;
+	NSSize                _storedOffset;
 	NSString             *_storedQuery;
 	NSRect                _storedFrame;
 
@@ -80,8 +80,8 @@ extern NSString *const PGDocumentRemovedChildrenKey;
 - (PGNode *)node;
 - (void)openBookmark:(PGBookmark *)aBookmark;
 
-- (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView center:(out NSPoint *)outCenter query:(out NSString **)outQuery; // No arguments may be NULL.
-- (void)storeNode:(PGNode *)node imageView:(PGImageView *)imageView center:(NSPoint)center query:(NSString *)query;
+- (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView offset:(out NSSize *)outOffset query:(out NSString **)outQuery; // No arguments may be NULL.
+- (void)storeNode:(PGNode *)node imageView:(PGImageView *)imageView offset:(NSSize)offset query:(NSString *)query;
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame;
 - (void)storeWindowFrame:(NSRect)frame;
 

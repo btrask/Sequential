@@ -163,15 +163,13 @@ DEALINGS WITH THE SOFTWARE. */
 	[self setNeedsDisplay:YES];
 }
 - (NSPoint)rotateByDegrees:(float)val
+           adjustingPoint:(NSPoint)aPoint
 {
-	NSRect const r = [self convertRect:[[self superview] bounds] fromView:[self superview]];
 	NSRect const b1 = [self bounds];
-	NSPoint screenCenter = NSMakePoint(NSMidX(r) - NSMidX(b1), NSMidY(r) - NSMidY(b1)); // Our bounds are going to change to fit the rotated image. Any point we want to remain constant relative to the image, we have to make relative to the bounds' center, since that's where the image is drawn.
+	NSPoint const p = PGOffsetPointByXY(aPoint, -NSMidX(b1), -NSMidY(b1)); // Our bounds are going to change to fit the rotated image. Any point we want to remain constant relative to the image, we have to make relative to the bounds' center, since that's where the image is drawn.
 	[self setRotationInDegrees:[self rotationInDegrees] + val];
 	NSRect const b2 = [self bounds];
-	screenCenter.x += NSMidX(b2);
-	screenCenter.y += NSMidY(b2);
-	return [self convertPoint:[[self _transformWithRotationInDegrees:val] transformPoint:screenCenter] toView:[self superview]];
+	return [[self _transformWithRotationInDegrees:val] transformPoint:PGOffsetPointByXY(p, NSMidX(b2), NSMidY(b2))];
 }
 
 #pragma mark -
@@ -377,6 +375,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender
 {
 	return NO;
+}
+- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender
+{
+	return YES;
 }
 
 #pragma mark NSView

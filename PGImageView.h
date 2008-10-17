@@ -68,7 +68,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (float)rotationInDegrees;
 - (void)setRotationInDegrees:(float)val;
-- (NSPoint)rotateByDegrees:(float)val;
+- (NSPoint)rotateByDegrees:(float)val adjustingPoint:(NSPoint)aPoint;
 
 - (BOOL)canAnimateRep;
 - (BOOL)animates;

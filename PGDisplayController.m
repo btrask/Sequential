@@ -308,7 +308,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(document == _activeDocument) return NO;
 	if(_activeDocument) {
 		if(_reading) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
-		[_activeDocument storeNode:[self activeNode] imageView:_imageView center:[clipView center] query:[searchField stringValue]];
+		[_activeDocument storeNode:[self activeNode] imageView:_imageView offset:[clipView pinLocationOffset] query:[searchField stringValue]];
 		[self _setImageView:nil];
 		[_activeDocument AE_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
@@ -344,15 +344,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		NSDisableScreenUpdates();
 		PGNode *node;
 		PGImageView *view;
-		NSPoint center;
+		NSSize offset;
 		NSString *query;
-		[_activeDocument getStoredNode:&node imageView:&view center:&center query:&query];
+		[_activeDocument getStoredNode:&node imageView:&view offset:&offset query:&query];
 		[self _setImageView:view];
 		if([view rep]) {
 			[self _setActiveNode:node];
 			[clipView setDocumentView:view];
 			[view setImageRep:[view rep] orientation:[view orientation] size:[self _sizeForImageRep:[view rep] orientation:[view orientation]]];
-			[clipView scrollToCenterAt:center allowAnimation:NO];
+			[clipView scrollPinLocationToOffset:offset allowAnimation:NO];
 			[self _readFinished];
 		} else {
 			[clipView setDocumentView:view];
@@ -1008,7 +1008,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount
 {
-	[clipView scrollToCenterAt:[_imageView rotateByDegrees:amount] allowAnimation:NO];
+	[clipView scrollCenterTo:[clipView convertPoint:[_imageView rotateByDegrees:amount adjustingPoint:[_imageView convertPoint:[clipView center] fromView:clipView]] fromView:_imageView] allowAnimation:NO];
 }
 - (void)clipViewGestureDidEnd:(PGClipView *)sender
 {
@@ -1031,7 +1031,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
       parentOfItem:(id)item
 {
-	return [item parentNode];
+	PGNode *const parent = [(PGNode *)item parentNode];
+	return [[self activeDocument] node] == parent && ![parent isViewable] ? nil : parent;
 }
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
         itemCanHaveChildren:(id)item

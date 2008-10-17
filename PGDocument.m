@@ -120,7 +120,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 
 - (void)getStoredNode:(out PGNode **)outNode
         imageView:(out PGImageView **)outImageView
-        center:(out NSPoint *)outCenter
+        offset:(out NSSize *)outOffset
         query:(out NSString **)outQuery
 {
 	if(_storedNode) {
@@ -128,7 +128,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 		_storedNode = nil;
 		*outImageView = [_storedImageView autorelease];
 		_storedImageView = nil;
-		*outCenter = _storedCenter;
+		*outOffset = _storedOffset;
 		*outQuery = [_storedQuery autorelease];
 		_storedQuery = nil;
 	} else {
@@ -139,14 +139,14 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 }
 - (void)storeNode:(PGNode *)node
         imageView:(PGImageView *)imageView
-        center:(NSPoint)center
+        offset:(NSSize)offset
         query:(NSString *)query
 {
 	[_storedNode autorelease];
 	_storedNode = [node retain];
 	[_storedImageView autorelease];
 	_storedImageView = [imageView retain];
-	_storedCenter = center;
+	_storedOffset = offset;
 	[_storedQuery autorelease];
 	_storedQuery = [query copy];
 }
@@ -242,7 +242,7 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(_storedNode != newStoredNode) {
 		[_storedNode release];
 		_storedNode = [newStoredNode retain];
-		_storedCenter = PGRectEdgeMaskToPointWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), FLT_MAX);
+		_storedOffset = PGRectEdgeMaskToSizeWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), FLT_MAX);
 	}
 	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
 }

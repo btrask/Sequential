@@ -43,10 +43,11 @@ typedef int PGScrollType;
 	         NSColor       *_backgroundColor;
 	         BOOL           _showsBorder;
 	         NSCursor      *_cursor;
+	         NSPoint        _immediatePosition;
 	         NSPoint        _position;
 	         NSTimer       *_scrollTimer;
 	         NSTimeInterval _lastScrollTime;
-	         NSPoint        _immediatePosition;
+	         PGRectEdgeMask _pinLocation;
 	         enum {
 	                        PGNotDragging,
 	                        PGPreliminaryDragging,
@@ -78,13 +79,19 @@ typedef int PGScrollType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
 - (NSPoint)position;
-- (NSPoint)center;
 - (BOOL)scrollTo:(NSPoint)aPoint allowAnimation:(BOOL)flag;
-- (BOOL)scrollToCenterAt:(NSPoint)aPoint allowAnimation:(BOOL)flag;
 - (BOOL)scrollBy:(NSSize)aSize allowAnimation:(BOOL)flag;
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask allowAnimation:(BOOL)flag;
 - (BOOL)scrollToLocation:(PGPageLocation)location allowAnimation:(BOOL)flag;
 - (void)stopAnimatedScrolling;
+
+- (PGRectEdgeMask)pinLocation;
+- (void)setPinLocation:(PGRectEdgeMask)mask;
+- (NSSize)pinLocationOffset;
+- (BOOL)scrollPinLocationToOffset:(NSSize)aSize allowAnimation:(BOOL)flag;
+
+- (NSPoint)center;
+- (BOOL)scrollCenterTo:(NSPoint)aPoint allowAnimation:(BOOL)flag;
 
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
@@ -110,6 +117,7 @@ typedef int PGScrollType;
 @interface NSView (PGClipViewDocumentView)
 
 - (BOOL)acceptsClicksInClipView:(PGClipView *)sender;
+- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender;
 
 @end
 
