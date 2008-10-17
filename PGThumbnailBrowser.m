@@ -93,7 +93,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[path addObject:ancestor];
 	} while(ancestor);
 	id pathItem;
-	NSEnumerator *const pathItemEnum = [path objectEnumerator];
+	NSEnumerator *const pathItemEnum = [path reverseObjectEnumerator];
 	while((pathItem = [pathItemEnum nextObject])) [[self lastView] setSelection:[NSSet setWithObject:pathItem]];
 	[[self lastView] setSelection:items];
 	[self scrollToLastColumn];

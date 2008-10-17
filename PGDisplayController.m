@@ -352,7 +352,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[self _setActiveNode:node];
 			[clipView setDocumentView:view];
 			[view setImageRep:[view rep] orientation:[view orientation] size:[self _sizeForImageRep:[view rep] orientation:[view orientation]]];
-			[clipView scrollPinLocationToOffset:offset allowAnimation:NO];
+			[clipView scrollPinLocationToOffset:offset];
 			[self _readFinished];
 		} else {
 			[clipView setDocumentView:view];
@@ -532,7 +532,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		PGOrientation const orientation = [[self activeNode] orientation];
 		[_imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
 		[clipView setDocumentView:_imageView];
-		[clipView scrollToLocation:_initialLocation allowAnimation:NO];
+		[clipView scrollToLocation:_initialLocation mode:PGScrollNoAnimation];
 		[[self window] makeFirstResponder:clipView];
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
@@ -1008,7 +1008,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount
 {
-	[clipView scrollCenterTo:[clipView convertPoint:[_imageView rotateByDegrees:amount adjustingPoint:[_imageView convertPoint:[clipView center] fromView:clipView]] fromView:_imageView] allowAnimation:NO];
+	[clipView scrollCenterTo:[clipView convertPoint:[_imageView rotateByDegrees:amount adjustingPoint:[_imageView convertPoint:[clipView center] fromView:clipView]] fromView:_imageView] mode:PGScrollNoAnimation];
 }
 - (void)clipViewGestureDidEnd:(PGClipView *)sender
 {

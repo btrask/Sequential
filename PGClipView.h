@@ -28,10 +28,17 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 enum {
+	PGScrollKeepCurrent    = 0,
+	PGScrollNoAnimation    = 1,
+	PGScrollAllowAnimation = 2
+};
+typedef unsigned PGScrollMode;
+
+enum {
 	PGScrollByLine = 0,
 	PGScrollByPage = 1
 };
-typedef int PGScrollType;
+typedef unsigned PGScrollType;
 
 @interface PGClipView : NSView
 {
@@ -79,19 +86,20 @@ typedef int PGScrollType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
 - (NSPoint)position;
-- (BOOL)scrollTo:(NSPoint)aPoint allowAnimation:(BOOL)flag;
-- (BOOL)scrollBy:(NSSize)aSize allowAnimation:(BOOL)flag;
-- (BOOL)scrollToEdge:(PGRectEdgeMask)mask allowAnimation:(BOOL)flag;
-- (BOOL)scrollToLocation:(PGPageLocation)location allowAnimation:(BOOL)flag;
+- (NSPoint)positionForScrollMode:(PGScrollMode)mode;
+- (BOOL)scrollTo:(NSPoint)aPoint mode:(PGScrollMode)mode;
+- (BOOL)scrollBy:(NSSize)aSize mode:(PGScrollMode)mode;
+- (BOOL)scrollToEdge:(PGRectEdgeMask)mask mode:(PGScrollMode)mode;
+- (BOOL)scrollToLocation:(PGPageLocation)location mode:(PGScrollMode)mode;
 - (void)stopAnimatedScrolling;
 
 - (PGRectEdgeMask)pinLocation;
 - (void)setPinLocation:(PGRectEdgeMask)mask;
 - (NSSize)pinLocationOffset;
-- (BOOL)scrollPinLocationToOffset:(NSSize)aSize allowAnimation:(BOOL)flag;
+- (BOOL)scrollPinLocationToOffset:(NSSize)aSize;
 
 - (NSPoint)center;
-- (BOOL)scrollCenterTo:(NSPoint)aPoint allowAnimation:(BOOL)flag;
+- (BOOL)scrollCenterTo:(NSPoint)aPoint mode:(PGScrollMode)mode;
 
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
