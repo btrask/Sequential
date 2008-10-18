@@ -80,7 +80,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setSelection:(NSSet *)items
 {
-	if(items == _selection || (items && [_selection isEqualToSet:items])) return;
+	if(items == _selection) return;
 	NSMutableSet *const removedItems = [[_selection mutableCopy] autorelease];
 	[removedItems minusSet:items];
 	id removedItem;
@@ -184,15 +184,19 @@ DEALINGS WITH THE SOFTWARE. */
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[[NSColor alternateSelectedControlColor] set];
-			NSBezierPath *const path = [NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -4, -4) cornerRadius:4.0];
-			[path setLineWidth:2.0];
-			[path stroke];
+			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -4, -4) cornerRadius:4.0] fill];
 		}
+		NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
+		[shadow setShadowBlurRadius:4.0f];
+		[shadow setShadowOffset:NSMakeSize(0.0f, -2.0f)];
+		[shadow set];
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		[thumb setFlipped:[self isFlipped]];
 		NSSize const originalSize = [thumb size];
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
-		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0 : 0.5)];
+		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
+		[shadow setShadowColor:nil];
+		[shadow set];
 	}
 }
 

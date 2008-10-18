@@ -109,7 +109,10 @@ DEALINGS WITH THE SOFTWARE. */
 	} while(ancestor);
 	id pathItem;
 	NSEnumerator *const pathItemEnum = [path reverseObjectEnumerator];
-	while((pathItem = [pathItemEnum nextObject])) [[self lastView] setSelection:[NSSet setWithObject:pathItem]];
+	while((pathItem = [pathItemEnum nextObject])) {
+		[[self lastView] setSelection:[NSSet setWithObject:pathItem]];
+		NSParameterAssert([[self lastView] representedObject] == pathItem);
+	}
 	[[self lastView] setSelection:items];
 	[self scrollToLastColumn];
 }

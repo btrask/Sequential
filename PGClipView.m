@@ -71,7 +71,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 @interface PGClipView (Private)
 
-- (BOOL)_setPosition:(NSPoint)aPoint markForRedisplayIfNeeded:(BOOL)flag;
+- (BOOL)_setPosition:(NSPoint)aPoint scrollEnclosingClipViews:(BOOL)scroll markForRedisplay:(BOOL)redisplay;
 - (BOOL)_scrollTo:(NSPoint)aPoint;
 - (void)_scrollOneFrame:(NSTimer *)timer;
 - (void)_beginPreliminaryDrag;
@@ -449,7 +449,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)viewFrameDidChange:(NSNotification *)aNotif
 {
-	[self stopAnimatedScrolling];
 	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
 	[self scrollPinLocationToOffset:offset];
@@ -458,22 +457,23 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 #pragma mark Private Protocol
 
 - (BOOL)_setPosition:(NSPoint)aPoint
-        markForRedisplayIfNeeded:(BOOL)flag
+        scrollEnclosingClipViews:(BOOL)scroll
+        markForRedisplay:(BOOL)redisplay
 {
 	NSPoint const newPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
-	[[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
+	if(scroll) [[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
 	_immediatePosition = newPosition;
 	[self setBoundsOrigin:NSMakePoint(floorf(_immediatePosition.x), floorf(_immediatePosition.y))];
-	if(flag) [self setNeedsDisplay:YES];
+	if(redisplay) [self setNeedsDisplay:YES];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
 #if PGCopiesOnScroll
-	if(![documentView isOpaque]) return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
+	if(![documentView isOpaque]) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
 	NSRect const oldBounds = [self bounds];
-	if(![self _setPosition:aPoint markForRedisplayIfNeeded:NO]) return NO;
+	if(![self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:NO]) return NO;
 	NSRect const bounds = [self bounds];
 	float const x = NSMinX(bounds) - NSMinX(oldBounds);
 	float const y = NSMinY(bounds) - NSMinY(oldBounds);
@@ -492,7 +492,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self displayIfNeededIgnoringOpacity];
 	return YES;
 #else
-	return [self _setPosition:aPoint markForRedisplayIfNeeded:YES];
+	return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
 #endif
 }
 - (void)_scrollOneFrame:(NSTimer *)timer
@@ -522,7 +522,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)PG_scrollRectToVisible:(NSRect)aRect
         forView:(NSView *)view
 {
-	[super PG_scrollRectToVisible:aRect forView:view];
 	NSRect const r = [self convertRect:aRect fromView:view];
 	NSRect const b = [self insetBounds];
 	NSSize o = NSZeroSize;
@@ -534,7 +533,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		// TODO: Same as above.
 	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMinY(r) - NSMinY(b);
 	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMaxY(r) - NSMaxY(b);
-	[self scrollBy:o animation:PGPreferAnimation];
+	[self scrollBy:o animation:PGAllowAnimation];
 }
 
 #pragma mark PGZooming Protocol
@@ -606,7 +605,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) markForRedisplayIfNeeded:YES];
+	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES];
 }
 
 #pragma mark NSResponder
