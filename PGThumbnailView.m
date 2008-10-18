@@ -106,15 +106,31 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return _numberOfColumns;
 }
-- (unsigned)indexOfItemAtPoint:(NSPoint)p
+- (unsigned)indexOfItemAtPoint:(NSPoint)aPoint
 {
+	NSPoint p = aPoint;
+	if(PGRightToLeftLayout == _layoutDirection) p.x = NSMaxX([self bounds]) - p.x;
 	return floorf(p.y / PGThumbnailSizeTotal) * _numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
 }
 - (NSRect)frameOfItemAtIndex:(unsigned)index
           withMargin:(BOOL)flag
 {
-	NSRect const frame = NSMakeRect((index % _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, (index / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize);
+	NSRect frame = NSMakeRect((index % _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, (index / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize);
+	if(PGRightToLeftLayout == _layoutDirection) frame.origin.x = NSMaxX([self bounds]) - NSMaxX(frame);
 	return flag ? NSInsetRect(frame, -PGThumbnailMargin, -PGThumbnailMargin) : frame;
+}
+
+#pragma mark -
+
+- (PGLayoutDirection)layoutDirection
+{
+	return _layoutDirection;
+}
+- (void)setLayoutDirection:(PGLayoutDirection)dir
+{
+	if(dir == _layoutDirection) return;
+	_layoutDirection = dir;
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -
@@ -158,9 +174,13 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)drawRect:(NSRect)aRect
 {
-	unsigned i = [self indexOfItemAtPoint:aRect.origin];
-	unsigned const max = MIN([_items count], [self indexOfItemAtPoint:NSMakePoint(NSMaxX(aRect), NSMaxY(aRect))] + 1);
-	for(; i < max; i++) {
+	int count = 0;
+	NSRect const *rects = NULL;
+	[self getRectsBeingDrawn:&rects count:&count];
+	unsigned i = 0;
+	for(; i < [_items count]; i++) {
+		NSRect const frameWithMargin = [self frameOfItemAtIndex:i withMargin:YES];
+		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[[NSColor alternateSelectedControlColor] set];

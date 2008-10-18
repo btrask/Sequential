@@ -24,15 +24,22 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
+enum {
+	PGLeftToRightLayout = 0,
+	PGRightToLeftLayout = 1
+};
+typedef unsigned PGLayoutDirection;
+
 @interface PGThumbnailView : NSView
 {
 	@private
-	IBOutlet id             dataSource;
-	IBOutlet id             delegate;
-	         id            _representedObject;
-	         NSArray      *_items;
-	         NSMutableSet *_selection;
-	         unsigned      _numberOfColumns;
+	IBOutlet id                 dataSource;
+	IBOutlet id                 delegate;
+	         id                _representedObject;
+	         NSArray          *_items;
+	         NSMutableSet     *_selection;
+	         unsigned          _numberOfColumns;
+	         PGLayoutDirection _layoutDirection;
 }
 
 - (id)dataSource;
@@ -49,6 +56,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (unsigned)numberOfColumns;
 - (unsigned)indexOfItemAtPoint:(NSPoint)p;
 - (NSRect)frameOfItemAtIndex:(unsigned)index withMargin:(BOOL)flag;
+
+- (PGLayoutDirection)layoutDirection;
+- (void)setLayoutDirection:(PGLayoutDirection)dir;
 
 - (void)reloadData;
 

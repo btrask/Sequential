@@ -56,6 +56,12 @@ NSRect PGCenteredSizeInRect(NSSize s, NSRect r)
 {
 	return NSMakeRect(NSMidX(r) - s.width / 2, NSMidY(r) - s.height / 2, s.width, s.height);
 }
+BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count)
+{
+	unsigned i = count;
+	while(i--) if(NSIntersectsRect(rect, list[i])) return YES;
+	return NO;
+}
 
 #pragma mark PGRectEdgeMask
 

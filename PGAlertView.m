@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGBezelPanel.h"
 
 // Other
+#import "PGGeometry.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
@@ -35,13 +36,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #define PGAlertViewSize     300.0f
 #define PGAlertMinTopMargin 20.0f
-
-static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count)
-{
-	unsigned i = count;
-	while(i--) if(NSIntersectsRect(rect, list[i])) return YES;
-	return NO;
-}
 
 @interface PGAlertView (Private)
 
@@ -254,7 +248,7 @@ static inline BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigne
 		NSMakePoint(250, 50)};
 	for(i = 4; i--;) {
 		NSRect const corner = corners[i];
-		if(!PGIntersectsRectList(corner, rects, count)) continue; // -needsToDrawRect: is broken in 10.3, see hxxp://developer.apple.com/technotes/tn2002/tn2107.html.
+		if(!PGIntersectsRectList(corner, rects, count)) continue;
 		[[NSColor clearColor] set];
 		NSRectFill(corners[i]);
 		[[NSColor colorWithDeviceWhite:0 alpha:0.5] set];

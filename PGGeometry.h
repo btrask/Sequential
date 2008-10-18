@@ -38,6 +38,7 @@ extern NSSize PGScaleSizeByFloat(NSSize size, float scale);
 #pragma mark NSRect
 
 extern NSRect PGCenteredSizeInRect(NSSize s, NSRect r);
+extern BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count); // -needsToDrawRect: is broken in 10.3, see hxxp://developer.apple.com/technotes/tn2002/tn2107.html.
 
 #pragma mark PGRectEdgeMask
 
