@@ -25,7 +25,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGThumbnailView.h"
 
 // Views
-@class PGClipView;
+#import "PGClipView.h"
 
 // Other
 #import "PGGeometry.h"
@@ -87,7 +87,16 @@ DEALINGS WITH THE SOFTWARE. */
 	NSEnumerator *const removedItemEnum = [removedItems objectEnumerator];
 	while((removedItem = [removedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
 	[_selection setSet:items];
-	[_selection intersectSet:[NSSet setWithArray:_items]];
+	unsigned const selCount = [_selection count];
+	if(1 == selCount) [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES]];
+	else if(selCount) {
+		unsigned i = 0;
+		for(; i < [_items count]; i++) {
+			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
+			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES]];
+			break;
+		}
+	}
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
@@ -115,7 +124,6 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL const hadSelection = !![_selection count];
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
-	[_selection intersectSet:[NSSet setWithArray:_items]];
 	[self setFrameSize:NSZeroSize];
 	[self setNeedsDisplay:YES];
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
@@ -191,8 +199,11 @@ DEALINGS WITH THE SOFTWARE. */
 	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
 	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
 	if([_selection containsObject:item]) {
-		if(!modifyExistingSelection) return;
-		if(item) [_selection removeObject:item];
+		if(!modifyExistingSelection) {
+			[_selection removeAllObjects];
+			[self setNeedsDisplay:YES];
+			if(canSelect && item) [_selection addObject:item];
+		} else if(item) [_selection removeObject:item];
 	} else {
 		if(!modifyExistingSelection) {
 			[_selection removeAllObjects];

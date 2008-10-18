@@ -120,11 +120,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)scrollToTopOfColumnWithView:(NSView *)aView
 {
-	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask mode:PGScrollKeepCurrent];
+	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
 }
 - (void)scrollToLastColumn
 {
-	[_clipView scrollToEdge:PGMaxXEdgeMask mode:PGScrollAllowAnimation];
+	[_clipView scrollToEdge:PGMaxXEdgeMask animation:PGPreferAnimation];
 }
 
 #pragma mark -

@@ -118,7 +118,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSPoint const p = [self position];
 	_boundsInset = inset;
-	[self scrollTo:p mode:PGScrollNoAnimation];
+	[self scrollTo:p animation:PGAllowAnimation];
 }
 - (NSRect)insetBounds
 {
@@ -234,17 +234,17 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return _scrollTimer ? _position : _immediatePosition;
 }
-- (NSPoint)positionForScrollMode:(PGScrollMode)mode
+- (NSPoint)positionForScrollAnimation:(PGAnimationType)type
 {
-	return PGScrollKeepCurrent == mode ? _immediatePosition : [self position];
+	return [self position];
 }
 
 - (BOOL)scrollTo:(NSPoint)aPoint
-        mode:(PGScrollMode)mode
+        animation:(PGAnimationType)type
 {
-	if(PGScrollAllowAnimation != mode) {
-		if(PGAnimateScrolling && PGScrollNoAnimation == mode) [self stopAnimatedScrolling];
-		return [self _scrollTo:aPoint];
+	if(!PGAnimateScrolling || PGPreferAnimation != type) {
+		if(PGNoAnimation == type) [self stopAnimatedScrolling];
+		if(!_scrollTimer) return [self _scrollTo:aPoint];
 	}
 	NSPoint const newTargetPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
 	if(NSEqualPoints(newTargetPosition, [self position])) return NO;
@@ -256,20 +256,20 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	return YES;
 }
 - (BOOL)scrollBy:(NSSize)aSize
-        mode:(PGScrollMode)mode
+        animation:(PGAnimationType)type
 {
-	return [self scrollTo:PGOffsetPointBySize([self positionForScrollMode:mode], aSize) mode:mode];
+	return [self scrollTo:PGOffsetPointBySize([self positionForScrollAnimation:type], aSize) animation:type];
 }
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask
-        mode:(PGScrollMode)mode
+        animation:(PGAnimationType)type
 {
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
-	return [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) mode:mode];
+	return [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) animation:type];
 }
 - (BOOL)scrollToLocation:(PGPageLocation)location
-        mode:(PGScrollMode)mode
+        animation:(PGAnimationType)type
 {
-	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] mode:mode];
+	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] animation:type];
 }
 
 - (void)stopAnimatedScrolling
@@ -304,7 +304,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const b = [self insetBounds];
 	PGRectEdgeMask const pin = [self pinLocation];
 	if([[self documentView] scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
-	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) mode:PGScrollKeepCurrent];
+	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:PGAllowAnimation];
 }
 
 #pragma mark -
@@ -316,11 +316,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	return PGOffsetPointByXY([self position], inset.minX + NSWidth(b) / 2, inset.minY + NSHeight(b) / 2);
 }
 - (BOOL)scrollCenterTo:(NSPoint)aPoint
-        mode:(PGScrollMode)mode
+        animation:(PGAnimationType)type
 {
 	NSRect const b = [self insetBounds];
 	PGInset const inset = [self boundsInset];
-	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2, -inset.minY - NSHeight(b) / 2) mode:mode];
+	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2, -inset.minY - NSHeight(b) / 2) animation:type];
 }
 
 #pragma mark -
@@ -359,8 +359,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			} else [[NSCursor closedHandCursor] push];
 			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
 		}
-		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) mode:PGScrollNoAnimation];
-		else [self scrollTo:PGOffsetPointByXY(dragPoint, -[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y) mode:PGScrollNoAnimation];
+		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) animation:PGNoAnimation];
+		else [self scrollTo:PGOffsetPointByXY(dragPoint, -[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y) animation:PGNoAnimation];
 		finalPoint = PGPointInRect(PGOffsetPointByXY(finalPoint, [latestEvent deltaX], -[latestEvent deltaY]), availableDragRect);
 	}
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
@@ -394,7 +394,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			if(currentTime > pageTurnTime + PGPageTurnMovementDelay) {
 				NSSize const d = [self distanceInDirection:PGNonContradictoryRectEdges(pressedDirections) forScrollType:PGScrollByLine];
 				float const timeAdjustment = lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1;
-				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) mode:PGScrollNoAnimation];
+				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) animation:PGNoAnimation];
 			}
 			lastScrollTime = currentTime;
 			continue;
@@ -423,7 +423,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)scrollInDirection:(PGRectEdgeMask)direction
         type:(PGScrollType)scrollType
 {
-	if(![self shouldExitForMovementInDirection:direction] || ![[self delegate] clipView:self shouldExitEdges:direction]) [self scrollBy:[self distanceInDirection:direction forScrollType:scrollType] mode:PGScrollAllowAnimation];
+	if(![self shouldExitForMovementInDirection:direction] || ![[self delegate] clipView:self shouldExitEdges:direction]) [self scrollBy:[self distanceInDirection:direction forScrollType:scrollType] animation:PGPreferAnimation];
 }
 - (void)magicPanForward:(BOOL)forward
         acrossFirst:(BOOL)across
@@ -442,7 +442,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		} else if(across) position.x = FLT_MAX * (mask & PGMinXEdgeMask ? 1 : -1);
 		else position.y = FLT_MAX * (mask & PGMinYEdgeMask ? 1 : -1);
 	}
-	[self scrollTo:position mode:PGScrollAllowAnimation];
+	[self scrollTo:position animation:PGPreferAnimation];
 }
 
 #pragma mark -
@@ -461,7 +461,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         markForRedisplayIfNeeded:(BOOL)flag
 {
 	NSPoint const newPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
-	[[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) mode:PGScrollKeepCurrent];
+	[[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
 	_immediatePosition = newPosition;
 	[self setBoundsOrigin:NSMakePoint(floorf(_immediatePosition.x), floorf(_immediatePosition.y))];
@@ -515,6 +515,26 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (PGClipView *)PG_clipView
 {
 	return self;
+}
+
+#pragma mark -
+
+- (void)PG_scrollRectToVisible:(NSRect)aRect
+        forView:(NSView *)view
+{
+	[super PG_scrollRectToVisible:aRect forView:view];
+	NSRect const r = [self convertRect:aRect fromView:view];
+	NSRect const b = [self insetBounds];
+	NSSize o = NSZeroSize;
+	if(NSWidth(r) > NSWidth(b)) {
+		// TODO: Use the current pin location to pick an edge of the rect to show.
+	} else if(NSMinX(r) < NSMinX(b)) o.width = NSMinX(r) - NSMinX(b);
+	else if(NSMaxX(r) > NSMaxX(b)) o.width = NSMaxX(r) - NSMaxX(b);
+	if(NSHeight(r) > NSHeight(b)) {
+		// TODO: Same as above.
+	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMinY(r) - NSMinY(b);
+	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMaxY(r) - NSMaxY(b);
+	[self scrollBy:o animation:PGPreferAnimation];
 }
 
 #pragma mark PGZooming Protocol
@@ -586,7 +606,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	[self _setPosition:PGOffsetPointByXY([self position], 0, heightDiff) markForRedisplayIfNeeded:YES];
+	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) markForRedisplayIfNeeded:YES];
 }
 
 #pragma mark NSResponder
@@ -608,7 +628,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	float const x = -[anEvent deltaX], y = [anEvent deltaY];
-	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) mode:PGScrollAllowAnimation];
+	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) animation:PGPreferAnimation];
 }
 
 #pragma mark -
@@ -702,11 +722,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (IBAction)moveToBeginningOfDocument:(id)sender
 {
-	[self scrollToLocation:PGHomeLocation mode:PGScrollAllowAnimation];
+	[self scrollToLocation:PGHomeLocation animation:PGPreferAnimation];
 }
 - (IBAction)moveToEndOfDocument:(id)sender
 {
-	[self scrollToLocation:PGEndLocation mode:PGScrollAllowAnimation];
+	[self scrollToLocation:PGEndLocation animation:PGPreferAnimation];
 }
 - (IBAction)scrollPageUp:(id)sender
 {
@@ -801,6 +821,18 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (PGClipView *)PG_clipView
 {
 	return [self PG_enclosingClipView];
+}
+
+#pragma mark -
+
+- (void)PG_scrollRectToVisible:(NSRect)aRect
+{
+	[self PG_scrollRectToVisible:aRect forView:self];
+}
+- (void)PG_scrollRectToVisible:(NSRect)aRect
+        forView:(NSView *)view
+{
+	[[self superview] PG_scrollRectToVisible:aRect forView:view];
 }
 
 @end

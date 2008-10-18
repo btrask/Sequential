@@ -105,7 +105,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	_shouldSaveFrame = NO;
 	[[self window] setFrame:[[self window] PG_zoomedFrame] display:YES]; // Don't just send -zoom: because that will use the user size if the window is already the system size.
 	_shouldSaveFrame = YES;
-	[clipView scrollToLocation:_initialLocation mode:PGScrollNoAnimation];
+	[clipView scrollToLocation:_initialLocation animation:PGNoAnimation];
 	_shouldZoomOnNextImageLoad = NO;
 }
 

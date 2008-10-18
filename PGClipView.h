@@ -28,17 +28,17 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 enum {
-	PGScrollKeepCurrent    = 0,
-	PGScrollNoAnimation    = 1,
-	PGScrollAllowAnimation = 2
-};
-typedef unsigned PGScrollMode;
-
-enum {
 	PGScrollByLine = 0,
 	PGScrollByPage = 1
 };
 typedef unsigned PGScrollType;
+
+enum {
+	PGNoAnimation     = 0,
+	PGAllowAnimation  = 1,
+	PGPreferAnimation = 2
+};
+typedef unsigned PGAnimationType;
 
 @interface PGClipView : NSView
 {
@@ -86,11 +86,11 @@ typedef unsigned PGScrollType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
 - (NSPoint)position;
-- (NSPoint)positionForScrollMode:(PGScrollMode)mode;
-- (BOOL)scrollTo:(NSPoint)aPoint mode:(PGScrollMode)mode;
-- (BOOL)scrollBy:(NSSize)aSize mode:(PGScrollMode)mode;
-- (BOOL)scrollToEdge:(PGRectEdgeMask)mask mode:(PGScrollMode)mode;
-- (BOOL)scrollToLocation:(PGPageLocation)location mode:(PGScrollMode)mode;
+- (NSPoint)positionForScrollAnimation:(PGAnimationType)type;
+- (BOOL)scrollTo:(NSPoint)aPoint animation:(PGAnimationType)type;
+- (BOOL)scrollBy:(NSSize)aSize animation:(PGAnimationType)type;
+- (BOOL)scrollToEdge:(PGRectEdgeMask)mask animation:(PGAnimationType)type;
+- (BOOL)scrollToLocation:(PGPageLocation)location animation:(PGAnimationType)type;
 - (void)stopAnimatedScrolling;
 
 - (PGRectEdgeMask)pinLocation;
@@ -99,7 +99,7 @@ typedef unsigned PGScrollType;
 - (BOOL)scrollPinLocationToOffset:(NSSize)aSize;
 
 - (NSPoint)center;
-- (BOOL)scrollCenterTo:(NSPoint)aPoint mode:(PGScrollMode)mode;
+- (BOOL)scrollCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
 
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
@@ -133,5 +133,8 @@ typedef unsigned PGScrollType;
 
 - (PGClipView *)PG_enclosingClipView;
 - (PGClipView *)PG_clipView;
+
+- (void)PG_scrollRectToVisible:(NSRect)aRect;
+- (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view;
 
 @end
