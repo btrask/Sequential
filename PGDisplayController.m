@@ -361,6 +361,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[searchField setStringValue:query];
 		[self _updateInfoPanelLocation];
 		[self documentShowsInfoDidChange:nil];
+		if(![_activeDocument showsThumbnails]) [_thumbnailPanel close];
 		[self documentShowsThumbnailsDidChange:nil];
 		NSEnableScreenUpdates();
 	}
@@ -592,6 +593,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
 		[[_thumbnailPanel content] setLayoutDirection:ltr ? PGLeftToRightLayout : PGRightToLeftLayout];
 		[_thumbnailPanel displayOverWindow:[self window]];
+		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
 		PGInset const inset = PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0);
 		[clipView setBoundsInset:inset];
@@ -603,15 +605,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_graphicPanel changeFrameAnimate:NO];
 		NSEnableScreenUpdates();
 	} else {
-		[_thumbnailPanel fadeOut];
 		[clipView setBoundsInset:PGZeroInset];
 		[_findPanel setFrameInset:PGZeroInset];
 		[_graphicPanel setFrameInset:PGZeroInset];
 		NSDisableScreenUpdates();
 		[self _updateImageViewSizeAllowAnimation:NO];
-		[self _updateInfoPanelLocation];
 		[_findPanel changeFrameAnimate:NO];
 		[_graphicPanel changeFrameAnimate:NO];
+		[_thumbnailPanel fadeOut];
+		[self _updateInfoPanelLocation];
 		NSEnableScreenUpdates();
 	}
 }

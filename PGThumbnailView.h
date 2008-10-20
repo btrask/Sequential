@@ -52,6 +52,7 @@ typedef unsigned PGLayoutDirection;
 - (NSArray *)items;
 - (NSSet *)selection;
 - (void)setSelection:(NSSet *)items;
+- (void)scrollToFirstSelectedItem;
 
 - (unsigned)numberOfColumns;
 - (unsigned)indexOfItemAtPoint:(NSPoint)p;

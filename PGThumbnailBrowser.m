@@ -113,7 +113,7 @@ DEALINGS WITH THE SOFTWARE. */
 		NSParameterAssert([[self lastView] representedObject] == pathItem);
 	}
 	[[self lastView] setSelection:items];
-	[self scrollToLastColumn];
+	[self scrollToLastColumnAnimate:NO];
 }
 - (void)setSelectedItem:(id)item
 {
@@ -125,8 +125,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)reloadData
 {
 	if(![[self views] count]) return [self _addColumnWithItem:nil];
+	NSDisableScreenUpdates();
+	[[self viewAtIndex:0] setSelection:nil];
 	unsigned i = 0;
 	for(; i < [[self views] count]; i++) [[self viewAtIndex:i] reloadData];
+	NSEnableScreenUpdates();
 }
 - (void)reloadItem:(id)item
         reloadChildren:(BOOL)flag
@@ -175,8 +178,8 @@ DEALINGS WITH THE SOFTWARE. */
 		[nextView reloadData];
 		[self removeColumnsAfterView:nextView];
 		[self scrollToTopOfColumnWithView:nextView];
-		[self scrollToLastColumn];
 	} else [self _addColumnWithItem:selectedItem];
+	[self scrollToLastColumnAnimate:YES];
 	[[self delegate] thumbnailBrowserSelectionDidChange:self];
 }
 

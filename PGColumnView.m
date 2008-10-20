@@ -49,7 +49,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)addColumnWithView:(NSView *)aView
 {
 	[self insertColumnWithView:aView atIndex:[_views count]];
-	[self scrollToLastColumn];
 }
 - (void)insertColumnWithView:(NSView *)aView
         atIndex:(unsigned)index
@@ -122,9 +121,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[_clipViews objectAtIndex:[_views indexOfObjectIdenticalTo:aView]]  scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
 }
-- (void)scrollToLastColumn
+- (void)scrollToLastColumnAnimate:(BOOL)flag
 {
-	[_clipView scrollToEdge:PGMaxXEdgeMask animation:PGPreferAnimation];
+	[_clipView scrollToEdge:PGMaxXEdgeMask animation:(flag ? PGPreferAnimation : PGNoAnimation)];
 }
 
 #pragma mark -

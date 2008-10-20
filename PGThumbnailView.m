@@ -87,17 +87,22 @@ DEALINGS WITH THE SOFTWARE. */
 	NSEnumerator *const removedItemEnum = [removedItems objectEnumerator];
 	while((removedItem = [removedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
 	[_selection setSet:items];
+	[self scrollToFirstSelectedItem];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
+- (void)scrollToFirstSelectedItem
+{
 	unsigned const selCount = [_selection count];
-	if(1 == selCount) [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES]];
+	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES]];
 	else if(selCount) {
 		unsigned i = 0;
 		for(; i < [_items count]; i++) {
 			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
 			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES]];
-			break;
+			return;
 		}
 	}
-	[[self delegate] thumbnailViewSelectionDidChange:self];
+	[[self PG_enclosingClipView] scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
 }
 
 #pragma mark -
@@ -115,6 +120,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSRect)frameOfItemAtIndex:(unsigned)index
           withMargin:(BOOL)flag
 {
+	if(!_numberOfColumns) [self setFrameSize:NSZeroSize];
 	NSRect frame = NSMakeRect((index % _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, (index / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize);
 	if(PGRightToLeftLayout == _layoutDirection) frame.origin.x = NSMaxX([self bounds]) - NSMaxX(frame);
 	return flag ? NSInsetRect(frame, -PGThumbnailMargin, -PGThumbnailMargin) : frame;
@@ -141,6 +147,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
 	[self setFrameSize:NSZeroSize];
+	[self scrollToFirstSelectedItem];
 	[self setNeedsDisplay:YES];
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
 }

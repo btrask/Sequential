@@ -51,7 +51,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setColumnWidth:(float)width;
 
 - (void)scrollToTopOfColumnWithView:(NSView *)aView;
-- (void)scrollToLastColumn;
+- (void)scrollToLastColumnAnimate:(BOOL)flag;
 
 - (void)layout;
 
