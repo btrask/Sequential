@@ -574,11 +574,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	[self _updateInfoWithNodeCount];
 	[self _updateNodeIndex];
-	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
+	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
+	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
@@ -612,9 +612,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self _updateImageViewSizeAllowAnimation:NO];
 		[_findPanel changeFrameAnimate:NO];
 		[_graphicPanel changeFrameAnimate:NO];
-		[_thumbnailPanel fadeOut];
 		[self _updateInfoPanelLocation];
 		NSEnableScreenUpdates();
+		[_thumbnailPanel fadeOut];
 	}
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
@@ -664,7 +664,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
-	if([_thumbnailPanel isVisible]) [[_thumbnailPanel content] setSelectedItem:aNode];
+	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] setSelectedItem:aNode];
 	return YES;
 }
 - (void)_readActiveNode
@@ -747,7 +747,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
 		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
 	}
-	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) inset.minX += NSWidth([_thumbnailPanel frame]);
+	if([[self activeDocument] showsThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOrigin:corner];
 	[_infoPanel changeFrameAnimate:NO];
