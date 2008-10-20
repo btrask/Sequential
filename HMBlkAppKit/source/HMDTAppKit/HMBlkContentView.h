@@ -29,6 +29,4 @@ POSSIBILITY OF SUCH DAMAGE.
 
 @interface HMBlkContentView : NSView
 
-- (void)trackResize:(BOOL)isResize withEvent:(NSEvent *)firstEvent;
-
 @end

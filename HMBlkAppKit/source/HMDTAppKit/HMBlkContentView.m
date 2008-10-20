@@ -69,76 +69,6 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 	_rightTopRect.size = [_rightTopImage size];
 }
 
-#pragma mark Instance Methods
-
-- (void)trackResize:(BOOL)isResize
-        withEvent:(NSEvent *)firstEvent
-{
-	NSWindow *const w = [self window];
-	NSRect const initialFrame = [w frame];
-	NSPoint const firstMousePoint = [w convertBaseToScreen:[firstEvent locationInWindow]];
-	NSScreen *boundingScreen = nil;
-	if(isResize) {
-		NSRect const f = [w frame];
-		NSScreen *const screen = [w screen];
-		if(screen && NSPointInRect(NSMakePoint(NSMaxX(f) - 9, NSMinY(f) + 12), [screen visibleFrame])) boundingScreen = screen;
-	}
-
-	BOOL dragged = NO;
-	NSEvent *latestEvent;
-	while((latestEvent = [w nextEventMatchingMask:NSLeftMouseDraggedMask | NSLeftMouseUpMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) && [latestEvent type] != NSLeftMouseUp) {
-		dragged = YES;
-		NSPoint const mousePoint = [w convertBaseToScreen:[latestEvent locationInWindow]];
-		float const dx = mousePoint.x - firstMousePoint.x;
-		float const dy = firstMousePoint.y - mousePoint.y;
-		NSRect frame = initialFrame;
-		if(isResize) {
-			frame.size.width += dx;
-			frame.size.height += dy;
-			frame.origin.y -= dy;
-
-			// Constrain with min and max size
-			NSSize  minSize, maxSize;
-			minSize = [w minSize];
-			maxSize = [w maxSize];
-			if(minSize.width > 0 && frame.size.width < minSize.width) frame.size.width = minSize.width;
-			if(maxSize.width > 0 && frame.size.width > maxSize.width) frame.size.width = maxSize.width;
-			if(minSize.height > 0 && frame.size.height < minSize.height) {
-				frame.origin.y += frame.size.height - minSize.height;
-				frame.size.height = minSize.height;
-			}
-			if(maxSize.height > 0 && frame.size.height > maxSize.height) {
-				frame.origin.y += frame.size.height - minSize.height;
-				frame.size.height = maxSize.height;
-			}
-
-			// Constrain to the screen.
-			if(boundingScreen) {
-				NSRect const s = [boundingScreen visibleFrame];
-				if(NSMaxX(frame) - 8 > NSMaxX(s)) frame.size.width -= NSMaxX(frame) - 8 - NSMaxX(s);
-				if(NSMinY(frame) + 12 < NSMinY(s)) {
-					float const y = NSMinY(frame) + 12 - NSMinY(s);
-					frame.origin.y -= y;
-					frame.size.height += y;
-				}
-			}
-		} else {
-			frame.origin.x += dx;
-			frame.origin.y -= dy;
-
-			// Constrain by menu bar
-			NSArray *const screens = [NSScreen screens];
-			if([screens count]) {
-				NSScreen *const mainScreen = [screens objectAtIndex:0];
-				if([w screen] == mainScreen && NSMaxY(frame) - 4 > NSMaxY([mainScreen visibleFrame])) frame.origin.y -= NSMaxY(frame) - 4 - NSMaxY([mainScreen visibleFrame]);
-			}
-		}
-		[w setFrame:frame display:YES];
-	}
-	[w discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
-	if(!isResize && !dragged) [w makeFirstResponder:self];
-}
-
 #pragma mark NSView
 
 - (BOOL)isOpaque
@@ -248,7 +178,8 @@ static NSRect   _rightTopRect = {{0, 0}, {0, 0}};
 {
 	NSRect const b = [self bounds];
 	NSPoint const mousePoint = [self convertPoint:[anEvent locationInWindow] fromView:nil];
-	if([self mouse:mousePoint inRect:NSMakeRect(8, 12, NSWidth(b) - 16, NSHeight(b) - 16)]) [self trackResize:[[self window] isResizable] && NSPointInRect(mousePoint, NSMakeRect(NSWidth(b) - 30, 18, 16, 16)) withEvent:anEvent];
+	NSWindow *const w = [self window];
+	if([self mouse:mousePoint inRect:NSMakeRect(8, 12, NSWidth(b) - 16, NSHeight(b) - 16)] && ![w HM_trackResize:[w isResizable] && [self mouse:mousePoint inRect:[[self window] HM_resizeRectForView:self]] withEvent:anEvent]) [w makeFirstResponder:self];
 }
 
 @end

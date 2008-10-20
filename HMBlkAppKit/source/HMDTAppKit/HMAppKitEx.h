@@ -140,3 +140,12 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSView (HMAdditions)
 - (BOOL)HM_isActive;
 @end
+
+@interface NSWindow (HMAdditions)
+
+- (NSRect)HM_logicalFrame;
+- (void)HM_setLogicalFrame:(NSRect)aRect display:(BOOL)flag;
+- (NSRect)HM_resizeRectForView:(NSView *)aView;
+- (BOOL)HM_trackResize:(BOOL)isResize withEvent:(NSEvent *)firstEvent;
+
+@end

@@ -83,6 +83,24 @@ POSSIBILITY OF SUCH DAMAGE.
 	return _resizable;
 }
 
+#pragma mark HMAdditions Protocol
+
+- (NSRect)HM_logicalFrame
+{
+	NSRect const f = [super HM_logicalFrame];
+	return NSMakeRect(NSMinX(f) + 7, NSMinY(f) + 12, NSWidth(f) - 15, NSHeight(f) - 16);
+}
+- (void)HM_setLogicalFrame:(NSRect)aRect
+        display:(BOOL)flag
+{
+	[super HM_setLogicalFrame:NSMakeRect(NSMinX(aRect) - 7, NSMinY(aRect) - 12, NSWidth(aRect) + 15, NSHeight(aRect) + 16) display:flag];
+}
+- (NSRect)HM_resizeRectForView:(NSView *)aView
+{
+	NSView *const c = [self contentView];
+	return [c convertRect:NSMakeRect(NSWidth([c bounds]) - 30, 18, 16, 16) toView:aView];
+}
+
 #pragma mark NSMenuValidation Protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem

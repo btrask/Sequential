@@ -346,3 +346,88 @@ DEALINGS WITH THE SOFTWARE. */
 }
 
 @end
+
+@implementation NSWindow (HMAdditions)
+
+- (NSRect)HM_logicalFrame
+{
+	return [self frame];
+}
+- (void)HM_setLogicalFrame:(NSRect)aRect
+        display:(BOOL)flag
+{
+	[self setFrame:aRect display:flag];
+}
+- (NSRect)HM_resizeRectForView:(NSView *)aView
+{
+	NSView *const c = [self contentView];
+	NSRect const b = [c bounds];
+	return [c convertRect:NSMakeRect(NSMaxX(b) - 15, NSMinY(b), 15, 15) toView:aView];
+}
+- (BOOL)HM_trackResize:(BOOL)isResize
+        withEvent:(NSEvent *)firstEvent
+{
+	NSRect const initialFrame = [self HM_logicalFrame];
+	NSPoint const firstMousePoint = [[firstEvent window] convertBaseToScreen:[firstEvent locationInWindow]];
+	NSScreen *boundingScreen = nil;
+	if(isResize) {
+		NSScreen *const screen = [self screen];
+		if(screen && NSPointInRect(NSMakePoint(NSMaxX(initialFrame) - 1, NSMinY(initialFrame)), [screen visibleFrame])) boundingScreen = screen;
+	}
+
+	BOOL dragged = NO;
+	NSEvent *latestEvent;
+	while((latestEvent = [self nextEventMatchingMask:NSLeftMouseDraggedMask | NSLeftMouseUpMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) && [latestEvent type] != NSLeftMouseUp) {
+		dragged = YES;
+		NSPoint const mousePoint = [[latestEvent window] convertBaseToScreen:[latestEvent locationInWindow]];
+		float const dx = mousePoint.x - firstMousePoint.x;
+		float const dy = firstMousePoint.y - mousePoint.y;
+		NSRect frame = initialFrame;
+		if(isResize) {
+			frame.size.width += dx;
+			frame.size.height += dy;
+			frame.origin.y -= dy;
+
+			// Constrain with min and max size
+			NSSize  minSize, maxSize;
+			minSize = [self minSize];
+			maxSize = [self maxSize];
+			if(minSize.width > 0 && frame.size.width < minSize.width) frame.size.width = minSize.width;
+			if(maxSize.width > 0 && frame.size.width > maxSize.width) frame.size.width = maxSize.width;
+			if(minSize.height > 0 && frame.size.height < minSize.height) {
+				frame.origin.y += frame.size.height - minSize.height;
+				frame.size.height = minSize.height;
+			}
+			if(maxSize.height > 0 && frame.size.height > maxSize.height) {
+				frame.origin.y += frame.size.height - minSize.height;
+				frame.size.height = maxSize.height;
+			}
+
+			// Constrain to the screen.
+			if(boundingScreen) {
+				NSRect const s = [boundingScreen visibleFrame];
+				if(NSMaxX(frame) > NSMaxX(s)) frame.size.width -= NSMaxX(frame) - NSMaxX(s);
+				if(NSMinY(frame) < NSMinY(s)) {
+					float const y = NSMinY(frame) - NSMinY(s);
+					frame.origin.y -= y;
+					frame.size.height += y;
+				}
+			}
+		} else {
+			frame.origin.x += dx;
+			frame.origin.y -= dy;
+
+			// Constrain by menu bar
+			NSArray *const screens = [NSScreen screens];
+			if([screens count]) {
+				NSScreen *const mainScreen = [screens objectAtIndex:0];
+				if([self screen] == mainScreen && NSMaxY(frame) > NSMaxY([mainScreen visibleFrame])) frame.origin.y -= NSMaxY(frame) - NSMaxY([mainScreen visibleFrame]);
+			}
+		}
+		[self HM_setLogicalFrame:frame display:YES];
+	}
+	[self discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
+	return dragged;
+}
+
+@end

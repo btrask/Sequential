@@ -929,10 +929,10 @@
 				0E88D5A00E30C2E900871528 /* Corner-Top-Left.png */,
 				0E88D5A10E30C2E900871528 /* Corner-Top-Right.png */,
 				0E88D5A20E30C2E900871528 /* Cursor-Hand-Pointing.png */,
-				0E4794280DF182C40083B7CA /* Silhouette-Black.png */,
-				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
 				0E9012A30DF22636004B6F69 /* Mirror-Black.png */,
 				0E9012A40DF22636004B6F69 /* Mirror-White.png */,
+				0E4794280DF182C40083B7CA /* Silhouette-Black.png */,
+				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";

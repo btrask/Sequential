@@ -593,7 +593,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[_thumbnailPanel content] setLayoutDirection:ltr ? PGLeftToRightLayout : PGRightToLeftLayout];
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
-		PGInset const inset = PGMakeInset((ltr ? 0 : NSWidth([_thumbnailPanel frame])), 0, (ltr ? NSWidth([_thumbnailPanel frame]) : 0), 0);
+		PGInset const inset = PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0);
 		[clipView setBoundsInset:inset];
 		[_findPanel setFrameInset:inset];
 		[_graphicPanel setFrameInset:inset];
@@ -620,15 +620,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSDisableScreenUpdates();
 	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
 	[[_thumbnailPanel content] setLayoutDirection:ltr ? PGLeftToRightLayout : PGRightToLeftLayout];
-	[_thumbnailPanel changeFrameAnimate:NO];
-	PGInset const inset = PGMakeInset((ltr ? 0 : NSWidth([_thumbnailPanel frame])), 0, (ltr ? NSWidth([_thumbnailPanel frame]) : 0), 0);
-	[clipView setBoundsInset:inset];
-	[_findPanel setFrameInset:inset];
-	[_graphicPanel setFrameInset:inset];
-	[self _updateImageViewSizeAllowAnimation:NO];
 	[self _updateInfoPanelLocation];
-	[_findPanel changeFrameAnimate:NO];
-	[_graphicPanel changeFrameAnimate:NO];
 	NSEnableScreenUpdates();
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
@@ -753,10 +745,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
 		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
 	}
-	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) {
-		if(ltr) inset.maxX += NSWidth([_thumbnailPanel frame]);
-		else inset.minX += NSWidth([_thumbnailPanel frame]);
-	}
+	if([_thumbnailPanel isVisible] && ![_thumbnailPanel isFadingOut]) inset.minX += NSWidth([_thumbnailPanel frame]);
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOrigin:corner];
 	[_infoPanel changeFrameAnimate:NO];

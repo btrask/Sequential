@@ -26,7 +26,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Views
 @class PGBezelPanel;
-#import "PGThumbnailView.h"
 
 @interface PGThumbnailBrowser (Private)
 
@@ -187,7 +186,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect((PGLeftToRightLayout == _layoutDirection ? NSMaxX(aRect) - [self columnWidth] + 1 : NSMinX(aRect)), NSMinY(aRect), [self columnWidth] - 1, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), [self columnWidth] - 1, NSHeight(aRect));
 }
 
 @end
