@@ -342,6 +342,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self setTimerInterval:0];
 	if(_activeDocument) {
 		NSDisableScreenUpdates();
+		if(![_activeDocument showsThumbnails]) [_thumbnailPanel close];
+		[self documentShowsThumbnailsDidChange:nil];
 		PGNode *node;
 		PGImageView *view;
 		NSSize offset;
@@ -361,8 +363,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[searchField setStringValue:query];
 		[self _updateInfoPanelLocation];
 		[self documentShowsInfoDidChange:nil];
-		if(![_activeDocument showsThumbnails]) [_thumbnailPanel close];
-		[self documentShowsThumbnailsDidChange:nil];
 		NSEnableScreenUpdates();
 	}
 	return NO;

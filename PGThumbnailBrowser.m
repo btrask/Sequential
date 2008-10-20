@@ -117,7 +117,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setSelectedItem:(id)item
 {
-	[self setSelection:[NSSet setWithObject:item]];
+	[self setSelection:(item ? [NSSet setWithObject:item] : nil)];
 }
 
 #pragma mark -
