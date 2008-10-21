@@ -45,7 +45,11 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
-#define PGThumbnailSize 96.0
+#define PGThumbnailSize            96.0f
+#define PGFilmstripBorderSize      8.0f
+#define PGFilmstripTotalBorderSize (PGFilmstripBorderSize * 2.0f)
+#define PGFilmstripNotchSize       (PGFilmstripBorderSize / 2.0f)
+#define PGFilmstripNotchBorderSize ((PGFilmstripBorderSize - PGFilmstripNotchSize) / 2.0f)
 
 static NSConditionLock *PGThumbnailsNeededLock            = nil;
 static NSMutableArray  *PGAdaptersThatRequestedThumbnails = nil;
@@ -151,14 +155,46 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	NSImageRep *const rep = [NSImageRep AE_bestImageRepWithData:data];
 	if(!rep) return nil;
 	NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	NSSize const s = PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height));
-	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+	NSSize const s1 = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height)));
+	BOOL const vert = ![rep hasAlpha] && s1.width + PGFilmstripTotalBorderSize < PGThumbnailSize && s1.width > 10;
+	BOOL const horz = !vert && ![rep hasAlpha] && s1.height + PGFilmstripTotalBorderSize < PGThumbnailSize && s1.height > 10;
+	NSSize const s2 = NSMakeSize(s1.width + (vert ? 16 : 0), s1.height + (horz ? 16 : 0));
+	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s2.width pixelsHigh:s2.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 	if(!thumbRep) return nil;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	[rep drawInRect:(NSRect){NSZeroPoint, s}];
+	if(horz) {
+		[[NSColor blackColor] set];
+		NSRectFill(NSMakeRect(0, 0, s2.width, PGFilmstripBorderSize));
+		NSRectFill(NSMakeRect(0, s2.height - PGFilmstripBorderSize, s2.width, PGFilmstripBorderSize));
+		[[NSColor clearColor] set];
+		float left = PGFilmstripNotchSize / -2.0f;
+		for(; left < s2.width; left += PGFilmstripNotchSize + PGFilmstripNotchBorderSize) {
+			NSRectFill(NSMakeRect(left, PGFilmstripNotchBorderSize, PGFilmstripNotchSize, PGFilmstripNotchSize));
+			NSRectFill(NSMakeRect(left, s1.height + PGFilmstripBorderSize + PGFilmstripNotchBorderSize, PGFilmstripNotchSize, PGFilmstripNotchSize));
+		}
+	} else if(vert) {
+		[[NSColor blackColor] set];
+		NSRectFill(NSMakeRect(0, 0, PGFilmstripBorderSize, s2.height));
+		NSRectFill(NSMakeRect(s2.width - PGFilmstripBorderSize, 0, PGFilmstripBorderSize, s2.height));
+		[[NSColor clearColor] set];
+		float bottom = PGFilmstripNotchSize / -2.0f;
+		for(; bottom < s2.height; bottom += PGFilmstripNotchSize + PGFilmstripNotchBorderSize) {
+			NSRectFill(NSMakeRect(PGFilmstripNotchBorderSize, bottom, PGFilmstripNotchSize, PGFilmstripNotchSize));
+			NSRectFill(NSMakeRect(s1.width + PGFilmstripBorderSize + PGFilmstripNotchBorderSize, bottom, PGFilmstripNotchSize, PGFilmstripNotchSize));
+		}
+	}
+	[rep drawInRect:NSMakeRect((s2.width - s1.width) / 2.0f, (s2.height - s1.height) / 2.0f, s1.width, s1.height)];
+	[NSGraphicsContext saveGraphicsState];
+	NSBezierPath *const clip = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(-10, s2.height - 40, s2.width + 20, 20)];
+	[clip appendBezierPathWithRect:NSMakeRect(0, s2.height - 30, s2.width, 30)];
+	[clip setWindingRule:NSEvenOddWindingRule];
+	[clip addClip];
+	[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
+	NSRectFillUsingOperation(NSMakeRect(0, s2.height - 30, s2.width, 30), NSCompositeSourceAtop);
+	[NSGraphicsContext restoreGraphicsState];
 	[NSGraphicsContext setCurrentContext:nil];
-	NSImage *const image = [[[NSImage alloc] initWithSize:s] autorelease];
+	NSImage *const image = [[[NSImage alloc] initWithSize:s2] autorelease];
 	[image addRepresentation:thumbRep];
 	return image;
 }
@@ -254,7 +290,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 			PGAdaptersThatRequestedThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
 			PGAdaptersWaitingForThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
 			PGInfoDictionaries = [[NSMutableArray alloc] init];
-			unsigned processorCount = MIN(4, MPProcessorsScheduled());
+			ItemCount processorCount = MIN((ItemCount)4, MPProcessorsScheduled());
 			while(processorCount--) [NSApplication detachDrawingThread:@selector(_threaded_generateThumbnails) toTarget:[PGResourceAdapter class] withObject:nil];
 		}
 		[PGAdaptersWaitingForThumbnails addObject:self];

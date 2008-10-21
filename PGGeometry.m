@@ -49,6 +49,10 @@ NSSize PGScaleSizeByFloat(NSSize size, float scale)
 {
 	return PGScaleSizeByXY(size, scale, scale);
 }
+NSSize PGIntegralSize(NSSize s)
+{
+	return NSMakeSize(roundf(s.width), roundf(s.height));
+}
 
 #pragma mark NSRect
 

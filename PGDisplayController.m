@@ -718,7 +718,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		} else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
-	return NSMakeSize(roundf(newSize.width), roundf(newSize.height));
+	return PGIntegralSize(newSize);
 }
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {

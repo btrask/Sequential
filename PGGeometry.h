@@ -34,6 +34,7 @@ extern NSSize PGPointDiff(NSPoint p1, NSPoint p2);
 
 extern NSSize PGScaleSizeByXY(NSSize size, float scaleX, float scaleY);
 extern NSSize PGScaleSizeByFloat(NSSize size, float scale);
+extern NSSize PGIntegralSize(NSSize s);
 
 #pragma mark NSRect
 
