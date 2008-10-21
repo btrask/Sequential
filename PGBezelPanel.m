@@ -150,12 +150,12 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 - (BOOL)canBecomeKeyWindow
 {
 	if([self isFadingOut]) return NO;
-	return _acceptsEvents;
+	return _acceptsEvents || ![_parentWindow isKeyWindow];
 }
 - (void)becomeKeyWindow
 {
-	if(_canBecomeKey) [super becomeKeyWindow];
-	else [_parentWindow makeKeyAndOrderFront:self];
+	[super becomeKeyWindow];
+	if(!_canBecomeKey) [_parentWindow makeKeyAndOrderFront:self];
 }
 - (void)setContentView:(NSView *)aView
 {

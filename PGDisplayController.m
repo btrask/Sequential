@@ -555,7 +555,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self _updateInfoWithNodeCount];
 	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
-	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadData];
+	if([[self activeDocument] showsThumbnails]) {
+		[[_thumbnailPanel content] reloadData];
+		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
+	}
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
 {

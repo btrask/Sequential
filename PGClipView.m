@@ -344,7 +344,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			break;
 		default: return NO;
 	}
-	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO];
+	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
 	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
@@ -367,7 +367,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
 	if(PGNotDragging != _dragMode) {
 		handled = YES;
-		[_cursor set];
+		[NSCursor pop];
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
@@ -587,6 +587,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)resetCursorRects
 {
+	if(!_cursor) return;
 	unsigned i;
 	NSRect rects[4];
 	NSRect b = [self bounds];
