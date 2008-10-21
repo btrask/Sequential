@@ -63,6 +63,8 @@ typedef unsigned PGMatchPriority;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
++ (NSImage *)threaded_generateThumbnailWithData:(NSData *)data;
+
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
 
@@ -77,8 +79,7 @@ typedef unsigned PGMatchPriority;
 - (NSImage *)thumbnail;
 - (void)setThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateThumbnail;
-- (NSImage *)threaded_generateThumbnailWithInfo:(NSDictionary *)info;
-- (NSImage *)threaded_generateThumbnailWithData:(NSData *)data;
+- (void)threaded_getThumbnail:(out NSImage **)outThumbnail data:(out NSData **)outData withInfo:(NSDictionary *)info; // If possible, return the data and override +threaded_generateThumbnailWithData:, because less locking has to be done that way.
 - (void)cancelThumbnailGeneration;
 
 - (void)noteResourceDidChange;
