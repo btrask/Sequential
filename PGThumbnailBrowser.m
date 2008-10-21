@@ -189,7 +189,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), [self columnWidth] - 1, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), ([self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
 }
 
 @end

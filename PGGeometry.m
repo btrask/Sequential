@@ -151,15 +151,19 @@ PGInset PGMakeInset(float minX, float minY, float maxX, float maxY)
 {
 	return (PGInset){minX, minY, maxX, maxY};
 }
-extern PGInset PGInvertInset(PGInset inset)
+PGInset PGInvertInset(PGInset inset)
 {
 	return PGMakeInset(-inset.minX, -inset.minY, -inset.maxX, -inset.maxY);
+}
+PGInset PGScaleInset(PGInset i, float s)
+{
+	return PGMakeInset(i.minX * s, i.minY * s, i.maxX * s, i.maxY * s);
 }
 NSRect PGInsetRect(NSRect r, PGInset i)
 {
 	return NSMakeRect(NSMinX(r) + i.minX, NSMinY(r) + i.minY, NSWidth(r) - i.minX - i.maxX, NSHeight(r) - i.minY - i.maxY);
 }
-extern NSSize PGInsetSize(NSSize s, PGInset i)
+NSSize PGInsetSize(NSSize s, PGInset i)
 {
 	return NSMakeSize(s.width - i.minX - i.maxX, s.height - i.minY - i.maxY);
 }

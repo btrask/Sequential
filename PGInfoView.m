@@ -72,7 +72,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(string == _messageText) return;
 	[_messageText release];
 	_messageText = [string copy];
-	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:PGBezelPanelShouldAnimateKey]]; // The animation happens syncrhonously, which slows down page switching.
+	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 
 #pragma mark -

@@ -30,8 +30,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGBezelPanelFrameShouldChangeNotification;
 
-extern NSString *const PGBezelPanelShouldAnimateKey;
-
 @interface PGBezelPanel : PGFadeOutPanel
 {
 	@private
@@ -53,9 +51,9 @@ extern NSString *const PGBezelPanelShouldAnimateKey;
 - (PGInset)frameInset;
 - (void)setFrameInset:(PGInset)inset;
 
-- (void)changeFrameAnimate:(BOOL)flag;
+- (void)updateFrame;
 
-- (void)frameShouldChange:(NSNotification *)aNotif; // Calls -changeFrameAnimate:.
+- (void)frameShouldChange:(NSNotification *)aNotif;
 - (void)windowDidResize:(NSNotification *)aNotif;
 
 @end

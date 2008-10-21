@@ -30,7 +30,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 NSString *const PGBezelPanelFrameShouldChangeNotification = @"PGBezelPanelFrameShouldChange";
 
-NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
+@interface PGBezelPanel (Private)
+
+- (void)_updateFrameWithWindow:(NSWindow *)aWindow;
+
+@end
 
 @implementation PGBezelPanel
 
@@ -62,7 +66,7 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 	[self cancelFadeOut];
 	if(aWindow != _parentWindow) [_parentWindow removeChildWindow:self];
 	[self setIgnoresMouseEvents:!_acceptsEvents];
-	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], _frameInset) scale:[self AE_userSpaceScaleFactor]] display:NO];
+	[self _updateFrameWithWindow:aWindow];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
 	if(!PGIsTigerOrLater()) [self orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
@@ -102,24 +106,31 @@ NSString *const PGBezelPanelShouldAnimateKey = @"PGBezelPanelShouldAnimate";
 
 #pragma mark -
 
-- (void)changeFrameAnimate:(BOOL)flag
+- (void)updateFrame
 {
-	if(!flag) NSDisableScreenUpdates();
-	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([_parentWindow AE_contentRect], _frameInset) scale:[self AE_userSpaceScaleFactor]] display:YES animate:flag];
+	NSDisableScreenUpdates();
+	[self _updateFrameWithWindow:_parentWindow];
 	[self display];
-	if(!flag) NSEnableScreenUpdates();
+	NSEnableScreenUpdates();
 }
 
 #pragma mark -
 
 - (void)frameShouldChange:(NSNotification *)aNotif
 {
-	NSParameterAssert(aNotif);
-	[self changeFrameAnimate:[[[aNotif userInfo] objectForKey:PGBezelPanelShouldAnimateKey] boolValue]];
+	[self updateFrame];
 }
 - (void)windowDidResize:(NSNotification *)aNotif
 {
-	[self changeFrameAnimate:NO];
+	[self updateFrame];
+}
+
+#pragma mark Private Protocol
+
+- (void)_updateFrameWithWindow:(NSWindow *)aWindow
+{
+	float const s = [self AE_userSpaceScaleFactor];
+	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s] display:NO];
 }
 
 #pragma mark NSStandardKeyBindingMethods Protocol

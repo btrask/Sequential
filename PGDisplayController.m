@@ -612,8 +612,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_graphicPanel setFrameInset:inset];
 		[self _updateImageViewSizeAllowAnimation:NO];
 		[self _updateInfoPanelLocation];
-		[_findPanel changeFrameAnimate:NO];
-		[_graphicPanel changeFrameAnimate:NO];
+		[_findPanel updateFrame];
+		[_graphicPanel updateFrame];
 		NSEnableScreenUpdates();
 	} else {
 		[clipView setBoundsInset:PGZeroInset];
@@ -621,8 +621,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_graphicPanel setFrameInset:PGZeroInset];
 		NSDisableScreenUpdates();
 		[self _updateImageViewSizeAllowAnimation:NO];
-		[_findPanel changeFrameAnimate:NO];
-		[_graphicPanel changeFrameAnimate:NO];
+		[_findPanel updateFrame];
+		[_graphicPanel updateFrame];
 		[self _updateInfoPanelLocation];
 		NSEnableScreenUpdates();
 		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
@@ -762,7 +762,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([[self activeDocument] showsThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOrigin:corner];
-	[_infoPanel changeFrameAnimate:NO];
+	[_infoPanel updateFrame];
 }
 - (void)_updateInfoPanelText
 {

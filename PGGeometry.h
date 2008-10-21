@@ -108,6 +108,7 @@ extern PGInset const PGZeroInset;
 
 extern PGInset PGMakeInset(float minX, float minY, float maxX, float maxY);
 extern PGInset PGInvertInset(PGInset inset);
+extern PGInset PGScaleInset(PGInset i, float s);
 extern NSRect PGInsetRect(NSRect r, PGInset i);
 extern NSSize PGInsetSize(NSSize s, PGInset i);
 
