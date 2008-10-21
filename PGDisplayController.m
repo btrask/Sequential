@@ -469,6 +469,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		NSEnableScreenUpdates();
 	} else {
 		[_findPanel fadeOut];
+		[self _updateInfoPanelLocation];
 		[[self window] makeKeyWindow];
 	}
 }
@@ -738,10 +739,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)_updateInfoWithNodeCount
 {
+	if(![self shouldShowInfo]) return [_infoPanel close];
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	[[_infoPanel content] setCount:count];
-	if([self shouldShowInfo]) [_infoPanel displayOverWindow:[self window]];
-	else [_infoPanel close];
+	[_infoPanel displayOverWindow:[self window]];
 }
 - (void)_updateNodeIndex
 {
@@ -751,6 +752,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)_updateInfoPanelLocation
 {
+	NSParameterAssert([self activeDocument]); // I'm pretty sure this is always true now.
 	if(![self activeDocument]) return; // If we're closing, don't bother.
 	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
 	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
@@ -919,11 +921,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)windowWillClose:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	if([aNotif object] == _findPanel) [self _updateInfoPanelLocation];
-	else if([aNotif object] == [self window]) {
-		if([_findPanel parentWindow]) [_findPanel close];
-		[self close];
-	}
+	if([aNotif object] != [self window]) return;
+	if([_findPanel parentWindow]) [_findPanel close];
+	[self close];
 }
 
 #pragma mark NSWindowDelegate Protocol
