@@ -254,7 +254,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 			PGAdaptersThatRequestedThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
 			PGAdaptersWaitingForThumbnails = [[NSMutableArray alloc] initWithCallbacks:NULL];
 			PGInfoDictionaries = [[NSMutableArray alloc] init];
-			unsigned processorCount = MPProcessorsScheduled();
+			unsigned processorCount = MIN(4, MPProcessorsScheduled());
 			while(processorCount--) [NSApplication detachDrawingThread:@selector(_threaded_generateThumbnails) toTarget:[PGResourceAdapter class] withObject:nil];
 		}
 		[PGAdaptersWaitingForThumbnails addObject:self];
