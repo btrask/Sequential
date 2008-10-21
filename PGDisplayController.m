@@ -60,8 +60,9 @@ DEALINGS WITH THE SOFTWARE. */
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 NSString *const PGDisplayControllerTimerDidChangeNotification      = @"PGDisplayControllerTimerDidChange";
 
-#define PGScaleMax 16.0f
-#define PGScaleMin (1.0f / 8.0f)
+#define PGScaleMax      16.0f
+#define PGScaleMin      (1.0f / 8.0f)
+#define PGWindowMinSize 400.0f
 
 static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
@@ -593,12 +594,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if([[self activeDocument] showsThumbnails]) {
 		NSDisableScreenUpdates();
-		BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-		[[_thumbnailPanel content] setLayoutDirection:ltr ? PGLeftToRightLayout : PGRightToLeftLayout];
+		[[_thumbnailPanel content] setLayoutDirection:([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGLeftToRightLayout : PGRightToLeftLayout)];
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
-		PGInset const inset = PGMakeInset(NSWidth([_thumbnailPanel frame]), 0, 0, 0);
+		float const panelWidth = NSWidth([_thumbnailPanel frame]);
+		NSWindow *const w = [self window];
+		[w setMinSize:NSMakeSize(PGWindowMinSize + panelWidth, PGWindowMinSize)];
+		NSRect currentFrame = [w frame];
+		if(NSWidth(currentFrame) < PGWindowMinSize + panelWidth) {
+			currentFrame.size.width = PGWindowMinSize + panelWidth;
+			[w setFrame:currentFrame display:YES];
+		}
+		PGInset const inset = PGMakeInset(panelWidth, 0, 0, 0);
 		[clipView setBoundsInset:inset];
 		[_findPanel setFrameInset:inset];
 		[_graphicPanel setFrameInset:inset];
@@ -617,6 +625,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_graphicPanel changeFrameAnimate:NO];
 		[self _updateInfoPanelLocation];
 		NSEnableScreenUpdates();
+		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
 		[_thumbnailPanel fadeOut];
 	}
 }
