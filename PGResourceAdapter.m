@@ -45,6 +45,8 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
+NSString *const PGImageDataKey              = @"PGImageData";
+
 #define PGThumbnailSize            96.0f
 #define PGFilmstripBorderSize      8.0f
 #define PGFilmstripTotalBorderSize (PGFilmstripBorderSize * 2.0f)
@@ -149,10 +151,21 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-+ (NSImage *)threaded_generateThumbnailWithData:(NSData *)data
++ (NSImage *)threaded_thumbnailWithCreationDictionary:(NSDictionary *)dict
 {
-	if(!data) return nil;
-	NSImageRep *const rep = [NSImageRep AE_bestImageRepWithData:data];
+	NSImageRep *const rep = [self threaded_thumbnailRepWithCreationDictionary:dict];
+	if(!rep) return nil;
+	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
+	[image addRepresentation:rep];
+	return image;
+}
++ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict
+{
+	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
+	if(!rep) {
+		NSData *const data = [dict objectForKey:PGImageDataKey];
+		if(data) rep = [NSImageRep AE_bestImageRepWithData:data];
+	}
 	if(!rep) return nil;
 	NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	NSSize const s1 = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height)));
@@ -194,9 +207,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	NSRectFillUsingOperation(NSMakeRect(0, s2.height - 30, s2.width, 30), NSCompositeSourceAtop);
 	[NSGraphicsContext restoreGraphicsState];
 	[NSGraphicsContext setCurrentContext:nil];
-	NSImage *const image = [[[NSImage alloc] initWithSize:s2] autorelease];
-	[image addRepresentation:thumbRep];
-	return image;
+	return thumbRep;
 }
 
 #pragma mark Private Protocol
@@ -211,13 +222,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		[PGAdaptersThatRequestedThumbnails removeObjectAtIndex:0];
 		NSDictionary *const info = [[[PGInfoDictionaries objectAtIndex:0] retain] autorelease];
 		[PGInfoDictionaries removeObjectAtIndex:0];
-		NSImage *thumbnail = nil;
-		NSData *data = nil;
-		[adapter threaded_getThumbnail:&thumbnail data:&data withInfo:info];
+		NSDictionary *const dict = [adapter threaded_thumbnailCreationDictionaryWithInfo:info];
 		Class const class = [adapter class];
 		[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
-		if(!thumbnail) thumbnail = [class threaded_generateThumbnailWithData:data];
-		[self performSelectorOnMainThread:@selector(_setThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", thumbnail, @"Thumbnail", nil] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(_setThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", [class threaded_thumbnailWithCreationDictionary:dict], @"Thumbnail", nil] waitUntilDone:NO];
 		[pool release];
 	}
 }
@@ -241,8 +249,8 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	@synchronized(self) {
 		if(aNode == _node) return;
 		_node = aNode;
-		[self noteIsViewableDidChange];
 	}
+	[self noteIsViewableDidChange];
 }
 
 #pragma mark -
@@ -309,14 +317,12 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
-- (void)threaded_getThumbnail:(out NSImage **)outThumbnail
-        data:(out NSData **)outData
-        withInfo:(NSDictionary *)info
+- (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
 {
-	if(outThumbnail) *outThumbnail = nil;
 	@synchronized(self) {
-		if(outData) *outData = [[self node] dataWithInfo:info fast:NO];
+		return [NSDictionary dictionaryWithObjectsAndKeys:[[self node] dataWithInfo:info fast:NO], PGImageDataKey, nil];
 	}
+	return nil;
 }
 - (void)cancelThumbnailGeneration
 {

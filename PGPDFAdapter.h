@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	@private
 	NSPDFImageRep *_rep;
+	NSPDFImageRep *_threadedRep;
 }
 
 @end

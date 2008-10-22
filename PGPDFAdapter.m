@@ -28,9 +28,18 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
+static NSString *const PGIndexKey = @"PGIndex";
+
 @interface PGPDFAdapter (Private)
 
 - (NSPDFImageRep *)_rep;
+- (NSPDFImageRep *)_threaded_rep;
+
+@end
+
+@interface NSPDFImageRep (PGAdditions)
+
+- (void)PG_setCurrentPage:(int)index;
 
 @end
 
@@ -41,6 +50,13 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSPDFImageRep *)_rep
 {
 	return [[_rep retain] autorelease];
+}
+- (NSPDFImageRep *)_threaded_rep
+{
+	@synchronized(self) {
+		return [[_threadedRep retain] autorelease];
+	}
+	return nil;
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -63,6 +79,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFinished];
 	_rep = [[NSPDFImageRep alloc] initWithData:data];
 	if(!_rep) return [[self node] loadFinished];
+	_threadedRep = [_rep copy];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
@@ -84,12 +101,40 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)dealloc
 {
 	[_rep release];
+	@synchronized(self) {
+		[_threadedRep release];
+		_threadedRep = nil;
+	}
 	[super dealloc];
 }
 
 @end
 
 @implementation PGPDFPageAdapter
+
+#pragma mark PGResourceAdapter
+
+#define PGThumbnailSize 96.0f // TODO: Standardize this.
+
++ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict
+{
+	NSPDFImageRep *const rep = [dict objectForKey:PGImageRepKey];
+	if(!rep) return nil;
+	NSBitmapImageRep *thumbRep = nil;
+	@synchronized(rep) {
+		[rep PG_setCurrentPage:[[dict objectForKey:PGIndexKey] intValue]];
+		NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
+		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height)));
+		thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+		[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
+		[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+		[[NSColor whiteColor] set];
+		NSRectFill(NSMakeRect(0, 0, s.width, s.height));
+		[rep drawInRect:NSMakeRect(0, 0, s.width, s.height)];
+		[NSGraphicsContext setCurrentContext:nil];
+	}
+	return thumbRep;
+}
 
 #pragma mark PGResourceAdapting Protocol
 
@@ -121,10 +166,34 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)read
 {
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
-	[rep setCurrentPage:[[self identifier] index]];
-	[rep setPixelsWide:NSWidth([rep bounds])]; // Important on Panther, where this doesn't get set automatically.
-	[rep setPixelsHigh:NSHeight([rep bounds])];
+	[rep PG_setCurrentPage:[[self identifier] index]];
 	[[self node] readFinishedWithImageRep:rep error:nil];
+}
+
+#pragma mark -
+
+- (BOOL)canGenerateThumbnail
+{
+	return YES;
+}
+- (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
+{
+	@synchronized(self) {
+		return [NSDictionary dictionaryWithObjectsAndKeys:[(PGPDFAdapter *)[self parentAdapter] _threaded_rep], PGImageRepKey, [NSNumber numberWithInt:[[self identifier] index]], PGIndexKey, nil];
+	}
+	return nil;
+}
+
+@end
+
+@implementation NSPDFImageRep (PGAdditions)
+
+- (void)PG_setCurrentPage:(int)index
+{
+	[self setCurrentPage:index];
+	NSRect const b = [self bounds];
+	[self setPixelsWide:NSWidth(b)]; // Important on Panther, where this doesn't get set automatically.
+	[self setPixelsHigh:NSHeight(b)];
 }
 
 @end

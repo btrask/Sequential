@@ -200,7 +200,10 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 
 - (void)dealloc
 {
-	[_archive release];
+	@synchronized(_archive) {
+		[_archive release];
+		_archive = nil;
+	}
 	[super dealloc];
 }
 

@@ -35,6 +35,8 @@ extern NSString *const PGCFBundleTypeMIMETypesKey;
 extern NSString *const PGCFBundleTypeOSTypesKey;
 extern NSString *const PGCFBundleTypeExtensionsKey;
 
+extern NSString *const PGImageDataKey;
+
 enum {
 	PGMatchByPriorAgreement     = 6000,
 	PGMatchByIntrinsicAttribute = 5000,
@@ -63,7 +65,8 @@ typedef unsigned PGMatchPriority;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
-+ (NSImage *)threaded_generateThumbnailWithData:(NSData *)data;
++ (NSImage *)threaded_thumbnailWithCreationDictionary:(NSDictionary *)dict;
++ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
@@ -79,7 +82,7 @@ typedef unsigned PGMatchPriority;
 - (NSImage *)thumbnail;
 - (void)setThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateThumbnail;
-- (void)threaded_getThumbnail:(out NSImage **)outThumbnail data:(out NSData **)outData withInfo:(NSDictionary *)info; // If possible, return the data and override +threaded_generateThumbnailWithData:, because less locking has to be done that way.
+- (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info;
 - (void)cancelThumbnailGeneration;
 
 - (void)noteResourceDidChange;
