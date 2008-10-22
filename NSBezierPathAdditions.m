@@ -37,5 +37,12 @@ DEALINGS WITH THE SOFTWARE. */
 	[path closePath];
 	return path;
 }
+- (void)AE_fillUsingOperation:(NSCompositingOperation)op
+{
+	[NSGraphicsContext saveGraphicsState];
+	[self addClip];
+	NSRectFillUsingOperation([self bounds], op);
+	[NSGraphicsContext restoreGraphicsState];
+}
 
 @end

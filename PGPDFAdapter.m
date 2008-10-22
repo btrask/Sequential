@@ -114,9 +114,8 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 #pragma mark PGResourceAdapter
 
-#define PGThumbnailSize 96.0f // TODO: Standardize this.
-
-+ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict
++ (NSImageRep *)threaded_thumbnailRepOfSize:(float)size
+                withCreationDictionary:(NSDictionary *)dict
 {
 	NSPDFImageRep *const rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) return nil;
@@ -124,7 +123,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 	@synchronized(rep) {
 		[rep PG_setCurrentPage:[[dict objectForKey:PGIndexKey] intValue]];
 		NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height)));
+		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height)));
 		thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 		[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
 		[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];

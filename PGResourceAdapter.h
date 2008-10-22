@@ -65,8 +65,8 @@ typedef unsigned PGMatchPriority;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
-+ (NSImage *)threaded_thumbnailWithCreationDictionary:(NSDictionary *)dict;
-+ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict;
++ (NSImage *)threaded_thumbnailOfSize:(float)size withCreationDictionary:(NSDictionary *)dict;
++ (NSImageRep *)threaded_thumbnailRepOfSize:(float)size withCreationDictionary:(NSDictionary *)dict;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;

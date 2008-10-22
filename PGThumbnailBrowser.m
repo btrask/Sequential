@@ -68,21 +68,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (PGLayoutDirection)layoutDirection
-{
-	return _layoutDirection;
-}
-- (void)setLayoutDirection:(PGLayoutDirection)dir
-{
-	if(dir == _layoutDirection) return;
-	_layoutDirection = dir;
-	PGThumbnailView *view;
-	NSEnumerator *const viewEnum = [[self views] objectEnumerator];
-	while((view = [viewEnum nextObject])) [view setLayoutDirection:dir];
-}
-
-#pragma mark -
-
 - (NSSet *)selection
 {
 	PGThumbnailView *const lastView = [[self views] lastObject];
@@ -152,8 +137,8 @@ DEALINGS WITH THE SOFTWARE. */
 	[thumbnailView setDataSource:[self dataSource]];
 	[thumbnailView setDelegate:self];
 	[thumbnailView setRepresentedObject:item];
-	[thumbnailView setLayoutDirection:[self layoutDirection]];
 	[thumbnailView reloadData];
+	if(![[self views] count]) [self setColumnWidth:NSWidth([thumbnailView frame]) + 1];
 	[self addColumnWithView:thumbnailView];
 }
 
@@ -189,7 +174,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), ([self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), ([self columnWidth] * 2 - 1) * scaleFactor, NSHeight(aRect));
 }
 
 @end

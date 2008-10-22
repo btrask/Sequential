@@ -27,5 +27,6 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSBezierPath (AEAdditions)
 
 + (id)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(float)radius;
+- (void)AE_fillUsingOperation:(NSCompositingOperation)op;
 
 @end

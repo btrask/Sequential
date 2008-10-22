@@ -33,7 +33,6 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	IBOutlet id                 dataSource;
 	IBOutlet id                 delegate;
-	         PGLayoutDirection _layoutDirection;
 }
 
 - (id)dataSource;
@@ -44,9 +43,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSSet *)selection;
 - (void)setSelection:(NSSet *)items;
 - (void)setSelectedItem:(id)item;
-
-- (PGLayoutDirection)layoutDirection;
-- (void)setLayoutDirection:(PGLayoutDirection)dir;
 
 - (void)reloadData;
 - (void)reloadItem:(id)item reloadChildren:(BOOL)flag;

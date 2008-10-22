@@ -166,11 +166,12 @@ DEALINGS WITH THE SOFTWARE. */
 		[_clipView setDocumentView:_view];
 		_clipViews = [[NSMutableArray alloc] init];
 		_views = [[NSMutableArray alloc] init];
-		_columnWidth = (96 + 12) * 3 + 1;
+		_columnWidth = (128.0f + 12.0f) + 1;
 	}
 	return self;
 }
-- (void)drawRect:(NSRect)aRect
+// TODO: Remove.
+/*- (void)drawRect:(NSRect)aRect
 {
 	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
 	NSRectFill(aRect);
@@ -180,7 +181,7 @@ DEALINGS WITH THE SOFTWARE. */
 	unsigned const count = [_clipViews count];
 	[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
 	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + _columnWidth * (i + 1) - 1, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
-}
+}*/
 - (void)setFrameSize:(NSSize)aSize
 {
 	[super setFrameSize:aSize];

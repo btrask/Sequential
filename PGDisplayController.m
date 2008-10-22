@@ -79,7 +79,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateInfoWithNodeCount;
 - (void)_updateNodeIndex;
-- (void)_updateInfoPanelLocation;
 - (void)_updateInfoPanelText;
 - (void)_runTimer;
 
@@ -362,7 +361,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[self setActiveNode:node initialLocation:PGHomeLocation];
 		}
 		[searchField setStringValue:query];
-		[self _updateInfoPanelLocation];
+		[self documentReadingDirectionDidChange:nil];
 		[self documentShowsInfoDidChange:nil];
 		NSEnableScreenUpdates();
 	}
@@ -465,11 +464,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[self window] orderFront:self];
 		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
 		[_findPanel makeKeyWindow];
-		[self _updateInfoPanelLocation];
+		[self documentReadingDirectionDidChange:nil];
 		NSEnableScreenUpdates();
 	} else {
 		[_findPanel fadeOut];
-		[self _updateInfoPanelLocation];
+		[self documentReadingDirectionDidChange:nil];
 		[[self window] makeKeyWindow];
 	}
 }
@@ -595,7 +594,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if([[self activeDocument] showsThumbnails]) {
 		NSDisableScreenUpdates();
-		[[_thumbnailPanel content] setLayoutDirection:([[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? PGLeftToRightLayout : PGRightToLeftLayout)];
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
@@ -612,7 +610,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_findPanel setFrameInset:inset];
 		[_graphicPanel setFrameInset:inset];
 		[self _updateImageViewSizeAllowAnimation:NO];
-		[self _updateInfoPanelLocation];
+		[self documentReadingDirectionDidChange:nil];
 		[_findPanel updateFrame];
 		[_graphicPanel updateFrame];
 		NSEnableScreenUpdates();
@@ -624,7 +622,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self _updateImageViewSizeAllowAnimation:NO];
 		[_findPanel updateFrame];
 		[_graphicPanel updateFrame];
-		[self _updateInfoPanelLocation];
+		[self documentReadingDirectionDidChange:nil];
 		NSEnableScreenUpdates();
 		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
 		[_thumbnailPanel fadeOut];
@@ -632,11 +630,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
-	NSDisableScreenUpdates();
+	if(![self activeDocument]) return;
 	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-	[[_thumbnailPanel content] setLayoutDirection:ltr ? PGLeftToRightLayout : PGRightToLeftLayout];
-	[self _updateInfoPanelLocation];
-	NSEnableScreenUpdates();
+	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
+	PGInset inset = PGZeroInset;
+	switch(corner) {
+		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
+		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
+	}
+	if([[self activeDocument] showsThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
+	[_infoPanel setFrameInset:inset];
+	[[_infoPanel content] setOrigin:corner];
+	[_infoPanel updateFrame];
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
@@ -749,22 +754,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_displayImageIndex = [[self activeNode] viewableNodeIndex];
 	[[_infoPanel content] setIndex:_displayImageIndex];
 	[self synchronizeWindowTitleWithDocumentName];
-}
-- (void)_updateInfoPanelLocation
-{
-	NSParameterAssert([self activeDocument]); // I'm pretty sure this is always true now.
-	if(![self activeDocument]) return; // If we're closing, don't bother.
-	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
-	PGInset inset = PGZeroInset;
-	switch(corner) {
-		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
-		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
-	}
-	if([[self activeDocument] showsThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
-	[_infoPanel setFrameInset:inset];
-	[[_infoPanel content] setOrigin:corner];
-	[_infoPanel updateFrame];
 }
 - (void)_updateInfoPanelText
 {
@@ -1149,7 +1138,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)showWindow:(id)sender
 {
 	[super showWindow:sender];
-	[self _updateInfoPanelLocation];
+	[self documentReadingDirectionDidChange:nil];
 	[self documentShowsInfoDidChange:nil];
 	[self documentShowsThumbnailsDidChange:nil];
 }

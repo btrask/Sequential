@@ -33,9 +33,11 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSBezierPathAdditions.h"
 
-#define PGThumbnailSize      96.0
-#define PGThumbnailMargin    6.0
-#define PGThumbnailSizeTotal (PGThumbnailSize + PGThumbnailMargin * 2)
+#define PGThumbnailSize         128.0f
+#define PGThumbnailMarginWidth  12.0
+#define PGThumbnailMarginHeight 2.0f
+#define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
+#define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
 
 @implementation PGThumbnailView
 
@@ -107,36 +109,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark -
 
-- (unsigned)numberOfColumns
+- (unsigned)indexOfItemAtPoint:(NSPoint)p
 {
-	return _numberOfColumns;
-}
-- (unsigned)indexOfItemAtPoint:(NSPoint)aPoint
-{
-	NSPoint p = aPoint;
-	if(PGRightToLeftLayout == _layoutDirection) p.x = NSMaxX([self bounds]) - p.x;
-	return floorf(p.y / PGThumbnailSizeTotal) * _numberOfColumns + floorf(p.x / PGThumbnailSizeTotal);
+	return floorf(p.y / PGThumbnailTotalHeight);
 }
 - (NSRect)frameOfItemAtIndex:(unsigned)index
           withMargin:(BOOL)flag
 {
-	if(!_numberOfColumns) [self setFrameSize:NSZeroSize];
-	NSRect frame = NSMakeRect((index % _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, (index / _numberOfColumns) * PGThumbnailSizeTotal + PGThumbnailMargin, PGThumbnailSize, PGThumbnailSize);
-	if(PGRightToLeftLayout == _layoutDirection) frame.origin.x = NSMaxX([self bounds]) - NSMaxX(frame);
-	return flag ? NSInsetRect(frame, -PGThumbnailMargin, -PGThumbnailMargin) : frame;
-}
-
-#pragma mark -
-
-- (PGLayoutDirection)layoutDirection
-{
-	return _layoutDirection;
-}
-- (void)setLayoutDirection:(PGLayoutDirection)dir
-{
-	if(dir == _layoutDirection) return;
-	_layoutDirection = dir;
-	[self setNeedsDisplay:YES];
+	NSRect frame = NSMakeRect(PGThumbnailMarginWidth, index * PGThumbnailTotalHeight + PGThumbnailMarginHeight, PGThumbnailSize, PGThumbnailSize);
+	return flag ? NSInsetRect(frame, -PGThumbnailMarginWidth, -PGThumbnailMarginHeight) : frame;
 }
 
 #pragma mark -
@@ -179,8 +160,29 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 }
+
+
+static void PGGradientCallback(void *info, float const *inData, float *outData)
+{
+	outData[0] = 1;
+	outData[1] = inData[0] / 10.0f;
+}
+
+
 - (void)drawRect:(NSRect)aRect
 {
+	NSRect const b = [self bounds];
+	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
+	[shadow setShadowOffset:NSMakeSize(0, -2)];
+	[shadow setShadowBlurRadius:4.0f];
+	[shadow set];
+	CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
+	[[NSColor colorWithDeviceWhite:0.1 alpha:0.95f] set];
+	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(0, 0, PGThumbnailTotalWidth, NSHeight(b))));
+
+	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
+	[nilShadow setShadowColor:nil];
+
 	int count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
@@ -191,33 +193,61 @@ DEALINGS WITH THE SOFTWARE. */
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[[NSColor alternateSelectedControlColor] set];
-			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], -4, -4) cornerRadius:4.0] fill];
+			NSRectFill(frameWithMargin);
 		}
-		NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-		[shadow setShadowBlurRadius:4.0f];
-		[shadow setShadowOffset:NSMakeSize(0.0f, -2.0f)];
-		[shadow set];
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		[thumb setFlipped:[self isFlipped]];
 		NSSize const originalSize = [thumb size];
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
-		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
-		[shadow setShadowColor:nil];
 		[shadow set];
+		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
+		[nilShadow set];
 	}
+
+	CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
+	float const domain[] = {0, 1};
+	float const range[] = {0, 1, 0, 1};
+	CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
+	CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
+
+	[NSGraphicsContext saveGraphicsState];
+	[[NSBezierPath bezierPathWithRect:NSIntersectionRect(aRect, NSMakeRect(NSMinX(b), NSMinY(b), PGThumbnailTotalWidth / 2.0f, NSHeight(b)))] addClip];
+	CGShadingRef const leftShading = CGShadingCreateAxial(colorSpace, CGPointMake(NSMinX(b), 0), CGPointMake(NSMaxX(b), 0), function, YES, YES);
+	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], leftShading);
+	CFRelease(leftShading);
+	[NSGraphicsContext restoreGraphicsState];
+
+	[NSGraphicsContext saveGraphicsState];
+	[[NSBezierPath bezierPathWithRect:NSIntersectionRect(aRect, NSMakeRect(NSMinX(b) + PGThumbnailTotalWidth / 2.0f, NSMinY(b), PGThumbnailTotalWidth / 2.0f, NSHeight(b)))] addClip];
+	CGShadingRef const rightShading = CGShadingCreateAxial(colorSpace, CGPointMake(NSMaxX(b), 0), CGPointMake(NSMidX(b), 0), function, YES, YES);
+	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], rightShading);
+	CFRelease(rightShading);
+	[NSGraphicsContext restoreGraphicsState];
+
+	CFRelease(function);
+	CFRelease(colorSpace);
+
+	float top = floorf(NSMinY(aRect) / 9) * 9 - 3.0f;
+	for(; top < NSMaxY(aRect); top += 9) {
+		[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(3, top + 1, 6, 6) cornerRadius:1] fill];
+		[[NSBezierPath AE_bezierPathWithRoundRect: NSMakeRect(PGThumbnailSize + PGThumbnailMarginWidth + 3, top + 1, 6, 6)cornerRadius:1] fill];
+
+		[[NSColor clearColor] set];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(3, top, 6, 6) cornerRadius:1] AE_fillUsingOperation:NSCompositeCopy];
+		[[NSBezierPath AE_bezierPathWithRoundRect: NSMakeRect(PGThumbnailSize + PGThumbnailMarginWidth + 3, top, 6, 6)cornerRadius:1] AE_fillUsingOperation:NSCompositeCopy];
+	}
+
+	CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
+	[nilShadow set];
 }
 
 #pragma mark -
 
 - (void)setFrameSize:(NSSize)oldSize
 {
-	NSView *const superview = [self superview];
-	if(!superview) return;
-	NSRect const sb = [superview bounds];
-	unsigned const maxCols = NSWidth(sb) / PGThumbnailSizeTotal;
-	_numberOfColumns = MAX(MIN(ceilf(sqrt([_items count])), maxCols), 1);
-	if(ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal > NSHeight(sb)) _numberOfColumns = MIN(ceilf((NSHeight(sb) / PGThumbnailSizeTotal) * [_items count]), maxCols);
-	[super setFrameSize:NSMakeSize(_numberOfColumns * PGThumbnailSizeTotal, ceilf((float)[_items count] / _numberOfColumns) * PGThumbnailSizeTotal)];
+	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
+	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 4, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
 #pragma mark NSResponder

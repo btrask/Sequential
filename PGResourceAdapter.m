@@ -47,7 +47,6 @@ NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
 NSString *const PGImageDataKey              = @"PGImageData";
 
-#define PGThumbnailSize            96.0f
 #define PGFilmstripBorderSize      8.0f
 #define PGFilmstripTotalBorderSize (PGFilmstripBorderSize * 2.0f)
 #define PGFilmstripNotchSize       (PGFilmstripBorderSize / 2.0f)
@@ -151,15 +150,17 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-+ (NSImage *)threaded_thumbnailWithCreationDictionary:(NSDictionary *)dict
++ (NSImage *)threaded_thumbnailOfSize:(float)size
+             withCreationDictionary:(NSDictionary *)dict
 {
-	NSImageRep *const rep = [self threaded_thumbnailRepWithCreationDictionary:dict];
+	NSImageRep *const rep = [self threaded_thumbnailRepOfSize:size withCreationDictionary:dict];
 	if(!rep) return nil;
 	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
 	[image addRepresentation:rep];
 	return image;
 }
-+ (NSImageRep *)threaded_thumbnailRepWithCreationDictionary:(NSDictionary *)dict
++ (NSImageRep *)threaded_thumbnailRepOfSize:(float)size
+                withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) {
@@ -168,43 +169,12 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	}
 	if(!rep) return nil;
 	NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	NSSize const s1 = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(PGThumbnailSize / originalSize.width, PGThumbnailSize / originalSize.height)));
-	BOOL const vert = ![rep hasAlpha] && s1.width + PGFilmstripTotalBorderSize < PGThumbnailSize && s1.width > 10;
-	BOOL const horz = !vert && ![rep hasAlpha] && s1.height + PGFilmstripTotalBorderSize < PGThumbnailSize && s1.height > 10;
-	NSSize const s2 = NSMakeSize(s1.width + (vert ? 16 : 0), s1.height + (horz ? 16 : 0));
-	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s2.width pixelsHigh:s2.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+	NSSize const s = PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height));
+	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 	if(!thumbRep) return nil;
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	if(horz) {
-		[[NSColor blackColor] set];
-		NSRectFill(NSMakeRect(0, 0, s2.width, PGFilmstripBorderSize));
-		NSRectFill(NSMakeRect(0, s2.height - PGFilmstripBorderSize, s2.width, PGFilmstripBorderSize));
-		[[NSColor clearColor] set];
-		float left = PGFilmstripNotchSize / -2.0f;
-		for(; left < s2.width; left += PGFilmstripNotchSize + PGFilmstripNotchBorderSize) {
-			NSRectFill(NSMakeRect(left, PGFilmstripNotchBorderSize, PGFilmstripNotchSize, PGFilmstripNotchSize));
-			NSRectFill(NSMakeRect(left, s1.height + PGFilmstripBorderSize + PGFilmstripNotchBorderSize, PGFilmstripNotchSize, PGFilmstripNotchSize));
-		}
-	} else if(vert) {
-		[[NSColor blackColor] set];
-		NSRectFill(NSMakeRect(0, 0, PGFilmstripBorderSize, s2.height));
-		NSRectFill(NSMakeRect(s2.width - PGFilmstripBorderSize, 0, PGFilmstripBorderSize, s2.height));
-		[[NSColor clearColor] set];
-		float bottom = PGFilmstripNotchSize / -2.0f;
-		for(; bottom < s2.height; bottom += PGFilmstripNotchSize + PGFilmstripNotchBorderSize) {
-			NSRectFill(NSMakeRect(PGFilmstripNotchBorderSize, bottom, PGFilmstripNotchSize, PGFilmstripNotchSize));
-			NSRectFill(NSMakeRect(s1.width + PGFilmstripBorderSize + PGFilmstripNotchBorderSize, bottom, PGFilmstripNotchSize, PGFilmstripNotchSize));
-		}
-	}
-	[rep drawInRect:NSMakeRect((s2.width - s1.width) / 2.0f, (s2.height - s1.height) / 2.0f, s1.width, s1.height)];
-	[NSGraphicsContext saveGraphicsState];
-	NSBezierPath *const clip = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(-10, s2.height - 40, s2.width + 20, 20)];
-	[clip appendBezierPathWithRect:NSMakeRect(0, s2.height - 30, s2.width, 30)];
-	[clip setWindingRule:NSEvenOddWindingRule];
-	[clip addClip];
-	[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
-	NSRectFillUsingOperation(NSMakeRect(0, s2.height - 30, s2.width, 30), NSCompositeSourceAtop);
+	[rep drawInRect:NSIntegralRect(NSMakeRect(0, 0, s.width, s.height))];
 	[NSGraphicsContext restoreGraphicsState];
 	[NSGraphicsContext setCurrentContext:nil];
 	return thumbRep;
@@ -225,7 +195,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		NSDictionary *const dict = [adapter threaded_thumbnailCreationDictionaryWithInfo:info];
 		Class const class = [adapter class];
 		[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
-		[self performSelectorOnMainThread:@selector(_setThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", [class threaded_thumbnailWithCreationDictionary:dict], @"Thumbnail", nil] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(_setThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", [class threaded_thumbnailOfSize:128.0f withCreationDictionary:dict], @"Thumbnail", nil] waitUntilDone:NO];
 		[pool release];
 	}
 }
