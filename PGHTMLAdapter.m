@@ -50,7 +50,6 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 {
 	[_webView stopLoading:self];
 	[_webView setFrameLoadDelegate:nil];
-	[_webView setPolicyDelegate:nil];
 	[_webView autorelease];
 	_webView = nil;
 }
@@ -96,18 +95,6 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	[self _clearWebView];
 }
 
-#pragma mark WebPolicyDelegate Protocol
-
-- (void)webView:(WebView *)sender
-        decidePolicyForNavigationAction:(NSDictionary *)actionInformation
-        request:(NSURLRequest *)request
-        frame:(WebFrame *)frame
-        decisionListener:(id<WebPolicyDecisionListener>)listener
-{
-	if(frame == [_webView mainFrame]) [listener use];
-	else [listener ignore];
-}
-
 #pragma mark PGResourceAdapting Protocol
 
 - (float)loadProgress
@@ -129,7 +116,6 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	if(!data) return [[self node] loadFinished];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
-	[_webView setPolicyDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];
 	[prefs setJavaEnabled:NO];
 	[prefs setPlugInsEnabled:NO];
