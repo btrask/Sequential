@@ -543,7 +543,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[self window] makeFirstResponder:clipView];
 	} else {
 		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
-		PGOrientation const orientation = [[self activeNode] orientation];
+		PGOrientation const orientation = [[self activeNode] orientationWithBase:YES];
 		[_imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
 		[clipView setDocumentView:_imageView];
 		[clipView scrollToLocation:_initialLocation animation:PGNoAnimation];
@@ -638,7 +638,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
-	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientation]]];
+	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES]]];
 }
 
 #pragma mark -

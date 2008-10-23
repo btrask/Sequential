@@ -46,6 +46,7 @@ NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
 NSString *const PGImageDataKey              = @"PGImageData";
+NSString *const PGOrientationKey            = @"PGOrientation";
 
 #define PGFilmstripBorderSize      8.0f
 #define PGFilmstripTotalBorderSize (PGFilmstripBorderSize * 2.0f)
@@ -168,14 +169,23 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		if(data) rep = [NSImageRep AE_bestImageRepWithData:data];
 	}
 	if(!rep) return nil;
-	NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
+	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntValue];
+	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	NSSize const s = PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height));
 	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 	if(!thumbRep) return nil;
-	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
-	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	[rep drawInRect:NSIntegralRect(NSMakeRect(0, 0, s.width, s.height))];
-	[NSGraphicsContext restoreGraphicsState];
+	NSGraphicsContext *const ctx = [NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]];
+	[NSGraphicsContext setCurrentContext:ctx];
+	[ctx setImageInterpolation:NSImageInterpolationHigh];
+	if(PGUpright == orientation) [rep drawInRect:NSIntegralRect(NSMakeRect(0, 0, s.width, s.height))];
+	else {
+		NSAffineTransform *const t = [NSAffineTransform transform];
+		[t translateXBy:s.width / 2.0f yBy:s.height / 2.0f];
+		if(PGRotated90CC & orientation) [t rotateByDegrees:90];
+		[t scaleXBy:(PGFlippedHorz & orientation ? -1 : 1) yBy:(PGFlippedVert & orientation ? -1 : 1)];
+		[t concat];
+		[rep drawInRect:NSIntegralRect(NSMakeRect(s.width / -2.0f, s.height / -2.0f, s.width, s.height))];
+	}
 	[NSGraphicsContext setCurrentContext:nil];
 	return thumbRep;
 }
@@ -272,7 +282,9 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 			while(processorCount--) [NSApplication detachDrawingThread:@selector(_threaded_generateThumbnails) toTarget:[PGResourceAdapter class] withObject:nil];
 		}
 		[PGAdaptersWaitingForThumbnails addObject:self];
-		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
+		NSMutableDictionary *const info = [[[self info] mutableCopy] autorelease];
+		[info setObject:[NSNumber numberWithUnsignedInt:[self orientationWithBase:NO]] forKey:PGOrientationKey];
+		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:info];
 	}
 	return [[self identifier] icon];
 }
@@ -281,7 +293,8 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	if(anImage == _thumbnail) return;
 	[_thumbnail release];
 	_thumbnail = [anImage retain];
-	[[self document] noteNodeThumbnailDidChange:[self node]];
+	if(anImage || ![self canGenerateThumbnail]) [[self document] noteNodeThumbnailDidChange:[self node]];
+	else (void)[self thumbnail];
 }
 - (BOOL)canGenerateThumbnail
 {
@@ -290,7 +303,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
 {
 	@synchronized(self) {
-		return [NSDictionary dictionaryWithObjectsAndKeys:[[self node] dataWithInfo:info fast:NO], PGImageDataKey, nil];
+		return [NSDictionary dictionaryWithObjectsAndKeys:[[self node] dataWithInfo:info fast:NO], PGImageDataKey, [info objectForKey:PGOrientationKey], PGOrientationKey, nil];
 	}
 	return nil;
 }
@@ -401,9 +414,9 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return nil;
 }
-- (PGOrientation)orientation
+- (PGOrientation)orientationWithBase:(BOOL)flag
 {
-	return [[self document] baseOrientation];
+	return flag ? [[self document] baseOrientation] : PGUpright;
 }
 - (BOOL)isResolutionIndependent
 {

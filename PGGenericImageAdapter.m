@@ -59,8 +59,10 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_readExifWithData:(NSData *)data
 {
 	if(_exifEntries || !data) return;
+	PGOrientation const oldOrientation = _orientation;
 	[PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 	[_exifEntries retain];
+	if(oldOrientation != _orientation) [self setThumbnail:nil];
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
@@ -96,9 +98,9 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return [[_exifEntries retain] autorelease];
 }
-- (PGOrientation)orientation
+- (PGOrientation)orientationWithBase:(BOOL)flag
 {
-	return PGAddOrientation(_orientation, [super orientation]);
+	return PGAddOrientation(_orientation, [super orientationWithBase:flag]);
 }
 - (void)clearCache
 {

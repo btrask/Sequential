@@ -77,7 +77,7 @@ typedef int PGLoadPolicy;
 
 - (BOOL)isContainer;
 - (NSArray *)exifEntries;
-- (PGOrientation)orientation; // Incorporates the document's -baseOrientation.
+- (PGOrientation)orientationWithBase:(BOOL)flag;
 - (BOOL)isResolutionIndependent;
 - (void)clearCache;
 

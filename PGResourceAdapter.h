@@ -36,6 +36,7 @@ extern NSString *const PGCFBundleTypeOSTypesKey;
 extern NSString *const PGCFBundleTypeExtensionsKey;
 
 extern NSString *const PGImageDataKey;
+extern NSString *const PGOrientationKey;
 
 enum {
 	PGMatchByPriorAgreement     = 6000,
