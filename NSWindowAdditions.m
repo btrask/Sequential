@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	Rect r;
 	GetWindowBounds([self windowRef], kWindowContentRgn, &r); // Updated in realtime, unlike -frame. See hxxp://rentzsch.com/cocoa/nswindowFrameLies.
-	return NSMakeRect(r.left, CGDisplayPixelsHigh(kCGDirectMainDisplay) - r.bottom, r.right - r.left, r.bottom - r.top);
+	return NSMakeRect(r.left, (float)CGDisplayPixelsHigh(kCGDirectMainDisplay) - r.bottom, r.right - r.left, r.bottom - r.top);
 }
 - (void)AE_setContentRect:(NSRect)aRect
 {
