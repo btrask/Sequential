@@ -81,6 +81,7 @@ typedef unsigned PGMatchPriority;
 - (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
 
 - (NSImage *)thumbnail;
+- (NSImage *)fastThumbnail;
 - (void)setThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateThumbnail;
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info;

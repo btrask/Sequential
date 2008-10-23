@@ -286,6 +286,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		[info setObject:[NSNumber numberWithUnsignedInt:[self orientationWithBase:NO]] forKey:PGOrientationKey];
 		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:info];
 	}
+	return [self fastThumbnail];
+}
+- (NSImage *)fastThumbnail
+{
 	return [[self identifier] icon];
 }
 - (void)setThumbnail:(NSImage *)anImage

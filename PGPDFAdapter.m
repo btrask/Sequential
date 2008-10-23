@@ -171,6 +171,10 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 #pragma mark -
 
+- (NSImage *)fastThumbnail
+{
+	return [[self parentAdapter] fastThumbnail];
+}
 - (BOOL)canGenerateThumbnail
 {
 	return YES;
