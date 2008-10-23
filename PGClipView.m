@@ -274,9 +274,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)stopAnimatedScrolling
 {
+	if(!_scrollTimer) return;
 	[_scrollTimer invalidate];
 	_scrollTimer = nil;
 	_lastScrollTime = 0;
+	[self PG_viewDidScrollInClipView:self];
 }
 
 #pragma mark -
@@ -295,7 +297,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const b = [self insetBounds];
 	PGRectEdgeMask const pin = [self pinLocation];
 	NSSize const diff = PGPointDiff(PGPointOfPartOfRect(b, pin), PGPointOfPartOfRect(_documentFrame, pin));
-	if(![[self documentView] scalesContentWithFrameSizeInClipView:self]) return diff;
+	if(![[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) return diff;
 	return NSMakeSize(diff.width * 2.0f / NSWidth(_documentFrame), diff.height * 2.0f / NSHeight(_documentFrame));
 }
 - (BOOL)scrollPinLocationToOffset:(NSSize)aSize
@@ -303,7 +305,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize o = aSize;
 	NSRect const b = [self insetBounds];
 	PGRectEdgeMask const pin = [self pinLocation];
-	if([[self documentView] scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
+	if([[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
 	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:PGAllowAnimation];
 }
 
@@ -376,6 +378,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			[NSCursor unhide];
 		}
 		_dragMode = PGNotDragging;
+		[self PG_viewDidScrollInClipView:self];
 	} else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent first:_firstMouse];
 	_firstMouse = NO;
 	return handled;
@@ -466,6 +469,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_immediatePosition = newPosition;
 	[self setBoundsOrigin:NSMakePoint(floorf(_immediatePosition.x), floorf(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
+	if(PGNotDragging == _dragMode && !_scrollTimer) [self PG_viewDidScrollInClipView:self];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
@@ -583,7 +587,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSView *const subview = [super hitTest:aPoint];
 	if(!subview) return nil;
-	return [subview acceptsClicksInClipView:self] ? subview : self;
+	return [subview PG_acceptsClicksInClipView:self] ? subview : self;
 }
 - (void)resetCursorRects
 {
@@ -592,13 +596,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect rects[4];
 	NSRect b = [self bounds];
 	if([[self window] styleMask] & NSResizableWindowMask) {
-		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
+		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] PG_acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
 		while(i--) [self addCursorRect:rects[i] cursor:_cursor];
 
 		b.origin.y += 15;
 		b.size.height -= 15;
 	}
-	PGGetRectDifference(rects, &i, b, ([[self documentView] acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
+	PGGetRectDifference(rects, &i, b, ([[self documentView] PG_acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
 	while(i--) [self addCursorRect:rects[i] cursor:_cursor];
 }
 
@@ -799,19 +803,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 @end
 
-@implementation NSView (PGClipViewDocumentView)
-
-- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
-{
-	return YES;
-}
-- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender
-{
-	return NO;
-}
-
-@end
-
 @implementation NSView (PGClipViewAdditions)
 
 - (PGClipView *)PG_enclosingClipView
@@ -823,8 +814,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	return [self PG_enclosingClipView];
 }
 
-#pragma mark -
-
 - (void)PG_scrollRectToVisible:(NSRect)aRect
 {
 	[self PG_scrollRectToVisible:aRect forView:self];
@@ -833,6 +822,19 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         forView:(NSView *)view
 {
 	[[self superview] PG_scrollRectToVisible:aRect forView:view];
+}
+
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
+{
+	return YES;
+}
+- (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender
+{
+	return NO;
+}
+- (void)PG_viewDidScrollInClipView:(PGClipView *)clipView
+{
+	[[self subviews] makeObjectsPerformSelector:@selector(PG_viewDidScrollInClipView:) withObject:clipView];
 }
 
 @end

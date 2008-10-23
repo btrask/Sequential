@@ -1096,6 +1096,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return [[item resourceAdapter] thumbnail];
 }
+- (NSString *)thumbnailView:(PGThumbnailView *)sender
+              labelForItem:(id)item
+{
+	return [[item identifier] displayName];
+}
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;
 {

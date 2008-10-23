@@ -122,13 +122,6 @@ typedef unsigned PGAnimationType;
 
 @end
 
-@interface NSView (PGClipViewDocumentView)
-
-- (BOOL)acceptsClicksInClipView:(PGClipView *)sender;
-- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender;
-
-@end
-
 @interface NSView (PGClipViewAdditions)
 
 - (PGClipView *)PG_enclosingClipView;
@@ -136,5 +129,9 @@ typedef unsigned PGAnimationType;
 
 - (void)PG_scrollRectToVisible:(NSRect)aRect;
 - (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view;
+
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender;
+- (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender;
+- (void)PG_viewDidScrollInClipView:(PGClipView *)clipView;
 
 @end

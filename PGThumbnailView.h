@@ -27,11 +27,11 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGThumbnailView : NSView
 {
 	@private
-	IBOutlet id                 dataSource;
-	IBOutlet id                 delegate;
-	         id                _representedObject;
-	         NSArray          *_items;
-	         NSMutableSet     *_selection;
+	IBOutlet id             dataSource;
+	IBOutlet id             delegate;
+	         id            _representedObject;
+	         NSArray      *_items;
+	         NSMutableSet *_selection;
 }
 
 - (id)dataSource;
@@ -51,12 +51,15 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)reloadData;
 
+- (void)resetToolTips;
+
 @end
 
 @interface NSObject (PGThumbnailViewDataSource)
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender;
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item;
+- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item;
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 
 @end

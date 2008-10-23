@@ -370,13 +370,13 @@ DEALINGS WITH THE SOFTWARE. */
 	[self _cache];
 }
 
-#pragma mark PGClipViewDocumentView Protocol
+#pragma mark PGClipViewAdditions Protocol
 
-- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
 {
 	return NO;
 }
-- (BOOL)scalesContentWithFrameSizeInClipView:(PGClipView *)sender
+- (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender
 {
 	return YES;
 }

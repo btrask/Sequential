@@ -39,6 +39,12 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
 #define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
 
+static void PGGradientCallback(void *info, float const *inData, float *outData)
+{
+	outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
+	outData[1] = 0.95f;
+}
+
 @implementation PGThumbnailView
 
 #pragma mark Instance Methods
@@ -133,11 +139,40 @@ DEALINGS WITH THE SOFTWARE. */
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
-#pragma mark PGClipViewDocumentView Protocol
+#pragma mark -
 
-- (BOOL)acceptsClicksInClipView:(PGClipView *)sender
+- (void)resetToolTips
+{
+	[self removeAllToolTips];
+	NSRect const v = [self visibleRect];
+	unsigned i = 0;
+	for(; i < [_items count]; i++) {
+		NSRect const r = NSIntersectionRect(v, [self frameOfItemAtIndex:i withMargin:YES]);
+		if(!NSIsEmptyRect(r)) [self addToolTipRect:r owner:self userData:nil];
+	}
+}
+
+#pragma mark NSToolTipOwner Protocol
+
+- (NSString *)view:(NSView *)view
+              stringForToolTip:(NSToolTipTag)tag
+              point:(NSPoint)point
+              userData:(void *)data
+{
+	NSString *const label = [[self dataSource] thumbnailView:self labelForItem:[_items objectAtIndex:[self indexOfItemAtPoint:point]]];
+	return label ? label : @"";
+}
+
+#pragma mark PGClipViewAdditions Protocol
+
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
 {
 	return NO;
+}
+- (void)PG_viewDidScrollInClipView:(PGClipView *)sender
+{
+	[super PG_viewDidScrollInClipView:sender];
+	[self resetToolTips];
 }
 
 #pragma mark NSView
@@ -160,15 +195,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 }
-
-
-static void PGGradientCallback(void *info, float const *inData, float *outData)
-{
-	outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
-	outData[1] = 0.95f;
-}
-
-
 - (void)drawRect:(NSRect)aRect
 {
 	NSRect const b = [self bounds];
@@ -283,6 +309,11 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 }
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender
              thumbnailForItem:(id)item
+{
+	return nil;
+}
+- (NSString *)thumbnailView:(PGThumbnailView *)sender
+              labelForItem:(id)item
 {
 	return nil;
 }
