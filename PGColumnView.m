@@ -69,7 +69,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[clip setDocumentView:aView];
 	[self layout];
 	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
-	[aView setAutoresizingMask:NSViewWidthSizable];
+	[aView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
 	[self scrollToTopOfColumnWithView:aView];
 }
 - (void)removeColumnsAfterView:(NSView *)aView
