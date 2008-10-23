@@ -77,7 +77,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_readFinished;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
-- (void)_updateInfoWithNodeCount;
+- (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelText;
 - (void)_runTimer;
@@ -342,7 +342,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self setTimerInterval:0];
 	if(_activeDocument) {
 		NSDisableScreenUpdates();
-		if(![_activeDocument showsThumbnails]) [_thumbnailPanel close];
+		if(![self shouldShowThumbnails]) [_thumbnailPanel close];
 		[self documentShowsThumbnailsDidChange:nil];
 		PGNode *node;
 		PGImageView *view;
@@ -432,9 +432,21 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (BOOL)shouldShowInfo
+- (BOOL)canShowInfo
 {
 	return YES;
+}
+- (BOOL)shouldShowInfo
+{
+	return [[self activeDocument] showsInfo] && [self canShowInfo];
+}
+- (BOOL)canShowThumbnails
+{
+	return [[[self activeDocument] node] hasViewableNodeCountGreaterThan:1];
+}
+- (BOOL)shouldShowThumbnails
+{
+	return [[self activeDocument] showsThumbnails] && [self canShowThumbnails];
 }
 
 #pragma mark -
@@ -553,10 +565,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
-	[self _updateInfoWithNodeCount];
+	[self _noteViewableNodeCountDidChange];
 	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
-	if([[self activeDocument] showsThumbnails]) {
+	if([self shouldShowThumbnails]) {
 		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
 	}
@@ -576,27 +588,65 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	} else if([self activeNode] == node) {
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
-	[self _updateInfoWithNodeCount];
+	[self _noteViewableNodeCountDidChange];
 	[self _updateNodeIndex];
-	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
 {
-	if([[self activeDocument] showsInfo]) [self _updateInfoWithNodeCount];
-	else [_infoPanel fadeOut];
+	if([self shouldShowInfo]) {
+		[[_infoPanel content] setCount:[[[self activeDocument] node] viewableNodeCount]];
+		[_infoPanel displayOverWindow:[self window]];
+	} else [_infoPanel fadeOut];
 }
 - (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif
 {
-	if([[self activeDocument] showsThumbnails]) {
+	if([self shouldShowThumbnails]) {
 		NSDisableScreenUpdates();
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
+		NSEnableScreenUpdates();
+	} else {
+		[self thumbnailPanelFrameDidChange:nil];
+		[_thumbnailPanel fadeOut];
+	}
+}
+- (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
+{
+	if(![self activeDocument]) return;
+	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
+	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
+	PGInset inset = PGZeroInset;
+	switch(corner) {
+		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
+		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
+	}
+	if([self shouldShowThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
+	[_infoPanel setFrameInset:inset];
+	[[_infoPanel content] setOrigin:corner];
+	[_infoPanel updateFrame];
+}
+- (void)documentImageScaleDidChange:(NSNotification *)aNotif
+{
+	[self _updateImageViewSizeAllowAnimation:YES];
+}
+- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
+{
+	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientation]]];
+}
+
+#pragma mark -
+
+- (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif
+{
+	NSDisableScreenUpdates();
+	if([self shouldShowThumbnails]) {
 		float const panelWidth = NSWidth([_thumbnailPanel frame]);
 		NSWindow *const w = [self window];
 		[w setMinSize:NSMakeSize(PGWindowMinSize + panelWidth, PGWindowMinSize)];
@@ -613,47 +663,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self documentReadingDirectionDidChange:nil];
 		[_findPanel updateFrame];
 		[_graphicPanel updateFrame];
-		NSEnableScreenUpdates();
 	} else {
 		[clipView setBoundsInset:PGZeroInset];
 		[_findPanel setFrameInset:PGZeroInset];
 		[_graphicPanel setFrameInset:PGZeroInset];
-		NSDisableScreenUpdates();
 		[self _updateImageViewSizeAllowAnimation:NO];
 		[_findPanel updateFrame];
 		[_graphicPanel updateFrame];
 		[self documentReadingDirectionDidChange:nil];
-		NSEnableScreenUpdates();
 		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
-		[_thumbnailPanel fadeOut];
 	}
+	NSEnableScreenUpdates();
 }
-- (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
-{
-	if(![self activeDocument]) return;
-	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
-	PGInset inset = PGZeroInset;
-	switch(corner) {
-		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
-		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
-	}
-	if([[self activeDocument] showsThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
-	[_infoPanel setFrameInset:inset];
-	[[_infoPanel content] setOrigin:corner];
-	[_infoPanel updateFrame];
-}
-- (void)documentImageScaleDidChange:(NSNotification *)aNotif
-{
-	[self _updateImageViewSizeAllowAnimation:YES];
-}
-- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
-{
-	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientation] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientation]]];
-}
-
-#pragma mark -
-
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 {
 	[clipView setBackgroundColor:[[PGPrefController sharedPrefController] backgroundPatternColor]];
@@ -682,7 +703,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
-	if([[self activeDocument] showsThumbnails]) [[_thumbnailPanel content] setSelectedItem:aNode];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] setSelectedItem:aNode];
 	return YES;
 }
 - (void)_readActiveNode
@@ -742,12 +763,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[_imageView setSize:[self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation]] allowAnimation:flag];
 }
-- (void)_updateInfoWithNodeCount
+- (void)_noteViewableNodeCountDidChange
 {
-	if(![self shouldShowInfo]) return [_infoPanel close];
-	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	[[_infoPanel content] setCount:count];
-	[_infoPanel displayOverWindow:[self window]];
+	[self documentShowsInfoDidChange:nil];
+	[self documentShowsThumbnailsDidChange:nil];
 }
 - (void)_updateNodeIndex
 {
@@ -820,8 +839,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
 	}
-	if(![self shouldShowInfo]) {
+	if(![self canShowInfo]) {
 		if(@selector(toggleInfo:) == action) return NO;
+	}
+	if(![self canShowThumbnails]) {
+		if(@selector(toggleThumbnails:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
 		if(@selector(revertOrientation:) == action) return NO;
@@ -832,7 +854,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(@selector(zoomOut:) == action && [_imageView averageScaleFactor] <= PGScaleMin) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
-	if(!firstNode) { // We could use -hasViewableNodes, but we might have to get -firstNode anyway.
+	if(!firstNode) { // We might have to get -firstNode anyway.
 		if(@selector(firstPage:) == action) return NO;
 		if(@selector(previousPage:) == action) return NO;
 		if(@selector(nextPage:) == action) return NO;
@@ -1077,7 +1099,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;
 {
-	return [item hasViewableNodes];
+	return [item hasViewableNodeCountGreaterThan:0];
 }
 
 #pragma mark NSServicesRequests Protocol
@@ -1220,6 +1242,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_thumbnailPanel setDelegate:self];
 		[[_thumbnailPanel content] setDataSource:self];
 		[[_thumbnailPanel content] setDelegate:self];
+		[_thumbnailPanel AE_addObserver:self selector:@selector(thumbnailPanelFrameDidChange:) name:PGBezelPanelFrameDidChangeNotification];
 
 		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 	}

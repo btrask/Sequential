@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 extern NSString *const PGBezelPanelFrameShouldChangeNotification;
+extern NSString *const PGBezelPanelFrameDidChangeNotification;
 
 @interface PGBezelPanel : PGFadeOutPanel
 {

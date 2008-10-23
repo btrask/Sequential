@@ -31,6 +31,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark Instance Methods
 
+- (unsigned)numberOfColumns
+{
+	return [_views count];
+}
 - (NSArray *)views
 {
 	return [[_views copy] autorelease];
@@ -68,22 +72,9 @@ DEALINGS WITH THE SOFTWARE. */
 	[aView setAutoresizingMask:NSViewWidthSizable];
 	[self scrollToTopOfColumnWithView:aView];
 }
-- (void)removeColumnWithView:(NSView *)aView
-{
-	NSParameterAssert(aView);
-	unsigned const i = [_views indexOfObjectIdenticalTo:aView];
-	NSParameterAssert(NSNotFound != i);
-	(void)[[aView retain] autorelease];
-	PGClipView *const clip = [_clipViews objectAtIndex:i];
-	[clip setDocumentView:nil];
-	[clip removeFromSuperview];
-	[_clipViews removeObjectAtIndex:i];
-	[_views removeObjectAtIndex:i];
-	[self layout];
-}
 - (void)removeColumnsAfterView:(NSView *)aView
 {
-	unsigned const i = [_views indexOfObject:aView];
+	unsigned const i = aView ? [_views indexOfObject:aView] : 0;
 	NSParameterAssert(NSNotFound != i);
 	while([_views count] > i + 1) {
 		PGClipView *const clip = [_clipViews lastObject];
@@ -92,14 +83,6 @@ DEALINGS WITH THE SOFTWARE. */
 		[_clipViews removeLastObject];
 		[_views removeLastObject];
 	}
-	[self layout];
-}
-- (void)removeAllColumns
-{
-	[_clipViews makeObjectsPerformSelector:@selector(setDocumentView:) withObject:nil];
-	[_clipViews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-	[_clipViews removeAllObjects];
-	[_views removeAllObjects];
 	[self layout];
 }
 

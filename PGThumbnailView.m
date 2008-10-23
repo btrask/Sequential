@@ -164,24 +164,35 @@ DEALINGS WITH THE SOFTWARE. */
 
 static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
-	outData[0] = 1;
-	outData[1] = inData[0] / 10.0f;
+	outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
+	outData[1] = 0.95f;
 }
 
 
 - (void)drawRect:(NSRect)aRect
 {
 	NSRect const b = [self bounds];
+	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
+	[nilShadow setShadowColor:nil];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 	[shadow setShadowOffset:NSMakeSize(0, -2)];
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
-	CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
-	[[NSColor colorWithDeviceWhite:0.1 alpha:0.95f] set];
-	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(0, 0, PGThumbnailTotalWidth, NSHeight(b))));
 
-	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
-	[nilShadow setShadowColor:nil];
+	CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
+
+	static CGShadingRef shade = NULL;
+	if(!shade) {
+		CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
+		float const domain[] = {0, 1};
+		float const range[] = {0, 1, 0, 1};
+		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
+		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
+		shade = CGShadingCreateAxial(colorSpace, CGPointMake(NSMinX(b), 0), CGPointMake(NSMinX(b) + PGThumbnailTotalWidth, 0), function, NO, NO);
+		CFRelease(function);
+		CFRelease(colorSpace);
+	}
+	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], shade);
 
 	int count = 0;
 	NSRect const *rects = NULL;
@@ -192,8 +203,8 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
-			[[NSColor alternateSelectedControlColor] set];
-			NSRectFill(frameWithMargin);
+			[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.33f] set];
+			NSRectFillUsingOperation(frameWithMargin, NSCompositeSourceOver);
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		[thumb setFlipped:[self isFlipped]];
@@ -203,29 +214,6 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
 		[nilShadow set];
 	}
-
-	CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
-	float const domain[] = {0, 1};
-	float const range[] = {0, 1, 0, 1};
-	CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
-	CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
-
-	[NSGraphicsContext saveGraphicsState];
-	[[NSBezierPath bezierPathWithRect:NSIntersectionRect(aRect, NSMakeRect(NSMinX(b), NSMinY(b), PGThumbnailTotalWidth / 2.0f, NSHeight(b)))] addClip];
-	CGShadingRef const leftShading = CGShadingCreateAxial(colorSpace, CGPointMake(NSMinX(b), 0), CGPointMake(NSMaxX(b), 0), function, YES, YES);
-	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], leftShading);
-	CFRelease(leftShading);
-	[NSGraphicsContext restoreGraphicsState];
-
-	[NSGraphicsContext saveGraphicsState];
-	[[NSBezierPath bezierPathWithRect:NSIntersectionRect(aRect, NSMakeRect(NSMinX(b) + PGThumbnailTotalWidth / 2.0f, NSMinY(b), PGThumbnailTotalWidth / 2.0f, NSHeight(b)))] addClip];
-	CGShadingRef const rightShading = CGShadingCreateAxial(colorSpace, CGPointMake(NSMaxX(b), 0), CGPointMake(NSMidX(b), 0), function, YES, YES);
-	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], rightShading);
-	CFRelease(rightShading);
-	[NSGraphicsContext restoreGraphicsState];
-
-	CFRelease(function);
-	CFRelease(colorSpace);
 
 	float top = floorf(NSMinY(aRect) / 9) * 9 - 3.0f;
 	for(; top < NSMaxY(aRect); top += 9) {
@@ -247,7 +235,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 - (void)setFrameSize:(NSSize)oldSize
 {
 	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
-	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 4, MAX(height, [_items count] * PGThumbnailTotalHeight))];
+	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 2, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
 #pragma mark NSResponder

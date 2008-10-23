@@ -161,14 +161,6 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
-- (BOOL)hasViewableNodes
-{
-	if([[self node] isViewable]) return YES;
-	PGNode *child;
-	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
-	while((child = [childEnum nextObject])) if([[child resourceAdapter] hasViewableNodes]) return YES;
-	return NO;
-}
 - (BOOL)hasDataNodes
 {
 	if([self canGetData]) return YES;
@@ -184,6 +176,21 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) count += [[child resourceAdapter] viewableNodeCount];
 	return count;
+}
+- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt
+{
+	unsigned count = [[self node] isViewable] ? 1 : 0;
+	if(count > anInt) return YES;
+	PGNode *child;
+	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
+	while((child = [childEnum nextObject])) {
+		PGResourceAdapter *const adapter = [child resourceAdapter];
+		if([adapter hasViewableNodeCountGreaterThan:anInt - count]) return YES;
+		if(![child isViewable]) continue;
+		count++;
+		if(count > anInt) return YES;
+	}
+	return NO;
 }
 
 #pragma mark -

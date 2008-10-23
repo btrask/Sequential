@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSWindowAdditions.h"
 
 NSString *const PGBezelPanelFrameShouldChangeNotification = @"PGBezelPanelFrameShouldChange";
+NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameDidChange";
 
 @interface PGBezelPanel (Private)
 
@@ -131,6 +132,7 @@ NSString *const PGBezelPanelFrameShouldChangeNotification = @"PGBezelPanelFrameS
 {
 	float const s = [self AE_userSpaceScaleFactor];
 	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s] display:NO];
+	[self AE_postNotificationName:PGBezelPanelFrameDidChangeNotification];
 }
 
 #pragma mark NSStandardKeyBindingMethods Protocol

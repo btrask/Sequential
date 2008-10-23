@@ -413,10 +413,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-- (BOOL)hasViewableNodes
-{
-	return [[self node] isViewable];
-}
 - (BOOL)hasDataNodes
 {
 	return [[self node] canGetData];
@@ -428,6 +424,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (unsigned)viewableNodeCount
 {
 	return [[self node] isViewable] ? 1 : 0;
+}
+- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt
+{
+	return [self viewableNodeCount] > anInt;
 }
 
 #pragma mark -

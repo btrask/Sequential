@@ -37,15 +37,14 @@ DEALINGS WITH THE SOFTWARE. */
 	float           _columnWidth;
 }
 
+- (unsigned)numberOfColumns;
 - (NSArray *)views;
 - (id)lastView;
 - (id)viewAtIndex:(unsigned)index;
 
 - (void)addColumnWithView:(NSView *)aView;
 - (void)insertColumnWithView:(NSView *)aView atIndex:(unsigned)index;
-- (void)removeColumnWithView:(NSView *)aView;
 - (void)removeColumnsAfterView:(NSView *)aView;
-- (void)removeAllColumns;
 
 - (float)columnWidth;
 - (void)setColumnWidth:(float)width;

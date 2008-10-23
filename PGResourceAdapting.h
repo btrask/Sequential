@@ -81,10 +81,10 @@ typedef int PGLoadPolicy;
 - (BOOL)isResolutionIndependent;
 - (void)clearCache;
 
-- (BOOL)hasViewableNodes;
 - (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.
 - (unsigned)viewableNodeIndex;
 - (unsigned)viewableNodeCount;
+- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt;
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;

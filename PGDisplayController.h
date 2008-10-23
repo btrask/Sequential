@@ -135,7 +135,10 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
+- (BOOL)canShowInfo;
 - (BOOL)shouldShowInfo;
+- (BOOL)canShowThumbnails;
+- (BOOL)shouldShowThumbnails;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
@@ -164,6 +167,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
 
+- (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif;
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 
 @end

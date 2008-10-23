@@ -25,7 +25,10 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGThumbnailBrowser.h"
 
 // Views
-@class PGBezelPanel;
+#import "PGBezelPanel.h"
+
+// Categories
+#import "NSObjectAdditions.h"
 
 @interface PGThumbnailBrowser (Private)
 
@@ -78,7 +81,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (void)setSelection:(NSSet *)items
 {
-	if(![[self views] count]) [self _addColumnWithItem:nil];
+	if(![self numberOfColumns]) [self _addColumnWithItem:nil];
 	if(![items count]) return [self removeColumnsAfterView:[self viewAtIndex:0]];
 	id ancestor = [items anyObject];
 	NSMutableArray *const path = [NSMutableArray array];
@@ -109,11 +112,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)reloadData
 {
-	if(![[self views] count]) return [self _addColumnWithItem:nil];
+	if(![self numberOfColumns]) return [self _addColumnWithItem:nil];
 	NSDisableScreenUpdates();
 	[[self viewAtIndex:0] setSelection:nil];
 	unsigned i = 0;
-	for(; i < [[self views] count]; i++) [[self viewAtIndex:i] reloadData];
+	for(; i < [self numberOfColumns]; i++) [[self viewAtIndex:i] reloadData];
 	NSEnableScreenUpdates();
 }
 - (void)reloadItem:(id)item
@@ -138,7 +141,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[thumbnailView setDelegate:self];
 	[thumbnailView setRepresentedObject:item];
 	[thumbnailView reloadData];
-	if(![[self views] count]) [self setColumnWidth:NSWidth([thumbnailView frame]) + 1];
+	if(![self numberOfColumns]) [self setColumnWidth:NSWidth([thumbnailView frame]) + 1];
 	[self addColumnWithView:thumbnailView];
 }
 
@@ -174,7 +177,21 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), ([self columnWidth] * 2 - 1) * scaleFactor, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], (unsigned)3) * [self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
+}
+
+#pragma mark PGColumnView
+
+- (void)insertColumnWithView:(NSView *)aView
+        atIndex:(unsigned)index
+{
+	[super insertColumnWithView:aView atIndex:index];
+	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+}
+- (void)removeColumnsAfterView:(NSView *)aView
+{
+	[super removeColumnsAfterView:aView];
+	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 
 @end
