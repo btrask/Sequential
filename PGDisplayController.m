@@ -1193,7 +1193,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	PGResourceIdentifier *const identifier = [[[self activeDocument] node] identifier];
 	NSURL *const URL = [identifier URL];
-	if(PGIsLeopardOrLater()) {
+	if(PGIsLeopardOrLater() && ![identifier isFileIdentifier]) {
 		[[self window] setRepresentedURL:URL];
 		if(![identifier isFileIdentifier]) {
 			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
