@@ -274,7 +274,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(flag) [self loadIfNecessary];
+	if(flag) [self loadIfNecessary]; // FIXME: It isn't OK to call -loadIfNecessary outside of PGNode's loading methods. Figure out the right way to do this.
 }
 - (void)noteSortOrderDidChange
 {
