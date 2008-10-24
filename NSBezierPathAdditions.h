@@ -27,6 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 @interface NSBezierPath (AEAdditions)
 
 + (id)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(float)radius;
++ (void)AE_drawSpinnerInRect:(NSRect)aRect startAtPetal:(int)petal;
 - (void)AE_fillUsingOperation:(NSCompositingOperation)op;
 
 @end

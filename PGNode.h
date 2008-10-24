@@ -93,6 +93,8 @@ typedef unsigned PGNodeStatus;
 - (NSError *)error;
 - (void)setError:(NSError *)error;
 
+- (NSImage *)thumbnail;
+
 - (BOOL)isViewable;
 - (unsigned)depth;
 - (PGNode *)viewableAncestor;

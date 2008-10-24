@@ -53,7 +53,7 @@ enum {
 	PGNodeNothing               = 0,
 	PGNodeLoading               = 1 << 0,
 	PGNodeReading               = 1 << 1,
-	PGNodeThumbnailing          = 1 << 2, // TODO: Currently unused, remove if it stays that way.
+	PGNodeThumbnailing          = 1 << 2,
 	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading,
 	PGNodeLoadingOrThumbnailing = PGNodeLoading | PGNodeThumbnailing
 }; // PGNodeStatus.
@@ -178,10 +178,14 @@ enum {
 - (void)loadFinished
 {
 	NSParameterAssert(PGNodeLoading & _status);
-	_status = ~PGNodeLoading & _status;
+	_status &= ~PGNodeLoading;
 	[self noteIsViewableDidChange];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
+	if(PGNodeThumbnailing & _status) {
+		_status &= ~PGNodeThumbnailing;
+		[[self document] noteNodeThumbnailDidChange:self];
+	}
 }
 
 #pragma mark -
@@ -201,7 +205,7 @@ enum {
         error:(NSError *)error
 {
 	NSParameterAssert((PGNodeLoadingOrReading & _status) == PGNodeReading);
-	_status = ~PGNodeReading & _status;
+	_status &= ~PGNodeReading;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
 	[dict AE_setObject:aRep forKey:PGImageRepKey];
 	if(error) [dict setObject:error forKey:PGErrorKey];
@@ -232,6 +236,18 @@ enum {
 		[self _setResourceAdapter:[_adapters lastObject]];
 		[_adapter fallbackLoad];
 	}
+}
+
+#pragma mark -
+
+- (NSImage *)thumbnail
+{
+	if(PGNodeLoading & _status) {
+		_status |= PGNodeThumbnailing;
+		return nil;
+	}
+	_status &= ~PGNodeThumbnailing;
+	return [[self resourceAdapter] thumbnail];
 }
 
 #pragma mark -

@@ -37,6 +37,19 @@ DEALINGS WITH THE SOFTWARE. */
 	[path closePath];
 	return path;
 }
++ (void)AE_drawSpinnerInRect:(NSRect)r
+        startAtPetal:(int)petal
+{
+	[NSBezierPath setDefaultLineWidth:MIN(NSWidth(r), NSHeight(r)) / 11];
+	[NSBezierPath setDefaultLineCapStyle:NSRoundLineCapStyle];
+	unsigned i = 0;
+	for(; i < 12; i++) {
+		[[NSColor colorWithDeviceWhite:1 alpha:(petal < 0 ? 0.75f : ((petal + i) % 12) / -12.0f + 1)] set];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2 * i / 12) * NSWidth(r) / 4, NSMidY(r) + sinf(pi * 2 * i / 12) * NSHeight(r) / 4) toPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2 * i / 12) * NSWidth(r) / 2, NSMidY(r) + sinf(pi * 2 * i / 12) * NSHeight(r) / 2)];
+	}
+	[NSBezierPath setDefaultLineWidth:1];
+	[NSBezierPath setDefaultLineCapStyle:NSMiterLineJoinStyle];
+}
 - (void)AE_fillUsingOperation:(NSCompositingOperation)op
 {
 	[NSGraphicsContext saveGraphicsState];

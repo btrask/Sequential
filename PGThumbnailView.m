@@ -223,23 +223,27 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	int count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
+	[shadow set];
 	unsigned i = 0;
 	for(; i < [_items count]; i++) {
 		NSRect const frameWithMargin = [self frameOfItemAtIndex:i withMargin:YES];
 		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
-			[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.33f] set];
+			[nilShadow set];
+			[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.5f] set];
 			NSRectFillUsingOperation(frameWithMargin, NSCompositeSourceOver);
+			[shadow set];
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
-		[thumb setFlipped:[self isFlipped]];
-		NSSize const originalSize = [thumb size];
-		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
-		[shadow set];
-		[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
-		[nilShadow set];
+		if(thumb) {
+			[thumb setFlipped:[self isFlipped]];
+			NSSize const originalSize = [thumb size];
+			NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
+			[thumb drawInRect:PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height)), frame) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
+		} else [NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20, 20) startAtPetal:-1];
 	}
+	[nilShadow set];
 
 	float top = floorf(NSMinY(aRect) / 9) * 9 - 3.0f;
 	for(; top < NSMaxY(aRect); top += 9) {

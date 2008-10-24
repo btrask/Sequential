@@ -32,6 +32,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
+#import "NSBezierPathAdditions.h"
 #import "NSObjectAdditions.h"
 
 #define PGAlertViewSize     300.0f
@@ -447,23 +448,12 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)drawInView:(PGAlertView *)anAlertView
 {
 	[super drawInView:anAlertView];
-	unsigned const frameCount = [anAlertView frameCount];
-	float const s = _progress ? 0.9 : 1;
-	float const h = _progress ? 155.0 : 150.0;
-	unsigned i;
-	for(i = 0; i < 12; i++) {
-		NSBezierPath *const line = [[[NSBezierPath alloc] init] autorelease];
-		[line setLineWidth:20 * s];
-		[line setLineCapStyle:NSRoundLineCapStyle];
-		[line moveToPoint:NSMakePoint(150 + cosf((i / 12.0) * pi * 2) * 55 * s, h + sinf((i / 12.0) * pi * 2) * 55 * s)];
-		[line lineToPoint:NSMakePoint(150 + cosf((i / 12.0) * pi * 2) * 110 * s, h + sinf((i / 12.0) * pi * 2) * 110 * s)];
-		[[NSColor colorWithDeviceWhite:1 alpha:(((frameCount + i) % 12) / -12.0) + 1] set];
-		[line stroke];
-	}
+	[NSBezierPath AE_drawSpinnerInRect:(_progress ? NSMakeRect(50, 60, 200, 200) : NSMakeRect(40, 40, 220, 220)) startAtPetal:[anAlertView frameCount]];
 	if(!_progress) return;
 	BOOL switched = NO;
 	[[NSColor whiteColor] set];
-	for(i = 0; i < 22; i++) {
+	unsigned i = 0;
+	for(; i < 22; i++) {
 		if(!switched && i >= _progress * 22) {
 			NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 			[shadow setShadowColor:nil];
