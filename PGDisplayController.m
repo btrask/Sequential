@@ -1167,8 +1167,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[super showWindow:sender];
 	[self documentReadingDirectionDidChange:nil];
-	[self documentShowsInfoDidChange:nil];
-	[self documentShowsThumbnailsDidChange:nil];
+	[self _noteViewableNodeCountDidChange];
 }
 
 #pragma mark -
