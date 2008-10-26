@@ -88,6 +88,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 	IBOutlet NSMenuItem              *fitToView;
 	IBOutlet NSMenuItem              *zoomIn;
+	IBOutlet NSMenuItem              *zoomOut;
 
 	IBOutlet NSMenuItem              *pageMenuItem;
 	IBOutlet NSMenu                  *defaultPageMenu;
@@ -151,6 +152,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)showKeyboardShortcuts:(id)sender;
 
 - (BOOL)performEscapeKeyAction;
+- (BOOL)performZoomIn;
+- (BOOL)performZoomOut;
 - (BOOL)performToggleFullscreen;
 - (BOOL)performToggleInfo;
 

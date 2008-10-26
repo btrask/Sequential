@@ -985,14 +985,22 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
 {
-	unsigned const modifiers = [anEvent modifierFlags];
-	float const timerFactor = modifiers & NSAlternateKeyMask ? 10.0 : 1.0;
+	unsigned const modifiers = NSDeviceIndependentModifierFlagsMask & [anEvent modifierFlags];
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	unsigned short const keyCode = [anEvent keyCode];
-	if(!(modifiers & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask))) switch(keyCode) {
+	if(!(modifiers & (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask))) switch(keyCode) {
+		case PGKeyEscape: return [d performEscapeKeyAction];
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
-
+	} else if(NSCommandKeyMask == modifiers) switch(keyCode) {
+		case PGKeyI: return [d performToggleInfo];
+	}
+	if(0 == modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
+		case PGKeyEquals: return [d performZoomIn];
+		case PGKeyMinus: return [d performZoomOut];
+	}
+	float const timerFactor = NSAlternateKeyMask & modifiers ? 10.0f : 1.0f;
+	if(0 == modifiers || NSAlternateKeyMask == modifiers) switch(keyCode) {
 		case PGKey0: [self setTimerInterval:0]; return YES;
 		case PGKey1: [self setTimerInterval:1 * timerFactor]; return YES;
 		case PGKey2: [self setTimerInterval:2 * timerFactor]; return YES;
@@ -1003,10 +1011,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKey7: [self setTimerInterval:7 * timerFactor]; return YES;
 		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
 		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
-
-		case PGKeyEscape: return [d performEscapeKeyAction];
-	} else switch(keyCode) {
-		case PGKeyI: return NSCommandKeyMask & modifiers && [d performToggleInfo];
 	}
 	return NO;
 }

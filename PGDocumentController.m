@@ -275,6 +275,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 	return NO;
 }
+- (BOOL)performZoomIn
+{
+	return [zoomIn AE_performAction];
+}
+- (BOOL)performZoomOut
+{
+	return [zoomOut AE_performAction];
+}
 - (BOOL)performToggleFullscreen
 {
 	return [toggleFullscreen AE_performAction];
@@ -632,8 +640,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[mirrorHorz setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorHorz rotation:0] autorelease] label:[mirrorHorz title]]];
 	[mirrorVert setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorVert rotation:90] autorelease] label:[mirrorVert title]]];
 
-	[zoomIn setKeyEquivalent:(PGIsLeopardOrLater() ? @"+" : @"=")]; // Leopard is smart about this.
-	[zoomIn setKeyEquivalentModifierMask:NSCommandKeyMask];
+	[zoomIn setKeyEquivalent:@"+"];
+	[zoomIn setKeyEquivalentModifierMask:0];
+	[zoomOut setKeyEquivalent:@"-"];
+	[zoomOut setKeyEquivalentModifierMask:0];
 
 	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E1]];
 	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];

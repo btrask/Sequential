@@ -36,6 +36,8 @@ enum {
 	PGKeySpace = 49,
 	PGKeyReturn = 36,
 	PGKeyEscape = 53,
+	PGKeyEquals = 24,
+	PGKeyMinus = 27,
 
 	PGKeyArrowUp = 126,
 	PGKeyArrowDown = 125,
