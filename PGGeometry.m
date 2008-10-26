@@ -151,21 +151,25 @@ PGInset PGMakeInset(float minX, float minY, float maxX, float maxY)
 {
 	return (PGInset){minX, minY, maxX, maxY};
 }
-PGInset PGInvertInset(PGInset inset)
-{
-	return PGMakeInset(-inset.minX, -inset.minY, -inset.maxX, -inset.maxY);
-}
 PGInset PGScaleInset(PGInset i, float s)
 {
 	return PGMakeInset(i.minX * s, i.minY * s, i.maxX * s, i.maxY * s);
 }
-NSRect PGInsetRect(NSRect r, PGInset i)
+PGInset PGInvertInset(PGInset inset)
 {
-	return NSMakeRect(NSMinX(r) + i.minX, NSMinY(r) + i.minY, NSWidth(r) - i.minX - i.maxX, NSHeight(r) - i.minY - i.maxY);
+	return PGScaleInset(inset, -1);
+}
+NSPoint PGInsetPoint(NSPoint p, PGInset i)
+{
+	return NSMakePoint(p.x + i.minX, p.y + i.minY);
 }
 NSSize PGInsetSize(NSSize s, PGInset i)
 {
-	return NSMakeSize(s.width - i.minX - i.maxX, s.height - i.minY - i.maxY);
+	return NSMakeSize(MAX(0, s.width - i.minX - i.maxX), MAX(0, s.height - i.minY - i.maxY));
+}
+NSRect PGInsetRect(NSRect r, PGInset i)
+{
+	return (NSRect){PGInsetPoint(r.origin, i), PGInsetSize(r.size, i)};
 }
 
 #pragma mark Animation

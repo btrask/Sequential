@@ -24,6 +24,9 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import "PGBezelPanel.h"
 
+// Other
+#import "PGGeometry.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSWindowAdditions.h"

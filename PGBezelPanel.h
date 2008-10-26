@@ -26,7 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import <HMDTAppKit/PGFadeOutPanel.h>
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 
 extern NSString *const PGBezelPanelFrameShouldChangeNotification;
 extern NSString *const PGBezelPanelFrameDidChangeNotification;

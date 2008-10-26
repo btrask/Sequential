@@ -27,6 +27,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import <IOKit/hidsystem/event_status_driver.h>
 
 // Other
+#import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
 #import "PGNonretainedObjectProxy.h"
 #import "PGZooming.h"
@@ -168,14 +169,15 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (NSRect)scrollableRectWithBorder:(BOOL)flag
 {
 	NSSize const boundsSize = [self insetBounds].size;
-	NSSize diff = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2, (boundsSize.height - NSHeight(_documentFrame)) / 2);
-	NSSize const borderSize = _showsBorder && flag ? NSMakeSize(PGBorderPadding, PGBorderPadding) : NSZeroSize;
-	if(diff.width < 0) diff.width = borderSize.width;
-	if(diff.height < 0) diff.height = borderSize.height;
-	NSRect scrollableRect = NSInsetRect(_documentFrame, -diff.width, -diff.height);
-	scrollableRect.size.width -= boundsSize.width;
-	scrollableRect.size.height -= boundsSize.height;
-	return NSOffsetRect(scrollableRect, -[self boundsInset].minX, -[self boundsInset].minY);
+	NSSize margin = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2, (boundsSize.height - NSHeight(_documentFrame)) / 2);
+	float const padding = _showsBorder && flag ? PGBorderPadding : 0;
+	if(margin.width < 0) margin.width = padding;
+	if(margin.height < 0) margin.height = padding;
+	NSRect r = NSInsetRect(_documentFrame, -margin.width, -margin.height);
+	r.size.width -= boundsSize.width;
+	r.size.height -= boundsSize.height;
+	PGInset const inset = [self boundsInset];
+	return NSOffsetRect(r, -inset.minX, -inset.minY);
 }
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction
           forScrollType:(PGScrollType)scrollType
@@ -190,9 +192,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize const max = [self maximumDistanceForScrollType:scrollType];
 	switch(scrollType) {
 		case PGScrollByLine:
+		{
 			if(PGHorzEdgesMask & direction) s.width = max.width;
 			if(PGVertEdgesMask & direction) s.height = max.height;
 			break;
+		}
 		case PGScrollByPage:
 		{
 			NSRect const scrollableRect = [self scrollableRectWithBorder:YES];

@@ -25,7 +25,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 
 enum {
 	PGScrollByLine = 0,

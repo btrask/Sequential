@@ -22,24 +22,4 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
-
-// Other
 #import "PGGeometryTypes.h"
-
-@interface PGExifEntry : NSObject
-{
-	@private
-	NSString *_label;
-	NSString *_value;
-}
-
-+ (NSData *)exifDataWithImageData:(NSData *)data;
-+ (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data;
-
-- (id)initWithLabel:(NSString *)label value:(NSString *)value;
-- (NSString *)label;
-- (NSString *)value;
-- (NSComparisonResult)compare:(PGExifEntry *)anEntry;
-
-@end

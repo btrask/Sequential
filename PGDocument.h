@@ -38,7 +38,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGDisplayController;
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 
 extern NSString *const PGDocumentWillRemoveNodesNotification;
 extern NSString *const PGDocumentSortedNodesDidChangeNotification;

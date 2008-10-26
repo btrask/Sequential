@@ -24,22 +24,44 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-// Other
-#import "PGGeometryTypes.h"
+enum {
+	PGNoEdges       = 0,
+	PGMinXEdgeMask  = 1 << NSMinXEdge,
+	PGMinYEdgeMask  = 1 << NSMinYEdge,
+	PGMaxXEdgeMask  = 1 << NSMaxXEdge,
+	PGMaxYEdgeMask  = 1 << NSMaxYEdge,
+	PGHorzEdgesMask = PGMinXEdgeMask | PGMaxXEdgeMask,
+	PGVertEdgesMask = PGMinYEdgeMask | PGMaxYEdgeMask,
+	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
+	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
+};
+typedef unsigned PGRectEdgeMask;
 
-@interface PGExifEntry : NSObject
-{
-	@private
-	NSString *_label;
-	NSString *_value;
-}
+enum {
+	PGReadingDirectionLeftToRight = 0,
+	PGReadingDirectionRightToLeft = 1
+};
+typedef int PGReadingDirection;
 
-+ (NSData *)exifDataWithImageData:(NSData *)data;
-+ (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data;
+enum {
+	PGHomeLocation = 0,
+	PGEndLocation  = 1
+};
+typedef int PGPageLocation;
 
-- (id)initWithLabel:(NSString *)label value:(NSString *)value;
-- (NSString *)label;
-- (NSString *)value;
-- (NSComparisonResult)compare:(PGExifEntry *)anEntry;
+enum {
+	PGUpright      = 0,
+	PGFlippedVert  = 1 << 0,
+	PGFlippedHorz  = 1 << 1,
+	PGRotated90CC  = 1 << 2, // Counter-Clockwise.
+	PGUpsideDown   = PGFlippedVert | PGFlippedHorz,
+	PGRotated270CC = PGFlippedVert | PGFlippedHorz | PGRotated90CC
+};
+typedef unsigned PGOrientation;
 
-@end
+typedef struct {
+	float minX;
+	float minY;
+	float maxX;
+	float maxY;
+} PGInset;

@@ -28,6 +28,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
+// Other
+#import "PGGeometry.h"
+
 static NSString *const PGIndexKey = @"PGIndex";
 
 @interface PGPDFAdapter (Private)

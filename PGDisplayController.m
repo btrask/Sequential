@@ -49,6 +49,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGEncodingAlert.h"
 
 // Other
+#import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
 #import "PGNonretainedObjectProxy.h"
 

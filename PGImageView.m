@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGClipView;
 
 // Other
+#import "PGGeometry.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories

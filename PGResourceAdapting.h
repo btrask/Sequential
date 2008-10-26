@@ -33,7 +33,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGBookmark;
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 
 extern NSString *const PGURLKey;
 extern NSString *const PGDataKey;

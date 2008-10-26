@@ -23,6 +23,7 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
+#import "PGGeometryTypes.h"
 
 #pragma mark NSPoint
 
@@ -43,19 +44,6 @@ extern BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count
 
 #pragma mark PGRectEdgeMask
 
-enum {
-	PGNoEdges       = 0,
-	PGMinXEdgeMask  = 1 << NSMinXEdge,
-	PGMinYEdgeMask  = 1 << NSMinYEdge,
-	PGMaxXEdgeMask  = 1 << NSMaxXEdge,
-	PGMaxYEdgeMask  = 1 << NSMaxYEdge,
-	PGHorzEdgesMask = PGMinXEdgeMask | PGMaxXEdgeMask,
-	PGVertEdgesMask = PGMinYEdgeMask | PGMaxYEdgeMask,
-	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
-	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
-};
-typedef unsigned PGRectEdgeMask;
-
 extern NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude);
 extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
 extern NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask);
@@ -63,54 +51,24 @@ extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float thres
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
 extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
 
-#pragma mark PGReadingDirection
-
-enum {
-	PGReadingDirectionLeftToRight = 0,
-	PGReadingDirectionRightToLeft = 1
-};
-typedef int PGReadingDirection;
-
 #pragma mark PGPageLocation
-
-enum {
-	PGHomeLocation = 0,
-	PGEndLocation  = 1
-};
-typedef int PGPageLocation;
 
 extern PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir);
 
 #pragma mark PGOrientation
 
-enum {
-	PGUpright      = 0,
-	PGFlippedVert  = 1 << 0,
-	PGFlippedHorz  = 1 << 1,
-	PGRotated90CC  = 1 << 2, // Counter-Clockwise.
-	PGUpsideDown   = PGFlippedVert | PGFlippedHorz,
-	PGRotated270CC = PGFlippedVert | PGFlippedHorz | PGRotated90CC
-};
-typedef unsigned PGOrientation;
-
 extern PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
 
 #pragma mark PGInset
 
-typedef struct {
-	float minX;
-	float minY;
-	float maxX;
-	float maxY;
-} PGInset;
-
 extern PGInset const PGZeroInset;
 
 extern PGInset PGMakeInset(float minX, float minY, float maxX, float maxY);
-extern PGInset PGInvertInset(PGInset inset);
 extern PGInset PGScaleInset(PGInset i, float s);
-extern NSRect PGInsetRect(NSRect r, PGInset i);
+extern PGInset PGInvertInset(PGInset inset);
+extern NSPoint PGInsetPoint(NSPoint p, PGInset i);
 extern NSSize PGInsetSize(NSSize s, PGInset i);
+extern NSRect PGInsetRect(NSRect r, PGInset i);
 
 #pragma mark Animation
 

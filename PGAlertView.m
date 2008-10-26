@@ -28,7 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGBezelPanel.h"
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories

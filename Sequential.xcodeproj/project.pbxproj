@@ -39,6 +39,7 @@
 		0E06CBDD0CF9B3B8004124B0 /* Document-XBM.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC30CF9B3B8004124B0 /* Document-XBM.icns */; };
 		0E06CBDE0CF9B3B8004124B0 /* Document-ZIP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC40CF9B3B8004124B0 /* Document-ZIP.icns */; };
 		0E06CBDF0CF9B3B8004124B0 /* Document-PIC.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC50CF9B3B8004124B0 /* Document-PIC.icns */; };
+		0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */; };
 		0E1D37510A7E319100C542A6 /* PGFullscreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D37500A7E319100C542A6 /* PGFullscreenController.m */; };
 		0E1D379B0A7E532300C542A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E1D379A0A7E532300C542A6 /* Carbon.framework */; };
 		0E1D39F40A7F24E700C542A6 /* PGFullscreenWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D39F30A7F24E700C542A6 /* PGFullscreenWindow.m */; };
@@ -270,6 +271,8 @@
 		0E12117D0D31A5D10055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0E12117E0D31A5D70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGExtract.nib; sourceTree = "<group>"; };
 		0E1211800D31A5E70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGEncoding.nib; sourceTree = "<group>"; };
+		0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGGeometryTypes.h; sourceTree = "<group>"; };
+		0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGGeometryTypes.m; sourceTree = "<group>"; };
 		0E1D374F0A7E319100C542A6 /* PGFullscreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFullscreenController.h; sourceTree = "<group>"; };
 		0E1D37500A7E319100C542A6 /* PGFullscreenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFullscreenController.m; sourceTree = "<group>"; };
 		0E1D379A0A7E532300C542A6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
@@ -731,6 +734,8 @@
 				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
 				0E92E1340E2CA88400276801 /* PGGeometry.h */,
 				0E92E1350E2CA88400276801 /* PGGeometry.m */,
+				0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */,
+				0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */,
 				0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */,
 				0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */,
 				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
@@ -1201,6 +1206,7 @@
 				0EDB9BFF0EA1E27D00B7342A /* PGThumbnailView.m in Sources */,
 				0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */,
 				0E20AF640EA702A1002A7854 /* NSImageRepAdditions.m in Sources */,
+				0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

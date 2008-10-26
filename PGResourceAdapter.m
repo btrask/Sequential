@@ -32,6 +32,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Other
 #import "PGCFMutableArray.h"
+#import "PGGeometry.h"
 
 // Categories
 #import "NSImageRepAdditions.h"

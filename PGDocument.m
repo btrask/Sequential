@@ -39,6 +39,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGBookmarkController.h"
 #import "PGDisplayController.h"
 
+// Other
+#import "PGGeometry.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"

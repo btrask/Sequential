@@ -37,7 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGFindlessTextView;
 
 // Other
-#import "PGGeometry.h"
+#import "PGGeometryTypes.h"
 
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
