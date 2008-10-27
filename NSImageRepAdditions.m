@@ -28,9 +28,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 + (id)AE_bestImageRepWithData:(NSData *)data
 {
+	NSArray *const reps = [NSBitmapImageRep imageRepsWithData:data];
+	if(1 == [reps count]) return [reps objectAtIndex:0];
 	int bestPixelCount = 0;
 	NSBitmapImageRep *rep, *bestRep = nil;
-	NSEnumerator *const repEnum = data ? [[NSBitmapImageRep imageRepsWithData:data] objectEnumerator] : nil;
+	NSEnumerator *const repEnum = data ? [reps objectEnumerator] : nil;
 	while((rep = [repEnum nextObject])) {
 		int const w = [rep pixelsWide], h = [rep pixelsHigh];
 		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
