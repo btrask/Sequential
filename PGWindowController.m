@@ -29,6 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGNode.h"
 
 // Views
+#import "PGClipView.h"
 #import "PGBezelPanel.h"
 
 // Controllers

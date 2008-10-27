@@ -458,9 +458,12 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)viewFrameDidChange:(NSNotification *)aNotif
 {
+	_documentViewIsResizing++;
 	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
 	[self scrollPinLocationToOffset:offset];
+	NSParameterAssert(_documentViewIsResizing);
+	_documentViewIsResizing--;
 }
 
 #pragma mark Private Protocol
@@ -480,7 +483,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
-	if(!PGCopiesOnScroll || PGIsLeopardOrLater() || (_backgroundIsComplex && ![documentView isOpaque])) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
+	if(!PGCopiesOnScroll || PGIsLeopardOrLater() || _documentViewIsResizing || (_backgroundIsComplex && ![documentView isOpaque])) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
 	NSRect const oldBounds = [self bounds];
 	NSRect const oldResizeRect = [[self window] HM_resizeRectForView:self];
 	if(![self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:NO]) return NO;

@@ -34,6 +34,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 // Views
 #import "PGDocumentWindow.h"
+#import "PGClipView.h"
 #import "PGImageView.h"
 #import "PGBezelPanel.h"
 #import "PGAlertView.h"

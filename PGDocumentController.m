@@ -916,7 +916,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if([equiv length] == 1
 		&& (keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0])) != PGKeyUnknown
 		&& [anEvent keyCode] == keyCode
-		&& ([anEvent modifierFlags] & (NSControlKeyMask | NSAlternateKeyMask | NSCommandKeyMask)) == [item keyEquivalentModifierMask]) return [item AE_performAction];
+		&& ([anEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) == ([item keyEquivalentModifierMask] & NSDeviceIndependentModifierFlagsMask)) return [item AE_performAction];
 		else if([[item submenu] performKeyEquivalent:anEvent]) return YES;
 	}
 	return [super performKeyEquivalent:anEvent];

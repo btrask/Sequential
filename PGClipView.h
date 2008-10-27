@@ -56,6 +56,7 @@ typedef unsigned PGAnimationType;
 	         NSTimer       *_scrollTimer;
 	         NSTimeInterval _lastScrollTime;
 	         PGRectEdgeMask _pinLocation;
+	         unsigned       _documentViewIsResizing;
 	         enum {
 	                        PGNotDragging,
 	                        PGPreliminaryDragging,

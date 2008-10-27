@@ -29,7 +29,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGNode;
 
 // Views
-#import "PGClipView.h"
+@class PGClipView;
 @class PGImageView;
 @class PGBezelPanel;
 @class PGLoadingGraphic;
