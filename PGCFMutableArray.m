@@ -136,7 +136,7 @@ static unsigned PGCFIndexToUnsigned(CFIndex i)
 
 - (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
 {
-	[self release];
+	[[self init] release];
 	return [[PGCFMutableArray alloc] initWithCallbacks:callbacks];
 }
 

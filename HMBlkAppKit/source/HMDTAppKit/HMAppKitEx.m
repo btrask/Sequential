@@ -360,6 +360,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSRect)HM_resizeRectForView:(NSView *)aView
 {
+	if(![self showsResizeIndicator]) return NSZeroRect;
 	NSView *const c = [self contentView];
 	NSRect const b = [c bounds];
 	return [c convertRect:NSMakeRect(NSMaxX(b) - 15, NSMinY(b), 15, 15) toView:aView];

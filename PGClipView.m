@@ -25,6 +25,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGClipView.h"
 #import <IOKit/hidsystem/IOHIDLib.h>
 #import <IOKit/hidsystem/event_status_driver.h>
+#import <HMDTAppKit/HMAppKitEx.h>
 
 // Other
 #import "PGGeometry.h"
@@ -38,7 +39,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 #define PGMouseHiddenDraggingStyle true
 #define PGAnimateScrolling         true
-#define PGCopiesOnScroll           false // Not much of a speedup.
+#define PGCopiesOnScroll           true // Only used prior to Leopard.
 #define PGClickSlopDistance        3.0
 #define PGPageTurnMovementDelay    0.5
 #define PGGameStyleArrowScrolling  true
@@ -137,6 +138,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(aColor == _backgroundColor || (aColor && _backgroundColor && [aColor isEqual:_backgroundColor])) return;
 	[_backgroundColor release];
 	_backgroundColor = [aColor copy];
+	_backgroundIsComplex = !_backgroundColor || [NSPatternColorSpace isEqualToString:[_backgroundColor colorSpaceName]];
 	if([[self documentView] isOpaque]) {
 		unsigned i;
 		NSRect rects[4];
@@ -478,9 +480,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
-#if PGCopiesOnScroll
-	if(![documentView isOpaque]) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
+	if(!PGCopiesOnScroll || PGIsLeopardOrLater() || (_backgroundIsComplex && ![documentView isOpaque])) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
 	NSRect const oldBounds = [self bounds];
+	NSRect const oldResizeRect = [[self window] HM_resizeRectForView:self];
 	if(![self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:NO]) return NO;
 	NSRect const bounds = [self bounds];
 	float const x = NSMinX(bounds) - NSMinX(oldBounds);
@@ -497,11 +499,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect rects[4];
 	PGGetRectDifference(rects, &i, NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame), copiedRect);
 	while(i--) [self setNeedsDisplayInRect:rects[i]];
+	[self setNeedsDisplayInRect:oldResizeRect];
 	[self displayIfNeededIgnoringOpacity];
+	[self setNeedsDisplayInRect:[[self window] HM_resizeRectForView:self]]; // The window needs to draw this itself.
 	return YES;
-#else
-	return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
-#endif
 }
 - (void)_scrollOneFrame:(NSTimer *)timer
 {
@@ -558,6 +559,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if((self = [super initWithFrame:aRect])) {
 		[self setShowsBorder:YES];
 		[self setCursor:[NSCursor arrowCursor]];
+		_backgroundIsComplex = YES;
 	}
 	return self;
 }

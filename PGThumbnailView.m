@@ -191,6 +191,10 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	return YES;
 }
+- (BOOL)isOpaque
+{
+	return YES;
+}
 - (void)setUpGState
 {
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
@@ -198,6 +202,11 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 - (void)drawRect:(NSRect)aRect
 {
 	NSRect const b = [self bounds];
+
+	[[NSColor clearColor] set];
+	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(NSMinX(b), NSMinY(b), PGThumbnailMarginWidth, NSHeight(b))));
+	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(PGThumbnailTotalWidth - PGThumbnailTotalWidth, NSMinY(b), NSWidth(b) + PGThumbnailTotalWidth - PGThumbnailTotalWidth, NSHeight(b))));
+
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];

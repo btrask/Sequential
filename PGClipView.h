@@ -48,6 +48,7 @@ typedef unsigned PGAnimationType;
 	         NSRect         _documentFrame;
 	         PGInset        _boundsInset;
 	         NSColor       *_backgroundColor;
+	         BOOL           _backgroundIsComplex;
 	         BOOL           _showsBorder;
 	         NSCursor      *_cursor;
 	         NSPoint        _immediatePosition;

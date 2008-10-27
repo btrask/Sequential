@@ -271,27 +271,27 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
 	if(!_cache || !_rep || _isPDF || [self canAnimateRep]) return;
+	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+	if(NSEqualSizes(pixelSize, _immediateSize) && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData])) return;
 	if(_cacheIsValid) {
 		_cacheIsValid = NO;
 		[_image removeRepresentation:_cache];
 	} else [_image removeRepresentation:_rep];
-	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
 	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) {
 		_cacheIsOutOfDate = YES;
 		return;
 	}
-	NSSize const scaledSize = _immediateSize;
-	if(scaledSize.width > 10000 || scaledSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
+	if(_immediateSize.width > 10000 || _immediateSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
 
-	[_cache setSize:scaledSize];
-	[_cache setPixelsWide:scaledSize.width];
-	[_cache setPixelsHigh:scaledSize.height];
+	[_cache setSize:_immediateSize];
+	[_cache setPixelsWide:_immediateSize.width];
+	[_cache setPixelsHigh:_immediateSize.height];
 	NSWindow *const cacheWindow = [_cache window];
 	NSRect cacheWindowFrame = [cacheWindow frame];
-	cacheWindowFrame.size.width = MAX(NSWidth(cacheWindowFrame), scaledSize.width);
-	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), scaledSize.height);
+	cacheWindowFrame.size.width = MAX(NSWidth(cacheWindowFrame), _immediateSize.width);
+	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), _immediateSize.height);
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 
@@ -302,7 +302,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[view unlockFocus];
 
 	[_image removeRepresentation:_rep];
-	[_image setSize:scaledSize];
+	[_image setSize:_immediateSize];
 	[_image addRepresentation:_cache];
 	_cacheIsValid = YES;
 }

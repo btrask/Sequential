@@ -123,7 +123,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (NSImage *)AE_icon
 {
-	return [self isFileURL] ? [[NSWorkspace sharedWorkspace] iconForFile:[self path]] : [NSImage imageNamed:@"URL"];
+	if(![self isFileURL]) return [NSImage imageNamed:@"URL"];
+	NSImage *const icon = [[NSWorkspace sharedWorkspace] iconForFile:[self path]];
+	[icon setDataRetained:YES];
+	if(!PGIsLeopardOrLater()) [icon setSize:NSMakeSize(128, 128)];
+	return icon;
 }
 
 @end
