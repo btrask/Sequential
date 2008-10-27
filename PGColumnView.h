@@ -44,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)addColumnWithView:(NSView *)aView;
 - (void)insertColumnWithView:(NSView *)aView atIndex:(unsigned)index;
-- (void)removeColumnsAfterView:(NSView *)aView;
+- (BOOL)removeColumnsAfterView:(NSView *)aView;
 
 - (float)columnWidth;
 - (void)setColumnWidth:(float)width;

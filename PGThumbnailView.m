@@ -39,6 +39,12 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
 #define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
 
+@interface PGThumbnailView (Private)
+
+- (void)_validateSelection;
+
+@end
+
 static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
@@ -94,7 +100,13 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	id removedItem;
 	NSEnumerator *const removedItemEnum = [removedItems objectEnumerator];
 	while((removedItem = [removedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
+	NSMutableSet *const addedItems = [[items mutableCopy] autorelease];
+	[addedItems minusSet:_selection];
+	id addedItem;
+	NSEnumerator *const addedItemEnum = [addedItems objectEnumerator];
+	while((addedItem = [addedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
 	[_selection setSet:items];
+	[self _validateSelection];
 	[self scrollToFirstSelectedItem];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
@@ -133,6 +145,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	BOOL const hadSelection = !![_selection count];
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
+	[self _validateSelection];
 	[self sizeToFit];
 	[self scrollToFirstSelectedItem];
 	[self setNeedsDisplay:YES];
@@ -155,6 +168,15 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		NSRect const r = NSIntersectionRect(v, [self frameOfItemAtIndex:i withMargin:YES]);
 		if(!NSIsEmptyRect(r)) [self addToolTipRect:r owner:self userData:nil];
 	}
+}
+
+#pragma mark Private Protocol
+
+- (void)_validateSelection
+{
+	id selectedItem;
+	NSEnumerator *const selectedItemEnum = [[[_selection copy] autorelease] objectEnumerator];
+	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
 
 #pragma mark NSToolTipOwner Protocol

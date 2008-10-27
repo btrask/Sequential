@@ -82,7 +82,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setSelection:(NSSet *)items
 {
 	if(![self numberOfColumns]) [self _addColumnWithItem:nil];
-	if(![items count]) return [self removeColumnsAfterView:[self viewAtIndex:0]];
+	if(![items count]) {
+		[self removeColumnsAfterView:[self viewAtIndex:0]];
+		return;
+	}
+	NSDisableScreenUpdates();
 	id ancestor = [items anyObject];
 	NSMutableArray *const path = [NSMutableArray array];
 	do {
@@ -101,6 +105,7 @@ DEALINGS WITH THE SOFTWARE. */
 		NSParameterAssert([[self lastView] representedObject] == pathItem);
 	}
 	[[self lastView] setSelection:items];
+	NSEnableScreenUpdates();
 	[self scrollToLastColumnAnimate:NO];
 }
 - (void)setSelectedItem:(id)item
@@ -114,7 +119,6 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(![self numberOfColumns]) return [self _addColumnWithItem:nil];
 	NSDisableScreenUpdates();
-	[[self viewAtIndex:0] setSelection:nil];
 	unsigned i = 0;
 	for(; i < [self numberOfColumns]; i++) [[self viewAtIndex:i] reloadData];
 	NSEnableScreenUpdates();
@@ -188,10 +192,11 @@ DEALINGS WITH THE SOFTWARE. */
 	[super insertColumnWithView:aView atIndex:index];
 	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
-- (void)removeColumnsAfterView:(NSView *)aView
+- (BOOL)removeColumnsAfterView:(NSView *)aView
 {
-	[super removeColumnsAfterView:aView];
-	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	BOOL const changed = [super removeColumnsAfterView:aView];
+	if(changed) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	return changed;
 }
 
 @end
