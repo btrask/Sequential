@@ -360,6 +360,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
 		if(PGPreliminaryDragging == _dragMode || (PGNotDragging == _dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
+			if(PGNotDragging == _dragMode) [self PG_viewWillScrollInClipView:self];
 			_dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
 				[NSCursor hide];
@@ -520,6 +521,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSAssert(PGNotDragging == _dragMode, @"Already dragging.");
 	_dragMode = PGPreliminaryDragging;
 	[[NSCursor closedHandCursor] push];
+	[self PG_viewWillScrollInClipView:self];
 }
 
 #pragma mark PGClipViewAdditions Protocol
@@ -841,9 +843,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return NO;
 }
+- (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
+{
+	[[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
+}
 - (void)PG_viewDidScrollInClipView:(PGClipView *)clipView
 {
-	[[self subviews] makeObjectsPerformSelector:@selector(PG_viewDidScrollInClipView:) withObject:clipView];
+	[[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
 }
 
 @end

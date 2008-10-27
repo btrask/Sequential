@@ -174,6 +174,10 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	return NO;
 }
+- (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
+{
+	[self removeAllToolTips];
+}
 - (void)PG_viewDidScrollInClipView:(PGClipView *)sender
 {
 	[super PG_viewDidScrollInClipView:sender];

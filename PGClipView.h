@@ -134,6 +134,7 @@ typedef unsigned PGAnimationType;
 
 - (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender;
 - (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender;
+- (void)PG_viewWillScrollInClipView:(PGClipView *)clipView; // May not be sent.
 - (void)PG_viewDidScrollInClipView:(PGClipView *)clipView;
 
 @end
