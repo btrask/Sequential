@@ -133,10 +133,15 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	BOOL const hadSelection = !![_selection count];
 	[_items release];
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
-	[self setFrameSize:NSZeroSize];
+	[self sizeToFit];
 	[self scrollToFirstSelectedItem];
 	[self setNeedsDisplay:YES];
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
+}
+- (void)sizeToFit
+{
+	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
+	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 2, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
 #pragma mark -
@@ -273,8 +278,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 
 - (void)setFrameSize:(NSSize)oldSize
 {
-	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
-	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 2, MAX(height, [_items count] * PGThumbnailTotalHeight))];
+	[self sizeToFit];
 }
 
 #pragma mark NSResponder

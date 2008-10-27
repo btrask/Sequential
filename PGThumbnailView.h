@@ -50,6 +50,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSRect)frameOfItemAtIndex:(unsigned)index withMargin:(BOOL)flag;
 
 - (void)reloadData;
+- (void)sizeToFit;
 
 - (void)resetToolTips;
 

@@ -68,8 +68,8 @@ DEALINGS WITH THE SOFTWARE. */
 	[clip setShowsBorder:NO];
 	[clip setDocumentView:aView];
 	[self layout];
-	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[aView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[self scrollToTopOfColumnWithView:aView];
 }
 - (void)removeColumnsAfterView:(NSView *)aView
@@ -153,20 +153,9 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	return self;
 }
-// TODO: Remove.
-/*- (void)drawRect:(NSRect)aRect
-{
-	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
-	NSRectFill(aRect);
-	NSRect const vb = [_view bounds];
-	[[NSColor whiteColor] set];
-	unsigned i = 0;
-	unsigned const count = [_clipViews count];
-	[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
-	for(; i < count; i++) NSFrameRect([_view convertRect:NSMakeRect(NSMinX(vb) + _columnWidth * (i + 1) - 1, NSMinY(vb), 1, NSHeight(vb)) toView:self]);
-}*/
 - (void)setFrameSize:(NSSize)aSize
 {
+	if(NSEqualSizes([self frame].size, aSize)) return;
 	[super setFrameSize:aSize];
 	[self layout];
 }

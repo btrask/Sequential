@@ -134,7 +134,9 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (void)_updateFrameWithWindow:(NSWindow *)aWindow
 {
 	float const s = [self AE_userSpaceScaleFactor];
-	[self setFrame:[[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s] display:NO];
+	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
+	if(NSEqualRects([self frame], f)) return;
+	[self setFrame:f display:NO];
 	[self AE_postNotificationName:PGBezelPanelFrameDidChangeNotification];
 }
 

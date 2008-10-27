@@ -161,10 +161,10 @@ DEALINGS WITH THE SOFTWARE. */
 	NSParameterAssert(NSNotFound != col);
 	if(col + 1 < [views count]) {
 		PGThumbnailView *const nextView = [views objectAtIndex:col + 1];
-		if([nextView representedObject] == selectedItem) return [nextView setSelection:nil];
+		[nextView setSelection:nil];
+		if([nextView representedObject] == selectedItem) return;
 		[nextView setRepresentedObject:selectedItem];
 		[nextView reloadData];
-		[self removeColumnsAfterView:nextView];
 		[self scrollToTopOfColumnWithView:nextView];
 	} else [self _addColumnWithItem:selectedItem];
 	[self scrollToLastColumnAnimate:YES];
