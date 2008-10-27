@@ -27,7 +27,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Models
 @class PGSubscription;
 
-extern NSString *const PGResourceIdentifierDidChangeNotification;
+extern NSString *const PGResourceIdentifierIconDidChangeNotification;
+extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
 
 enum {
 	PGLabelNone   = 0,

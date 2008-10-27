@@ -302,10 +302,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSParameterAssert(anArray);
 	if(_prefsLoaded && [anArray isEqual:_recentDocumentIdentifiers]) return;
-	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierDidChangeNotification];
+	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
 	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] retain];
-	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];
 }
 - (unsigned)maximumRecentDocumentCount

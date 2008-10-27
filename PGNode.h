@@ -111,7 +111,8 @@ typedef unsigned PGNodeStatus;
 - (BOOL)canBookmark;
 - (PGBookmark *)bookmark;
 
-- (void)identifierDidChange:(NSNotification *)aNotif;
+- (void)identifierIconDidChange:(NSNotification *)aNotif;
+- (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;
 
 @end
 

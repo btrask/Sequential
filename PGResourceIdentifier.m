@@ -35,7 +35,8 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSStringAdditions.h"
 #import "NSURLAdditions.h"
 
-NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifierDidChange";
+NSString *const PGResourceIdentifierIconDidChangeNotification        = @"PGResourceIdentifierIconDidChange";
+NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResourceIdentifierDisplayNameDidChange";
 
 @interface PGAliasIdentifier : PGResourceIdentifier <NSCoding>
 {
@@ -146,7 +147,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	if(icon == _icon) return;
 	[_icon release];
 	_icon = [icon retain];
-	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierIconDidChangeNotification];
 }
 
 #pragma mark -
@@ -167,7 +168,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
-	if(flag && !_customDisplayName) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
+	if(flag && !_customDisplayName) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
 }
 - (void)setCustomDisplayName:(NSString *)aString
         notify:(BOOL)flag
@@ -176,7 +177,7 @@ NSString *const PGResourceIdentifierDidChangeNotification = @"PGResourceIdentifi
 	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
 	[_customDisplayName release];
 	_customDisplayName = [string copy];
-	if(flag) [self AE_postNotificationName:PGResourceIdentifierDidChangeNotification];
+	if(flag) [self AE_postNotificationName:PGResourceIdentifierDisplayNameDidChangeNotification];
 }
 - (void)updateNaturalDisplayName
 {

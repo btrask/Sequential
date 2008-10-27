@@ -93,7 +93,8 @@ enum {
 		_parentAdapter = parent;
 		_document = doc;
 		_identifier = [ident retain];
-		[_identifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDidChangeNotification];
+		[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
+		[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
 		_dataSource = dataSource;
 		PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
 		_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
@@ -329,7 +330,11 @@ enum {
 
 #pragma mark -
 
-- (void)identifierDidChange:(NSNotification *)aNotif
+- (void)identifierIconDidChange:(NSNotification *)aNotif
+{
+	[self _updateMenuItem];
+}
+- (void)identifierDisplayNameDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
 	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
