@@ -200,10 +200,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGXMLParserNodeCreation Protocol
 
-- (BOOL)createsMultipleNodes
-{
-	return YES;
-}
 - (NSString *)title
 {
 	return [[_title copy] autorelease];

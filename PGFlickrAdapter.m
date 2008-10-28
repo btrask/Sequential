@@ -76,11 +76,11 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 #pragma mark PGURLLoadDelegate Protocol
 
-- (void)connectionLoadingDidProgress:(PGURLLoad *)sender
+- (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
 	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
-- (void)connectionDidReceiveResponse:(PGURLLoad *)sender
+- (void)loadDidReceiveResponse:(PGURLLoad *)sender
 {
 	if(sender != _sizeLoad && sender != _infoLoad) return;
 	NSHTTPURLResponse *const resp = (NSHTTPURLResponse *)[sender response];
@@ -94,24 +94,24 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 	}
 }
-- (void)connectionDidSucceed:(PGURLLoad *)sender
+- (void)loadDidSucceed:(PGURLLoad *)sender
 {
 	if(![_sizeLoad loaded] || ![_infoLoad loaded]) return;
 	NSURL *const URL = [[self info] objectForKey:PGURLKey];
 	[[self identifier] setCustomDisplayName:[[PGFlickrInfoParser parserWithData:[_infoLoad data] baseURL:URL] title] notify:YES];
 	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data] baseURL:URL];
 	NSError *const error = [sizeParser error];
-	if(error) return [[self node] setError:error];
-	[[self node] continueLoadWithInfo:[sizeParser info]];
+	if(error) [[self node] setError:error];
+	else [[self node] continueLoadWithInfo:[sizeParser info]];
 }
-- (void)connectionDidFail:(PGURLLoad *)sender
+- (void)loadDidFail:(PGURLLoad *)sender
 {
 	if(sender != _sizeLoad && sender != _infoLoad) return;
 	[_sizeLoad cancelAndNotify:NO];
 	[_infoLoad cancelAndNotify:NO];
 	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[sender request] URL]] forKey:NSLocalizedDescriptionKey]]];
 }
-- (void)connectionDidCancel:(PGURLLoad *)sender
+- (void)loadDidCancel:(PGURLLoad *)sender
 {
 	if(sender == _sizeLoad || sender == _infoLoad) {
 		[_sizeLoad cancelAndNotify:NO];
@@ -158,6 +158,11 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 #pragma mark PGXMLParserNodeCreation Protocol
 
+- (BOOL)createsMultipleNodes
+{
+	return NO;
+}
+
 - (NSString *)URLString
 {
 	return [[_URLString retain] autorelease];
@@ -165,6 +170,11 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 - (NSString *)errorString
 {
 	return [[_errorString retain] autorelease];
+}
+
+- (id)info
+{
+	return [NSDictionary dictionaryWithObjectsAndKeys:[self URL], PGURLKey, nil];
 }
 
 #pragma mark NSXMLParserDelegateEventAdditions Protocol
