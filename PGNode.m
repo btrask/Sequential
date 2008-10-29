@@ -84,27 +84,26 @@ enum {
       identifier:(PGResourceIdentifier *)ident
       dataSource:(id)dataSource
 {
+	if(!(self = [super init])) return nil;
+	NSParameterAssert(!parent != !doc);
 	if(!ident) {
 		[self release];
 		return nil;
 	}
-	NSParameterAssert(!parent != !doc);
-	if((self = [super init])) {
-		_parentAdapter = parent;
-		_document = doc;
-		_identifier = [ident retain];
-		[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-		[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
-		_dataSource = dataSource;
-		PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
-		_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
-		[self _setResourceAdapter:adapter];
-		_menuItem = [[NSMenuItem alloc] init];
-		[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
-		[_menuItem setAction:@selector(jumpToPage:)];
-		_allowMenuItemUpdates = YES;
-		[self _updateMenuItem];
-	}
+	_parentAdapter = parent;
+	_document = doc;
+	_identifier = [ident retain];
+	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
+	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+	_dataSource = dataSource;
+	PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
+	_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
+	[self _setResourceAdapter:adapter];
+	_menuItem = [[NSMenuItem alloc] init];
+	[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
+	[_menuItem setAction:@selector(jumpToPage:)];
+	_allowMenuItemUpdates = YES;
+	[self _updateMenuItem];
 	return self;
 }
 
@@ -435,7 +434,7 @@ enum {
 	do {
 		if(dataLength) break;
 		NSData *const data = [self data];
-		if(data) dataLength = [[NSNumber alloc] initWithUnsignedInt:[data length]];
+		if(data) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
 		if(dataLength) break;
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {

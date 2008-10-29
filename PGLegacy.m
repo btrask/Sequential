@@ -35,7 +35,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	[self release];
+	[[self init] release];
 	PGResourceIdentifier *result = nil;
 	NSURL *URL = [aCoder decodeObjectForKey:@"URL"];
 	if(URL) result = [[URL AE_resourceIdentifier] retain];
@@ -55,7 +55,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	[self release];
+	[[self init] release];
 	unsigned length;
 	uint8_t const *data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 	if(!data) data = [aCoder decodeBytesForKey:@"HandleData" returnedLength:&length];
@@ -68,7 +68,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	[self release];
+	[[self init] release];
 	PGResourceIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
 	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
 	PGResourceIdentifier *const fileIdent = [docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]];
@@ -83,7 +83,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	[self release];
+	[[self init] release];
 	PGResourceIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
 	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
 	PGResourceIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];

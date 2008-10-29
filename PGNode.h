@@ -55,7 +55,6 @@ typedef unsigned PGNodeStatus;
 	PGDocument           *_document;
 
 	PGResourceIdentifier *_identifier;
-	NSData               *_data;
 	id                    _dataSource;
 
 	NSMutableArray       *_adapters;

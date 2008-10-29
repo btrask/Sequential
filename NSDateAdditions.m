@@ -31,11 +31,10 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	static CFDateFormatterRef f = nil;
 	if(!f || CFDateFormatterGetDateStyle(f) != dateStyle || CFDateFormatterGetTimeStyle(f) != timeStyle) {
-		if(f) {
-			CFRelease(CFDateFormatterGetLocale(f));
-			CFRelease(f);
-		}
-		f = CFDateFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), dateStyle, timeStyle);
+		if(f) CFRelease(f);
+		CFLocaleRef const locale = CFLocaleCopyCurrent();
+		f = CFDateFormatterCreate(kCFAllocatorDefault, locale, dateStyle, timeStyle);
+		CFRelease(locale);
 	}
 	return [(NSString *)CFDateFormatterCreateStringWithDate(kCFAllocatorDefault, f, (CFDateRef)self) autorelease];
 }

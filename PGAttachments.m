@@ -70,11 +70,11 @@ static void PGEnsureWindowCreatedHack(void)
 - (id)initWithMenuItem:(NSMenuItem *)anItem
       rotation:(float)angle
 {
-	if(!PGIsTigerOrLater()) {
-		[self release];
-		return nil;
-	}
 	if((self = [super init])) {
+		if(!PGIsTigerOrLater()) {
+			[self release];
+			return nil;
+		}
 		PGEnsureWindowCreatedHack();
 		_item = anItem;
 		_angle = angle;
@@ -167,12 +167,13 @@ static void PGEnsureWindowCreatedHack(void)
 
 - (id)initImageCell:(NSImage *)anImage
 {
+	if(!(self = [super initImageCell:anImage])) return nil;
 	if(!anImage || !PGIsTigerOrLater()) {
 		[self release];
 		return nil;
 	}
 	PGEnsureWindowCreatedHack();
-	return [super initImageCell:anImage];
+	return self;
 }
 
 @end

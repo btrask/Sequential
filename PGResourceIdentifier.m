@@ -227,15 +227,14 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
+	if(!(self = [super init])) return nil;
 	Class const class = NSClassFromString([aCoder decodeObjectForKey:@"ClassName"]);
 	if(class && [self class] != class) {
 		[self release];
 		return [[class alloc] initWithCoder:aCoder];
 	}
-	if((self = [super init])) {
-		[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-		[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
-	}
+	[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
+	[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	return self;
 }
 - (void)encodeWithCoder:(NSCoder *)aCoder
@@ -301,11 +300,11 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 - (id)initWithAliasData:(const uint8_t *)data
       length:(unsigned)length
 {
-	if(!data || !length) {
-		[self release];
-		return nil;
-	}
 	if((self = [super init])) {
+		if(!data || !length) {
+			[self release];
+			return nil;
+		}
 		_alias = (AliasHandle)NewHandle(length);
 		memcpy(*_alias, data, length);
 	}

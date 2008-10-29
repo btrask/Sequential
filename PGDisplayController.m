@@ -974,9 +974,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
 	BOOL forward;
 	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] intValue]) {
-		case PGNextPreviousAction: forward = primary; break;
 		case PGLeftRightAction: forward = primary == rtl; break;
 		case PGRightLeftAction: forward = primary != rtl; break;
+		default: forward = primary; break;
 	}
 	if([anEvent modifierFlags] & NSShiftKeyMask) forward = !forward;
 	if(forward) [self nextPage:self];
@@ -1182,7 +1182,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self window] useOptimizedDrawing:YES];
 
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
-	[clipView setCursor:(cursorImage ? [[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] : [NSCursor pointingHandCursor])];
+	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] autorelease] : [NSCursor pointingHandCursor])];
 	[clipView setPostsFrameChangedNotifications:YES];
 	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 

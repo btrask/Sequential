@@ -29,7 +29,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (NSString *)AE_localizedStringWithFractionDigits:(unsigned)placesAfterDecimal
 {
 	static CFNumberFormatterRef f = nil;
-	if(!f) f = CFNumberFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), kCFNumberFormatterDecimalStyle);
+	if(!f) {
+		CFLocaleRef const locale = CFLocaleCopyCurrent();
+		f = CFNumberFormatterCreate(kCFAllocatorDefault, locale, kCFNumberFormatterDecimalStyle);
+		CFRelease(locale);
+	}
 	NSNumber *const precision = [NSNumber numberWithInt:placesAfterDecimal];
 	CFNumberFormatterSetProperty(f, kCFNumberFormatterMinFractionDigits, (CFNumberRef)precision);
 	CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)precision);
@@ -51,7 +55,9 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	static CFNumberFormatterRef f = nil;
 	if(!f) {
-		f = CFNumberFormatterCreate(kCFAllocatorDefault, CFLocaleCopyCurrent(), kCFNumberFormatterDecimalStyle);
+		CFLocaleRef const locale = CFLocaleCopyCurrent();
+		f = CFNumberFormatterCreate(kCFAllocatorDefault, locale, kCFNumberFormatterDecimalStyle);
+		CFRelease(locale);
 		CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)[NSNumber numberWithInt:1]);
 	}
 	return [NSString stringWithFormat:@"%@ %@", [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)[NSNumber numberWithDouble:b]) autorelease], NSLocalizedString(unit, @"Units (bytes, kilobytes, etc).")];

@@ -68,7 +68,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
         presortedOrder:(PGSortOrder)anOrder
 {
 	if(anArray == _unsortedChildren) return;
-	NSMutableArray *const removedChildren = [_unsortedChildren mutableCopy];
+	NSMutableArray *const removedChildren = [[_unsortedChildren mutableCopy] autorelease];
 	PGNode *newChild;
 	NSEnumerator *const newChildEnum = [anArray objectEnumerator];
 	while((newChild = [newChildEnum nextObject])) [removedChildren removeObjectIdenticalTo:newChild];

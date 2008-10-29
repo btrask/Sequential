@@ -33,7 +33,6 @@ DEALINGS WITH THE SOFTWARE. */
 	         NSArray         *_encodings;
 	         NSArray         *_encodingNames;
 	         NSArray         *_samples;
-	         NSStringEncoding _defaultEncoding;
 	         id               _delegate;
 }
 
