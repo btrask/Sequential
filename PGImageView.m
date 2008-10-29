@@ -78,7 +78,10 @@ DEALINGS WITH THE SOFTWARE. */
         size:(NSSize)size
 {
 	[self setNeedsDisplay:YES]; // Always redisplay in case rep is a PDF.
-	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
+	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) {
+		if(_isPDF) [self _cache];
+		return;
+	}
 	_orientation = orientation;
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
@@ -270,9 +273,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_cache
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
-	if(!_cache || !_rep || _isPDF || [self canAnimateRep]) return;
+	if(!_cache || !_rep || [self canAnimateRep]) return;
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-	if(NSEqualSizes(pixelSize, _immediateSize) && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData])) return;
+	if(NSEqualSizes(pixelSize, _immediateSize) && !_isPDF && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData])) return;
 	if(_cacheIsValid) {
 		_cacheIsValid = NO;
 		[_image removeRepresentation:_cache];
@@ -297,6 +300,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 	if(![view lockFocusIfCanDraw]) return [self PG_performSelector:@selector(_cache) withObject:nil afterDelay:0 retain:NO];
 	NSRect const cacheRect = [_cache rect];
+	if(_isPDF && ![_rep isOpaque]) {
+		[[NSColor whiteColor] set];
+		NSRectFill(cacheRect);
+	}
 	[self _drawInRect:cacheRect];
 	[self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
@@ -417,25 +424,29 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	BOOL const drawCorners = !_cacheIsValid && [self _drawsRoundedCorners];
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
-	int count = 0;
-	NSRect const *rects = NULL;
-	if(_isPDF) {
-		[[NSColor whiteColor] set];
-		if(deg) NSRectFill(b);
-		else {
-			[self getRectsBeingDrawn:&rects count:&count];
-			NSRectFillList(rects, count);
-		}
-	}
 	if(_cacheIsValid) {
 		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
 		if(deg) [_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
 		else {
-			if(!rects) [self getRectsBeingDrawn:&rects count:&count]; // Be sure this gets read.
+			int count = 0;
+			NSRect const *rects = NULL;
+			[self getRectsBeingDrawn:&rects count:&count];
 			int i = count;
 			while(i--) [_image drawInRect:rects[i] fromRect:rects[i] operation:operation fraction:1.0];
 		}
-	} else [self _drawInRect:b];
+	} else {
+		if(_isPDF && ![_rep isOpaque]) {
+			[[NSColor whiteColor] set];
+			if(deg) NSRectFill(b);
+			else {
+				int count = 0;
+				NSRect const *rects = NULL;
+				[self getRectsBeingDrawn:&rects count:&count];
+				NSRectFillList(rects, count);
+			}
+		}
+		[self _drawInRect:b];
+	}
 	if(drawCorners) {
 		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
