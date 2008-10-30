@@ -85,8 +85,9 @@ DEALINGS WITH THE SOFTWARE. */
 		[NSApp beginSheet:[self window] modalForWindow:window modalDelegate:[self retain] didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 	} else {
 		_delegate = nil;
-		[anObject encodingAlertDidEnd:self selectedEncoding:[NSApp runModalForWindow:[self window]]];
+		NSStringEncoding const encoding = [NSApp runModalForWindow:[self window]];
 		[[self window] close];
+		[anObject encodingAlertDidEnd:self selectedEncoding:encoding];
 	}
 }
 - (void)sheetDidEnd:(NSWindow *)sheet
