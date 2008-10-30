@@ -30,6 +30,8 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
+#define PGMaxVisibleColumns (unsigned)3
+
 @interface PGThumbnailBrowser (Private)
 
 - (void)_addColumnWithItem:(id)item;
@@ -181,7 +183,7 @@ DEALINGS WITH THE SOFTWARE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], (unsigned)3) * [self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], PGMaxVisibleColumns) * [self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
 }
 
 #pragma mark PGColumnView
@@ -189,14 +191,15 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)insertColumnWithView:(NSView *)aView
         atIndex:(unsigned)index
 {
+	unsigned const columns = [self numberOfColumns];
 	[super insertColumnWithView:aView atIndex:index];
-	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
-- (BOOL)removeColumnsAfterView:(NSView *)aView
+- (void)removeColumnsAfterView:(NSView *)aView
 {
-	BOOL const changed = [super removeColumnsAfterView:aView];
-	if(changed) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
-	return changed;
+	unsigned const columns = [self numberOfColumns];
+	[super removeColumnsAfterView:aView];
+	if(MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 
 @end

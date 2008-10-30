@@ -36,7 +36,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 @interface PGBezelPanel (Private)
 
-- (void)_updateFrameWithWindow:(NSWindow *)aWindow;
+- (void)_updateFrameWithWindow:(NSWindow *)aWindow display:(BOOL)flag;
 
 @end
 
@@ -70,7 +70,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 	[self cancelFadeOut];
 	if(aWindow != _parentWindow) [_parentWindow removeChildWindow:self];
 	[self setIgnoresMouseEvents:!_acceptsEvents];
-	[self _updateFrameWithWindow:aWindow];
+	[self _updateFrameWithWindow:aWindow display:NO];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
 	if(!PGIsTigerOrLater()) [self orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
@@ -110,33 +110,36 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 #pragma mark -
 
-- (void)updateFrame
+- (void)updateFrameDisplay:(BOOL)flag
 {
-	NSDisableScreenUpdates();
-	[self _updateFrameWithWindow:_parentWindow];
-	[self display];
-	NSEnableScreenUpdates();
+	[self _updateFrameWithWindow:_parentWindow display:flag];
 }
 
 #pragma mark -
 
 - (void)frameShouldChange:(NSNotification *)aNotif
 {
-	[self updateFrame];
+	[self updateFrameDisplay:YES];
 }
 - (void)windowDidResize:(NSNotification *)aNotif
 {
-	[self updateFrame];
+	[self updateFrameDisplay:YES];
 }
 
 #pragma mark Private Protocol
 
 - (void)_updateFrameWithWindow:(NSWindow *)aWindow
+        display:(BOOL)flag
 {
 	float const s = [self AE_userSpaceScaleFactor];
 	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
 	if(NSEqualRects([self frame], f)) return;
+	if(flag) NSDisableScreenUpdates();
 	[self setFrame:f display:NO];
+	if(flag) {
+		[self display];
+		NSEnableScreenUpdates();
+	}
 	[self AE_postNotificationName:PGBezelPanelFrameDidChangeNotification];
 }
 

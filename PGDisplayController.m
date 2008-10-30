@@ -586,7 +586,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	} else if([self activeNode] == node) {
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
-	[self _noteViewableNodeCountDidChange];
+	[self documentShowsInfoDidChange:nil];
 	[self _updateNodeIndex];
 	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
 }
@@ -628,7 +628,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([self shouldShowThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOrigin:corner];
-	[_infoPanel updateFrame];
+	[_infoPanel updateFrameDisplay:YES];
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
@@ -659,15 +659,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_graphicPanel setFrameInset:inset];
 		[self _updateImageViewSizeAllowAnimation:NO];
 		[self documentReadingDirectionDidChange:nil];
-		[_findPanel updateFrame];
-		[_graphicPanel updateFrame];
+		[_findPanel updateFrameDisplay:YES];
+		[_graphicPanel updateFrameDisplay:YES];
 	} else {
 		[clipView setBoundsInset:PGZeroInset];
 		[_findPanel setFrameInset:PGZeroInset];
 		[_graphicPanel setFrameInset:PGZeroInset];
 		[self _updateImageViewSizeAllowAnimation:NO];
-		[_findPanel updateFrame];
-		[_graphicPanel updateFrame];
+		[_findPanel updateFrameDisplay:YES];
+		[_graphicPanel updateFrameDisplay:YES];
 		[self documentReadingDirectionDidChange:nil];
 		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
 	}

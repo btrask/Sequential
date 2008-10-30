@@ -52,7 +52,7 @@ extern NSString *const PGBezelPanelFrameDidChangeNotification;
 - (PGInset)frameInset;
 - (void)setFrameInset:(PGInset)inset;
 
-- (void)updateFrame;
+- (void)updateFrameDisplay:(BOOL)flag;
 
 - (void)frameShouldChange:(NSNotification *)aNotif;
 - (void)windowDidResize:(NSNotification *)aNotif;

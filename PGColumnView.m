@@ -72,7 +72,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[aView setFrameSize:NSMakeSize(NSWidth([clip bounds]), NSHeight([aView frame]))];
 	[self scrollToTopOfColumnWithView:aView];
 }
-- (BOOL)removeColumnsAfterView:(NSView *)aView
+- (void)removeColumnsAfterView:(NSView *)aView
 {
 	unsigned const i = aView ? [_views indexOfObject:aView] : 0;
 	NSParameterAssert(NSNotFound != i);
