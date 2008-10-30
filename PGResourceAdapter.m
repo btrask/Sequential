@@ -165,10 +165,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
                 withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
-	if(!rep) {
-		NSData *const data = [dict objectForKey:PGImageDataKey];
-		if(data) rep = [NSImageRep AE_bestImageRepWithData:data];
-	}
+	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGImageDataKey]];
 	if(!rep) return nil;
 	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntValue];
 	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);

@@ -28,6 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 + (id)AE_bestImageRepWithData:(NSData *)data
 {
+	if(!data) return nil;
 	NSArray *const reps = [NSBitmapImageRep imageRepsWithData:data];
 	if(1 == [reps count]) return [reps objectAtIndex:0];
 	int bestPixelCount = 0;
