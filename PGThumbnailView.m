@@ -338,6 +338,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 - (void)dealloc
 {
 	[_representedObject release];
+	[_items release];
 	[_selection release];
 	[super dealloc];
 }

@@ -74,6 +74,7 @@
 		0E5EC1D90CEDFEED00E7FF9A /* PGURL.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D70CEDFEED00E7FF9A /* PGURL.nib */; };
 		0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
+		0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */; };
 		0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */; };
 		0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */; };
 		0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */; };
@@ -341,6 +342,8 @@
 		0E675E3A0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMutableDictionaryAdditions.m; sourceTree = "<group>"; };
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		0E7A18280E66CE8B00BCA2AF /* de */ = {isa = PBXFileReference; lastKnownFileType = folder; name = de; path = de.lproj/SequentialHelp; sourceTree = "<group>"; };
+		0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCancelableProxy.h; sourceTree = "<group>"; };
+		0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCancelableProxy.m; sourceTree = "<group>"; };
 		0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFlickrAdapter.h; sourceTree = "<group>"; };
 		0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFlickrAdapter.m; sourceTree = "<group>"; };
 		0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParser.h; sourceTree = "<group>"; };
@@ -730,6 +733,8 @@
 				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
 				0EC11DF10CA02B98003E492C /* PGByteOrdering.h */,
 				0EC11DF20CA02B98003E492C /* PGByteOrdering.m */,
+				0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */,
+				0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */,
 				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
 				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
 				0E92E1340E2CA88400276801 /* PGGeometry.h */,
@@ -1207,6 +1212,7 @@
 				0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */,
 				0E20AF640EA702A1002A7854 /* NSImageRepAdditions.m in Sources */,
 				0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */,
+				0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

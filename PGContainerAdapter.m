@@ -72,8 +72,10 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	PGNode *newChild;
 	NSEnumerator *const newChildEnum = [anArray objectEnumerator];
 	while((newChild = [newChildEnum nextObject])) [removedChildren removeObjectIdenticalTo:newChild];
-	[[self document] noteNode:[self node] willRemoveNodes:removedChildren];
-	[removedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
+	if([removedChildren count]) {
+		[[self document] noteNode:[self node] willRemoveNodes:removedChildren];
+		[removedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
+	}
 	[_unsortedChildren release];
 	_unsortedChildren = [anArray copy];
 	_unsortedOrder = anOrder;

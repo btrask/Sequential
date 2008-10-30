@@ -185,7 +185,7 @@ enum {
 	[self readIfNecessary];
 	if(PGNodeThumbnailing & _status) {
 		_status &= ~PGNodeThumbnailing;
-		[[self document] noteNodeThumbnailDidChange:self];
+		[[self document] noteNodeThumbnailDidChange:self children:NO];
 	}
 }
 
@@ -514,7 +514,7 @@ enum {
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
+	return [NSString stringWithFormat:@"<%@(%@) %p [%u]: %@>", [self class], [_adapter class], self, [self retainCount], [self identifier]];
 }
 
 #pragma mark -

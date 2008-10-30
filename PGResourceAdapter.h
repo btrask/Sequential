@@ -82,6 +82,7 @@ typedef unsigned PGMatchPriority;
 
 - (NSImage *)thumbnail;
 - (NSImage *)fastThumbnail;
+- (NSImage *)realThumbnail;
 - (void)setThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateThumbnail;
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info;

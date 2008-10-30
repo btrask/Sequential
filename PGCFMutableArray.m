@@ -55,6 +55,26 @@ static unsigned PGCFIndexToUnsigned(CFIndex i)
 {
 	CFArrayAppendArray(_array, (CFArrayRef)otherArray, CFRangeMake(0, CFArrayGetCount((CFArrayRef)otherArray)));
 }
+- (void)removeObject:(id)anObject
+        inRange:(NSRange)range
+{
+	CFIndex const start = PGUnsignedToCFIndex(range.location);
+	CFIndex i = PGUnsignedToCFIndex(NSMaxRange(range));
+	while(kCFNotFound != (i = CFArrayGetLastIndexOfValue(_array, CFRangeMake(start, i - start), anObject))) CFArrayRemoveValueAtIndex(_array, i);
+}
+- (void)removeObject:(id)anObject
+{
+	return [self removeObject:anObject inRange:NSMakeRange(0, [self count])];
+}
+- (void)removeObjectIdenticalTo:(id)anObject
+        inRange:(NSRange)range
+{
+	return [self removeObject:anObject inRange:range];
+}
+- (void)removeObjectIdenticalTo:(id)anObject
+{
+	return [self removeObjectIdenticalTo:anObject inRange:NSMakeRange(0, [self count])];
+}
 
 #pragma mark NSExtendedArray Protocol
 

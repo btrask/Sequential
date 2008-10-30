@@ -592,7 +592,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:NO];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif

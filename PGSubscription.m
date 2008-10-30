@@ -27,6 +27,9 @@ DEALINGS WITH THE SOFTWARE. */
 #import <unistd.h>
 #import <fcntl.h>
 
+// Other
+#import "PGCancelableProxy.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 
@@ -35,8 +38,8 @@ NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventD
 NSString *const PGSubscriptionPathKey      = @"PGSubscriptionPath";
 NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
-static int           PGKQueue                   = -1;
-static NSMutableSet *PGActiveSubscriptionValues = nil;
+static int PGKQueue              = -1;
+static id  PGActiveSubscriptions = nil;
 
 @interface PGLeafSubscription : PGSubscription
 {
@@ -45,12 +48,11 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 }
 
 + (void)threaded_sendFileEvents;
-+ (void)sendFileEvent:(NSDictionary *)aDict;
 
 - (id)initWithPath:(NSString *)path;
 - (NSString *)path;
 - (PGSubscription *)rootSubscription;
-- (void)noteFileEventDidOccurWithFlags:(unsigned)flags;
+- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum;
 
 @end
 
@@ -112,14 +114,9 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 		struct kevent ev[5]; // Group up to 5 events at once.
 		unsigned const count = kevent(PGKQueue, NULL, 0, ev, 5, NULL);
 		unsigned i = 0;
-		for(; i < count; i++) [self performSelectorOnMainThread:@selector(sendFileEvent:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:(id)ev[i].udata], @"Subscription", [NSNumber numberWithUnsignedInt:ev[i].fflags], @"Flags", nil] waitUntilDone:NO];
+		for(; i < count; i++) [[PGLeafSubscription PG_performOn:(id)ev[i].udata allow:NO withStorage:PGActiveSubscriptions] performSelectorOnMainThread:@selector(noteFileEventDidOccurWithFlags:) withObject:[NSNumber numberWithUnsignedInt:ev[i].fflags] waitUntilDone:NO];
 		[pool release];
 	}
-}
-+ (void)sendFileEvent:(NSDictionary *)aDict
-{
-	NSValue *const subscriptionValue = [aDict objectForKey:@"Subscription"];
-	if([PGActiveSubscriptionValues containsObject:subscriptionValue]) [[subscriptionValue nonretainedObjectValue] noteFileEventDidOccurWithFlags:[[aDict objectForKey:@"Flags"] unsignedIntValue]];
 }
 
 #pragma mark Instance Methods
@@ -136,9 +133,10 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 		}
 		if(-1 == PGKQueue) {
 			PGKQueue = kqueue();
-			PGActiveSubscriptionValues = [[NSMutableSet alloc] init];
+			PGActiveSubscriptions = [[PGCancelableProxy storage] retain];
 			[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:[self class] withObject:nil];
 		}
+		[self PG_allowPerformsWithStorage:PGActiveSubscriptions];
 		struct kevent ev;
 		EV_SET(&ev, _descriptor, EVFILT_VNODE, EV_ADD | EV_CLEAR, NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE, 0, self);
 		struct timespec timeout = {0, 0};
@@ -146,7 +144,6 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 			[self release];
 			return nil;
 		}
-		[PGActiveSubscriptionValues addObject:[NSValue valueWithNonretainedObject:self]];
 	}
 	return self;
 }
@@ -163,12 +160,12 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 {
 	return self;
 }
-- (void)noteFileEventDidOccurWithFlags:(unsigned)flags
+- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum
 {
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
 	NSString *const path = [self path];
 	if(path) [dict setObject:path forKey:PGSubscriptionPathKey];
-	if(flags) [dict setObject:[NSNumber numberWithUnsignedInt:flags] forKey:PGSubscriptionRootFlagsKey];
+	if(flagsNum) [dict setObject:flagsNum forKey:PGSubscriptionRootFlagsKey];
 	[[self rootSubscription] AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
@@ -190,7 +187,7 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 
 - (void)dealloc
 {
-	[PGActiveSubscriptionValues removeObject:[NSValue valueWithNonretainedObject:self]];
+	[self PG_cancelPerformsWithStorage:PGActiveSubscriptions];
 	if(-1 != _descriptor) close(_descriptor);
 	[super dealloc];
 }
@@ -238,10 +235,10 @@ static NSMutableSet *PGActiveSubscriptionValues = nil;
 	_children = [children retain];
 	return self;
 }
-- (void)noteFileEventDidOccurWithFlags:(unsigned)flags
+- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum
 {
-	if([self rootSubscription] == self) [super noteFileEventDidOccurWithFlags:flags];
-	else if(NOTE_WRITE & flags) [super noteFileEventDidOccurWithFlags:0];
+	if([self rootSubscription] == self) [super noteFileEventDidOccurWithFlags:flagsNum];
+	else if(NOTE_WRITE & [flagsNum unsignedIntValue]) [super noteFileEventDidOccurWithFlags:0];
 }
 
 #pragma mark NSObject

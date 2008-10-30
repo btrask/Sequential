@@ -55,6 +55,7 @@ NSString *const PGDocumentBaseOrientationDidChangeNotification = @"PGDocumentBas
 
 NSString *const PGDocumentNodeKey            = @"PGDocumentNode";
 NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
+NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 #define PGDocumentMaxCachedNodes 3
 
@@ -267,8 +268,9 @@ NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
 	if(_node) [self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeThumbnailDidChange:(PGNode *)node
+        children:(BOOL)flag
 {
-	if(node) [self AE_postNotificationName:PGDocumentNodeThumbnailDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	if(node) [self AE_postNotificationName:PGDocumentNodeThumbnailDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, [NSNumber numberWithBool:flag], PGDocumentUpdateChildrenKey, nil]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {

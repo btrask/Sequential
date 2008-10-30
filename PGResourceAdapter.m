@@ -272,7 +272,8 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (NSImage *)thumbnail
 {
-	if(_thumbnail) return [[_thumbnail retain] autorelease];
+	NSImage *const realThumbnail = [self realThumbnail];
+	if(realThumbnail) return realThumbnail;
 	if([self canGenerateThumbnail] && ![PGAdaptersWaitingForThumbnails containsObject:self]) {
 		if(!PGThumbnailsNeededLock) {
 			PGThumbnailsNeededLock = [[NSConditionLock alloc] initWithCondition:NO];
@@ -293,12 +294,16 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[self identifier] icon];
 }
+- (NSImage *)realThumbnail
+{
+	return [[_thumbnail retain] autorelease];
+}
 - (void)setThumbnail:(NSImage *)anImage
 {
 	if(anImage == _thumbnail) return;
 	[_thumbnail release];
 	_thumbnail = [anImage retain];
-	if(anImage || ![self canGenerateThumbnail]) [[self document] noteNodeThumbnailDidChange:[self node]];
+	if(anImage || ![self canGenerateThumbnail]) [[self document] noteNodeThumbnailDidChange:[self node] children:NO];
 	else (void)[self thumbnail];
 }
 - (BOOL)canGenerateThumbnail
@@ -581,7 +586,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
+	return [NSString stringWithFormat:@"<%@ %p [%u]: %@>", [self class], self, [self retainCount], [self identifier]];
 }
 
 #pragma mark NSObject

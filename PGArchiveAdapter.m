@@ -25,17 +25,28 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGArchiveAdapter.h"
 
 // Models
+#import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
 // Controllers
 #import "PGDocumentController.h"
 
+// Other
+#import "PGCancelableProxy.h"
+
 // Categories
 #import "NSMutableDictionaryAdditions.h"
 #import "NSStringAdditions.h"
 
 static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
+static id PGArchiveAdapterList = nil;
+
+@interface PGArchiveAdapter (Private)
+
+- (void)_updateThumbnailsOfChildren;
+
+@end
 
 @interface XADArchive (PGAdditions)
 
@@ -52,6 +63,13 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
                    withInfo:(NSMutableDictionary *)info
 {
 	return [[info objectForKey:PGKnownToBeArchiveKey] boolValue] ? PGMatchByIntrinsicAttribute : [super matchPriorityForNode:node withInfo:info];
+}
+
+#pragma mark NSObject
+
++ (void)initialize
+{
+	if([PGArchiveAdapter class] == self) PGArchiveAdapterList = [[PGCancelableProxy storage] retain];
 }
 
 #pragma mark Instance Methods
@@ -93,6 +111,13 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		if(node) [children addObject:node];
 	}
 	return children;
+}
+
+#pragma mark Private Protocol
+
+- (void)_updateThumbnailsOfChildren
+{
+	[[self document] noteNodeThumbnailDidChange:[self node] children:YES];
 }
 
 #pragma mark XADArchiveDelegate Protocol
@@ -159,9 +184,19 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 		if(pass) [_archive setPassword:pass];
 		data = [_archive contentsOfEntry:i];
 		switch([_archive lastError]) {
-			case XADERR_OK: break;
-			case XADERR_PASSWORD: [sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
-			default: return NO;
+			case XADERR_OK:
+			{
+				if(_needsPassword) {
+					_needsPassword = NO;
+					[[PGArchiveAdapter PG_performOn:self allow:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
+				}
+				break;
+			}
+			case XADERR_PASSWORD:
+				_needsPassword = YES;
+				[sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
+			default:
+				return NO;
 		}
 	}
 	if(outData) *outData = data;
@@ -200,6 +235,7 @@ static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 
 - (void)dealloc
 {
+	[self PG_cancelPerformsWithStorage:PGArchiveAdapterList];
 	@synchronized(_archive) {
 		[_archive release];
 		_archive = nil;

@@ -23,18 +23,25 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import <mac/XADArchive.h>
-#import "PGContainerAdapter.h"
 
-@interface PGArchiveAdapter : PGContainerAdapter
+@interface PGCancelableProxy : NSObject // Only objects support NSThreadPerformAdditions.
 {
 	@private
-	XADArchive      *_archive;
-	NSStringEncoding _encodingError;
-	BOOL             _needsPassword;
+	id    _target;
+	Class _class;
+	id    _storage;
 }
 
-- (XADArchive *)archive;
-- (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes;
++ (id)storage;
+
+- (id)initWithTarget:(id)target class:(Class)class storage:(id)storage;
+
+@end
+
+@interface NSObject (PGCancelable) // These methods guarantee that either the entire method will be performed before anything can cancel it, or the method won't be performed at all. If the method doesn't get invoked, 0 (cast as whatever the return type is) is returned.
+
++ (id)PG_performOn:(id)target allow:(BOOL)flag withStorage:(id)storage; // Send this to the class that defines the message you intend to invoke.
+- (void)PG_allowPerformsWithStorage:(id)storage;
+- (void)PG_cancelPerformsWithStorage:(id)storage;
 
 @end
