@@ -76,7 +76,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	unsigned const i = aView ? [_views indexOfObject:aView] : 0;
 	NSParameterAssert(NSNotFound != i);
-	if([_views count] <= i + 1) return NO;
+	if([_views count] <= i + 1) return;
 	while([_views count] > i + 1) {
 		PGClipView *const clip = [_clipViews lastObject];
 		[clip setDocumentView:nil];
@@ -85,7 +85,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[_views removeLastObject];
 	}
 	[self layout];
-	return YES;
+	return;
 }
 
 #pragma mark -
