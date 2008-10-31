@@ -589,7 +589,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self documentShowsInfoDidChange:nil];
 	[self _updateNodeIndex];
 	if(![self shouldShowThumbnails] != ![_thumbnailPanel isVisible]) [self documentShowsThumbnailsDidChange:nil]; // Show or hide it.
-	else if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
+	else if([self shouldShowThumbnails]) {
+		[[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
+		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
+	}
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
