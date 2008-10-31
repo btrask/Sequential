@@ -62,7 +62,7 @@ DEALINGS WITH THE SOFTWARE. */
 	PGOrientation const oldOrientation = _orientation;
 	[PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 	[_exifEntries retain];
-	if(oldOrientation != _orientation) [self setThumbnail:nil];
+	if(oldOrientation != _orientation) [self setRealThumbnail:nil];
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
@@ -128,7 +128,7 @@ DEALINGS WITH THE SOFTWARE. */
 	_readFailed = NO;
 	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
 }
-- (BOOL)canGenerateThumbnail
+- (BOOL)canGenerateRealThumbnail
 {
 	return YES;
 }

@@ -77,7 +77,7 @@ static NSString *const PGFinderApplicationName     = @"Finder";
 
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type)
 {
-	return CFSwapInt32BigToHost(*(OSType *)[[type dataUsingEncoding:NSUTF8StringEncoding] bytes]);
+	return type ? CFSwapInt32BigToHost(*(OSType *)[[type dataUsingEncoding:NSUTF8StringEncoding] bytes]) : '????';
 }
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type)
 {

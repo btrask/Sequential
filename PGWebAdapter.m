@@ -56,6 +56,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(sender != _mainLoad) return;
 	id const resp = [sender response];
+	[[self info] setObject:[resp MIMEType] forKey:PGMIMETypeKey];
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
 		[_mainLoad cancelAndNotify:NO];
 		[_faviconLoad cancelAndNotify:NO];
