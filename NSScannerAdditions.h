@@ -23,15 +23,9 @@ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
-#import "PGContainerAdapter.h"
 
-// Models
-@class PGURLLoad;
+@interface NSScanner (AEAdditions)
 
-@interface PGFlickrAdapter : PGContainerAdapter
-{
-	@private
-	PGURLLoad *_load;
-}
+- (BOOL)AE_scanFromString:(NSString *)start toString:(NSString *)end intoString:(out NSString **)outString;
 
 @end

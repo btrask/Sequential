@@ -868,8 +868,10 @@
 	</dict>
 	<key>PGXMLParsers</key>
 	<array>
-		<string>PGOEmbedParser</string>
 		<string>PGMediaRSSParser</string>
+		<string>PGFlickrPhotoListParser</string>
+		<string>PGFlickrPhotoParser</string>
+		<string>PGOEmbedParser</string>
 	</array>
 </dict>
 </plist>

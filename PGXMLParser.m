@@ -109,7 +109,6 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
         attributes:(NSDictionary *)attrs
 {
 	if(![self isMemberOfClass:[PGXMLParser class]]) return;
-	if([[p pathComponents] count] != 2) return;
 	static NSArray *parserNames = nil;
 	if(!parserNames) parserNames = [[[[NSBundle mainBundle] infoDictionary] objectForKey:PGXMLParsersKey] copy];
 	NSString *parserName;
@@ -131,7 +130,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
 - (BOOL)createsMultipleNodes
 {
-	return YES;
+	return [_subparsers count] == 1 ? [[_subparsers lastObject] createsMultipleNodes] : YES;
 }
 
 #pragma mark -
@@ -153,9 +152,13 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 - (id)info
 {
 	if([self createsMultipleNodes]) return nil;
+	if(![_subparsers count]) {
+		NSURL *const URL = [self URL];
+		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:URL, PGURLKey, nil] : nil;
+	}
 	NSMutableArray *const dicts = [NSMutableArray array];
 	PGXMLParser *parser;
-	NSEnumerator *const parserEnum = [[self subparsers] objectEnumerator];
+	NSEnumerator *const parserEnum = [_subparsers objectEnumerator];
 	while((parser = [parserEnum nextObject])) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
 	return dicts;
 }
@@ -187,6 +190,7 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent
 {
+	if([self isMemberOfClass:[PGXMLParser class]]) return [[_subparsers lastObject] nodeWithParentAdapter:parent];
 	PGResourceIdentifier *const ident = [[self URL] AE_resourceIdentifier];
 	if(!ident) return nil;
 	[ident setCustomDisplayName:[self title] notify:NO];

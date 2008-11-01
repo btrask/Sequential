@@ -22,16 +22,18 @@ THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
 OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
-#import <Cocoa/Cocoa.h>
-#import "PGContainerAdapter.h"
+#import "NSScannerAdditions.h"
 
-// Models
-@class PGURLLoad;
+@implementation NSScanner (AEAdditions)
 
-@interface PGFlickrAdapter : PGContainerAdapter
+- (BOOL)AE_scanFromString:(NSString *)start
+        toString:(NSString *)end
+        intoString:(out NSString **)outString
 {
-	@private
-	PGURLLoad *_load;
+	[self setScanLocation:0];
+	[self scanUpToString:start intoString:NULL];
+	if(![self scanString:start intoString:NULL]) return NO;
+	return [self scanUpToString:end intoString:outString];
 }
 
 @end

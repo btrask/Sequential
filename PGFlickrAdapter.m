@@ -31,27 +31,36 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGXMLParser.h"
 
 // Categories
+#import "NSMutableDictionaryAdditions.h"
 #import "NSObjectAdditions.h"
+#import "NSScannerAdditions.h"
 
 static NSString *const PGFlickrAPIKey = @"efba0200d782ae552a34fc78d18c02bc"; // Registered to me for use in Sequential. Do no evil.
-static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
-@interface PGFlickrSizeParser : PGXMLParser
+static NSString *const PGFlickrPhotoNameKey = @"PGFlickrPhotoName";
+static NSString *const PGFlickrUserNameKey  = @"PGFlickrUserName";
+static NSString *const PGFlickrGroupNameKey = @"PGFlickrGroupName";
+static NSString *const PGFlickrTagNameKey   = @"PGFlickrTagName";
+static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
+
+@interface PGFlickrPhotoListParser : PGXMLParser
 {
 	@private
-	unsigned  _size;
-	NSString *_URLString;
-	NSString *_errorString;
+	NSString *_title;
 }
-
 @end
 
-@interface PGFlickrInfoParser : PGXMLParser
+@interface PGFlickrPhotoParser : PGXMLParser
 {
 	@private
 	NSMutableString *_title;
+	NSString *_farm;
+	NSString *_server;
+	NSString *_id;
+	NSString *_secret;
+	NSString *_originalFormat;
+	NSString *_errorString;
 }
-
 @end
 
 @implementation PGFlickrAdapter
@@ -64,13 +73,32 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 	NSURL *const URL = [info objectForKey:PGURLKey];
 	if(!URL || [URL isFileURL]) return PGNotAMatch;
 	if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
-	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@"com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
-	NSArray *const components = [[URL path] pathComponents];
-	if([components count] < 4) return PGNotAMatch; // Flickr image paths should be /photos/USER_NAME/IMAGE_NAME.
-	if(![@"photos" isEqualToString:[components objectAtIndex:1]]) return PGNotAMatch; // All photos start with /photos.
-	if([@"tags" isEqualToString:[components objectAtIndex:2]]) return PGNotAMatch; // Tags are /photos/tags/TAG_NAME.
-	if([@"sets" isEqualToString:[components objectAtIndex:3]]) return PGNotAMatch; // Sets are /photos/USER_NAME/sets/SET_NUMBER.
-	[info setObject:[components objectAtIndex:3] forKey:PGFlickrImageNameKey];
+	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
+
+	NSString *photo = nil;
+	NSString *user = nil;
+	NSString *group = nil;
+	NSString *tag = nil;
+	NSString *set = nil;
+	NSScanner *const scanner = [NSScanner scannerWithString:[URL path]];
+	if([scanner AE_scanFromString:@"/photos/" toString:@"/" intoString:&user]) {
+		if([[NSArray arrayWithObjects:@"tags", @"sets", nil] containsObject:user]) user = nil;
+		else {
+			[scanner scanString:@"/" intoString:NULL];
+			[scanner scanUpToString:@"/" intoString:&photo];
+			if([[NSArray arrayWithObjects:@"tags", @"sets", @"groups", @"archives", @"favorites", nil] containsObject:photo]) photo = nil;
+		}
+	}
+	[scanner AE_scanFromString:@"/groups/" toString:@"/" intoString:&group];
+	[scanner AE_scanFromString:@"/tags/" toString:@"/" intoString:&tag];
+	[scanner AE_scanFromString:@"/sets/" toString:@"/" intoString:&set];
+	if(!photo && !user && !group && !tag && !set) return PGNotAMatch;
+
+	[info AE_setObject:photo forKey:PGFlickrPhotoNameKey];
+	[info AE_setObject:user forKey:PGFlickrUserNameKey];
+	[info AE_setObject:group forKey:PGFlickrGroupNameKey];
+	[info AE_setObject:tag forKey:PGFlickrTagNameKey];
+	[info AE_setObject:set forKey:PGFlickrSetNameKey];
 	return PGMatchByIntrinsicAttribute + 700;
 }
 
@@ -82,137 +110,106 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 }
 - (void)loadDidReceiveResponse:(PGURLLoad *)sender
 {
-	if(sender != _sizeLoad && sender != _infoLoad) return;
+	if(sender != _load) return;
 	NSHTTPURLResponse *const resp = (NSHTTPURLResponse *)[sender response];
 	if(![@"text/xml" isEqualToString:[resp MIMEType]]) {
-		[_sizeLoad cancelAndNotify:NO];
-		[_infoLoad cancelAndNotify:NO];
+		[_load cancelAndNotify:NO];
 		[[self node] loadFinished];
 	} else if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] > 300)) {
-		[_sizeLoad cancelAndNotify:NO];
-		[_infoLoad cancelAndNotify:NO];
+		[_load cancelAndNotify:NO];
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 	}
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {
-	if(![_sizeLoad loaded] || ![_infoLoad loaded]) return;
-	NSURL *const URL = [[self info] objectForKey:PGURLKey];
-	[[self identifier] setCustomDisplayName:[[PGFlickrInfoParser parserWithData:[_infoLoad data] baseURL:URL] title] notify:YES];
-	PGFlickrSizeParser *const sizeParser = [PGFlickrSizeParser parserWithData:[_sizeLoad data] baseURL:URL];
-	NSError *const error = [sizeParser error];
+	if(sender != _load) return;
+	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[self info] objectForKey:PGURLKey]];
+	[[self identifier] setCustomDisplayName:[parser title] notify:YES];
+	NSError *const error = [parser error];
 	if(error) [[self node] setError:error];
-	else [[self node] continueLoadWithInfo:[sizeParser info]];
+	else if([parser createsMultipleNodes]) {
+		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
+		[[self node] loadFinished];
+	} else {
+		id const info = [parser info];
+		if(info && [info count]) [[self node] continueLoadWithInfo:info];
+		else [[self node] setError:nil];
+	}
 }
 - (void)loadDidFail:(PGURLLoad *)sender
 {
-	if(sender != _sizeLoad && sender != _infoLoad) return;
-	[_sizeLoad cancelAndNotify:NO];
-	[_infoLoad cancelAndNotify:NO];
+	if(sender != _load) return;
+	[_load cancelAndNotify:NO];
 	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[sender request] URL]] forKey:NSLocalizedDescriptionKey]]];
 }
 - (void)loadDidCancel:(PGURLLoad *)sender
 {
-	if(sender == _sizeLoad || sender == _infoLoad) {
-		[_sizeLoad cancelAndNotify:NO];
-		[_infoLoad cancelAndNotify:NO];
-		[[self node] loadFinished];
-	}
+	if(sender != _load) return;
+	[[self node] loadFinished];
 }
 
 #pragma mark PGLoading Protocol
 
 - (float)loadProgress
 {
-	return ([_sizeLoad loadProgress] + [_infoLoad loadProgress]) / 2.0;
+	return [_load loadProgress];
 }
 
 #pragma mark PGResourceAdapter
 
 - (void)load
 {
-	NSString *const name = [[self info] objectForKey:PGFlickrImageNameKey];
-	if(!name) return [[self node] loadFinished];
-	[_sizeLoad cancelAndNotify:NO];
-	[_sizeLoad release];
-	_sizeLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getSizes&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] parentLoad:self delegate:self];
-	[_infoLoad cancelAndNotify:NO];
-	[_infoLoad release];
-	_infoLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/rest/?method=flickr.photos.getInfo&photo_id=%@&format=rest&api_key=%@", name, PGFlickrAPIKey]]] parentLoad:self delegate:self];
+	[_load cancelAndNotify:NO];
+	[_load release];
+	NSDictionary *const info = [self info];
+	NSMutableString *const URLString = [NSMutableString stringWithFormat:@"http://www.flickr.com/services/rest/?format=rest&api_key=%@", PGFlickrAPIKey];
+	NSString *const photoName = [info objectForKey:PGFlickrPhotoNameKey];
+	if(photoName) [URLString appendFormat:@"&method=flickr.photos.getInfo&photo_id=%@", photoName];
+	else {
+		[URLString appendString:@"&per_page=30&extras=original_format,original_secret&media=photos"];
+		NSString *const setName = [info objectForKey:PGFlickrSetNameKey];
+		if(setName) [URLString appendFormat:@"&method=flickr.photoset.getPhotos&photoset_id=%@", PGFlickrAPIKey, setName];
+		else {
+			NSString *const user = [info objectForKey:PGFlickrUserNameKey];
+			NSString *const group = [info objectForKey:PGFlickrGroupNameKey];
+			NSString *const tag = [info objectForKey:PGFlickrTagNameKey];
+			if(!user && !group && !tag) return [[self node] loadFinished];
+			[URLString appendString:@"&method=flickr.photos.search"];
+			if(user) [URLString appendFormat:@"&user_id=%@", user];
+			if(group) [URLString appendFormat:@"&group_id=%@", group];
+			if(tag) [URLString appendFormat:@"&tags=%@", tag];
+		}
+	}
+	_load = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:URLString]] parentLoad:self delegate:self];
 }
 
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[_sizeLoad cancelAndNotify:NO];
-	[_sizeLoad release];
-	[_infoLoad cancelAndNotify:NO];
-	[_infoLoad release];
+	[_load cancelAndNotify:NO];
+	[_load release];
 	[super dealloc];
 }
 
 @end
 
-@implementation PGFlickrSizeParser
+@implementation PGFlickrPhotoListParser
+
+#pragma mark PGXMLParser
+
++ (BOOL)canParseTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	return [@"/rsp/photos" isEqualToString:p] || [@"/rsp/photoset" isEqualToString:p];
+}
 
 #pragma mark PGXMLParserNodeCreation Protocol
 
 - (BOOL)createsMultipleNodes
 {
-	return NO;
+	return YES;
 }
-
-- (NSString *)URLString
-{
-	return [[_URLString retain] autorelease];
-}
-- (NSString *)errorString
-{
-	return [[_errorString retain] autorelease];
-}
-
-- (id)info
-{
-	return [NSDictionary dictionaryWithObjectsAndKeys:[self URL], PGURLKey, nil];
-}
-
-#pragma mark NSXMLParserDelegateEventAdditions Protocol
-
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
-{
-	if([@"/rsp/sizes/size" isEqualToString:p]) {
-		NSString *const label = [attrs objectForKey:@"label"];
-		static NSArray *sizes = nil;
-		if(!sizes) sizes = [[NSArray alloc] initWithObjects:@"square", @"thumbnail", @"small", @"medium", @"large", @"original", nil];
-		unsigned const size = label ? [sizes indexOfObject:[label lowercaseString]] + 1 : NSNotFound;
-		if(NSNotFound != size && size > _size) {
-			_size = size;
-			[_URLString release];
-			_URLString = [[attrs objectForKey:@"source"] copy];
-		}
-	} else if([@"/rsp/err" isEqualToString:p]) {
-		[_errorString release];
-		_errorString = [[attrs objectForKey:@"msg"] copy];
-	}
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[_URLString release];
-	[_errorString release];
-	[super dealloc];
-}
-
-@end
-
-@implementation PGFlickrInfoParser
-
-#pragma mark PGXMLParserNodeCreation Protocol
-
 - (NSString *)title
 {
 	return [[_title retain] autorelease];
@@ -220,6 +217,86 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 
 #pragma mark PGXMLParser
 
+- (void)beganTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	if([@"/rsp/photoset" isEqualToString:p]) {
+		[_title release];
+		_title = [[attrs objectForKey:@"id"] copy];
+	} else if([@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) [self useSubparser:[[[PGFlickrPhotoParser alloc] init] autorelease]];
+}
+
+#pragma mark NSObject
+
+- (void)dealloc
+{
+	[_title release];
+	[super dealloc];
+}
+
+@end
+
+@implementation PGFlickrPhotoParser
+
+#pragma mark PGXMLParser
+
++ (BOOL)canParseTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	return [@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p] || [@"/rsp/err" isEqualToString:p];
+}
+
+#pragma mark PGXMLParserNodeCreation Protocol
+
+- (BOOL)createsMultipleNodes
+{
+	return NO;
+}
+- (NSString *)title
+{
+	return [[_title retain] autorelease];
+}
+- (NSString *)URLString
+{
+	if(!_farm || !_server || !_id || !_secret) return nil;
+	if(_originalFormat) return [NSString stringWithFormat:@"http://farm%@.static.flickr.com/%@/%@_%@_o.%@", _farm, _server, _id, _secret, _originalFormat];
+	return [NSString stringWithFormat:@"http://farm%@.static.flickr.com/%@/%@_%@.jpg", _farm, _server, _id, _secret];
+}
+- (NSString *)errorString
+{
+	return [[_errorString retain] autorelease];
+}
+
+#pragma mark PGXMLParser
+
+- (void)beganTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	if([@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) {
+		[_farm release];
+		_farm = [@"1" copy]; // The docs don't mention this getting sent.
+		[_server release];
+		_server = [[attrs objectForKey:@"server"] copy];
+		[_id release];
+		_id = [[attrs objectForKey:@"id"] copy];
+		NSString *const originalSecret = [attrs objectForKey:@"originalsecret"];
+		if(originalSecret) {
+			[_secret release];
+			_secret = [originalSecret copy];
+		}
+		NSString *const originalFormat = [attrs objectForKey:@"originalformat"];
+		if(originalFormat) {
+			[_originalFormat release];
+			_originalFormat = [originalFormat copy];
+		}
+		if(!_secret) _secret = [[attrs objectForKey:@"secret"] copy];
+		NSString *const title = [attrs objectForKey:@"title"];
+		if(title) [_title setString:title];
+	} else if([@"/rsp/err" isEqualToString:p]) {
+		[_errorString release];
+		_errorString = [[attrs objectForKey:@"msg"] copy];
+	}
+}
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
 {
 	return [@"/rsp/photo/title" isEqualToString:p] ? _title : [super contentStringForTagPath:p];
@@ -237,6 +314,12 @@ static NSString *const PGFlickrImageNameKey = @"PGFlickrImageName";
 - (void)dealloc
 {
 	[_title release];
+	[_farm release];
+	[_server release];
+	[_id release];
+	[_secret release];
+	[_originalFormat release];
+	[_errorString release];
 	[super dealloc];
 }
 
