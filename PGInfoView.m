@@ -72,6 +72,7 @@ DEALINGS WITH THE SOFTWARE. */
 	if(string == _messageText) return;
 	[_messageText release];
 	_messageText = [string copy];
+	[self setNeedsDisplay:YES];
 	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 

@@ -46,9 +46,9 @@ DEALINGS WITH THE SOFTWARE. */
 	return [[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark Instance Methods
 
-- (void)load
+- (void)createChildren
 {
 	[[self document] setProcessingNodes:YES];
 	NSParameterAssert([self shouldLoad]);
@@ -58,7 +58,6 @@ DEALINGS WITH THE SOFTWARE. */
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];
-		[[self node] loadFinished];
 		return; // Don't go into packages.
 	}
 	NSString *const path = [URL path];
@@ -84,12 +83,19 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[self setUnsortedChildren:newPages presortedOrder:PGUnsorted];
 	[[self document] setProcessingNodes:NO];
+}
+
+#pragma mark PGResourceAdapter
+
+- (void)load
+{
+	[self createChildren];
 	[[self node] loadFinished];
 }
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(![[self identifier] hasTarget]) return [[self node] removeFromDocument];
-	[super noteFileEventDidOccurDirect:flag];
+	if(![[self identifier] hasTarget]) [[self node] removeFromDocument];
+	else if(flag) [self createChildren];
 }
 
 @end

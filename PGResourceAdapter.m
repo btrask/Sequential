@@ -567,10 +567,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-- (void)noteFileEventDidOccurDirect:(BOOL)flag
-{
-	[[self node] startLoadWithInfo:nil];
-}
+- (void)noteFileEventDidOccurDirect:(BOOL)flag {}
 - (void)noteSortOrderDidChange {}
 - (void)noteIsViewableDidChange
 {

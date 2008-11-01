@@ -27,4 +27,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface PGFolderAdapter : PGContainerAdapter
 
+- (void)createChildren;
+
 @end

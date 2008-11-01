@@ -274,10 +274,6 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSEnumerator *const childEnum = [[self sortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) [[child resourceAdapter] addMenuItemsToMenu:menu];
 }
-- (void)noteFileEventDidOccurDirect:(BOOL)flag
-{
-	if(flag) [self loadIfNecessary]; // FIXME: It isn't OK to call -loadIfNecessary outside of PGNode's loading methods. Figure out the right way to do this.
-}
 - (void)noteSortOrderDidChange
 {
 	[_sortedChildren release];
