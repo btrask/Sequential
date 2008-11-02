@@ -165,7 +165,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	if(!rep) return nil;
 	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntValue];
 	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1, MIN(size / originalSize.width, size / originalSize.height))));
+	NSSize s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1, MIN(size / originalSize.width, size / originalSize.height))));
 	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 	if(!thumbRep) return nil;
 	NSGraphicsContext *const ctx = [NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]];
@@ -175,10 +175,13 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	else {
 		NSAffineTransform *const t = [NSAffineTransform transform];
 		[t translateXBy:s.width / 2.0f yBy:s.height / 2.0f];
-		if(PGRotated90CC & orientation) [t rotateByDegrees:90];
+		if(PGRotated90CC & orientation) {
+			s = NSMakeSize(s.height, s.width);
+			[t rotateByDegrees:90];
+		}
 		[t scaleXBy:(PGFlippedHorz & orientation ? -1 : 1) yBy:(PGFlippedVert & orientation ? -1 : 1)];
 		[t concat];
-		[rep drawInRect:PGIntegralRect(NSMakeRect(s.width / -2.0f, s.height / -2.0f, s.width, s.height))];
+		[rep drawInRect:NSMakeRect(s.width / -2.0f, s.height / -2.0f, s.width, s.height)];
 	}
 	[NSGraphicsContext setCurrentContext:nil];
 	return thumbRep;
