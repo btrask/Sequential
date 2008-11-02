@@ -35,7 +35,6 @@ extern NSString *const PGCFBundleTypeMIMETypesKey;
 extern NSString *const PGCFBundleTypeOSTypesKey;
 extern NSString *const PGCFBundleTypeExtensionsKey;
 
-extern NSString *const PGImageDataKey;
 extern NSString *const PGOrientationKey;
 
 enum {

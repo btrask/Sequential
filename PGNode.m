@@ -116,16 +116,15 @@ enum {
 - (NSData *)dataWithInfo:(NSDictionary *)info
             fast:(BOOL)flag
 {
+	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
+	if(data) return data;
 	@synchronized(self) {
-		NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
-		if(data) return data;
 		if([self dataSource] && ![[self dataSource] node:self getData:&data info:info fast:flag]) return nil;
-		if(data) return data;
-		PGResourceIdentifier *const identifier = [self identifier];
-		if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
-		return data;
 	}
-	return nil;
+	if(data) return data;
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+	return data;
 }
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info
 {

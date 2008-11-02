@@ -46,8 +46,7 @@ NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
 NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
-NSString *const PGImageDataKey              = @"PGImageData";
-NSString *const PGOrientationKey            = @"PGOrientation";
+NSString *const PGOrientationKey = @"PGOrientation";
 
 #define PGThumbnailSize 128
 
@@ -162,7 +161,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
                 withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
-	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGImageDataKey]];
+	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGDataKey]];
 	if(!rep) return nil;
 	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntValue];
 	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
@@ -345,10 +344,11 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 }
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
 {
+	NSData *data = nil;
 	@synchronized(self) {
-		return [NSDictionary dictionaryWithObjectsAndKeys:[[self node] dataWithInfo:info fast:NO], PGImageDataKey, [info objectForKey:PGOrientationKey], PGOrientationKey, nil];
+		data = [[self node] dataWithInfo:info fast:NO];
 	}
-	return nil;
+	return [NSDictionary dictionaryWithObjectsAndKeys:data, PGDataKey, [info objectForKey:PGOrientationKey], PGOrientationKey, nil];
 }
 - (void)cancelThumbnailGeneration
 {
