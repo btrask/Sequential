@@ -41,6 +41,7 @@ extern NSSize PGIntegralSize(NSSize s);
 
 extern NSRect PGCenteredSizeInRect(NSSize s, NSRect r);
 extern BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count); // -needsToDrawRect: is broken in 10.3, see hxxp://developer.apple.com/technotes/tn2002/tn2107.html.
+extern NSRect PGIntegralRect(NSRect r); // NSIntegralRect() expands the rectangle in all directions. It's better to round the origin and width separately.
 
 #pragma mark PGRectEdgeMask
 

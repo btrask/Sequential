@@ -28,7 +28,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGBezelPanel.h"
 
 // Other
-#import "PGGeometryTypes.h"
+#import "PGGeometry.h"
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
@@ -145,7 +145,7 @@ DEALINGS WITH THE SOFTWARE. */
           scale:(float)scaleFactor
 {
 	float const scaledPanelSize = scaleFactor * PGAlertViewSize;
-	return NSIntegralRect(NSMakeRect(floorf(NSMidX(aRect) - scaledPanelSize / 2), floorf(MIN(NSMaxY(aRect) - scaledPanelSize - PGAlertMinTopMargin * scaleFactor, NSMinY(aRect) + NSHeight(aRect) * (2.0 / 3.0) - scaledPanelSize / 2)), floorf(scaledPanelSize), floorf(scaledPanelSize)));
+	return PGIntegralRect(NSMakeRect(floorf(NSMidX(aRect) - scaledPanelSize / 2), floorf(MIN(NSMaxY(aRect) - scaledPanelSize - PGAlertMinTopMargin * scaleFactor, NSMinY(aRect) + NSHeight(aRect) * (2.0 / 3.0) - scaledPanelSize / 2)), floorf(scaledPanelSize), floorf(scaledPanelSize)));
 }
 
 #pragma mark NSView

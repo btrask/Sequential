@@ -66,6 +66,10 @@ BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count)
 	while(i--) if(NSIntersectsRect(rect, list[i])) return YES;
 	return NO;
 }
+NSRect PGIntegralRect(NSRect r)
+{
+	return NSMakeRect(roundf(NSMinX(r)), roundf(NSMinY(r)), roundf(NSWidth(r)), roundf(NSHeight(r)));
+}
 
 #pragma mark PGRectEdgeMask
 
