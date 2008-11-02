@@ -26,6 +26,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 @interface NSDate (AEAdditions)
 
+- (BOOL)AE_isAfter:(NSDate *)date;
 - (NSString *)AE_localizedStringWithDateStyle:(CFDateFormatterStyle)dateStyle timeStyle:(CFDateFormatterStyle)timeStyle;
 
 @end

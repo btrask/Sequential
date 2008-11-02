@@ -26,6 +26,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 @implementation NSDate (AEAdditions)
 
+- (BOOL)AE_isAfter:(NSDate *)date
+{
+	return [self earlierDate:date] != self;
+}
 - (NSString *)AE_localizedStringWithDateStyle:(CFDateFormatterStyle)dateStyle
               timeStyle:(CFDateFormatterStyle)timeStyle
 {

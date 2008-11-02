@@ -62,7 +62,7 @@ DEALINGS WITH THE SOFTWARE. */
 	PGOrientation const oldOrientation = _orientation;
 	[PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
 	[_exifEntries retain];
-	if(oldOrientation != _orientation) [self setRealThumbnail:nil];
+	if(oldOrientation != _orientation) [self invalidateThumbnail];
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {

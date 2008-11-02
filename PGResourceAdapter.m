@@ -35,6 +35,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGGeometry.h"
 
 // Categories
+#import "NSDateAdditions.h"
 #import "NSImageRepAdditions.h"
 #import "NSMenuItemAdditions.h"
 #import "NSStringAdditions.h"
@@ -47,6 +48,7 @@ NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
 NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
 NSString *const PGOrientationKey = @"PGOrientation";
+NSString *const PGDateKey        = @"PGDate";
 
 #define PGThumbnailSize 128
 
@@ -202,17 +204,18 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		NSDictionary *const dict = [adapter threaded_thumbnailCreationDictionaryWithInfo:info];
 		Class const class = [adapter class];
 		[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
-		[self performSelectorOnMainThread:@selector(_setRealThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", [class threaded_thumbnailOfSize:PGThumbnailSize withCreationDictionary:dict], @"Thumbnail", nil] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(_setRealThumbnailWithDictionary:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithNonretainedObject:adapter], @"AdapterValue", [class threaded_thumbnailOfSize:PGThumbnailSize withCreationDictionary:dict], @"Thumbnail", [info objectForKey:PGDateKey], PGDateKey, nil] waitUntilDone:NO];
 		[pool release];
 	}
 }
 + (void)_setRealThumbnailWithDictionary:(NSDictionary *)aDict
 {
 	PGResourceAdapter *const adapter = [[aDict objectForKey:@"AdapterValue"] nonretainedObjectValue];
-	if(![PGAdaptersWaitingForThumbnails containsObject:adapter]) return;
-	[PGAdaptersWaitingForThumbnails removeObject:adapter];
+	unsigned const i = [PGAdaptersWaitingForThumbnails indexOfObject:adapter];
+	if(NSNotFound == i) return;
+	[PGAdaptersWaitingForThumbnails removeObjectAtIndex:i];
 	NSImage *const thumbnail = [aDict objectForKey:@"Thumbnail"];
-	if(thumbnail) [adapter setRealThumbnail:thumbnail];
+	if(thumbnail) [adapter setRealThumbnail:thumbnail validAsOf:[aDict objectForKey:PGDateKey]];
 }
 
 #pragma mark Instance Methods
@@ -282,6 +285,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		[PGAdaptersWaitingForThumbnails addObject:self];
 		NSMutableDictionary *const info = [[[self info] mutableCopy] autorelease];
 		[info setObject:[NSNumber numberWithUnsignedInt:[self orientationWithBase:NO]] forKey:PGOrientationKey];
+		[info setObject:[NSDate date] forKey:PGDateKey];
 		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:info];
 	}
 	if(_fastThumbnail) return [[_fastThumbnail retain] autorelease];
@@ -330,16 +334,20 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return [[_realThumbnail retain] autorelease];
 }
 - (void)setRealThumbnail:(NSImage *)anImage
+        validAsOf:(NSDate *)date
 {
 	if(anImage == _realThumbnail) return;
+	if(date && _lastThumbnailInvalidation && [_lastThumbnailInvalidation AE_isAfter:date]) {
+		(void)[self thumbnail];
+		return;
+	}
 	[_realThumbnail release];
 	_realThumbnail = [anImage retain];
 	if(anImage) {
 		[_fastThumbnail release];
 		_fastThumbnail = nil;
 	}
-	if(anImage || ![self canGenerateRealThumbnail]) [[self document] noteNodeThumbnailDidChange:[self node] children:NO];
-	else (void)[self thumbnail];
+	[[self document] noteNodeThumbnailDidChange:[self node] children:NO];
 }
 - (BOOL)canGenerateRealThumbnail
 {
@@ -363,6 +371,15 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		[PGInfoDictionaries removeObjectAtIndex:i];
 	}
 	[PGThumbnailsNeededLock unlockWithCondition:!![PGAdaptersThatRequestedThumbnails count]];
+}
+- (void)invalidateThumbnail
+{
+	if(![self canGenerateRealThumbnail]) return;
+	[_realThumbnail release];
+	_realThumbnail = nil;
+	[_lastThumbnailInvalidation release];
+	_lastThumbnailInvalidation = [[NSDate alloc] init];
+	(void)[self thumbnail];
 }
 
 #pragma mark -
@@ -638,6 +655,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[_info release];
 	[_fastThumbnail release];
 	[_realThumbnail release];
+	[_lastThumbnailInvalidation release];
 	[_subloads release];
 	[super dealloc];
 }

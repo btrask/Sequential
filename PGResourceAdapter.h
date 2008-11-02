@@ -56,6 +56,7 @@ typedef unsigned PGMatchPriority;
 	NSMutableDictionary *_info;
 	NSImage             *_fastThumbnail;
 	NSImage             *_realThumbnail;
+	NSDate              *_lastThumbnailInvalidation;
 	NSMutableArray      *_subloads;
 }
 
@@ -83,10 +84,11 @@ typedef unsigned PGMatchPriority;
 - (NSImage *)thumbnail;
 - (NSImage *)fastThumbnail;
 - (NSImage *)realThumbnail;
-- (void)setRealThumbnail:(NSImage *)anImage;
+- (void)setRealThumbnail:(NSImage *)anImage validAsOf:(NSDate *)date;
 - (BOOL)canGenerateRealThumbnail;
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info;
 - (void)cancelThumbnailGeneration;
+- (void)invalidateThumbnail;
 
 - (void)noteResourceDidChange;
 
