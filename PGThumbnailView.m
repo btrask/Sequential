@@ -337,6 +337,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 
 - (void)dealloc
 {
+	[self removeAllToolTips];
 	[_representedObject release];
 	[_items release];
 	[_selection release];
