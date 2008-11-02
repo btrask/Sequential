@@ -477,7 +477,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(scroll) [[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
 	_immediatePosition = newPosition;
-	[self setBoundsOrigin:NSMakePoint(floorf(_immediatePosition.x), floorf(_immediatePosition.y))];
+	[self setBoundsOrigin:NSMakePoint(roundf(_immediatePosition.x), roundf(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	if(PGNotDragging == _dragMode && !_scrollTimer) [self PG_viewDidScrollInClipView:self];
 	return YES;

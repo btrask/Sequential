@@ -285,7 +285,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	}
 	[nilShadow set];
 
-	float top = floorf(NSMinY(aRect) / 9) * 9 - 3.0f;
+	float top = roundf(NSMinY(aRect) / 9) * 9 - 3.0f;
 	for(; top < NSMaxY(aRect); top += 9) {
 		[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
 		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(3, top + 1, 6, 6) cornerRadius:1] fill];

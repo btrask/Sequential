@@ -145,7 +145,7 @@ DEALINGS WITH THE SOFTWARE. */
           scale:(float)scaleFactor
 {
 	float const scaledPanelSize = scaleFactor * PGAlertViewSize;
-	return PGIntegralRect(NSMakeRect(floorf(NSMidX(aRect) - scaledPanelSize / 2), floorf(MIN(NSMaxY(aRect) - scaledPanelSize - PGAlertMinTopMargin * scaleFactor, NSMinY(aRect) + NSHeight(aRect) * (2.0 / 3.0) - scaledPanelSize / 2)), floorf(scaledPanelSize), floorf(scaledPanelSize)));
+	return PGIntegralRect(NSMakeRect(NSMidX(aRect) - scaledPanelSize / 2, MIN(NSMaxY(aRect) - scaledPanelSize - PGAlertMinTopMargin * scaleFactor, NSMinY(aRect) + NSHeight(aRect) * (2.0 / 3.0) - scaledPanelSize / 2), scaledPanelSize, scaledPanelSize));
 }
 
 #pragma mark NSView
