@@ -613,6 +613,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_thumbnailPanel displayOverWindow:[self window]];
 		[[_thumbnailPanel content] reloadData];
 		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
+		[self thumbnailPanelFrameDidChange:nil];
 		NSEnableScreenUpdates();
 	} else {
 		[self thumbnailPanelFrameDidChange:nil];
@@ -648,33 +649,28 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif
 {
 	NSDisableScreenUpdates();
+	PGInset inset = PGZeroInset;
+	NSSize minSize = NSMakeSize(PGWindowMinSize, PGWindowMinSize);
 	if([self shouldShowThumbnails]) {
 		float const panelWidth = NSWidth([_thumbnailPanel frame]);
-		NSWindow *const w = [self window];
-		[w setMinSize:NSMakeSize(PGWindowMinSize + panelWidth, PGWindowMinSize)];
-		NSRect currentFrame = [w frame];
-		if(NSWidth(currentFrame) < PGWindowMinSize + panelWidth) {
-			currentFrame.size.width = PGWindowMinSize + panelWidth;
-			[w setFrame:currentFrame display:YES];
-		}
-		PGInset const inset = PGMakeInset(panelWidth, 0, 0, 0);
-		[clipView setBoundsInset:inset];
-		[_findPanel setFrameInset:inset];
-		[_graphicPanel setFrameInset:inset];
-		[self _updateImageViewSizeAllowAnimation:NO];
-		[self documentReadingDirectionDidChange:nil];
-		[_findPanel updateFrameDisplay:YES];
-		[_graphicPanel updateFrameDisplay:YES];
-	} else {
-		[clipView setBoundsInset:PGZeroInset];
-		[_findPanel setFrameInset:PGZeroInset];
-		[_graphicPanel setFrameInset:PGZeroInset];
-		[self _updateImageViewSizeAllowAnimation:NO];
-		[_findPanel updateFrameDisplay:YES];
-		[_graphicPanel updateFrameDisplay:YES];
-		[self documentReadingDirectionDidChange:nil];
-		[[self window] setMinSize:NSMakeSize(PGWindowMinSize, PGWindowMinSize)];
+		minSize.width += panelWidth;
+		inset.minX += panelWidth;
 	}
+	[clipView setBoundsInset:inset];
+	[clipView displayIfNeeded];
+	[_findPanel setFrameInset:inset];
+	[_graphicPanel setFrameInset:inset];
+	[self _updateImageViewSizeAllowAnimation:NO];
+	[self documentReadingDirectionDidChange:nil];
+	[_findPanel updateFrameDisplay:YES];
+	[_graphicPanel updateFrameDisplay:YES];
+	NSWindow *const w = [self window];
+	NSRect currentFrame = [w frame];
+	if(NSWidth(currentFrame) < minSize.width) {
+		currentFrame.size.width = minSize.width;
+		[w setFrame:currentFrame display:YES];
+	}
+	[w setMinSize:minSize];
 	NSEnableScreenUpdates();
 }
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
