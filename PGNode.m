@@ -53,9 +53,7 @@ enum {
 	PGNodeNothing               = 0,
 	PGNodeLoading               = 1 << 0,
 	PGNodeReading               = 1 << 1,
-	PGNodeThumbnailing          = 1 << 2,
-	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading,
-	PGNodeLoadingOrThumbnailing = PGNodeLoading | PGNodeThumbnailing
+	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading
 }; // PGNodeStatus.
 
 @interface PGNode (Private)
@@ -182,10 +180,7 @@ enum {
 	[self noteIsViewableDidChange];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
-	if(PGNodeThumbnailing & _status) {
-		_status &= ~PGNodeThumbnailing;
-		[[self document] noteNodeThumbnailDidChange:self children:NO];
-	}
+	[[self document] noteNodeThumbnailDidChange:self children:NO];
 }
 
 #pragma mark -
@@ -242,12 +237,7 @@ enum {
 
 - (NSImage *)thumbnail
 {
-	if(PGNodeLoading & _status) {
-		_status |= PGNodeThumbnailing;
-		return nil;
-	}
-	_status &= ~PGNodeThumbnailing;
-	return [[self resourceAdapter] thumbnail];
+	return PGNodeLoading & _status ? nil : [[self resourceAdapter] thumbnail];
 }
 
 #pragma mark -
