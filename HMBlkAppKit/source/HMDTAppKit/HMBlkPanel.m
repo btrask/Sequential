@@ -56,17 +56,6 @@ POSSIBILITY OF SUCH DAMAGE.
 	return _majorGridColor;
 }
 
-#pragma mark Instance Methods
-
-- (void)addMouseMoveListener:(id)listener
-{
-	[_mouseMoveListeners addObject:listener];
-}
-- (void)removeMouseMoveListener:(id)listener
-{
-	[_mouseMoveListeners removeObject:listener];
-}
-
 #pragma mark NSNibAwaking Protocol
 
 - (void)awakeFromNib
@@ -80,7 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 - (BOOL)isResizable
 {
-	return _resizable;
+	return !!(NSWindowZoomButton & [self styleMask]);
 }
 
 #pragma mark HMAdditions Protocol
@@ -116,9 +105,6 @@ POSSIBILITY OF SUCH DAMAGE.
       defer:(BOOL)flag
 {
 	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:backingType defer:flag];
-
-	_resizable = !!(NSWindowZoomButton & styleMask);
-	_mouseMoveListeners = [[NSMutableSet set] retain];
 
 	[self setLevel:NSFloatingWindowLevel];
 	[self setOpaque:NO];
@@ -199,7 +185,6 @@ POSSIBILITY OF SUCH DAMAGE.
 {
 	[_blkContentView release];
 	[_closeButton release];
-	[_mouseMoveListeners release];
 	[super dealloc];
 }
 

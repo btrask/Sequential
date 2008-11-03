@@ -609,6 +609,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		PGNode *const node = [self activeNode];
 		[[_thumbnailPanel content] setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
 		[self thumbnailPanelFrameDidChange:nil];
+		[[_thumbnailPanel content] displayIfNeeded];
 		NSEnableScreenUpdates();
 	} else {
 		[self thumbnailPanelFrameDidChange:nil];

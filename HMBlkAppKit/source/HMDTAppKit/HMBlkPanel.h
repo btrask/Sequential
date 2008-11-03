@@ -32,16 +32,11 @@ POSSIBILITY OF SUCH DAMAGE.
 {
 	HMBlkContentView *_blkContentView;
 	NSButton         *_closeButton;
-	BOOL              _resizable;
-	NSMutableSet     *_mouseMoveListeners;
 }
 
 + (NSImage *)contentBackgroundImage;
 + (NSColor*)highlightColorForView:(NSView *)view;
 + (NSArray *)alternatingRowBackgroundColors;
 + (NSColor *)majorGridColor;
-
-- (void)addMouseMoveListener:(id)listener;
-- (void)removeMouseMoveListener:(id)listener;
 
 @end
