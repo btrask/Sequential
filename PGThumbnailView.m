@@ -306,6 +306,14 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	[self sizeToFit];
 }
+- (void)viewWillMoveToWindow:(NSWindow *)newWindow
+{
+	[self removeAllToolTips];
+}
+- (void)viewWillMoveToSuperview:(NSView *)newSuperview
+{
+	[self removeAllToolTips];
+}
 
 #pragma mark NSResponder
 
@@ -337,7 +345,6 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 
 - (void)dealloc
 {
-	[self removeAllToolTips];
 	[_representedObject release];
 	[_items release];
 	[_selection release];
