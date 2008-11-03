@@ -274,15 +274,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
 	if(!_cache || !_rep || [self canAnimateRep]) return;
-	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-	if(NSEqualSizes(pixelSize, _immediateSize) && !_isPDF && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData])) return;
 	if(_cacheIsValid) {
 		_cacheIsValid = NO;
 		[_image removeRepresentation:_cache];
 	} else [_image removeRepresentation:_rep];
+	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) {
+	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer || (NSEqualSizes(pixelSize, _immediateSize) && !_isPDF && PGUpright == _orientation && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData]))) {
 		_cacheIsOutOfDate = YES;
 		return;
 	}
