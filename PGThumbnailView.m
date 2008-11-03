@@ -306,14 +306,6 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	[self sizeToFit];
 }
-- (void)viewWillMoveToWindow:(NSWindow *)newWindow
-{
-	[self removeAllToolTips];
-}
-- (void)viewWillMoveToSuperview:(NSView *)newSuperview
-{
-	[self removeAllToolTips];
-}
 
 #pragma mark NSResponder
 

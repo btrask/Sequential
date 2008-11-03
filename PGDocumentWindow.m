@@ -36,14 +36,14 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	NSDragOperation const op = [[self delegate] window:self dragOperationForInfo:sender];
 	if(NSDragOperationNone == op) return NSDragOperationNone;
-	fDragHighlightPanel = [[PGDragHighlightView PG_bezelPanel] retain];
-	[fDragHighlightPanel displayOverWindow:self];
+	_dragHighlightPanel = [[PGDragHighlightView PG_bezelPanel] retain];
+	[_dragHighlightPanel displayOverWindow:self];
 	return op;
 }
 - (void)draggingExited:(id<NSDraggingInfo>)sender
 {
-	[[fDragHighlightPanel autorelease] fadeOut];
-	fDragHighlightPanel = nil;
+	[[_dragHighlightPanel autorelease] fadeOut];
+	_dragHighlightPanel = nil;
 }
 
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
@@ -56,7 +56,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[self draggingExited:nil]; // Just in case.
 }
 
-#pragma mark -
+#pragma mark NSKeyboardUI Protocol
 
 - (void)selectKeyViewFollowingView:(NSView *)aView
 {
@@ -73,7 +73,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)dealloc
 {
-	[fDragHighlightPanel release];
+	[_dragHighlightPanel release];
 	[super dealloc];
 }
 

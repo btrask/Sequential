@@ -30,7 +30,7 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGDocumentWindow : NSWindow
 {
 	@private
-	PGBezelPanel *fDragHighlightPanel;
+	PGBezelPanel *_dragHighlightPanel;
 }
 
 @end

@@ -56,6 +56,13 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	[[self delegate] closeWindowContent:self];
 }
+- (void)close
+{
+	NSWindow *childWindow;
+	NSEnumerator *const childWindowEnum = [[self childWindows] objectEnumerator];
+	while((childWindow = [childWindowEnum nextObject])) [self removeChildWindow:childWindow];
+	[super close];
+}
 
 #pragma mark -
 

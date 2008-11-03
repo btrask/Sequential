@@ -43,7 +43,10 @@ DEALINGS WITH THE SOFTWARE. */
       storage:(id)storage
 {
 	if((self = [super init])) {
-		NSParameterAssert(target);
+		if(!target) {
+			[self release];
+			return nil;
+		}
 		NSParameterAssert(class);
 		NSParameterAssert(storage);
 		_target = target;
@@ -92,6 +95,7 @@ DEALINGS WITH THE SOFTWARE. */
       allow:(BOOL)flag
       withStorage:(id)storage
 {
+	if(!target) return nil;
 	NSParameterAssert(storage);
 	if(flag) {
 		@synchronized(storage) {
