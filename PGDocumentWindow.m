@@ -69,6 +69,18 @@ DEALINGS WITH THE SOFTWARE. */
 	[super selectKeyViewPrecedingView:aView];
 }
 
+#pragma mark NSWindow
+
+- (void)close
+{
+	NSDisableScreenUpdates();
+	NSWindow *childWindow;
+	NSEnumerator *const childWindowEnum = [[self childWindows] objectEnumerator];
+	while((childWindow = [childWindowEnum nextObject])) [childWindow close];
+	[super close];
+	NSEnableScreenUpdates();
+}
+
 #pragma mark NSObject
 
 - (void)dealloc
