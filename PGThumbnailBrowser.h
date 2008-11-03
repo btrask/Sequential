@@ -31,8 +31,9 @@ DEALINGS WITH THE SOFTWARE. */
 @interface PGThumbnailBrowser : PGColumnView
 {
 	@private
-	IBOutlet id                 dataSource;
-	IBOutlet id                 delegate;
+	IBOutlet id        dataSource;
+	IBOutlet id        delegate;
+	         unsigned _updateCount;
 }
 
 - (id)dataSource;
@@ -41,11 +42,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)setDelegate:(id)obj;
 
 - (NSSet *)selection;
-- (void)setSelection:(NSSet *)items;
-- (void)setSelectedItem:(id)item;
-
-- (void)reloadData;
-- (void)reloadItem:(id)item reloadChildren:(BOOL)flag;
+- (void)setSelection:(NSSet *)aSet reload:(BOOL)flag;
+- (void)redisplayItem:(id)item children:(BOOL)flag;
 
 @end
 

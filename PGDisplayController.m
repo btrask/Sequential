@@ -586,17 +586,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	} else if([self activeNode] == node) {
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
-	[self documentShowsInfoDidChange:nil];
+	[self _noteViewableNodeCountDidChange];
 	[self _updateNodeIndex];
-	if(![self shouldShowThumbnails] != ![_thumbnailPanel isVisible]) [self documentShowsThumbnailsDidChange:nil]; // Show or hide it.
-	else if([self shouldShowThumbnails]) {
-		[[_thumbnailPanel content] reloadItem:[node parentNode] reloadChildren:YES];
-		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
-	}
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	if([self shouldShowThumbnails]) [[_thumbnailPanel content] reloadItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] reloadChildren:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
 }
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
@@ -611,8 +606,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([self shouldShowThumbnails]) {
 		NSDisableScreenUpdates();
 		[_thumbnailPanel displayOverWindow:[self window]];
-		[[_thumbnailPanel content] reloadData];
-		[[_thumbnailPanel content] setSelectedItem:[self activeNode]];
+		PGNode *const node = [self activeNode];
+		[[_thumbnailPanel content] setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
 		[self thumbnailPanelFrameDidChange:nil];
 		NSEnableScreenUpdates();
 	} else {
@@ -701,7 +696,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
-	if([self shouldShowThumbnails]) [[_thumbnailPanel content] setSelectedItem:aNode];
+	if([self shouldShowThumbnails]) [[_thumbnailPanel content] setSelection:(aNode ? [NSSet setWithObject:aNode] : nil) reload:NO];
 	return YES;
 }
 - (void)_readActiveNode

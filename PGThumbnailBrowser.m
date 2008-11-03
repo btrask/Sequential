@@ -81,59 +81,52 @@ DEALINGS WITH THE SOFTWARE. */
 	id const item = [lastView representedObject];
 	return item ? [NSSet setWithObject:item] : nil;
 }
-- (void)setSelection:(NSSet *)items
+- (void)setSelection:(NSSet *)aSet
+        reload:(BOOL)flag
 {
-	if(![self numberOfColumns]) [self _addColumnWithItem:nil];
-	if(![items count]) {
-		[self removeColumnsAfterView:[self viewAtIndex:0]];
-		return;
-	}
-	NSDisableScreenUpdates();
-	id ancestor = [items anyObject];
+	++_updateCount;
+	unsigned const initialNumberOfColumns = [self numberOfColumns];
+	if(!initialNumberOfColumns) [self _addColumnWithItem:nil];
+	else if(flag) [[self viewAtIndex:0] reloadData];
+
 	NSMutableArray *const path = [NSMutableArray array];
-	do {
-		ancestor = [[self dataSource] thumbnailBrowser:self parentOfItem:ancestor];
-		unsigned const i = [self indexOfColumnForItem:ancestor];
-		if(NSNotFound != i) {
-			[self removeColumnsAfterView:[self viewAtIndex:i]];
-			break;
-		}
-		[path addObject:ancestor];
-	} while(ancestor);
-	id pathItem;
-	NSEnumerator *const pathItemEnum = [path reverseObjectEnumerator];
-	while((pathItem = [pathItemEnum nextObject])) {
-		[[self lastView] setSelection:[NSSet setWithObject:pathItem]];
-		NSParameterAssert([[self lastView] representedObject] == pathItem);
-	}
-	[[self lastView] setSelection:items];
-	NSEnableScreenUpdates();
-	[self scrollToLastColumnAnimate:NO];
-}
-- (void)setSelectedItem:(id)item
-{
-	[self setSelection:(item ? [NSSet setWithObject:item] : nil)];
-}
+	id obj = [aSet anyObject];
+	while((obj = [[self dataSource] thumbnailBrowser:self parentOfItem:obj])) [path insertObject:obj atIndex:0];
 
-#pragma mark -
-
-- (void)reloadData
-{
-	if(![self numberOfColumns]) return [self _addColumnWithItem:nil];
-	NSDisableScreenUpdates();
 	unsigned i = 0;
-	for(; i < [self numberOfColumns]; i++) [[self viewAtIndex:i] reloadData];
-	NSEnableScreenUpdates();
+	for(; i < [path count]; i++) {
+		PGThumbnailView *const view = [self viewAtIndex:i];
+		id const item = [path objectAtIndex:i];
+		NSParameterAssert([[self dataSource] thumbnailBrowser:self itemCanHaveChildren:item]);
+		[view setSelection:[NSSet setWithObject:item]];
+		if(i + 1 < [self numberOfColumns]) {
+			PGThumbnailView *const nextView = [self viewAtIndex:i + 1];
+			if([nextView representedObject] != item || flag) {
+				[nextView setRepresentedObject:item];
+				[nextView reloadData];
+			}
+		} else [self _addColumnWithItem:item];
+	}
+
+	PGThumbnailView *const lastView = [self viewAtIndex:i];
+	[self removeColumnsAfterView:lastView];
+	if([lastView representedObject] == [path lastObject]) [lastView setSelection:aSet];
+
+	--_updateCount;
+	if(MIN(initialNumberOfColumns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
-- (void)reloadItem:(id)item
-        reloadChildren:(BOOL)flag
+- (void)redisplayItem:(id)item
+        children:(BOOL)flag
 {
+	id const parent = [[self dataSource] thumbnailBrowser:self parentOfItem:item];
 	PGThumbnailView *view;
 	NSEnumerator *const viewEnum = [[self views] objectEnumerator];
 	while((view = [viewEnum nextObject])) {
-		unsigned const i = [[view items] indexOfObjectIdenticalTo:item];
-		if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
-		else if(flag && [view representedObject] == item) [view reloadData];
+		id const rep = [view representedObject];
+		if(rep == parent) {
+			unsigned const i = [[view items] indexOfObject:item];
+			if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
+		} else if(flag && rep == item) [view setNeedsDisplay:YES];
 	}
 }
 
@@ -155,6 +148,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
+	if(_updateCount) return;
 	NSSet *const newSelection = [sender selection];
 	id const selectedItem = [newSelection anyObject];
 	if([newSelection count] != 1 || (dataSource && ![dataSource thumbnailBrowser:self itemCanHaveChildren:selectedItem])) {
@@ -193,13 +187,13 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	unsigned const columns = [self numberOfColumns];
 	[super insertColumnWithView:aView atIndex:index];
-	if(MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!_updateCount && MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 - (void)removeColumnsAfterView:(NSView *)aView
 {
 	unsigned const columns = [self numberOfColumns];
 	[super removeColumnsAfterView:aView];
-	if(MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!_updateCount && MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 
 @end
