@@ -44,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[NSBezierPath setDefaultLineCapStyle:NSRoundLineCapStyle];
 	unsigned i = 0;
 	for(; i < 12; i++) {
-		[[NSColor colorWithDeviceWhite:1 alpha:(petal < 0 ? 0.75f : ((petal + i) % 12) / -12.0f + 1)] set];
+		[[NSColor colorWithDeviceWhite:1 alpha:(petal < 0 ? 0.1f : ((petal + i) % 12) / -12.0f + 1)] set];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2 * i / 12) * NSWidth(r) / 4, NSMidY(r) + sinf(pi * 2 * i / 12) * NSHeight(r) / 4) toPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2 * i / 12) * NSWidth(r) / 2, NSMidY(r) + sinf(pi * 2 * i / 12) * NSHeight(r) / 2)];
 	}
 	[NSBezierPath setDefaultLineWidth:1];
