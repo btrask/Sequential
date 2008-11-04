@@ -38,7 +38,6 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGActivityPanelController;
 
 extern NSString *const PGAntialiasWhenUpscalingKey;
-extern NSString *const PGAnimatesImagesKey;
 extern NSString *const PGRoundsImageCornersKey;
 extern NSString *const PGAutozoomsWindowsKey;
 extern NSString *const PGOnlyAutozoomsSingleImagesKey;

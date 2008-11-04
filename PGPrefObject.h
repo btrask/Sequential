@@ -32,6 +32,7 @@ extern NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification;
 extern NSString *const PGPrefObjectReadingDirectionDidChangeNotification;
 extern NSString *const PGPrefObjectImageScaleDidChangeNotification;
 extern NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification;
+extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
 
 enum {
@@ -80,6 +81,7 @@ typedef int PGSortOrder;
 	PGImageScalingMode       _imageScalingMode;
 	float                    _imageScaleFactor;
 	PGImageScalingConstraint _imageScalingConstraint;
+	BOOL                     _animatesImages;
 	PGSortOrder              _sortOrder;
 }
 
@@ -99,6 +101,9 @@ typedef int PGSortOrder;
 - (void)setImageScaleFactor:(float)aFloat;
 - (PGImageScalingConstraint)imageScalingConstraint;
 - (void)setImageScalingConstraint:(PGImageScalingConstraint)flag;
+
+- (BOOL)animatesImages;
+- (void)setAnimatesImages:(BOOL)flag;
 
 - (PGSortOrder)sortOrder;
 - (void)setSortOrder:(PGSortOrder)anOrder;

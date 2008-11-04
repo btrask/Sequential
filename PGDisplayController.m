@@ -318,10 +318,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
 	}
 	if(flag && !document && _activeDocument) {
 		_activeDocument = nil;
@@ -337,10 +339,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
+
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
+	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
 	[self setTimerInterval:0];
 	if(_activeDocument) {
 		NSDisableScreenUpdates();
@@ -593,6 +597,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if([self shouldShowThumbnails]) [[_thumbnailPanel content] redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
 }
+- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
+{
+	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES]]];
+}
+
+#pragma mark -
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif
 {
@@ -635,9 +645,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[self _updateImageViewSizeAllowAnimation:YES];
 }
-- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
+- (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif
 {
-	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES]]];
+	[_imageView setAnimates:[[self activeDocument] animatesImages]];
 }
 
 #pragma mark -
@@ -679,14 +689,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_setImageView:(PGImageView *)aView
 {
 	if(aView == _imageView) return;
-	[_imageView unbind:@"animates"];
 	[_imageView unbind:@"antialiasWhenUpscaling"];
 	[_imageView unbind:@"drawsRoundedCorners"];
 	[_imageView release];
 	_imageView = [aView retain];
-	[_imageView bind:@"animates" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAnimatesImagesKey options:nil];
 	[_imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
 	[_imageView bind:@"drawsRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
+	[self documentAnimatesImagesDidChange:nil];
 }
 - (BOOL)_setActiveNode:(PGNode *)aNode
 {
@@ -989,6 +998,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKeyEscape: return [d performEscapeKeyAction];
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
+		case PGKeySpace:
+		{
+			if(![_imageView canAnimateRep]) return NO;
+			[[self activeDocument] setAnimatesImages:![[self activeDocument] animatesImages]];
+			return YES;
+		}
 	} else if(NSCommandKeyMask == modifiers) switch(keyCode) {
 		case PGKeyI: return [d performToggleInfo];
 	}

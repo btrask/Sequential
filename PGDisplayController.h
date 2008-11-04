@@ -161,11 +161,13 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif;
+- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
+
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif;
 - (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
-- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
+- (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif;
 
 - (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif;
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;

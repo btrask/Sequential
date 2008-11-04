@@ -692,6 +692,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			return [self arrowKeyDown:anEvent];
 #endif
 
+		case PGKeyN:
 		case PGKeySpace: return [self magicPanForward:forward acrossFirst:YES];
 		case PGKeyV: return [self magicPanForward:forward acrossFirst:NO];
 		case PGKeyB: return [self magicPanForward:NO acrossFirst:YES];

@@ -57,7 +57,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSUserDefaultsAdditions.h"
 
 NSString *const PGAntialiasWhenUpscalingKey    = @"PGAntialiasWhenUpscaling";
-NSString *const PGAnimatesImagesKey            = @"PGAnimatesImages";
 NSString *const PGRoundsImageCornersKey        = @"PGRoundsImageCorners";
 NSString *const PGAutozoomsWindowsKey          = @"PGAutozoomsWindows";
 NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
@@ -118,7 +117,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	NSNumber *const yes = [NSNumber numberWithBool:YES], *no = [NSNumber numberWithBool:NO];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		yes, PGAntialiasWhenUpscalingKey,
-		yes, PGAnimatesImagesKey,
 		yes, PGRoundsImageCornersKey,
 		yes, PGAutozoomsWindowsKey,
 		yes, PGOnlyAutozoomsSingleImagesKey,

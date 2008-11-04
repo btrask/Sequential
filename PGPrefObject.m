@@ -32,6 +32,7 @@ NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification     = @"PGPrefO
 NSString *const PGPrefObjectReadingDirectionDidChangeNotification    = @"PGPrefObjectReadingDirectionDidChange";
 NSString *const PGPrefObjectImageScaleDidChangeNotification          = @"PGPrefObjectImageScaleDidChange";
 NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification = @"PGPrefObjectUpscalesToFitScreenDidChange";
+NSString *const PGPrefObjectAnimatesImagesDidChangeNotification      = @"PGPrefObjectAnimatesImagesDidChange";
 NSString *const PGPrefObjectSortOrderDidChangeNotification           = @"PGPrefObjectSortOrderDidChange";
 
 static NSString *const PGShowsInfoKey                   = @"PGShowsInfo";
@@ -40,6 +41,7 @@ static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRi
 static NSString *const PGImageScalingModeKey            = @"PGImageScalingMode";
 static NSString *const PGImageScaleFactorKey            = @"PGImageScaleFactor";
 static NSString *const PGImageScalingConstraintKey      = @"PGImageScalingConstraint";
+static NSString *const PGAnimatesImagesKey              = @"PGAnimatesImages";
 static NSString *const PGSortOrderKey                   = @"PGSortOrder2";
 static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Deprecated after 1.3.2.
 
@@ -66,6 +68,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 		[NSNumber numberWithInt:PGConstantFactorScaling], PGImageScalingModeKey,
 		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
 		[NSNumber numberWithInt:PGScaleFreely], PGImageScalingConstraintKey,
+		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
 		[NSNumber numberWithInt:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
 		nil]];
 }
@@ -150,6 +153,20 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 
 #pragma mark -
 
+- (BOOL)animatesImages
+{
+	return _animatesImages;
+}
+- (void)setAnimatesImages:(BOOL)flag
+{
+	if(!flag == !_animatesImages) return;
+	_animatesImages = flag;
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGAnimatesImagesKey];
+	[self AE_postNotificationName:PGPrefObjectAnimatesImagesDidChangeNotification];
+}
+
+#pragma mark -
+
 - (PGSortOrder)sortOrder
 {
 	return _sortOrder;
@@ -177,6 +194,7 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 		_imageScaleFactor = [[d objectForKey:PGImageScaleFactorKey] floatValue];
 		_imageScalingConstraint = [[d objectForKey:PGImageScalingConstraintKey] intValue];
 		if(_imageScalingConstraint < PGDownscale || _imageScalingConstraint > PGUpscale) _imageScalingConstraint = PGDownscale;
+		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
 		_sortOrder = [[d objectForKey:PGSortOrderKey] intValue];
 	}
 	return self;

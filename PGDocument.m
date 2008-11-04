@@ -347,6 +347,11 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[super setImageScalingConstraint:constraint];
 	[[PGPrefObject globalPrefObject] setImageScalingConstraint:constraint];
 }
+- (void)setAnimatesImages:(BOOL)flag
+{
+	[super setAnimatesImages:flag];
+	[[PGPrefObject globalPrefObject] setAnimatesImages:flag];
+}
 - (void)setSortOrder:(PGSortOrder)anOrder
 {
 	if([self sortOrder] != anOrder) {

@@ -36,6 +36,7 @@ enum {
 	PGKeyJ = 38,
 	PGKeyK = 40,
 	PGKeyL = 37,
+	PGKeyN = 45,
 	PGKeyQ = 12,
 	PGKeyR = 15,
 	PGKeyS = 1,
