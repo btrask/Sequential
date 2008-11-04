@@ -44,8 +44,8 @@ DEALINGS WITH THE SOFTWARE. */
 
 	NSCachedImageRep *_cache;
 	BOOL              _usesCaching;
-	BOOL              _cacheIsValid;
-	BOOL              _cacheIsOutOfDate;
+	BOOL              _cached;
+	BOOL              _shouldRecache;
 
 	float             _rotationInDegrees;
 	BOOL              _animates;

@@ -34,7 +34,9 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-#define PGAnimateSizeChanges true
+#define PGAnimateSizeChanges        true
+#define PGWindowServerMaxWindowSize 10000 // Hard limit imposed by the window server
+#define PGDebugDrawingModes         false
 
 @interface PGImageView (Private)
 
@@ -42,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_animate;
 - (BOOL)_drawsRoundedCorners;
 - (void)_cache;
-- (void)_drawInRect:(NSRect)aRect;
+- (void)_drawWithFrame:(NSRect)aRect rects:(NSRect const *)rects count:(unsigned)count;
 - (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
 - (BOOL)_setSize:(NSSize)size;
@@ -84,9 +86,8 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	_orientation = orientation;
 	if(rep != _rep) {
-		[_image removeRepresentation:_rep];
-		_cacheIsValid = NO;
-		[_image removeRepresentation:_cache];
+		[_image removeRepresentation:(_cached ? _cache : _rep)];
+		_cached = NO;
 		[_rep release];
 		_rep = nil;
 		[self setSize:size allowAnimation:NO];
@@ -127,10 +128,7 @@ DEALINGS WITH THE SOFTWARE. */
 	_sizeTransitionTimer = nil;
 	_lastSizeAnimationTime = 0;
 	[self _setSize:_size];
-	if(_cacheIsOutOfDate) {
-		_cacheIsOutOfDate = NO;
-		[self _cache];
-	}
+	if(_shouldRecache) [self _cache];
 	[self setNeedsDisplay:YES];
 }
 - (float)averageScaleFactor
@@ -148,9 +146,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _usesCaching) return;
 	_usesCaching = flag;
-	if(!flag || !_cacheIsOutOfDate) return;
-	_cacheIsOutOfDate = NO;
-	[self _cache];
+	if(flag && _shouldRecache) [self _cache];
 }
 
 #pragma mark -
@@ -273,19 +269,18 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_cache
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
+	_shouldRecache = NO;
 	if(!_cache || !_rep || [self canAnimateRep]) return;
-	if(_cacheIsValid) {
-		_cacheIsValid = NO;
-		[_image removeRepresentation:_cache];
-	} else [_image removeRepresentation:_rep];
+	[_image removeRepresentation:(_cached ? _cache : _rep)];
+	_cached = NO;
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
 	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer || (NSEqualSizes(pixelSize, _immediateSize) && !_isPDF && PGUpright == _orientation && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData]))) {
-		_cacheIsOutOfDate = YES;
+		_shouldRecache = YES;
 		return;
 	}
-	if(_immediateSize.width > 10000 || _immediateSize.height > 10000) return; // 10,000 is a hard limit imposed on window size by the Window Server.
+	if(_immediateSize.width > PGWindowServerMaxWindowSize || _immediateSize.height > PGWindowServerMaxWindowSize) return;
 
 	[_cache setSize:_immediateSize];
 	[_cache setPixelsWide:_immediateSize.width];
@@ -303,16 +298,18 @@ DEALINGS WITH THE SOFTWARE. */
 		[[NSColor whiteColor] set];
 		NSRectFill(cacheRect);
 	}
-	[self _drawInRect:cacheRect];
+	[self _drawWithFrame:cacheRect rects:NULL count:0];
 	[self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
 
 	[_image removeRepresentation:_rep];
 	[_image setSize:_immediateSize];
 	[_image addRepresentation:_cache];
-	_cacheIsValid = YES;
+	_cached = YES;
 }
-- (void)_drawInRect:(NSRect)aRect
+- (void)_drawWithFrame:(NSRect)aRect
+        rects:(NSRect const *)rects
+        count:(unsigned)count
 {
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
@@ -328,7 +325,12 @@ DEALINGS WITH THE SOFTWARE. */
 		[t concat];
 		r.origin = NSMakePoint(NSWidth(r) / -2, NSHeight(r) / -2);
 	}
-	[_rep drawInRect:r];
+	if(count && PGUpright == _orientation) {
+		int i = count;
+		float const sx = [_image size].width / _immediateSize.width;
+		float const sy = [_image size].height / _immediateSize.height;
+		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * sx, NSMinY(rects[i]) * sy, NSWidth(rects[i]) * sx, NSHeight(rects[i]) * sy) operation:NSCompositeCopy fraction:1.0];
+	} else [_image drawInRect:r fromRect:NSZeroRect operation:NSCompositeCopy fraction:1];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (void)_drawCornersOnRect:(NSRect)r
@@ -421,31 +423,32 @@ DEALINGS WITH THE SOFTWARE. */
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
-	BOOL const drawCorners = !_cacheIsValid && [self _drawsRoundedCorners];
+	BOOL const drawCorners = !_cached && [self _drawsRoundedCorners];
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
-	if(_cacheIsValid) {
+	int count = 0;
+	NSRect const *rects = NULL;
+	if(_cached) {
 		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
-		if(deg) [_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
-		else {
-			int count = 0;
-			NSRect const *rects = NULL;
-			[self getRectsBeingDrawn:&rects count:&count];
+		if(deg) {
+			[_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
+			if(PGDebugDrawingModes) [[NSColor purpleColor] set];
+		} else {
+			if(!count) [self getRectsBeingDrawn:&rects count:&count];
 			int i = count;
 			while(i--) [_image drawInRect:rects[i] fromRect:rects[i] operation:operation fraction:1.0];
+			if(PGDebugDrawingModes) [[NSColor redColor] set];
 		}
 	} else {
-		if(_isPDF && ![_rep isOpaque]) {
+		if(!deg && !count) [self getRectsBeingDrawn:&rects count:&count];
+		if(_isPDF && !_cached && ![_rep isOpaque]) {
 			[[NSColor whiteColor] set];
 			if(deg) NSRectFill(b);
-			else {
-				int count = 0;
-				NSRect const *rects = NULL;
-				[self getRectsBeingDrawn:&rects count:&count];
-				NSRectFillList(rects, count);
-			}
+			else NSRectFillList(rects, count);
 		}
-		[self _drawInRect:b];
+		[self _drawWithFrame:b rects:rects count:count];
+		if(PGDebugDrawingModes) [(count ? [NSColor greenColor] : [NSColor blueColor]) set];
 	}
+	if(PGDebugDrawingModes) NSFrameRect(b);
 	if(drawCorners) {
 		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
@@ -459,8 +462,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)viewDidEndLiveResize
 {
 	[super viewDidEndLiveResize];
-	if(!_cacheIsOutOfDate) return;
-	_cacheIsOutOfDate = NO;
+	if(!_shouldRecache) return;
 	[self _cache];
 	[self setNeedsDisplay:YES];
 }
