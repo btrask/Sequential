@@ -43,7 +43,7 @@ DEALINGS WITH THE SOFTWARE. */
 		if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
 		if(!href || [@"" isEqualToString:href]) continue;
 		NSURL *const URL = [NSURL URLWithString:href];
-		if((schemes && ![schemes containsObject:[URL scheme]]) || (exts && ![exts containsObject:[[URL path] pathExtension]])) continue;
+		if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
 		PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 		if([results containsObject:ident]) continue;
 		[ident setCustomDisplayName:[a innerText] notify:NO];
