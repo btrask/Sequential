@@ -69,7 +69,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 - (BOOL)isResizable
 {
-	return !!(NSWindowZoomButton & [self styleMask]);
+	return _resizable;
 }
 
 #pragma mark HMAdditions Protocol
@@ -105,6 +105,7 @@ POSSIBILITY OF SUCH DAMAGE.
       defer:(BOOL)flag
 {
 	self = [super initWithContentRect:contentRect styleMask:NSBorderlessWindowMask backing:backingType defer:flag];
+	_resizable = !!(NSResizableWindowMask & styleMask);
 
 	[self setLevel:NSFloatingWindowLevel];
 	[self setOpaque:NO];

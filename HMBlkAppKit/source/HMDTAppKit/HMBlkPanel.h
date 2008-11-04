@@ -32,6 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 {
 	HMBlkContentView *_blkContentView;
 	NSButton         *_closeButton;
+	BOOL              _resizable;
 }
 
 + (NSImage *)contentBackgroundImage;
