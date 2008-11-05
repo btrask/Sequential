@@ -276,7 +276,7 @@ DEALINGS WITH THE SOFTWARE. */
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer || (NSEqualSizes(pixelSize, _immediateSize) && !_isPDF && PGUpright == _orientation && (![_rep respondsToSelector:@selector(valueForProperty:)] || ![(NSBitmapImageRep *)_rep valueForProperty:NSImageColorSyncProfileData]))) {
+	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) {
 		_shouldRecache = YES;
 		return;
 	}
