@@ -115,11 +115,7 @@
 				<string>id</string>
 				<key>previousTab</key>
 				<string>id</string>
-				<key>revealInBrowser</key>
-				<string>id</string>
-				<key>revealInFinder</key>
-				<string>id</string>
-				<key>revealInPathFinder</key>
+				<key>reveal</key>
 				<string>id</string>
 				<key>revertOrientation</key>
 				<string>id</string>
@@ -355,6 +351,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGThumbnailBrowser</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -367,14 +371,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGColumnView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -429,22 +425,6 @@
 			<string>NSObject</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>activateDocument</key>
@@ -483,9 +463,7 @@
 				<string>id</string>
 				<key>showPreferences</key>
 				<string>id</string>
-				<key>switchToFinder</key>
-				<string>id</string>
-				<key>switchToPathFinder</key>
+				<key>switchToFileManager</key>
 				<string>id</string>
 				<key>toggleActivity</key>
 				<string>id</string>
@@ -504,8 +482,6 @@
 				<string>NSMenu</string>
 				<key>firstPage</key>
 				<string>NSMenuItem</string>
-				<key>fitToView</key>
-				<string>NSMenuItem</string>
 				<key>lastPage</key>
 				<string>NSMenuItem</string>
 				<key>mirrorHorz</key>
@@ -516,20 +492,10 @@
 				<string>NSMenuItem</string>
 				<key>pageMenuItem</key>
 				<string>NSMenuItem</string>
-				<key>precedingRevealItem</key>
-				<string>NSMenuItem</string>
-				<key>precedingSwitchItem</key>
-				<string>NSMenuItem</string>
 				<key>previousPage</key>
 				<string>NSMenuItem</string>
 				<key>recentMenu</key>
 				<string>NSMenu</string>
-				<key>revealInBrowser</key>
-				<string>NSMenuItem</string>
-				<key>revealInFinder</key>
-				<string>NSMenuItem</string>
-				<key>revealInPathFinder</key>
-				<string>NSMenuItem</string>
 				<key>rotate180</key>
 				<string>NSMenuItem</string>
 				<key>rotate270CC</key>
@@ -540,15 +506,9 @@
 				<string>NSMenuItem</string>
 				<key>selectPreviousDocument</key>
 				<string>NSMenuItem</string>
-				<key>switchToFinder</key>
-				<string>NSMenuItem</string>
-				<key>switchToPathFinder</key>
-				<string>NSMenuItem</string>
 				<key>toggleFullscreen</key>
 				<string>NSMenuItem</string>
 				<key>toggleInfo</key>
-				<string>NSMenuItem</string>
-				<key>toggleThumbnails</key>
 				<string>NSMenuItem</string>
 				<key>windowsMenu</key>
 				<string>NSMenu</string>
@@ -561,6 +521,22 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

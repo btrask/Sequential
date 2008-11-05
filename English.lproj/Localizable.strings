@@ -10,6 +10,15 @@
 /* Label for when no image is being displayed in the window. */
 "No image" = "No image";
 
+/* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
+"Reveal in Finder" = "Reveal in Finder";
+"Reveal in Path Finder" = "Reveal in Path Finder";
+"Reveal in Browser" = "Reveal in Browser";
+
+/* Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item. */
+"Switch to Finder" = "Switch to Finder";
+"Switch to Path Finder" = "Switch to Path Finder";
+
 /* Enter/exit full screen. Two states of the same item. */
 "Enter Full Screen" = "Enter Full Screen";
 "Exit Full Screen" = "Exit Full Screen";

@@ -108,17 +108,17 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark Instance Methods
 
-- (IBAction)revealInPathFinder:(id)sender
+- (IBAction)reveal:(id)sender
 {
-	if(![[[[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"Path Finder\"\nactivate\nreveal \"%@\"\nend tell", [[[[self activeNode] identifier] superURLByFollowingAliases:NO] path]]] autorelease] executeAndReturnError:NULL]) NSBeep();
-}
-- (IBAction)revealInFinder:(id)sender
-{
-	if(![[NSWorkspace sharedWorkspace] selectFile:[[[[self activeNode] identifier] superURLByFollowingAliases:NO] path] inFileViewerRootedAtPath:nil]) NSBeep();
-}
-- (IBAction)revealInBrowser:(id)sender
-{
-	if(![[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] identifier] superURLByFollowingAliases:NO]]) NSBeep();
+	NSURL *const URL = [[[self activeDocument] identifier] superURLByFollowingAliases:NO];
+	if([[self activeDocument] isOnline]) {
+		if([[NSWorkspace sharedWorkspace] openURL:URL]) return;
+	} else if([[PGDocumentController sharedDocumentController] pathFinderRunning]) {
+		if([[[[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"Path Finder\"\nactivate\nreveal \"%@\"\nend tell", [URL path]]] autorelease] executeAndReturnError:NULL]) return;
+	} else {
+		if([[NSWorkspace sharedWorkspace] selectFile:[URL path] inFileViewerRootedAtPath:nil]) return;
+	}
+	NSBeep();
 }
 - (IBAction)extractImages:(id)sender
 {
@@ -166,21 +166,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)hideFindPanel:(id)sender
 {
 	[self setFindPanelShown:NO];
-}
-
-#pragma mark -
-
-- (IBAction)toggleFullscreen:(id)sender
-{
-	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
-}
-- (IBAction)toggleInfo:(id)sender
-{
-	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
-}
-- (IBAction)toggleThumbnails:(id)sender
-{
-	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
 
 #pragma mark -
@@ -804,10 +789,26 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 
+#pragma mark PGDisplaying Protocol
+
+- (IBAction)toggleFullscreen:(id)sender
+{
+	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
+}
+- (IBAction)toggleInfo:(id)sender
+{
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
+}
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
+}
+
 #pragma mark NSMenuValidation Protocol
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
+	(void)[[PGDocumentController sharedDocumentController] validateMenuItem:anItem];
 	SEL const action = [anItem action];
 	if(@selector(jumpToPage:) == action) {
 		PGNode *const node = [[anItem representedObject] PG_nonretainedObjectValue];
@@ -817,10 +818,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[anItem setState:state];
 		return [node isViewable] || [anItem submenu];
 	}
+	if(@selector(reveal:) == action && [[self activeDocument] isOnline]) [anItem setTitle:NSLocalizedString(@"Reveal in Browser", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
 	if(![[self activeNode] isViewable]) {
-		if(@selector(revealInPathFinder:) == action) return NO;
-		if(@selector(revealInFinder:) == action) return NO;
-		if(@selector(revealInBrowser:) == action) return NO;
+		if(@selector(reveal:) == action) return NO;
 		if(@selector(pauseDocument:) == action) return NO;
 		if(@selector(pauseAndCloseDocument:) == action) return NO;
 	}

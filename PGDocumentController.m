@@ -25,6 +25,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGDocumentController.h"
 #import <Carbon/Carbon.h>
 #import <sys/resource.h>
+#import <objc/Protocol.h>
 
 // Models
 #import "PGDocument.h"
@@ -70,9 +71,7 @@ static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprec
 static NSString *const PGRecentItemsDeprecatedKey  = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey             = @"PGFullscreen";
 
-static NSString *const PGNSApplicationName         = @"NSApplicationName";
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
-static NSString *const PGFinderApplicationName     = @"Finder";
 
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type)
 {
@@ -89,14 +88,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 @interface PGDocumentController (Private)
 
 - (void)_setFullscreen:(BOOL)flag;
-
-- (void)_setRevealsInBrowser:(BOOL)flag;
 - (void)_setPageMenu:(NSMenu *)aMenu;
-
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
-
-- (void)_applicationLaunched:(NSString *)app;
-- (void)_applicationTerminated:(NSString *)app;
 
 @end
 
@@ -139,26 +132,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[PGPrefController sharedPrefController] showWindow:self];
 }
-
-#pragma mark -
-
-- (IBAction)closeAll:(id)sender
+- (IBAction)switchToFileManager:(id)sender
 {
-	[[_fullscreenController window] close];
-	PGDocument *doc;
-	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
-	while((doc = [docEnum nextObject])) [[[doc displayController] window] performClose:self];
-}
-
-#pragma mark -
-
-- (IBAction)switchToPathFinder:(id)sender
-{
-	if(![[[[NSAppleScript alloc] initWithSource:@"tell application \"Path Finder\" to activate"] autorelease] executeAndReturnError:NULL]) NSBeep();
-}
-- (IBAction)switchToFinder:(id)sender
-{
-	if(![[[[NSAppleScript alloc] initWithSource:@"tell application \"Finder\" to activate"] autorelease] executeAndReturnError:NULL]) NSBeep();
+	if(![[[[NSAppleScript alloc] initWithSource:([self pathFinderRunning] ? @"tell application \"Path Finder\" to activate" : @"tell application \"Finder\" to activate")] autorelease] executeAndReturnError:NULL]) NSBeep();
 }
 
 #pragma mark -
@@ -188,6 +164,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)clearRecentDocuments:(id)sender
 {
 	[self setRecentDocumentIdentifiers:[NSArray array]];
+}
+- (IBAction)closeAll:(id)sender
+{
+	[[_fullscreenController window] close];
+	PGDocument *doc;
+	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
+	while((doc = [docEnum nextObject])) [[[doc displayController] window] performClose:self];
 }
 
 #pragma mark -
@@ -292,6 +275,16 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
+- (BOOL)pathFinderRunning
+{
+	NSDictionary *dict;
+	NSEnumerator *const dictEnum = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
+	while((dict = [dictEnum nextObject])) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
+	return NO;
+}
+
+#pragma mark -
+
 - (NSArray *)recentDocumentIdentifiers
 {
 	return [[_recentDocumentIdentifiers retain] autorelease];
@@ -332,8 +325,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(_prefsLoaded && flag == _fullscreen) return;
 	_fullscreen = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGFullscreenKey];
-	[toggleFullscreen setTitle:NSLocalizedString((flag ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
-	[fitToView setTitle:NSLocalizedString((flag ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
 	[self _setFullscreen:flag];
 }
 
@@ -409,19 +400,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)setCurrentDocument:(PGDocument *)document
 {
 	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
-	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
-
 	_currentDocument = document;
-	[self _setRevealsInBrowser:[_currentDocument isOnline]];
 	[self _setPageMenu:(_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu])];
-
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
-	[[self currentPrefObject] AE_addObserver:self selector:@selector(showsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
 	[self readingDirectionDidChange:nil];
-	[self showsInfoDidChange:nil];
-	[self showsThumbnailsDidChange:nil];
 }
 
 #pragma mark -
@@ -464,24 +446,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_recentDocumentIdentifiers] forKey:PGRecentItemsKey];
 }
-- (void)workspaceDidLaunchApplication:(NSNotification *)aNotif
-{
-	if(aNotif) return [self _applicationLaunched:[[aNotif userInfo] objectForKey:PGNSApplicationName]];
-	[switchToPathFinder AE_removeFromMenu];
-	[revealInPathFinder AE_removeFromMenu];
-	[switchToFinder AE_removeFromMenu];
-	[revealInFinder AE_removeFromMenu];
-	[_runningApps release];
-	_runningApps = [[NSCountedSet alloc] init];
-	NSDictionary *dict;
-	NSEnumerator *const dictEnum = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
-	while((dict = [dictEnum nextObject])) [self _applicationLaunched:[dict objectForKey:PGNSApplicationName]];
-}
-- (void)workspaceDidTerminateApplication:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	[self _applicationTerminated:[[aNotif userInfo] objectForKey:PGNSApplicationName]];
-}
 
 - (void)readingDirectionDidChange:(NSNotification *)aNotif
 {
@@ -494,14 +458,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[lastPage setKeyEquivalent:next];
 	[previousPage setKeyEquivalentModifierMask:0];
 	[nextPage setKeyEquivalentModifierMask:0];
-}
-- (void)showsInfoDidChange:(NSNotification *)aNotif
-{
-	[toggleInfo setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
-}
-- (void)showsThumbnailsDidChange:(NSNotification *)aNotif
-{
-	[toggleThumbnails setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
 }
 
 #pragma mark Private Protocol
@@ -545,43 +501,26 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 	NSEnableScreenUpdates();
 }
-
-#pragma mark -
-
-- (void)_setRevealsInBrowser:(BOOL)flag
-{
-	if(flag == _revealsInBrowser) return;
-	_revealsInBrowser = flag;
-	if(flag) {
-		[revealInPathFinder AE_removeFromMenu];
-		[revealInFinder AE_removeFromMenu];
-		[revealInBrowser AE_addAfterItem:precedingRevealItem];
-	} else {
-		[revealInBrowser AE_removeFromMenu];
-		[self workspaceDidLaunchApplication:nil];
-	}
-}
 - (void)_setPageMenu:(NSMenu *)aMenu
 {
 	NSMenu *const mainMenu = [NSApp mainMenu];
 	unsigned const pageMenuItemIndex = [mainMenu indexOfItem:[[pageMenuItem retain] autorelease]];
 	[mainMenu removeItemAtIndex:pageMenuItemIndex]; // Works around a Tiger bug where two Page menus appear.
 
-	NSMenu *const oldMenu = [pageMenuItem submenu];
 	NSMenu *const newMenu = aMenu ? aMenu : defaultPageMenu;
-	[newMenu setTitle:[pageMenuItem title]]; // Otherwise the title can get changed.
-	firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
-	previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
-	nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
-	lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
+	if(!PGIsLeopardOrLater()) {
+		NSMenu *const oldMenu = [pageMenuItem submenu];
+		[newMenu setTitle:[pageMenuItem title]]; // Otherwise the title can get changed.
+		firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
+		previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
+		nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
+		lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
+	}
 	[pageMenuItem setSubmenu:newMenu];
 
 	[mainMenu insertItem:pageMenuItem atIndex:pageMenuItemIndex];
 	[self readingDirectionDidChange:nil];
 }
-
-#pragma mark -
-
 - (PGDocument *)_openNew:(BOOL)flag
                 document:(PGDocument *)document
                 display:(BOOL)display
@@ -592,43 +531,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	return document;
 }
 
-#pragma mark -
-
-- (void)_applicationLaunched:(NSString *)app
-{
-	[_runningApps addObject:app];
-	if([_runningApps countForObject:app] != 1) return;
-	if([PGPathFinderApplicationName isEqual:app]) {
-		[switchToPathFinder AE_addAfterItem:precedingSwitchItem];
-		if(!_revealsInBrowser) [revealInPathFinder AE_addAfterItem:precedingRevealItem];
-	} else if([PGFinderApplicationName isEqual:app]) {
-		[switchToFinder AE_addAfterItem:([switchToPathFinder menu] ? switchToPathFinder : precedingSwitchItem)];
-		if(!_revealsInBrowser) [revealInFinder AE_addAfterItem:([revealInPathFinder menu] ? revealInPathFinder : precedingRevealItem)];
-	}
-}
-- (void)_applicationTerminated:(NSString *)app
-{
-	[_runningApps removeObject:[[app retain] autorelease]];
-	if([_runningApps countForObject:app] != 0) return;
-	if([PGPathFinderApplicationName isEqual:app]) {
-		[switchToPathFinder AE_removeFromMenu];
-		if(!_revealsInBrowser) [revealInPathFinder AE_removeFromMenu];
-	} else if([PGFinderApplicationName isEqual:app]) {
-		[switchToFinder AE_removeFromMenu];
-		if(!_revealsInBrowser) [revealInFinder AE_removeFromMenu];
-	}
-}
-
 #pragma mark NSNibAwakening Protocol
 
 - (void)awakeFromNib
 {
-	[switchToPathFinder retain];
-	[switchToFinder retain];
-	[revealInPathFinder retain];
-	[revealInFinder retain];
-	[revealInBrowser retain];
-	[revealInBrowser AE_removeFromMenu];
 	[defaultPageMenu retain];
 	[windowsMenuSeparator retain];
 	[windowsMenuSeparator AE_removeFromMenu];
@@ -655,12 +561,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	_prefsLoaded = YES;
 
 	[self setCurrentDocument:nil];
-
-	[self workspaceDidLaunchApplication:nil];
 	[self readingDirectionDidChange:nil];
-	[self showsInfoDidChange:nil];
-	[self showsThumbnailsDidChange:nil];
 }
+
+#pragma mark PGDisplaying Protocol
+
+- (IBAction)reveal:(id)sender {}
+- (IBAction)toggleFullscreen:(id)sender {}
+- (IBAction)toggleInfo:(id)sender {}
+- (IBAction)toggleThumbnails:(id)sender {}
 
 #pragma mark NSMenuValidation Protocol
 
@@ -670,9 +579,21 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
 	int const tag = [anItem tag];
-	if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
-	else if(@selector(changeImageScalingMode:) == action) [anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
-	else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
+
+	if([@protocol(PGDisplaying) descriptionForInstanceMethod:action]) {
+		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
+		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
+		if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
+		return NO;
+	}
+
+	if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
+	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
+	else if(@selector(changeImageScalingMode:) == action) {
+		if(PGViewFitScaling == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
+		[anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
 	else if(@selector(changeImageScalingConstraint:) == action) [anItem setState:tag == [pref imageScalingConstraint]];
 	else if(@selector(changeSortOrder:) == action) [anItem setState:tag == (PGSortOrderMask & [pref sortOrder])];
 	else if(@selector(changeSortDirection:) == action) {
@@ -802,10 +723,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		_timerPanel = [[PGTimerPanelController alloc] init];
 		_activityPanel = [[PGActivityPanelController alloc] init];
 
-		NSNotificationCenter *const workspaceCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
-		[workspaceCenter addObserver:self selector:@selector(workspaceDidLaunchApplication:) name:NSWorkspaceDidLaunchApplicationNotification object:nil];
-		[workspaceCenter addObserver:self selector:@selector(workspaceDidTerminateApplication:) name:NSWorkspaceDidTerminateApplicationNotification object:nil];
-
 		if(!PGSharedDocumentController) {
 			PGSharedDocumentController = [self retain];
 			[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleAppleEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
@@ -819,14 +736,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	if(PGSharedDocumentController == self) [[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
 	[self AE_removeObserver];
-	[switchToPathFinder release];
-	[switchToFinder release];
-	[revealInPathFinder release];
-	[revealInFinder release];
-	[revealInBrowser release];
 	[defaultPageMenu release];
 	[windowsMenuSeparator release];
-	[_runningApps release];
 	[_recentMenuSeparatorItem release];
 	[_recentDocumentIdentifiers release];
 	[_documents release];

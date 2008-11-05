@@ -47,6 +47,7 @@
 		0E1D3EC90A8091FE00C542A6 /* PGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */; };
 		0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */; };
 		0E20AF640EA702A1002A7854 /* NSImageRepAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF630EA702A1002A7854 /* NSImageRepAdditions.m */; };
+		0E2237A80EC2096E002F09C8 /* PGDisplaying.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2237A70EC2096E002F09C8 /* PGDisplaying.m */; };
 		0E255B960E3A99AA00EDF04C /* PGTimer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E255B940E3A99AA00EDF04C /* PGTimer.nib */; };
 		0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */; };
 		0E255BA70E3A9D2E00EDF04C /* PGCircleProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255BA60E3A9D2E00EDF04C /* PGCircleProgressIndicator.m */; };
@@ -288,6 +289,8 @@
 		0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCFMutableArray.m; sourceTree = "<group>"; };
 		0E20AF620EA702A1002A7854 /* NSImageRepAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSImageRepAdditions.h; sourceTree = "<group>"; };
 		0E20AF630EA702A1002A7854 /* NSImageRepAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSImageRepAdditions.m; sourceTree = "<group>"; };
+		0E2237A60EC2096D002F09C8 /* PGDisplaying.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDisplaying.h; sourceTree = "<group>"; };
+		0E2237A70EC2096E002F09C8 /* PGDisplaying.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDisplaying.m; sourceTree = "<group>"; };
 		0E255B950E3A99AA00EDF04C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGTimer.nib; sourceTree = "<group>"; };
 		0E255B990E3A9A1E00EDF04C /* PGTimerPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimerPanelController.h; sourceTree = "<group>"; };
 		0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimerPanelController.m; sourceTree = "<group>"; };
@@ -617,6 +620,8 @@
 		0E1D37360A7E1A5800C542A6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				0E2237A60EC2096D002F09C8 /* PGDisplaying.h */,
+				0E2237A70EC2096E002F09C8 /* PGDisplaying.m */,
 				0E1D3EC70A8091FD00C542A6 /* PGDocumentController.h */,
 				0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */,
 				0E90163B0DF435AB004B6F69 /* PGPrefController.h */,
@@ -1219,6 +1224,7 @@
 				0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */,
 				0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */,
 				0E7B0E8A0EBC1C14009A7F07 /* NSScannerAdditions.m in Sources */,
+				0E2237A80EC2096E002F09C8 /* PGDisplaying.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

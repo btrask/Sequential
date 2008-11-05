@@ -36,13 +36,16 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGFindView;
 @class PGFindlessTextView;
 
+// Controllers
+#import "PGDisplaying.h"
+
 // Other
 #import "PGGeometryTypes.h"
 
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
-@interface PGDisplayController : NSWindowController
+@interface PGDisplayController : NSWindowController <PGDisplaying>
 {
 	@protected
 	IBOutlet PGClipView          *clipView;
@@ -83,9 +86,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 + (NSArray *)pasteboardTypes;
 
-- (IBAction)revealInPathFinder:(id)sender;
-- (IBAction)revealInFinder:(id)sender;
-- (IBAction)revealInBrowser:(id)sender;
 - (IBAction)extractImages:(id)sender;
 - (IBAction)moveToTrash:(id)sender;
 
@@ -94,10 +94,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)revertOrientation:(id)sender;
 - (IBAction)performFindPanelAction:(id)sender;
 - (IBAction)hideFindPanel:(id)sender;
-
-- (IBAction)toggleFullscreen:(id)sender;
-- (IBAction)toggleInfo:(id)sender;
-- (IBAction)toggleThumbnails:(id)sender;
 
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;

@@ -31,6 +31,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGBookmark;
 
 // Controllers
+#import "PGDisplaying.h"
 @class PGDisplayController;
 @class PGFullscreenController;
 @class PGExifPanelController;
@@ -59,51 +60,38 @@ enum {
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
 
-@interface PGDocumentController : NSResponder
+@interface PGDocumentController : NSResponder <PGDisplaying>
 {
 	@private
-	IBOutlet NSMenuItem              *precedingSwitchItem;
-	IBOutlet NSMenuItem              *switchToPathFinder;
-	IBOutlet NSMenuItem              *switchToFinder;
-	IBOutlet NSMenuItem              *precedingRevealItem;
-	IBOutlet NSMenuItem              *revealInPathFinder;
-	IBOutlet NSMenuItem              *revealInFinder;
-	IBOutlet NSMenuItem              *revealInBrowser;
-	         NSCountedSet           *_runningApps;
-	         BOOL                    _revealsInBrowser;
+	IBOutlet NSMenu      *recentMenu;
+	         NSMenuItem *_recentMenuSeparatorItem;
 
-	IBOutlet NSMenu                  *recentMenu;
-	         NSMenuItem             *_recentMenuSeparatorItem;
+	IBOutlet NSMenuItem *rotate90CC;
+	IBOutlet NSMenuItem *rotate270CC;
+	IBOutlet NSMenuItem *rotate180;
+	IBOutlet NSMenuItem *mirrorHorz;
+	IBOutlet NSMenuItem *mirrorVert;
 
-	IBOutlet NSMenuItem              *toggleFullscreen;
-	IBOutlet NSMenuItem              *toggleInfo;
-	IBOutlet NSMenuItem              *toggleThumbnails;
+	IBOutlet NSMenuItem *toggleFullscreen;
+	IBOutlet NSMenuItem *toggleInfo;
+	IBOutlet NSMenuItem *zoomIn;
+	IBOutlet NSMenuItem *zoomOut;
 
-	IBOutlet NSMenuItem              *rotate90CC;
-	IBOutlet NSMenuItem              *rotate270CC;
-	IBOutlet NSMenuItem              *rotate180;
-	IBOutlet NSMenuItem              *mirrorHorz;
-	IBOutlet NSMenuItem              *mirrorVert;
+	IBOutlet NSMenuItem *pageMenuItem;
+	IBOutlet NSMenu     *defaultPageMenu;
+	IBOutlet NSMenuItem *firstPage;
+	IBOutlet NSMenuItem *previousPage;
+	IBOutlet NSMenuItem *nextPage;
+	IBOutlet NSMenuItem *lastPage;
 
-	IBOutlet NSMenuItem              *fitToView;
-	IBOutlet NSMenuItem              *zoomIn;
-	IBOutlet NSMenuItem              *zoomOut;
+	IBOutlet NSMenu     *windowsMenu;
+	IBOutlet NSMenuItem *windowsMenuSeparator;
+	IBOutlet NSMenuItem *selectPreviousDocument;
+	IBOutlet NSMenuItem *selectNextDocument;
 
-	IBOutlet NSMenuItem              *pageMenuItem;
-	IBOutlet NSMenu                  *defaultPageMenu;
-	IBOutlet NSMenuItem              *firstPage;
-	IBOutlet NSMenuItem              *previousPage;
-	IBOutlet NSMenuItem              *nextPage;
-	IBOutlet NSMenuItem              *lastPage;
-
-	IBOutlet NSMenu                  *windowsMenu;
-	IBOutlet NSMenuItem              *windowsMenuSeparator;
-	IBOutlet NSMenuItem              *selectPreviousDocument;
-	IBOutlet NSMenuItem              *selectNextDocument;
-
-	         BOOL                    _prefsLoaded;
-	         NSArray                *_recentDocumentIdentifiers;
-	         BOOL                    _fullscreen;
+	         BOOL        _prefsLoaded;
+	         NSArray    *_recentDocumentIdentifiers;
+	         BOOL        _fullscreen;
 
 	         PGDocument             *_currentDocument;
 	         NSMutableArray         *_documents;
@@ -114,23 +102,20 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	         PGTimerPanelController    *_timerPanel;
 	         PGActivityPanelController *_activityPanel;
 
-	         NSMutableDictionary    *_classesByExtension;
+	         NSMutableDictionary *_classesByExtension;
 }
 
 + (PGDocumentController *)sharedDocumentController;
 
 - (IBAction)provideFeedback:(id)sender;
 - (IBAction)showPreferences:(id)sender;
-
-- (IBAction)closeAll:(id)sender;
-
-- (IBAction)switchToPathFinder:(id)sender;
-- (IBAction)switchToFinder:(id)sender;
+- (IBAction)switchToFileManager:(id)sender;
 
 - (IBAction)open:(id)sender;
 - (IBAction)openURL:(id)sender;
 - (IBAction)openRecentDocument:(id)sender;
 - (IBAction)clearRecentDocuments:(id)sender;
+- (IBAction)closeAll:(id)sender;
 
 - (IBAction)changeImageScalingMode:(id)sender; // PGImageScalingMode from [sender tag].
 - (IBAction)changeImageScalingConstraint:(id)sender; // PGImageScalingConstraint from [sender tag].
@@ -155,6 +140,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (BOOL)performZoomOut;
 - (BOOL)performToggleFullscreen;
 - (BOOL)performToggleInfo;
+
+- (BOOL)pathFinderRunning;
 
 - (NSArray *)recentDocumentIdentifiers;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray;
@@ -183,10 +170,6 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 
 - (void)recentDocumentIdentifierDidChange:(NSNotification *)aNotif;
-- (void)workspaceDidLaunchApplication:(NSNotification *)aNotif;
-- (void)workspaceDidTerminateApplication:(NSNotification *)aNotif;
 - (void)readingDirectionDidChange:(NSNotification *)aNotif;
-- (void)showsInfoDidChange:(NSNotification *)aNotif;
-- (void)showsThumbnailsDidChange:(NSNotification *)aNotif;
 
 @end

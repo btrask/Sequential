@@ -10,6 +10,15 @@
 /* Label for when no image is being displayed in the window. */
 "No image" = "Aucune image";
 
+/* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
+"Reveal in Finder" = "Afficher dans Finder";
+"Reveal in Path Finder" = "Afficher dans Path Finder";
+"Reveal in Browser" = "Afficher dans le navigateur";
+
+/* Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item. */
+"Switch to Finder" = "Basculer vers le Finder";
+"Switch to Path Finder" = "Basculer vers Path Finder";
+
 /* Enter/exit full screen. Two states of the same item. */
 "Enter Full Screen" = "Mode plein écran";
 "Exit Full Screen" = "Sortir du mode plein écran";
