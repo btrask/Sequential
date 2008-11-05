@@ -44,7 +44,8 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_animate;
 - (BOOL)_drawsRoundedCorners;
 - (void)_cache;
-- (void)_drawWithFrame:(NSRect)aRect rects:(NSRect const *)rects count:(unsigned)count;
+- (BOOL)_imageIsOpaque;
+- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(unsigned)count;
 - (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
 - (BOOL)_setSize:(NSSize)size;
@@ -93,7 +94,6 @@ DEALINGS WITH THE SOFTWARE. */
 		[self setSize:size allowAnimation:NO];
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
-		_isOpaque = _rep && ![_rep hasAlpha];
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
 
@@ -128,7 +128,7 @@ DEALINGS WITH THE SOFTWARE. */
 	_sizeTransitionTimer = nil;
 	_lastSizeAnimationTime = 0;
 	[self _setSize:_size];
-	if(_shouldRecache) [self _cache];
+	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
 }
 - (float)averageScaleFactor
@@ -146,7 +146,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _usesCaching) return;
 	_usesCaching = flag;
-	if(flag && _shouldRecache) [self _cache];
+	if(flag && !_cached) [self _cache];
 }
 
 #pragma mark -
@@ -269,17 +269,13 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)_cache
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
-	_shouldRecache = NO;
 	if(!_cache || !_rep || [self canAnimateRep]) return;
 	[_image removeRepresentation:(_cached ? _cache : _rep)];
 	_cached = NO;
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
-	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) {
-		_shouldRecache = YES;
-		return;
-	}
+	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
 	if(_immediateSize.width > PGWindowServerMaxWindowSize || _immediateSize.height > PGWindowServerMaxWindowSize) return;
 
 	[_cache setSize:_immediateSize];
@@ -294,12 +290,12 @@ DEALINGS WITH THE SOFTWARE. */
 
 	if(![view lockFocusIfCanDraw]) return [self PG_performSelector:@selector(_cache) withObject:nil afterDelay:0 retain:NO];
 	NSRect const cacheRect = [_cache rect];
-	if(_isPDF && ![_rep isOpaque]) {
+	if(_isPDF) {
 		[[NSColor whiteColor] set];
 		NSRectFill(cacheRect);
 	}
-	[self _drawWithFrame:cacheRect rects:NULL count:0];
-	[self _drawCornersOnRect:cacheRect];
+	[self _drawWithFrame:cacheRect operation:(_isPDF ? NSCompositeSourceOver : NSCompositeCopy) rects:NULL count:0];
+	if([self _drawsRoundedCorners]) [self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
 
 	[_image removeRepresentation:_rep];
@@ -307,35 +303,46 @@ DEALINGS WITH THE SOFTWARE. */
 	[_image addRepresentation:_cache];
 	_cached = YES;
 }
+- (BOOL)_imageIsOpaque
+{
+	return (_isPDF && _cached) || [_rep isOpaque];
+}
 - (void)_drawWithFrame:(NSRect)aRect
+        operation:(NSCompositingOperation)operation
         rects:(NSRect const *)rects
         count:(unsigned)count
 {
-	[NSGraphicsContext saveGraphicsState];
-	[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
+	NSSize const imageSize = [_image size];
+	NSSize const s = NSMakeSize(imageSize.width / _immediateSize.width, imageSize.height / _immediateSize.height);
+	BOOL const actualSize = NSEqualSizes(s, NSMakeSize(1, 1));
+	if(!actualSize) {
+		[NSGraphicsContext saveGraphicsState];
+		[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
+	}
 	NSRect r = aRect;
-	if(PGUpright != _orientation) {
-		NSAffineTransform *const t = [NSAffineTransform transform];
-		[t translateXBy:NSMidX(r) yBy:NSMidY(r)];
+	NSAffineTransform *transform = nil;
+	if(!_cached && PGUpright != _orientation) {
+		transform = [NSAffineTransform transform];
+		[transform translateXBy:NSMidX(r) yBy:NSMidY(r)];
 		if(_orientation & PGRotated90CC) {
 			r.size = NSMakeSize(NSHeight(r), NSWidth(r));
-			[t rotateByDegrees:90];
+			[transform rotateByDegrees:90];
 		}
-		[t scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
-		[t concat];
+		[transform scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
+		[transform concat];
 		r.origin = NSMakePoint(NSWidth(r) / -2, NSHeight(r) / -2);
 	}
 	if(count && PGUpright == _orientation) {
 		int i = count;
-		float const sx = [_image size].width / _immediateSize.width;
-		float const sy = [_image size].height / _immediateSize.height;
-		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * sx, NSMinY(rects[i]) * sy, NSWidth(rects[i]) * sx, NSHeight(rects[i]) * sy) operation:NSCompositeCopy fraction:1.0];
-	} else [_image drawInRect:r fromRect:NSZeroRect operation:NSCompositeCopy fraction:1];
-	[NSGraphicsContext restoreGraphicsState];
+		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:operation fraction:1.0];
+	} else [_image drawInRect:r fromRect:NSZeroRect operation:operation fraction:1];
+	if(actualSize) {
+		[transform invert];
+		[transform concat];
+	} else [NSGraphicsContext restoreGraphicsState];
 }
 - (void)_drawCornersOnRect:(NSRect)r
 {
-	if(!_rep || ![self _drawsRoundedCorners]) return;
 	static NSImage *tl = nil, *tr = nil, *br = nil, *bl = nil;
 	if(!tl) tl = [[NSImage imageNamed:@"Corner-Top-Left"] retain];
 	if(!tr) tr = [[NSImage imageNamed:@"Corner-Top-Right"] retain];
@@ -410,14 +417,14 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (BOOL)isOpaque
 {
-	return _isOpaque && ![self _drawsRoundedCorners] && ![self rotationInDegrees];
+	return [self _imageIsOpaque] && ![self _drawsRoundedCorners] && ![self rotationInDegrees];
 }
 - (void)drawRect:(NSRect)aRect
 {
+	if(!_rep) return;
 	NSRect b = (NSRect){NSZeroPoint, _immediateSize};
 	b.origin.x = roundf(NSMidX([self bounds]) - NSWidth(b) / 2);
 	b.origin.y = roundf(NSMidY([self bounds]) - NSHeight(b) / 2);
-
 	float const deg = [self rotationInDegrees];
 	if(deg) {
 		[NSGraphicsContext saveGraphicsState];
@@ -427,28 +434,21 @@ DEALINGS WITH THE SOFTWARE. */
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	int count = 0;
 	NSRect const *rects = NULL;
-	if(_cached) {
-		NSCompositingOperation const operation = !_isPDF && [self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver;
-		if(deg) {
-			[_image drawInRect:b fromRect:NSZeroRect operation:operation fraction:1.0];
-			if(PGDebugDrawingModes) [[NSColor purpleColor] set];
-		} else {
-			if(!count) [self getRectsBeingDrawn:&rects count:&count];
-			int i = count;
-			while(i--) [_image drawInRect:rects[i] fromRect:rects[i] operation:operation fraction:1.0];
-			if(PGDebugDrawingModes) [[NSColor redColor] set];
-		}
-	} else {
-		if(!deg && !count) [self getRectsBeingDrawn:&rects count:&count];
-		if(_isPDF && !_cached && ![_rep isOpaque]) {
-			[[NSColor whiteColor] set];
-			if(deg) NSRectFill(b);
-			else NSRectFillList(rects, count);
-		}
-		[self _drawWithFrame:b rects:rects count:count];
-		if(PGDebugDrawingModes) [(count ? [NSColor greenColor] : [NSColor blueColor]) set];
+	if(!deg) [self getRectsBeingDrawn:&rects count:&count];
+	if(_isPDF && !_cached) {
+		[[NSColor whiteColor] set];
+		if(count) NSRectFillList(rects, count);
+		else NSRectFill(b);
 	}
-	if(PGDebugDrawingModes) NSFrameRect(b);
+	[self _drawWithFrame:b operation:([self _imageIsOpaque] ? NSCompositeCopy : NSCompositeSourceOver) rects:rects count:count];
+	if(PGDebugDrawingModes) {
+		[(_cached ? [NSColor redColor] : [NSColor blueColor]) set];
+		NSFrameRect(b);
+		[([self _imageIsOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
+		NSFrameRect(NSInsetRect(b, 2, 2));
+		[(deg ? [NSColor blueColor] : [NSColor redColor]) set];
+		NSFrameRect(NSInsetRect(b, 4, 4));
+	}
 	if(drawCorners) {
 		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
@@ -462,7 +462,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)viewDidEndLiveResize
 {
 	[super viewDidEndLiveResize];
-	if(!_shouldRecache) return;
+	if(_cached) return;
 	[self _cache];
 	[self setNeedsDisplay:YES];
 }

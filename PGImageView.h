@@ -32,7 +32,6 @@ DEALINGS WITH THE SOFTWARE. */
 	@private
 	NSImage          *_image;
 	NSImageRep       *_rep;
-	BOOL              _isOpaque;
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
 	unsigned          _numberOfFrames;
@@ -45,7 +44,6 @@ DEALINGS WITH THE SOFTWARE. */
 	NSCachedImageRep *_cache;
 	BOOL              _usesCaching;
 	BOOL              _cached;
-	BOOL              _shouldRecache;
 
 	float             _rotationInDegrees;
 	BOOL              _animates;
