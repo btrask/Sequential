@@ -154,11 +154,9 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	return YES;
 }
-- (void)setNode:(PGNode *)aNode
+- (BOOL)canExtractChildren
 {
-	[[[self node] menuItem] setSubmenu:nil];
-	[super setNode:aNode];
-	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
+	return !![_unsortedChildren count];
 }
 
 #pragma mark -
@@ -281,6 +279,15 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	PGNode *child;
 	NSEnumerator *childEnum = [_unsortedChildren objectEnumerator];
 	while((child = [childEnum nextObject])) [child noteSortOrderDidChange];
+}
+
+#pragma mark PGResourceAdapter
+
+- (void)setNode:(PGNode *)aNode
+{
+	[[[self node] menuItem] setSubmenu:nil];
+	[super setNode:aNode];
+	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
 }
 
 #pragma mark NSObject

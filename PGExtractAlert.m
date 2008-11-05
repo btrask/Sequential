@@ -58,7 +58,15 @@ DEALINGS WITH THE SOFTWARE. */
 	[_openPanel setCanCreateDirectories:YES];
 	[_openPanel setAllowsMultipleSelection:NO];
 	[_openPanel setDelegate:self];
+
 	[_openPanel setAccessoryView:accessoryView];
+	NSBox *const box = (NSBox *)[[accessoryView superview] superview];
+	if([box isKindOfClass:[NSBox class]]) {
+		[accessoryView setFrame:[box frame]];
+		[[box superview] replaceSubview:box with:accessoryView];
+		[accessoryView setAutoresizingMask:NSViewWidthSizable | NSViewMaxYMargin];
+	}
+
 	[_openPanel setPrompt:NSLocalizedString(@"Choose", nil)];
 	[_openPanel setTitle:NSLocalizedString(@"Extract", @"Extraction window title.")];
 	[self retain];
@@ -179,7 +187,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         isItemExpandable:(id)item
 {
-	return [item isContainer] && [[item unsortedChildren] count];
+	return [item canExtractChildren];
 }
 - (int)outlineView:(NSOutlineView *)outlineView
        numberOfChildrenOfItem:(id)item

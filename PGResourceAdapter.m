@@ -462,10 +462,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[self node] canGetDataWithInfo:_info];
 }
-- (BOOL)canExtractData
-{
-	return NO;
-}
 
 #pragma mark -
 
@@ -473,6 +469,21 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
+- (BOOL)canExtractData
+{
+	return NO;
+}
+- (BOOL)canExtractChildren
+{
+	return NO;
+}
+- (BOOL)isResolutionIndependent
+{
+	return NO;
+}
+
+#pragma mark -
+
 - (NSArray *)exifEntries
 {
 	return nil;
@@ -480,10 +491,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (PGOrientation)orientationWithBase:(BOOL)flag
 {
 	return flag ? [[self document] baseOrientation] : PGUpright;
-}
-- (BOOL)isResolutionIndependent
-{
-	return NO;
 }
 - (void)clearCache {}
 

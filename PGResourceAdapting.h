@@ -73,12 +73,14 @@ typedef int PGLoadPolicy;
 - (NSMutableDictionary *)info;
 - (NSData *)data;
 - (BOOL)canGetData;
-- (BOOL)canExtractData;
 
 - (BOOL)isContainer;
+- (BOOL)canExtractData;
+- (BOOL)canExtractChildren;
+- (BOOL)isResolutionIndependent;
+
 - (NSArray *)exifEntries;
 - (PGOrientation)orientationWithBase:(BOOL)flag;
-- (BOOL)isResolutionIndependent;
 - (void)clearCache;
 
 - (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.

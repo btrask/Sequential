@@ -68,6 +68,10 @@ static NSString *const PGIndexKey = @"PGIndex";
 {
 	return YES;
 }
+- (BOOL)canExtractChildren
+{
+	return NO;
+}
 
 #pragma mark PGResourceAdapter
 
