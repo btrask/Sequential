@@ -44,7 +44,7 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGPageTurnMovementDelay    0.5
 #define PGGameStyleArrowScrolling  true
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
-#define PGLineScrollDistance       (PGBorderPadding * 3)
+#define PGLineScrollDistance       (PGBorderPadding * 4)
 
 static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
 {
@@ -195,8 +195,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	switch(scrollType) {
 		case PGScrollByLine:
 		{
-			if(PGHorzEdgesMask & direction) s.width = max.width;
-			if(PGVertEdgesMask & direction) s.height = max.height;
+			if(PGHorzEdgesMask & direction && PGVertEdgesMask & direction) s = NSMakeSize(sqrtf(powf(max.width, 2) / 2.0f), sqrtf(powf(max.height, 2) / 2.0f));
+			else if(PGHorzEdgesMask & direction) s.width = max.width;
+			else if(PGVertEdgesMask & direction) s.height = max.height;
 			break;
 		}
 		case PGScrollByPage:
