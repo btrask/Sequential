@@ -46,6 +46,13 @@ DEALINGS WITH THE SOFTWARE. */
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
 #define PGLineScrollDistance       (PGBorderPadding * 4)
 
+enum {
+	PGNotDragging,
+	PGPreliminaryDragging,
+	PGDragging
+};
+typedef unsigned PGDragMode;
+
 static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
 {
 	if(NSIsEmptyRect(subtrahend)) {
@@ -76,7 +83,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)_setPosition:(NSPoint)aPoint scrollEnclosingClipViews:(BOOL)scroll markForRedisplay:(BOOL)redisplay;
 - (BOOL)_scrollTo:(NSPoint)aPoint;
 - (void)_scrollOneFrame:(NSTimer *)timer;
-- (void)_beginPreliminaryDrag;
+- (void)_beginPreliminaryDrag:(NSValue *)val;
 
 @end
 
@@ -338,45 +345,40 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent
 {
 	NSParameterAssert(firstEvent);
-	NSParameterAssert(PGNotDragging == _dragMode);
 	[self beginScrolling];
 	[self stopAnimatedScrolling];
 	BOOL handled = NO;
 	unsigned dragMask = 0;
 	NSEventType stopType = 0;
 	switch([firstEvent type]) {
-		case NSLeftMouseDown:
-			dragMask = NSLeftMouseDraggedMask;
-			stopType = NSLeftMouseUp;
-			break;
-		case NSRightMouseDown:
-			dragMask = NSRightMouseDraggedMask;
-			stopType = NSRightMouseUp;
-			break;
+		case NSLeftMouseDown:  dragMask = NSLeftMouseDraggedMask;  stopType = NSLeftMouseUp;  break;
+		case NSRightMouseDown: dragMask = NSRightMouseDraggedMask; stopType = NSRightMouseUp; break;
 		default: return NO;
 	}
-	[self PG_performSelector:@selector(_beginPreliminaryDrag) withObject:nil afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
+	PGDragMode dragMode = PGNotDragging;
+	NSValue *const dragModeValue = [NSValue valueWithPointer:&dragMode];
+	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
 	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
 	NSRect const availableDragRect = NSInsetRect([[self window] AE_contentRect], 4, 4);
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
-		if(PGPreliminaryDragging == _dragMode || (PGNotDragging == _dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
-			_dragMode = PGDragging;
+		if(PGPreliminaryDragging == dragMode || (PGNotDragging == dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
+			dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
 				[NSCursor hide];
 				CGAssociateMouseAndMouseCursorPosition(false); // Prevents the cursor from being moved over the dock, which makes it reappear when it shouldn't.
 			} else [[NSCursor closedHandCursor] push];
-			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
+			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag:) object:dragModeValue];
 		}
 		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) animation:PGNoAnimation];
 		else [self scrollTo:PGOffsetPointByXY(dragPoint, -[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y) animation:PGNoAnimation];
 		finalPoint = PGPointInRect(PGOffsetPointByXY(finalPoint, [latestEvent deltaX], -[latestEvent deltaY]), availableDragRect);
 	}
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag:) object:dragModeValue];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
-	if(PGNotDragging != _dragMode) {
+	if(PGNotDragging != dragMode) {
 		handled = YES;
 		[NSCursor pop];
 		if(PGMouseHiddenDraggingStyle) {
@@ -386,7 +388,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
 		}
-		_dragMode = PGNotDragging;
+		dragMode = PGNotDragging;
 	} else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent first:_firstMouse];
 	_firstMouse = NO;
 	[self endScrolling];
@@ -535,10 +537,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(![self _scrollTo:(dist < 1 ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
 }
 
-- (void)_beginPreliminaryDrag
+- (void)_beginPreliminaryDrag:(NSValue *)val
 {
-	NSAssert(PGNotDragging == _dragMode, @"Already dragging.");
-	_dragMode = PGPreliminaryDragging;
+	PGDragMode *dragMode = [val pointerValue];
+	NSAssert(PGNotDragging == *dragMode, @"Already dragging.");
+	*dragMode = PGPreliminaryDragging;
 	[[NSCursor closedHandCursor] push];
 }
 
