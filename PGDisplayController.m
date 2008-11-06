@@ -1119,6 +1119,20 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return [item hasViewableNodeCountGreaterThan:0];
 }
+- (NSColor *)thumbnailView:(PGThumbnailView *)sender
+             labelColorForItem:(id)item
+{
+	switch([[item identifier] labelColor]) {
+		case PGLabelRed: return [NSColor redColor];
+		case PGLabelOrange: return [NSColor orangeColor];
+		case PGLabelYellow: return [NSColor yellowColor];
+		case PGLabelGreen: return [NSColor greenColor];
+		case PGLabelBlue: return [NSColor blueColor];
+		case PGLabelPurple: return [NSColor purpleColor];
+		case PGLabelGray: return [NSColor grayColor];
+		default: return nil;
+	}
+}
 
 #pragma mark NSServicesRequests Protocol
 

@@ -238,7 +238,8 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 
-	CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
+	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextBeginTransparencyLayer(context, NULL);
 
 	static CGShadingRef shade = NULL;
 	if(!shade) {
@@ -269,12 +270,30 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 			[shadow set];
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
-		if(thumb) {
-			[thumb setFlipped:[self isFlipped]];
-			NSSize const originalSize = [thumb size];
-			NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
-			[thumb drawInRect:PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame)) fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
-		} else [NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20, 20) startAtPetal:-1];
+		if(!thumb) {
+			[NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20, 20) startAtPetal:-1];
+			continue;
+		}
+		[thumb setFlipped:[self isFlipped]];
+		NSSize const originalSize = [thumb size];
+		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
+		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
+		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
+
+		NSColor *const labelColor = [[self dataSource] thumbnailView:self labelColorForItem:item];
+		if(!labelColor) continue;
+		NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16, roundf(MAX(NSMaxY(thumbnailRect) - 16, NSMidY(thumbnailRect) - 6)), 12, 12);
+		[NSGraphicsContext saveGraphicsState];
+		[[NSBezierPath bezierPathWithRect:NSInsetRect(labelRect, -5, -5)] addClip]; // By adding a clipping rect we tell the system how big the transparency layer has to be.
+		CGContextBeginTransparencyLayer(context, NULL);
+		NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
+		[labelColor set];
+		[labelDot fill];
+		[[NSColor whiteColor] set];
+		[labelDot setLineWidth:2];
+		[labelDot stroke];
+		CGContextEndTransparencyLayer(context);
+		[NSGraphicsContext restoreGraphicsState];
 	}
 	[nilShadow set];
 
@@ -289,7 +308,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		[[NSBezierPath AE_bezierPathWithRoundRect: NSMakeRect(PGThumbnailSize + PGThumbnailMarginWidth + 3, top, 6, 6)cornerRadius:1] AE_fillUsingOperation:NSCompositeCopy];
 	}
 
-	CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
+	CGContextEndTransparencyLayer(context);
 	[nilShadow set];
 }
 
@@ -358,6 +377,11 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
         canSelectItem:(id)item;
 {
 	return YES;
+}
+- (NSColor *)thumbnailView:(PGThumbnailView *)sender
+             labelColorForItem:(id)item
+{
+	return nil;
 }
 
 @end
