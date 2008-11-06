@@ -63,6 +63,7 @@ typedef unsigned PGAnimationType;
 	                        PGDragging
 	         }              _dragMode;
 	         BOOL           _firstMouse;
+	         unsigned       _scrollCount;
 }
 
 - (id)delegate;
@@ -107,6 +108,9 @@ typedef unsigned PGAnimationType;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
 - (void)scrollInDirection:(PGRectEdgeMask)direction type:(PGScrollType)scrollType;
 - (void)magicPanForward:(BOOL)forward acrossFirst:(BOOL)across;
+
+- (void)beginScrolling;
+- (void)endScrolling;
 
 - (void)viewFrameDidChange:(NSNotification *)aNotif;
 

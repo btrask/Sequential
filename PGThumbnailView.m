@@ -157,19 +157,6 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 2, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
-#pragma mark -
-
-- (void)resetToolTips
-{
-	[self removeAllToolTips];
-	NSRect const v = [self visibleRect];
-	unsigned i = 0;
-	for(; i < [_items count]; i++) {
-		NSRect const r = NSIntersectionRect(v, [self frameOfItemAtIndex:i withMargin:YES]);
-		if(!NSIsEmptyRect(r)) [self addToolTipRect:r owner:self userData:nil];
-	}
-}
-
 #pragma mark Private Protocol
 
 - (void)_validateSelection
@@ -198,12 +185,18 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 }
 - (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
 {
+	[super PG_viewWillScrollInClipView:clipView];
 	[self removeAllToolTips];
 }
 - (void)PG_viewDidScrollInClipView:(PGClipView *)sender
 {
 	[super PG_viewDidScrollInClipView:sender];
-	[self resetToolTips];
+	NSRect const v = [self visibleRect];
+	unsigned i = 0;
+	for(; i < [_items count]; i++) {
+		NSRect const r = NSIntersectionRect(v, [self frameOfItemAtIndex:i withMargin:YES]);
+		if(!NSIsEmptyRect(r)) [self addToolTipRect:r owner:self userData:nil];
+	}
 }
 
 #pragma mark NSView

@@ -257,6 +257,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(NSEqualPoints(newTargetPosition, [self position])) return NO;
 	_position = newTargetPosition;
 	if(!_scrollTimer) {
+		[self beginScrolling];
 		_scrollTimer = [NSTimer timerWithTimeInterval:PGAnimationFramerate target:[self PG_nonretainedObjectProxy] selector:@selector(_scrollOneFrame:) userInfo:nil repeats:YES];
 		[[NSRunLoop currentRunLoop] addTimer:_scrollTimer forMode:PGCommonRunLoopsMode];
 	}
@@ -285,7 +286,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[_scrollTimer invalidate];
 	_scrollTimer = nil;
 	_lastScrollTime = 0;
-	[self PG_viewDidScrollInClipView:self];
+	[self endScrolling];
 }
 
 #pragma mark -
@@ -338,6 +339,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSParameterAssert(firstEvent);
 	NSParameterAssert(PGNotDragging == _dragMode);
+	[self beginScrolling];
 	[self stopAnimatedScrolling];
 	BOOL handled = NO;
 	unsigned dragMask = 0;
@@ -361,7 +363,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
 		if(PGPreliminaryDragging == _dragMode || (PGNotDragging == _dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
-			if(PGNotDragging == _dragMode) [self PG_viewWillScrollInClipView:self];
 			_dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
 				[NSCursor hide];
@@ -386,14 +387,15 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			[NSCursor unhide];
 		}
 		_dragMode = PGNotDragging;
-		[self PG_viewDidScrollInClipView:self];
 	} else handled = [[self delegate] clipView:self handleMouseEvent:firstEvent first:_firstMouse];
 	_firstMouse = NO;
+	[self endScrolling];
 	return handled;
 }
 - (void)arrowKeyDown:(NSEvent *)firstEvent
 {
 	NSParameterAssert(NSKeyDown == [firstEvent type]);
+	[self beginScrolling];
 	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGRectEdgeMask pressedDirections = PGNoEdges;
@@ -430,6 +432,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	} while(pressedDirections && (latestEvent = [NSApp nextEventMatchingMask:NSKeyUpMask | NSKeyDownMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:nil];
+	[self endScrolling];
 }
 - (void)scrollInDirection:(PGRectEdgeMask)direction
         type:(PGScrollType)scrollType
@@ -458,6 +461,20 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark -
 
+- (void)beginScrolling
+{
+	if(!_scrollCount++) [self PG_viewWillScrollInClipView:self];
+	[[self PG_enclosingClipView] beginScrolling];
+}
+- (void)endScrolling
+{
+	NSParameterAssert(_scrollCount);
+	[[self PG_enclosingClipView] endScrolling];
+	if(!--_scrollCount) [self PG_viewDidScrollInClipView:self];
+}
+
+#pragma mark -
+
 - (void)viewFrameDidChange:(NSNotification *)aNotif
 {
 	_documentViewIsResizing++;
@@ -477,10 +494,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSPoint const newPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
 	if(scroll) [[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
+	[self beginScrolling];
 	_immediatePosition = newPosition;
 	[self setBoundsOrigin:NSMakePoint(roundf(_immediatePosition.x), roundf(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
-	if(PGNotDragging == _dragMode && !_scrollTimer) [self PG_viewDidScrollInClipView:self];
+	[self endScrolling];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
@@ -522,7 +540,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSAssert(PGNotDragging == _dragMode, @"Already dragging.");
 	_dragMode = PGPreliminaryDragging;
 	[[NSCursor closedHandCursor] push];
-	[self PG_viewWillScrollInClipView:self];
 }
 
 #pragma mark PGClipViewAdditions Protocol
@@ -549,6 +566,14 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMinY(r) - NSMinY(b);
 	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMaxY(r) - NSMaxY(b);
 	[self scrollBy:o animation:PGAllowAnimation];
+}
+- (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
+{
+	if(clipView == self || !_scrollCount) [super PG_viewWillScrollInClipView:clipView];
+}
+- (void)PG_viewDidScrollInClipView:(PGClipView *)clipView
+{
+	if(clipView == self || !_scrollCount) [super PG_viewDidScrollInClipView:clipView];
 }
 
 #pragma mark PGZooming Protocol
@@ -847,11 +872,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
 {
-	[[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
+	if(clipView) [[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
 }
 - (void)PG_viewDidScrollInClipView:(PGClipView *)clipView
 {
-	[[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
+	if(clipView) [[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
 }
 
 @end

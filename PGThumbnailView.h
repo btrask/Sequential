@@ -52,8 +52,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)reloadData;
 - (void)sizeToFit;
 
-- (void)resetToolTips;
-
 @end
 
 @interface NSObject (PGThumbnailViewDataSource)
