@@ -108,6 +108,7 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;
 
+- (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif;
 
 @end

@@ -85,6 +85,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 			[_node startLoadWithInfo:nil];
 			[self _setInitialIdentifier:ident];
 		}
+		[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
@@ -291,6 +292,10 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 #pragma mark -
 
+- (void)identifierIconDidChange:(NSNotification *)aNotif
+{
+	[[self displayController] synchronizeWindowTitleWithDocumentName];
+}
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
