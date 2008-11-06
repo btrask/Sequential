@@ -384,7 +384,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
-			NSPoint const screenPoint = [[self window] convertBaseToScreen:finalPoint];
+			NSPoint const screenPoint = PGPointInRect([[self window] convertBaseToScreen:finalPoint], [[self window] AE_contentRect]);
 			IOHIDSetMouseLocation((io_connect_t)handle, roundf(screenPoint.x), roundf(CGDisplayPixelsHigh(kCGDirectMainDisplay) - screenPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
