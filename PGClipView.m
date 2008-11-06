@@ -359,9 +359,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSValue *const dragModeValue = [NSValue valueWithPointer:&dragMode];
 	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
-	NSPoint finalPoint = [[self window] convertBaseToScreen:originalPoint]; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
+	NSPoint finalPoint = originalPoint; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
+	NSRect const availableDragRect = [self convertRect:NSInsetRect([self insetBounds], 4, 4) toView:nil];
 	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
-	NSRect const availableDragRect = NSInsetRect([[self window] AE_contentRect], 4, 4);
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
 		if(PGPreliminaryDragging == dragMode || (PGNotDragging == dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
@@ -384,7 +384,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
-			IOHIDSetMouseLocation((io_connect_t)handle, (int)finalPoint.x, (int)(CGDisplayPixelsHigh(kCGDirectMainDisplay) - finalPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
+			NSPoint const screenPoint = [[self window] convertBaseToScreen:finalPoint];
+			IOHIDSetMouseLocation((io_connect_t)handle, roundf(screenPoint.x), roundf(CGDisplayPixelsHigh(kCGDirectMainDisplay) - screenPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
 		}
