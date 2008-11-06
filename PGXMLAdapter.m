@@ -85,9 +85,11 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)load
 {
 	NSData *const data = [self data];
+	NSLog(@"loading with data %p", data);
 	if(!data) return [[self node] loadFinished];
 	_triedLoading = YES;
 	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[self info] objectForKey:PGURLKey]];
+	NSLog(@"p: %@; subparsers: %@", p, [p subparsers]);
 	NSString *const title = [p title];
 	if(title) [[self identifier] setCustomDisplayName:title notify:YES];
 	if(![p createsMultipleNodes]) {
@@ -120,6 +122,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 #pragma mark PGXMLParserNodeCreation Protocol
 
+- (BOOL)createsMultipleNodes
+{
+	return NO;
+}
 - (NSString *)title
 {
 	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _title : nil;
