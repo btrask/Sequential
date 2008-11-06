@@ -215,7 +215,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSImageInterpolation)interpolation
 {
-	if(_sizeTransitionTimer || [self inLiveResize]) return NSImageInterpolationNone;
+	if(_numberOfFrames > 1 || _sizeTransitionTimer || [self inLiveResize]) return NSImageInterpolationNone;
 	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
 	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
 	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
