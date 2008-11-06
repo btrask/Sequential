@@ -563,12 +563,12 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize o = NSZeroSize;
 	if(NSWidth(r) > NSWidth(b)) {
 		// TODO: Use the current pin location to pick an edge of the rect to show.
-	} else if(NSMinX(r) < NSMinX(b)) o.width = NSMinX(r) - NSMinX(b);
-	else if(NSMaxX(r) > NSMaxX(b)) o.width = NSMaxX(r) - NSMaxX(b);
+	} else if(NSMinX(r) < NSMinX(b)) o.width = NSMaxX(r) - NSMaxX(b);
+	else if(NSMaxX(r) > NSMaxX(b)) o.width = NSMinX(r) - NSMinX(b);
 	if(NSHeight(r) > NSHeight(b)) {
 		// TODO: Same as above.
-	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMinY(r) - NSMinY(b);
-	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMaxY(r) - NSMaxY(b);
+	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMaxY(r) - NSMaxY(b);
+	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMinY(r) - NSMinY(b);
 	[self scrollBy:o animation:PGAllowAnimation];
 }
 - (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
