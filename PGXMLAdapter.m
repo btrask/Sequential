@@ -32,6 +32,13 @@ DEALINGS WITH THE SOFTWARE. */
 #import "PGResourceIdentifier.h"
 #import "PGXMLParser.h"
 
+@interface PGMediaRSSParser : PGXMLParser
+{
+	@private
+	NSMutableString *_title;
+}
+@end
+
 @interface PGOEmbedParser : PGXMLParser
 {
 	@private
@@ -40,7 +47,6 @@ DEALINGS WITH THE SOFTWARE. */
 	NSMutableString *_title;
 	NSMutableString *_URLString;
 }
-
 @end
 
 @implementation PGXMLAdapter
@@ -85,11 +91,9 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)load
 {
 	NSData *const data = [self data];
-	NSLog(@"loading with data %p", data);
 	if(!data) return [[self node] loadFinished];
 	_triedLoading = YES;
-	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[self info] objectForKey:PGURLKey]];
-	NSLog(@"p: %@; subparsers: %@", p, [p subparsers]);
+	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[self info] objectForKey:PGURLKey] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
 	NSString *const title = [p title];
 	if(title) [[self identifier] setCustomDisplayName:title notify:YES];
 	if(![p createsMultipleNodes]) {
@@ -169,20 +173,11 @@ DEALINGS WITH THE SOFTWARE. */
 
 @end
 
-@interface PGMediaRSSParser : PGXMLParser
-{
-	@private
-	NSMutableString *_title;
-}
-
-@end
-
 @interface PGMediaRSSItemParser : PGXMLParser
 {
 	@private
 	NSMutableString *_title;
 }
-
 @end
 
 @interface PGMediaRSSItemContentParser : PGXMLParser
@@ -191,7 +186,6 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *_URLString;
 	NSString *_MIMEType;
 }
-
 @end
 
 @implementation PGMediaRSSParser

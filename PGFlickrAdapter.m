@@ -43,6 +43,10 @@ static NSString *const PGFlickrGroupNameKey = @"PGFlickrGroupName";
 static NSString *const PGFlickrTagNameKey   = @"PGFlickrTagName";
 static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 
+enum {
+	PGFlickrUserNotFoundErr = 2
+};
+
 @interface PGFlickrPhotoListParser : PGXMLParser
 {
 	@private
@@ -60,7 +64,11 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 	NSString *_secret;
 	NSString *_originalFormat;
 	NSString *_errorString;
+	int       _errorCode;
 }
+
+- (int)errorCode;
+
 @end
 
 @implementation PGFlickrAdapter
@@ -123,10 +131,10 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {
 	if(sender != _load) return;
-	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[self info] objectForKey:PGURLKey]];
+	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[self info] objectForKey:PGURLKey] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
 	[[self identifier] setCustomDisplayName:[parser title] notify:YES];
 	NSError *const error = [parser error];
-	if(error) [[self node] setError:error];
+	if(error) [[self node] setError:([parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error)];
 	else if([parser createsMultipleNodes]) {
 		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
 		[[self node] loadFinished];
@@ -181,6 +189,10 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 		}
 	}
 	_load = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:URLString]] parentLoad:self delegate:self];
+}
+- (BOOL)shouldFallbackOnError
+{
+	return NO;
 }
 
 #pragma mark NSObject
@@ -238,6 +250,13 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 
 @implementation PGFlickrPhotoParser
 
+#pragma mark Instance Methods
+
+- (int)errorCode
+{
+	return _errorCode;
+}
+
 #pragma mark PGXMLParser
 
 + (BOOL)canParseTagPath:(NSString *)p
@@ -264,7 +283,7 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 }
 - (NSString *)errorString
 {
-	return [[_errorString retain] autorelease];
+	return _errorString ? [NSString stringWithFormat:NSLocalizedString(@"Flickr returned the error %@.", @"Flickr generic error message. %@ is replaced with the message as returned by Flickr."), ([_errorString hasSuffix:@"."] ? [_errorString substringToIndex:[_errorString length] - 1] : _errorString)] : nil;
 }
 
 #pragma mark PGXMLParser
@@ -283,18 +302,18 @@ static NSString *const PGFlickrSetNameKey   = @"PGFlickrSetName";
 		if(originalSecret) {
 			[_secret release];
 			_secret = [originalSecret copy];
-		}
+		} else if(!_secret) _secret = [[attrs objectForKey:@"secret"] copy];
 		NSString *const originalFormat = [attrs objectForKey:@"originalformat"];
 		if(originalFormat) {
 			[_originalFormat release];
 			_originalFormat = [originalFormat copy];
 		}
-		if(!_secret) _secret = [[attrs objectForKey:@"secret"] copy];
 		NSString *const title = [attrs objectForKey:@"title"];
 		if(title) [_title setString:title];
 	} else if([@"/rsp/err" isEqualToString:p]) {
 		[_errorString release];
 		_errorString = [[attrs objectForKey:@"msg"] copy];
+		_errorCode = [[attrs objectForKey:@"code"] intValue];
 	}
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p

@@ -227,7 +227,8 @@ enum {
 	}
 	if(PGNodeLoading & _status && [_adapters count] > 1) {
 		(void)[[[_adapters lastObject] retain] autorelease];
-		[_adapters removeLastObject];
+		if([_adapter shouldFallbackOnError]) [_adapters removeLastObject];
+		else [_adapters removeObjectsInRange:NSMakeRange(1, [_adapters count] - 1)];
 		[self _setResourceAdapter:[_adapters lastObject]];
 		[_adapter fallbackLoad];
 	}
@@ -541,8 +542,7 @@ enum {
 }
 - (void)forwardInvocation:(NSInvocation *)invocation
 {
-	[invocation setTarget:_adapter];
-	[invocation invoke];
+	[invocation invokeWithTarget:_adapter];
 }
 
 @end

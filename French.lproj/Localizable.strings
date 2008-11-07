@@ -102,6 +102,12 @@
 "Secondary click goes right." = "Le clic secondaire vas à droite.";
 "Secondary click goes left." = "Le clic secondaire vas à gauche.";
 
+/* Flickr error message. %@ is replaced with the message as returned by Flickr. */
+"Flickr returned the error %@." = "Flickr returned the error “%@.”";
+
+/* Flickr user not found error message. %@ is replaced with the user name/NSID. */
+"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr could not find the user “%@.” This user may not exist or may have disabled searches in the Flickr privacy settings.";
+
 /* Dialog button labels. */
 "OK" = "OK";
 "Cancel" = "Annuler";

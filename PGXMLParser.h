@@ -38,9 +38,10 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString       *_initialTagPath;
 	NSString       *_tagPath;
 	NSDictionary   *_attributes;
+	NSArray        *_classes;
 }
 
-+ (id)parserWithData:(NSData *)data baseURL:(NSURL *)URL;
++ (id)parserWithData:(NSData *)data baseURL:(NSURL *)URL classes:(NSArray *)classes;
 + (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
 
 - (NSURL *)baseURL;

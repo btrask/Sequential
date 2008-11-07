@@ -866,12 +866,5 @@
 			</array>
 		</dict>
 	</dict>
-	<key>PGXMLParsers</key>
-	<array>
-		<string>PGMediaRSSParser</string>
-		<string>PGFlickrPhotoListParser</string>
-		<string>PGFlickrPhotoParser</string>
-		<string>PGOEmbedParser</string>
-	</array>
 </dict>
 </plist>

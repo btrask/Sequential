@@ -262,6 +262,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	[self load];
 }
+- (BOOL)shouldFallbackOnError
+{
+	return YES;
+}
 - (void)read
 {
 	[[self node] readFinishedWithImageRep:nil error:nil];

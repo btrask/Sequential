@@ -31,7 +31,14 @@ DEALINGS WITH THE SOFTWARE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-static NSString *const PGXMLParsersKey = @"PGXMLParsers";
+@interface PGXMLParser (Private)
+
+- (NSArray *)_classes;
+- (void)_setClasses:(NSArray *)anArray;
+- (BOOL)_hasSubparser;
+- (PGXMLParser *)_subparser;
+
+@end
 
 @implementation PGXMLParser
 
@@ -39,9 +46,11 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
 + (id)parserWithData:(NSData *)data
       baseURL:(NSURL *)URL
+      classes:(NSArray *)classes
 {
 	PGXMLParser *const p = [[[self alloc] init] autorelease];
 	[p setBaseURL:URL];
+	[p _setClasses:classes];
 	[p parseWithData:data];
 	return p;
 }
@@ -108,16 +117,12 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 - (void)beganTagPath:(NSString *)p
         attributes:(NSDictionary *)attrs
 {
-	if(![self isMemberOfClass:[PGXMLParser class]]) return;
-	static NSArray *parserNames = nil;
-	if(!parserNames) parserNames = [[[[NSBundle mainBundle] infoDictionary] objectForKey:PGXMLParsersKey] copy];
-	NSString *parserName;
-	NSEnumerator *const parserNameEnum = [parserNames objectEnumerator];
-	while((parserName = [parserNameEnum nextObject])) {
-		Class const class = NSClassFromString(parserName);
-		if(![class canParseTagPath:p attributes:attrs]) continue;
+	Class class;
+	NSEnumerator *const classEnum = [[self _classes] objectEnumerator];
+	while((class = [classEnum nextObject])) {
+		if([self isKindOfClass:class] || ![class canParseTagPath:p attributes:attrs]) continue;
 		[self useSubparser:[[[class alloc] init] autorelease]];
-		break;
+		return;
 	}
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
@@ -126,18 +131,38 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 }
 - (void)endedTagPath:(NSString *)p {}
 
+#pragma mark Private Protocol
+
+- (NSArray *)_classes
+{
+	return _classes ? [[_classes retain] autorelease] : [_parent _classes];
+}
+- (void)_setClasses:(NSArray *)anArray
+{
+	[_classes autorelease];
+	_classes = [anArray retain];
+}
+- (BOOL)_hasSubparser
+{
+	return 1 == [_subparsers count];
+}
+- (PGXMLParser *)_subparser
+{
+	return [self _hasSubparser] ? [_subparsers lastObject] : nil;
+}
+
 #pragma mark PGXMLParserNodeCreation Protocol
 
 - (BOOL)createsMultipleNodes
 {
-	return [_subparsers count] == 1 ? [[_subparsers lastObject] createsMultipleNodes] : YES;
+	return [self _hasSubparser] ? [[_subparsers lastObject] createsMultipleNodes] : YES;
 }
 
 #pragma mark -
 
 - (NSString *)title
 {
-	return nil;
+	return [[self _subparser] title];
 }
 - (NSURL *)URL
 {
@@ -167,11 +192,11 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 
 - (NSString *)URLString
 {
-	return nil;
+	return [[self _subparser] URLString];
 }
 - (NSString *)errorString
 {
-	return nil;
+	return [[self _subparser] errorString];
 }
 
 #pragma mark -
@@ -241,6 +266,13 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 	[pool release];
 }
 
+#pragma mark NSObject Protocol
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? YES : [[self _subparser] respondsToSelector:sel];
+}
+
 #pragma mark NSObject
 
 - (id)init
@@ -256,7 +288,23 @@ static NSString *const PGXMLParsersKey = @"PGXMLParsers";
 	[_subparsers release];
 	[_initialTagPath release];
 	[_tagPath release];
+	[_classes release];
 	[super dealloc];
+}
+
+#pragma mark -
+
+- (IMP)methodForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [[self _subparser] methodForSelector:sel];
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodSignatureForSelector:sel] : [[self _subparser] methodSignatureForSelector:sel];
+}
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+	[anInvocation invokeWithTarget:[self _subparser]];
 }
 
 @end

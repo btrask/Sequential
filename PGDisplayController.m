@@ -943,6 +943,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 #pragma mark NSWindowDelegate Protocol
 
 - (BOOL)window:(NSWindow *)window
+        shouldPopUpDocumentPathMenu:(NSMenu *)menu
+{
+	return ![[self activeDocument] isOnline];
+}
+- (BOOL)window:(NSWindow *)window
         shouldDragDocumentWithEvent:(NSEvent *)event
         from:(NSPoint)dragImageLocation
         withPasteboard:(NSPasteboard *)pboard

@@ -79,6 +79,7 @@ typedef unsigned PGMatchPriority;
 - (void)loadIfNecessary;
 - (void)load; // Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
 - (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
+- (BOOL)shouldFallbackOnError;
 - (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
 
 - (NSImage *)thumbnail;
