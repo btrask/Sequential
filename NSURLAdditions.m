@@ -52,9 +52,9 @@ DEALINGS WITH THE SOFTWARE. */
 
 	unsigned const schemeEnd = [scanner scanLocation];
 	NSString *login = nil;
-	[scanner scanUpToString:@"@" intoString:&login];
-	if([scanner isAtEnd]) [scanner setScanLocation:schemeEnd];
-	else [URL appendString:login];
+	[scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"@/"] intoString:&login];
+	if([scanner scanString:@"@" intoString:NULL]) [URL appendFormat:@"%@@", login];
+	else [scanner setScanLocation:schemeEnd];
 
 	NSString *host = @"";
 	if(![scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@":/"] intoString:&host]) {
@@ -67,9 +67,7 @@ DEALINGS WITH THE SOFTWARE. */
 		do {
 			NSString *subdomain = nil;
 			[hostScanner scanUpToCharactersFromSet:subdomainDelimitingCharacters intoString:&subdomain];
-			if(![subdomain length]) return nil;
-			if([@"-" isEqual:[subdomain substringToIndex:1]]) return nil;
-			if([@"-" isEqual:[subdomain substringFromIndex:[subdomain length] - 1]]) return nil;
+			if(![subdomain length] || [subdomain hasPrefix:@"-"] || [subdomain hasSuffix:@"-"]) return nil;
 			if([subdomain rangeOfCharacterFromSet:[[NSCharacterSet alphanumericCharacterSet] invertedSet]].location != NSNotFound) return nil;
 		} while([hostScanner scanString:@"." intoString:NULL] || [hostScanner scanString:@"-" intoString:NULL]);
 		if([host rangeOfString:@"."].location == NSNotFound) host = [NSString stringWithFormat:@"www.%@.com", host];
