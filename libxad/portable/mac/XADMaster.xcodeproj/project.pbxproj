@@ -595,14 +595,12 @@
 				OTHER_CFLAGS = (
 					"-Wno-pointer-to-int-cast",
 					"-Wno-int-to-pointer-cast",
-					"-DHAVE_CONFIG_H",
-					"-DUNIX",
-					"-DNO_FILENAME_MANGLING",
-					"$(OTHER_CFLAGS_QUOTED_1)",
-					"$(OTHER_CFLAGS_QUOTED_2)",
+					"$(OTHER_CPPFLAGS)",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "\"-I$(SRCROOT)/../include\"";
 				OTHER_CFLAGS_QUOTED_2 = "\"-I$(SRCROOT)/../unix\"";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPPFLAGS)";
+				OTHER_CPPFLAGS = "-DHAVE_CONFIG_H -DUNIX -DNO_FILENAME_MANGLING $(OTHER_CFLAGS_QUOTED_1) $(OTHER_CFLAGS_QUOTED_2)";
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					UniversalDetector,
@@ -631,14 +629,12 @@
 				OTHER_CFLAGS = (
 					"-Wno-pointer-to-int-cast",
 					"-Wno-int-to-pointer-cast",
-					"-DHAVE_CONFIG_H",
-					"-DUNIX",
-					"-DNO_FILENAME_MANGLING",
-					"$(OTHER_CFLAGS_QUOTED_1)",
-					"$(OTHER_CFLAGS_QUOTED_2)",
+					"$(OTHER_CPPFLAGS)",
 				);
 				OTHER_CFLAGS_QUOTED_1 = "\"-I$(SRCROOT)/../include\"";
 				OTHER_CFLAGS_QUOTED_2 = "\"-I$(SRCROOT)/../unix\"";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CPPFLAGS)";
+				OTHER_CPPFLAGS = "-DHAVE_CONFIG_H -DUNIX -DNO_FILENAME_MANGLING $(OTHER_CFLAGS_QUOTED_1) $(OTHER_CFLAGS_QUOTED_2)";
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					UniversalDetector,
@@ -653,11 +649,13 @@
 			buildSettings = {
 				GCC_FAST_OBJC_DISPATCH = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PFE_FILE_C_DIALECTS = "";
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
 				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";
@@ -673,11 +671,18 @@
 				);
 				GCC_FAST_OBJC_DISPATCH = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_PFE_FILE_C_DIALECTS = "";
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
+				OTHER_CFLAGS = (
+					"-Wno-pointer-to-int-cast",
+					"-Wno-int-to-pointer-cast",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				PREBINDING = NO;
+				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				SYMROOT = ../../../build;
 				USER_HEADER_SEARCH_PATHS = "../../../UniversalDetector/**";

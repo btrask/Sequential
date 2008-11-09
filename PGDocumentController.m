@@ -505,20 +505,18 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSMenu *const mainMenu = [NSApp mainMenu];
 	unsigned const pageMenuItemIndex = [mainMenu indexOfItem:[[pageMenuItem retain] autorelease]];
-	[mainMenu removeItemAtIndex:pageMenuItemIndex]; // Works around a Tiger bug where two Page menus appear.
+	if(!PGIsLeopardOrLater()) [mainMenu removeItemAtIndex:pageMenuItemIndex]; // Works around a Tiger bug where two Page menus appear.
 
+	NSMenu *const oldMenu = [pageMenuItem submenu];
 	NSMenu *const newMenu = aMenu ? aMenu : defaultPageMenu;
-	if(!PGIsLeopardOrLater()) {
-		NSMenu *const oldMenu = [pageMenuItem submenu];
-		[newMenu setTitle:[pageMenuItem title]]; // Otherwise the title can get changed.
-		firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
-		previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
-		nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
-		lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
-	}
+	if(!PGIsLeopardOrLater()) [newMenu setTitle:[pageMenuItem title]]; // Otherwise the title can get changed.
+	firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
+	previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
+	nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
+	lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
 	[pageMenuItem setSubmenu:newMenu];
 
-	[mainMenu insertItem:pageMenuItem atIndex:pageMenuItemIndex];
+	if(!PGIsLeopardOrLater()) [mainMenu insertItem:pageMenuItem atIndex:pageMenuItemIndex];
 	[self readingDirectionDidChange:nil];
 }
 - (PGDocument *)_openNew:(BOOL)flag

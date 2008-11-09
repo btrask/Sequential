@@ -25,12 +25,6 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSWindowAdditions.h"
 #import <Carbon/Carbon.h>
 
-@interface NSWindow (TigerOrLater)
-
-- (float)userSpaceScaleFactor;
-
-@end
-
 @implementation NSWindow (AEAdditions)
 
 - (BOOL)AE_isVisible

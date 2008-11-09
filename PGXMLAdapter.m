@@ -70,13 +70,14 @@ DEALINGS WITH THE SOFTWARE. */
 	do {
 		DOMHTMLDocument *const doc = [info objectForKey:PGDOMDocumentKey];
 		if(!doc || ![doc isKindOfClass:[DOMHTMLDocument class]]) break;
+		NSURL *const docURL = [NSURL URLWithString:[doc URL]];
 		DOMNodeList *const elements = [doc getElementsByTagName:@"LINK"];
 		unsigned i = 0;
 		for(; i < [elements length]; i++) {
 			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
 			if(![@"alternate" isEqualToString:[[link rel] lowercaseString]]) continue;
 			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
-			NSURL *const linkURL = [link absoluteLinkURL];
+			NSURL *const linkURL = [NSURL URLWithString:[link href] relativeToURL:docURL];
 			if(!linkURL) continue;
 			[info setObject:linkURL forKey:PGURLKey];
 			[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];

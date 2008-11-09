@@ -70,13 +70,13 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return item ? [[item subloads] count] > 0 : YES;
 }
-- (NSInteger)outlineView:(NSOutlineView *)outlineView
-             numberOfChildrenOfItem:(id)item
+- (int)outlineView:(NSOutlineView *)outlineView
+       numberOfChildrenOfItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] count];
 }
 - (id)outlineView:(NSOutlineView *)outlineView
-      child:(NSInteger)index
+      child:(int)index
       ofItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] objectAtIndex:index];
