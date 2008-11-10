@@ -497,7 +497,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0.5;
+	return 0.25;
 }
 
 @end
@@ -521,7 +521,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0.5;
+	return 0.25;
 }
 
 @end
