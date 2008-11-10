@@ -1006,7 +1006,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKeySpace:
 		{
 			if(![_imageView canAnimateRep]) return NO;
-			[[self activeDocument] setAnimatesImages:![[self activeDocument] animatesImages]];
+			BOOL const nowPlaying = ![[self activeDocument] animatesImages];
+			[[_graphicPanel content] pushGraphic:(nowPlaying ? [PGAlertGraphic playGraphic] : [PGAlertGraphic pauseGraphic]) window:[self window]];
+			[[self activeDocument] setAnimatesImages:nowPlaying];
 			return YES;
 		}
 	} else if(NSCommandKeyMask == modifiers) switch(keyCode) {

@@ -61,12 +61,13 @@ typedef unsigned PGAlertGraphicType;
 + (id)cannotGoLeftGraphic;
 + (id)loopedRightGraphic;
 + (id)loopedLeftGraphic;
++ (id)playGraphic;
++ (id)pauseGraphic;
 
 - (PGAlertGraphicType)graphicType;
 
 - (void)drawInView:(PGAlertView *)anAlertView;
 - (void)flipHorizontally;
-
 - (NSTimeInterval)fadeOutDelay; // 0 means forever.
 
 - (NSTimeInterval)animationDelay; // 0 means don't animate.

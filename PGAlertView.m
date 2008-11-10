@@ -192,10 +192,13 @@ DEALINGS WITH THE SOFTWARE. */
 @end
 @interface PGCannotGoLeftGraphic : PGCannotGoRightGraphic
 @end
-
 @interface PGLoopedLeftGraphic : PGAlertGraphic
 @end
 @interface PGLoopedRightGraphic : PGLoopedLeftGraphic
+@end
+@interface PGPlayGraphic : PGAlertGraphic
+@end
+@interface PGPauseGraphic : PGAlertGraphic
 @end
 
 @implementation PGAlertGraphic
@@ -217,6 +220,14 @@ DEALINGS WITH THE SOFTWARE. */
 + (id)loopedLeftGraphic
 {
 	return [[[PGLoopedLeftGraphic alloc] init] autorelease];
+}
++ (id)playGraphic
+{
+	return [[[PGPlayGraphic alloc] init] autorelease];
+}
++ (id)pauseGraphic
+{
+	return [[[PGPauseGraphic alloc] init] autorelease];
 }
 
 #pragma mark Instance Methods
@@ -273,12 +284,9 @@ DEALINGS WITH THE SOFTWARE. */
 	[flip scaleXBy:-1 yBy:1];
 	[flip concat];
 }
-
-#pragma mark -
-
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0;
+	return 1;
 }
 
 #pragma mark -
@@ -291,9 +299,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	return 0;
 }
-- (void)animateOneFrame:(PGAlertView *)anAlertView
-{
-}
+- (void)animateOneFrame:(PGAlertView *)anAlertView {}
 
 #pragma mark NSObject Protocol
 
@@ -340,13 +346,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[wall stroke];
 }
 
-#pragma mark -
-
-- (NSTimeInterval)fadeOutDelay
-{
-	return 1;
-}
-
 @end
 
 @implementation PGCannotGoLeftGraphic
@@ -390,9 +389,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[s appendBezierPathWithArcWithCenter:NSMakePoint(195, 155) radius:65 startAngle:0 endAngle:90 clockwise:NO];
 	[s fill];
 }
-
-#pragma mark -
-
 - (NSTimeInterval)fadeOutDelay
 {
 	return 0.5;
@@ -481,6 +477,51 @@ DEALINGS WITH THE SOFTWARE. */
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(25, 50, 25, 200)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(50, 25, 200, 250)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(250, 50, 25, 200)];
+}
+
+@end
+
+@implementation PGPlayGraphic
+
+#pragma mark PGAlertGraphic
+
+- (void)drawInView:(PGAlertView *)anAlertView
+{
+	[super drawInView:anAlertView];
+	NSBezierPath *const path = [NSBezierPath bezierPath];
+	[path appendBezierPathWithArcWithCenter:NSMakePoint(200, 150) radius:10 startAngle:60 endAngle:-60 clockwise:YES];
+	[path appendBezierPathWithArcWithCenter:NSMakePoint(110, 100) radius:10 startAngle:-60 endAngle:180 clockwise:YES];
+	[path appendBezierPathWithArcWithCenter:NSMakePoint(110, 200) radius:10 startAngle:180 endAngle:60 clockwise:YES];
+	[[NSColor whiteColor] set];
+	[path fill];
+}
+- (NSTimeInterval)fadeOutDelay
+{
+	return 0.5;
+}
+
+@end
+
+@implementation PGPauseGraphic
+
+#pragma mark PGAlertGraphic
+
+- (void)drawInView:(PGAlertView *)anAlertView
+{
+	[super drawInView:anAlertView];
+	NSBezierPath *const path = [NSBezierPath bezierPath];
+	[path setLineWidth:30];
+	[path setLineCapStyle:NSRoundLineCapStyle];
+	[path moveToPoint:NSMakePoint(115, 100)];
+	[path lineToPoint:NSMakePoint(115, 200)];
+	[path moveToPoint:NSMakePoint(185, 100)];
+	[path lineToPoint:NSMakePoint(185, 200)];
+	[[NSColor whiteColor] set];
+	[path stroke];
+}
+- (NSTimeInterval)fadeOutDelay
+{
+	return 0.5;
 }
 
 @end
