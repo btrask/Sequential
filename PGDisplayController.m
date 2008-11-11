@@ -1003,6 +1003,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKeyEscape: return [d performEscapeKeyAction];
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
+	}
+	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
+		case PGKeyI: return [d performToggleInfo];
+	}
+	if(!modifiers || NSShiftKeyMask & modifiers) switch(keyCode) {
 		case PGKeySpace:
 		{
 			if(![_imageView canAnimateRep]) return NO;
@@ -1011,8 +1016,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[[self activeDocument] setAnimatesImages:nowPlaying];
 			return YES;
 		}
-	} else if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
-		case PGKeyI: return [d performToggleInfo];
 	}
 	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
 		case PGKeyEquals: return [d performZoomIn];
