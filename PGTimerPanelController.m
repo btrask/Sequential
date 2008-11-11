@@ -34,7 +34,7 @@ DEALINGS WITH THE SOFTWARE. */
 #import "NSObjectAdditions.h"
 #import "NSNumberAdditions.h"
 
-#define PGTimerMax 90.0f
+#define PGTimerMax (NSTimeInterval)90
 
 @interface PGTimerPanelController (Private)
 
@@ -49,9 +49,10 @@ DEALINGS WITH THE SOFTWARE. */
 
 - (IBAction)changeTimerInterval:(id)sender
 {
-	float const interval = round(pow([sender doubleValue], 2.0));
-	[[self displayController] setTimerInterval:(interval > PGTimerMax ? 0 : interval)];
-	[intervalSlider setDoubleValue:(interval > PGTimerMax ? FLT_MAX : sqrt(interval))];
+	NSTimeInterval const interval = round([sender doubleValue]);
+	NSTimeInterval const offPoint = ([intervalSlider maxValue] + PGTimerMax) / 2;
+	[[self displayController] setTimerInterval:(interval > offPoint ? 0 : MIN(interval, PGTimerMax))];
+	[intervalSlider setDoubleValue:(interval > offPoint ? DBL_MAX : MIN(interval, PGTimerMax))];
 }
 
 #pragma mark -
@@ -90,7 +91,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 	if(!timer) {
 		[totalField setStringValue:(interval ? [NSString stringWithFormat:NSLocalizedString(@"%@ seconds", @"Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds."), [[NSNumber numberWithDouble:interval] AE_localizedStringWithFractionDigits:1]] : NSLocalizedString(@"---", @"Display string for no timer interval."))];
-		[intervalSlider setDoubleValue:(interval ? sqrt(interval) : FLT_MAX)];
+		[intervalSlider setDoubleValue:(fabs(interval) < 0.1 ? DBL_MAX : interval)];
 		[intervalSlider setEnabled:!![self displayController]];
 	}
 }

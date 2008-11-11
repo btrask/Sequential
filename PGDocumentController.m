@@ -562,7 +562,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[self readingDirectionDidChange:nil];
 }
 
-#pragma mark PGDisplaying Protocol
+#pragma mark PGDisplayControlling Protocol
 
 - (IBAction)reveal:(id)sender {}
 - (IBAction)toggleFullscreen:(id)sender {}
@@ -571,14 +571,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark NSMenuValidation Protocol
 
-#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); ((__a) == (__b) ? NSOnState : ((__a) == round(__b) ? NSMixedState : NSOffState)); })
+#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); (fabs(__a - __b) < 0.001f ? NSOnState : (fabs(round(__a) - round(__b)) < 0.1f ? NSMixedState : NSOffState)); })
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
 	int const tag = [anItem tag];
 
-	if([@protocol(PGDisplaying) descriptionForInstanceMethod:action]) {
+	if([@protocol(PGDisplayControlling) descriptionForInstanceMethod:action]) {
 		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
 		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
@@ -590,15 +590,17 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScalingMode:) == action) {
 		if(PGViewFitScaling == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		[anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+		if(PGConstantFactorScaling == tag) [anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+		else [anItem setState:[pref imageScalingMode] == tag];
 	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
-	else if(@selector(changeImageScalingConstraint:) == action) [anItem setState:tag == [pref imageScalingConstraint]];
-	else if(@selector(changeSortOrder:) == action) [anItem setState:tag == (PGSortOrderMask & [pref sortOrder])];
+	else if(@selector(changeImageScalingConstraint:) == action) [anItem setState:[pref imageScalingConstraint] == tag];
+	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
 	else if(@selector(changeSortDirection:) == action) {
 		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
 		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
-	} else if(@selector(changeSortRepeat:) == action) [anItem setState:tag == (PGSortRepeatMask & [pref sortOrder])];
-	if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
+	} else if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [pref sortOrder]) == tag];
+	else if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
+
 	if([[self documents] count] <= 1) {
 		if(@selector(selectPreviousDocument:) == action) return NO;
 		if(@selector(selectNextDocument:) == action) return NO;
@@ -770,27 +772,33 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
 }
-
-// Allow our document controller to catch key equivalents.
 - (void)sendEvent:(NSEvent *)anEvent
 {
-	if([anEvent window] || [anEvent type] != NSKeyDown || (![[self mainMenu] performKeyEquivalent:anEvent] && ![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent])) [super sendEvent:anEvent];
+	if([anEvent type] == NSKeyDown) {
+		if([[self mainMenu] performKeyEquivalent:anEvent]) return;
+		NSWindow *const w = [anEvent window];
+		if(w) return [w sendEvent:anEvent];
+		else if([[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) return; // Allow our document controller to catch key equivalents.
+	}
+	[super sendEvent:anEvent];
 }
 
 @end
 
 @implementation PGWindow
 
-// Catch events that would normally be swallowed.
+- (void)sendEvent:(NSEvent *)anEvent
+{
+	if(!PGIsLeopardOrLater() && [anEvent type] == NSKeyDown && [anEvent modifierFlags] & NSCommandKeyMask) [[self firstResponder] keyDown:anEvent]; // Tiger never lets views catch events with the Command modifier.
+	else [super sendEvent:anEvent];
+}
 - (void)keyDown:(NSEvent *)anEvent
 {
-	if(![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super keyDown:anEvent];
+	if(![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super keyDown:anEvent]; // Catch events that would normally be swallowed.
 }
-
-// Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
-	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask);
+	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask); // Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
 	return [super validateMenuItem:anItem];
 }
 
@@ -816,17 +824,18 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	// Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
+	if([anEvent type] != NSKeyDown) return NO;
 	int i = 0;
 	for(; i < [self numberOfItems]; i++) {
 		NSMenuItem *const item = [self itemAtIndex:i];
 		NSString *const equiv = [item keyEquivalent];
-		unsigned short keyCode;
-		if([equiv length] == 1
-		&& (keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0])) != PGKeyUnknown
-		&& [anEvent keyCode] == keyCode
-		&& ([anEvent modifierFlags] & NSDeviceIndependentModifierFlagsMask) == ([item keyEquivalentModifierMask] & NSDeviceIndependentModifierFlagsMask)) return [item AE_performAction];
-		else if([[item submenu] performKeyEquivalent:anEvent]) return YES;
+		if([equiv length] != 1) continue;
+		unsigned short const keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0]);
+		if(PGKeyUnknown == keyCode || [anEvent keyCode] != keyCode) continue; // Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
+		unsigned const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask;
+		if(([anEvent modifierFlags] & modifiersMask) != ([item keyEquivalentModifierMask] & modifiersMask)) continue;
+		if([item AE_performAction]) return YES;
+		break;
 	}
 	return [super performKeyEquivalent:anEvent];
 }

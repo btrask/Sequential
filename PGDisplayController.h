@@ -37,7 +37,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGFindlessTextView;
 
 // Controllers
-#import "PGDisplaying.h"
+#import "PGDisplayControlling.h"
 
 // Other
 #import "PGGeometryTypes.h"
@@ -45,7 +45,7 @@ DEALINGS WITH THE SOFTWARE. */
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
-@interface PGDisplayController : NSWindowController <PGDisplaying>
+@interface PGDisplayController : NSWindowController <PGDisplayControlling>
 {
 	@protected
 	IBOutlet PGClipView          *clipView;

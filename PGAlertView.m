@@ -65,7 +65,7 @@ DEALINGS WITH THE SOFTWARE. */
 		[self _updateCurrentGraphic];
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
-	if(fadeOutDelay) [self PG_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay retain:NO];
+	if(fadeOutDelay >= 0.01) [self PG_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay retain:NO];
 	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
@@ -133,7 +133,7 @@ DEALINGS WITH THE SOFTWARE. */
 	[_frameTimer invalidate];
 	_frameCount = 0;
 	NSTimeInterval const animationDelay = [_currentGraphic animationDelay];
-	_frameTimer = animationDelay ? [NSTimer timerWithTimeInterval:animationDelay target:self selector:@selector(animateOneFrame:) userInfo:nil repeats:YES] : nil;
+	_frameTimer = animationDelay > 0 ? [NSTimer timerWithTimeInterval:animationDelay target:self selector:@selector(animateOneFrame:) userInfo:nil repeats:YES] : nil;
 	if(_frameTimer) [[NSRunLoop currentRunLoop] addTimer:_frameTimer forMode:PGCommonRunLoopsMode];
 	[self setNeedsDisplay:YES];
 }
@@ -460,6 +460,10 @@ DEALINGS WITH THE SOFTWARE. */
 		if(switched) [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(52 + i * 9, 32, 5, 5)] fill];
 		else NSRectFill(NSMakeRect(51 + i * 9, 30, 7, 9));
 	}
+}
+- (NSTimeInterval)fadeOutDelay
+{
+	return 0;
 }
 
 #pragma mark -

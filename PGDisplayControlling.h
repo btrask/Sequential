@@ -24,7 +24,7 @@ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS WITH THE SOFTWARE. */
 #import <Cocoa/Cocoa.h>
 
-@protocol PGDisplaying
+@protocol PGDisplayControlling
 
 - (IBAction)reveal:(id)sender;
 - (IBAction)toggleFullscreen:(id)sender;

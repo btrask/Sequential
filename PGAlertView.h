@@ -68,9 +68,9 @@ typedef unsigned PGAlertGraphicType;
 
 - (void)drawInView:(PGAlertView *)anAlertView;
 - (void)flipHorizontally;
-- (NSTimeInterval)fadeOutDelay; // 0 means forever.
+- (NSTimeInterval)fadeOutDelay; // Less than 0.01 means forever.
 
-- (NSTimeInterval)animationDelay; // 0 means don't animate.
+- (NSTimeInterval)animationDelay; // Less than or equal to 0 means don't animate.
 - (unsigned)frameMax;
 - (void)animateOneFrame:(PGAlertView *)anAlertView;
 

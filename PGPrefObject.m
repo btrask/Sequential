@@ -132,11 +132,11 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 }
 - (void)setImageScaleFactor:(float)aFloat
 {
-	float const newFactor = fabs(aFloat);
-	if(newFactor == _imageScaleFactor) return;
+	NSParameterAssert(aFloat > 0.0f);
+	float const newFactor = fabsf(1.0f - aFloat) < 0.01f ? 1.0f : aFloat; // If it's close to 1, fudge it.
 	_imageScaleFactor = newFactor;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:newFactor] forKey:PGImageScaleFactorKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
+	if([self imageScalingMode] == PGConstantFactorScaling) [self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
 - (PGImageScalingConstraint)imageScalingConstraint

@@ -46,6 +46,8 @@ DEALINGS WITH THE SOFTWARE. */
 	[[NSColor colorWithDeviceWhite:0.9 alpha:0.8] set];
 	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5, 0.5)] stroke];
 
+	if(_floatValue < 0.001) return;
+
 	[NSGraphicsContext saveGraphicsState];
 
 	NSBezierPath *path = [NSBezierPath bezierPath];

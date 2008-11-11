@@ -31,7 +31,7 @@ DEALINGS WITH THE SOFTWARE. */
 @class PGBookmark;
 
 // Controllers
-#import "PGDisplaying.h"
+#import "PGDisplayControlling.h"
 @class PGDisplayController;
 @class PGFullscreenController;
 @class PGExifPanelController;
@@ -60,7 +60,7 @@ enum {
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
 
-@interface PGDocumentController : NSResponder <PGDisplaying>
+@interface PGDocumentController : NSResponder <PGDisplayControlling>
 {
 	@private
 	IBOutlet NSMenu      *recentMenu;
