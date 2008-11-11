@@ -278,7 +278,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		NSSize const originalSize = [thumb size];
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
-		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.5f)];
+		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.33f)];
 
 		NSColor *const labelColor = [[self dataSource] thumbnailView:self labelColorForItem:item];
 		if(!labelColor) continue;

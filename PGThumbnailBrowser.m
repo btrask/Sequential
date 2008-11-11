@@ -114,6 +114,7 @@ DEALINGS WITH THE SOFTWARE. */
 
 	--_updateCount;
 	if(MIN(initialNumberOfColumns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if([self numberOfColumns] > initialNumberOfColumns) [self scrollToLastColumnAnimate:YES];
 }
 - (void)redisplayItem:(id)item
         children:(BOOL)flag
