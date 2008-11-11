@@ -14,6 +14,7 @@ New in 2.0.2
 - Improved searching.
 - Other minor improvements.
 - Panther support has been removed. Sorry.
+- Changed from the NCSA license to the BSD license. They're equivalent, but the BSD license is better known.
 
 A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
 
