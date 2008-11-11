@@ -68,7 +68,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 {
 	return YES;
 }
-- (BOOL)canExtractChildren
+- (BOOL)hasExtractableChildren
 {
 	return NO;
 }

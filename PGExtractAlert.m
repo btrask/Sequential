@@ -90,8 +90,14 @@ DEALINGS WITH THE SOFTWARE. */
 	NSString *const modifiedName = [_saveNamesByNodePointer objectForKey:[NSValue valueWithNonretainedObject:node]];
 	return modifiedName ? [[modifiedName retain] autorelease] : [[node identifier] naturalDisplayName];
 }
+- (void)replaceAlertDidEnd:(NSAlert *)alert
+	returnCode:(int)returnCode
+	contextInfo:(void *)contextInfo
+{
+	if(NSAlertFirstButtonReturn == returnCode) _extractOnSheetClose = YES;
+}
 
-#pragma mark -
+#pragma mark NSSavePanelDelegate Protocol
 
 - (BOOL)panel:(id)sender
         isValidFilename:(NSString *)filename
@@ -141,7 +147,6 @@ DEALINGS WITH THE SOFTWARE. */
 	[alert beginSheetModalForWindow:_openPanel modalDelegate:nil didEndSelector:NULL contextInfo:nil];
 	return NO;
 }
-
 - (void)panel:(id)sender
         directoryDidChange:(NSString *)path
 {
@@ -159,12 +164,6 @@ DEALINGS WITH THE SOFTWARE. */
 	}
 	[_initialNode release];
 	_initialNode = nil;
-}
-- (void)replaceAlertDidEnd:(NSAlert *)alert
-	returnCode:(int)returnCode
-	contextInfo:(void *)contextInfo
-{
-	if(NSAlertFirstButtonReturn == returnCode) _extractOnSheetClose = YES;
 }
 
 #pragma mark NSWindowNotifications Protocol
@@ -187,7 +186,7 @@ DEALINGS WITH THE SOFTWARE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         isItemExpandable:(id)item
 {
-	return [item canExtractChildren];
+	return [item hasExtractableChildren];
 }
 - (int)outlineView:(NSOutlineView *)outlineView
        numberOfChildrenOfItem:(id)item

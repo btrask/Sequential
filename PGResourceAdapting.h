@@ -37,7 +37,6 @@ DEALINGS WITH THE SOFTWARE. */
 
 extern NSString *const PGURLKey;
 extern NSString *const PGDataKey;
-extern NSString *const PGDataExistenceKey;
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;
@@ -47,6 +46,7 @@ extern NSString *const PGExtensionKey;
 extern NSString *const PGPasswordKey;
 extern NSString *const PGStringEncodingKey;
 
+extern NSString *const PGDataExistenceKey;
 enum {
 	PGDoesNotExist  = -1,
 	PGWillSoonExist = 0,
@@ -75,9 +75,9 @@ typedef int PGLoadPolicy;
 - (BOOL)canGetData;
 
 - (BOOL)isContainer;
-- (BOOL)canExtractData;
-- (BOOL)canExtractChildren;
 - (BOOL)isResolutionIndependent;
+- (BOOL)canExtractData;
+- (BOOL)hasExtractableChildren;
 
 - (NSArray *)exifEntries;
 - (PGOrientation)orientationWithBase:(BOOL)flag;

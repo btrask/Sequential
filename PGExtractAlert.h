@@ -47,5 +47,6 @@ DEALINGS WITH THE SOFTWARE. */
 - (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
 - (NSString *)saveNameForNode:(PGNode *)node;
+- (void)replaceAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo;
 
 @end

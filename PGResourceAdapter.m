@@ -473,15 +473,15 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
+- (BOOL)isResolutionIndependent
+{
+	return NO;
+}
 - (BOOL)canExtractData
 {
 	return NO;
 }
-- (BOOL)canExtractChildren
-{
-	return NO;
-}
-- (BOOL)isResolutionIndependent
+- (BOOL)hasExtractableChildren
 {
 	return NO;
 }
