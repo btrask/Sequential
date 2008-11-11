@@ -186,6 +186,7 @@ DEALINGS WITH THE SOFTWARE. */
 {
 	if(flag == _animates) return;
 	_animates = flag;
+	if(!flag && [self antialiasWhenUpscaling]) [self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
 - (void)pauseAnimation
@@ -215,7 +216,7 @@ DEALINGS WITH THE SOFTWARE. */
 }
 - (NSImageInterpolation)interpolation
 {
-	if(_numberOfFrames > 1 || _sizeTransitionTimer || [self inLiveResize]) return NSImageInterpolationNone;
+	if(_sizeTransitionTimer || [self inLiveResize] || ([self canAnimateRep] && [self animates])) return NSImageInterpolationNone;
 	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
 	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
 	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
