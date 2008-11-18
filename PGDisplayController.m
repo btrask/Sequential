@@ -78,7 +78,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_readActiveNode;
 - (void)_readFinished;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
-- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode;
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode factor:(float)factor;
+- (void)_zoomTowardScaleFactor:(float)factor;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
@@ -173,15 +174,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)zoomIn:(id)sender
 {
-	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MIN(PGScaleMax, [_imageView averageScaleFactor] * 2)];
-	[doc setImageScaleMode:PGConstantFactorScale];
+	[self _zoomTowardScaleFactor:MIN(PGScaleMax, [_imageView averageScaleFactor] * 2)];
 }
 - (IBAction)zoomOut:(id)sender
 {
-	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, [_imageView averageScaleFactor] / 2)];
-	[doc setImageScaleMode:PGConstantFactorScale];
+	[self _zoomTowardScaleFactor:MAX(PGScaleMin, [_imageView averageScaleFactor] / 2)];
 }
 
 #pragma mark -
@@ -454,9 +451,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
 }
-
-#pragma mark -
-
 - (BOOL)findPanelShown
 {
 	return [_findPanel isVisible] && ![_findPanel isFadingOut];
@@ -718,11 +712,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
 {
-	return [self _sizeForImageRep:rep orientation:orientation scaleMode:[[self activeDocument] imageScaleMode]];
+	return [self _sizeForImageRep:rep orientation:orientation scaleMode:[[self activeDocument] imageScaleMode] factor:[[self activeDocument] imageScaleFactor]];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
           scaleMode:(PGImageScaleMode)scaleMode
+          factor:(float)factor
 {
 	if(!rep) return NSZeroSize;
 	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
@@ -733,7 +728,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	NSSize newSize = originalSize;
 	if(PGConstantFactorScale == scaleMode) {
-		float const factor = [[self activeDocument] imageScaleFactor];
 		newSize.width *= factor;
 		newSize.height *= factor;
 	} else if(PGActualSizeWithDPI != scaleMode) {
@@ -752,6 +746,27 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
 	return PGIntegralSize(newSize);
+}
+- (void)_zoomTowardScaleFactor:(float)factor
+{
+	[NSCursor setHiddenUntilMouseMoves:YES];
+	int nextMode = NSNotFound;
+	NSSize nextSize = PGScaleSizeByFloat([_imageView originalSize], factor);
+	float const boundOffset = factor > [_imageView averageScaleFactor] ? 0.01 : -0.01;
+	nextSize.width += boundOffset;
+	nextSize.height += boundOffset;
+	NSSize const currentSize = [_imageView size];
+	NSNumber *mode;
+	NSEnumerator *const modeEnum = [PGScaleModes() objectEnumerator];
+	while((mode = [modeEnum nextObject])) {
+		NSSize const s = [self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation] scaleMode:[mode intValue] factor:1.0f];
+		if(MIN(currentSize.width, nextSize.width) >= s.width || MIN(currentSize.height, nextSize.height) >= s.height || s.width >= MAX(currentSize.width, nextSize.width) || s.height >= MAX(currentSize.height, nextSize.height)) continue;
+		nextSize = s;
+		nextMode = [mode intValue];
+	}
+	PGDocument *const doc = [self activeDocument];
+	if(NSNotFound == nextMode) [doc setImageScaleFactor:factor];
+	else [doc setImageScaleMode:nextMode];
 }
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
@@ -859,8 +874,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScaleMode] == PGConstantFactorScale) {
-		if(@selector(zoomIn:) == action && [_imageView averageScaleFactor] >= PGScaleMax) return NO;
-		if(@selector(zoomOut:) == action && [_imageView averageScaleFactor] <= PGScaleMin) return NO;
+		if(@selector(zoomIn:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMax) < 0.01) return NO;
+		if(@selector(zoomOut:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMin) < 0.01) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
 	if(!firstNode) { // We might have to get -firstNode anyway.
@@ -1063,8 +1078,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[_imageView setUsesCaching:NO];
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [_imageView averageScaleFactor] * (amount / 500 + 1)))];
-	[doc setImageScaleMode:PGConstantFactorScale];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500 + 1), PGScaleMax))];
 }
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount

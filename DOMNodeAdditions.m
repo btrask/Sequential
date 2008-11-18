@@ -59,9 +59,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned const count = [images length];
 	for(; i < count; i++) {
 		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
-		if([img AE_hasAncestorWithNodeName:@"A"]) continue;
+		if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
 		PGResourceIdentifier *const ident = [[NSURL URLWithString:[img src]] AE_resourceIdentifier];
-		if([results containsObject:ident]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+		if([results containsObject:ident]) continue;
 		NSString *const title = [img title]; // Prefer the title to the alt attribute.
 		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
 		[results addObject:ident];

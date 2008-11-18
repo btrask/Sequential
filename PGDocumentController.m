@@ -178,7 +178,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)changeImageScaleMode:(id)sender
 {
 	[[self currentPrefObject] setImageScaleMode:[sender tag]];
-	[[self currentPrefObject] setImageScaleFactor:1];
 }
 - (IBAction)changeImageScaleConstraint:(id)sender
 {
@@ -187,7 +186,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)changeImageScaleFactor:(id)sender
 {
 	[[self currentPrefObject] setImageScaleFactor:powf(2, [sender tag])];
-	[[self currentPrefObject] setImageScaleMode:PGConstantFactorScale];
 }
 
 #pragma mark -

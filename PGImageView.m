@@ -34,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-#define PGAnimateSizeChanges        true
-#define PGWindowServerMaxWindowSize 10000 // Hard limit imposed by the window server
-#define PGDebugDrawingModes         false
+#define PGAnimateSizeChanges true
+#define PGMaxWindowSize      5000 // 10,000 is a hard limit imposed by the window server.
+#define PGDebugDrawingModes  false
 
 @interface PGImageView (Private)
 
@@ -131,9 +131,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
 }
+- (NSSize)originalSize
+{
+	return PGRotated90CC & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+}
 - (float)averageScaleFactor
 {
-	return (PGRotated90CC & _orientation ? [self size].height / [_rep pixelsWide] + [self size].width / [_rep pixelsHigh] : [self size].width / [_rep pixelsWide] + [self size].height / [_rep pixelsHigh]) / 2.0;
+	NSSize const s = [self size];
+	NSSize const o = [self originalSize];
+	return (s.width / o.width + s.height / o.height) / 2.0f;
 }
 
 #pragma mark -
@@ -277,7 +283,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_image setSize:pixelSize];
 	[_image addRepresentation:_rep];
 	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
-	if(_immediateSize.width > PGWindowServerMaxWindowSize || _immediateSize.height > PGWindowServerMaxWindowSize) return;
+	if(_immediateSize.width > PGMaxWindowSize || _immediateSize.height > PGMaxWindowSize) return;
 
 	[_cache setSize:_immediateSize];
 	[_cache setPixelsWide:_immediateSize.width];

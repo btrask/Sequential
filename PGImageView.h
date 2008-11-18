@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSSize)size; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.
 - (void)setSize:(NSSize)size allowAnimation:(BOOL)flag;
 - (void)stopAnimatedSizeTransition;
+- (NSSize)originalSize;
 - (float)averageScaleFactor;
 
 - (BOOL)usesCaching;

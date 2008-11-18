@@ -49,6 +49,7 @@ enum {
 	PGActualSizeWithDPI            = 4
 };
 typedef int PGImageScaleMode;
+extern NSArray *PGScaleModes();
 
 enum {
 	PGDownscale   = -1,

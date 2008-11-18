@@ -45,6 +45,10 @@ static NSString *const PGAnimatesImagesKey              = @"PGAnimatesImages";
 static NSString *const PGSortOrderKey                   = @"PGSortOrder2";
 static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Deprecated after 1.3.2.
 
+NSArray *PGScaleModes() {
+	return [NSArray arrayWithObjects:[NSNumber numberWithInt:PGConstantFactorScale], [NSNumber numberWithInt:PGAutomaticScale], [NSNumber numberWithInt:PGViewFitScale], [NSNumber numberWithInt:PGActualSizeWithDPI], nil];
+}
+
 @implementation PGPrefObject
 
 #pragma mark Class Methods
@@ -120,9 +124,10 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 }
 - (void)setImageScaleMode:(PGImageScaleMode)aMode
 {
-	if(aMode == _imageScaleMode) return;
 	_imageScaleMode = aMode;
+	_imageScaleFactor = 1;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:aMode] forKey:PGImageScaleModeKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:1] forKey:PGImageScaleFactorKey];
 	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
@@ -135,8 +140,10 @@ static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Dep
 	NSParameterAssert(aFloat > 0.0f);
 	float const newFactor = fabsf(1.0f - aFloat) < 0.01f ? 1.0f : aFloat; // If it's close to 1, fudge it.
 	_imageScaleFactor = newFactor;
+	_imageScaleMode = PGConstantFactorScale;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:newFactor] forKey:PGImageScaleFactorKey];
-	if([self imageScaleMode] == PGConstantFactorScale) [self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:PGConstantFactorScale] forKey:PGImageScaleModeKey];
+	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
 - (PGImageScaleConstraint)imageScaleConstraint

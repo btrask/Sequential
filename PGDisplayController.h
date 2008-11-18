@@ -138,7 +138,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
-
 - (BOOL)findPanelShown;
 - (void)setFindPanelShown:(BOOL)flag;
 
