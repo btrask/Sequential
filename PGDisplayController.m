@@ -1078,7 +1078,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[_imageView setUsesCaching:NO];
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500 + 1), PGScaleMax))];
+	float const scale = MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500 + 1), PGScaleMax));
+	NSSize const targetSize = PGScaleSizeByFloat([_imageView originalSize], scale);
+	NSNumber *mode;
+	NSEnumerator *const modeEnum = [PGScaleModes() objectEnumerator];
+	while((mode = [modeEnum nextObject])) {
+		NSSize const s = [self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation] scaleMode:[mode intValue] factor:1.0f];
+		if(fabsf(s.width - targetSize.width) < 5 && fabsf(s.height - targetSize.height) < 5) return [doc setImageScaleMode:[mode intValue]];
+	}
+	[doc setImageScaleFactor:scale];
 }
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount
