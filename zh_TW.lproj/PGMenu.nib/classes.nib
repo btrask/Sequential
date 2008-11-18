@@ -351,6 +351,14 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGThumbnailBrowser</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -363,14 +371,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGColumnView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -429,11 +429,11 @@
 			<dict>
 				<key>activateDocument</key>
 				<string>id</string>
+				<key>changeImageScaleConstraint</key>
+				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
-				<key>changeImageScalingConstraint</key>
-				<string>id</string>
-				<key>changeImageScalingMode</key>
+				<key>changeImageScaleMode</key>
 				<string>id</string>
 				<key>changeReadingDirection</key>
 				<string>id</string>

@@ -42,20 +42,20 @@ enum {
 typedef int PGPatternType;
 
 enum {
-	PGConstantFactorScaling        = 0, // Formerly known as PGNoScaling.
-	PGAutomaticScaling             = 1,
-	PGDeprecatedVerticalFitScaling = 2, // Deprecated after 1.0.3.
-	PGViewFitScaling               = 3, // Fits the entire image inside the screen/window.
+	PGConstantFactorScale        = 0, // Formerly known as PGNoScale.
+	PGAutomaticScale             = 1,
+	PGDeprecatedVerticalFitScale = 2, // Deprecated after 1.0.3.
+	PGViewFitScale               = 3, // Fits the entire image inside the screen/window.
 	PGActualSizeWithDPI            = 4
 };
-typedef int PGImageScalingMode;
+typedef int PGImageScaleMode;
 
 enum {
 	PGDownscale   = -1,
 	PGScaleFreely = 0,
 	PGUpscale     = 1
 };
-typedef int PGImageScalingConstraint;
+typedef int PGImageScaleConstraint;
 
 enum {
 	PGUnsorted           = 0,
@@ -75,14 +75,14 @@ typedef int PGSortOrder;
 @interface PGPrefObject : NSObject
 {
 	@private
-	BOOL                     _showsInfo;
-	BOOL                     _showsThumbnails;
-	PGReadingDirection       _readingDirection;
-	PGImageScalingMode       _imageScalingMode;
-	float                    _imageScaleFactor;
-	PGImageScalingConstraint _imageScalingConstraint;
-	BOOL                     _animatesImages;
-	PGSortOrder              _sortOrder;
+	BOOL _showsInfo;
+	BOOL _showsThumbnails;
+	PGReadingDirection _readingDirection;
+	PGImageScaleMode _imageScaleMode;
+	float _imageScaleFactor;
+	PGImageScaleConstraint _imageScaleConstraint;
+	BOOL _animatesImages;
+	PGSortOrder _sortOrder;
 }
 
 + (id)globalPrefObject;
@@ -95,12 +95,12 @@ typedef int PGSortOrder;
 - (PGReadingDirection)readingDirection;
 - (void)setReadingDirection:(PGReadingDirection)aDirection;
 
-- (PGImageScalingMode)imageScalingMode;
-- (void)setImageScalingMode:(PGImageScalingMode)aMode;
+- (PGImageScaleMode)imageScaleMode;
+- (void)setImageScaleMode:(PGImageScaleMode)aMode;
 - (float)imageScaleFactor;
 - (void)setImageScaleFactor:(float)aFloat;
-- (PGImageScalingConstraint)imageScalingConstraint;
-- (void)setImageScalingConstraint:(PGImageScalingConstraint)flag;
+- (PGImageScaleConstraint)imageScaleConstraint;
+- (void)setImageScaleConstraint:(PGImageScaleConstraint)flag;
 
 - (BOOL)animatesImages;
 - (void)setAnimatesImages:(BOOL)flag;

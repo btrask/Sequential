@@ -78,6 +78,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_readActiveNode;
 - (void)_readFinished;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
@@ -174,13 +175,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	PGDocument *const doc = [self activeDocument];
 	[doc setImageScaleFactor:MIN(PGScaleMax, [_imageView averageScaleFactor] * 2)];
-	[doc setImageScalingMode:PGConstantFactorScaling];
+	[doc setImageScaleMode:PGConstantFactorScale];
 }
 - (IBAction)zoomOut:(id)sender
 {
 	PGDocument *const doc = [self activeDocument];
 	[doc setImageScaleFactor:MAX(PGScaleMin, [_imageView averageScaleFactor] / 2)];
-	[doc setImageScalingMode:PGConstantFactorScaling];
+	[doc setImageScaleMode:PGConstantFactorScale];
 }
 
 #pragma mark -
@@ -717,32 +718,37 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
 {
+	return [self _sizeForImageRep:rep orientation:orientation scaleMode:[[self activeDocument] imageScaleMode]];
+}
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep
+          orientation:(PGOrientation)orientation
+          scaleMode:(PGImageScaleMode)scaleMode
+{
 	if(!rep) return NSZeroSize;
-	PGImageScalingMode const scalingMode = [[self activeDocument] imageScalingMode];
-	NSSize originalSize = PGActualSizeWithDPI == scalingMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
+	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	if(orientation & PGRotated90CC) {
 		float const w = originalSize.width;
 		originalSize.width = originalSize.height;
 		originalSize.height = w;
 	}
 	NSSize newSize = originalSize;
-	if(PGConstantFactorScaling == scalingMode) {
+	if(PGConstantFactorScale == scaleMode) {
 		float const factor = [[self activeDocument] imageScaleFactor];
 		newSize.width *= factor;
 		newSize.height *= factor;
-	} else if(PGActualSizeWithDPI != scalingMode) {
-		PGImageScalingConstraint const constraint = [[self activeDocument] imageScalingConstraint];
+	} else if(PGActualSizeWithDPI != scaleMode) {
+		PGImageScaleConstraint const constraint = [[self activeDocument] imageScaleConstraint];
 		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
 		NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
 		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
 		NSRect const bounds = [clipView insetBounds];
 		float scaleX = NSWidth(bounds) / roundf(newSize.width);
 		float scaleY = NSHeight(bounds) / roundf(newSize.height);
-		if(PGAutomaticScaling == scalingMode) {
+		if(PGAutomaticScale == scaleMode) {
 			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
 			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floorf(newSize.height * scaleX / scrollMax.height + 0.3) * scrollMax.height) / newSize.height));
 			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floorf(newSize.width * scaleY / scrollMax.width + 0.3) * scrollMax.width) / newSize.width));
-		} else if(PGViewFitScaling == scalingMode) scaleX = scaleY = MIN(scaleX, scaleY);
+		} else if(PGViewFitScale == scaleMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
 	return PGIntegralSize(newSize);
@@ -852,7 +858,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(@selector(revertOrientation:) == action) return NO;
 	}
 	PGDocument *const doc = [self activeDocument];
-	if([doc imageScalingMode] == PGConstantFactorScaling) {
+	if([doc imageScaleMode] == PGConstantFactorScale) {
 		if(@selector(zoomIn:) == action && [_imageView averageScaleFactor] >= PGScaleMax) return NO;
 		if(@selector(zoomOut:) == action && [_imageView averageScaleFactor] <= PGScaleMin) return NO;
 	}
@@ -1058,7 +1064,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_imageView setUsesCaching:NO];
 	PGDocument *const doc = [self activeDocument];
 	[doc setImageScaleFactor:MAX(PGScaleMin, MIN(PGScaleMax, [_imageView averageScaleFactor] * (amount / 500 + 1)))];
-	[doc setImageScalingMode:PGConstantFactorScaling];
+	[doc setImageScaleMode:PGConstantFactorScale];
 }
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount

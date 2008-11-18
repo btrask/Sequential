@@ -427,11 +427,11 @@
 			<dict>
 				<key>activateDocument</key>
 				<string>id</string>
+				<key>changeImageScaleConstraint</key>
+				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
-				<key>changeImageScalingConstraint</key>
-				<string>id</string>
-				<key>changeImageScalingMode</key>
+				<key>changeImageScaleMode</key>
 				<string>id</string>
 				<key>changeReadingDirection</key>
 				<string>id</string>

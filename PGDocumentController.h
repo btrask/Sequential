@@ -117,8 +117,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (IBAction)clearRecentDocuments:(id)sender;
 - (IBAction)closeAll:(id)sender;
 
-- (IBAction)changeImageScalingMode:(id)sender; // PGImageScalingMode from [sender tag].
-- (IBAction)changeImageScalingConstraint:(id)sender; // PGImageScalingConstraint from [sender tag].
+- (IBAction)changeImageScaleMode:(id)sender; // PGImageScaleMode from [sender tag].
+- (IBAction)changeImageScaleConstraint:(id)sender; // PGImageScaleConstraint from [sender tag].
 - (IBAction)changeImageScaleFactor:(id)sender; // 2 to the power of [sender tag].
 
 - (IBAction)changeSortOrder:(id)sender; // PGSortOrder from [sender tag].

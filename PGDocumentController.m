@@ -175,19 +175,19 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (IBAction)changeImageScalingMode:(id)sender
+- (IBAction)changeImageScaleMode:(id)sender
 {
-	[[self currentPrefObject] setImageScalingMode:[sender tag]];
+	[[self currentPrefObject] setImageScaleMode:[sender tag]];
 	[[self currentPrefObject] setImageScaleFactor:1];
 }
-- (IBAction)changeImageScalingConstraint:(id)sender
+- (IBAction)changeImageScaleConstraint:(id)sender
 {
-	[[self currentPrefObject] setImageScalingConstraint:[sender tag]];
+	[[self currentPrefObject] setImageScaleConstraint:[sender tag]];
 }
 - (IBAction)changeImageScaleFactor:(id)sender
 {
 	[[self currentPrefObject] setImageScaleFactor:powf(2, [sender tag])];
-	[[self currentPrefObject] setImageScalingMode:PGConstantFactorScaling];
+	[[self currentPrefObject] setImageScaleMode:PGConstantFactorScale];
 }
 
 #pragma mark -
@@ -588,12 +588,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
-	else if(@selector(changeImageScalingMode:) == action) {
-		if(PGViewFitScaling == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScaling == tag) [anItem setState:([pref imageScalingMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
-		else [anItem setState:[pref imageScalingMode] == tag];
+	else if(@selector(changeImageScaleMode:) == action) {
+		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
+		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+		else [anItem setState:[pref imageScaleMode] == tag];
 	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
-	else if(@selector(changeImageScalingConstraint:) == action) [anItem setState:[pref imageScalingConstraint] == tag];
+	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
 	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
 	else if(@selector(changeSortDirection:) == action) {
 		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
@@ -607,9 +607,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 	if(![self currentDocument]) {
 		if(@selector(changeReadingDirection:) == action) return NO;
-		if(@selector(changeImageScalingMode:) == action) return NO;
+		if(@selector(changeImageScaleMode:) == action) return NO;
 		if(@selector(changeImageScaleFactor:) == action) return NO;
-		if(@selector(changeImageScalingConstraint:) == action) return NO;
+		if(@selector(changeImageScaleConstraint:) == action) return NO;
 		if(@selector(changeSortOrder:) == action) return NO;
 		if(@selector(changeSortDirection:) == action) return NO;
 		if(@selector(changeSortRepeat:) == action) return NO;

@@ -337,20 +337,20 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[super setReadingDirection:aDirection];
 	[[PGPrefObject globalPrefObject] setReadingDirection:aDirection];
 }
-- (void)setImageScalingMode:(PGImageScalingMode)aMode
+- (void)setImageScaleMode:(PGImageScaleMode)aMode
 {
-	[super setImageScalingMode:aMode];
-	[[PGPrefObject globalPrefObject] setImageScalingMode:aMode];
+	[super setImageScaleMode:aMode];
+	[[PGPrefObject globalPrefObject] setImageScaleMode:aMode];
 }
 - (void)setImageScaleFactor:(float)aFloat
 {
 	[super setImageScaleFactor:aFloat];
 	[[PGPrefObject globalPrefObject] setImageScaleFactor:aFloat];
 }
-- (void)setImageScalingConstraint:(PGImageScalingConstraint)constraint
+- (void)setImageScaleConstraint:(PGImageScaleConstraint)constraint
 {
-	[super setImageScalingConstraint:constraint];
-	[[PGPrefObject globalPrefObject] setImageScalingConstraint:constraint];
+	[super setImageScaleConstraint:constraint];
+	[[PGPrefObject globalPrefObject] setImageScaleConstraint:constraint];
 }
 - (void)setAnimatesImages:(BOOL)flag
 {

@@ -429,11 +429,11 @@
 			<dict>
 				<key>activateDocument</key>
 				<string>id</string>
+				<key>changeImageScaleConstraint</key>
+				<string>id</string>
 				<key>changeImageScaleFactor</key>
 				<string>id</string>
-				<key>changeImageScalingConstraint</key>
-				<string>id</string>
-				<key>changeImageScalingMode</key>
+				<key>changeImageScaleMode</key>
 				<string>id</string>
 				<key>changeReadingDirection</key>
 				<string>id</string>
@@ -524,19 +524,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSResponder</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>
