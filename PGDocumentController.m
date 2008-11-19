@@ -772,7 +772,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)sendEvent:(NSEvent *)anEvent
 {
-	if([anEvent window] || [anEvent type] != NSKeyDown || ![[self mainMenu] performKeyEquivalent:anEvent] || ![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super sendEvent:anEvent];
+	if([anEvent window] || [anEvent type] != NSKeyDown || !([[self mainMenu] performKeyEquivalent:anEvent] || [[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent])) [super sendEvent:anEvent];
 }
 
 @end
