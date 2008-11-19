@@ -709,9 +709,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)keyDown:(NSEvent *)anEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
+	if([anEvent modifierFlags] & NSCommandKeyMask) return [super keyDown:anEvent];
 	if([[self delegate] clipView:self handleKeyDown:anEvent]) return;
 	unsigned const modifiers = [anEvent modifierFlags];
-	if(modifiers & NSCommandKeyMask) return [super keyDown:anEvent]; // Ignore all command key equivalents.
 	BOOL const forward = !(NSShiftKeyMask & modifiers);
 	switch([anEvent keyCode]) {
 #if PGGameStyleArrowScrolling
@@ -745,6 +745,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			return [super keyDown:anEvent]; // Pass these keys on.
 	}
 	if(![[NSApp mainMenu] performKeyEquivalent:anEvent]) [self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
+}
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	[NSCursor setHiddenUntilMouseMoves:YES];
+	return [super performKeyEquivalent:anEvent] || [[self delegate] performKeyEquivalent:anEvent];
 }
 
 #if !PGGameStyleArrowScrolling

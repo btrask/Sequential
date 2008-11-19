@@ -772,28 +772,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)sendEvent:(NSEvent *)anEvent
 {
-	if([anEvent type] == NSKeyDown) {
-		if([[self mainMenu] performKeyEquivalent:anEvent]) return;
-		NSWindow *const w = [anEvent window];
-		if(w) return [w sendEvent:anEvent];
-		else if([[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) return; // Allow our document controller to catch key equivalents.
-	}
-	[super sendEvent:anEvent];
+	if([anEvent window] || [anEvent type] != NSKeyDown || ![[self mainMenu] performKeyEquivalent:anEvent] || ![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super sendEvent:anEvent];
 }
 
 @end
 
 @implementation PGWindow
 
-- (void)sendEvent:(NSEvent *)anEvent
-{
-	if(!PGIsLeopardOrLater() && [anEvent type] == NSKeyDown && [anEvent modifierFlags] & NSCommandKeyMask) [[self firstResponder] keyDown:anEvent]; // Tiger never lets views catch events with the Command modifier.
-	else [super sendEvent:anEvent];
-}
-- (void)keyDown:(NSEvent *)anEvent
-{
-	if(![[PGDocumentController sharedDocumentController] performKeyEquivalent:anEvent]) [super keyDown:anEvent]; // Catch events that would normally be swallowed.
-}
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask); // Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
@@ -823,8 +808,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
 	if([anEvent type] != NSKeyDown) return NO;
-	int i = 0;
-	for(; i < [self numberOfItems]; i++) {
+	int i;
+	int const count = [self numberOfItems];
+	for(i = 0; i < count; i++) {
 		NSMenuItem *const item = [self itemAtIndex:i];
 		NSString *const equiv = [item keyEquivalent];
 		if([equiv length] != 1) continue;
@@ -832,10 +818,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if(PGKeyUnknown == keyCode || [anEvent keyCode] != keyCode) continue; // Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
 		unsigned const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask;
 		if(([anEvent modifierFlags] & modifiersMask) != ([item keyEquivalentModifierMask] & modifiersMask)) continue;
-		if([item AE_performAction]) return YES;
-		break;
+		return [item AE_performAction];
 	}
-	return [super performKeyEquivalent:anEvent];
+	for(i = 0; i < count; i++) if([[[self itemAtIndex:i] submenu] performKeyEquivalent:anEvent]) return YES;
+	return [NSApp mainMenu] == self ? [super performKeyEquivalent:anEvent] : NO;
 }
 
 @end

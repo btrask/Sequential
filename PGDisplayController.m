@@ -1018,15 +1018,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
         handleKeyDown:(NSEvent *)anEvent
 {
 	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	unsigned short const keyCode = [anEvent keyCode];
 	if(!modifiers) switch(keyCode) {
-		case PGKeyEscape: return [d performEscapeKeyAction];
+		case PGKeyEscape: return [[PGDocumentController sharedDocumentController] performEscapeKeyAction];
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
-	}
-	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
-		case PGKeyI: return [d performToggleInfo];
 	}
 	if(!modifiers || NSShiftKeyMask & modifiers) switch(keyCode) {
 		case PGKeySpace:
@@ -1037,10 +1033,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[[self activeDocument] setAnimatesImages:nowPlaying];
 			return YES;
 		}
-	}
-	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
-		case PGKeyEquals: return [d performZoomIn];
-		case PGKeyMinus: return [d performZoomOut];
 	}
 	float const timerFactor = NSAlternateKeyMask & modifiers ? 10.0f : 1.0f;
 	if(!modifiers || NSAlternateKeyMask & modifiers) switch(keyCode) {
@@ -1055,7 +1047,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
 		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
 	}
-	return NO;
+	return [self performKeyEquivalent:anEvent];
 }
 - (BOOL)clipView:(PGClipView *)sender
         shouldExitEdges:(PGRectEdgeMask)mask
@@ -1290,6 +1282,20 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark NSResponder
 
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
+	unsigned short const keyCode = [anEvent keyCode];
+	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
+	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
+		case PGKeyI: return [d performToggleInfo];
+	}
+	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
+		case PGKeyEquals: return [d performZoomIn];
+		case PGKeyMinus: return [d performZoomOut];
+	}
+	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
+}
 - (id)validRequestorForSendType:(NSString *)sendType
       returnType:(NSString *)returnType
 {
