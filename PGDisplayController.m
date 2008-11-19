@@ -1076,7 +1076,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSEnumerator *const modeEnum = [PGScaleModes() objectEnumerator];
 	while((mode = [modeEnum nextObject])) {
 		NSSize const s = [self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation] scaleMode:[mode intValue] factor:1.0f];
-		if(fabsf(s.width - targetSize.width) < 5 && fabsf(s.height - targetSize.height) < 5) return [doc setImageScaleMode:[mode intValue]];
+		if(fabsf(s.width - targetSize.width) < 20 && fabsf(s.height - targetSize.height) < 20) return [doc setImageScaleMode:[mode intValue]];
 	}
 	[doc setImageScaleFactor:scale];
 }
