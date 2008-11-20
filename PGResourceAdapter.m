@@ -549,7 +549,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return [[self sortedViewableNodeNext:flag] sortedViewableNodeNext:flag afterRemovalOfChildren:removedChildren fromNode:changedNode];
 }
 
-- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag
+- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)flag
 {
 	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
 	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];

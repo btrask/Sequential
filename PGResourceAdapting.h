@@ -93,7 +93,7 @@ typedef int PGLoadPolicy;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode; // Returns a node that will still exist after the change.
-- (PGNode *)sotedFirstViewableNodeInFolderNext:(BOOL)flag;
+- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)flag;
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent;

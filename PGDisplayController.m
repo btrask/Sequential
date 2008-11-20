@@ -217,13 +217,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) return;
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) return;
 	[self prepareToLoop];
 	[self tryToLoopForward:NO toNode:[[[[[self activeDocument] node] sortedViewableNodeFirst:NO] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[self activeNode] sotedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) return;
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) return;
 	[self prepareToLoop];
 	[self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
 }
