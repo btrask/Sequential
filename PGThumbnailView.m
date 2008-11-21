@@ -34,7 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSBezierPathAdditions.h"
 
 #define PGThumbnailSize         128.0f
-#define PGThumbnailMarginWidth  12.0
+#define PGThumbnailHoleSize     6.0f
+#define PGThumbnailHoleSpacing  3.0f
+#define PGThumbnailHoleAdvance  (PGThumbnailHoleSize + PGThumbnailHoleSpacing)
+#define PGThumbnailMarginWidth  (PGThumbnailHoleSize + PGThumbnailHoleSpacing * 2)
 #define PGThumbnailMarginHeight 2.0f
 #define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
 #define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
@@ -228,8 +231,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	NSRect const b = [self bounds];
 
 	[[NSColor clearColor] set];
-	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(NSMinX(b), NSMinY(b), PGThumbnailMarginWidth, NSHeight(b))));
-	NSRectFill(NSIntersectionRect(aRect, NSMakeRect(PGThumbnailTotalWidth - PGThumbnailTotalWidth, NSMinY(b), NSWidth(b) + PGThumbnailTotalWidth - PGThumbnailTotalWidth, NSHeight(b))));
+	NSRectFill(b); // We say we're opaque so we have to fill everything.
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
@@ -297,15 +299,18 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	}
 	[nilShadow set];
 
-	float top = roundf(NSMinY(aRect) / 9) * 9 - 3.0f;
-	for(; top < NSMaxY(aRect); top += 9) {
+	float top = roundf(NSMinY(aRect) / PGThumbnailHoleAdvance) * PGThumbnailHoleAdvance - PGThumbnailHoleSize / 2;
+	for(; top < NSMaxY(aRect); top += PGThumbnailHoleAdvance) {
+		NSRect const leftHoleRect = NSMakeRect(PGThumbnailHoleSpacing, top, PGThumbnailHoleSize, PGThumbnailHoleSize);
+		NSRect const rightHoleRect = NSMakeRect(PGThumbnailTotalWidth - PGThumbnailMarginWidth + PGThumbnailHoleSpacing, top, PGThumbnailHoleSize, PGThumbnailHoleSize);
+
 		[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(3, top + 1, 6, 6) cornerRadius:1] fill];
-		[[NSBezierPath AE_bezierPathWithRoundRect: NSMakeRect(PGThumbnailSize + PGThumbnailMarginWidth + 3, top + 1, 6, 6)cornerRadius:1] fill];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0, 1) cornerRadius:2] fill];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0, 1) cornerRadius:2] fill];
 
 		[[NSColor clearColor] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(3, top, 6, 6) cornerRadius:1] AE_fillUsingOperation:NSCompositeCopy];
-		[[NSBezierPath AE_bezierPathWithRoundRect: NSMakeRect(PGThumbnailSize + PGThumbnailMarginWidth + 3, top, 6, 6)cornerRadius:1] AE_fillUsingOperation:NSCompositeCopy];
+		[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
+		[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
 	}
 
 	CGContextEndTransparencyLayer(context);
