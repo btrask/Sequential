@@ -150,12 +150,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)panel:(id)sender
         directoryDidChange:(NSString *)path
 {
-	if(!_initialSelection) return;
 	[_destination release];
 	_destination = [path retain];
 	[nodesOutline reloadData];
 	[nodesOutline expandItem:_rootNode expandChildren:YES];
 
+	if(!_initialSelection) return;
 	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
 	PGNode *node;
 	NSEnumerator *const nodeEnum = [_initialSelection objectEnumerator];
