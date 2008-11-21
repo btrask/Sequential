@@ -347,7 +347,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[clipView setDocumentView:view];
 			[self setActiveNode:node initialLocation:PGHomeLocation];
 		}
+		[self documentNodeIsViewableDidChange:nil]; // In case the node has become unviewable in the meantime.
 		[searchField setStringValue:query];
+
 		[self documentReadingDirectionDidChange:nil];
 		[self documentShowsInfoDidChange:nil];
 		if(![self shouldShowThumbnails]) [_thumbnailPanel close];
@@ -563,15 +565,16 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif
 {
-	NSParameterAssert(aNotif);
-	PGNode *const node = [[aNotif userInfo] objectForKey:PGDocumentNodeKey];
+	PGNode *const node = aNotif ? [[aNotif userInfo] objectForKey:PGDocumentNodeKey] : [self activeNode];
 	if(![self activeNode]) {
 		if([node isViewable]) [self setActiveNode:node initialLocation:PGHomeLocation];
 	} else if([self activeNode] == node) {
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
-	[self _noteViewableNodeCountDidChange];
-	[self _updateNodeIndex];
+	if(aNotif) {
+		[self _noteViewableNodeCountDidChange];
+		[self _updateNodeIndex];
+	}
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
