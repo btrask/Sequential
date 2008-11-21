@@ -124,7 +124,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)extractImages:(id)sender
 {
-	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialNode:[self activeNode]] autorelease] beginSheetForWindow:nil];
+	NSSet *set = nil;
+	if([self shouldShowThumbnails]) set = [[_thumbnailPanel content] selection];
+	else if([self activeNode]) set = [NSSet setWithObject:[self activeNode]];
+	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
 }
 - (IBAction)moveToTrash:(id)sender
 {

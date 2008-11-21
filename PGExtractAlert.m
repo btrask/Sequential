@@ -39,11 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #pragma mark Instance Methods
 
 - (id)initWithRoot:(PGNode *)root
-      initialNode:(PGNode *)aNode
+      initialSelection:(NSSet *)aSet
 {
 	if(!(self = [super initWithWindowNibName:@"PGExtract"])) return nil;
 	_rootNode = [root retain];
-	_initialNode = [aNode retain];
+	_initialSelection = [aSet copy];
 	_saveNamesByNodePointer = [[NSMutableDictionary alloc] init];
 	return self;
 }
@@ -150,20 +150,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)panel:(id)sender
         directoryDidChange:(NSString *)path
 {
+	if(!_initialSelection) return;
 	[_destination release];
 	_destination = [path retain];
 	[nodesOutline reloadData];
 	[nodesOutline expandItem:_rootNode expandChildren:YES];
-	if(!_initialNode) return;
-	PGNode *node = _initialNode;
-	while(node && ![node canExtractData]) node = [node parentNode];
-	unsigned const defaultRow = node ? [nodesOutline rowForItem:node] : NSNotFound;
-	if(NSNotFound != defaultRow) {
-		[nodesOutline selectRowIndexes:[NSIndexSet indexSetWithIndex:defaultRow] byExtendingSelection:NO];
-		[nodesOutline scrollRowToVisible:defaultRow];
+
+	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
+	PGNode *node;
+	NSEnumerator *const nodeEnum = [_initialSelection objectEnumerator];
+	while((node = [nodeEnum nextObject])) {
+		if(![node canExtractData]) continue;
+		int const rowIndex = [nodesOutline rowForItem:node];
+		if(-1 != rowIndex) [indexes addIndex:(unsigned)rowIndex];
 	}
-	[_initialNode release];
-	_initialNode = nil;
+	[nodesOutline selectRowIndexes:indexes byExtendingSelection:NO];
+	unsigned const firstRow = [indexes firstIndex];
+	if(NSNotFound != firstRow) [nodesOutline scrollRowToVisible:firstRow];
+	[_initialSelection release];
+	_initialSelection = nil;
 }
 
 #pragma mark NSWindowNotifications Protocol
@@ -245,7 +250,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[nodesOutline setDataSource:nil];
 	[nodesOutline setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
 	[_rootNode release];
-	[_initialNode release];
+	[_initialSelection release];
 	[_saveNamesByNodePointer release];
 	[_destination release];
 	[_openPanel release];
