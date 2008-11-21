@@ -466,6 +466,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[self node] canGetDataWithInfo:_info];
 }
+- (BOOL)hasNodesWithData
+{
+	return [[self node] canGetData];
+}
 
 #pragma mark -
 
@@ -500,10 +504,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-- (BOOL)hasDataNodes
-{
-	return [[self node] canGetData];
-}
 - (unsigned)viewableNodeIndex
 {
 	return [[self parentAdapter] viewableIndexOfChild:[self node]];

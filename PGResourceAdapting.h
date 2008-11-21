@@ -73,6 +73,7 @@ typedef int PGLoadPolicy;
 - (NSMutableDictionary *)info;
 - (NSData *)data;
 - (BOOL)canGetData;
+- (BOOL)hasNodesWithData;
 
 - (BOOL)isContainer;
 - (BOOL)isResolutionIndependent;
@@ -83,7 +84,6 @@ typedef int PGLoadPolicy;
 - (PGOrientation)orientationWithBase:(BOOL)flag;
 - (void)clearCache;
 
-- (BOOL)hasDataNodes; // Nodes that return YES from -canGetData.
 - (unsigned)viewableNodeIndex;
 - (unsigned)viewableNodeCount;
 - (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt;

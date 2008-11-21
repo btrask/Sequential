@@ -845,7 +845,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(@selector(pauseDocument:) == action) return NO;
 		if(@selector(pauseAndCloseDocument:) == action) return NO;
 	}
-	if(![[[self activeDocument] node] hasDataNodes]) {
+	if(![[[self activeDocument] node] hasNodesWithData]) {
 		if(@selector(extractImages:) == action) return NO;
 	}
 	if(![[[self activeNode] identifier] isFileIdentifier]) {
