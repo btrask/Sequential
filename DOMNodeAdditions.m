@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
 		PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
 		if([results containsObject:ident]) continue;
-		[ident setCustomDisplayName:[a innerText] notify:NO];
+		[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
 		[results addObject:ident];
 	}
 	return results;
