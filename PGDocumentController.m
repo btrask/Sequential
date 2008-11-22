@@ -766,7 +766,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[PGWindow poseAsClass:[NSWindow class]];
 	[PGView poseAsClass:[NSView class]];
 	[PGMenu poseAsClass:[NSMenu class]];
-	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"com.poisonousinsect.Sequential"]; // Fall back on the old preference file if necessary.
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
 }
