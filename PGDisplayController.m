@@ -1148,7 +1148,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (NSString *)thumbnailView:(PGThumbnailView *)sender
               labelForItem:(id)item
 {
-	return [[item identifier] displayName];
+	return [item hasRealThumbnail] ? nil : [[item identifier] displayName];
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;

@@ -76,6 +76,7 @@ typedef int PGLoadPolicy;
 - (BOOL)hasNodesWithData;
 
 - (BOOL)isContainer;
+- (BOOL)hasRealThumbnail;
 - (BOOL)isResolutionIndependent;
 - (BOOL)canExtractData;
 - (BOOL)hasExtractableChildren;

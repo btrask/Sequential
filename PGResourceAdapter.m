@@ -477,6 +477,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
+- (BOOL)hasRealThumbnail
+{
+	return !!_realThumbnail;
+}
 - (BOOL)isResolutionIndependent
 {
 	return NO;

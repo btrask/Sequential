@@ -169,37 +169,11 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
 
-#pragma mark NSToolTipOwner Protocol
-
-- (NSString *)view:(NSView *)view
-              stringForToolTip:(NSToolTipTag)tag
-              point:(NSPoint)point
-              userData:(void *)data
-{
-	NSString *const label = [[self dataSource] thumbnailView:self labelForItem:[_items objectAtIndex:[self indexOfItemAtPoint:point]]];
-	return label ? label : @"";
-}
-
 #pragma mark PGClipViewAdditions Protocol
 
 - (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
 {
 	return NO;
-}
-- (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
-{
-	[super PG_viewWillScrollInClipView:clipView];
-	[self removeAllToolTips];
-}
-- (void)PG_viewDidScrollInClipView:(PGClipView *)sender
-{
-	[super PG_viewDidScrollInClipView:sender];
-	NSRect const v = [self visibleRect];
-	unsigned i = 0;
-	for(; i < [_items count]; i++) {
-		NSRect const r = NSIntersectionRect(v, [self frameOfItemAtIndex:i withMargin:YES]);
-		if(!NSIsEmptyRect(r)) [self addToolTipRect:r owner:self userData:nil];
-	}
 }
 
 #pragma mark NSView
@@ -280,22 +254,60 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		NSSize const originalSize = [thumb size];
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
-		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([[self dataSource] thumbnailView:self canSelectItem:item] ? 1.0f : 0.33f)];
+		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
+		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
 
+		NSString *const label = [[self dataSource] thumbnailView:self labelForItem:item];
 		NSColor *const labelColor = [[self dataSource] thumbnailView:self labelColorForItem:item];
-		if(!labelColor) continue;
-		NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16, roundf(MAX(NSMaxY(thumbnailRect) - 16, NSMidY(thumbnailRect) - 6)), 12, 12);
-		[NSGraphicsContext saveGraphicsState];
-		[[NSBezierPath bezierPathWithRect:NSInsetRect(labelRect, -5, -5)] addClip]; // By adding a clipping rect we tell the system how big the transparency layer has to be.
-		CGContextBeginTransparencyLayer(context, NULL);
-		NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
-		[labelColor set];
-		[labelDot fill];
-		[[NSColor whiteColor] set];
-		[labelDot setLineWidth:2];
-		[labelDot stroke];
-		CGContextEndTransparencyLayer(context);
-		[NSGraphicsContext restoreGraphicsState];
+		if(label) {
+			[nilShadow set];
+			static NSMutableDictionary *attributes = nil;
+			if(!attributes) {
+				NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+				[style setLineBreakMode:NSLineBreakByWordWrapping];
+				[style setAlignment:NSCenterTextAlignment];
+				NSShadow *const textShadow = [[[NSShadow alloc] init] autorelease];
+				[textShadow setShadowBlurRadius:2];
+				[textShadow setShadowOffset:NSMakeSize(0, -1)];
+				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:textShadow, NSShadowAttributeName, [NSFont systemFontOfSize:11], NSFontAttributeName, style, NSParagraphStyleAttributeName, nil];
+			}
+			[attributes setObject:(enabled ? [NSColor alternateSelectedControlTextColor] : [NSColor disabledControlTextColor]) forKey:NSForegroundColorAttributeName];
+			static NSTextStorage *textStorage = nil;
+			static NSLayoutManager *layoutManager = nil;
+			static NSTextContainer *textContainer = nil;
+			if(!textStorage) {
+				textStorage = [[NSTextStorage alloc] init];
+				layoutManager = [[NSLayoutManager alloc] init];
+				textContainer = [[NSTextContainer alloc] init];
+				[layoutManager addTextContainer:[textContainer autorelease]];
+				[textStorage addLayoutManager:[layoutManager autorelease]];
+				[textContainer setLineFragmentPadding:0];
+			}
+			[[textStorage mutableString] setString:label];
+			[textStorage setAttributes:attributes range:NSMakeRange(0, [textStorage length])];
+			[textContainer setContainerSize:NSMakeSize(PGThumbnailSize - 12, PGThumbnailSize - 8)];
+			NSRange const glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+			NSSize const labelSize = [layoutManager usedRectForTextContainer:textContainer].size;
+			[textContainer setContainerSize:labelSize]; // We center the text in the text container, so the final size has to be the right width.
+			NSRect const labelRect = NSIntegralRect(NSMakeRect(NSMidX(frame) - labelSize.width / 2, NSMidY(frame) - labelSize.height / 2, labelSize.width, labelSize.height));
+			[[(labelColor ? labelColor : [NSColor blackColor]) colorWithAlphaComponent:0.5] set];
+			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(labelRect, -4, -2) cornerRadius:6] fill];
+			[layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:labelRect.origin];
+			[shadow set];
+		} else if(labelColor) {
+			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16, roundf(MAX(NSMaxY(thumbnailRect) - 16, NSMidY(thumbnailRect) - 6)), 12, 12);
+			[NSGraphicsContext saveGraphicsState];
+			[[NSBezierPath bezierPathWithRect:NSInsetRect(labelRect, -5, -5)] addClip]; // By adding a clipping rect we tell the system how big the transparency layer has to be.
+			CGContextBeginTransparencyLayer(context, NULL);
+			NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
+			[labelColor set];
+			[labelDot fill];
+			[[NSColor whiteColor] set];
+			[labelDot setLineWidth:2];
+			[labelDot stroke];
+			CGContextEndTransparencyLayer(context);
+			[NSGraphicsContext restoreGraphicsState];
+		}
 	}
 	[nilShadow set];
 
@@ -373,15 +385,15 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
 	return nil;
 }
-- (NSString *)thumbnailView:(PGThumbnailView *)sender
-              labelForItem:(id)item
-{
-	return nil;
-}
 - (BOOL)thumbnailView:(PGThumbnailView *)sender
         canSelectItem:(id)item;
 {
 	return YES;
+}
+- (NSString *)thumbnailView:(PGThumbnailView *)sender
+              labelForItem:(id)item
+{
+	return nil;
 }
 - (NSColor *)thumbnailView:(PGThumbnailView *)sender
              labelColorForItem:(id)item

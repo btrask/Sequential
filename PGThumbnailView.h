@@ -58,8 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender;
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item;
-- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item;
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
+- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item;
 - (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item;
 
 @end
