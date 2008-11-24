@@ -15,6 +15,7 @@ New in 2.0.2
 - Fixes keyboard shortcuts some keyboard layouts.
 - Animated GIFs can now be paused with the space bar.
 - Automatic Fit scaling mode is now a bit more clever.
+- The Escape key can now be configured to quit.
 - Other minor improvements.
 - Panther support has been removed. Sorry.
 - Changed from the NCSA license to the BSD license.
