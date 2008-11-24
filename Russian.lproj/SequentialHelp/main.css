@@ -1,0 +1,8 @@
+* { font-family: Lucida Grande, Arial, sans-serif; }
+a { color: #79c; text-decoration: none; }
+
+td { padding: 0.5em; border-top: 1px solid #bbb; }
+table { border-bottom: 1px solid #bbb; }
+
+.icon { width: 1.5em; height: 1.5em; margin-bottom: -0.3em; }
+.header { font-weight: bold; background: #eee; }
