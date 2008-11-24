@@ -42,19 +42,52 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
 #define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
 
+static NSString *const PGThumbnailGlossStyleEnabledKey = @"PGThumbnailGlossStyleEnabled";
+static BOOL PGThumbnailGlossStyleEnabled = NO;
+
 @interface PGThumbnailView (Private)
 
 - (void)_validateSelection;
+- (void)_drawThumbnailBackground:(NSRect)aRect;
+- (void)_drawThumbnailGloss:(NSRect)aRect;
 
 @end
 
 static void PGGradientCallback(void *info, float const *inData, float *outData)
 {
-	outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
-	outData[1] = 0.95f;
+	if(PGThumbnailGlossStyleEnabled) {
+		outData[0] = 1.0f;
+		outData[1] = inData[0] < 0.5f ? 0.1f * inData[0] + 0.15f : -0.3f * inData[0] + 0.45f;
+	} else {
+		outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
+		outData[1] = 0.95f;
+	}
+}
+static void PGDrawGradient(void)
+{
+	static CGShadingRef shade = NULL;
+	if(!shade) {
+		CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
+		float const domain[] = {0, 1};
+		float const range[] = {0, 1, 0, 1};
+		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
+		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
+		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0, 0), CGPointMake(PGThumbnailTotalWidth, 0), function, NO, NO);
+		CFRelease(function);
+		CFRelease(colorSpace);
+	}
+	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], shade);
 }
 
 @implementation PGThumbnailView
+
+#pragma mark NSObject
+
++ (void)initialize
+{
+	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:PGThumbnailGlossStyleEnabledKey]];
+	PGThumbnailGlossStyleEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:PGThumbnailGlossStyleEnabledKey];
+}
 
 #pragma mark Instance Methods
 
@@ -168,6 +201,17 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	NSEnumerator *const selectedItemEnum = [[[_selection copy] autorelease] objectEnumerator];
 	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
+- (void)_drawThumbnailBackground:(NSRect)aRect
+{
+	if(PGThumbnailGlossStyleEnabled) {
+		[[NSColor blackColor] set];
+		NSRectFill(NSIntersectionRect(aRect, NSMakeRect(0, 0, PGThumbnailTotalWidth, NSHeight([self bounds]))));
+	} else PGDrawGradient();
+}
+- (void)_drawThumbnailGloss:(NSRect)aRect
+{
+	if(PGThumbnailGlossStyleEnabled) PGDrawGradient();
+}
 
 #pragma mark PGClipViewAdditions Protocol
 
@@ -217,18 +261,7 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextBeginTransparencyLayer(context, NULL);
 
-	static CGShadingRef shade = NULL;
-	if(!shade) {
-		CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
-		float const domain[] = {0, 1};
-		float const range[] = {0, 1, 0, 1};
-		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
-		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
-		shade = CGShadingCreateAxial(colorSpace, CGPointMake(NSMinX(b), 0), CGPointMake(NSMinX(b) + PGThumbnailTotalWidth, 0), function, NO, NO);
-		CFRelease(function);
-		CFRelease(colorSpace);
-	}
-	CGContextDrawShading([[NSGraphicsContext currentContext] graphicsPort], shade);
+	[self _drawThumbnailBackground:aRect];
 
 	int count = 0;
 	NSRect const *rects = NULL;
@@ -310,6 +343,8 @@ static void PGGradientCallback(void *info, float const *inData, float *outData)
 		}
 	}
 	[nilShadow set];
+
+	[self _drawThumbnailGloss:aRect];
 
 	float top = roundf(NSMinY(aRect) / PGThumbnailHoleAdvance) * PGThumbnailHoleAdvance - PGThumbnailHoleSize / 2;
 	for(; top < NSMaxY(aRect); top += PGThumbnailHoleAdvance) {
