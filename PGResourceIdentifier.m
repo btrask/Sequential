@@ -41,11 +41,15 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 @interface PGAliasIdentifier : PGResourceIdentifier <NSCoding>
 {
 	@private
-	AliasHandle     _alias;
+	AliasHandle _alias;
+	BOOL _hasValidRef;
+	FSRef _ref;
 }
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
+- (BOOL)setAliasWithData:(const uint8_t *)data length:(unsigned)length;
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)follow validate:(BOOL)validate;
 
 @end
 
@@ -289,11 +293,11 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 {
 	NSParameterAssert([URL isFileURL]);
 	if((self = [super init])) {
-		FSRef ref;
-		if(!CFURLGetFSRef((CFURLRef)URL, &ref) || FSNewAliasMinimal(&ref, &_alias) != noErr) {
+		if(!CFURLGetFSRef((CFURLRef)URL, &_ref) || FSNewAliasMinimal(&_ref, &_alias) != noErr) {
 			[self release];
 			return [[PGURLIdentifier alloc] initWithURL:URL];
 		}
+		_hasValidRef = YES;
 	}
 	return self;
 }
@@ -301,14 +305,33 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
       length:(unsigned)length
 {
 	if((self = [super init])) {
-		if(!data || !length) {
+		if(![self setAliasWithData:data length:length]) {
 			[self release];
 			return nil;
 		}
-		_alias = (AliasHandle)NewHandle(length);
-		memcpy(*_alias, data, length);
 	}
 	return self;
+}
+- (BOOL)setAliasWithData:(const uint8_t *)data
+        length:(unsigned)length
+{
+	if(!data || !length) return NO;
+	_alias = (AliasHandle)NewHandle(length);
+	if(!_alias) return NO;
+	memcpy(*_alias, data, length);
+	return YES;
+}
+- (BOOL)getRef:(out FSRef *)outRef
+        byFollowingAliases:(BOOL)follow
+        validate:(BOOL)validate
+{
+	NSParameterAssert(outRef);
+	Boolean dontCare1, dontCare2;
+	if(validate && _hasValidRef && !follow) _hasValidRef = FSIsFSRefValid(&_ref);
+	if(!_hasValidRef && FSResolveAliasWithMountFlags(NULL, _alias, &_ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
+	_hasValidRef = YES;
+	*outRef = _ref;
+	return follow ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
 
 #pragma mark NSCoding Protocol
@@ -318,10 +341,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if((self = [super initWithCoder:aCoder])) {
 		unsigned length;
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
-		if(data) {
-			_alias = (AliasHandle)NewHandle(length);
-			memcpy(*_alias, data, length);
-		}
+		(void)[self setAliasWithData:data length:length];
 	}
 	return self;
 }
@@ -342,7 +362,7 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 	if(obj == self) return YES;
 	if(![obj isKindOfClass:[PGAliasIdentifier class]]) return [super isEqual:obj];
 	FSRef ourRef, theirRef;
-	if(![self getRef:&ourRef byFollowingAliases:NO] || ![obj getRef:&theirRef byFollowingAliases:NO]) return NO;
+	if(![self getRef:&ourRef byFollowingAliases:NO validate:NO] || ![obj getRef:&theirRef byFollowingAliases:NO validate:NO]) return NO;
 	return FSCompareFSRefs(&ourRef, &theirRef) == noErr;
 }
 
@@ -357,13 +377,12 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 - (BOOL)getRef:(out FSRef *)outRef
         byFollowingAliases:(BOOL)flag
 {
-	Boolean dontCare1, dontCare2;
-	if(FSResolveAliasWithMountFlags(NULL, _alias, outRef, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
-	return flag ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
+	return [self getRef:outRef byFollowingAliases:flag validate:YES];
 }
 - (BOOL)hasTarget
 {
-	return [self URLByFollowingAliases:YES] != nil;
+	FSRef ref;
+	return [self getRef:&ref byFollowingAliases:NO validate:YES];
 }
 - (BOOL)isFileIdentifier
 {
@@ -374,7 +393,6 @@ NSString *const PGResourceIdentifierDisplayNameDidChangeNotification = @"PGResou
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
 	if(_alias) DisposeHandle((Handle)_alias);
 	[super dealloc];
 }
