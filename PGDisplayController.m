@@ -112,13 +112,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)reveal:(id)sender
 {
-	NSURL *const URL = [[[self activeDocument] identifier] superURLByFollowingAliases:NO];
 	if([[self activeDocument] isOnline]) {
-		if([[NSWorkspace sharedWorkspace] openURL:URL]) return;
-	} else if([[PGDocumentController sharedDocumentController] pathFinderRunning]) {
-		if([[[[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"Path Finder\"\nactivate\nreveal \"%@\"\nend tell", [URL path]]] autorelease] executeAndReturnError:NULL]) return;
+		if([[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] originalIdentifier] superURLByFollowingAliases:NO]]) return;
 	} else {
-		if([[NSWorkspace sharedWorkspace] selectFile:[URL path] inFileViewerRootedAtPath:nil]) return;
+		NSString *const path = [[[[self activeNode] identifier] superURLByFollowingAliases:NO] path];
+		if([[PGDocumentController sharedDocumentController] pathFinderRunning]) {
+			if([[[[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"Path Finder\"\nactivate\nreveal \"%@\"\nend tell", path]] autorelease] executeAndReturnError:NULL]) return;
+		} else {
+			if([[NSWorkspace sharedWorkspace] selectFile:path inFileViewerRootedAtPath:nil]) return;
+		}
 	}
 	NSBeep();
 }

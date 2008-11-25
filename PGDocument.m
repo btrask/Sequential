@@ -73,11 +73,11 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident
 {
 	if((self = [self init])) {
-		_identifier = [ident retain];
+		_originalIdentifier = [ident retain];
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident dataSource:nil];
 		[_node startLoadWithInfo:nil];
 		PGResourceIdentifier *rootIdentifier = ident;
-		if([_identifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
+		if([_originalIdentifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
 			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
@@ -85,7 +85,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 			[_node startLoadWithInfo:nil];
 			[self _setInitialIdentifier:ident];
 		}
-		[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
+		[_originalIdentifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
@@ -103,9 +103,13 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	}
 	return self;
 }
-- (PGResourceIdentifier *)identifier
+- (PGResourceIdentifier *)originalIdentifier
 {
-	return [[_identifier retain] autorelease];
+	return [[_originalIdentifier retain] autorelease];
+}
+- (PGResourceIdentifier *)rootIdentifier
+{
+	return [[self node] identifier];
 }
 - (PGNode *)node
 {
@@ -204,7 +208,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 - (BOOL)isOnline
 {
-	return ![[self identifier] isFileIdentifier];
+	return ![[self rootIdentifier] isFileIdentifier];
 }
 - (NSMenu *)pageMenu
 {
@@ -383,7 +387,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[self AE_removeObserver];
 	[_node cancelLoad];
 	[_node detachFromTree];
-	[_identifier release];
+	[_originalIdentifier release];
 	[_node release];
 	[_subscription release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.

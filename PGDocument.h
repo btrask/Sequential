@@ -54,7 +54,7 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 @interface PGDocument : PGPrefObject
 {
 	@private
-	PGResourceIdentifier *_identifier;
+	PGResourceIdentifier *_originalIdentifier;
 	PGNode               *_node;
 	PGSubscription       *_subscription;
 	NSMutableArray       *_cachedNodes;
@@ -77,7 +77,8 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident;
 - (id)initWithURL:(NSURL *)aURL;
 - (id)initWithBookmark:(PGBookmark *)aBookmark;
-- (PGResourceIdentifier *)identifier;
+- (PGResourceIdentifier *)originalIdentifier;
+- (PGResourceIdentifier *)rootIdentifier;
 - (PGNode *)node;
 - (void)openBookmark:(PGBookmark *)aBookmark;
 
