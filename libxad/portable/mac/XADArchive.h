@@ -70,6 +70,7 @@ typedef xadERROR XADError;
 
 -(int)numberOfEntries;
 -(NSString *)nameOfEntry:(int)n;
+-(NSString *)nameOfEntry:(int)n cleanedUp:(BOOL)flag;
 -(BOOL)entryHasSize:(int)n;
 -(int)sizeOfEntry:(int)n;
 -(BOOL)entryIsDirectory:(int)n;

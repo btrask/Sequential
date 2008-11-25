@@ -379,6 +379,10 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 
 -(NSString *)nameOfEntry:(int)n
 {
+	return [self nameOfEntry:n cleanedUp:NO];
+}
+-(NSString *)nameOfEntry:(int)n cleanedUp:(BOOL)flag
+{
 	struct xadFileInfo *info=[self xadFileInfoForEntry:n];
 	char *cname=info->xfi_FileName;
 	NSString *name=nil;
@@ -420,40 +424,41 @@ static xadUINT32 XADProgressFunc(struct Hook *hook,xadPTR object,struct xadProgr
 		name=mutablename;
 	}
 
-	// Clean up path
-	NSMutableArray *components=[NSMutableArray arrayWithArray:[name pathComponents]];
+	if(flag) {
+		NSMutableArray *components=[NSMutableArray arrayWithArray:[name pathComponents]];
 
-	// Drop . anywhere in the path
-	for(int i=0;i<[components count];)
-	{
-		NSString *comp=[components objectAtIndex:i];
-		if([comp isEqual:@"."]) [components removeObjectAtIndex:i];
-		else i++;
-	}
-
-	// Drop all .. that can be dropped
-	for(int i=1;i<[components count];)
-	{
-		NSString *comp1=[components objectAtIndex:i-1];
-		NSString *comp2=[components objectAtIndex:i];
-		if(![comp1 isEqual:@".."]&&[comp2 isEqual:@".."])
+		// Drop . anywhere in the path
+		for(int i=0;i<[components count];)
 		{
-			[components removeObjectAtIndex:i];
-			[components removeObjectAtIndex:i-1];
-			if(i>1) i--;
+			NSString *comp=[components objectAtIndex:i];
+			if([comp isEqual:@"."]) [components removeObjectAtIndex:i];
+			else i++;
 		}
-		else i++;
-	}
 
-	// Drop slashes and .. at the start of the path
-	while([components count])
-	{
-		NSString *first=[components objectAtIndex:0];
-		if([first isEqual:@"/"]||[first isEqual:@".."]) [components removeObjectAtIndex:0];
-		else break;
-	}
+		// Drop all .. that can be dropped
+		for(int i=1;i<[components count];)
+		{
+			NSString *comp1=[components objectAtIndex:i-1];
+			NSString *comp2=[components objectAtIndex:i];
+			if(![comp1 isEqual:@".."]&&[comp2 isEqual:@".."])
+			{
+				[components removeObjectAtIndex:i];
+				[components removeObjectAtIndex:i-1];
+				if(i>1) i--;
+			}
+			else i++;
+		}
 
-	name=[NSString pathWithComponents:components];
+		// Drop slashes and .. at the start of the path
+		while([components count])
+		{
+			NSString *first=[components objectAtIndex:0];
+			if([first isEqual:@"/"]||[first isEqual:@".."]) [components removeObjectAtIndex:0];
+			else break;
+		}
+
+		name=[NSString pathWithComponents:components];
+	}
 
 	// Strip any possible .rsrc extenstion off resource forks
 	if([self _entryIsLonelyResourceFork:n])

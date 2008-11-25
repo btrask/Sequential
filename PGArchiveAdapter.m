@@ -88,7 +88,7 @@ static id PGArchiveAdapterList = nil;
 	NSMutableArray *const children = [NSMutableArray array];
 	int i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
-		NSString *const entryPath = [_archive nameOfEntry:i];
+		NSString *const entryPath = [_archive nameOfEntry:i cleanedUp:NO];
 		if(_encodingError) return nil;
 		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
 		[indexes removeIndex:i];
@@ -165,7 +165,7 @@ static id PGArchiveAdapterList = nil;
 	if(NSNotFound == i) return;
 	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
 	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
-	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
+	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i cleanedUp:NO] pathExtension] forKey:PGExtensionKey];
 }
 - (BOOL)node:(PGNode *)sender
         getData:(out NSData **)outData
@@ -263,7 +263,7 @@ static id PGArchiveAdapterList = nil;
               preferOSType:(BOOL)flag
 {
 	NSString *const osType = flag ? [self OSTypeForEntry:index standardFormat:YES] : nil;
-	return osType ? osType : [[self nameOfEntry:index] pathExtension];
+	return osType ? osType : [[self nameOfEntry:index cleanedUp:NO] pathExtension];
 }
 
 @end
