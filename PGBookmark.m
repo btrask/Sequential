@@ -25,6 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmark.h"
 
 // Models
+#import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 #import "PGSubscription.h"
@@ -40,7 +41,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 - (id)initWithNode:(PGNode *)aNode
 {
-	return [self initWithDocumentIdentifier:[[aNode document] identifier] fileIdentifier:[aNode identifier] displayName:nil];
+	return [self initWithDocumentIdentifier:[[[aNode document] node] identifier] fileIdentifier:[aNode identifier] displayName:nil];
 }
 - (id)initWithDocumentIdentifier:(PGResourceIdentifier *)docIdent
       fileIdentifier:(PGResourceIdentifier *)fileIdent
