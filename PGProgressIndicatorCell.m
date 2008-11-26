@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSRect r = aRect;
 	r.size.width = ceilf(NSWidth(aRect) * [[self objectValue] floatValue]); // For some reason -[NSCell floatValue] doesn't work.
 	[NSGraphicsContext saveGraphicsState];
-	[[NSBezierPath bezierPathWithRect:r] addClip];
+	NSRectClip(r);
 	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2, 2) cornerRadius:(NSHeight(aRect) - 4) / 2] addClip];
 	
 	r.size.height = ceilf(NSHeight(r) / 2);

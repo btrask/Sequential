@@ -330,7 +330,7 @@ static void PGDrawGradient(void)
 		} else if(labelColor) {
 			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16, roundf(MAX(NSMaxY(thumbnailRect) - 16, NSMidY(thumbnailRect) - 6)), 12, 12);
 			[NSGraphicsContext saveGraphicsState];
-			[[NSBezierPath bezierPathWithRect:NSInsetRect(labelRect, -5, -5)] addClip]; // By adding a clipping rect we tell the system how big the transparency layer has to be.
+			NSRectClip(NSInsetRect(labelRect, -5, -5)); // By adding a clipping rect we tell the system how big the transparency layer has to be.
 			CGContextBeginTransparencyLayer(context, NULL);
 			NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
 			[labelColor set];
