@@ -171,7 +171,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (BOOL)canBecomeKeyWindow
 {
 	if([self isFadingOut]) return NO;
-	return _acceptsEvents || ![_parentWindow isKeyWindow];
+	return _canBecomeKey || (_acceptsEvents && ![_parentWindow isKeyWindow] && [_parentWindow canBecomeKeyWindow]);
 }
 - (void)becomeKeyWindow
 {
