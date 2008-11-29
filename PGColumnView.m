@@ -116,11 +116,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)layout
 {
 	NSRect const b = [self bounds];
-	[_view setFrameSize:NSMakeSize(MAX(_columnWidth * [_views count] - 1, NSWidth(b)), NSHeight(b))];
+	[_view setFrameSize:NSMakeSize(MAX(_columnWidth * [_views count], NSWidth(b)), NSHeight(b))];
 	NSRect const vb = [_view bounds];
 	unsigned i = 0;
 	unsigned const count = [_clipViews count];
-	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth - 1, NSHeight(vb))];
+	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
 }
 
@@ -151,7 +151,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_clipView setDocumentView:_view];
 		_clipViews = [[NSMutableArray alloc] init];
 		_views = [[NSMutableArray alloc] init];
-		_columnWidth = (128.0f + 12.0f) + 1;
+		_columnWidth = 128.0f + 12.0f;
 	}
 	return self;
 }

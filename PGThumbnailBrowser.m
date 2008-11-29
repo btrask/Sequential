@@ -141,7 +141,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[thumbnailView setDelegate:self];
 	[thumbnailView setRepresentedObject:item];
 	[thumbnailView reloadData];
-	if(![self numberOfColumns]) [self setColumnWidth:NSWidth([thumbnailView frame]) + 1];
+	if(![self numberOfColumns]) [self setColumnWidth:NSWidth([thumbnailView frame])];
 	[self addColumnWithView:thumbnailView];
 }
 
@@ -178,7 +178,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)scaleFactor
 {
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], PGMaxVisibleColumns) * [self columnWidth] - 1) * scaleFactor, NSHeight(aRect));
+	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], PGMaxVisibleColumns) * [self columnWidth]) * scaleFactor, NSHeight(aRect));
 }
 
 #pragma mark PGColumnView
