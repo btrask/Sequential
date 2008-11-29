@@ -128,6 +128,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSPoint const p = [self position];
 	_boundsInset = inset;
 	[self scrollTo:p animation:PGAllowAnimation];
+	[[self window] invalidateCursorRectsForView:self];
 }
 - (NSRect)insetBounds
 {
@@ -635,7 +636,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(!_cursor) return;
 	unsigned i;
 	NSRect rects[4];
-	NSRect b = [self bounds];
+	NSRect b = [self insetBounds];
 	if([[self window] styleMask] & NSResizableWindowMask) {
 		PGGetRectDifference(rects, &i, NSMakeRect(NSMinX(b), NSMinY(b), NSWidth(b) - 15, 15), ([[self documentView] PG_acceptsClicksInClipView:self] ? _documentFrame : NSZeroRect));
 		while(i--) [self addCursorRect:rects[i] cursor:_cursor];
