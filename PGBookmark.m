@@ -87,7 +87,9 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 - (void)eventDidOccur:(NSNotification *)aNotif
 {
-	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
+	NSParameterAssert(aNotif);
+	if([aNotif object] == _documentSubscription) [_documentIdentifier updateNaturalDisplayName];
+	else if([aNotif object] == _fileSubscription) [_fileIdentifier updateNaturalDisplayName];
 }
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
