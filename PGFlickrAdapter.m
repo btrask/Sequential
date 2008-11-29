@@ -78,8 +78,9 @@ enum {
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
-	NSURL *const URL = [info objectForKey:PGURLKey];
-	if(!URL || [URL isFileURL]) return PGNotAMatch;
+	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
+	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
+	NSURL *const URL = [ident URL];
 	if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
 	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
 
@@ -131,7 +132,7 @@ enum {
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {
 	if(sender != _load) return;
-	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[self info] objectForKey:PGURLKey] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
+	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
 	[[self identifier] setCustomDisplayName:[parser title] notify:YES];
 	NSError *const error = [parser error];
 	if(error) [[self node] setError:([parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error)];

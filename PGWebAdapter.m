@@ -42,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
-	NSURL *const URL = [info objectForKey:PGURLKey];
-	return !URL || [[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [URL isFileURL] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
+	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
+	return !ident || [[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [ident isFileIdentifier] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
 #pragma mark PGURLLoadDelegate Protocol
@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainLoad data], PGDataKey, nil]];
 	} else if(sender == _faviconLoad) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconLoad data]] autorelease];
-		if(favicon) [[self identifier] setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
+		if(favicon) [[self identifier]	setIcon:favicon notify:YES]; // Don't clear the favicon we already have if we can't load a new one.
 	}
 }
 - (void)loadDidFail:(PGURLLoad *)sender
@@ -103,7 +103,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSParameterAssert(![self canGetData]);
 	_triedLoad = YES;
-	NSURL *const URL = [[self info] objectForKey:PGURLKey];
+	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URL];
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] parentLoad:self delegate:self];

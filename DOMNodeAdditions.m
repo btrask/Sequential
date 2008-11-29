@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(!href || [@"" isEqualToString:href]) continue;
 		NSURL *const URL = [NSURL URLWithString:href];
 		if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
-		PGResourceIdentifier *const ident = [URL AE_resourceIdentifier];
+		PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
 		if([results containsObject:ident]) continue;
 		[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
 		[results addObject:ident];
@@ -60,7 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(; i < count; i++) {
 		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
 		if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
-		PGResourceIdentifier *const ident = [[NSURL URLWithString:[img src]] AE_resourceIdentifier];
+		PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
 		if([results containsObject:ident]) continue;
 		NSString *const title = [img title]; // Prefer the title to the alt attribute.
 		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];

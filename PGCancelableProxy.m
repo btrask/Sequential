@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (id)initWithTarget:(id)target
       class:(Class)class
+      allowOnce:(BOOL)flag
       storage:(id)storage
 {
 	if((self = [super init])) {
@@ -52,6 +53,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		_target = target;
 		_class = class;
 		_storage = [storage retain];
+		_allowOnce = flag;
+		if(flag) @synchronized(storage) {
+			[storage addObject:target];
+		}
 	}
 	return self;
 }
@@ -75,7 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	@synchronized(_storage) {
 		unsigned const i = [_storage indexOfObject:_target];
 		if(NSNotFound != i) {
-			[_storage removeObjectAtIndex:i];
+			if(_allowOnce) [_storage removeObjectAtIndex:i];
 			[invocation invokeWithTarget:_target];
 			return;
 		}
@@ -92,17 +97,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @implementation NSObject (PGCancelable)
 
 + (id)PG_performOn:(id)target
-      allow:(BOOL)flag
+      allowOnce:(BOOL)flag
       withStorage:(id)storage
 {
 	if(!target) return nil;
 	NSParameterAssert(storage);
-	if(flag) {
-		@synchronized(storage) {
-			[storage addObject:target];
-		}
-	}
-	return [[[PGCancelableProxy alloc] initWithTarget:target class:self storage:storage] autorelease];
+	return [[[PGCancelableProxy alloc] initWithTarget:target class:self allowOnce:flag storage:storage] autorelease];
 }
 - (void)PG_allowPerformsWithStorage:(id)storage
 {

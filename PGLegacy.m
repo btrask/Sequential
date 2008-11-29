@@ -36,13 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)initWithCoder:(NSCoder *)aCoder
 {
 	[[self init] release];
-	PGResourceIdentifier *result = nil;
+	PGDisplayableIdentifier *result = nil;
 	NSURL *URL = [aCoder decodeObjectForKey:@"URL"];
-	if(URL) result = [[URL AE_resourceIdentifier] retain];
+	if(URL) result = [[URL PG_displayableIdentifier] retain];
 	else {
 		unsigned length;
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
-		result = [[PGResourceIdentifier resourceIdentifierWithAliasData:data length:length] retain];
+		result = [[PGDisplayableIdentifier resourceIdentifierWithAliasData:data length:length] retain];
 	}
 	[result setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
 	[result setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned length;
 	uint8_t const *data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 	if(!data) data = [aCoder decodeBytesForKey:@"HandleData" returnedLength:&length];
-	return [[PGResourceIdentifier resourceIdentifierWithAliasData:data length:length] retain];
+	return [[PGDisplayableIdentifier resourceIdentifierWithAliasData:data length:length] retain];
 }
 
 @end
@@ -69,9 +69,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)initWithCoder:(NSCoder *)aCoder
 {
 	[[self init] release];
-	PGResourceIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
+	PGDisplayableIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
 	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
-	PGResourceIdentifier *const fileIdent = [docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]];
+	PGDisplayableIdentifier *const fileIdent = [[docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]] displayableIdentifier];
 	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"] notify:NO];
 	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"] notify:NO];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
@@ -84,9 +84,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)initWithCoder:(NSCoder *)aCoder
 {
 	[[self init] release];
-	PGResourceIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
+	PGDisplayableIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
 	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
-	PGResourceIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
+	PGDisplayableIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL] PG_displayableIdentifier];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
 }
 

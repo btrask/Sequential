@@ -36,17 +36,17 @@ extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
 
 enum {
-	PGNoPattern           = 0,
+	PGNoPattern = 0,
 	PGCheckerboardPattern = 1
 };
 typedef int PGPatternType;
 
 enum {
-	PGConstantFactorScale        = 0, // Formerly known as PGNoScale.
-	PGAutomaticScale             = 1,
+	PGConstantFactorScale = 0, // Formerly known as PGNoScale.
+	PGAutomaticScale = 1,
 	PGDeprecatedVerticalFitScale = 2, // Deprecated after 1.0.3.
-	PGViewFitScale               = 3, // Fits the entire image inside the screen/window.
-	PGActualSizeWithDPI            = 4
+	PGViewFitScale = 3, // Fits the entire image inside the screen/window.
+	PGActualSizeWithDPI = 4
 };
 typedef int PGImageScaleMode;
 extern NSArray *PGScaleModes();

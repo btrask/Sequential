@@ -70,22 +70,22 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 #pragma mark Instance Methods
 
-- (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident
+- (id)initWithIdentifier:(PGDisplayableIdentifier *)ident
 {
 	if((self = [self init])) {
 		_originalIdentifier = [ident retain];
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident dataSource:nil];
 		[_node startLoadWithInfo:nil];
-		PGResourceIdentifier *rootIdentifier = ident;
+		PGDisplayableIdentifier *rootIdentifier = ident;
 		if([_originalIdentifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
-			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] AE_resourceIdentifier];
+			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] PG_displayableIdentifier];
 			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier dataSource:nil];
 			[_node startLoadWithInfo:nil];
 			[self _setInitialIdentifier:ident];
 		}
-		[_originalIdentifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
+		[_originalIdentifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
@@ -94,20 +94,20 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 }
 - (id)initWithURL:(NSURL *)aURL
 {
-	return [self initWithResourceIdentifier:[aURL AE_resourceIdentifier]];
+	return [self initWithIdentifier:[aURL PG_displayableIdentifier]];
 }
 - (id)initWithBookmark:(PGBookmark *)aBookmark
 {
-	if((self = [self initWithResourceIdentifier:[aBookmark documentIdentifier]])) {
+	if((self = [self initWithIdentifier:[aBookmark documentIdentifier]])) {
 		[self openBookmark:aBookmark];
 	}
 	return self;
 }
-- (PGResourceIdentifier *)originalIdentifier
+- (PGDisplayableIdentifier *)originalIdentifier
 {
 	return [[_originalIdentifier retain] autorelease];
 }
-- (PGResourceIdentifier *)rootIdentifier
+- (PGDisplayableIdentifier *)rootIdentifier
 {
 	return [[self node] identifier];
 }
@@ -305,8 +305,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	NSParameterAssert(aNotif);
 	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
-	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] AE_resourceIdentifier];
-	if([ident isEqual:[[self node] identifier]]) [[self displayController] synchronizeWindowTitleWithDocumentName];
+	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] PG_resourceIdentifier];
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 

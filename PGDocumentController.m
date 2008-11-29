@@ -291,12 +291,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSParameterAssert(anArray);
 	if(_prefsLoaded && [anArray isEqual:_recentDocumentIdentifiers]) return;
-	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierIconDidChangeNotification];
-	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGResourceIdentifierDisplayNameDidChangeNotification];
+	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
 	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] retain];
-	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+	NSLog(@"identifiers: %@", _recentDocumentIdentifiers);
+	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];
 }
 - (unsigned)maximumRecentDocumentCount
@@ -355,7 +356,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(![_documents count]) [windowsMenuSeparator AE_removeFromMenu];
 	[self _setFullscreen:[_documents count] > 0];
 }
-- (PGDocument *)documentForResourceIdentifier:(PGResourceIdentifier *)ident
+- (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident
 {
 	PGDocument *doc;
 	NSEnumerator *const docEnum = [_documents objectEnumerator];
@@ -409,20 +410,20 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (id)openDocumentWithContentsOfURL:(NSURL *)URL
       display:(BOOL)display
 {
-	PGResourceIdentifier *const identifier = [URL AE_resourceIdentifier];
-	PGDocument *const doc = [self documentForResourceIdentifier:identifier];
-	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithResourceIdentifier:identifier] autorelease]) display:display];
+	PGResourceIdentifier *const identifier = [URL PG_resourceIdentifier];
+	PGDocument *const doc = [self documentForIdentifier:identifier];
+	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithIdentifier:[identifier displayableIdentifier]] autorelease]) display:display];
 }
 - (id)openDocumentWithBookmark:(PGBookmark *)aBookmark
       display:(BOOL)display
 {
-	PGDocument *const doc = [self documentForResourceIdentifier:[aBookmark documentIdentifier]];
+	PGDocument *const doc = [self documentForIdentifier:[aBookmark documentIdentifier]];
 	[doc openBookmark:aBookmark];
 	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease]) display:display];
 }
 - (void)noteNewRecentDocument:(PGDocument *)document
 {
-	PGResourceIdentifier *const identifier = [document originalIdentifier];
+	PGDisplayableIdentifier *const identifier = [document originalIdentifier];
 	if(!identifier) return;
 	NSMutableArray *const identifiers = [[[self recentDocumentIdentifiers] mutableCopy] autorelease];
 	[identifiers removeObject:identifier];
@@ -622,7 +623,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(menu == recentMenu) {
 		[_recentMenuSeparatorItem AE_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
 		NSMutableArray *const identifiers = [NSMutableArray array];
-		PGResourceIdentifier *identifier;
+		PGDisplayableIdentifier *identifier;
 		NSEnumerator *const identifierEnum = [[self recentDocumentIdentifiers] objectEnumerator];
 		while((identifier = [identifierEnum nextObject])) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
 		[self setRecentDocumentIdentifiers:identifiers];
@@ -642,11 +643,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(menu == recentMenu) {
 		NSArray *const identifiers = [self recentDocumentIdentifiers];
 		if((unsigned)index < [identifiers count]) {
-			PGResourceIdentifier *const identifier = [identifiers objectAtIndex:index];
+			PGDisplayableIdentifier *const identifier = [identifiers objectAtIndex:index];
 			NSString *const name = [identifier displayName];
 
 			BOOL uniqueName = YES;
-			PGResourceIdentifier *comparisonIdentifier;
+			PGDisplayableIdentifier *comparisonIdentifier;
 			NSEnumerator *const comparisonIdentifierEnum = [identifiers objectEnumerator];
 			while(uniqueName && (comparisonIdentifier = [comparisonIdentifierEnum nextObject])) if(comparisonIdentifier != identifier && [[comparisonIdentifier displayName] isEqual:name]) uniqueName = NO;
 

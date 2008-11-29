@@ -35,4 +35,6 @@ extern NSString *const PGSubscriptionRootFlagsKey; // Only included when the sub
 + (id)subscriptionWithPath:(NSString *)path descendents:(BOOL)flag;
 + (id)subscriptionWithPath:(NSString *)path;
 
+- (NSString *)path;
+
 @end

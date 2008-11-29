@@ -154,7 +154,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;
 - (void)removeDocument:(PGDocument *)document;
-- (PGDocument *)documentForResourceIdentifier:(PGResourceIdentifier *)ident;
+- (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident;
 - (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document;
 - (NSMenuItem *)windowsMenuItemForDocument:(PGDocument *)document;
 

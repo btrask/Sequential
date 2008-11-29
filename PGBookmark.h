@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Models
 @class PGNode;
-@class PGResourceIdentifier;
+@class PGDisplayableIdentifier;
 @class PGSubscription;
 
 extern NSString *const PGBookmarkDidUpdateNotification;
@@ -34,17 +34,17 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 @interface PGBookmark : NSObject <NSCoding>
 {
 	@private
-	PGResourceIdentifier *_documentIdentifier;
-	PGSubscription       *_documentSubscription;
-	PGResourceIdentifier *_fileIdentifier;
-	PGSubscription       *_fileSubscription;
+	PGDisplayableIdentifier *_documentIdentifier;
+	PGSubscription *_documentSubscription;
+	PGDisplayableIdentifier *_fileIdentifier;
+	PGSubscription *_fileSubscription;
 }
 
 - (id)initWithNode:(PGNode *)aNode;
-- (id)initWithDocumentIdentifier:(PGResourceIdentifier *)docIdent fileIdentifier:(PGResourceIdentifier *)fileIdent displayName:(NSString *)aString; // For backward compatibility.
+- (id)initWithDocumentIdentifier:(PGDisplayableIdentifier *)docIdent fileIdentifier:(PGDisplayableIdentifier *)fileIdent displayName:(NSString *)aString; // For backward compatibility.
 
-- (PGResourceIdentifier *)documentIdentifier;
-- (PGResourceIdentifier *)fileIdentifier;
+- (PGDisplayableIdentifier *)documentIdentifier;
+- (PGDisplayableIdentifier *)fileIdentifier;
 - (BOOL)isValid;
 
 - (void)eventDidOccur:(NSNotification *)aNotif;

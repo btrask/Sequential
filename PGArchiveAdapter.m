@@ -97,7 +97,7 @@ static id PGArchiveAdapterList = nil;
 		if([path isEqualToString:entryPath]) continue;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
-		PGResourceIdentifier *const identifier = [[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)];
+		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)] displayableIdentifier];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode('fldr') : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
@@ -188,7 +188,7 @@ static id PGArchiveAdapterList = nil;
 			{
 				if(_needsPassword) {
 					_needsPassword = NO;
-					[[PGArchiveAdapter PG_performOn:self allow:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
+					[[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
 				}
 				break;
 			}
@@ -213,8 +213,8 @@ static id PGArchiveAdapterList = nil;
 {
 	if(!_archive) {
 		XADError error;
-		NSURL *const URL = [[self info] objectForKey:PGURLKey];
-		if([URL isFileURL]) _archive = [[XADArchive alloc] initWithFile:[URL path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
+		PGResourceIdentifier *const ident = [[self info] objectForKey:PGIdentifierKey];
+		if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *const data = [self data];
 			if(!data) return [[self node] loadFinished];

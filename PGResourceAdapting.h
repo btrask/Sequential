@@ -29,13 +29,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGNode;
 @class PGContainerAdapter;
 @class PGResourceIdentifier;
+@class PGDisplayableIdentifier;
 #import "PGLoading.h"
 @class PGBookmark;
 
 // Other
 #import "PGGeometryTypes.h"
 
-extern NSString *const PGURLKey;
+extern NSString *const PGIdentifierKey;
 extern NSString *const PGDataKey;
 extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
@@ -69,7 +70,7 @@ typedef int PGLoadPolicy;
 - (PGContainerAdapter *)rootContainerAdapter;
 - (PGDocument *)document;
 
-- (PGResourceIdentifier *)identifier;
+- (PGDisplayableIdentifier *)identifier;
 - (NSMutableDictionary *)info;
 - (NSData *)data;
 - (BOOL)canGetData;

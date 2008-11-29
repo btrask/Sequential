@@ -60,10 +60,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(p) return p;
 	do {
 		if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist) break;
-		NSURL *const URL = [info objectForKey:PGURLKey];
+		NSURL *const URL = [[info objectForKey:PGIdentifierKey] URL];
 		if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) break;
 		if(![[URL path] hasPrefix:@"/photos"]) break;
-		[info setObject:[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] forKey:PGURLKey];
+		[info setObject:[[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] PG_resourceIdentifier] forKey:PGIdentifierKey];
 		[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
 		return PGMatchByIntrinsicAttribute + 300;
 	} while(NO);
@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
 			NSURL *const linkURL = [NSURL URLWithString:[link href] relativeToURL:docURL];
 			if(!linkURL) continue;
-			[info setObject:linkURL forKey:PGURLKey];
+			[info setObject:[linkURL PG_resourceIdentifier] forKey:PGIdentifierKey];
 			[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
 			return PGMatchByIntrinsicAttribute + 300;
 		}
@@ -94,7 +94,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
 	_triedLoading = YES;
-	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[self info] objectForKey:PGURLKey] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
+	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
 	NSString *const title = [p title];
 	if(title) [[self identifier] setCustomDisplayName:title notify:YES];
 	if(![p createsMultipleNodes]) {
@@ -297,7 +297,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (id)info
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, [self URL], PGURLKey, _MIMEType, PGMIMETypeKey, nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
 }
 
 #pragma mark PGXMLParser

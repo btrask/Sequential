@@ -982,7 +982,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
         withPasteboard:(NSPasteboard *)pboard
 {
 	if([self window] != window) return YES;
-	PGResourceIdentifier *const ident = [[[self activeDocument] node] identifier];
+	PGDisplayableIdentifier *const ident = [[[self activeDocument] node] identifier];
 	if(![ident isFileIdentifier]) {
 		[pboard declareTypes:[NSArray arrayWithObject:NSURLPboardType] owner:nil];
 		[[ident URL] writeToPasteboard:pboard];
@@ -1250,7 +1250,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)synchronizeWindowTitleWithDocumentName
 {
-	PGResourceIdentifier *const identifier = [[[self activeDocument] node] identifier];
+	PGDisplayableIdentifier *const identifier = [[[self activeDocument] node] identifier];
 	NSURL *const URL = [identifier URL];
 	if(PGIsLeopardOrLater() && ![identifier isFileIdentifier]) {
 		[[self window] setRepresentedURL:URL];

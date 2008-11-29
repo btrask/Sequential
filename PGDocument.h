@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGNode;
 @class PGResourceIdentifier;
+@class PGDisplayableIdentifier;
 @class PGSubscription;
 @class PGBookmark;
 
@@ -54,31 +55,31 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 @interface PGDocument : PGPrefObject
 {
 	@private
-	PGResourceIdentifier *_originalIdentifier;
-	PGNode               *_node;
-	PGSubscription       *_subscription;
-	NSMutableArray       *_cachedNodes;
+	PGDisplayableIdentifier *_originalIdentifier;
+	PGNode *_node;
+	PGSubscription *_subscription;
+	NSMutableArray *_cachedNodes;
 
-	PGNode               *_storedNode;
-	PGImageView          *_storedImageView;
-	NSSize                _storedOffset;
-	NSString             *_storedQuery;
-	NSRect                _storedFrame;
+	PGNode *_storedNode;
+	PGImageView *_storedImageView;
+	NSSize _storedOffset;
+	NSString *_storedQuery;
+	NSRect _storedFrame;
 
-	PGResourceIdentifier *_initialIdentifier;
-	PGDisplayController  *_displayController;
-	NSMenu               *_pageMenu;
-	PGOrientation         _baseOrientation;
+	PGDisplayableIdentifier *_initialIdentifier;
+	PGDisplayController *_displayController;
+	NSMenu *_pageMenu;
+	PGOrientation _baseOrientation;
 
-	unsigned              _processingNodeCount;
-	BOOL                  _sortedChildrenChanged;
+	unsigned _processingNodeCount;
+	BOOL _sortedChildrenChanged;
 }
 
-- (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident;
+- (id)initWithIdentifier:(PGDisplayableIdentifier *)ident;
 - (id)initWithURL:(NSURL *)aURL;
 - (id)initWithBookmark:(PGBookmark *)aBookmark;
-- (PGResourceIdentifier *)originalIdentifier;
-- (PGResourceIdentifier *)rootIdentifier;
+- (PGDisplayableIdentifier *)originalIdentifier;
+- (PGDisplayableIdentifier *)rootIdentifier;
 - (PGNode *)node;
 - (void)openBookmark:(PGBookmark *)aBookmark;
 

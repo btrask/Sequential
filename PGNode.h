@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGDocument;
 @class PGResourceAdapter;
 @class PGContainerAdapter;
-@class PGResourceIdentifier;
+@class PGDisplayableIdentifier;
 
 extern NSString *const PGNodeLoadingDidProgressNotification;
 extern NSString *const PGNodeReadyForViewingNotification;
@@ -51,28 +51,27 @@ typedef unsigned PGNodeStatus;
 @interface PGNode : NSObject
 {
 	@private
-	PGContainerAdapter   *_parentAdapter;
-	PGDocument           *_document;
+	PGContainerAdapter *_parentAdapter;
+	PGDocument *_document;
+	PGDisplayableIdentifier *_identifier;
+	id _dataSource;
 
-	PGResourceIdentifier *_identifier;
-	id                    _dataSource;
+	NSMutableArray *_adapters;
+	PGResourceAdapter *_adapter;
+	PGNodeStatus _status;
+	NSError *_error;
+	PGNodeStatus _errorPhase;
 
-	NSMutableArray       *_adapters;
-	PGResourceAdapter    *_adapter;
-	PGNodeStatus          _status;
-	NSError              *_error;
-	PGNodeStatus          _errorPhase;
+	BOOL _viewable;
+	NSMenuItem *_menuItem;
+	BOOL _allowMenuItemUpdates; // Just an optimization.
 
-	BOOL                  _viewable;
-	NSMenuItem           *_menuItem;
-	BOOL                  _allowMenuItemUpdates; // Just an optimization.
-
-	NSDate               *_dateModified;
-	NSDate               *_dateCreated;
-	NSNumber             *_dataLength;
+	NSDate *_dateModified;
+	NSDate *_dateCreated;
+	NSNumber *_dataLength;
 }
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGResourceIdentifier *)ident dataSource:(id)dataSource;
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(id)dataSource;
 
 - (id)dataSource;
 - (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;

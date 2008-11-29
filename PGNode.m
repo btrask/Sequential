@@ -79,7 +79,7 @@ enum {
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent
       document:(PGDocument *)doc
-      identifier:(PGResourceIdentifier *)ident
+      identifier:(PGDisplayableIdentifier *)ident
       dataSource:(id)dataSource
 {
 	if(!(self = [super init])) return nil;
@@ -91,8 +91,8 @@ enum {
 	_parentAdapter = parent;
 	_document = doc;
 	_identifier = [ident retain];
-	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	_dataSource = dataSource;
 	PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
 	_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
@@ -120,13 +120,13 @@ enum {
 		if([self dataSource] && ![[self dataSource] node:self getData:&data info:info fast:flag]) return nil;
 	}
 	if(data) return data;
-	PGResourceIdentifier *const identifier = [self identifier];
+	PGResourceIdentifier *const identifier = [info objectForKey:PGIdentifierKey];
 	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
 	return data;
 }
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info
 {
-	return [self dataSource] || [info objectForKey:PGFourCCDataKey] || [info objectForKey:PGDataKey] || [[self identifier] isFileIdentifier];
+	return [self dataSource] || [info objectForKey:PGFourCCDataKey] || [info objectForKey:PGDataKey] || [[info objectForKey:PGIdentifierKey] isFileIdentifier];
 }
 
 #pragma mark -
@@ -355,12 +355,12 @@ enum {
 	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
 	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
 	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
-	if(![mutableInfo objectForKey:PGURLKey]) {
+	if(![mutableInfo objectForKey:PGIdentifierKey]) {
 		NSURL *const responseURL = [response URL];
-		[mutableInfo AE_setObject:(responseURL ? responseURL : [[self identifier] URLByFollowingAliases:YES]) forKey:PGURLKey];
+		[mutableInfo AE_setObject:(responseURL ? [responseURL PG_resourceIdentifier] : [self identifier]) forKey:PGIdentifierKey];
 	}
 	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[response MIMEType] forKey:PGMIMETypeKey];
-	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[mutableInfo objectForKey:PGURLKey] path] pathExtension] forKey:PGExtensionKey];
+	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[[mutableInfo objectForKey:PGIdentifierKey] URL] path] pathExtension] forKey:PGExtensionKey];
 	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		NSData *const data = [self dataWithInfo:mutableInfo fast:YES];
@@ -463,7 +463,7 @@ enum {
 
 #pragma mark -
 
-- (PGResourceIdentifier *)identifier
+- (PGDisplayableIdentifier *)identifier
 {
 	return [[_identifier retain] autorelease];
 }
@@ -504,7 +504,7 @@ enum {
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@(%@) %p [%u]: %@>", [self class], [_adapter class], self, [self retainCount], [self identifier]];
+	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
 }
 
 #pragma mark -

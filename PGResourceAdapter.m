@@ -450,7 +450,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-- (PGResourceIdentifier *)identifier
+- (PGDisplayableIdentifier *)identifier
 {
 	return [[self node] identifier];
 }
@@ -651,7 +651,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p [%u]: %@>", [self class], self, [self retainCount], [self identifier]];
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
 }
 
 #pragma mark NSObject

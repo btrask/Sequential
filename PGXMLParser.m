@@ -179,7 +179,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([self createsMultipleNodes]) return nil;
 	if(![_subparsers count]) {
 		NSURL *const URL = [self URL];
-		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:URL, PGURLKey, nil] : nil;
+		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:[URL PG_resourceIdentifier], PGIdentifierKey, nil] : nil;
 	}
 	NSMutableArray *const dicts = [NSMutableArray array];
 	PGXMLParser *parser;
@@ -216,7 +216,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent
 {
 	if([self isMemberOfClass:[PGXMLParser class]]) return [[_subparsers lastObject] nodeWithParentAdapter:parent];
-	PGResourceIdentifier *const ident = [[self URL] AE_resourceIdentifier];
+	PGDisplayableIdentifier *const ident = [[self URL] PG_displayableIdentifier];
 	if(!ident) return nil;
 	[ident setCustomDisplayName:[self title] notify:NO];
 	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:ident dataSource:nil] autorelease];

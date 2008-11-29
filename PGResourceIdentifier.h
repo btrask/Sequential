@@ -25,10 +25,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
 // Models
+@class PGDisplayableIdentifier;
 @class PGSubscription;
 
-extern NSString *const PGResourceIdentifierIconDidChangeNotification;
-extern NSString *const PGResourceIdentifierDisplayNameDidChangeNotification;
+extern NSString *const PGDisplayableIdentifierIconDidChangeNotification;
+extern NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification;
 
 enum {
 	PGLabelNone   = 0,
@@ -43,15 +44,12 @@ enum {
 typedef UInt8 PGLabelColor;
 
 @interface PGResourceIdentifier : NSObject <NSCoding>
-{
-	@private
-	NSImage  *_icon;
-	NSString *_naturalDisplayName;
-	NSString *_customDisplayName;
-}
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL;
 + (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(unsigned)length; // For backward compatability.
+
+- (PGResourceIdentifier *)identifier;
+- (PGDisplayableIdentifier *)displayableIdentifier;
 
 - (PGResourceIdentifier *)subidentifierWithIndex:(int)index;
 - (PGResourceIdentifier *)superidentifier;
@@ -66,6 +64,19 @@ typedef UInt8 PGLabelColor;
 - (BOOL)hasTarget;
 - (BOOL)isFileIdentifier;
 
+- (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;
+
+@end
+
+@interface PGDisplayableIdentifier : PGResourceIdentifier <NSCoding>
+{
+	@private
+	PGResourceIdentifier *_identifier;
+	NSImage *_icon;
+	NSString *_naturalDisplayName;
+	NSString *_customDisplayName;
+}
+
 - (NSImage *)icon;
 - (void)setIcon:(NSImage *)icon notify:(BOOL)flag;
 
@@ -76,13 +87,13 @@ typedef UInt8 PGLabelColor;
 - (void)updateNaturalDisplayName;
 
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
-- (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;
-- (PGLabelColor)labelColor; // Currently unused.
+- (PGLabelColor)labelColor;
 
 @end
 
 @interface NSURL (PGResourceIdentifierCreation)
 
-- (id)AE_resourceIdentifier;
+- (PGResourceIdentifier *)PG_resourceIdentifier;
+- (PGDisplayableIdentifier *)PG_displayableIdentifier;
 
 @end

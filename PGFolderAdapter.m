@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
-	NSURL *const URL = [info objectForKey:PGURLKey];
-	if(![URL isFileURL]) return PGNotAMatch;
+	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
+	if(![ident isFileIdentifier]) return PGNotAMatch;
 	BOOL flag = NO;
-	return [[NSFileManager defaultManager] fileExistsAtPath:[URL path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
+	return [[NSFileManager defaultManager] fileExistsAtPath:[[ident URLByFollowingAliases:YES] path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
 }
 
 #pragma mark Instance Methods
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSParameterAssert([self shouldLoad]);
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
-	NSURL *const URL = [[self info] objectForKey:PGURLKey];
+	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URLByFollowingAliases:YES];
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
 		[[self document] setProcessingNodes:NO];
@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if([ignoredPaths containsObject:pagePath]) continue;
 		NSURL *const pageURL = [pagePath AE_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
-		PGResourceIdentifier *const pageIdent = [pageURL AE_resourceIdentifier];
+		PGDisplayableIdentifier *const pageIdent = [pageURL PG_displayableIdentifier];
 		PGNode *node = [self childForIdentifier:pageIdent];
 		if(node) {
 			[oldPages removeObjectIdenticalTo:node];

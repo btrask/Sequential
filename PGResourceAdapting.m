@@ -24,14 +24,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceAdapting.h"
 
-NSString *const PGURLKey            = @"PGURL";
-NSString *const PGDataKey           = @"PGURLData";
-NSString *const PGDataExistenceKey  = @"PGDataExistence";
-NSString *const PGURLResponseKey    = @"PGURLResponse";
-NSString *const PGAdapterClassKey   = @"PGAdapterClass";
-NSString *const PGFourCCDataKey     = @"PGFourCCData";
-NSString *const PGMIMETypeKey       = @"PGMIMEType";
-NSString *const PGOSTypeKey         = @"PGOSType";
-NSString *const PGExtensionKey      = @"PGExtension";
-NSString *const PGPasswordKey       = @"PGPassword";
+NSString *const PGIdentifierKey = @"PGIdentifier";
+NSString *const PGDataKey = @"PGURLData";
+NSString *const PGDataExistenceKey = @"PGDataExistence";
+NSString *const PGURLResponseKey = @"PGURLResponse";
+NSString *const PGAdapterClassKey = @"PGAdapterClass";
+NSString *const PGFourCCDataKey = @"PGFourCCData";
+NSString *const PGMIMETypeKey = @"PGMIMEType";
+NSString *const PGOSTypeKey = @"PGOSType";
+NSString *const PGExtensionKey = @"PGExtension";
+NSString *const PGPasswordKey = @"PGPassword";
 NSString *const PGStringEncodingKey = @"PGStringEncoding";

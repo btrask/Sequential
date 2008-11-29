@@ -43,19 +43,19 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	return [self initWithDocumentIdentifier:[[aNode document] rootIdentifier] fileIdentifier:[aNode identifier] displayName:nil];
 }
-- (id)initWithDocumentIdentifier:(PGResourceIdentifier *)docIdent
-      fileIdentifier:(PGResourceIdentifier *)fileIdent
+- (id)initWithDocumentIdentifier:(PGDisplayableIdentifier *)docIdent
+      fileIdentifier:(PGDisplayableIdentifier *)fileIdent
       displayName:(NSString *)aString
 {
 	if((self = [super init])) {
 		_documentIdentifier = [docIdent retain];
-		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 		_documentSubscription = [[_documentIdentifier subscriptionWithDescendents:NO] retain];
 		[_documentSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_fileIdentifier = [fileIdent retain];
-		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierIconDidChangeNotification];
-		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGResourceIdentifierDisplayNameDidChangeNotification];
+		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 		_fileSubscription = [[_fileIdentifier subscriptionWithDescendents:NO] retain];
 		[_fileSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		if(aString) {
@@ -68,11 +68,11 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 #pragma mark -
 
-- (PGResourceIdentifier *)documentIdentifier
+- (PGDisplayableIdentifier *)documentIdentifier
 {
 	return [[_documentIdentifier retain] autorelease];
 }
-- (PGResourceIdentifier *)fileIdentifier
+- (PGDisplayableIdentifier *)fileIdentifier
 {
 	return [[_fileIdentifier retain] autorelease];
 }
