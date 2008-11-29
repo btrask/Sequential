@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned i = 0;
 	unsigned const count = [links length];
 	for(; i < count; i++) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
 		NSString *href = [a href];
 		unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
@@ -48,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if([results containsObject:ident]) continue;
 		[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
 		[results addObject:ident];
+		[pool release];
 	}
 	return results;
 }
@@ -58,6 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned i = 0;
 	unsigned const count = [images length];
 	for(; i < count; i++) {
+		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
 		if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
 		PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
@@ -65,6 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSString *const title = [img title]; // Prefer the title to the alt attribute.
 		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
 		[results addObject:ident];
+		[pool release];
 	}
 	return results;
 }

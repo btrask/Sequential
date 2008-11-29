@@ -189,13 +189,14 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 - (unsigned)hash
 {
-	return [[self class] hash] ^ (unsigned)[self index];
+	return [[PGResourceIdentifier class] hash] ^ (unsigned)[self index];
 }
 - (BOOL)isEqual:(id)obj
 {
-	if(obj == self) return YES;
-	if([obj isKindOfClass:[PGDisplayableIdentifier class]]) return [self isEqual:[obj identifier]];
-	return [obj isKindOfClass:[self class]] && [(PGResourceIdentifier *)obj index] == [self index] && [[self superidentifier] isEqual:[obj superidentifier]];
+	if([self identifier] == [obj identifier]) return YES;
+	if(![obj isKindOfClass:[PGResourceIdentifier class]] || [self index] != [(PGResourceIdentifier *)obj index]) return NO;
+	if([self superidentifier] != [obj superidentifier] && ![[self superidentifier] isEqual:[obj superidentifier]]) return NO;
+	return [[self URL] isEqual:[obj URL]];
 }
 
 #pragma mark -
@@ -346,17 +347,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
-{
-	return [_identifier hash];
-}
-- (BOOL)isEqual:(id)obj
-{
-	return [_identifier isEqual:obj];
-}
-
-#pragma mark -
-
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<%@ %p: %@:%d (\"%@\")>", [self class], self, [self URL], [self index], [self displayName]];
@@ -485,7 +475,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	NSParameterAssert(outRef);
 	Boolean dontCare1, dontCare2;
-	if(validate && _hasValidRef && !follow) _hasValidRef = FSIsFSRefValid(&_ref);
+	if(validate && _hasValidRef && !follow) _hasValidRef = PGIsTigerOrLater() ? FSIsFSRefValid(&_ref) : NO; // Not threadsafe on 10.3.
 	if(!_hasValidRef && FSResolveAliasWithMountFlags(NULL, _alias, &_ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
 	_hasValidRef = YES;
 	*outRef = _ref;
@@ -514,10 +504,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
-{
-	return [[self class] hash];
-}
 - (BOOL)isEqual:(id)obj
 {
 	if(obj == self) return YES;
