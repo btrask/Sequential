@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGArchiveAdapter : PGContainerAdapter
 {
 	@private
-	XADArchive      *_archive;
-	NSStringEncoding _encodingError;
-	BOOL             _needsPassword;
+	XADArchive *_archive;
+	BOOL _encodingError;
+	BOOL _needsPassword;
 }
 
 - (XADArchive *)archive;
