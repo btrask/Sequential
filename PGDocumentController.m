@@ -294,7 +294,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
 	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] retain];
-	NSLog(@"identifiers: %@", _recentDocumentIdentifiers);
 	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];

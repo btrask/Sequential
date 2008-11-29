@@ -254,10 +254,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
-	if(flag && !_customDisplayName) {
-		NSLog(@"set natural display name: %@", self);
-		[self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
-	}
+	if(flag && !_customDisplayName) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 - (void)setCustomDisplayName:(NSString *)aString
         notify:(BOOL)flag
@@ -266,10 +263,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
 	[_customDisplayName release];
 	_customDisplayName = [string copy];
-	if(flag) {
-		NSLog(@"set custom display name: %@", self);
-		[self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
-	}
+	if(flag) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 - (void)updateNaturalDisplayNameNotify:(BOOL)flag
 {
