@@ -244,7 +244,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 }
 - (NSString *)naturalDisplayName
 {
-	if(!_naturalDisplayName) [self updateNaturalDisplayName];
+	if(!_naturalDisplayName) [self updateNaturalDisplayNameNotify:YES];
 	if(_naturalDisplayName) return [[_naturalDisplayName retain] autorelease];
 	return @"";
 }
@@ -271,7 +271,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 		[self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	}
 }
-- (void)updateNaturalDisplayName
+- (void)updateNaturalDisplayNameNotify:(BOOL)flag
 {
 	NSString *name = nil;
 	NSURL *const URL = [self URL];
@@ -282,7 +282,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
 		}
 	}
-	[self setNaturalDisplayName:name notify:YES];
+	[self setNaturalDisplayName:name notify:flag];
 }
 
 #pragma mark -

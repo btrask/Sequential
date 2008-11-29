@@ -84,7 +84,7 @@ typedef UInt8 PGLabelColor;
 - (NSString *)naturalDisplayName;
 - (void)setNaturalDisplayName:(NSString *)aString notify:(BOOL)flag; // The name from the filesystem or raw address of the URL.
 - (void)setCustomDisplayName:(NSString *)aString notify:(BOOL)flag; // A custom name, like a webpage title.
-- (void)updateNaturalDisplayName;
+- (void)updateNaturalDisplayNameNotify:(BOOL)flag;
 
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
 - (PGLabelColor)labelColor;

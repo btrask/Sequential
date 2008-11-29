@@ -472,7 +472,7 @@ enum {
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	[[self identifier] updateNaturalDisplayName];
+	[[self identifier] updateNaturalDisplayNameNotify:YES];
 	[self _updateFileAttributes];
 	[_adapter noteFileEventDidOccurDirect:flag];
 }
