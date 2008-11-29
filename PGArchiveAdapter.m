@@ -98,7 +98,7 @@ static id PGArchiveAdapterList = nil;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)] displayableIdentifier];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode('fldr') : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
 		if(isFile) [node startLoadWithInfo:nil];
@@ -251,7 +251,7 @@ static id PGArchiveAdapterList = nil;
               standardFormat:(BOOL)flag
 {
 	OSType value;
-	if([self entryIsDirectory:index]) value = 'fldr';
+	if([self entryIsDirectory:index]) value = kGenericFolderIcon;
 	else {
 		NSNumber *const typeCode = [[self attributesOfEntry:index] objectForKey:NSFileHFSTypeCode];
 		if(!typeCode) return nil;
