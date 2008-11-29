@@ -163,8 +163,9 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (PGDocument *)currentDocument;
 - (void)setCurrentDocument:(PGDocument *)document;
 
-- (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)display;
-- (id)openDocumentWithBookmark:(PGBookmark *)aBookmark display:(BOOL)display;
+- (id)openDocumentWithContentsOfIdentifier:(PGResourceIdentifier *)ident display:(BOOL)flag;
+- (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)flag;
+- (id)openDocumentWithBookmark:(PGBookmark *)aBookmark display:(BOOL)flag;
 - (void)noteNewRecentDocument:(PGDocument *)document;
 
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;

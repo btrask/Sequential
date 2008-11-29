@@ -158,8 +158,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)openRecentDocument:(id)sender
 {
-	NSURL *const URL = [[sender representedObject] URL];
-	if(URL) [self openDocumentWithContentsOfURL:URL display:YES];
+	[self openDocumentWithContentsOfIdentifier:[sender representedObject] display:YES];
 }
 - (IBAction)clearRecentDocuments:(id)sender
 {
@@ -407,19 +406,24 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (id)openDocumentWithContentsOfURL:(NSURL *)URL
-      display:(BOOL)display
+- (id)openDocumentWithContentsOfIdentifier:(PGResourceIdentifier *)ident
+      display:(BOOL)flag
 {
-	PGResourceIdentifier *const identifier = [URL PG_resourceIdentifier];
-	PGDocument *const doc = [self documentForIdentifier:identifier];
-	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithIdentifier:[identifier displayableIdentifier]] autorelease]) display:display];
+	if(!ident) return nil;
+	PGDocument *const doc = [self documentForIdentifier:ident];
+	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithIdentifier:[ident displayableIdentifier]] autorelease]) display:flag];
+}
+- (id)openDocumentWithContentsOfURL:(NSURL *)URL
+      display:(BOOL)flag
+{
+	return [self openDocumentWithContentsOfIdentifier:[URL PG_resourceIdentifier] display:flag];
 }
 - (id)openDocumentWithBookmark:(PGBookmark *)aBookmark
-      display:(BOOL)display
+      display:(BOOL)flag
 {
 	PGDocument *const doc = [self documentForIdentifier:[aBookmark documentIdentifier]];
 	[doc openBookmark:aBookmark];
-	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease]) display:display];
+	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease]) display:flag];
 }
 - (void)noteNewRecentDocument:(PGDocument *)document
 {
