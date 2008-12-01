@@ -351,14 +351,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>PGThumbnailBrowser</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -371,6 +363,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGColumnView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
