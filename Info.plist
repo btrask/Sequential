@@ -611,7 +611,7 @@
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleGetInfoString</key>
-	<string>2.0.2</string>
+	<string>2.0.2v2</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>SequentialHelp</string>
 	<key>CFBundleHelpBookName</key>
@@ -642,7 +642,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2.0.2</string>
+	<string>2.0.2v2</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.4.8</string>
 	<key>NSMainNibFile</key>
