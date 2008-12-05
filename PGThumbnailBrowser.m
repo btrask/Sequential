@@ -162,8 +162,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSParameterAssert(NSNotFound != col);
 	if(col + 1 < [views count]) {
 		PGThumbnailView *const nextView = [views objectAtIndex:col + 1];
-		[nextView setSelection:nil];
 		if([nextView representedObject] == selectedItem) return;
+		[nextView setSelection:nil];
 		[nextView setRepresentedObject:selectedItem];
 		[nextView reloadData];
 		[self scrollToTopOfColumnWithView:nextView];
