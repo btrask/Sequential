@@ -211,26 +211,24 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)skipBeforeFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) return;
-	[self prepareToLoop];
-	[self tryToLoopForward:NO toNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation allowAlerts:YES];
+	[self loopForward:NO];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) return;
-	[self prepareToLoop];
-	[self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	[self loopForward:YES];
 }
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) return;
-	[self prepareToLoop];
-	[self tryToLoopForward:NO toNode:[[[[[self activeDocument] node] sortedViewableNodeFirst:NO] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	[self prepareToLoop]; // -firstOfPreviousFolder: is an exception to our usual looping mechanic, so we can't use -loopForward:.
+	PGNode *const last = [[[self activeDocument] node] sortedViewableNodeFirst:NO];
+	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO]) initialLocation:PGHomeLocation allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) return;
-	[self prepareToLoop];
-	[self tryToLoopForward:YES toNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation allowAlerts:YES];
+	[self loopForward:YES];
 }
 - (IBAction)firstOfFolder:(id)sender
 {
@@ -396,6 +394,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
 	[self prepareToLoop];
 	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l allowAlerts:flag];
+}
+- (void)loopForward:(BOOL)flag
+{
+	[self prepareToLoop];
+	[self tryToLoopForward:flag toNode:[[[self activeDocument] node] sortedViewableNodeFirst:flag] initialLocation:(flag ? PGHomeLocation : PGEndLocation) allowAlerts:YES];
 }
 - (void)prepareToLoop
 {

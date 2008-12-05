@@ -127,6 +127,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)setActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
+- (void)loopForward:(BOOL)flag;
 - (void)prepareToLoop; // Call this before sending -tryToLoop….
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;

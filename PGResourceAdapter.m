@@ -477,6 +477,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
+- (BOOL)isSortedFirstViewableNodeOfFolder
+{
+	return [[self containerAdapter] sortedFirstViewableNodeInFolderFirst:YES] == [self node];
+}
 - (BOOL)hasRealThumbnail
 {
 	return !!_realThumbnail;
