@@ -94,13 +94,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [[[PGAliasIdentifier alloc] initWithAliasData:data length:length] autorelease];
 }
 
-#pragma mark NSKeyedUnarchiverObjectSubstitution Protocol
-
-+ (Class)classForKeyedUnarchiver
-{
-	return [PGDisplayableIdentifier class];
-}
-
 #pragma mark Instance Methods
 
 - (PGResourceIdentifier *)identifier
@@ -174,9 +167,16 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
+	if([self class] == [PGResourceIdentifier class]) {
+		[self release];
+		return [[PGDisplayableIdentifier alloc] initWithCoder:aCoder];
+	}
 	return [self init];
 }
-- (void)encodeWithCoder:(NSCoder *)aCoder {}
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+	if([self class] != [PGResourceIdentifier class] && [self class] != [PGDisplayableIdentifier class]) [aCoder encodeObject:NSStringFromClass([self class]) forKey:@"ClassName"];
+}
 
 #pragma mark NSKeyedArchiverObjectSubstitution Protocol
 
@@ -196,14 +196,14 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if([self identifier] == [obj identifier]) return YES;
 	if(![obj isKindOfClass:[PGResourceIdentifier class]] || [self index] != [(PGResourceIdentifier *)obj index]) return NO;
 	if([self superidentifier] != [obj superidentifier] && ![[self superidentifier] isEqual:[obj superidentifier]]) return NO;
-	return [[self URL] isEqual:[obj URL]];
+	return [self URL] == [obj URL] || [[self URL] isEqual:[obj URL]];
 }
 
 #pragma mark -
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@:%d", [self URL], [self index]];
+	return [NSString stringWithFormat:@"%@", [self URL]];
 }
 
 @end
@@ -311,8 +311,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 - (id)_initWithIdentifier:(PGResourceIdentifier *)ident
 {
 	if((self = [super init])) {
-		NSParameterAssert(![ident isKindOfClass:[PGDisplayableIdentifier class]]);
-		_identifier = [ident retain];
+		_identifier = [[ident identifier] retain];
 	}
 	return self;
 }
@@ -321,26 +320,18 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
-	Class const class = NSClassFromString([aCoder decodeObjectForKey:@"ClassName"]);
-	if(!class) {
-		[self release];
-		return nil;
+	Class class = NSClassFromString([aCoder decodeObjectForKey:@"ClassName"]);
+	if([PGResourceIdentifier class] == class || [PGDisplayableIdentifier class] == class) class = Nil;
+	if((self = [self _initWithIdentifier:[[[class alloc] initWithCoder:aCoder] autorelease]])) {
+		[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
+		[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	}
-	id ident = nil;
-	if([self class] == class) {
-		ident = [[[PGAliasIdentifier alloc] initWithCoder:aCoder] autorelease];
-		if(!ident) ident = [[[PGURLIdentifier alloc] initWithCoder:aCoder] autorelease];
-		if(!ident) ident = [[[PGIndexIdentifier alloc] initWithCoder:aCoder] autorelease];
-	} else ident = [[[class alloc] initWithCoder:aCoder] autorelease];
-	if(!(self = [self _initWithIdentifier:ident])) return nil;
-	[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-	[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
 	return self;
 }
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
+	[super encodeWithCoder:aCoder];
 	[_identifier encodeWithCoder:aCoder]; // For backward compatibility, we can't use encodeObject:forKey:, so encode it directly.
-	[aCoder encodeObject:NSStringFromClass([_identifier class]) forKey:@"ClassName"];
 	[aCoder encodeObject:_icon forKey:@"Icon"];
 	[aCoder encodeObject:_customDisplayName forKey:@"DisplayName"];
 }
@@ -349,7 +340,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p: %@:%d (\"%@\")>", [self class], self, [self URL], [self index], [self displayName]];
+	return [NSString stringWithFormat:@"<%@ %p: %@ (\"%@\")>", [self class], self, _identifier, [self displayName]];
 }
 
 #pragma mark PGResourceIdentifier
@@ -605,6 +596,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 - (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier
       index:(int)index
 {
+	NSParameterAssert(identifier);
 	if((self = [super init])) {
 		_superidentifier = [identifier retain];
 		_index = index;
@@ -627,6 +619,13 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[super encodeWithCoder:aCoder];
 	[aCoder encodeObject:_superidentifier forKey:@"Superidentifier"];
 	[aCoder encodeInt:_index forKey:@"Index"];
+}
+
+#pragma mark NSObject Protocol
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@:%d", [self superidentifier], [self index]];
 }
 
 #pragma mark PGResourceIdentifier
