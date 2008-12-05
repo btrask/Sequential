@@ -76,16 +76,11 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	NSButton *const deleteButton = [alert addButtonWithTitle:NSLocalizedString(@"Delete Bookmark", nil)];
 	NSButton *const cancelButton = [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
-	if(_deletesBookmarks) {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"Are you sure you want to delete the bookmark %@?", @"Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name."), [[bookmark fileIdentifier] displayName]]];
-		[alert setInformativeText:NSLocalizedString(@"This operation cannot be undone.", @"Confirmation dialog informative text.")];
-		[deleteButton setKeyEquivalent:@"\r"];
-	} else {
-		[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [[bookmark fileIdentifier] displayName]]];
-		[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", @"Bookmarked file could not be found error informative text.")];
-		[deleteButton setKeyEquivalent:@""];
-		[cancelButton setKeyEquivalent:@"\r"];
-	}
+	if(_deletesBookmarks) return [self removeBookmark:bookmark];
+	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [[bookmark fileIdentifier] displayName]]];
+	[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", @"Bookmarked file could not be found error informative text.")];
+	[deleteButton setKeyEquivalent:@""];
+	[cancelButton setKeyEquivalent:@"\r"];
 	if([alert runModal] == NSAlertFirstButtonReturn) [self removeBookmark:bookmark];
 	else [self _updateMenuItemForBookmark:bookmark];
 }

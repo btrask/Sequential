@@ -85,12 +85,6 @@
 /* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder. */
 "File already exists." = "檔案已存在。";
 
-/* Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name. */
-"Are you sure you want to delete the bookmark %@?" = "您確定要刪除書籤“%@”？";
-
-/* Confirmation dialog informative text. */
-"This operation cannot be undone." = "無法還原此操作。";
-
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
 "The file referenced by the bookmark %@ could not be found." = "找不到書籤“%@”相關的檔案。";
 

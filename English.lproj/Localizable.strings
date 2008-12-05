@@ -85,12 +85,6 @@
 /* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder. */
 "File already exists." = "File already exists.";
 
-/* Confirmation dialog when the user intentionally deletes a bookmark. %@ is the bookmarked file's name. */
-"Are you sure you want to delete the bookmark %@?" = "Are you sure you want to delete the bookmark “%@?”";
-
-/* Confirmation dialog informative text. */
-"This operation cannot be undone." = "This operation cannot be undone.";
-
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
 "The file referenced by the bookmark %@ could not be found." = "The file referenced by the bookmark “%@” could not be found.";
 
