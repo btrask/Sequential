@@ -479,7 +479,8 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 }
 - (BOOL)isSortedFirstViewableNodeOfFolder
 {
-	return [[self containerAdapter] sortedFirstViewableNodeInFolderFirst:YES] == [self node];
+	PGContainerAdapter *const container = [self containerAdapter];
+	return !container || [container sortedFirstViewableNodeInFolderFirst:YES] == [self node];
 }
 - (BOOL)hasRealThumbnail
 {
