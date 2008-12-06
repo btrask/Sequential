@@ -322,6 +322,7 @@
 			<array>
 				<string>image/jpeg</string>
 				<string>image/jpg</string>
+				<string>image/pjpeg</string>
 			</array>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
@@ -749,6 +750,7 @@
 				<string>image/gif</string>
 				<string>image/jpeg</string>
 				<string>image/jpg</string>
+				<string>image/pjpeg</string>
 				<string>image/pict</string>
 				<string>image/x-pict</string>
 				<string>image/png</string>
