@@ -6,6 +6,22 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>HMBlkOutlineView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSOutlineView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFadeOutPanel</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSPanel</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGFullscreenWindow</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -14,16 +30,27 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGColorWell</string>
+			<string>HMBlkPanel</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>accessory</key>
-				<string>NSView</string>
-			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSColorWell</string>
+			<string>PGFadeOutPanel</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFloatingPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSTableColumn</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -35,43 +62,11 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSTextField</string>
+			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>NSControl</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>changeDisplayScreen</key>
-				<string>id</string>
-				<key>setDisplayScreen</key>
-				<string>id</string>
-				<key>showPrefsHelp</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGPrefController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>screensPopUp</key>
-				<string>NSPopUpButton</string>
-				<key>secondaryMouseActionLabel</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGColumnView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -80,6 +75,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSScroller</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -88,31 +91,31 @@
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
 				<string>PGFullscreenWindow</string>
+				<key>connectionDidCancel</key>
+				<string>PGURLConnection</string>
 				<key>connectionDidClose</key>
+				<string>PGURLConnection</string>
+				<key>connectionDidFail</key>
 				<string>PGURLConnection</string>
 				<key>connectionDidReceiveResponse</key>
 				<string>PGURLConnection</string>
+				<key>connectionDidSucceed</key>
+				<string>PGURLConnection</string>
 				<key>connectionLoadingDidProgress</key>
 				<string>PGURLConnection</string>
-				<key>loadDidCancel</key>
-				<string>PGURLLoad</string>
-				<key>loadDidFail</key>
-				<string>PGURLLoad</string>
-				<key>loadDidReceiveResponse</key>
-				<string>PGURLLoad</string>
-				<key>loadDidSucceed</key>
-				<string>PGURLLoad</string>
-				<key>loadLoadingDidProgress</key>
-				<string>PGURLLoad</string>
-				<key>thumbnailBrowserSelectionDidChange</key>
-				<string>PGThumbnailBrowser</string>
-				<key>thumbnailViewSelectionDidChange</key>
-				<string>PGThumbnailView</string>
 			</dict>
 			<key>CLASS</key>
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSCell</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -137,29 +140,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGThumbnailBrowser</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>delegate</key>
-				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>PGColumnView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>PGClipView</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -175,18 +155,35 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGThumbnailView</string>
+			<string>NSTableView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSControl</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelLoad</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGActivityPanelController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>delegate</key>
-				<string>id</string>
+				<key>activityOutline</key>
+				<string>NSOutlineView</string>
+				<key>cancelButton</key>
+				<string>NSButton</string>
+				<key>identifierColumn</key>
+				<string>NSTableColumn</string>
+				<key>progressColumn</key>
+				<string>NSTableColumn</string>
 			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSView</string>
+			<string>PGFloatingPanelController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -195,6 +192,22 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkScrollView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSScrollView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkButton</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSButton</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

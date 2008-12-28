@@ -6,6 +6,14 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
+			<string>PGFadeOutPanel</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSPanel</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>PGFullscreenWindow</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -14,16 +22,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGColorWell</string>
+			<string>HMBlkPanel</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>accessory</key>
-				<string>NSView</string>
-			</dict>
 			<key>SUPERCLASS</key>
-			<string>NSColorWell</string>
+			<string>PGFadeOutPanel</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFloatingPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -32,38 +43,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSTextField</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSControl</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>changeDisplayScreen</key>
-				<string>id</string>
-				<key>setDisplayScreen</key>
-				<string>id</string>
-				<key>showPrefsHelp</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGPrefController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>screensPopUp</key>
-				<string>NSPopUpButton</string>
-				<key>secondaryMouseActionLabel</key>
-				<string>NSTextField</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -113,6 +92,38 @@
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGCircleProgressIndicator</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>changeTimerInterval</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGTimerPanelController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>intervalSlider</key>
+				<string>NSSlider</string>
+				<key>progressIndicator</key>
+				<string>PGCircleProgressIndicator</string>
+				<key>remainingField</key>
+				<string>NSTextField</string>
+				<key>totalField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>PGFloatingPanelController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -195,6 +206,14 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkSlider</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSSlider</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

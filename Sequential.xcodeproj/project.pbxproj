@@ -231,6 +231,19 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0E04504E0F06884D00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv_SE; path = sv_SE.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0E04504F0F06885A00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = sv_SE; path = sv_SE.lproj/Credits.rtf; sourceTree = "<group>"; };
+		0E0450500F06886100441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv_SE; path = sv_SE.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0E0450510F06886F00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGMenu.nib; sourceTree = "<group>"; };
+		0E0450520F06887900441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGPreferences.nib; sourceTree = "<group>"; };
+		0E0450530F06888000441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGWindow.nib; sourceTree = "<group>"; };
+		0E0450540F06888700441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGExif.nib; sourceTree = "<group>"; };
+		0E0450550F06888F00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGTimer.nib; sourceTree = "<group>"; };
+		0E0450560F0688A300441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0E0450570F0688AA00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGURL.nib; sourceTree = "<group>"; };
+		0E0450580F0688B200441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGExtract.nib; sourceTree = "<group>"; };
+		0E0450590F0688B900441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGEncoding.nib; sourceTree = "<group>"; };
+		0E04505A0F0688C700441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = folder; name = sv_SE; path = sv_SE.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0E04E98C0C23BA7100078EC2 /* PGBezelPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBezelPanel.h; sourceTree = "<group>"; };
 		0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBezelPanel.m; sourceTree = "<group>"; };
 		0E04EBCC0C253BB000078EC2 /* PGAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAlertView.h; sourceTree = "<group>"; };
@@ -1023,6 +1036,7 @@
 				zh_TW,
 				de,
 				Russian,
+				sv_SE,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Pornograph */;
 			projectDirPath = "";
@@ -1268,6 +1282,7 @@
 				0E1211780D31A5A40055F587 /* Polish */,
 				0E9851F80EDA196B002E5B4F /* Russian */,
 				0E5DD3520CAF91310085241E /* Spanish */,
+				0E04504E0F06884D00441263 /* sv_SE */,
 				0E9B60AC0E5C0EAE002D19FD /* zh_TW */,
 			);
 			name = InfoPlist.strings;
@@ -1283,6 +1298,7 @@
 				0E1211800D31A5E70055F587 /* Polish */,
 				0E9852030EDA19CE002E5B4F /* Russian */,
 				0E5DD3580CAF91840085241E /* Spanish */,
+				0E0450590F0688B900441263 /* sv_SE */,
 				0E9B60DC0E5C0EFF002D19FD /* zh_TW */,
 			);
 			name = PGEncoding.nib;
@@ -1298,6 +1314,7 @@
 				0E255F0A0E3C07D700EDF04C /* Polish */,
 				0E9851FF0EDA19AD002E5B4F /* Russian */,
 				0E255F0B0E3C07DA00EDF04C /* Spanish */,
+				0E0450550F06888F00441263 /* sv_SE */,
 				0E9B60D80E5C0EE8002D19FD /* zh_TW */,
 			);
 			name = PGTimer.nib;
@@ -1313,6 +1330,7 @@
 				0EC1C5350E366FBD00E911E7 /* Polish */,
 				0E9852000EDA19B5002E5B4F /* Russian */,
 				0EC1C5360E366FBF00E911E7 /* Spanish */,
+				0E0450560F0688A300441263 /* sv_SE */,
 				0E9B60D90E5C0EEF002D19FD /* zh_TW */,
 			);
 			name = PGActivity.nib;
@@ -1328,6 +1346,7 @@
 				0E12117D0D31A5D10055F587 /* Polish */,
 				0E9852010EDA19BE002E5B4F /* Russian */,
 				0E8135790D019987001A5B60 /* Spanish */,
+				0E0450570F0688AA00441263 /* sv_SE */,
 				0E9B60DA0E5C0EF4002D19FD /* zh_TW */,
 			);
 			name = PGURL.nib;
@@ -1343,6 +1362,7 @@
 				0EC1C5310E366FAA00E911E7 /* Polish */,
 				0E9851FC0EDA1992002E5B4F /* Russian */,
 				0EC1C5320E366FAD00E911E7 /* Spanish */,
+				0E0450520F06887900441263 /* sv_SE */,
 				0E9B60B00E5C0ECB002D19FD /* zh_TW */,
 			);
 			name = PGPreferences.nib;
@@ -1358,6 +1378,7 @@
 				0E12117A0D31A5B90055F587 /* Polish */,
 				0E9851FA0EDA1981002E5B4F /* Russian */,
 				0E5DD3540CAF915A0085241E /* Spanish */,
+				0E0450500F06886100441263 /* sv_SE */,
 				0E9B60AE0E5C0EBD002D19FD /* zh_TW */,
 			);
 			name = Localizable.strings;
@@ -1373,6 +1394,7 @@
 				0E12117E0D31A5D70055F587 /* Polish */,
 				0E9852020EDA19C6002E5B4F /* Russian */,
 				0E81357B0D019996001A5B60 /* Spanish */,
+				0E0450580F0688B200441263 /* sv_SE */,
 				0E9B60DB0E5C0EFA002D19FD /* zh_TW */,
 			);
 			name = PGExtract.nib;
@@ -1388,6 +1410,7 @@
 				0EE98F900DEEB1540004F628 /* Polish */,
 				0E9851FD0EDA199B002E5B4F /* Russian */,
 				0EE98F910DEEB1570004F628 /* Spanish */,
+				0E0450530F06888000441263 /* sv_SE */,
 				0E9B60D40E5C0EDE002D19FD /* zh_TW */,
 			);
 			name = PGWindow.nib;
@@ -1402,6 +1425,7 @@
 				0EC1C5440E366FD900E911E7 /* it_IT */,
 				0EC1C5500E366FDC00E911E7 /* Polish */,
 				0E9852040EDA19D5002E5B4F /* Russian */,
+				0E04505A0F0688C700441263 /* sv_SE */,
 				0EC1C55C0E366FDE00E911E7 /* Spanish */,
 			);
 			name = SequentialHelp;
@@ -1417,6 +1441,7 @@
 				0EA542650DB72C2D00F60F0E /* Polish */,
 				0E9851FE0EDA19A5002E5B4F /* Russian */,
 				0EA542660DB72C3100F60F0E /* Spanish */,
+				0E0450540F06888700441263 /* sv_SE */,
 				0E9B60D70E5C0EE3002D19FD /* zh_TW */,
 			);
 			name = PGExif.nib;
@@ -1432,6 +1457,7 @@
 				0E12117B0D31A5C00055F587 /* Polish */,
 				0E9851FB0EDA198A002E5B4F /* Russian */,
 				0E5DD3550CAF91640085241E /* Spanish */,
+				0E0450510F06886F00441263 /* sv_SE */,
 				0E9B60AF0E5C0EC4002D19FD /* zh_TW */,
 			);
 			name = PGMenu.nib;
@@ -1447,6 +1473,7 @@
 				0E1211790D31A5AF0055F587 /* Polish */,
 				0E9851F90EDA1971002E5B4F /* Russian */,
 				0E5DD3530CAF913D0085241E /* Spanish */,
+				0E04504F0F06885A00441263 /* sv_SE */,
 				0E9B60AD0E5C0EB7002D19FD /* zh_TW */,
 			);
 			name = Credits.rtf;
