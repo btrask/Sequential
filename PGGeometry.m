@@ -70,6 +70,30 @@ NSRect PGIntegralRect(NSRect r)
 {
 	return NSMakeRect(roundf(NSMinX(r)), roundf(NSMinY(r)), roundf(NSWidth(r)), roundf(NSHeight(r)));
 }
+void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
+{
+	if(NSIsEmptyRect(subtrahend)) {
+		diff[0] = minuend;
+		*count = 1;
+		return;
+	}
+	unsigned i = 0;
+	diff[i] = NSMakeRect(NSMinX(minuend), NSMaxY(subtrahend), NSWidth(minuend), MAX(NSMaxY(minuend) - NSMaxY(subtrahend), 0));
+	if(!NSIsEmptyRect(diff[i])) i++;
+	diff[i] = NSMakeRect(NSMinX(minuend), NSMinY(minuend), NSWidth(minuend), MAX(NSMinY(subtrahend) - NSMinY(minuend), 0));
+	if(!NSIsEmptyRect(diff[i])) i++;
+	float const sidesMinY = MAX(NSMinY(minuend), NSMinY(subtrahend));
+	float const sidesHeight = NSMaxY(subtrahend) - MAX(NSMinY(minuend), NSMinY(subtrahend));
+	diff[i] = NSMakeRect(NSMinX(minuend), sidesMinY, MAX(NSMinX(subtrahend) - NSMinX(minuend), 0), sidesHeight);
+	if(!NSIsEmptyRect(diff[i])) i++;
+	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0), sidesHeight);
+	if(!NSIsEmptyRect(diff[i])) i++;
+	*count = i;
+}
+NSRect PGScaleRect(NSRect r, float scaleX, float scaleY)
+{
+	return NSMakeRect(NSMinX(r) * scaleX, NSMinY(r) * scaleY, NSWidth(r) * scaleX, NSHeight(r) * scaleY);
+}
 
 #pragma mark PGRectEdgeMask
 

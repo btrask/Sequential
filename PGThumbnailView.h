@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 - (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item;
 - (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item;
+- (NSRect)thumbnailView:(PGThumbnailView *)sender highlightRectForItem:(id)item; // A rect within {{0, 0}, {1, 1}}.
 
 @end
 

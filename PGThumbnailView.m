@@ -247,6 +247,13 @@ static void PGDrawGradient(void)
 - (void)drawRect:(NSRect)aRect
 {
 	NSRect const b = [self bounds];
+	int count = 0;
+	NSRect const *rects = NULL;
+	[self getRectsBeingDrawn:&rects count:&count];
+
+
+	// TODO: For performance, we should make sure that we need to draw anything at all besides the thumbnails themselves before drawing the background.
+
 
 	[[NSColor clearColor] set];
 	NSRectFill(b); // We say we're opaque so we have to fill everything.
@@ -263,9 +270,6 @@ static void PGDrawGradient(void)
 
 	[self _drawThumbnailBackground:aRect];
 
-	int count = 0;
-	NSRect const *rects = NULL;
-	[self getRectsBeingDrawn:&rects count:&count];
 	[shadow set];
 	unsigned i = 0;
 	for(; i < [_items count]; i++) {
@@ -289,6 +293,20 @@ static void PGDrawGradient(void)
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
 		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
+
+		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
+		if(!NSIsEmptyRect(highlight)) {
+			[nilShadow set];
+			NSRect rects[4];
+			unsigned count = 0;
+			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
+			PGGetRectDifference(rects, &count, thumbnailRect, r);
+			[[NSColor colorWithDeviceWhite:0 alpha:0.5f] set];
+			NSRectFillListUsingOperation(rects, count, NSCompositeSourceOver);
+			[[NSColor whiteColor] set];
+			NSFrameRect(r);
+			[shadow set];
+		}
 
 		NSString *const label = [[self dataSource] thumbnailView:self labelForItem:item];
 		NSColor *const labelColor = [[self dataSource] thumbnailView:self labelColorForItem:item];
@@ -434,6 +452,11 @@ static void PGDrawGradient(void)
              labelColorForItem:(id)item
 {
 	return nil;
+}
+- (NSRect)thumbnailView:(PGThumbnailView *)sender
+          highlightRectForItem:(id)item
+{
+	return NSZeroRect;
 }
 
 @end

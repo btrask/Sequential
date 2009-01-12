@@ -1076,6 +1076,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
 }
+- (void)clipViewBoundsDidChange:(PGClipView *)sender
+{
+	[[_thumbnailPanel content] redisplayItem:[self activeNode] children:NO];
+}
 - (void)clipView:(PGClipView *)sender
         magnifyBy:(float)amount
 {
@@ -1164,6 +1168,17 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGLabelGray: return [NSColor grayColor];
 		default: return nil;
 	}
+}
+- (NSRect)thumbnailView:(PGThumbnailView *)sender
+          highlightRectForItem:(id)item
+{
+	if(_reading || [self activeNode] != item || [clipView documentView] != _imageView) return NSZeroRect;
+	NSRect const scrollableRect = [clipView scrollableRectWithBorder:NO];
+	if(NSWidth(scrollableRect) <= 0.01 && NSHeight(scrollableRect) <= 0.01) return NSZeroRect; // We can't use NSIsEmptyRect() because it can be 0 in one direction but not the other.
+	NSRect const f = [clipView documentFrame];
+	NSRect r = PGScaleRect(NSOffsetRect(NSIntersectionRect(f, [clipView insetBounds]), -NSMinX(f), -NSMinY(f)), 1 / NSWidth(f), 1 / NSHeight(f));
+	r.origin.y = 1 - NSMaxY(r);
+	return r;
 }
 
 #pragma mark NSServicesRequests Protocol

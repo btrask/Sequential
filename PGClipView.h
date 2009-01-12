@@ -66,6 +66,7 @@ typedef unsigned PGAnimationType;
 
 - (NSView *)documentView;
 - (void)setDocumentView:(NSView *)aView;
+- (NSRect)documentFrame;
 - (PGInset)boundsInset;
 - (void)setBoundsInset:(PGInset)inset;
 - (NSRect)insetBounds;
@@ -117,6 +118,7 @@ typedef unsigned PGAnimationType;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.
+- (void)clipViewBoundsDidChange:(PGClipView *)sender;
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount;
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount;
 - (void)clipViewGestureDidEnd:(PGClipView *)sender;

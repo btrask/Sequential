@@ -53,26 +53,6 @@ enum {
 };
 typedef unsigned PGDragMode;
 
-static inline void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
-{
-	if(NSIsEmptyRect(subtrahend)) {
-		diff[0] = minuend;
-		*count = 1;
-		return;
-	}
-	unsigned i = 0;
-	diff[i] = NSMakeRect(NSMinX(minuend), NSMaxY(subtrahend), NSWidth(minuend), MAX(NSMaxY(minuend) - NSMaxY(subtrahend), 0));
-	if(!NSIsEmptyRect(diff[i])) i++;
-	diff[i] = NSMakeRect(NSMinX(minuend), NSMinY(minuend), NSWidth(minuend), MAX(NSMinY(subtrahend) - NSMinY(minuend), 0));
-	if(!NSIsEmptyRect(diff[i])) i++;
-	float const sidesMinY = MAX(NSMinY(minuend), NSMinY(subtrahend));
-	float const sidesHeight = NSMaxY(subtrahend) - MAX(NSMinY(minuend), NSMinY(subtrahend));
-	diff[i] = NSMakeRect(NSMinX(minuend), sidesMinY, MAX(NSMinX(subtrahend) - NSMinX(minuend), 0), sidesHeight);
-	if(!NSIsEmptyRect(diff[i])) i++;
-	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0), sidesHeight);
-	if(!NSIsEmptyRect(diff[i])) i++;
-	*count = i;
-}
 static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return NSMakePoint(MAX(MIN(aPoint.x, NSMaxX(aRect)), NSMinX(aRect)), MAX(MIN(aPoint.y, NSMaxY(aRect)), NSMinY(aRect)));
@@ -119,6 +99,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self viewFrameDidChange:nil];
 	[documentView setPostsFrameChangedNotifications:YES];
 }
+- (NSRect)documentFrame
+{
+	return _documentFrame;
+}
 - (PGInset)boundsInset
 {
 	return _boundsInset;
@@ -129,6 +113,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_boundsInset = inset;
 	[self scrollTo:p animation:PGAllowAnimation];
 	[[self window] invalidateCursorRectsForView:self];
+	[[self delegate] clipViewBoundsDidChange:self];
 }
 - (NSRect)insetBounds
 {
@@ -485,6 +470,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
 	[self scrollPinLocationToOffset:offset];
+	[[self delegate] clipViewBoundsDidChange:self];
 	NSParameterAssert(_documentViewIsResizing);
 	_documentViewIsResizing--;
 }
@@ -503,6 +489,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self setBoundsOrigin:NSMakePoint(roundf(_immediatePosition.x), roundf(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	[self endScrolling];
+	[[self delegate] clipViewBoundsDidChange:self];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
@@ -653,6 +640,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
 	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES];
+	[[self delegate] clipViewBoundsDidChange:self];
 }
 
 #pragma mark NSResponder
@@ -845,6 +833,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return PGNoEdges;
 }
+- (void)clipViewBoundsDidChange:(PGClipView *)sender {}
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}
 - (void)clipViewGestureDidEnd:(PGClipView *)sender {}
