@@ -1,4 +1,21 @@
-2.0.1 (September 15, 2008)
+2.0.2v2 (December 10th, 2008)
+- Solves issues that could cause some bookmarks to be unopenable.
+- Other minor improvements.
+
+2.0.2 (December 2nd, 2008)
+- Thumbnail view.
+- Improved support for online images.
+- A reload button is displayed for images that couldn't be downloaded.
+- Improved searching with support for page numbers.
+- Fixes keyboard shortcuts some keyboard layouts.
+- Animated GIFs can now be paused with the space bar.
+- Automatic Fit scaling mode is now a bit more clever.
+- The Escape key can now be configured to quit.
+- Other minor improvements.
+- Panther support has been removed. Sorry.
+- Changed from the NCSA license to the BSD license.
+
+2.0.1 (September 15th, 2008)
 - Traditional Chinese localization by Jack Lin.
 - German localization by Christoph Schmitz.
 - Updated French localization by Thomas Audibert.
