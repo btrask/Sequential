@@ -119,6 +119,10 @@
 				<string>id</string>
 				<key>revertOrientation</key>
 				<string>id</string>
+				<key>setAsDesktopPicture</key>
+				<string>id</string>
+				<key>setCopyAsDesktopPicture</key>
+				<string>id</string>
 				<key>skipBeforeFolder</key>
 				<string>id</string>
 				<key>skipPastFolder</key>
@@ -198,6 +202,10 @@
 				<string>id</string>
 				<key>revertOrientation</key>
 				<string>id</string>
+				<key>setAsDesktopPicture</key>
+				<string>id</string>
+				<key>setCopyAsDesktopPicture</key>
+				<string>id</string>
 				<key>skipBeforeFolder</key>
 				<string>id</string>
 				<key>skipPastFolder</key>
@@ -256,6 +264,8 @@
 			<dict>
 				<key>changeEncoding</key>
 				<string>id</string>
+				<key>clipViewBoundsDidChange</key>
+				<string>PGClipView</string>
 				<key>clipViewGestureDidEnd</key>
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>

@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSControlAdditions.h"
 #import "NSObjectAdditions.h"
+#import "NSScreenAdditions.h"
 #import "NSStringAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
@@ -130,6 +131,23 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([self shouldShowThumbnails]) set = [[_thumbnailPanel content] selection];
 	else if([self activeNode]) set = [NSSet setWithObject:[self activeNode]];
 	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
+}
+- (IBAction)setAsDesktopPicture:(id)sender
+{
+	PGResourceIdentifier *const ident = [[self activeNode] identifier];
+	if(![ident isFileIdentifier] || ![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:[[ident URLByFollowingAliases:YES] path]]) NSBeep();
+}
+- (IBAction)setCopyAsDesktopPicture:(id)sender
+{
+	NSSavePanel *const savePanel = [NSSavePanel savePanel];
+	[savePanel setTitle:NSLocalizedString(@"Save Copy as Desktop Picture", @"Title of save dialog when setting a copy as the desktop picture.")];
+	PGDisplayableIdentifier *const ident = [[self activeNode] identifier];
+	[savePanel setRequiredFileType:[[ident naturalDisplayName] pathExtension]];
+	[savePanel setCanSelectHiddenExtension:YES];
+	if([savePanel runModalForDirectory:nil file:[[ident naturalDisplayName] stringByDeletingPathExtension]] != NSFileHandlingPanelOKButton) return;
+	NSString *const path = [savePanel filename];
+	[[[self activeNode] data] writeToFile:path atomically:NO];
+	if(![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:path]) NSBeep();
 }
 - (IBAction)moveToTrash:(id)sender
 {
@@ -853,20 +871,24 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(@selector(reveal:) == action && [[self activeDocument] isOnline]) [anItem setTitle:NSLocalizedString(@"Reveal in Browser", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
 	if(![[self activeNode] isViewable]) {
 		if(@selector(reveal:) == action) return NO;
+		if(@selector(setAsDesktopPicture:) == action) return NO;
+		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
 		if(@selector(pauseDocument:) == action) return NO;
 		if(@selector(pauseAndCloseDocument:) == action) return NO;
+		if(@selector(copy:) == action) return NO;
 	}
 	if(![[[self activeDocument] node] hasNodesWithData]) {
 		if(@selector(extractImages:) == action) return NO;
 	}
+	if(![[self activeNode] canGetData]) {
+		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
+	}
 	if(![[[self activeNode] identifier] isFileIdentifier]) {
+		if(@selector(setAsDesktopPicture:) == action) return NO;
 		if(@selector(moveToTrash:) == action) return NO;
 	}
 	if(![[[self activeNode] identifier] URL]) {
 		if(@selector(moveToTrash:) == action) return NO;
-	}
-	if(![self activeNode]) {
-		if(@selector(copy:) == action) return NO;
 	}
 	if(@selector(performFindPanelAction:) == action) switch([anItem tag]) {
 		case NSFindPanelActionShowFindPanel:

@@ -9,6 +9,7 @@ Sequential has mature full screen support and can display images' Exif data.
 
 New in 2.0.3
 - The visible portion of the current image is now highlighted in the thumbnail sidebar.
+- It is now possible to set images as the desktop picture from within Sequential.
 
 A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
 

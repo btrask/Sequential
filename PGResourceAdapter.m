@@ -308,11 +308,11 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		if(thumbnail) break;
 		NSDictionary *const info = [self info];
 		do {
-			NSString *const OSType = [info objectForKey:PGOSTypeKey];
-			NSString *const MIMEType = [info objectForKey:PGMIMETypeKey];
-			if(!OSType && !MIMEType) break;
+			NSString *const osType = [info objectForKey:PGOSTypeKey];
+			NSString *const mimeType = [info objectForKey:PGMIMETypeKey];
+			if(!osType && !mimeType) break;
 			IconRef iconRef = NULL;
-			if(noErr != GetIconRefFromTypeInfo('????', PGHFSTypeCodeForPseudoFileType(OSType), NULL, (CFStringRef)MIMEType, kIconServicesNormalUsageFlag, &iconRef)) break;
+			if(noErr != GetIconRefFromTypeInfo('????', PGHFSTypeCodeForPseudoFileType(osType), NULL, (CFStringRef)mimeType, kIconServicesNormalUsageFlag, &iconRef)) break;
 			NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:PGThumbnailSize pixelsHigh:PGThumbnailSize bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 			if(!thumbRep) {
 				ReleaseIconRef(iconRef);

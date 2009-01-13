@@ -19,6 +19,9 @@
 "Switch to Finder" = "切換至 Finder";
 "Switch to Path Finder" = "切換至 Path Finder";
 
+/* Title of save dialog when setting a copy as the desktop picture. */
+"Save Copy as Desktop Picture" = "Save Copy as Desktop Picture";
+
 /* Enter/exit full screen. Two states of the same item. */
 "Enter Full Screen" = "進入全螢幕";
 "Exit Full Screen" = "離開全螢幕";

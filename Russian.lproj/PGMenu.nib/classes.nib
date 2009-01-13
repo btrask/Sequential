@@ -46,19 +46,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSApplication</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSMenuItem</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSApplication</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -118,6 +118,10 @@
 				<key>reveal</key>
 				<string>id</string>
 				<key>revertOrientation</key>
+				<string>id</string>
+				<key>setAsDesktopPicture</key>
+				<string>id</string>
+				<key>setCopyAsDesktopPicture</key>
 				<string>id</string>
 				<key>skipBeforeFolder</key>
 				<string>id</string>
@@ -198,6 +202,10 @@
 				<string>id</string>
 				<key>revertOrientation</key>
 				<string>id</string>
+				<key>setAsDesktopPicture</key>
+				<string>id</string>
+				<key>setCopyAsDesktopPicture</key>
+				<string>id</string>
 				<key>skipBeforeFolder</key>
 				<string>id</string>
 				<key>skipPastFolder</key>
@@ -256,6 +264,8 @@
 			<dict>
 				<key>changeEncoding</key>
 				<string>id</string>
+				<key>clipViewBoundsDidChange</key>
+				<string>PGClipView</string>
 				<key>clipViewGestureDidEnd</key>
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
