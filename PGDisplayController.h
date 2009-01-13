@@ -48,40 +48,41 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 @interface PGDisplayController : NSWindowController <PGDisplayControlling>
 {
 	@protected
-	IBOutlet PGClipView          *clipView;
-	         PGPageLocation      _initialLocation;
+	IBOutlet PGClipView *clipView;
+	PGPageLocation _initialLocation;
 
 	@private
-	         PGImageView        *_imageView;
-	         BOOL                _reading;
-	         unsigned            _displayImageIndex;
+	IBOutlet PGFindView *findView;
+	IBOutlet NSSearchField *searchField;
+	IBOutlet NSView *errorView;
+	IBOutlet NSTextField *errorLabel;
+	IBOutlet NSTextField *errorMessage;
+	IBOutlet NSButton *reloadButton;
+	IBOutlet NSView *passwordView;
+	IBOutlet NSTextField *passwordLabel;
+	IBOutlet NSTextField *passwordField;
+	IBOutlet NSView *encodingView;
+	IBOutlet NSTextField *encodingLabel;
 
-	         PGBezelPanel       *_graphicPanel;
-	         PGLoadingGraphic   *_loadingGraphic;
-	         PGBezelPanel       *_infoPanel;
-	         PGBezelPanel       *_thumbnailPanel;
+	PGDocument *_activeDocument;
+	PGNode *_activeNode;
+	PGImageView *_imageView;
+	BOOL _reading;
+	unsigned _displayImageIndex;
 
-	IBOutlet PGFindView          *findView;
-	IBOutlet NSSearchField       *searchField;
-	         PGBezelPanel       *_findPanel;
-	         PGFindlessTextView *_findFieldEditor;
+	PGBezelPanel *_graphicPanel;
+	PGLoadingGraphic *_loadingGraphic;
+	PGBezelPanel *_infoPanel;
+	PGBezelPanel *_thumbnailPanel;
 
-	IBOutlet NSView              *errorView;
-	IBOutlet NSTextField         *errorLabel;
-	IBOutlet NSTextField         *errorMessage;
-	IBOutlet NSButton            *reloadButton;
-	IBOutlet NSView              *passwordView;
-	IBOutlet NSTextField         *passwordLabel;
-	IBOutlet NSTextField         *passwordField;
-	IBOutlet NSView              *encodingView;
-	IBOutlet NSTextField         *encodingLabel;
+	PGBezelPanel *_findPanel;
+	PGFindlessTextView *_findFieldEditor;
 
-	         PGDocument         *_activeDocument;
-	         PGNode             *_activeNode;
+	NSTimeInterval _timerInterval;
+	NSDate *_nextTimerFireDate;
+	NSTimer *_timer;
 
-	         NSTimeInterval      _timerInterval;
-	         NSDate             *_nextTimerFireDate;
-	         NSTimer            *_timer;
+	BOOL _allowZoomAnimation;
 }
 
 + (NSArray *)pasteboardTypes;
@@ -148,6 +149,9 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (NSTimeInterval)timerInterval;
 - (void)setTimerInterval:(NSTimeInterval)time; // 0 for off.
 - (void)advanceOnTimer:(NSTimer *)timer;
+
+- (void)zoomBy:(float)aFloat;
+- (void)zoomKeyDown:(NSEvent *)firstEvent;
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif;
 

@@ -67,6 +67,13 @@ NSString *const PGDisplayControllerTimerDidChangeNotification      = @"PGDisplay
 #define PGScaleMin      (1.0f / 8.0f)
 #define PGWindowMinSize 400.0f
 
+enum {
+	PGZoomNone = 0,
+	PGZoomIn   = 1 << 0,
+	PGZoomOut  = 1 << 1
+};
+typedef unsigned PGZoomDirection;
+
 static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return NSMakeSize(MIN(MAX(min.width, size.width), max.width), MIN(MAX(min.height, size.height), max.height));
@@ -80,7 +87,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_readFinished;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode factor:(float)factor;
-- (void)_zoomTowardScaleFactor:(float)factor;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
@@ -197,11 +203,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)zoomIn:(id)sender
 {
-	[self _zoomTowardScaleFactor:MIN(PGScaleMax, [_imageView averageScaleFactor] * 2)];
+	[self zoomBy:2.0f];
 }
 - (IBAction)zoomOut:(id)sender
 {
-	[self _zoomTowardScaleFactor:MAX(PGScaleMin, [_imageView averageScaleFactor] / 2)];
+	[self zoomBy:1 / 2.0f];
 }
 
 #pragma mark -
@@ -523,6 +529,47 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (void)zoomBy:(float)aFloat
+{
+	PGDocument *const doc = [self activeDocument];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([doc imageScaleFactor] * aFloat, PGScaleMax))];
+}
+- (void)zoomKeyDown:(NSEvent *)firstEvent
+{
+	[NSCursor setHiddenUntilMouseMoves:YES];
+	[_imageView setUsesCaching:NO];
+	_allowZoomAnimation = NO;
+	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFramerate];
+	NSEvent *latestEvent = firstEvent;
+	PGZoomDirection dir = PGZoomNone;
+	BOOL stop = NO;
+	do {
+		NSEventType const type = [latestEvent type];
+		if(NSKeyDown == type || NSKeyUp == type) {
+			PGZoomDirection newDir = PGZoomNone;
+			switch([latestEvent keyCode]) {
+				case PGKeyEquals: newDir = PGZoomIn;  break;
+				case PGKeyMinus:  newDir = PGZoomOut; break;
+			}
+			switch(type) {
+				case NSKeyDown: dir |= newDir;  break;
+				case NSKeyUp:   dir &= ~newDir; break;
+			}
+		}
+		switch(dir) {
+			case PGZoomNone: stop = YES; break;
+			case PGZoomIn:  [self zoomBy:1.1f]; break;
+			case PGZoomOut: [self zoomBy:1 / 1.1f]; break;
+		}
+	} while(!stop && (latestEvent = [[self window] nextEventMatchingMask:NSKeyDownMask | NSKeyUpMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
+	[NSEvent stopPeriodicEvents];
+	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
+	_allowZoomAnimation = YES;
+	[_imageView setUsesCaching:YES];
+}
+
+#pragma mark -
+
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif
 {
 	[self _updateImageViewSizeAllowAnimation:NO];
@@ -652,7 +699,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
-	[self _updateImageViewSizeAllowAnimation:YES];
+	[self _updateImageViewSizeAllowAnimation:_allowZoomAnimation];
 }
 - (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif
 {
@@ -775,27 +822,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
 	return PGIntegralSize(newSize);
-}
-- (void)_zoomTowardScaleFactor:(float)factor
-{
-	[NSCursor setHiddenUntilMouseMoves:YES];
-	int nextMode = NSNotFound;
-	NSSize nextSize = PGScaleSizeByFloat([_imageView originalSize], factor);
-	float const boundOffset = factor > [_imageView averageScaleFactor] ? 0.01 : -0.01;
-	nextSize.width += boundOffset;
-	nextSize.height += boundOffset;
-	NSSize const currentSize = [_imageView size];
-	NSNumber *mode;
-	NSEnumerator *const modeEnum = [PGScaleModes() objectEnumerator];
-	while((mode = [modeEnum nextObject])) {
-		NSSize const s = [self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation] scaleMode:[mode intValue] factor:1.0f];
-		if(MIN(currentSize.width, nextSize.width) >= s.width || MIN(currentSize.height, nextSize.height) >= s.height || s.width >= MAX(currentSize.width, nextSize.width) || s.height >= MAX(currentSize.height, nextSize.height)) continue;
-		nextSize = s;
-		nextMode = [mode intValue];
-	}
-	PGDocument *const doc = [self activeDocument];
-	if(NSNotFound == nextMode) [doc setImageScaleFactor:factor];
-	else [doc setImageScaleMode:nextMode];
 }
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
@@ -1067,6 +1093,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			return YES;
 		}
 	}
+	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
+		case PGKeyEquals:
+		case PGKeyMinus: [self zoomKeyDown:anEvent]; return YES;
+	}
 	float const timerFactor = NSAlternateKeyMask & modifiers ? 10.0f : 1.0f;
 	if(!modifiers || NSAlternateKeyMask & modifiers) switch(keyCode) {
 		case PGKey0: [self setTimerInterval:0]; return YES;
@@ -1329,10 +1359,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
 		case PGKeyI: return [d performToggleInfo];
 	}
-	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
+/*	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
 		case PGKeyEquals: return [d performZoomIn];
 		case PGKeyMinus: return [d performZoomOut];
-	}
+	}*/
 	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
 }
 - (id)validRequestorForSendType:(NSString *)sendType
@@ -1357,6 +1387,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[_thumbnailPanel content] setDataSource:self];
 		[[_thumbnailPanel content] setDelegate:self];
 		[_thumbnailPanel AE_addObserver:self selector:@selector(thumbnailPanelFrameDidChange:) name:PGBezelPanelFrameDidChangeNotification];
+
+		_allowZoomAnimation = YES;
 
 		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
 	}

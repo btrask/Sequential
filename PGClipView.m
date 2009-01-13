@@ -698,8 +698,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)keyDown:(NSEvent *)anEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
-	if([anEvent modifierFlags] & NSCommandKeyMask) return [super keyDown:anEvent];
 	if([[self delegate] clipView:self handleKeyDown:anEvent]) return;
+	if([anEvent modifierFlags] & NSCommandKeyMask) return [super keyDown:anEvent];
 	unsigned const modifiers = [anEvent modifierFlags];
 	BOOL const forward = !(NSShiftKeyMask & modifiers);
 	switch([anEvent keyCode]) {
