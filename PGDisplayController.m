@@ -612,6 +612,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	[self _readFinished];
+	[self clipViewBoundsDidChange:nil];
 }
 
 #pragma mark -
