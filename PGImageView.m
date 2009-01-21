@@ -447,15 +447,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(count) NSRectFillList(rects, count);
 		else NSRectFill(b);
 	}
-	[self _drawWithFrame:b operation:([self _imageIsOpaque] ? NSCompositeCopy : NSCompositeSourceOver) rects:rects count:count];
-	if(PGDebugDrawingModes) {
-		[(_cached ? [NSColor redColor] : [NSColor blueColor]) set];
-		NSFrameRect(b);
-		[([self _imageIsOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
-		NSFrameRect(NSInsetRect(b, 2, 2));
-		[(deg ? [NSColor blueColor] : [NSColor redColor]) set];
-		NSFrameRect(NSInsetRect(b, 4, 4));
-	}
+	[self _drawWithFrame:b operation:([self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver) rects:rects count:count];
+#if PGDebugDrawingModes
+	[(_cached ? [NSColor redColor] : [NSColor blueColor]) set];
+	NSFrameRect(b); // Outer frame: Cached
+	[([self isOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
+	NSFrameRect(NSInsetRect(b, 2, 2)); // Middle frame 1: View opaque
+	[([self _imageIsOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
+	NSFrameRect(NSInsetRect(b, 4, 4)); // Middle frame 2: Image opaque
+	[(deg ? [NSColor blueColor] : [NSColor redColor]) set];
+	NSFrameRect(NSInsetRect(b, 6, 6)); // Inner frame: Rotated
+#endif
 	if(drawCorners) {
 		[self _drawCornersOnRect:b];
 		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
