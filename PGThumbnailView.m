@@ -292,9 +292,14 @@ static void PGDrawGradient(void)
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
-		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
 
 		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
+		if(!NSIsEmptyRect(highlight)) {
+			CGContextBeginTransparencyLayer(context, NULL);
+		}
+
+		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
+
 		if(!NSIsEmptyRect(highlight)) {
 			[nilShadow set];
 			NSRect rects[4];
@@ -302,10 +307,11 @@ static void PGDrawGradient(void)
 			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
 			PGGetRectDifference(rects, &count, thumbnailRect, r);
 			[[NSColor colorWithDeviceWhite:0 alpha:0.5f] set];
-			NSRectFillListUsingOperation(rects, count, NSCompositeSourceOver);
+			NSRectFillListUsingOperation(rects, count, NSCompositeSourceAtop);
 			[[NSColor whiteColor] set];
 			NSFrameRect(r);
 			[shadow set];
+			CGContextEndTransparencyLayer(context);
 		}
 
 		NSString *const label = [[self dataSource] thumbnailView:self labelForItem:item];
