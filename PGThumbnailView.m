@@ -301,17 +301,17 @@ static void PGDrawGradient(void)
 		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
 
 		if(!NSIsEmptyRect(highlight)) {
-			[nilShadow set];
 			NSRect rects[4];
 			unsigned count = 0;
 			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
 			PGGetRectDifference(rects, &count, thumbnailRect, r);
 			[[NSColor colorWithDeviceWhite:0 alpha:0.5f] set];
 			NSRectFillListUsingOperation(rects, count, NSCompositeSourceAtop);
+			CGContextEndTransparencyLayer(context);
+			[nilShadow set];
 			[[NSColor whiteColor] set];
 			NSFrameRect(r);
 			[shadow set];
-			CGContextEndTransparencyLayer(context);
 		}
 
 		NSString *const label = [[self dataSource] thumbnailView:self labelForItem:item];
