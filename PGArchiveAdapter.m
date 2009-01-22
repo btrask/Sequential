@@ -101,9 +101,11 @@ static id PGArchiveAdapterList = nil;
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive typeForEntry:i preferOSType:YES])] notify:NO];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent] notify:NO];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
-		if(isFile) [node startLoadWithInfo:nil];
+		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:(isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive OSTypeForEntry:i standardFormat:NO]), PGOSTypeKey, nil];
+		if(isFile) [node startLoadWithInfo:info];
 		else {
-			[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGContainerAdapter class], PGAdapterClassKey, nil]];
+			[info setObject:[PGContainerAdapter class] forKey:PGAdapterClassKey];
+			[node startLoadWithInfo:info];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
