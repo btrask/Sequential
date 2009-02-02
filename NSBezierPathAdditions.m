@@ -53,8 +53,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)AE_fillUsingOperation:(NSCompositingOperation)op
 {
 	[NSGraphicsContext saveGraphicsState];
-	[self addClip];
-	NSRectFillUsingOperation([self bounds], op);
+	if(PGIsTigerOrLater()) {
+		[[NSGraphicsContext currentContext] setCompositingOperation:op];
+		[self fill];
+	} else {
+		[self addClip];
+		NSRectFillUsingOperation([self bounds], op);
+	}
 	[NSGraphicsContext restoreGraphicsState];
 }
 
