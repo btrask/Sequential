@@ -370,6 +370,11 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	}
 	[[PGPrefObject globalPrefObject] setSortOrder:anOrder];
 }
+- (void)setTimerInterval:(NSTimeInterval)interval
+{
+	[super setTimerInterval:interval];
+	[[PGPrefObject globalPrefObject] setTimerInterval:interval];
+}
 
 #pragma mark NSObject
 

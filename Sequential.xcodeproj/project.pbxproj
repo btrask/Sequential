@@ -50,7 +50,7 @@
 		0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */; };
 		0E255B960E3A99AA00EDF04C /* PGTimer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E255B940E3A99AA00EDF04C /* PGTimer.nib */; };
 		0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */; };
-		0E255BA70E3A9D2E00EDF04C /* PGCircleProgressIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255BA60E3A9D2E00EDF04C /* PGCircleProgressIndicator.m */; };
+		0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */; };
 		0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255DED0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m */; };
 		0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E27080D0E2E222700D65876 /* NSControlAdditions.m */; };
 		0E2D08790DD2B4F800EC128A /* PGRoundedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */; };
@@ -307,8 +307,8 @@
 		0E255B950E3A99AA00EDF04C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGTimer.nib; sourceTree = "<group>"; };
 		0E255B990E3A9A1E00EDF04C /* PGTimerPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimerPanelController.h; sourceTree = "<group>"; };
 		0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimerPanelController.m; sourceTree = "<group>"; };
-		0E255BA50E3A9D2E00EDF04C /* PGCircleProgressIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCircleProgressIndicator.h; sourceTree = "<group>"; };
-		0E255BA60E3A9D2E00EDF04C /* PGCircleProgressIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCircleProgressIndicator.m; sourceTree = "<group>"; };
+		0E255BA50E3A9D2E00EDF04C /* PGTimerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimerButton.h; sourceTree = "<group>"; };
+		0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimerButton.m; sourceTree = "<group>"; };
 		0E255DEC0E3BC85D00EDF04C /* PGNonretainedObjectProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNonretainedObjectProxy.h; sourceTree = "<group>"; };
 		0E255DED0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNonretainedObjectProxy.m; sourceTree = "<group>"; };
 		0E255F080E3C07D100EDF04C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGTimer.nib; sourceTree = "<group>"; };
@@ -637,8 +637,8 @@
 				0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */,
 				0EC33E3D0E29B0A700450CF8 /* PGProgressIndicatorCell.h */,
 				0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */,
-				0E255BA50E3A9D2E00EDF04C /* PGCircleProgressIndicator.h */,
-				0E255BA60E3A9D2E00EDF04C /* PGCircleProgressIndicator.m */,
+				0E255BA50E3A9D2E00EDF04C /* PGTimerButton.h */,
+				0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -1235,7 +1235,7 @@
 				0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */,
 				0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */,
 				0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */,
-				0E255BA70E3A9D2E00EDF04C /* PGCircleProgressIndicator.m in Sources */,
+				0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */,
 				0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */,
 				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
 				0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */,

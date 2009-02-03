@@ -34,6 +34,7 @@ extern NSString *const PGPrefObjectImageScaleDidChangeNotification;
 extern NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification;
 extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
+extern NSString *const PGPrefObjectTimerIntervalDidChangeNotification;
 
 enum {
 	PGNoPattern = 0,
@@ -84,6 +85,7 @@ typedef int PGSortOrder;
 	PGImageScaleConstraint _imageScaleConstraint;
 	BOOL _animatesImages;
 	PGSortOrder _sortOrder;
+	NSTimeInterval _timerInterval;
 }
 
 + (id)globalPrefObject;
@@ -108,5 +110,8 @@ typedef int PGSortOrder;
 
 - (PGSortOrder)sortOrder;
 - (void)setSortOrder:(PGSortOrder)anOrder;
+
+- (NSTimeInterval)timerInterval;
+- (void)setTimerInterval:(NSTimeInterval)interval;
 
 @end

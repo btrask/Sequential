@@ -48,9 +48,6 @@
 /* Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds.*/
 "%@ seconds" = "%@ Sekunden";
 
-/* Display string for no timer interval. */
-"---" = "---";
-
 /* Units (bytes, kilobytes, etc). */
 "B" = "Byte";
 "KB" = "KB";

@@ -91,7 +91,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelText;
-- (void)_runTimer;
 
 @end
 
@@ -334,6 +333,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
+		[_activeDocument AE_removeObserver:self name:PGPrefObjectTimerIntervalDidChangeNotification];
 	}
 	if(flag && !document && _activeDocument) {
 		_activeDocument = nil;
@@ -355,7 +355,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
-	[self setTimerInterval:0];
+	[_activeDocument AE_addObserver:self selector:@selector(documentTimerIntervalDidChange:) name:PGPrefObjectTimerIntervalDidChangeNotification];
+	[self setTimerRunning:NO];
 	if(_activeDocument) {
 		NSDisableScreenUpdates();
 		PGNode *node;
@@ -511,20 +512,28 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return [[_nextTimerFireDate retain] autorelease];
 }
-- (NSTimeInterval)timerInterval
+- (BOOL)isTimerRunning
 {
-	return _timerInterval;
+	return !!_timer;
 }
-- (void)setTimerInterval:(NSTimeInterval)time
+- (void)setTimerRunning:(BOOL)run
 {
-	NSParameterAssert(time >= 0);
-	if(time == _timerInterval) return;
-	_timerInterval = time;
-	[self _runTimer];
+	[_nextTimerFireDate release];
+	[_timer invalidate];
+	[_timer release];
+	if(run) {
+		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
+		_timer = [[NSTimer alloc] initWithFireDate:_nextTimerFireDate interval:0 target:[self PG_nonretainedObjectProxy] selector:@selector(advanceOnTimer:) userInfo:nil repeats:NO];
+		[[NSRunLoop currentRunLoop] addTimer:_timer forMode:PGCommonRunLoopsMode];
+	} else {
+		_nextTimerFireDate = nil;
+		_timer = nil;
+	}
+	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 - (void)advanceOnTimer:(NSTimer *)timer
 {
-	if(![self tryToGoForward:YES allowAlerts:YES]) [self setTimerInterval:0];
+	if(![self tryToGoForward:YES allowAlerts:YES]) [self setTimerRunning:NO];
 }
 
 #pragma mark -
@@ -706,6 +715,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[_imageView setAnimates:[[self activeDocument] animatesImages]];
 }
+- (void)documentTimerIntervalDidChange:(NSNotification *)aNotif
+{
+	[self setTimerRunning:[self isTimerRunning]];
+}
 
 #pragma mark -
 
@@ -783,7 +796,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
-	[self _runTimer];
+	[self setTimerRunning:[self isTimerRunning]];
 	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
@@ -849,21 +862,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if([parent parentNode]) text = [NSString stringWithFormat:@"%@\n%@", [[parent identifier] displayName], text];
 	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
 	[[_infoPanel content] setMessageText:text];
-}
-- (void)_runTimer
-{
-	[_nextTimerFireDate release];
-	[_timer invalidate];
-	[_timer release];
-	if([self timerInterval]) {
-		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[self timerInterval]];
-		_timer = [[NSTimer alloc] initWithFireDate:_nextTimerFireDate interval:0 target:[self PG_nonretainedObjectProxy] selector:@selector(advanceOnTimer:) userInfo:nil repeats:NO];
-		[[NSRunLoop currentRunLoop] addTimer:_timer forMode:NSDefaultRunLoopMode];
-	} else {
-		_nextTimerFireDate = nil;
-		_timer = nil;
-	}
-	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 
 #pragma mark PGDisplayControlling Protocol
@@ -1099,17 +1097,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKeyMinus: [self zoomKeyDown:anEvent]; return YES;
 	}
 	float const timerFactor = NSAlternateKeyMask & modifiers ? 10.0f : 1.0f;
+	PGDocument *const d = [self activeDocument];
 	if(!modifiers || NSAlternateKeyMask & modifiers) switch(keyCode) {
-		case PGKey0: [self setTimerInterval:0]; return YES;
-		case PGKey1: [self setTimerInterval:1 * timerFactor]; return YES;
-		case PGKey2: [self setTimerInterval:2 * timerFactor]; return YES;
-		case PGKey3: [self setTimerInterval:3 * timerFactor]; return YES;
-		case PGKey4: [self setTimerInterval:4 * timerFactor]; return YES;
-		case PGKey5: [self setTimerInterval:5 * timerFactor]; return YES;
-		case PGKey6: [self setTimerInterval:6 * timerFactor]; return YES;
-		case PGKey7: [self setTimerInterval:7 * timerFactor]; return YES;
-		case PGKey8: [self setTimerInterval:8 * timerFactor]; return YES;
-		case PGKey9: [self setTimerInterval:9 * timerFactor]; return YES;
+		case PGKey0: [self setTimerRunning:NO]; return YES;
+		case PGKey1: [d setTimerInterval:1 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey2: [d setTimerInterval:2 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey3: [d setTimerInterval:3 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey4: [d setTimerInterval:4 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey5: [d setTimerInterval:5 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey6: [d setTimerInterval:6 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey7: [d setTimerInterval:7 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey8: [d setTimerInterval:8 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey9: [d setTimerInterval:9 * timerFactor]; [self setTimerRunning:YES]; return YES;
 	}
 	return [self performKeyEquivalent:anEvent];
 }
@@ -1360,10 +1359,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
 		case PGKeyI: return [d performToggleInfo];
 	}
-/*	if(!modifiers || (NSCommandKeyMask | NSShiftKeyMask) & modifiers) switch(keyCode) {
-		case PGKeyEquals: return [d performZoomIn];
-		case PGKeyMinus: return [d performZoomOut];
-	}*/
 	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
 }
 - (id)validRequestorForSendType:(NSString *)sendType

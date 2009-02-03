@@ -57,19 +57,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSStringAdditions.h"
 #import "NSUserDefaultsAdditions.h"
 
-NSString *const PGAntialiasWhenUpscalingKey    = @"PGAntialiasWhenUpscaling";
-NSString *const PGRoundsImageCornersKey        = @"PGRoundsImageCorners";
-NSString *const PGAutozoomsWindowsKey          = @"PGAutozoomsWindows";
+NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
+NSString *const PGRoundsImageCornersKey = @"PGRoundsImageCorners";
+NSString *const PGAutozoomsWindowsKey = @"PGAutozoomsWindows";
 NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
-NSString *const PGBackgroundColorKey           = @"PGBackgroundColor";
-NSString *const PGBackgroundPatternKey         = @"PGBackgroundPattern";
-NSString *const PGMouseClickActionKey          = @"PGMouseClickAction";
-NSString *const PGEscapeKeyMappingKey          = @"PGEscapeKeyMapping";
+NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
+NSString *const PGBackgroundPatternKey = @"PGBackgroundPattern";
+NSString *const PGMouseClickActionKey = @"PGMouseClickAction";
+NSString *const PGEscapeKeyMappingKey = @"PGEscapeKeyMapping";
 
-static NSString *const PGRecentItemsKey            = @"PGRecentItems2";
+static NSString *const PGRecentItemsKey = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
-static NSString *const PGRecentItemsDeprecatedKey  = @"PGRecentDocuments"; // Deprecated after 1.2.2.
-static NSString *const PGFullscreenKey             = @"PGFullscreen";
+static NSString *const PGRecentItemsDeprecatedKey = @"PGRecentDocuments"; // Deprecated after 1.2.2.
+static NSString *const PGFullscreenKey = @"PGFullscreen";
 
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 

@@ -14,19 +14,11 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGFullscreenWindow</string>
+			<string>PGTimerButton</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
-			<string>PGDocumentWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>HMBlkPanel</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>PGFadeOutPanel</string>
+			<string>NSButton</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -35,22 +27,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGColumnView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -63,6 +39,8 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clipViewBoundsDidChange</key>
+				<string>PGClipView</string>
 				<key>clipViewGestureDidEnd</key>
 				<string>PGClipView</string>
 				<key>closeWindowContent</key>
@@ -94,17 +72,11 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>PGCircleProgressIndicator</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>changeTimerInterval</key>
+				<string>id</string>
+				<key>toggleTimer</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -115,10 +87,10 @@
 			<dict>
 				<key>intervalSlider</key>
 				<string>NSSlider</string>
-				<key>progressIndicator</key>
-				<string>PGCircleProgressIndicator</string>
 				<key>remainingField</key>
 				<string>NSTextField</string>
+				<key>timerButton</key>
+				<string>PGTimerButton</string>
 				<key>totalField</key>
 				<string>NSTextField</string>
 			</dict>
@@ -145,29 +117,6 @@
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGThumbnailBrowser</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>delegate</key>
-				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>PGColumnView</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -201,19 +150,74 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>HMBlkSlider</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSSlider</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFullscreenWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>PGDocumentWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HMBlkPanel</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>PGFadeOutPanel</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGColumnView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGThumbnailBrowser</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>delegate</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>PGColumnView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

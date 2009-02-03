@@ -492,12 +492,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawInView:(PGAlertView *)anAlertView
 {
 	[super drawInView:anAlertView];
-	NSBezierPath *const path = [NSBezierPath bezierPath];
-	[path appendBezierPathWithArcWithCenter:NSMakePoint(200, 150) radius:10 startAngle:60 endAngle:-60 clockwise:YES];
-	[path appendBezierPathWithArcWithCenter:NSMakePoint(110, 100) radius:10 startAngle:-60 endAngle:180 clockwise:YES];
-	[path appendBezierPathWithArcWithCenter:NSMakePoint(110, 200) radius:10 startAngle:180 endAngle:60 clockwise:YES];
+	NSRect const b = [anAlertView bounds];
 	[[NSColor whiteColor] set];
-	[path fill];
+	[NSBezierPath AE_drawIcon:AEPlayIcon inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
 }
 - (NSTimeInterval)fadeOutDelay
 {
@@ -513,15 +510,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawInView:(PGAlertView *)anAlertView
 {
 	[super drawInView:anAlertView];
-	NSBezierPath *const path = [NSBezierPath bezierPath];
-	[path setLineWidth:30];
-	[path setLineCapStyle:NSRoundLineCapStyle];
-	[path moveToPoint:NSMakePoint(115, 100)];
-	[path lineToPoint:NSMakePoint(115, 200)];
-	[path moveToPoint:NSMakePoint(185, 100)];
-	[path lineToPoint:NSMakePoint(185, 200)];
+	NSRect const b = [anAlertView bounds];
 	[[NSColor whiteColor] set];
-	[path stroke];
+	[NSBezierPath AE_drawIcon:AEPauseIcon inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
 }
 - (NSTimeInterval)fadeOutDelay
 {

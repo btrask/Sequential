@@ -24,20 +24,28 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-enum {
-	AENoIcon = 0,
-	AEPlayIcon = 1,
-	AEPauseIcon = 2,
-	AEStopIcon = 3
-};
-typedef unsigned AEIconType;
+// Categories
+#import "NSBezierPathAdditions.h"
 
-@interface NSBezierPath (AEAdditions)
+@interface PGTimerButton : NSButton
 
-+ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(float)radius;
-+ (void)AE_drawIcon:(AEIconType)type inRect:(NSRect)r;
-+ (void)AE_drawSpinnerInRect:(NSRect)aRect startAtPetal:(int)petal;
+- (AEIconType)iconType;
+- (void)setIconType:(AEIconType)state;
+- (float)progress;
+- (void)setProgress:(float)aFloat;
 
-- (void)AE_fillUsingOperation:(NSCompositingOperation)op;
+@end
+
+@interface PGTimerButtonCell : NSButtonCell
+{
+	@private
+	AEIconType _iconType;
+	float _progress;
+}
+
+- (AEIconType)iconType;
+- (void)setIconType:(AEIconType)state;
+- (float)progress;
+- (void)setProgress:(float)aFloat;
 
 @end

@@ -78,7 +78,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	PGBezelPanel *_findPanel;
 	PGFindlessTextView *_findFieldEditor;
 
-	NSTimeInterval _timerInterval;
 	NSDate *_nextTimerFireDate;
 	NSTimer *_timer;
 
@@ -146,8 +145,8 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)setFindPanelShown:(BOOL)flag;
 
 - (NSDate *)nextTimerFireDate;
-- (NSTimeInterval)timerInterval;
-- (void)setTimerInterval:(NSTimeInterval)time; // 0 for off.
+- (BOOL)isTimerRunning;
+- (void)setTimerRunning:(BOOL)run;
 - (void)advanceOnTimer:(NSTimer *)timer;
 
 - (void)zoomBy:(float)aFloat;
@@ -170,6 +169,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif;
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif;
 - (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif;
+- (void)documentTimerIntervalDidChange:(NSNotification *)aNotif;
 
 - (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif;
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;

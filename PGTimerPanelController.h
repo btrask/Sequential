@@ -26,18 +26,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFloatingPanelController.h"
 
 // Views
-@class PGCircleProgressIndicator;
+@class PGTimerButton;
 
 @interface PGTimerPanelController : PGFloatingPanelController
 {
 	@private
-	IBOutlet PGCircleProgressIndicator *progressIndicator;
-	IBOutlet NSTextField               *remainingField;
-	IBOutlet NSTextField               *totalField;
-	IBOutlet NSSlider                  *intervalSlider;
-	         NSTimer                  *_updateTimer;
+	IBOutlet PGTimerButton *timerButton;
+	IBOutlet NSTextField *remainingField;
+	IBOutlet NSTextField *totalField;
+	IBOutlet NSSlider *intervalSlider;
+	NSTimer *_updateTimer;
 }
 
+- (IBAction)toggleTimer:(id)sender;
 - (IBAction)changeTimerInterval:(id)sender;
 
 - (void)displayControllerTimerDidChange:(NSNotification *)aNotif;

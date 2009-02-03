@@ -27,23 +27,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-NSString *const PGPrefObjectShowsInfoDidChangeNotification           = @"PGPrefObjectShowsInfoDidChange";
-NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification     = @"PGPrefObjectShowsThumbnailsDidChange";
-NSString *const PGPrefObjectReadingDirectionDidChangeNotification    = @"PGPrefObjectReadingDirectionDidChange";
-NSString *const PGPrefObjectImageScaleDidChangeNotification          = @"PGPrefObjectImageScaleDidChange";
+NSString *const PGPrefObjectShowsInfoDidChangeNotification = @"PGPrefObjectShowsInfoDidChange";
+NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification = @"PGPrefObjectShowsThumbnailsDidChange";
+NSString *const PGPrefObjectReadingDirectionDidChangeNotification = @"PGPrefObjectReadingDirectionDidChange";
+NSString *const PGPrefObjectImageScaleDidChangeNotification = @"PGPrefObjectImageScaleDidChange";
 NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification = @"PGPrefObjectUpscalesToFitScreenDidChange";
-NSString *const PGPrefObjectAnimatesImagesDidChangeNotification      = @"PGPrefObjectAnimatesImagesDidChange";
-NSString *const PGPrefObjectSortOrderDidChangeNotification           = @"PGPrefObjectSortOrderDidChange";
+NSString *const PGPrefObjectAnimatesImagesDidChangeNotification = @"PGPrefObjectAnimatesImagesDidChange";
+NSString *const PGPrefObjectSortOrderDidChangeNotification = @"PGPrefObjectSortOrderDidChange";
+NSString *const PGPrefObjectTimerIntervalDidChangeNotification = @"PGPrefObjectTimerIntervalDidChange";
 
-static NSString *const PGShowsInfoKey                   = @"PGShowsInfo";
-static NSString *const PGShowsThumbnailsKey             = @"PGShowsThumbnails";
+static NSString *const PGShowsInfoKey = @"PGShowsInfo";
+static NSString *const PGShowsThumbnailsKey = @"PGShowsThumbnails";
 static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRightToLeft";
-static NSString *const PGImageScaleModeKey              = @"PGImageScaleMode";
-static NSString *const PGImageScaleFactorKey            = @"PGImageScaleFactor";
-static NSString *const PGImageScaleConstraintKey        = @"PGImageScaleConstraint";
-static NSString *const PGAnimatesImagesKey              = @"PGAnimatesImages";
-static NSString *const PGSortOrderKey                   = @"PGSortOrder2";
-static NSString *const PGSortOrderDeprecatedKey         = @"PGSortOrder"; // Deprecated after 1.3.2.
+static NSString *const PGImageScaleModeKey = @"PGImageScaleMode";
+static NSString *const PGImageScaleFactorKey = @"PGImageScaleFactor";
+static NSString *const PGImageScaleConstraintKey = @"PGImageScaleConstraint";
+static NSString *const PGAnimatesImagesKey = @"PGAnimatesImages";
+static NSString *const PGSortOrderKey = @"PGSortOrder2";
+static NSString *const PGTimerIntervalKey = @"PGTimerInterval";
+
+static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated after 1.3.2.
 
 NSArray *PGScaleModes() {
 	return [NSArray arrayWithObjects:[NSNumber numberWithInt:PGConstantFactorScale], [NSNumber numberWithInt:PGAutomaticScale], [NSNumber numberWithInt:PGViewFitScale], [NSNumber numberWithInt:PGActualSizeWithDPI], nil];
@@ -74,6 +77,7 @@ NSArray *PGScaleModes() {
 		[NSNumber numberWithInt:PGScaleFreely], PGImageScaleConstraintKey,
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
 		[NSNumber numberWithInt:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
+		[NSNumber numberWithDouble:30.0f], PGTimerIntervalKey,
 		nil]];
 }
 
@@ -186,6 +190,20 @@ NSArray *PGScaleModes() {
 	[self AE_postNotificationName:PGPrefObjectSortOrderDidChangeNotification];
 }
 
+#pragma mark -
+
+- (NSTimeInterval)timerInterval
+{
+	return _timerInterval;
+}
+- (void)setTimerInterval:(NSTimeInterval)interval
+{
+	if(interval == _timerInterval) return;
+	_timerInterval = interval;
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:interval] forKey:PGTimerIntervalKey];
+	[self AE_postNotificationName:PGPrefObjectTimerIntervalDidChangeNotification];
+}
+
 #pragma mark NSObject
 
 - (id)init
@@ -203,6 +221,7 @@ NSArray *PGScaleModes() {
 		if(_imageScaleConstraint < PGDownscale || _imageScaleConstraint > PGUpscale) _imageScaleConstraint = PGDownscale;
 		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
 		_sortOrder = [[d objectForKey:PGSortOrderKey] intValue];
+		_timerInterval = [[d objectForKey:PGTimerIntervalKey] doubleValue];
 	}
 	return self;
 }

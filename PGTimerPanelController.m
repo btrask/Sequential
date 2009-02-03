@@ -24,6 +24,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGTimerPanelController.h"
 
+// Models
+#import "PGPrefObject.h"
+#import "PGDocument.h"
+
+// Views
+#import "PGTimerButton.h"
+
 // Controllers
 #import "PGDisplayController.h"
 
@@ -34,11 +41,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSNumberAdditions.h"
 
-#define PGTimerMax (NSTimeInterval)90
-
 @interface PGTimerPanelController (Private)
 
-- (void)_runTimerIfNeeded;
+- (PGPrefObject *)_currentPrefObject;
+- (void)_update;
 - (void)_updateOnTimer:(NSTimer *)timer;
 
 @end
@@ -47,51 +53,61 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark Instance Methods
 
+- (IBAction)toggleTimer:(id)sender
+{
+	[[self displayController] setTimerRunning:![[self displayController] isTimerRunning]];
+}
 - (IBAction)changeTimerInterval:(id)sender
 {
 	NSTimeInterval const interval = round([sender doubleValue]);
-	NSTimeInterval const offPoint = ([intervalSlider maxValue] + PGTimerMax) / 2;
-	[[self displayController] setTimerInterval:(interval > offPoint ? 0 : MIN(interval, PGTimerMax))];
-	[intervalSlider setDoubleValue:(interval > offPoint ? DBL_MAX : MIN(interval, PGTimerMax))];
+	[[self _currentPrefObject] setTimerInterval:interval];
+	[self _updateOnTimer:nil];
 }
 
 #pragma mark -
 
 - (void)displayControllerTimerDidChange:(NSNotification *)aNotif
 {
-	[self _runTimerIfNeeded];
-	[self _updateOnTimer:nil];
+	[self _update];
 }
 
 #pragma mark Private Protocol
 
-- (void)_runTimerIfNeeded
+- (PGPrefObject *)_currentPrefObject
 {
-	if([self isShown] && [self displayController] && [[self displayController] timerInterval]) {
-		if(_updateTimer) return;
-		_updateTimer = [[NSTimer timerWithTimeInterval:1.0 / 24.0 target:[self PG_nonretainedObjectProxy] selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES] retain];
-		[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
-	} else {
-		if(!_updateTimer) return;
+	PGDocument *const doc = [[self displayController] activeDocument];
+	return doc ? doc : [PGPrefObject globalPrefObject];
+}
+- (void)_update
+{
+	PGDisplayController *const d = [self displayController];
+	BOOL const run = [d isTimerRunning];
+	if(![self isShown] || !run) {
 		[_updateTimer invalidate];
 		[_updateTimer release];
 		_updateTimer = nil;
+	} else if(!_updateTimer) {
+		_updateTimer = [[NSTimer timerWithTimeInterval:1.0 / 24.0 target:[self PG_nonretainedObjectProxy] selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES] retain];
+		[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
 	}
+	[timerButton setEnabled:!!d];
+	[timerButton setIconType:run ? AEStopIcon : AEPlayIcon];
+	[self _updateOnTimer:nil];
 }
 - (void)_updateOnTimer:(NSTimer *)timer
 {
-	NSDate *const fireDate = [[self displayController] nextTimerFireDate];
-	NSTimeInterval timeRemaining = fireDate ? [fireDate timeIntervalSinceNow] : 0;
-	if(timeRemaining < 0) timeRemaining = 0;
-	NSTimeInterval const interval = [self displayController] ? [[self displayController] timerInterval] : 0;
-
-	[progressIndicator setFloatValue:(interval ? (interval - timeRemaining) / interval : 0)];
-
-	[remainingField setStringValue:(interval ? [NSString stringWithFormat:NSLocalizedString(@"%@ seconds", @"Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds."), [[NSNumber numberWithDouble:timeRemaining] AE_localizedStringWithFractionDigits:1]] : NSLocalizedString(@"---", @"Display string for no timer interval."))];
-
+	NSTimeInterval const interval = [[self _currentPrefObject] timerInterval];
+	BOOL const running = [[self displayController] isTimerRunning];
+	NSTimeInterval timeRemaining = interval;
+	if(running) {
+		NSDate *const fireDate = [[self displayController] nextTimerFireDate];
+		timeRemaining = MAX(0.0f, fireDate ? [fireDate timeIntervalSinceNow] : 0.0f);
+	}
+	[timerButton setProgress:(running ? (interval - timeRemaining) / interval : 0)];
+	[remainingField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), timeRemaining]];
 	if(!timer) {
-		[totalField setStringValue:(interval ? [NSString stringWithFormat:NSLocalizedString(@"%@ seconds", @"Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds."), [[NSNumber numberWithDouble:interval] AE_localizedStringWithFractionDigits:1]] : NSLocalizedString(@"---", @"Display string for no timer interval."))];
-		[intervalSlider setDoubleValue:(fabs(interval) < 0.1 ? DBL_MAX : interval)];
+		[totalField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), interval]];
+		[intervalSlider setDoubleValue:interval];
 		[intervalSlider setEnabled:!![self displayController]];
 	}
 }
@@ -101,7 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setShown:(BOOL)flag
 {
 	[super setShown:flag];
-	[self _runTimerIfNeeded];
+	[self _update];
 }
 - (BOOL)setDisplayController:(PGDisplayController *)controller
 {
@@ -110,8 +126,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[oldController AE_removeObserver:self name:PGDisplayControllerTimerDidChangeNotification];
 	PGDisplayController *const newController = [self displayController];
 	[newController AE_addObserver:self selector:@selector(displayControllerTimerDidChange:) name:PGDisplayControllerTimerDidChangeNotification];
-	[self _runTimerIfNeeded];
-	[self _updateOnTimer:nil];
+	[self _update];
 	return YES;
 }
 - (NSString *)nibName
