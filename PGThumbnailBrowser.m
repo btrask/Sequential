@@ -125,7 +125,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	while((view = [viewEnum nextObject])) {
 		id const rep = [view representedObject];
 		if(rep == parent) {
-			unsigned const i = [[view items] indexOfObject:item];
+			unsigned const i = [[view items] indexOfObjectIdenticalTo:item];
 			if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
 		} else if(flag && rep == item) [view setNeedsDisplay:YES];
 	}
