@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 @class PGAlertGraphic;
 
+// Categories
+#import "NSBezierPathAdditions.h"
+
 enum {
 	PGSingleImageGraphic,
 	PGInterImageGraphic
@@ -61,8 +64,6 @@ typedef unsigned PGAlertGraphicType;
 + (id)cannotGoLeftGraphic;
 + (id)loopedRightGraphic;
 + (id)loopedLeftGraphic;
-+ (id)playGraphic;
-+ (id)pauseGraphic;
 
 - (PGAlertGraphicType)graphicType;
 
@@ -86,5 +87,16 @@ typedef unsigned PGAlertGraphicType;
 
 - (float)progress;
 - (void)setProgress:(float)progress;
+
+@end
+
+@interface PGBezierPathIconGraphic : PGAlertGraphic
+{
+	@private
+	AEIconType _iconType;
+}
+
++ (id)graphicWithIconType:(AEIconType)type;
+- (id)initWithIconType:(AEIconType)type;
 
 @end

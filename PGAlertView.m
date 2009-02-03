@@ -196,10 +196,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @end
 @interface PGLoopedRightGraphic : PGLoopedLeftGraphic
 @end
-@interface PGPlayGraphic : PGAlertGraphic
-@end
-@interface PGPauseGraphic : PGAlertGraphic
-@end
 
 @implementation PGAlertGraphic
 
@@ -220,14 +216,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (id)loopedLeftGraphic
 {
 	return [[[PGLoopedLeftGraphic alloc] init] autorelease];
-}
-+ (id)playGraphic
-{
-	return [[[PGPlayGraphic alloc] init] autorelease];
-}
-+ (id)pauseGraphic
-{
-	return [[[PGPauseGraphic alloc] init] autorelease];
 }
 
 #pragma mark Instance Methods
@@ -485,7 +473,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation PGPlayGraphic
+@implementation PGBezierPathIconGraphic
+
+#pragma mark Class Methods
+
++ (id)graphicWithIconType:(AEIconType)type
+{
+	return [[[self alloc] initWithIconType:type] autorelease];
+}
+
+#pragma mark Instance Methods
+
+- (id)initWithIconType:(AEIconType)type
+{
+	if((self = [super init])) {
+		_iconType = type;
+	}
+	return self;
+}
 
 #pragma mark PGAlertGraphic
 
@@ -494,29 +499,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super drawInView:anAlertView];
 	NSRect const b = [anAlertView bounds];
 	[[NSColor whiteColor] set];
-	[NSBezierPath AE_drawIcon:AEPlayIcon inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
+	[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
 }
 - (NSTimeInterval)fadeOutDelay
 {
 	return 0.25;
 }
 
-@end
+#pragma mark NSObject Protocol
 
-@implementation PGPauseGraphic
-
-#pragma mark PGAlertGraphic
-
-- (void)drawInView:(PGAlertView *)anAlertView
+- (unsigned)hash
 {
-	[super drawInView:anAlertView];
-	NSRect const b = [anAlertView bounds];
-	[[NSColor whiteColor] set];
-	[NSBezierPath AE_drawIcon:AEPauseIcon inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
+	return [[self class] hash] ^ _iconType;
 }
-- (NSTimeInterval)fadeOutDelay
+- (BOOL)isEqual:(id)anObject
 {
-	return 0.25;
+	return [anObject isMemberOfClass:[self class]] && ((PGBezierPathIconGraphic *)anObject)->_iconType == _iconType;
 }
 
 @end

@@ -1087,7 +1087,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		{
 			if(![_imageView canAnimateRep]) return NO;
 			BOOL const nowPlaying = ![[self activeDocument] animatesImages];
-			[[_graphicPanel content] pushGraphic:(nowPlaying ? [PGAlertGraphic playGraphic] : [PGAlertGraphic pauseGraphic]) window:[self window]];
+			[[_graphicPanel content] pushGraphic:[PGBezierPathIconGraphic graphicWithIconType:(nowPlaying ? AEPlayIcon : AEPauseIcon)] window:[self window]];
 			[[self activeDocument] setAnimatesImages:nowPlaying];
 			return YES;
 		}
