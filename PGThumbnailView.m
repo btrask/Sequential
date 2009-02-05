@@ -32,24 +32,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSBezierPathAdditions.h"
+#import "NSImageAdditions.h"
+#import "NSObjectAdditions.h"
 
-#define PGThumbnailSize         128.0f
-#define PGThumbnailHoleSize     6.0f
-#define PGThumbnailHoleSpacing  3.0f
-#define PGThumbnailHoleAdvance  (PGThumbnailHoleSize + PGThumbnailHoleSpacing)
-#define PGThumbnailMarginWidth  (PGThumbnailHoleSize + PGThumbnailHoleSpacing * 2)
+#define PGBackgroundHoleSize 6.0f
+#define PGBackgroundHoleSpacing 3.0f
+#define PGBackgroundHeight (PGBackgroundHoleSize + PGBackgroundHoleSpacing)
+#define PGThumbnailSize 128.0f
+#define PGThumbnailMarginWidth (PGBackgroundHoleSize + PGBackgroundHoleSpacing * 2.0f)
 #define PGThumbnailMarginHeight 2.0f
-#define PGThumbnailTotalWidth   (PGThumbnailSize + PGThumbnailMarginWidth * 2)
-#define PGThumbnailTotalHeight  (PGThumbnailSize + PGThumbnailMarginHeight * 2)
+#define PGThumbnailTotalHeight (PGThumbnailSize + PGThumbnailMarginHeight * 2.0f)
+#define PGInnerTotalWidth (PGThumbnailSize + PGThumbnailMarginWidth * 2.0f)
+#define PGOuterTotalWidth (PGInnerTotalWidth + 2.0f)
 
 static NSString *const PGThumbnailGlossStyleEnabledKey = @"PGThumbnailGlossStyleEnabled";
 static BOOL PGThumbnailGlossStyleEnabled = NO;
+static NSImage *PGBackground = nil;
+static NSImage *PGHighlightedBackground = nil;
 
 @interface PGThumbnailView (Private)
 
 - (void)_validateSelection;
-- (void)_drawThumbnailBackground:(NSRect)aRect;
-- (void)_drawThumbnailGloss:(NSRect)aRect;
+- (NSImage *)_backgroundWithHighlight:(BOOL)highlight;
 
 @end
 
@@ -72,7 +76,7 @@ static void PGDrawGradient(void)
 		float const range[] = {0, 1, 0, 1};
 		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
 		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
-		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0, 0), CGPointMake(PGThumbnailTotalWidth, 0), function, NO, NO);
+		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0, 0), CGPointMake(PGInnerTotalWidth, 0), function, NO, NO);
 		CFRelease(function);
 		CFRelease(colorSpace);
 	}
@@ -190,7 +194,16 @@ static void PGDrawGradient(void)
 - (void)sizeToFit
 {
 	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
-	[super setFrameSize:NSMakeSize(PGThumbnailTotalWidth + 2, MAX(height, [_items count] * PGThumbnailTotalHeight))];
+	[super setFrameSize:NSMakeSize(PGOuterTotalWidth, MAX(height, [_items count] * PGThumbnailTotalHeight))];
+}
+
+#pragma mark -
+
+- (void)systemColorsDidChange:(NSNotification *)aNotif
+{
+	[PGHighlightedBackground release];
+	PGHighlightedBackground = nil;
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark Private Protocol
@@ -201,16 +214,40 @@ static void PGDrawGradient(void)
 	NSEnumerator *const selectedItemEnum = [[[_selection copy] autorelease] objectEnumerator];
 	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
-- (void)_drawThumbnailBackground:(NSRect)aRect
+- (NSImage *)_backgroundWithHighlight:(BOOL)highlight
 {
+	NSImage *const background = [[NSImage alloc] initWithSize:NSMakeSize(PGOuterTotalWidth, PGBackgroundHeight)];
+	[background lockFocus];
+
+	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
+	[shadow setShadowOffset:NSMakeSize(0, 2)];
+	[shadow setShadowBlurRadius:4.0f];
+	[shadow set];
+	CGContextRef const imageContext = [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextBeginTransparencyLayer(imageContext, NULL);
+	NSRect const r = NSMakeRect(0, 0, PGInnerTotalWidth, PGBackgroundHeight);
 	if(PGThumbnailGlossStyleEnabled) {
 		[[NSColor blackColor] set];
-		NSRectFill(NSIntersectionRect(aRect, NSMakeRect(0, 0, PGThumbnailTotalWidth, NSHeight([self bounds]))));
+		NSRectFill(r);
 	} else PGDrawGradient();
-}
-- (void)_drawThumbnailGloss:(NSRect)aRect
-{
+	if(highlight) {
+		[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.5f] set];
+		NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	}
 	if(PGThumbnailGlossStyleEnabled) PGDrawGradient();
+
+	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0, PGBackgroundHoleSize, PGBackgroundHoleSize);
+	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0, PGBackgroundHoleSize, PGBackgroundHoleSize);
+	[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0, 1) cornerRadius:2] fill];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0, 1) cornerRadius:2] fill];
+	[[NSColor clearColor] set];
+	[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
+	[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
+
+	CGContextEndTransparencyLayer(imageContext);
+	[background unlockFocus];
+	return background;
 }
 
 #pragma mark PGClipViewAdditions Protocol
@@ -226,6 +263,7 @@ static void PGDrawGradient(void)
 {
 	if((self = [super initWithFrame:aRect])) {
 		_selection = (NSMutableSet *)CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(systemColorsDidChange:) name:NSSystemColorsDidChangeNotification object:nil];
 	}
 	return self;
 }
@@ -246,40 +284,30 @@ static void PGDrawGradient(void)
 }
 - (void)drawRect:(NSRect)aRect
 {
-	NSRect const b = [self bounds];
+	unsigned i;
 	int count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
 
-
-	// TODO: For performance, we should make sure that we need to draw anything at all besides the thumbnails themselves before drawing the background.
-
-
-	[[NSColor clearColor] set];
-	NSRectFill(b); // We say we're opaque so we have to fill everything.
+	if(!PGBackground) PGBackground = [self _backgroundWithHighlight:NO];
+	[PGBackground AE_tileInRect:aRect offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:NO];
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 	[shadow setShadowOffset:NSMakeSize(0, -2)];
 	[shadow setShadowBlurRadius:4.0f];
-	[shadow set];
 
 	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextBeginTransparencyLayer(context, NULL);
-
-	[self _drawThumbnailBackground:aRect];
-
 	[shadow set];
-	unsigned i = 0;
-	for(; i < [_items count]; i++) {
+	for(i = 0; i < [_items count]; i++) {
 		NSRect const frameWithMargin = [self frameOfItemAtIndex:i withMargin:YES];
 		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[nilShadow set];
-			[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.5f] set];
-			NSRectFillUsingOperation(frameWithMargin, NSCompositeSourceOver);
+			if(!PGHighlightedBackground) PGHighlightedBackground = [self _backgroundWithHighlight:YES];
+			[PGHighlightedBackground AE_tileInRect:frameWithMargin offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:YES];
 			[shadow set];
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
@@ -367,25 +395,6 @@ static void PGDrawGradient(void)
 		}
 	}
 	[nilShadow set];
-
-	[self _drawThumbnailGloss:aRect];
-
-	float top = roundf(NSMinY(aRect) / PGThumbnailHoleAdvance) * PGThumbnailHoleAdvance - PGThumbnailHoleSize / 2;
-	for(; top < NSMaxY(aRect); top += PGThumbnailHoleAdvance) {
-		NSRect const leftHoleRect = NSMakeRect(PGThumbnailHoleSpacing, top, PGThumbnailHoleSize, PGThumbnailHoleSize);
-		NSRect const rightHoleRect = NSMakeRect(PGThumbnailTotalWidth - PGThumbnailMarginWidth + PGThumbnailHoleSpacing, top, PGThumbnailHoleSize, PGThumbnailHoleSize);
-
-		[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0, 1) cornerRadius:2] fill];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0, 1) cornerRadius:2] fill];
-
-		[[NSColor clearColor] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
-		[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
-	}
-
-	CGContextEndTransparencyLayer(context);
-	[nilShadow set];
 }
 
 #pragma mark -
@@ -425,6 +434,7 @@ static void PGDrawGradient(void)
 
 - (void)dealloc
 {
+	[self AE_removeObserver];
 	[_representedObject release];
 	[_items release];
 	[_selection release];
