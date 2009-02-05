@@ -908,11 +908,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(![[self activeNode] canGetData]) {
 		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
 	}
-	if(![[[self activeNode] identifier] isFileIdentifier]) {
+	PGResourceIdentifier *const ident = [[self activeNode] identifier];
+	if(![ident isFileIdentifier] || ![ident URL]) {
 		if(@selector(setAsDesktopPicture:) == action) return NO;
-		if(@selector(moveToTrash:) == action) return NO;
-	}
-	if(![[[self activeNode] identifier] URL]) {
 		if(@selector(moveToTrash:) == action) return NO;
 	}
 	if(@selector(performFindPanelAction:) == action) switch([anItem tag]) {
