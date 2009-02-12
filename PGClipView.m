@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGGameStyleArrowScrolling  true
 #define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
 #define PGLineScrollDistance       (PGBorderPadding * 4)
+#define PGMouseWheelScrollFactor 10.0f
 
 enum {
 	PGNotDragging,
@@ -662,7 +663,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	float const x = -[anEvent deltaX], y = [anEvent deltaY];
-	[self scrollBy:NSMakeSize(x * PGLineScrollDistance, y * PGLineScrollDistance) animation:PGPreferAnimation];
+	[self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
 }
 
 #pragma mark -
