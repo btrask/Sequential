@@ -14,6 +14,7 @@ New in 2.0.3
 - Holding command while scrolling the mouse wheel now zooms in and out.
 - Zooming with the + and - keys is now smooth.
 - The timer can now be started and stopped without changing its duration.
+- The thumbnail sidebar's performance is improved.
 - Other minor improvements.
 
 A list of keyboard shortcuts can be found under Help > Keyboard Shortcuts.
