@@ -38,14 +38,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSWindowAdditions.h"
 
 #define PGMouseHiddenDraggingStyle true
-#define PGAnimateScrolling         true
-#define PGCopiesOnScroll           true // Only used prior to Leopard.
-#define PGClickSlopDistance        3.0
-#define PGPageTurnMovementDelay    0.5
-#define PGGameStyleArrowScrolling  true
-#define PGBorderPadding            (PGGameStyleArrowScrolling ? 10.0 : 23.0)
-#define PGLineScrollDistance       (PGBorderPadding * 4)
+#define PGAnimateScrolling true
+#define PGCopiesOnScroll true // Only used prior to Leopard.
+#define PGClickSlopDistance 3.0f
+#define PGPageTurnMovementDelay 0.5f
+#define PGGameStyleArrowScrolling true
+#define PGBorderPadding (PGGameStyleArrowScrolling ? 10.0f : 23.0f)
+#define PGLineScrollDistance (PGBorderPadding * 4.0f)
 #define PGMouseWheelScrollFactor 10.0f
+#define PGMouseWheelZoomFactor 20.0f
 
 enum {
 	PGNotDragging,
@@ -65,6 +66,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)_scrollTo:(NSPoint)aPoint;
 - (void)_scrollOneFrame:(NSTimer *)timer;
 - (void)_beginPreliminaryDrag:(NSValue *)val;
+- (void)_delayedEndGesture;
 
 @end
 
@@ -534,6 +536,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	*dragMode = PGPreliminaryDragging;
 	[[NSCursor closedHandCursor] push];
 }
+- (void)_delayedEndGesture
+{
+	[[self delegate] clipViewGestureDidEnd:self];
+}
 
 #pragma mark PGClipViewAdditions Protocol
 
@@ -663,7 +669,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	float const x = -[anEvent deltaX], y = [anEvent deltaY];
-	[self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
+	if([anEvent modifierFlags] & NSCommandKeyMask) {
+		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayedEndGesture) object:nil];
+		[[self delegate] clipView:self magnifyBy:y * PGMouseWheelZoomFactor];
+		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil afterDelay:1.0f inModes:[NSArray arrayWithObject:PGCommonRunLoopsMode] retain:NO]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
+	} else [self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
 }
 
 #pragma mark -
