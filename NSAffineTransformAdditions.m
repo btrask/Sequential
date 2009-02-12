@@ -22,20 +22,22 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "NSImageAdditions.h"
+#import "NSAffineTransformAdditions.h"
 
-@implementation NSImage (AEAdditions)
+@implementation NSAffineTransform (AEAdditions)
 
-- (void)AE_tileInRect:(NSRect)aRect offset:(NSSize)offset operation:(NSCompositingOperation)op clip:(BOOL)flag
++ (id)AE_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation
 {
-	if(flag) {
-		[NSGraphicsContext saveGraphicsState];
-		NSRectClip(aRect);
+	NSAffineTransform *const transform = [self transform];
+	if(PGUpright == orientation) return transform;
+	[transform translateXBy:NSMidX(*rectPtr) yBy:NSMidY(*rectPtr)];
+	if(orientation & PGRotated90CC) {
+		[transform rotateByDegrees:90.0f];
+		rectPtr->size = NSMakeSize(NSHeight(*rectPtr), NSWidth(*rectPtr)); // Swap.
 	}
-	NSSize const s = [self size];
-	float top = floorf(NSMinY(aRect) / s.height) * s.height - offset.height;
-	for(; top < NSMaxY(aRect); top += s.height) [self drawInRect:NSMakeRect(NSMinX(aRect), top, s.width, s.height) fromRect:NSZeroRect operation:op fraction:1.0f];
-	if(flag) [NSGraphicsContext restoreGraphicsState];
+	[transform scaleXBy:(orientation & PGFlippedHorz ? -1.0f : 1.0f) yBy:(orientation & PGFlippedVert ? -1.0f : 1.0f)];
+	[transform translateXBy:-NSMidX(*rectPtr) yBy:-NSMidY(*rectPtr)];
+	return transform;
 }
 
 @end

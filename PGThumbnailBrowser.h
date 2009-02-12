@@ -31,15 +31,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGThumbnailBrowser : PGColumnView
 {
 	@private
-	IBOutlet id        dataSource;
-	IBOutlet id        delegate;
-	         unsigned _updateCount;
+	IBOutlet id dataSource;
+	IBOutlet id delegate;
+	PGOrientation _thumbnailOrientation;
+	unsigned _updateCount;
 }
 
 - (id)dataSource;
 - (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
 - (id)delegate;
 - (void)setDelegate:(id)obj;
+- (PGOrientation)thumbnailOrientation;
+- (void)setThumbnailOrientation:(PGOrientation)orientation;
 
 - (NSSet *)selection;
 - (void)setSelection:(NSSet *)aSet reload:(BOOL)flag;

@@ -27,55 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometryTypes.h"
 
-@interface PGThumbnailView : NSView
-{
-	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
-	id _representedObject;
-	PGOrientation _thumbnailOrientation;
-	NSArray *_items;
-	NSMutableSet *_selection;
-}
+@interface NSAffineTransform (AEAdditions)
 
-- (id)dataSource;
-- (void)setDataSource:(id)obj;
-- (id)delegate;
-- (void)setDelegate:(id)obj;
-- (id)representedObject;
-- (void)setRepresentedObject:(id)obj;
-- (PGOrientation)thumbnailOrientation;
-- (void)setThumbnailOrientation:(PGOrientation)orientation;
-
-- (NSArray *)items;
-- (NSSet *)selection;
-- (void)setSelection:(NSSet *)items;
-- (void)scrollToFirstSelectedItem;
-
-- (unsigned)indexOfItemAtPoint:(NSPoint)p;
-- (NSRect)frameOfItemAtIndex:(unsigned)index withMargin:(BOOL)flag;
-
-- (void)reloadData;
-- (void)sizeToFit;
-
-- (void)systemColorsDidChange:(NSNotification *)aNotif;
-
-@end
-
-@interface NSObject (PGThumbnailViewDataSource)
-
-- (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender;
-- (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item;
-- (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
-- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item;
-- (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item;
-- (NSRect)thumbnailView:(PGThumbnailView *)sender highlightRectForItem:(id)item; // A rect within {{0, 0}, {1, 1}}.
-- (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item;
-
-@end
-
-@interface NSObject (PGThumbnailViewDelegate)
-
-- (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender;
++ (id)AE_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation;
 
 @end

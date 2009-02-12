@@ -666,6 +666,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
 	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES]]];
+	[[_thumbnailPanel content] setThumbnailOrientation:[[self activeDocument] baseOrientation]];
 }
 
 #pragma mark -
@@ -1229,6 +1230,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSRect r = PGScaleRect(NSOffsetRect(NSIntersectionRect(f, [clipView insetBounds]), -NSMinX(f), -NSMinY(f)), 1 / NSWidth(f), 1 / NSHeight(f));
 	r.origin.y = 1 - NSMaxY(r);
 	return r;
+}
+- (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item
+{
+	return [item hasRealThumbnail];
 }
 
 #pragma mark NSServicesRequests Protocol

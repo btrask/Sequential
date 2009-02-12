@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGNonretainedObjectProxy.h"
 
 // Categories
+#import "NSAffineTransformAdditions.h"
 #import "NSObjectAdditions.h"
 
 #define PGAnimateSizeChanges true
@@ -329,15 +330,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSRect r = aRect;
 	NSAffineTransform *transform = nil;
 	if(!_cached && PGUpright != _orientation) {
-		transform = [NSAffineTransform transform];
-		[transform translateXBy:NSMidX(r) yBy:NSMidY(r)];
-		if(_orientation & PGRotated90CC) {
-			r.size = NSMakeSize(NSHeight(r), NSWidth(r));
-			[transform rotateByDegrees:90];
-		}
-		[transform scaleXBy:(_orientation & PGFlippedHorz ? -1 : 1) yBy:(_orientation & PGFlippedVert ? -1 : 1)];
+		transform = [NSAffineTransform AE_transformWithRect:&r orientation:_orientation];
 		[transform concat];
-		r.origin = NSMakePoint(NSWidth(r) / -2, NSHeight(r) / -2);
 	}
 	if(count && PGUpright == _orientation) {
 		int i = count;

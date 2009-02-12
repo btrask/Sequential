@@ -60,6 +60,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	delegate = obj;
 }
+- (PGOrientation)thumbnailOrientation
+{
+	return _thumbnailOrientation;
+}
+- (void)setThumbnailOrientation:(PGOrientation)orientation
+{
+	_thumbnailOrientation = orientation;
+	unsigned i = [self numberOfColumns];
+	while(i--) [[self viewAtIndex:i] setThumbnailOrientation:orientation];
+}
 
 #pragma mark -
 
@@ -140,6 +150,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[thumbnailView setDataSource:[self dataSource]];
 	[thumbnailView setDelegate:self];
 	[thumbnailView setRepresentedObject:item];
+	[thumbnailView setThumbnailOrientation:[self thumbnailOrientation]];
 	[thumbnailView reloadData];
 	if(![self numberOfColumns]) [self setColumnWidth:NSWidth([thumbnailView frame])];
 	[self addColumnWithView:thumbnailView];

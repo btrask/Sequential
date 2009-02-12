@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
+#import "NSAffineTransformAdditions.h"
 #import "NSDateAdditions.h"
 #import "NSImageRepAdditions.h"
 #import "NSMenuItemAdditions.h"
@@ -173,18 +174,9 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	NSGraphicsContext *const ctx = [NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]];
 	[NSGraphicsContext setCurrentContext:ctx];
 	[ctx setImageInterpolation:NSImageInterpolationHigh];
-	if(PGUpright == orientation) [rep drawInRect:NSMakeRect(0, 0, s.width, s.height)];
-	else {
-		NSAffineTransform *const t = [NSAffineTransform transform];
-		[t translateXBy:s.width / 2.0f yBy:s.height / 2.0f];
-		if(PGRotated90CC & orientation) {
-			s = NSMakeSize(s.height, s.width);
-			[t rotateByDegrees:90];
-		}
-		[t scaleXBy:(PGFlippedHorz & orientation ? -1 : 1) yBy:(PGFlippedVert & orientation ? -1 : 1)];
-		[t concat];
-		[rep drawInRect:NSMakeRect(s.width / -2.0f, s.height / -2.0f, s.width, s.height)];
-	}
+	NSRect rect = NSMakeRect(0, 0, s.width, s.height);
+	if(PGUpright != orientation) [[NSAffineTransform AE_transformWithRect:&rect orientation:orientation] concat];
+	[rep drawInRect:rect];
 	[NSGraphicsContext setCurrentContext:nil];
 	return thumbRep;
 }

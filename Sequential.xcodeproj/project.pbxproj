@@ -68,6 +68,7 @@
 		0E53BF560DB761180012AC5B /* HMBlkAppKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */; };
 		0E56B8D90E24917C00987F57 /* PGActivity.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E56B8D70E24917C00987F57 /* PGActivity.nib */; };
 		0E56B8DD0E24918C00987F57 /* PGActivityPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E56B8DC0E24918C00987F57 /* PGActivityPanelController.m */; };
+		0E5872200F44ACC300D12D91 /* NSAffineTransformAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E58721F0F44ACC300D12D91 /* NSAffineTransformAdditions.m */; };
 		0E5B552F0D0B7FCF0094938A /* NSDateAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5B552E0D0B7FCF0094938A /* NSDateAdditions.m */; };
 		0E5EBF710CEB751300E7FF9A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E5EBF700CEB751300E7FF9A /* WebKit.framework */; };
 		0E5EC04B0CEB850300E7FF9A /* PGMainThreadProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */; };
@@ -343,6 +344,8 @@
 		0E56B8D80E24917C00987F57 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGActivity.nib; sourceTree = "<group>"; };
 		0E56B8DB0E24918C00987F57 /* PGActivityPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGActivityPanelController.h; sourceTree = "<group>"; };
 		0E56B8DC0E24918C00987F57 /* PGActivityPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGActivityPanelController.m; sourceTree = "<group>"; };
+		0E58721E0F44ACC300D12D91 /* NSAffineTransformAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSAffineTransformAdditions.h; sourceTree = "<group>"; };
+		0E58721F0F44ACC300D12D91 /* NSAffineTransformAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSAffineTransformAdditions.m; sourceTree = "<group>"; };
 		0E5B552D0D0B7FCF0094938A /* NSDateAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSDateAdditions.h; sourceTree = "<group>"; };
 		0E5B552E0D0B7FCF0094938A /* NSDateAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSDateAdditions.m; sourceTree = "<group>"; };
 		0E5DD3520CAF91310085241E /* Spanish */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Spanish; path = Spanish.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -695,6 +698,8 @@
 			children = (
 				0EE645AC0DC667CD00A90F86 /* DOMNodeAdditions.h */,
 				0EE645AD0DC667CD00A90F86 /* DOMNodeAdditions.m */,
+				0E58721E0F44ACC300D12D91 /* NSAffineTransformAdditions.h */,
+				0E58721F0F44ACC300D12D91 /* NSAffineTransformAdditions.m */,
 				0E808D670D7CC46A003C9DE1 /* NSArrayAdditions.h */,
 				0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */,
 				0E04EC080C254C1300078EC2 /* NSBezierPathAdditions.h */,
@@ -1259,6 +1264,7 @@
 				0E7B0E8A0EBC1C14009A7F07 /* NSScannerAdditions.m in Sources */,
 				0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */,
 				0E8877EB0F3AB9C000B79DDC /* NSImageAdditions.m in Sources */,
+				0E5872200F44ACC300D12D91 /* NSAffineTransformAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

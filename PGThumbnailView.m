@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
+#import "NSAffineTransformAdditions.h"
 #import "NSBezierPathAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSObjectAdditions.h"
@@ -120,6 +121,16 @@ static void PGDrawGradient(void)
 	if(obj == _representedObject) return;
 	[_representedObject release];
 	_representedObject = [obj retain];
+}
+- (PGOrientation)thumbnailOrientation
+{
+	return _thumbnailOrientation;
+}
+- (void)setThumbnailOrientation:(PGOrientation)orientation
+{
+	if(orientation == _thumbnailOrientation) return;
+	_thumbnailOrientation = orientation;
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -
@@ -284,7 +295,7 @@ static void PGDrawGradient(void)
 }
 - (void)drawRect:(NSRect)aRect
 {
-	unsigned i;
+	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
 	int count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
@@ -297,10 +308,10 @@ static void PGDrawGradient(void)
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 	[shadow setShadowOffset:NSMakeSize(0, -2)];
 	[shadow setShadowBlurRadius:4.0f];
-
-	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
 	[shadow set];
-	for(i = 0; i < [_items count]; i++) {
+
+	unsigned i = 0;
+	for(; i < [_items count]; i++) {
 		NSRect const frameWithMargin = [self frameOfItemAtIndex:i withMargin:YES];
 		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
 		id const item = [_items objectAtIndex:i];
@@ -315,8 +326,8 @@ static void PGDrawGradient(void)
 			[NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20, 20) startAtPetal:-1];
 			continue;
 		}
-		[thumb setFlipped:[self isFlipped]];
-		NSSize const originalSize = [thumb size];
+		NSSize originalSize = [thumb size];
+		if(PGRotated90CC & _thumbnailOrientation) originalSize = NSMakeSize(originalSize.height, originalSize.width);
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
@@ -324,10 +335,14 @@ static void PGDrawGradient(void)
 		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
 		if(!NSIsEmptyRect(highlight)) {
 			CGContextBeginTransparencyLayer(context, NULL);
+			[nilShadow set];
 		}
-
-		[thumb drawInRect:thumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
-
+		NSRect transformedThumbnailRect = thumbnailRect;
+		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:([[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert)]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
+		[transform concat];
+		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
+		[transform invert];
+		[transform concat];
 		if(!NSIsEmptyRect(highlight)) {
 			NSRect rects[4];
 			unsigned count = 0;
@@ -473,6 +488,10 @@ static void PGDrawGradient(void)
           highlightRectForItem:(id)item
 {
 	return NSZeroRect;
+}
+- (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item
+{
+	return NO;
 }
 
 @end
