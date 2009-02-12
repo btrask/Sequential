@@ -10,10 +10,12 @@ Sequential has mature full screen support and can display images' Exif data.
 New in 2.0.3
 - The visible portion of the current image is now highlighted in the thumbnail sidebar.
 - It is now possible to set images as the desktop picture from within Sequential.
+- Mighty Mouse support is improved.
+- Holding command while scrolling the mouse wheel now zooms in and out.
+- Zooming with the + and - keys is now smooth.
 - The timer can now be started and stopped without changing its duration.
-- Improved Mighty Mouse support.
 - Other minor improvements.
 
-A list of keyboard shorcuts can be found under Help > Keyboard Shortcuts.
+A list of keyboard shortcuts can be found under Help > Keyboard Shortcuts.
 
 Sequential icon by Carola Clavo (carolaclavo.com) and Daniel G. Portela (Camposancos, Spain; tresdeseos.es).
