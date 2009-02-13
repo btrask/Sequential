@@ -172,7 +172,7 @@ nxtmkr(void)
 
 	/* Read until we see JPEG_MARKER. */
 
-	while ((b = jpg1byte()) != JPEG_M_BEG)
+	while (jpg1byte() != JPEG_M_BEG)
 		bad++;
 
 	/* Read all JPEG_M_BEGs (which may be used for padding). */
@@ -287,14 +287,14 @@ jpegscan(FILE *fp, int *mark, unsigned int *len, int first)
  */
 int
 jpeginfo(int *prcsn, int *cmpnts, unsigned int *height, unsigned int *width,
-    const char *prcss)
+    const char **prcss)
 {
 
 	*prcsn = jpg_prcsn;
 	*cmpnts = jpg_cmpnts;
 	*height = jpg_height;
 	*width = jpg_width;
-	prcss = jpg_prcss;
+	*prcss = jpg_prcss;
 
 	return (seensof);
 }

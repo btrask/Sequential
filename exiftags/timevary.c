@@ -103,8 +103,10 @@ vary_append(struct vary *v, char *arg)
   } else
     nextp = &result;
 
-  if ((*nextp = (struct vary *)malloc(sizeof(struct vary))) == NULL)
+  if ((*nextp = (struct vary *)malloc(sizeof(struct vary))) == NULL) {
     exifdie((const char *)strerror(errno));
+    return NULL;
+  }
   (*nextp)->arg = arg;
   (*nextp)->next = NULL;
   return result;

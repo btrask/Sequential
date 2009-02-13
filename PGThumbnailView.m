@@ -227,7 +227,7 @@ static void PGDrawGradient(void)
 }
 - (NSImage *)_backgroundWithHighlight:(BOOL)highlight
 {
-	NSImage *const background = [[NSImage alloc] initWithSize:NSMakeSize(PGOuterTotalWidth, PGBackgroundHeight)];
+	NSImage *const background = [[[NSImage alloc] initWithSize:NSMakeSize(PGOuterTotalWidth, PGBackgroundHeight)] autorelease];
 	[background lockFocus];
 
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
@@ -300,7 +300,7 @@ static void PGDrawGradient(void)
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
 
-	if(!PGBackground) PGBackground = [self _backgroundWithHighlight:NO];
+	if(!PGBackground) PGBackground = [[self _backgroundWithHighlight:NO] retain]; 
 	[PGBackground AE_tileInRect:aRect offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:NO];
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
@@ -317,7 +317,7 @@ static void PGDrawGradient(void)
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[nilShadow set];
-			if(!PGHighlightedBackground) PGHighlightedBackground = [self _backgroundWithHighlight:YES];
+			if(!PGHighlightedBackground) PGHighlightedBackground = [[self _backgroundWithHighlight:YES] retain];
 			[PGHighlightedBackground AE_tileInRect:frameWithMargin offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:YES];
 			[shadow set];
 		}

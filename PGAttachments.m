@@ -29,7 +29,7 @@ static void PGEnsureWindowCreatedHack(void)
 	// The icons fail to draw on Tiger if there has never been a window loaded. Defer must be NO. The specific error is "-[_NSExistingCGSContext focusView:inWindow:]: selector not recognized" in -drawWithFrame:inView:.
 	static BOOL createdWindow = NO;
 	if(createdWindow) return;
-	[[[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO] release];
+	(void)[[[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO] autorelease];
 	createdWindow = YES;
 }
 

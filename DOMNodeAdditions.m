@@ -38,17 +38,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned const count = [links length];
 	for(; i < count; i++) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
-		NSString *href = [a href];
-		unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
-		if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
-		if(!href || [@"" isEqualToString:href]) continue;
-		NSURL *const URL = [NSURL URLWithString:href];
-		if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
-		PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
-		if([results containsObject:ident]) continue;
-		[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
-		[results addObject:ident];
+		do {
+			DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
+			NSString *href = [a href];
+			unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
+			if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
+			if(!href || [@"" isEqualToString:href]) continue;
+			NSURL *const URL = [NSURL URLWithString:href];
+			if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
+			PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
+			if([results containsObject:ident]) continue;
+			[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
+			[results addObject:ident];
+		} while(NO);
 		[pool release];
 	}
 	return results;
@@ -61,13 +63,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	unsigned const count = [images length];
 	for(; i < count; i++) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
-		if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
-		PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
-		if([results containsObject:ident]) continue;
-		NSString *const title = [img title]; // Prefer the title to the alt attribute.
-		[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
-		[results addObject:ident];
+		do {
+			DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
+			if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
+			if([results containsObject:ident]) continue;
+			NSString *const title = [img title]; // Prefer the title to the alt attribute.
+			[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
+			[results addObject:ident];
+		} while(NO);
 		[pool release];
 	}
 	return results;

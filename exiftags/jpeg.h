@@ -71,6 +71,6 @@
 
 extern int jpegscan(FILE *fp, int *mark, unsigned int *len, int first);
 extern int jpeginfo(int *prcsn, int *cmpnts, unsigned int *height,
-    unsigned int *width, const char *prcss);
+    unsigned int *width, const char **prcss);
 
 #endif
