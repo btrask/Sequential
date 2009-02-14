@@ -26,6 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface NSImage (AEAdditions)
 
-- (void)AE_tileInRect:(NSRect)aRect offset:(NSSize)offset operation:(NSCompositingOperation)op clip:(BOOL)flag; // Currently only tiles in the Y direction.
+- (void)AE_tileInRect:(NSRect)aRect phase:(NSPoint)phase operation:(NSCompositingOperation)op clip:(BOOL)flag;
 
 @end

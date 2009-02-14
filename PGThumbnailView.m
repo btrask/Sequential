@@ -301,7 +301,9 @@ static void PGDrawGradient(void)
 	[self getRectsBeingDrawn:&rects count:&count];
 
 	if(!PGBackground) PGBackground = [[self _backgroundWithHighlight:NO] retain]; 
-	[PGBackground AE_tileInRect:aRect offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:NO];
+	NSRect const b = [self bounds];
+	NSPoint patternPhase = NSMakePoint(NSMinX(b), NSMinY(b) - PGBackgroundHoleSize / 2.0f);
+	[PGBackground AE_tileInRect:aRect phase:patternPhase operation:NSCompositeCopy clip:NO];
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
@@ -318,7 +320,7 @@ static void PGDrawGradient(void)
 		if([_selection containsObject:item]) {
 			[nilShadow set];
 			if(!PGHighlightedBackground) PGHighlightedBackground = [[self _backgroundWithHighlight:YES] retain];
-			[PGHighlightedBackground AE_tileInRect:frameWithMargin offset:NSMakeSize(0, PGBackgroundHoleSize / 2) operation:NSCompositeCopy clip:YES];
+			[PGHighlightedBackground AE_tileInRect:frameWithMargin phase:patternPhase operation:NSCompositeCopy clip:YES];
 			[shadow set];
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];

@@ -26,15 +26,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSImage (AEAdditions)
 
-- (void)AE_tileInRect:(NSRect)aRect offset:(NSSize)offset operation:(NSCompositingOperation)op clip:(BOOL)flag
+- (void)AE_tileInRect:(NSRect)aRect phase:(NSPoint)phase operation:(NSCompositingOperation)op clip:(BOOL)flag
 {
 	if(flag) {
 		[NSGraphicsContext saveGraphicsState];
 		NSRectClip(aRect);
 	}
 	NSSize const s = [self size];
-	float top = floorf(NSMinY(aRect) / s.height) * s.height - offset.height;
-	for(; top < NSMaxY(aRect); top += s.height) [self drawInRect:NSMakeRect(NSMinX(aRect), top, s.width, s.height) fromRect:NSZeroRect operation:op fraction:1.0f];
+	float y = floorf((NSMinY(aRect) - phase.y) / s.height) * s.height + phase.y;
+	for(; y < NSMaxY(aRect); y += s.height) {
+		float x = floorf((NSMinX(aRect) - phase.x) / s.width) * s.width + phase.x;
+		for(; x < NSMaxX(aRect); x += s.width) {
+			[self drawInRect:NSMakeRect(x, y, s.width, s.height) fromRect:NSZeroRect operation:op fraction:1.0f];
+		}
+	}
 	if(flag) [NSGraphicsContext restoreGraphicsState];
 }
 
