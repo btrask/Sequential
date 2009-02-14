@@ -663,7 +663,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)rightMouseDown:(NSEvent *)anEvent
 {
-	[self handleMouseDown:anEvent];
+	if([[self window] isKeyWindow]) [self handleMouseDown:anEvent];
 }
 - (void)scrollWheel:(NSEvent *)anEvent
 {
