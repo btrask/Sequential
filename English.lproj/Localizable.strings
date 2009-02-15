@@ -40,7 +40,7 @@
 
 /* The title of the bookmarks menu. Two states. */
 "Resume" = "Resume";
-"Delete..." = "Delete…";
+"Delete" = "Delete";
 
 /* Bookmark menu item used when the file named %@ cannot be found. */
 "Missing File %@" = "Missing File “%@”";

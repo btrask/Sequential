@@ -48,7 +48,8 @@ static NSString *const PGTimerIntervalKey = @"PGTimerInterval";
 
 static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated after 1.3.2.
 
-NSArray *PGScaleModes() {
+NSArray *PGScaleModes(void)
+{
 	return [NSArray arrayWithObjects:[NSNumber numberWithInt:PGConstantFactorScale], [NSNumber numberWithInt:PGAutomaticScale], [NSNumber numberWithInt:PGViewFitScale], [NSNumber numberWithInt:PGActualSizeWithDPI], nil];
 }
 
