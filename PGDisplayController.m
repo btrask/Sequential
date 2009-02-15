@@ -906,7 +906,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(![[[self activeDocument] node] hasNodesWithData]) {
 		if(@selector(extractImages:) == action) return NO;
 	}
-	if(![[self activeNode] canGetData]) {
+	if(![[self activeNode] canExtractData]) {
 		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
 	}
 	PGResourceIdentifier *const ident = [[self activeNode] identifier];
