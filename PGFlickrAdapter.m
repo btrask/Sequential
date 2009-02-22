@@ -177,7 +177,7 @@ enum {
 	else {
 		[URLString appendString:@"&per_page=30&extras=original_format,original_secret&media=photos"];
 		NSString *const setName = [info objectForKey:PGFlickrSetNameKey];
-		if(setName) [URLString appendFormat:@"&method=flickr.photoset.getPhotos&photoset_id=%@", PGFlickrAPIKey, setName];
+		if(setName) [URLString appendFormat:@"&method=flickr.photosets.getPhotos&photoset_id=%@", setName];
 		else {
 			NSString *const user = [info objectForKey:PGFlickrUserNameKey];
 			NSString *const group = [info objectForKey:PGFlickrGroupNameKey];
