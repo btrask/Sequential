@@ -46,19 +46,19 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSMenuItem</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSApplication</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSMenuItem</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -361,14 +361,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGURLLoad</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>PGThumbnailBrowser</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -381,6 +373,14 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGColumnView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGURLLoad</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
