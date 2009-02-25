@@ -70,19 +70,16 @@
 /* Informative text for replacement alerts. */
 "Replacing a file overwrites its current contents." = "Replacing a file overwrites its current contents.";
 
-/* Extraction window title. */
-"Extract" = "Extract";
+/* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+"The image %@ could not be saved to %@." = "The image “%@” could not be saved to “%@.”";
 
-/* Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The page %@ could not be extracted to %@." = "The page “%@” could not be extracted to “%@.”";
+/* Multiple image save failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
+"%u images could not be saved to %@." = "%u images could not be saved to “%@.”";
 
-/* Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
-"%u pages could not be extracted to %@." = "%u pages could not be extracted to “%@.”";
-
-/* Informative text for extraction failure alerts. */
+/* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Make sure the volume is writable and has enough free space.";
 
-/* Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder. */
+/* Appears in the image save alert beside each filename that conflicts with an existing file in the destination folder. */
 "File already exists." = "File already exists.";
 
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */

@@ -77,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)canExtractData
+- (BOOL)canSaveData
 {
 	return YES;
 }

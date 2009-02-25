@@ -64,11 +64,11 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)canExtractData
+- (BOOL)canSaveData
 {
 	return YES;
 }
-- (BOOL)hasExtractableChildren
+- (BOOL)hasSavableChildren
 {
 	return NO;
 }

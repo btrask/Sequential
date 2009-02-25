@@ -162,13 +162,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	return YES;
 }
-- (BOOL)hasExtractableChildren
+- (BOOL)hasSavableChildren
 {
 	PGNode *child;
 	NSEnumerator *const childEnum = [[self unsortedChildren] objectEnumerator];
 	while((child = [childEnum nextObject])) {
 		PGResourceAdapter *childAdapter = [child resourceAdapter];
-		if([childAdapter canExtractData] || [childAdapter hasExtractableChildren]) return YES;
+		if([childAdapter canSaveData] || [childAdapter hasSavableChildren]) return YES;
 	}
 	return NO;
 }

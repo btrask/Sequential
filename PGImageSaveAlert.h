@@ -27,19 +27,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGNode;
 
-@interface PGExtractAlert : NSWindowController
+@interface PGImageSaveAlert : NSWindowController
 {
 	@private
 	IBOutlet NSView *accessoryView;
 	IBOutlet NSOutlineView *nodesOutline;
 	IBOutlet NSTableColumn *nameColumn;
 	IBOutlet NSTableColumn *errorColumn;
-		 PGNode *_rootNode;
-	         NSSet *_initialSelection;
-	         NSOpenPanel *_openPanel;
-	         NSString *_destination;
-	         NSMutableDictionary *_saveNamesByNodePointer;
-	         BOOL _extractOnSheetClose;
+	PGNode *_rootNode;
+	NSSet *_initialSelection;
+	NSOpenPanel *_openPanel;
+	NSString *_destination;
+	NSMutableDictionary *_saveNamesByNodePointer;
+	BOOL _saveOnSheetClose;
 }
 
 - (id)initWithRoot:(PGNode *)root initialSelection:(NSSet *)aSet;

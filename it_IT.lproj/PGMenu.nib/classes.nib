@@ -79,6 +79,8 @@
 				<string>id</string>
 				<key>revertOrientation</key>
 				<string>id</string>
+				<key>saveImagesTo</key>
+				<string>id</string>
 				<key>setAsDesktopPicture</key>
 				<string>id</string>
 				<key>setCopyAsDesktopPicture</key>
@@ -289,8 +291,6 @@
 				<string>id</string>
 				<key>changeTimerInterval</key>
 				<string>id</string>
-				<key>extractImages</key>
-				<string>id</string>
 				<key>firstOfFolder</key>
 				<string>id</string>
 				<key>firstOfNextFolder</key>
@@ -322,6 +322,8 @@
 				<key>reveal</key>
 				<string>id</string>
 				<key>revertOrientation</key>
+				<string>id</string>
+				<key>saveImagesTo</key>
 				<string>id</string>
 				<key>setAsDesktopPicture</key>
 				<string>id</string>

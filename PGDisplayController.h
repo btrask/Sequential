@@ -86,7 +86,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 + (NSArray *)pasteboardTypes;
 
-- (IBAction)extractImages:(id)sender;
+- (IBAction)saveImagesTo:(id)sender;
 - (IBAction)setAsDesktopPicture:(id)sender;
 - (IBAction)setCopyAsDesktopPicture:(id)sender;
 - (IBAction)moveToTrash:(id)sender;

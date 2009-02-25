@@ -482,11 +482,11 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return NO;
 }
-- (BOOL)canExtractData
+- (BOOL)canSaveData
 {
 	return NO;
 }
-- (BOOL)hasExtractableChildren
+- (BOOL)hasSavableChildren
 {
 	return NO;
 }

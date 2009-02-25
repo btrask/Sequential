@@ -80,8 +80,8 @@ typedef int PGLoadPolicy;
 - (BOOL)isSortedFirstViewableNodeOfFolder;
 - (BOOL)hasRealThumbnail;
 - (BOOL)isResolutionIndependent;
-- (BOOL)canExtractData;
-- (BOOL)hasExtractableChildren;
+- (BOOL)canSaveData;
+- (BOOL)hasSavableChildren;
 
 - (NSArray *)exifEntries;
 - (PGOrientation)orientationWithBase:(BOOL)flag;

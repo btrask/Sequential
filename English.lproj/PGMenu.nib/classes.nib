@@ -6,43 +6,11 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>PGFindView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGFullscreenWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>PGDocumentWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>PGFloatingPanelController</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSWindowController</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSTableColumn</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>
@@ -54,102 +22,11 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>NSMenuItem</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGColumnView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSControl</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>PG_grow</key>
-				<string>id</string>
-				<key>changeOrientation</key>
-				<string>id</string>
-				<key>changeTimerInterval</key>
-				<string>id</string>
-				<key>extractImages</key>
-				<string>id</string>
-				<key>firstOfFolder</key>
-				<string>id</string>
-				<key>firstOfNextFolder</key>
-				<string>id</string>
-				<key>firstOfPreviousFolder</key>
-				<string>id</string>
-				<key>firstPage</key>
-				<string>id</string>
-				<key>lastOfFolder</key>
-				<string>id</string>
-				<key>lastPage</key>
-				<string>id</string>
-				<key>moveToTrash</key>
-				<string>id</string>
-				<key>nextPage</key>
-				<string>id</string>
-				<key>nextTab</key>
-				<string>id</string>
-				<key>openURL</key>
-				<string>id</string>
-				<key>pauseAndCloseDocument</key>
-				<string>id</string>
-				<key>pauseDocument</key>
-				<string>id</string>
-				<key>previousPage</key>
-				<string>id</string>
-				<key>previousTab</key>
-				<string>id</string>
-				<key>reveal</key>
-				<string>id</string>
-				<key>revertOrientation</key>
-				<string>id</string>
-				<key>setAsDesktopPicture</key>
-				<string>id</string>
-				<key>setCopyAsDesktopPicture</key>
-				<string>id</string>
-				<key>skipBeforeFolder</key>
-				<string>id</string>
-				<key>skipPastFolder</key>
-				<string>id</string>
-				<key>toggleFullscreen</key>
-				<string>id</string>
-				<key>toggleInfo</key>
-				<string>id</string>
-				<key>toggleThumbnails</key>
-				<string>id</string>
-				<key>toggleTracksImageScalingMode</key>
-				<string>id</string>
-				<key>toggleTracksReadingDirection</key>
-				<string>id</string>
-				<key>toggleTracksSortDescriptor</key>
-				<string>id</string>
-				<key>zoomIn</key>
-				<string>id</string>
-				<key>zoomOut</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -201,6 +78,8 @@
 				<key>revealInPathFinder</key>
 				<string>id</string>
 				<key>revertOrientation</key>
+				<string>id</string>
+				<key>saveImagesTo</key>
 				<string>id</string>
 				<key>setAsDesktopPicture</key>
 				<string>id</string>
@@ -303,6 +182,182 @@
 			<string>ObjC</string>
 		</dict>
 		<dict>
+			<key>CLASS</key>
+			<string>PGURLConnection</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
+				<key>performWindowClose</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>NSWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGClipView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>delegate</key>
+				<string>id</string>
+				<key>documentView</key>
+				<string>NSView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGThumbnailView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>dataSource</key>
+				<string>id</string>
+				<key>delegate</key>
+				<string>id</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFindView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGFullscreenWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>PGDocumentWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSTableColumn</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSMenuItem</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGColumnView</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSView</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>PG_grow</key>
+				<string>id</string>
+				<key>changeOrientation</key>
+				<string>id</string>
+				<key>changeTimerInterval</key>
+				<string>id</string>
+				<key>firstOfFolder</key>
+				<string>id</string>
+				<key>firstOfNextFolder</key>
+				<string>id</string>
+				<key>firstOfPreviousFolder</key>
+				<string>id</string>
+				<key>firstPage</key>
+				<string>id</string>
+				<key>lastOfFolder</key>
+				<string>id</string>
+				<key>lastPage</key>
+				<string>id</string>
+				<key>moveToTrash</key>
+				<string>id</string>
+				<key>nextPage</key>
+				<string>id</string>
+				<key>nextTab</key>
+				<string>id</string>
+				<key>openURL</key>
+				<string>id</string>
+				<key>pauseAndCloseDocument</key>
+				<string>id</string>
+				<key>pauseDocument</key>
+				<string>id</string>
+				<key>previousPage</key>
+				<string>id</string>
+				<key>previousTab</key>
+				<string>id</string>
+				<key>reveal</key>
+				<string>id</string>
+				<key>revertOrientation</key>
+				<string>id</string>
+				<key>saveImagesTo</key>
+				<string>id</string>
+				<key>setAsDesktopPicture</key>
+				<string>id</string>
+				<key>setCopyAsDesktopPicture</key>
+				<string>id</string>
+				<key>skipBeforeFolder</key>
+				<string>id</string>
+				<key>skipPastFolder</key>
+				<string>id</string>
+				<key>toggleFullscreen</key>
+				<string>id</string>
+				<key>toggleInfo</key>
+				<string>id</string>
+				<key>toggleThumbnails</key>
+				<string>id</string>
+				<key>toggleTracksImageScalingMode</key>
+				<string>id</string>
+				<key>toggleTracksReadingDirection</key>
+				<string>id</string>
+				<key>toggleTracksSortDescriptor</key>
+				<string>id</string>
+				<key>zoomIn</key>
+				<string>id</string>
+				<key>zoomOut</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>changeSearch</key>
@@ -338,29 +393,6 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
-			<string>PGURLConnection</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>PG_grow</key>
-				<string>id</string>
-				<key>performWindowClose</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>NSWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSResponder</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>PGURLLoad</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -383,36 +415,6 @@
 			<string>PGColumnView</string>
 		</dict>
 		<dict>
-			<key>CLASS</key>
-			<string>PGClipView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>delegate</key>
-				<string>id</string>
-				<key>documentView</key>
-				<string>NSView</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGThumbnailView</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>dataSource</key>
-				<string>id</string>
-				<key>delegate</key>
-				<string>id</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSView</string>
-		</dict>
-		<dict>
 			<key>ACTIONS</key>
 			<dict>
 				<key>open</key>
@@ -431,22 +433,6 @@
 				<key>emptyMenuItem</key>
 				<string>NSMenuItem</string>
 			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>PGDocumentWindow</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSWindow</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>NSResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
 		</dict>
@@ -547,6 +533,22 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSResponder</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>PGDocumentWindow</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSWindow</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>NSResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

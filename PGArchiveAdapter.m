@@ -139,7 +139,7 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark PGResourceAdapting Protocol
 
-- (BOOL)canExtractData
+- (BOOL)canSaveData
 {
 	return YES;
 }

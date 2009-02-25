@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 #import "PGPrefController.h"
 #import "PGBookmarkController.h"
-#import "PGExtractAlert.h"
+#import "PGImageSaveAlert.h"
 #import "PGEncodingAlert.h"
 
 // Other
@@ -130,12 +130,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	NSBeep();
 }
-- (IBAction)extractImages:(id)sender
+- (IBAction)saveImagesTo:(id)sender
 {
 	NSSet *set = nil;
 	if([self shouldShowThumbnails]) set = [[_thumbnailPanel content] selection];
 	else if([self activeNode]) set = [NSSet setWithObject:[self activeNode]];
-	[[[[PGExtractAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
+	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
 }
 - (IBAction)setAsDesktopPicture:(id)sender
 {
@@ -904,9 +904,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(@selector(copy:) == action) return NO;
 	}
 	if(![[[self activeDocument] node] hasNodesWithData]) {
-		if(@selector(extractImages:) == action) return NO;
+		if(@selector(saveImagesTo:) == action) return NO;
 	}
-	if(![[self activeNode] canExtractData]) {
+	if(![[self activeNode] canSaveData]) {
 		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
 	}
 	PGResourceIdentifier *const ident = [[self activeNode] identifier];

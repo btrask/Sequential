@@ -22,7 +22,7 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGExtractAlert.h"
+#import "PGImageSaveAlert.h"
 
 // Models
 #import "PGNode.h"
@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 
-@implementation PGExtractAlert
+@implementation PGImageSaveAlert
 
 #pragma mark Instance Methods
 
 - (id)initWithRoot:(PGNode *)root
       initialSelection:(NSSet *)aSet
 {
-	if(!(self = [super initWithWindowNibName:@"PGExtract"])) return nil;
+	if(!(self = [super initWithWindowNibName:@"PGImageSave"])) return nil;
 	_rootNode = [root retain];
 	_initialSelection = [aSet copy];
 	_saveNamesByNodePointer = [[NSMutableDictionary alloc] init];
@@ -67,8 +67,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[accessoryView setAutoresizingMask:NSViewWidthSizable | NSViewMaxYMargin];
 	}
 
-	[_openPanel setPrompt:NSLocalizedString(@"Choose", nil)];
-	[_openPanel setTitle:NSLocalizedString(@"Extract", @"Extraction window title.")];
+	NSSavePanel *const savePanel = [NSSavePanel savePanel];
+	[_openPanel setPrompt:[savePanel prompt]];
+	[_openPanel setTitle:[savePanel title]];
 	[self retain];
 	if(window) [_openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 	else [self openPanelDidEnd:_openPanel returnCode:[_openPanel runModalForTypes:nil] contextInfo:NULL];
@@ -94,7 +95,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	returnCode:(int)returnCode
 	contextInfo:(void *)contextInfo
 {
-	if(NSAlertFirstButtonReturn == returnCode) _extractOnSheetClose = YES;
+	if(NSAlertFirstButtonReturn == returnCode) _saveOnSheetClose = YES;
 }
 
 #pragma mark NSSavePanelDelegate Protocol
@@ -114,7 +115,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			existingFilename = name;
 		}
 	}
-	if(existingFileCount && !_extractOnSheetClose) {
+	if(existingFileCount && !_saveOnSheetClose) {
 		NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 		if(1 == existingFileCount) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%@ already exists in %@. Do you want to replace it?", @"Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), existingFilename, [_destination AE_displayName]]];
@@ -140,9 +141,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[nodesOutline reloadData];
 	[nodesOutline selectRowIndexes:unsavedRows byExtendingSelection:NO];
 	NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
-	if(1 == [unsavedNodes count]) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The page %@ could not be extracted to %@.", @"Extraction single failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), [self saveNameForNode:[unsavedNodes objectAtIndex:0]], [_destination AE_displayName]]];
-	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages could not be extracted to %@.", @"Extraction multiple failure alert. %u is replaced with the number of files, %@ is replaced with the destination name."), [unsavedNodes count], [_destination AE_displayName]]];
-	[alert setInformativeText:NSLocalizedString(@"Make sure the volume is writable and has enough free space.", @"Informative text for extraction failure alerts.")];
+	if(1 == [unsavedNodes count]) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The image %@ could not be saved to %@.", @"Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), [self saveNameForNode:[unsavedNodes objectAtIndex:0]], [_destination AE_displayName]]];
+	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u images could not be saved to %@.", @"Multiple image save failure alert. %u is replaced with the number of files, %@ is replaced with the destination name."), [unsavedNodes count], [_destination AE_displayName]]];
+	[alert setInformativeText:NSLocalizedString(@"Make sure the volume is writable and has enough free space.", @"Informative text for save failure alerts.")];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
 	[alert beginSheetModalForWindow:_openPanel modalDelegate:nil didEndSelector:NULL contextInfo:nil];
 	return NO;
@@ -160,7 +161,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGNode *node;
 	NSEnumerator *const nodeEnum = [_initialSelection objectEnumerator];
 	while((node = [nodeEnum nextObject])) {
-		if(![node canExtractData]) continue;
+		if(![node canSaveData]) continue;
 		int const rowIndex = [nodesOutline rowForItem:node];
 		if(-1 != rowIndex) [indexes addIndex:(unsigned)rowIndex];
 	}
@@ -175,9 +176,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowDidEndSheet:(NSNotification *)notification
 {
-	if(!_extractOnSheetClose) return;
+	if(!_saveOnSheetClose) return;
 	[_openPanel ok:self];
-	_extractOnSheetClose = NO;
+	_saveOnSheetClose = NO;
 }
 
 #pragma mark NSOutlineViewDataSource Protocol
@@ -191,7 +192,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         isItemExpandable:(id)item
 {
-	return [item hasExtractableChildren];
+	return [item hasSavableChildren];
 }
 - (int)outlineView:(NSOutlineView *)outlineView
        numberOfChildrenOfItem:(id)item
@@ -204,7 +205,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSString *const saveName = [self saveNameForNode:item];
 	if(tableColumn == nameColumn) return saveName;
-	else if(tableColumn == errorColumn) if([[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:saveName]]) return NSLocalizedString(@"File already exists.", @"Appears in the extraction alert beside each filename that conflicts with an existing file in the destination folder.");
+	else if(tableColumn == errorColumn) if([[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:saveName]]) return NSLocalizedString(@"File already exists.", @"Appears in the image save alert beside each filename that conflicts with an existing file in the destination folder.");
 	return nil;
 }
 - (void)outlineView:(NSOutlineView *)outlineView
@@ -223,7 +224,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         forTableColumn:(NSTableColumn *)tableColumn
         item:(id)item
 {
-	if(tableColumn == nameColumn) [cell setTextColor:([item canExtractData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
+	if(tableColumn == nameColumn) [cell setTextColor:([item canSaveData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldEditTableColumn:(NSTableColumn *)tableColumn
@@ -240,7 +241,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldSelectItem:(id)item
 {
-	return [item canExtractData];
+	return [item canSaveData];
 }
 
 #pragma mark NSObject
