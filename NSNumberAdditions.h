@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface NSNumber (AEAdditions)
 
-- (NSString *)AE_localizedStringWithFractionDigits:(unsigned)placesAfterDecimal;
 - (NSString *)AE_localizedStringAsBytes;
 
 @end

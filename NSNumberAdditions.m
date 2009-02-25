@@ -24,21 +24,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSNumberAdditions.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 @implementation NSNumber (AEAdditions)
 
-- (NSString *)AE_localizedStringWithFractionDigits:(unsigned)placesAfterDecimal
-{
-	static CFNumberFormatterRef f = nil;
-	if(!f) {
-		CFLocaleRef const locale = CFLocaleCopyCurrent();
-		f = CFNumberFormatterCreate(kCFAllocatorDefault, locale, kCFNumberFormatterDecimalStyle);
-		CFRelease(locale);
-	}
-	NSNumber *const precision = [NSNumber numberWithInt:placesAfterDecimal];
-	CFNumberFormatterSetProperty(f, kCFNumberFormatterMinFractionDigits, (CFNumberRef)precision);
-	CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)precision);
-	return [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)self) autorelease];
-}
 - (NSString *)AE_localizedStringAsBytes
 {
 	double b = (double)[self unsignedLongLongValue];
@@ -51,16 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		case 2: unit = @"MB"; break;
 		case 3: unit = @"GB"; break;
 		case 4: unit = @"TB"; break;
-		default: NSAssert(0, @"Divided too far.");
+		default: PGAssertNotReached(@"Divided too far.");
 	}
-	static CFNumberFormatterRef f = nil;
-	if(!f) {
-		CFLocaleRef const locale = CFLocaleCopyCurrent();
-		f = CFNumberFormatterCreate(kCFAllocatorDefault, locale, kCFNumberFormatterDecimalStyle);
-		CFRelease(locale);
-		CFNumberFormatterSetProperty(f, kCFNumberFormatterMaxFractionDigits, (CFNumberRef)[NSNumber numberWithInt:1]);
-	}
-	return [NSString stringWithFormat:@"%@ %@", [(NSString *)CFNumberFormatterCreateStringWithNumber(kCFAllocatorDefault, f, (CFNumberRef)[NSNumber numberWithDouble:b]) autorelease], NSLocalizedString(unit, @"Units (bytes, kilobytes, etc).")];
+	return [NSString localizedStringWithFormat:@"%.1f %@", b, NSLocalizedString(unit, @"Units (bytes, kilobytes, etc).")];
 }
 
 @end
