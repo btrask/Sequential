@@ -54,7 +54,7 @@
 
 /* Begin PBXFileReference section */
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
-		0EE5F6E00DBA651A005A5F0B /* UniversalDetector.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = UniversalDetector.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0EE5F6E00DBA651A005A5F0B /* UniversalDetector.framework */ = {isa = PBXFileReference; path = UniversalDetector.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B0DD5960A29091F0009B697 /* XADArchivePipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XADArchivePipe.h; sourceTree = "<group>"; };
 		1B0DD5970A29091F0009B697 /* XADArchivePipe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XADArchivePipe.m; sourceTree = "<group>"; };
 		1B0DE3280A34AE4F0009B697 /* ConvertE.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ConvertE.c; path = ../include/ConvertE.c; sourceTree = SOURCE_ROOT; };

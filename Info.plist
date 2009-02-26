@@ -674,12 +674,8 @@
 			</array>
 			<key>PGBundleTypeFourCCs</key>
 			<array>
-				<data>
-				UEsDBA==
-				</data>
-				<data>
-				UmFyIQ==
-				</data>
+				<data>UEsDBA==</data>
+				<data>UmFyIQ==</data>
 			</array>
 		</dict>
 		<key>PGFlickrAdapter</key>
@@ -839,13 +835,9 @@
 			</array>
 			<key>PGBundleTypeFourCC</key>
 			<array>
-				<data>
-				JVBERg==
-				</data>
+				<data>JVBERg==</data>
 			</array>
 		</dict>
-		<key>PGFlickrAdapter</key>
-		<dict/>
 		<key>PGResourceAdapter</key>
 		<dict/>
 		<key>PGWebAdapter</key>
@@ -868,5 +860,15 @@
 			</array>
 		</dict>
 	</dict>
+	<key>SUAllowsAutomaticUpdates</key>
+	<false/>
+	<key>SUEnableAutomaticChecks</key>
+	<false/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUFeedURL</key>
+	<string>http://www.sequentialx.com/sequential.xml</string>
+	<key>SUShowReleaseNotes</key>
+	<false/>
 </dict>
 </plist>

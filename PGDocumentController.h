@@ -63,8 +63,8 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 @interface PGDocumentController : NSResponder <PGDisplayControlling>
 {
 	@private
-	IBOutlet NSMenu      *recentMenu;
-	         NSMenuItem *_recentMenuSeparatorItem;
+	IBOutlet NSMenu *recentMenu;
+	NSMenuItem *_recentMenuSeparatorItem;
 
 	IBOutlet NSMenuItem *rotate90CC;
 	IBOutlet NSMenuItem *rotate270CC;
@@ -78,36 +78,36 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	IBOutlet NSMenuItem *zoomOut;
 
 	IBOutlet NSMenuItem *pageMenuItem;
-	IBOutlet NSMenu     *defaultPageMenu;
+	IBOutlet NSMenu *defaultPageMenu;
 	IBOutlet NSMenuItem *firstPage;
 	IBOutlet NSMenuItem *previousPage;
 	IBOutlet NSMenuItem *nextPage;
 	IBOutlet NSMenuItem *lastPage;
 
-	IBOutlet NSMenu     *windowsMenu;
+	IBOutlet NSMenu *windowsMenu;
 	IBOutlet NSMenuItem *windowsMenuSeparator;
 	IBOutlet NSMenuItem *selectPreviousDocument;
 	IBOutlet NSMenuItem *selectNextDocument;
 
-	         BOOL        _prefsLoaded;
-	         NSArray    *_recentDocumentIdentifiers;
-	         BOOL        _fullscreen;
+	NSTimer *_updateTimer;
+	NSArray *_recentDocumentIdentifiers;
+	BOOL _fullscreen;
 
-	         PGDocument             *_currentDocument;
-	         NSMutableArray         *_documents;
-	         PGFullscreenController *_fullscreenController;
-	         BOOL                    _inFullscreen;
+	PGDocument *_currentDocument;
+	NSMutableArray *_documents;
+	PGFullscreenController *_fullscreenController;
+	BOOL _inFullscreen;
 
-	         PGExifPanelController     *_exifPanel;
-	         PGTimerPanelController    *_timerPanel;
-	         PGActivityPanelController *_activityPanel;
+	PGExifPanelController *_exifPanel;
+	PGTimerPanelController *_timerPanel;
+	PGActivityPanelController *_activityPanel;
 
-	         NSMutableDictionary *_classesByExtension;
+	NSMutableDictionary *_classesByExtension;
 }
 
 + (PGDocumentController *)sharedDocumentController;
 
-- (IBAction)provideFeedback:(id)sender;
+- (IBAction)installUpdate:(id)sender;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)switchToFileManager:(id)sender;
 

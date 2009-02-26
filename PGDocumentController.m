@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Carbon/Carbon.h>
 #import <sys/resource.h>
 #import <objc/Protocol.h>
+#import "Sparkle/Sparkle.h"
 
 // Models
 #import "PGDocument.h"
@@ -70,6 +71,8 @@ static NSString *const PGRecentItemsKey = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
 static NSString *const PGRecentItemsDeprecatedKey = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey = @"PGFullscreen";
+static NSString *const PGUpdateAvailableKey = @"PGUpdateAvailable";
+static NSString *const PGNextUpdateCheckDateKey = @"PGNextUpdateCheckDate";
 
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 
@@ -85,30 +88,33 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type)
 
 static PGDocumentController *PGSharedDocumentController = nil;
 
-@interface PGDocumentController (Private)
+@interface PGDocumentController(Private)
 
 - (void)_setFullscreen:(BOOL)flag;
 - (void)_setPageMenu:(NSMenu *)aMenu;
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
+- (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date;
+- (void)_checkForUpdates:(NSTimer *)timer;
 
 @end
 
 @implementation PGDocumentController
 
-#pragma mark Class Methods
+#pragma mark +PGDocumentController
 
 + (PGDocumentController *)sharedDocumentController
 {
 	return PGSharedDocumentController ? PGSharedDocumentController : [[self alloc] init];
 }
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
 	if([PGDocumentController class] != self) return;
 	NSNumber *const yes = [NSNumber numberWithBool:YES], *no = [NSNumber numberWithBool:NO];
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
+	NSUserDefaults *const d = [NSUserDefaults standardUserDefaults];
+	[d registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		yes, PGAntialiasWhenUpscalingKey,
 		yes, PGRoundsImageCornersKey,
 		yes, PGAutozoomsWindowsKey,
@@ -119,14 +125,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
 		[NSNumber numberWithInt:PGFullscreenMapping], PGEscapeKeyMappingKey,
+		no, PGUpdateAvailableKey,
 		nil]];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGDocumentController
 
-- (IBAction)provideFeedback:(id)sender
+- (IBAction)installUpdate:(id)sender
 {
-	if(![[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"mailto:sequential@comcast.net"]]) NSBeep();
+	[[SUUpdater sharedUpdater] checkForUpdates:sender]; // We validate this menu item specially but its behavior can just use the normal Sparkle mechanism.
 }
 - (IBAction)showPreferences:(id)sender
 {
@@ -289,7 +296,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray
 {
 	NSParameterAssert(anArray);
-	if(_prefsLoaded && [anArray isEqual:_recentDocumentIdentifiers]) return;
+	if(_recentDocumentIdentifiers && [anArray isEqual:_recentDocumentIdentifiers]) return;
 	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
@@ -319,7 +326,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)setFullscreen:(BOOL)flag
 {
-	if(_prefsLoaded && flag == _fullscreen) return;
+	if(flag == _fullscreen) return;
 	_fullscreen = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGFullscreenKey];
 	[self _setFullscreen:flag];
@@ -462,7 +469,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[nextPage setKeyEquivalentModifierMask:0];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGDocumentController(Private)
 
 - (void)_setFullscreen:(BOOL)flag
 {
@@ -530,96 +537,109 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(display) [document createUI];
 	return document;
 }
-
-#pragma mark NSNibAwakening Protocol
-
-- (void)awakeFromNib
+- (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date
 {
-	[defaultPageMenu retain];
-	[windowsMenuSeparator retain];
-	[windowsMenuSeparator AE_removeFromMenu];
-
-	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
-	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
-	[rotate180 setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate180 rotation:180] autorelease] label:[rotate180 title]]];
-
-	[mirrorHorz setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorHorz rotation:0] autorelease] label:[mirrorHorz title]]];
-	[mirrorVert setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorVert rotation:90] autorelease] label:[mirrorVert title]]];
-
-	[zoomIn setKeyEquivalent:@"+"];
-	[zoomIn setKeyEquivalentModifierMask:0];
-	[zoomOut setKeyEquivalent:@"-"];
-	[zoomOut setKeyEquivalentModifierMask:0];
-
-	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E1]];
-	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
-	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E3]];
-	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
-
-	NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
-	[self setFullscreen:[[defaults objectForKey:PGFullscreenKey] boolValue]];
-	_prefsLoaded = YES;
-
-	[self setCurrentDocument:nil];
-	[self readingDirectionDidChange:nil];
+	NSDate *const d = date ? date : [NSDate dateWithTimeIntervalSinceNow:604800.0f];
+	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
+	[_updateTimer invalidate];
+	[_updateTimer release];
+	_updateTimer = [[NSTimer alloc] initWithFireDate:d interval:0.0f target:self selector:@selector(_checkForUpdates:) userInfo:nil repeats:NO];
+	[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
+}
+- (void)_checkForUpdates:(NSTimer *)timer
+{
+	[[SUUpdater sharedUpdater] checkForUpdateInformation];
+	[self _scheduleNextUpdateCheckWithDate:nil];
 }
 
-#pragma mark PGDisplayControlling Protocol
+#pragma mark -NSResponder
 
-- (IBAction)reveal:(id)sender {}
-- (IBAction)toggleFullscreen:(id)sender {}
-- (IBAction)toggleInfo:(id)sender {}
-- (IBAction)toggleThumbnails:(id)sender {}
-
-#pragma mark NSMenuValidation Protocol
-
-#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); (fabs(__a - __b) < 0.001f ? NSOnState : (fabs(round(__a) - round(__b)) < 0.1f ? NSMixedState : NSOffState)); })
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	id const pref = [self currentPrefObject];
-	SEL const action = [anItem action];
-	int const tag = [anItem tag];
-
-	if([@protocol(PGDisplayControlling) descriptionForInstanceMethod:action]) {
-		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
-		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
-		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
-		if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
-		return NO;
+	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
+		case PGKeyEscape: [self performEscapeKeyAction]; break;
+		case PGKeyQ: [NSApp terminate:self]; return YES;
 	}
-
-	if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
-	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
-	else if(@selector(changeImageScaleMode:) == action) {
-		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
-		else [anItem setState:[pref imageScaleMode] == tag];
-	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
-	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
-	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
-	else if(@selector(changeSortDirection:) == action) {
-		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
-		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
-	} else if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [pref sortOrder]) == tag];
-	else if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
-
-	if([[self documents] count] <= 1) {
-		if(@selector(selectPreviousDocument:) == action) return NO;
-		if(@selector(selectNextDocument:) == action) return NO;
-	}
-	if(![self currentDocument]) {
-		if(@selector(changeReadingDirection:) == action) return NO;
-		if(@selector(changeImageScaleMode:) == action) return NO;
-		if(@selector(changeImageScaleFactor:) == action) return NO;
-		if(@selector(changeImageScaleConstraint:) == action) return NO;
-		if(@selector(changeSortOrder:) == action) return NO;
-		if(@selector(changeSortDirection:) == action) return NO;
-		if(@selector(changeSortRepeat:) == action) return NO;
-	}
-	return [super validateMenuItem:anItem];
+	return NO;
 }
 
-#pragma mark NSMenuDelegate Protocol
+#pragma mark -NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
+		id recentItemsData = [defaults objectForKey:PGRecentItemsKey];
+		if(!recentItemsData) {
+			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecated2Key];
+			[defaults removeObjectForKey:PGRecentItemsDeprecated2Key]; // Don't leave unused data around.
+		}
+		if(!recentItemsData) {
+			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
+			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
+		}
+		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
+		_fullscreen = [[defaults objectForKey:PGFullscreenKey] boolValue];
+
+		_documents = [[NSMutableArray alloc] init];
+		_classesByExtension = [[NSMutableDictionary alloc] init];
+
+		_exifPanel = [[PGExifPanelController alloc] init];
+		_timerPanel = [[PGTimerPanelController alloc] init];
+		_activityPanel = [[PGActivityPanelController alloc] init];
+
+		if(!PGSharedDocumentController) {
+			PGSharedDocumentController = [self retain];
+			[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleAppleEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
+			[self setNextResponder:[NSApp nextResponder]];
+			[NSApp setNextResponder:self];
+
+			NSDate *updateDate = [[NSUserDefaults standardUserDefaults] objectForKey:PGNextUpdateCheckDateKey];
+			if(updateDate && [updateDate earlierDate:[NSDate date]] == updateDate) {
+				[self _checkForUpdates:nil];
+				updateDate = nil;
+			}
+			[self _scheduleNextUpdateCheckWithDate:updateDate];
+		}
+	}
+	return self;
+}
+- (void)dealloc
+{
+	if(PGSharedDocumentController == self) [[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
+	[self AE_removeObserver];
+	[defaultPageMenu release];
+	[windowsMenuSeparator release];
+	[_updateTimer invalidate];
+	[_updateTimer release];
+	[_recentMenuSeparatorItem release];
+	[_recentDocumentIdentifiers release];
+	[_documents release];
+	[_fullscreenController release];
+	[_exifPanel release];
+	[_timerPanel release];
+	[_activityPanel release];
+	[_classesByExtension release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSApplicationNotifications)
+
+- (BOOL)application:(NSApplication *)sender
+        openFile:(NSString *)filename
+{
+	return !![self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
+}
+- (void)application:(NSApplication *)sender
+        openFiles:(NSArray *)filenames
+{
+	NSString *filename;
+	NSEnumerator *filenameEnum = [filenames objectEnumerator];
+	while((filename = [filenameEnum nextObject])) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
+	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
+}
+
+#pragma mark -NSObject(NSMenuDelegate)
 
 - (int)numberOfItemsInMenu:(NSMenu *)menu
 {
@@ -673,82 +693,102 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	return YES;
 }
 
-#pragma mark NSApplicationNotifications Protocol
+#pragma mark -NSObject(NSMenuValidation)
 
-- (BOOL)application:(NSApplication *)sender
-        openFile:(NSString *)filename
+#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); (fabs(__a - __b) < 0.001f ? NSOnState : (fabs(round(__a) - round(__b)) < 0.1f ? NSMixedState : NSOffState)); })
+- (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
-	return !![self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
-}
-- (void)application:(NSApplication *)sender
-        openFiles:(NSArray *)filenames
-{
-	NSString *filename;
-	NSEnumerator *filenameEnum = [filenames objectEnumerator];
-	while((filename = [filenameEnum nextObject])) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
-	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
-}
+	id const pref = [self currentPrefObject];
+	SEL const action = [anItem action];
+	int const tag = [anItem tag];
 
-#pragma mark NSResponder
-
-- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
-{
-	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
-		case PGKeyEscape: [self performEscapeKeyAction]; break;
-		case PGKeyQ: [NSApp terminate:self]; return YES;
+	if([@protocol(PGDisplayControlling) descriptionForInstanceMethod:action]) {
+		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
+		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
+		if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
+		return NO;
 	}
-	return NO;
-}
 
-#pragma mark NSObject
+	if(@selector(installUpdate:) == action) {
+		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Update Available...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check For Update...", @"Update menu item title. One of two states."))];
+	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
+	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
+	else if(@selector(changeImageScaleMode:) == action) {
+		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
+		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+		else [anItem setState:[pref imageScaleMode] == tag];
+	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
+	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
+	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
+	else if(@selector(changeSortDirection:) == action) {
+		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
+		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
+	} else if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [pref sortOrder]) == tag];
+	else if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
 
-- (id)init
-{
-	if((self = [super init])) {
-		NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
-
-		id recentItemsData = [defaults objectForKey:PGRecentItemsKey];
-		if(!recentItemsData) {
-			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecated2Key];
-			[defaults removeObjectForKey:PGRecentItemsDeprecated2Key]; // Don't leave unused data around.
-		}
-		if(!recentItemsData) {
-			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
-			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
-		}
-		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
-
-		_documents = [[NSMutableArray alloc] init];
-		_classesByExtension = [[NSMutableDictionary alloc] init];
-
-		_exifPanel = [[PGExifPanelController alloc] init];
-		_timerPanel = [[PGTimerPanelController alloc] init];
-		_activityPanel = [[PGActivityPanelController alloc] init];
-
-		if(!PGSharedDocumentController) {
-			PGSharedDocumentController = [self retain];
-			[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleAppleEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
-			[self setNextResponder:[NSApp nextResponder]];
-			[NSApp setNextResponder:self];
-		}
+	if([[self documents] count] <= 1) {
+		if(@selector(selectPreviousDocument:) == action) return NO;
+		if(@selector(selectNextDocument:) == action) return NO;
 	}
-	return self;
+	if(![self currentDocument]) {
+		if(@selector(changeReadingDirection:) == action) return NO;
+		if(@selector(changeImageScaleMode:) == action) return NO;
+		if(@selector(changeImageScaleFactor:) == action) return NO;
+		if(@selector(changeImageScaleConstraint:) == action) return NO;
+		if(@selector(changeSortOrder:) == action) return NO;
+		if(@selector(changeSortDirection:) == action) return NO;
+		if(@selector(changeSortRepeat:) == action) return NO;
+	}
+	return [super validateMenuItem:anItem];
 }
-- (void)dealloc
+
+#pragma mark -NSObject(NSNibAwaking)
+
+- (void)awakeFromNib
 {
-	if(PGSharedDocumentController == self) [[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
-	[self AE_removeObserver];
-	[defaultPageMenu release];
-	[windowsMenuSeparator release];
-	[_recentMenuSeparatorItem release];
-	[_recentDocumentIdentifiers release];
-	[_documents release];
-	[_fullscreenController release];
-	[_exifPanel release];
-	[_timerPanel release];
-	[_activityPanel release];
-	[_classesByExtension release];
-	[super dealloc];
+	[defaultPageMenu retain];
+	[windowsMenuSeparator retain];
+	[windowsMenuSeparator AE_removeFromMenu];
+
+	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
+	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
+	[rotate180 setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate180 rotation:180] autorelease] label:[rotate180 title]]];
+
+	[mirrorHorz setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorHorz rotation:0] autorelease] label:[mirrorHorz title]]];
+	[mirrorVert setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorVert rotation:90] autorelease] label:[mirrorVert title]]];
+
+	[zoomIn setKeyEquivalent:@"+"];
+	[zoomIn setKeyEquivalentModifierMask:0];
+	[zoomOut setKeyEquivalent:@"-"];
+	[zoomOut setKeyEquivalentModifierMask:0];
+
+	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E1]];
+	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
+	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E3]];
+	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
+
+	[self _setFullscreen:_fullscreen];
+	[self setCurrentDocument:nil];
+	[self readingDirectionDidChange:nil];
+}
+
+#pragma mark -NSObject(PGDisplayControlling)
+
+- (IBAction)reveal:(id)sender {}
+- (IBAction)toggleFullscreen:(id)sender {}
+- (IBAction)toggleInfo:(id)sender {}
+- (IBAction)toggleThumbnails:(id)sender {}
+
+#pragma mark -NSObject(SUUpdaterDelegateInformalProtocol)
+
+- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
+{
+	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:PGUpdateAvailableKey];
+}
+- (void)updaterDidNotFindUpdate:(SUUpdater *)update
+{
+	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
 }
 
 @end

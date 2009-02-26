@@ -10,6 +10,10 @@
 /* Label for when no image is being displayed in the window. */
 "No image" = "沒有影像";
 
+/* Update menu item title. One of two states. */
+"Update Available..." = "Update Available…";
+"Check For Update..." = "Check For Update…";
+
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
 "Reveal in Finder" = "顯示於 Finder";
 "Reveal in Path Finder" = "顯示於 Path Finder";

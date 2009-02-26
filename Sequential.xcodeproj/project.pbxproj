@@ -6,11 +6,27 @@
 	objectVersion = 42;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		0E04EF9C0F5592B9002FD4F2 /* Distribution */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 0E04EFA40F5592BB002FD4F2 /* Build configuration list for PBXAggregateTarget "Distribution" */;
+			buildPhases = (
+				0E04EF9B0F5592B9002FD4F2 /* ShellScript */,
+			);
+			dependencies = (
+				0E04EFA60F5592CE002FD4F2 /* PBXTargetDependency */,
+			);
+			name = Distribution;
+			productName = Distribution;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0E04E98E0C23BA7100078EC2 /* PGBezelPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */; };
 		0E04EBD00C253BB100078EC2 /* PGAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCD0C253BB000078EC2 /* PGAlertView.m */; };
 		0E04EBD10C253BB100078EC2 /* PGInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCF0C253BB000078EC2 /* PGInfoView.m */; };
 		0E04EC0A0C254C1300078EC2 /* NSBezierPathAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */; };
+		0E04EF9A0F558FE7002FD4F2 /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 0E04EF990F558FE7002FD4F2 /* dsa_pub.pem */; };
 		0E051D9D0C801B160041874F /* PGEncoding.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E051D9B0C801B150041874F /* PGEncoding.nib */; };
 		0E06CBA60CF9A8C2004124B0 /* URL.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CB8B0CF9A8C2004124B0 /* URL.png */; };
 		0E06CBC60CF9B3B8004124B0 /* Document-BMP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBAC0CF9B3B8004124B0 /* Document-BMP.icns */; };
@@ -119,6 +135,8 @@
 		0ED4AAF80DD18538007C5A77 /* PGFloatingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */; };
 		0ED4AB170DD18730007C5A77 /* PGExifPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */; };
 		0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */; };
+		0ED989A80F56A80C00AD91F5 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */; };
+		0ED989A90F56A81300AD91F5 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */; };
 		0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EDB9A750EA1896400B7342A /* PGColumnView.m */; };
 		0EDB9A790EA1899300B7342A /* PGThumbnailBrowser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EDB9A780EA1899300B7342A /* PGThumbnailBrowser.m */; };
 		0EDB9BFF0EA1E27D00B7342A /* PGThumbnailView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EDB9BFE0EA1E27D00B7342A /* PGThumbnailView.m */; };
@@ -172,6 +190,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0E04EFA50F5592CE002FD4F2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2A37F4A9FDCFA73011CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
+			remoteInfo = Sequential;
+		};
 		0E3DA4500DB0B6A800BE502B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */;
@@ -192,6 +217,41 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = HMBlkAppKit;
+		};
+		0EBAD5910F569E2B0014BA11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = Sparkle;
+		};
+		0EBAD5930F569E2B0014BA11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 61B5F90209C4CEE200B25A18;
+			remoteInfo = "Sparkle Test App";
+		};
+		0EBAD5950F569E2B0014BA11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = DAAEFC960DA571DF0051E0D0;
+			remoteInfo = "relaunch tool";
+		};
+		0EBAD5970F569E2B0014BA11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 612279D90DB5470200AB99EA;
+			remoteInfo = "Sparkle Unit Tests";
+		};
+		0EBAD5CD0F56A0860014BA11 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = Sparkle;
 		};
 		0EE5F8CA0DBA6757005A5F0B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -226,6 +286,7 @@
 				0EE5F99D0DBA753D005A5F0B /* UniversalDetector.framework in CopyFiles */,
 				0EE5F8DC0DBA6794005A5F0B /* XADMaster.framework in CopyFiles */,
 				0E53BF560DB761180012AC5B /* HMBlkAppKit.framework in CopyFiles */,
+				0ED989A90F56A81300AD91F5 /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +315,7 @@
 		0E04EBCF0C253BB000078EC2 /* PGInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInfoView.m; sourceTree = "<group>"; };
 		0E04EC080C254C1300078EC2 /* NSBezierPathAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSBezierPathAdditions.h; sourceTree = "<group>"; };
 		0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSBezierPathAdditions.m; sourceTree = "<group>"; };
+		0E04EF990F558FE7002FD4F2 /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		0E051D9C0C801B150041874F /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGEncoding.nib; sourceTree = "<group>"; };
 		0E06CB8B0CF9A8C2004124B0 /* URL.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = URL.png; sourceTree = "<group>"; };
 		0E06CBAC0CF9B3B8004124B0 /* Document-BMP.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Document-BMP.icns"; sourceTree = "<group>"; };
@@ -451,6 +513,7 @@
 		0EA89C9C0BD540E60077BEEE /* PGImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGImageView.h; sourceTree = "<group>"; };
 		0EA89C9D0BD540E60077BEEE /* PGImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGImageView.m; sourceTree = "<group>"; };
 		0EB167CA0A82ACC0001999E7 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = Sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		0EBF5A140C44DF56004584D2 /* NSMenuItemAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMenuItemAdditions.h; sourceTree = "<group>"; };
 		0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMenuItemAdditions.m; sourceTree = "<group>"; };
 		0EC11DEE0CA02B7B003E492C /* PGZooming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGZooming.h; sourceTree = "<group>"; };
@@ -498,6 +561,7 @@
 		0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGExifPanelController.m; sourceTree = "<group>"; };
 		0ED5F5A90E806F4E00715745 /* PGXMLAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLAdapter.h; sourceTree = "<group>"; };
 		0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLAdapter.m; sourceTree = "<group>"; };
+		0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EDB9A740EA1896400B7342A /* PGColumnView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGColumnView.h; sourceTree = "<group>"; };
 		0EDB9A750EA1896400B7342A /* PGColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGColumnView.m; sourceTree = "<group>"; };
 		0EDB9A770EA1899300B7342A /* PGThumbnailBrowser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGThumbnailBrowser.h; sourceTree = "<group>"; };
@@ -604,6 +668,7 @@
 				0E53BF510DB760EC0012AC5B /* HMBlkAppKit.framework in Frameworks */,
 				0EE5F8DA0DBA6786005A5F0B /* XADMaster.framework in Frameworks */,
 				0EE5F99C0DBA7533005A5F0B /* UniversalDetector.framework in Frameworks */,
+				0ED989A80F56A80C00AD91F5 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -772,6 +837,17 @@
 			path = "Document Icons";
 			sourceTree = "<group>";
 		};
+		0EBAD5870F569E2B0014BA11 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0EBAD5920F569E2B0014BA11 /* Sparkle.framework */,
+				0EBAD5940F569E2B0014BA11 /* Sparkle Test App.app */,
+				0EBAD5960F569E2B0014BA11 /* relaunch */,
+				0EBAD5980F569E2B0014BA11 /* Sparkle Unit Tests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		0EC11DED0CA028E1003E492C /* Other */ = {
 			isa = PBXGroup;
 			children = (
@@ -869,6 +945,7 @@
 				0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */,
 				0EE5F8D90DBA6786005A5F0B /* XADMaster.framework */,
 				0EE5F99B0DBA7533005A5F0B /* UniversalDetector.framework */,
+				0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */,
 			);
 			name = "Other Frameworks";
 			sourceTree = "<group>";
@@ -886,6 +963,7 @@
 			children = (
 				0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */,
 				0EE5F8BC0DBA6757005A5F0B /* XADMaster.xcodeproj */,
+				0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */,
 				2A37F4ABFDCFA73011CA2CEA /* Models */,
 				0E1D37350A7E1A5200C542A6 /* Views */,
 				0E1D37360A7E1A5800C542A6 /* Controllers */,
@@ -989,6 +1067,7 @@
 				0E9012A40DF22636004B6F69 /* Mirror-White.png */,
 				0E4794280DF182C40083B7CA /* Silhouette-Black.png */,
 				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
+				0E04EF990F558FE7002FD4F2 /* dsa_pub.pem */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1019,6 +1098,7 @@
 			dependencies = (
 				0E3DA4D60DB0BAD300BE502B /* PBXTargetDependency */,
 				0EE5F8DE0DBA67AC005A5F0B /* PBXTargetDependency */,
+				0EBAD5CE0F56A0860014BA11 /* PBXTargetDependency */,
 			);
 			name = Sequential;
 			productInstallPath = "$(HOME)/Applications";
@@ -1056,6 +1136,10 @@
 					ProjectRef = 0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */;
 				},
 				{
+					ProductGroup = 0EBAD5870F569E2B0014BA11 /* Products */;
+					ProjectRef = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+				},
+				{
 					ProductGroup = 0EE5F8C60DBA6757005A5F0B /* Products */;
 					ProjectRef = 0EE5F8BC0DBA6757005A5F0B /* XADMaster.xcodeproj */;
 				},
@@ -1063,6 +1147,7 @@
 			projectRoot = "";
 			targets = (
 				8D15AC270486D014006FF6A4 /* Sequential */,
+				0E04EF9C0F5592B9002FD4F2 /* Distribution */,
 			);
 		};
 /* End PBXProject section */
@@ -1080,6 +1165,34 @@
 			fileType = wrapper.application;
 			path = TestApp.app;
 			remoteRef = 0E3DA4520DB0B6A800BE502B /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0EBAD5920F569E2B0014BA11 /* Sparkle.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Sparkle.framework;
+			remoteRef = 0EBAD5910F569E2B0014BA11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0EBAD5940F569E2B0014BA11 /* Sparkle Test App.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "Sparkle Test App.app";
+			remoteRef = 0EBAD5930F569E2B0014BA11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0EBAD5960F569E2B0014BA11 /* relaunch */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = relaunch;
+			remoteRef = 0EBAD5950F569E2B0014BA11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		0EBAD5980F569E2B0014BA11 /* Sparkle Unit Tests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Sparkle Unit Tests.octest";
+			remoteRef = 0EBAD5970F569E2B0014BA11 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0EE5F8CB0DBA6757005A5F0B /* XADMaster.framework */ = {
@@ -1153,10 +1266,27 @@
 				0E88D5A50E30C2E900871528 /* Corner-Top-Left.png in Resources */,
 				0E88D5A60E30C2E900871528 /* Corner-Top-Right.png in Resources */,
 				0E255B960E3A99AA00EDF04C /* PGTimer.nib in Resources */,
+				0E04EF9A0F558FE7002FD4F2 /* dsa_pub.pem in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0E04EF9B0F5592B9002FD4F2 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nDOWNLOAD_BASE_URL=\"http://www.sequentialx.com\"\nRELEASENOTES_URL=\"http://www.sequentialx.com/release-notes.html#version-$VERSION\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME$VERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sequential Appcast Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nzip -qr \"$ARCHIVE_FILENAME\" \"$PROJECT_NAME.app\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $VERSION</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D15AC300486D014006FF6A4 /* Sources */ = {
@@ -1271,10 +1401,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0E04EFA60F5592CE002FD4F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8D15AC270486D014006FF6A4 /* Sequential */;
+			targetProxy = 0E04EFA50F5592CE002FD4F2 /* PBXContainerItemProxy */;
+		};
 		0E3DA4D60DB0BAD300BE502B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = HMBlkAppKit;
 			targetProxy = 0E3DA4D50DB0BAD300BE502B /* PBXContainerItemProxy */;
+		};
+		0EBAD5CE0F56A0860014BA11 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Sparkle;
+			targetProxy = 0EBAD5CD0F56A0860014BA11 /* PBXContainerItemProxy */;
 		};
 		0EE5F8DE0DBA67AC005A5F0B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1494,9 +1634,39 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		0E04EF9D0F5592B9002FD4F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = Distribution;
+			};
+			name = Debug;
+		};
+		0E04EF9E0F5592B9002FD4F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = Distribution;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		C05733C808A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/build/Debug\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/build/Debug\"";
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = Sequential;
 				WRAPPER_EXTENSION = app;
@@ -1506,6 +1676,15 @@
 		C05733C908A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/build/Debug\"";
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_3 = "\"$(SRCROOT)/build/Debug\"";
 				INFOPLIST_FILE = Info.plist;
 				PRODUCT_NAME = Sequential;
 				STRIP_INSTALLED_PRODUCT = YES;
@@ -1563,6 +1742,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0E04EFA40F5592BB002FD4F2 /* Build configuration list for PBXAggregateTarget "Distribution" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E04EF9D0F5592B9002FD4F2 /* Debug */,
+				0E04EF9E0F5592B9002FD4F2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C05733C708A9546B00998B17 /* Build configuration list for PBXNativeTarget "Sequential" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
