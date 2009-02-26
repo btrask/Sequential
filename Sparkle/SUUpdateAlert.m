@@ -112,25 +112,30 @@
 }
 
 - (void)awakeFromNib
-{	
-	[[self window] setLevel:NSFloatingWindowLevel];
-		
+{
 	// We're gonna do some frame magic to match the window's size to the description field and the presence of the release notes view.
 	NSRect frame = [[self window] frame];
 	
 	if (![self showsReleaseNotes])
 	{
+		NSWindow *const w = [[[NSWindow alloc] initWithContentRect:[[self window] contentRectForFrameRect:frame] styleMask:[[self window] styleMask] & ~NSResizableWindowMask backing:NSBackingStoreBuffered defer:YES] autorelease];
+		NSView *const contentView = [[[[self window] contentView] retain] autorelease];
+		[[self window] setContentView:nil];
+		[w setContentView:contentView];
+		[w setTitle:[[self window] title]];
+		[self setWindow:w];
 		// Resize the window to be appropriate for not having a huge release notes view.
-		frame.size.height -= [releaseNotesView frame].size.height + 40; // Extra 40 is for the release notes label and margin.
-		[[self window] setShowsResizeIndicator:NO];
+		frame.size.height -= [releaseNotesView frame].size.height + 50; // Extra 40 is for the release notes label and margin.
 	}
-	
+
+	[skipThisVersionButton setHidden:![self allowsAutomaticUpdates]];
 	if (![self allowsAutomaticUpdates])
 	{
 		NSRect boxFrame = [[[releaseNotesView superview] superview] frame];
 		boxFrame.origin.y -= 20;
 		boxFrame.size.height += 20;
 		[[[releaseNotesView superview] superview] setFrame:boxFrame];
+		frame.size.width = 420.0f;
 	}
 	
 	[[self window] setFrame:frame display:NO];

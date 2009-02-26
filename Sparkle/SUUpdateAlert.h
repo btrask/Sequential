@@ -26,6 +26,7 @@ typedef enum
 	
 	IBOutlet WebView *releaseNotesView;
 	IBOutlet NSTextField *description;
+	IBOutlet NSButton *skipThisVersionButton;
 	NSProgressIndicator *releaseNotesSpinner;
 	BOOL webViewFinishedLoading;
 }

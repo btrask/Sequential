@@ -790,6 +790,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
 }
+- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
+{
+	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
+}
 
 @end
 

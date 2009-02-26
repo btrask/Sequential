@@ -42,6 +42,8 @@
 				<string>NSTextField</string>
 				<key>releaseNotesView</key>
 				<string>WebView</string>
+				<key>skipThisVersionButton</key>
+				<string>NSButton</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>SUWindowController</string>
