@@ -711,7 +711,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 
 	if(@selector(installUpdate:) == action) {
-		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Update Available...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check For Update...", @"Update menu item title. One of two states."))];
+		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check For Update...", @"Update menu item title. One of two states."))];
 	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {

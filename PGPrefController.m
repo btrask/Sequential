@@ -38,24 +38,31 @@ NSString *const PGPrefControllerDisplayScreenDidChangeNotification          = @"
 
 static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
+static NSString *const PGGeneralPaneIdentifier = @"PGGeneralPane";
+static NSString *const PGImagePaneIdentifier = @"PGImagePane";
+static NSString *const PGKeyboardPaneIdentifier = @"PGKeyboardPane";
+static NSString *const PGUpdatePaneIdentifier = @"PGUpdatePane";
+
 static PGPrefController *PGSharedPrefController = nil;
 
 @interface PGPrefController (Private)
 
+- (NSString *)_titleForPane:(NSString *)identifier;
+- (void)_setCurrentPane:(NSString *)identifier;
 - (void)_updateSecondaryMouseActionLabel;
 
 @end
 
 @implementation PGPrefController
 
-#pragma mark Class Methods
+#pragma mark +PGPrefController
 
 + (id)sharedPrefController
 {
 	return PGSharedPrefController ? PGSharedPrefController : [[[self alloc] init] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGPrefController
 
 - (IBAction)changeDisplayScreen:(id)sender
 {
@@ -64,6 +71,10 @@ static PGPrefController *PGSharedPrefController = nil;
 - (IBAction)showPrefsHelp:(id)sender
 {
 	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"preferences" inBook:@"Sequential Help"];
+}
+- (IBAction)changePane:(NSToolbarItem *)sender
+{
+	[self _setCurrentPane:[sender itemIdentifier]];
 }
 
 #pragma mark -
@@ -85,8 +96,41 @@ static PGPrefController *PGSharedPrefController = nil;
 	[self AE_postNotificationName:PGPrefControllerDisplayScreenDidChangeNotification];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGPrefController(Private)
 
+- (NSString *)_titleForPane:(NSString *)identifier
+{
+	if([PGGeneralPaneIdentifier isEqualToString:identifier]) {
+		return NSLocalizedString(@"General", @"Title of general pref pane.");
+	} else if([PGImagePaneIdentifier isEqualToString:identifier]) {
+		return NSLocalizedString(@"Images", @"Title of image pref pane.");
+	} else if([PGKeyboardPaneIdentifier isEqualToString:identifier]) {
+		return NSLocalizedString(@"Keyboard & Mouse", @"Title of keyboard/mouse pref pane.");
+	} else if([PGUpdatePaneIdentifier isEqualToString:identifier]) {
+		return NSLocalizedString(@"Update", @"Title of update pref pane.");
+	}
+	return @"";
+}
+- (void)_setCurrentPane:(NSString *)identifier
+{
+	NSView *view = nil;
+	if([PGGeneralPaneIdentifier isEqualToString:identifier]) view = generalView;
+	else if([PGImagePaneIdentifier isEqualToString:identifier]) view = imageView;
+	else if([PGKeyboardPaneIdentifier isEqualToString:identifier]) view = keyboardView;
+	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) view = updateView;
+	NSWindow *const w = [self window];
+	[w setTitle:NSLocalizedString(@"Preferences", nil)];
+	[[w toolbar] setSelectedItemIdentifier:identifier];
+	if([w contentView] != view) {
+		[w setContentView:[[[NSView alloc] initWithFrame:NSZeroRect] autorelease]];
+		NSRect r = [w contentRectForFrameRect:[w frame]];
+		float const h = NSHeight([view frame]);
+		r.origin.y += NSHeight(r) - h;
+		r.size.height = h;
+		[w setFrame:[w frameRectForContentRect:r] display:YES animate:YES];
+		[w setContentView:view];
+	}
+}
 - (void)_updateSecondaryMouseActionLabel
 {
 	NSString *label = @"";
@@ -98,52 +142,20 @@ static PGPrefController *PGSharedPrefController = nil;
 	[secondaryMouseActionLabel setStringValue:NSLocalizedString(label, @"Informative string for secondary mouse button action.")];
 }
 
-#pragma mark NSKeyValueObserving Protocol
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-        ofObject:(id)object
-        change:(NSDictionary *)change
-	context:(void *)context
-{
-	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
-	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
-}
-
-#pragma mark NSApplicationNotifications Protocol
-
-- (void)applicationDidChangeScreenParameters:(NSNotification *)aNotif
-{
-	NSArray *const screens = [NSScreen screens];
-	[screensPopUp removeAllItems];
-	BOOL const hasScreens = [screens count] != 0;
-	[screensPopUp setEnabled:hasScreens];
-	if(!hasScreens) return [self setDisplayScreen:nil];
-
-	NSScreen *const currentScreen = [self displayScreen];
-	unsigned i = [screens indexOfObjectIdenticalTo:currentScreen];
-	if(NSNotFound == i) {
-		i = [screens indexOfObject:currentScreen];
-		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
-	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPrefControllerDisplayScreenDidChangeNotification.
-
-	NSMenu *const screensMenu = [screensPopUp menu];
-	for(i = 0; i < [screens count]; i++) {
-		NSScreen *const screen = [screens objectAtIndex:i];
-		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%ux%u)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %u", @"Non-primary screens. %u is replaced with the screen number."), i + 1] : NSLocalizedString(@"Main Screen", @"The primary screen.")), (unsigned)NSWidth([screen frame]), (unsigned)NSHeight([screen frame])] action:@selector(changeDisplayScreen:) keyEquivalent:@""] autorelease];
-		[item setRepresentedObject:screen];
-		[item setTarget:self];
-		[screensMenu addItem:item];
-		if([self displayScreen] == screen) [screensPopUp selectItem:item];
-	}
-}
-
 #pragma mark NSWindowController
 
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[[self window] center];
+	NSWindow *const w = [self window];
+
+	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGPrefControllerToolbar"] autorelease];
+	[toolbar setDelegate:self];
+	[w setToolbar:toolbar];
+	[w setShowsToolbarButton:NO];
+
+	[self _setCurrentPane:PGGeneralPaneIdentifier];
+	[w center];
 	[self _updateSecondaryMouseActionLabel];
 	[self applicationDidChangeScreenParameters:nil];
 }
@@ -176,6 +188,78 @@ static PGPrefController *PGSharedPrefController = nil;
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundPatternKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGMouseClickActionKey];
 	[super dealloc];
+}
+
+#pragma mark -NSObject(NSApplicationNotifications)
+
+- (void)applicationDidChangeScreenParameters:(NSNotification *)aNotif
+{
+	NSArray *const screens = [NSScreen screens];
+	[screensPopUp removeAllItems];
+	BOOL const hasScreens = [screens count] != 0;
+	[screensPopUp setEnabled:hasScreens];
+	if(!hasScreens) return [self setDisplayScreen:nil];
+
+	NSScreen *const currentScreen = [self displayScreen];
+	unsigned i = [screens indexOfObjectIdenticalTo:currentScreen];
+	if(NSNotFound == i) {
+		i = [screens indexOfObject:currentScreen];
+		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
+	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPrefControllerDisplayScreenDidChangeNotification.
+
+	NSMenu *const screensMenu = [screensPopUp menu];
+	for(i = 0; i < [screens count]; i++) {
+		NSScreen *const screen = [screens objectAtIndex:i];
+		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%ux%u)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %u", @"Non-primary screens. %u is replaced with the screen number."), i + 1] : NSLocalizedString(@"Main Screen", @"The primary screen.")), (unsigned)NSWidth([screen frame]), (unsigned)NSHeight([screen frame])] action:@selector(changeDisplayScreen:) keyEquivalent:@""] autorelease];
+		[item setRepresentedObject:screen];
+		[item setTarget:self];
+		[screensMenu addItem:item];
+		if([self displayScreen] == screen) [screensPopUp selectItem:item];
+	}
+}
+
+#pragma mark -NSObject(NSKeyValueObserving)
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+        ofObject:(id)object
+        change:(NSDictionary *)change
+	context:(void *)context
+{
+	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
+	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
+}
+
+#pragma mark -NSObject(NSToolbarDelegate)
+
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)ident willBeInsertedIntoToolbar:(BOOL)flag
+{
+	NSToolbarItem *const item = [[[NSToolbarItem alloc] initWithItemIdentifier:ident] autorelease];
+	[item setTarget:self];
+	[item setAction:@selector(changePane:)];
+	[item setLabel:[self _titleForPane:ident]];
+	if([PGGeneralPaneIdentifier isEqualToString:ident]) {
+		[item setImage:[NSImage imageNamed:@"Pref-General"]];
+	} else if([PGImagePaneIdentifier isEqualToString:ident]) {
+		[item setImage:[NSImage imageNamed:@"Pref-Images"]];
+	} else if([PGKeyboardPaneIdentifier isEqualToString:ident]) {
+		[item setImage:[NSImage imageNamed:@"Pref-Keyboard"]];
+	} else if([PGUpdatePaneIdentifier isEqualToString:ident]) {
+		[item setImage:[NSImage imageNamed:@"Pref-Update"]];
+	}
+	return item;
+}
+- (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
+{
+	return [NSArray arrayWithObjects:NSToolbarFlexibleSpaceItemIdentifier, PGGeneralPaneIdentifier, PGImagePaneIdentifier, PGKeyboardPaneIdentifier, PGUpdatePaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+}
+- (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
+{
+	return [self toolbarDefaultItemIdentifiers:toolbar];
+}
+- (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
+{
+	return [self toolbarDefaultItemIdentifiers:toolbar];
 }
 
 @end

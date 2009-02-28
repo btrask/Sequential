@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)PG_windowWillClose:(NSNotification *)aNotif
 {
-	if([self isActive]) [self deactivate];
+	[self deactivate];
 }
 
 #pragma mark NSColorWell
@@ -49,7 +49,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)viewWillMoveToWindow:(NSWindow *)aWindow
 {
 	[[self window] AE_removeObserver:self name:NSWindowWillCloseNotification];
+	[super viewWillMoveToWindow:aWindow];
 	[aWindow AE_addObserver:self selector:@selector(PG_windowWillClose:) name:NSWindowWillCloseNotification];
+}
+- (void)viewWillMoveToSuperview:(NSView *)newSuperview
+{
+	[super viewWillMoveToSuperview:newSuperview];
+	[self deactivate];
 }
 
 #pragma mark NSObject

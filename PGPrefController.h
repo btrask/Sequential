@@ -30,15 +30,23 @@ extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
 @interface PGPrefController : NSWindowController
 {
 	@private
+	IBOutlet NSView *generalView;
 	IBOutlet NSPopUpButton *screensPopUp;
-	IBOutlet NSTextField   *secondaryMouseActionLabel;
-		 NSScreen     *_displayScreen;
+	NSScreen *_displayScreen;
+
+	IBOutlet NSView *imageView;
+
+	IBOutlet NSView *keyboardView;
+	IBOutlet NSTextField *secondaryMouseActionLabel;
+
+	IBOutlet NSView *updateView;
 }
 
 + (id)sharedPrefController;
 
 - (IBAction)changeDisplayScreen:(id)sender;
 - (IBAction)showPrefsHelp:(id)sender;
+- (IBAction)changePane:(NSToolbarItem *)sender; // Gets the pane name from [sender itemIdentifier].
 
 - (NSColor *)backgroundPatternColor;
 - (NSScreen *)displayScreen;

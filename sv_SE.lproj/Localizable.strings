@@ -11,8 +11,8 @@
 "No image" = "Ingen bild";
 
 /* Update menu item title. One of two states. */
-"Update Available..." = "Update Available…";
 "Check For Update..." = "Check For Update…";
+"Install Update..." = "Install Update…";
 
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
 "Reveal in Finder" = "Visa i Finder";
