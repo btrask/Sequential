@@ -541,7 +541,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)zoomBy:(float)aFloat
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([doc imageScaleFactor] * aFloat, PGScaleMax))];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * aFloat, PGScaleMax))];
 }
 - (void)zoomKeyDown:(NSEvent *)firstEvent
 {
