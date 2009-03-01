@@ -60,6 +60,7 @@
 		0E1BE06F0F59DFDD007421EE /* Pref-Keyboard.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE06E0F59DFDD007421EE /* Pref-Keyboard.icns */; };
 		0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE07B0F59E113007421EE /* Pref-General.icns */; };
 		0E1BE0CA0F59E61B007421EE /* Pref-Images.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE0C90F59E61B007421EE /* Pref-Images.icns */; };
+		0E1BE0E30F5AA246007421EE /* PGThumbnailBezelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1BE0E20F5AA246007421EE /* PGThumbnailBezelController.m */; };
 		0E1D37510A7E319100C542A6 /* PGFullscreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D37500A7E319100C542A6 /* PGFullscreenController.m */; };
 		0E1D379B0A7E532300C542A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E1D379A0A7E532300C542A6 /* Carbon.framework */; };
 		0E1D39F40A7F24E700C542A6 /* PGFullscreenWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D39F30A7F24E700C542A6 /* PGFullscreenWindow.m */; };
@@ -360,6 +361,8 @@
 		0E1BE06E0F59DFDD007421EE /* Pref-Keyboard.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Keyboard.icns"; sourceTree = "<group>"; };
 		0E1BE07B0F59E113007421EE /* Pref-General.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-General.icns"; sourceTree = "<group>"; };
 		0E1BE0C90F59E61B007421EE /* Pref-Images.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Images.icns"; sourceTree = "<group>"; };
+		0E1BE0E10F5AA246007421EE /* PGThumbnailBezelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGThumbnailBezelController.h; sourceTree = "<group>"; };
+		0E1BE0E20F5AA246007421EE /* PGThumbnailBezelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGThumbnailBezelController.m; sourceTree = "<group>"; };
 		0E1D374F0A7E319100C542A6 /* PGFullscreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFullscreenController.h; sourceTree = "<group>"; };
 		0E1D37500A7E319100C542A6 /* PGFullscreenController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFullscreenController.m; sourceTree = "<group>"; };
 		0E1D379A0A7E532300C542A6 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
@@ -731,6 +734,8 @@
 				0E94F5240DAA6B0F00A23F73 /* PGWindowController.m */,
 				0E1D374F0A7E319100C542A6 /* PGFullscreenController.h */,
 				0E1D37500A7E319100C542A6 /* PGFullscreenController.m */,
+				0E1BE0E10F5AA246007421EE /* PGThumbnailBezelController.h */,
+				0E1BE0E20F5AA246007421EE /* PGThumbnailBezelController.m */,
 				0ED4AAF60DD18538007C5A77 /* PGFloatingPanelController.h */,
 				0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */,
 				0ED4AB150DD18730007C5A77 /* PGExifPanelController.h */,
@@ -1403,6 +1408,7 @@
 				0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */,
 				0E8877EB0F3AB9C000B79DDC /* NSImageAdditions.m in Sources */,
 				0E5872200F44ACC300D12D91 /* NSAffineTransformAdditions.m in Sources */,
+				0E1BE0E30F5AA246007421EE /* PGThumbnailBezelController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

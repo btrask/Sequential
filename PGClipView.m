@@ -37,6 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSWindowAdditions.h"
 
+NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidChange";
+
 #define PGMouseHiddenDraggingStyle true
 #define PGAnimateScrolling true
 #define PGCopiesOnScroll true // Only used prior to Leopard.
@@ -116,7 +118,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_boundsInset = inset;
 	[self scrollTo:p animation:PGAllowAnimation];
 	[[self window] invalidateCursorRectsForView:self];
-	[[self delegate] clipViewBoundsDidChange:self];
+	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 - (NSRect)insetBounds
 {
@@ -473,7 +475,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
 	[self scrollPinLocationToOffset:offset];
-	[[self delegate] clipViewBoundsDidChange:self];
+	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 	NSParameterAssert(_documentViewIsResizing);
 	_documentViewIsResizing--;
 }
@@ -492,7 +494,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self setBoundsOrigin:NSMakePoint(roundf(_immediatePosition.x), roundf(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	[self endScrolling];
-	[[self delegate] clipViewBoundsDidChange:self];
+	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
@@ -647,7 +649,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
 	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES];
-	[[self delegate] clipViewBoundsDidChange:self];
+	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 
 #pragma mark NSResponder
@@ -844,7 +846,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return PGNoEdges;
 }
-- (void)clipViewBoundsDidChange:(PGClipView *)sender {}
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}
 - (void)clipViewGestureDidEnd:(PGClipView *)sender {}

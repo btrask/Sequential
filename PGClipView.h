@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometryTypes.h"
 
+extern NSString *const PGClipViewBoundsDidChangeNotification;
+
 enum {
 	PGScrollByLine = 0,
 	PGScrollByPage = 1
@@ -118,7 +120,6 @@ typedef unsigned PGAnimationType;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.
-- (void)clipViewBoundsDidChange:(PGClipView *)sender;
 - (void)clipView:(PGClipView *)sender magnifyBy:(float)amount;
 - (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount;
 - (void)clipViewGestureDidEnd:(PGClipView *)sender;
