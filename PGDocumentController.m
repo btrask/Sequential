@@ -71,6 +71,8 @@ static NSString *const PGRecentItemsKey = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
 static NSString *const PGRecentItemsDeprecatedKey = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey = @"PGFullscreen";
+
+static NSString *const PGCheckForUpdatesKey = @"PGCheckForUpdates";
 static NSString *const PGUpdateAvailableKey = @"PGUpdateAvailable";
 static NSString *const PGNextUpdateCheckDateKey = @"PGNextUpdateCheckDate";
 
@@ -125,6 +127,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
 		[NSNumber numberWithInt:PGFullscreenMapping], PGEscapeKeyMappingKey,
+		yes, PGCheckForUpdatesKey,
 		no, PGUpdateAvailableKey,
 		nil]];
 }
@@ -539,6 +542,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date
 {
+	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGCheckForUpdatesKey]) return;
 	NSDate *const d = date ? date : [NSDate dateWithTimeIntervalSinceNow:604800.0f];
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
 	[_updateTimer invalidate];
@@ -548,6 +552,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)_checkForUpdates:(NSTimer *)timer
 {
+	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGCheckForUpdatesKey]) return;
 	[[SUUpdater sharedUpdater] checkForUpdateInformation];
 	[self _scheduleNextUpdateCheckWithDate:nil];
 }

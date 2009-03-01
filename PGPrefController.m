@@ -251,7 +251,7 @@ static PGPrefController *PGSharedPrefController = nil;
 }
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-	return [NSArray arrayWithObjects:NSToolbarFlexibleSpaceItemIdentifier, PGGeneralPaneIdentifier, PGImagePaneIdentifier, PGKeyboardPaneIdentifier, PGUpdatePaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
+	return [NSArray arrayWithObjects:PGGeneralPaneIdentifier, PGImagePaneIdentifier, PGKeyboardPaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, PGUpdatePaneIdentifier, nil];
 }
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
