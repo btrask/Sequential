@@ -59,6 +59,7 @@ extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 
 - (PGInset)contentInset;
 - (NSSet *)selectedNodes;
+- (void)display;
 - (void)fadeOut;
 
 - (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif;

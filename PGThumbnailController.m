@@ -52,7 +52,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 @interface PGThumbnailController(Private)
 
-- (void)_updateWindowFrameWithParentWindow:(NSWindow *)aWindow;
+- (void)_updateWindowFrame;
 
 @end
 
@@ -89,10 +89,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[[_displayController clipView] AE_addObserver:self selector:@selector(clipViewBoundsDidChange:) name:PGClipViewBoundsDidChangeNotification];
 	[[_displayController window] AE_addObserver:self selector:@selector(parentWindowDidResize:) name:NSWindowDidResizeNotification];
 	[self setDocument:[_displayController activeDocument]];
-	[self _updateWindowFrameWithParentWindow:[aController window]];
-	[self displayControllerActiveNodeDidChange:nil];
-	[[aController window] addChildWindow:_window ordered:NSWindowAbove];
-	if(!PGIsTigerOrLater()) [_window orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
+	[self display];
 }
 - (PGDocument *)document
 {
@@ -106,8 +103,9 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	_document = aDoc;
 	[_document AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_document AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
-	[_browser setSelection:nil reload:YES];
-	[self _updateWindowFrameWithParentWindow:nil];
+	[self _updateWindowFrame];
+	[self displayControllerActiveNodeDidChange:nil];
+	[self _updateWindowFrame];
 }
 
 #pragma mark -
@@ -119,6 +117,13 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (NSSet *)selectedNodes
 {
 	return [_browser selection];
+}
+- (void)display
+{
+	if(_selfRetained) [self autorelease];
+	_selfRetained = NO;
+	[[[self displayController] window] addChildWindow:_window ordered:NSWindowAbove];
+	if(!PGIsTigerOrLater()) [_window orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
 - (void)fadeOut
 {
@@ -132,10 +137,11 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
 {
 	PGNode *const node = [[self displayController] activeNode];
-	[_browser setSelection:(node ? [NSSet setWithObject:node] : nil) reload:NO];
+	[_browser setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
 }
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
+	[self clipViewBoundsDidChange:nil];
 }
 - (void)clipViewBoundsDidChange:(NSNotification *)aNotif
 {
@@ -143,7 +149,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)parentWindowDidResize:(NSNotification *)aNotif
 {
-	[self _updateWindowFrameWithParentWindow:nil];
+	[self _updateWindowFrame];
 }
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
@@ -156,9 +162,9 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 #pragma mark -PGThumbnailController(Private)
 
-- (void)_updateWindowFrameWithParentWindow:(NSWindow *)aWindow
+- (void)_updateWindowFrame
 {
-	NSWindow *const p = aWindow ? aWindow : [_window parentWindow];
+	NSWindow *const p = [_displayController window];
 	if(!p) return;
 	NSRect const r = [p AE_contentRect];
 	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window AE_userSpaceScaleFactor], NSHeight(r));
@@ -219,7 +225,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount
 {
-	if(MIN(oldCount, PGMaxVisibleColumns) != MIN([sender numberOfColumns], PGMaxVisibleColumns)) [self _updateWindowFrameWithParentWindow:nil];
+	if(MIN(oldCount, PGMaxVisibleColumns) != MIN([sender numberOfColumns], PGMaxVisibleColumns)) [self _updateWindowFrame];
 }
 
 #pragma mark -NSObject(PGThumbnailViewDataSource)

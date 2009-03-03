@@ -687,15 +687,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([PGThumbnailController shouldShowThumbnailsForDocument:[self activeDocument]]) {
 		if(_thumbnailController) return;
 		_thumbnailController = [[PGThumbnailController alloc] init];
+		NSDisableScreenUpdates();
 		[_thumbnailController setDisplayController:self];
+		[self thumbnailControllerContentInsetDidChange:nil];
+		NSEnableScreenUpdates();
 		[_thumbnailController AE_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
 	} else {
 		[_thumbnailController AE_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
 		[_thumbnailController fadeOut];
 		[_thumbnailController release];
 		_thumbnailController = nil;
+		[self thumbnailControllerContentInsetDidChange:nil];
 	}
-	[self thumbnailControllerContentInsetDidChange:nil];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
@@ -1217,7 +1220,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[super showWindow:sender];
 	[self documentReadingDirectionDidChange:nil];
-	[self _noteViewableNodeCountDidChange];
+	if([self shouldShowInfo]) [_infoPanel displayOverWindow:[self window]];
+	[_thumbnailController display];
 }
 
 #pragma mark -
