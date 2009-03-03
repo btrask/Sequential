@@ -199,6 +199,10 @@ NSRect PGInsetRect(NSRect r, PGInset i)
 {
 	return (NSRect){PGInsetPoint(r.origin, i), PGInsetSize(r.size, i)};
 }
+PGInset PGAddInsets(PGInset a, PGInset b)
+{
+	return PGMakeInset(a.minX + b.minX, a.minY + b.minY, a.maxX + b.maxX, a.maxY + b.maxY);
+}
 
 #pragma mark Animation
 

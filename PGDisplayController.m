@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAlertView.h"
 #import "PGInfoView.h"
 #import "PGFindView.h"
-#import "PGThumbnailBrowser.h"
 
 // Controllers
 #import "PGDocumentController.h"
 #import "PGPrefController.h"
 #import "PGBookmarkController.h"
+#import "PGThumbnailController.h"
 #import "PGImageSaveAlert.h"
 #import "PGEncodingAlert.h"
 
@@ -61,7 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSStringAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
-NSString *const PGDisplayControllerTimerDidChangeNotification      = @"PGDisplayControllerTimerDidChange";
+NSString *const PGDisplayControllerActiveNodeWasReadNotification = @"PGDisplayControllerActiveNodeWasRead";
+NSString *const PGDisplayControllerTimerDidChangeNotification = @"PGDisplayControllerTimerDidChange";
 
 #define PGScaleMax      16.0f
 #define PGScaleMin      (1.0f / 8.0f)
@@ -132,9 +133,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)saveImagesTo:(id)sender
 {
-	NSSet *set = nil;
-	if([self shouldShowThumbnails]) set = [[_thumbnailPanel content] selection];
-	else if([self activeNode]) set = [NSSet setWithObject:[self activeNode]];
+	NSSet *set = [_thumbnailController selectedNodes];
+	if(![set count] && [self activeNode]) set = [NSSet setWithObject:[self activeNode]];
 	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
 }
 - (IBAction)setAsDesktopPicture:(id)sender
@@ -325,7 +325,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
 		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
 
 		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
@@ -347,7 +346,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeDocument AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
 
 	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
@@ -380,8 +378,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 		[self documentReadingDirectionDidChange:nil];
 		[self documentShowsInfoDidChange:nil];
-		if(![self shouldShowThumbnails]) [_thumbnailPanel close];
 		[self documentShowsThumbnailsDidChange:nil];
+		[_thumbnailController setDocument:_activeDocument];
 		NSEnableScreenUpdates();
 	}
 	return NO;
@@ -456,6 +454,25 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (PGClipView *)clipView
+{
+	return [[clipView retain] autorelease];
+}
+- (PGPageLocation)initialLocation
+{
+	return _initialLocation;
+}
+- (BOOL)isReading
+{
+	return _reading;
+}
+- (BOOL)isDisplayingImage
+{
+	return [clipView documentView] == _imageView;
+}
+
+#pragma mark -
+
 - (BOOL)canShowInfo
 {
 	return YES;
@@ -463,14 +480,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)shouldShowInfo
 {
 	return [[self activeDocument] showsInfo] && [self canShowInfo];
-}
-- (BOOL)canShowThumbnails
-{
-	return [[[self activeDocument] node] hasViewableNodeCountGreaterThan:1];
-}
-- (BOOL)shouldShowThumbnails
-{
-	return [[self activeDocument] showsThumbnails] && [self canShowThumbnails];
 }
 
 #pragma mark -
@@ -621,7 +630,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	[self _readFinished];
-	[self clipViewBoundsDidChange:nil];
+	[_thumbnailController clipViewBoundsDidChange:nil];
 }
 
 #pragma mark -
@@ -659,14 +668,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self _updateNodeIndex];
 	}
 }
-- (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
-{
-	if([self shouldShowThumbnails]) [[_thumbnailPanel content] redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
-}
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
 	[_imageView setImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES] size:[self _sizeForImageRep:[_imageView rep] orientation:[[self activeNode] orientationWithBase:YES]]];
-	[[_thumbnailPanel content] setThumbnailOrientation:[[self activeDocument] baseOrientation]];
 }
 
 #pragma mark -
@@ -680,7 +684,21 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentShowsThumbnailsDidChange:(NSNotification *)aNotif
 {
-	if([self shouldShowThumbnails]) {
+	if([PGThumbnailController shouldShowThumbnailsForDocument:[self activeDocument]]) {
+		if(_thumbnailController) return;
+		NSDisableScreenUpdates();
+		_thumbnailController = [[PGThumbnailController alloc] init];
+		[_thumbnailController setDisplayController:self];
+		[_thumbnailController AE_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
+		[self thumbnailControllerContentInsetDidChange:nil];
+		NSEnableScreenUpdates();
+	} else {
+		[_thumbnailController AE_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
+		[_thumbnailController fadeOut];
+		[_thumbnailController release];
+		_thumbnailController = nil;
+	}
+/*	if([self shouldShowThumbnails]) {
 		NSDisableScreenUpdates();
 		[_thumbnailPanel displayOverWindow:[self window]];
 		PGNode *const node = [self activeNode];
@@ -691,7 +709,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	} else {
 		[self thumbnailPanelFrameDidChange:nil];
 		[_thumbnailPanel fadeOut];
-	}
+	}*/
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
@@ -703,7 +721,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
 		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
 	}
-	if([self shouldShowThumbnails]) inset.minX += NSWidth([_thumbnailPanel frame]);
+	if(_thumbnailController) inset = PGAddInsets(inset, [_thumbnailController contentInset]);
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOrigin:corner];
 	[_infoPanel updateFrameDisplay:YES];
@@ -723,15 +741,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif
+- (void)thumbnailControllerContentInsetDidChange:(NSNotification *)aNotif
 {
 	NSDisableScreenUpdates();
 	PGInset inset = PGZeroInset;
 	NSSize minSize = NSMakeSize(PGWindowMinSize, PGWindowMinSize);
-	if([self shouldShowThumbnails]) {
-		float const panelWidth = NSWidth([_thumbnailPanel frame]);
-		minSize.width += panelWidth;
-		inset.minX += panelWidth;
+	if(_thumbnailController) {
+		PGInset const thumbnailInset = [_thumbnailController contentInset];
+		inset = PGAddInsets(inset, thumbnailInset);
+		minSize.width += thumbnailInset.minX + thumbnailInset.maxX;
 	}
 	[clipView setBoundsInset:inset];
 	[clipView displayIfNeeded];
@@ -777,7 +795,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
-	if([self shouldShowThumbnails]) [[_thumbnailPanel content] setSelection:(aNode ? [NSSet setWithObject:aNode] : nil) reload:NO];
+	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
 	return YES;
 }
 - (void)_readActiveNode
@@ -798,7 +816,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
 	[self setTimerRunning:[self isTimerRunning]];
-	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
+	[self AE_postNotificationName:PGDisplayControllerActiveNodeWasReadNotification];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
           orientation:(PGOrientation)orientation
@@ -923,7 +941,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(![self canShowInfo]) {
 		if(@selector(toggleInfo:) == action) return NO;
 	}
-	if(![self canShowThumbnails]) {
+	if(![PGThumbnailController canShowThumbnailsForDocument:[self activeDocument]]) {
 		if(@selector(toggleThumbnails:) == action) return NO;
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
@@ -1127,10 +1145,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
 }
-- (void)clipViewBoundsDidChange:(PGClipView *)sender
-{
-	[[_thumbnailPanel content] redisplayItem:[self activeNode] children:NO];
-}
 - (void)clipView:(PGClipView *)sender
         magnifyBy:(float)amount
 {
@@ -1302,12 +1316,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
 		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
-		_thumbnailPanel = [[PGThumbnailBrowser PG_bezelPanel] retain];
-		[_thumbnailPanel setAcceptsEvents:YES];
-		[_thumbnailPanel setDelegate:self];
-		[[_thumbnailPanel content] setDataSource:self];
-		[[_thumbnailPanel content] setDelegate:self];
-		[_thumbnailPanel AE_addObserver:self selector:@selector(thumbnailPanelFrameDidChange:) name:PGBezelPanelFrameDidChangeNotification];
 
 		_allowZoomAnimation = YES;
 
@@ -1328,7 +1336,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_infoPanel release];
 	[_findPanel release];
 	[_findFieldEditor release];
-	[_thumbnailPanel release];
+	[_thumbnailController release];
 	[_nextTimerFireDate release];
 	[_timer invalidate];
 	[_timer release];

@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	unsigned _frameCount;
-	float    _alphaValue;
-	BOOL     _ignoresMouseEvents;
+	float _alphaValue;
+	BOOL _ignoresMouseEvents;
 }
 
 - (BOOL)isFadingOut;

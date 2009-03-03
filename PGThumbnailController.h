@@ -23,43 +23,50 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
-#import "PGColumnView.h"
+
+// Models
+@class PGDocument;
 
 // Views
-#import "PGThumbnailView.h"
+@class PGFadeOutPanel;
+@class PGThumbnailBrowser;
 
-@interface PGThumbnailBrowser : PGColumnView
+// Controllers
+@class PGDisplayController;
+
+// Other
+#import "PGGeometryTypes.h"
+
+extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
+
+@interface PGThumbnailController : NSObject
 {
 	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
-	PGOrientation _thumbnailOrientation;
-	unsigned _updateCount;
+	PGFadeOutPanel *_window;
+	PGThumbnailBrowser *_browser;
+	PGDisplayController *_displayController;
+	PGDocument *_document;
+	BOOL _selfRetained;
 }
 
-- (id)dataSource;
-- (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
-- (id)delegate;
-- (void)setDelegate:(id)obj;
-- (PGOrientation)thumbnailOrientation;
-- (void)setThumbnailOrientation:(PGOrientation)orientation;
++ (BOOL)canShowThumbnailsForDocument:(PGDocument *)aDoc;
++ (BOOL)shouldShowThumbnailsForDocument:(PGDocument *)aDoc;
 
-- (NSSet *)selection;
-- (void)setSelection:(NSSet *)aSet reload:(BOOL)flag;
-- (void)redisplayItem:(id)item children:(BOOL)flag;
+- (PGDisplayController *)displayController;
+- (void)setDisplayController:(PGDisplayController *)aController;
+- (PGDocument *)document;
+- (void)setDocument:(PGDocument *)aDoc;
 
-@end
+- (PGFadeOutPanel *)window;
+- (PGInset)contentInset;
+- (NSSet *)selectedNodes;
+- (void)fadeOut;
 
-@interface NSObject (PGThumbnailBrowserDataSource)
-
-- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item;
-- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
-
-@end
-
-@interface NSObject (PGThumbnailBrowserDelegate)
-
-- (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
-- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount;
+- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif;
+- (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif;
+- (void)clipViewBoundsDidChange:(NSNotification *)aNotif;
+- (void)parentWindowDidResize:(NSNotification *)aNotif;
+- (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif;
+- (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
 
 @end

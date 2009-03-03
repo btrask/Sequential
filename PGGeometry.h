@@ -72,6 +72,7 @@ extern PGInset PGInvertInset(PGInset inset);
 extern NSPoint PGInsetPoint(NSPoint p, PGInset i);
 extern NSSize PGInsetSize(NSSize s, PGInset i);
 extern NSRect PGInsetRect(NSRect r, PGInset i);
+extern PGInset PGAddInsets(PGInset a, PGInset b);
 
 #pragma mark Animation
 

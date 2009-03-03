@@ -68,7 +68,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (void)displayOverWindow:(NSWindow *)aWindow
 {
 	[self cancelFadeOut];
-	if(aWindow != _parentWindow) [_parentWindow removeChildWindow:self];
+	if(aWindow != [self parentWindow]) [[self parentWindow] removeChildWindow:self];
 	[self setIgnoresMouseEvents:!_acceptsEvents];
 	[self _updateFrameWithWindow:aWindow display:NO];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
@@ -112,7 +112,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 - (void)updateFrameDisplay:(BOOL)flag
 {
-	[self _updateFrameWithWindow:_parentWindow display:flag];
+	[self _updateFrameWithWindow:[self parentWindow] display:flag];
 }
 
 #pragma mark -
@@ -171,12 +171,12 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (BOOL)canBecomeKeyWindow
 {
 	if([self isFadingOut]) return NO;
-	return _canBecomeKey || (_acceptsEvents && ![_parentWindow isKeyWindow] && [_parentWindow canBecomeKeyWindow]);
+	return _canBecomeKey || (_acceptsEvents && ![[self parentWindow] isKeyWindow] && [[self parentWindow] canBecomeKeyWindow]);
 }
 - (void)becomeKeyWindow
 {
 	[super becomeKeyWindow];
-	if(!_canBecomeKey) [_parentWindow makeKeyAndOrderFront:self];
+	if(!_canBecomeKey) [[self parentWindow] makeKeyAndOrderFront:self];
 }
 - (void)setContentView:(NSView *)aView
 {
@@ -186,15 +186,9 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 }
 - (void)setParentWindow:(NSWindow *)aWindow
 {
-	[_parentWindow AE_removeObserver:self name:NSWindowDidResizeNotification];
+	[[self parentWindow] AE_removeObserver:self name:NSWindowDidResizeNotification];
 	[super setParentWindow:aWindow];
-	_parentWindow = aWindow;
-	[_parentWindow AE_addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification];
-}
-- (void)close
-{
-	[_parentWindow removeChildWindow:self];
-	[super close];
+	[[self parentWindow] AE_addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification];
 }
 
 #pragma mark -
@@ -203,13 +197,13 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (void)selectKeyViewFollowingView:(NSView *)aView
 {
 	if(![aView nextValidKeyView] || [aView nextValidKeyView] == [self initialFirstResponder]) {
-		if([self makeFirstResponder:nil]) [_parentWindow makeKeyWindow];
+		if([self makeFirstResponder:nil]) [[self parentWindow] makeKeyWindow];
 	} else [super selectKeyViewFollowingView:aView];
 }
 - (void)selectKeyViewPrecedingView:(NSView *)aView
 {
 	if(!aView || aView == [self initialFirstResponder]) {
-		if([self makeFirstResponder:nil]) [_parentWindow makeKeyWindow];
+		if([self makeFirstResponder:nil]) [[self parentWindow] makeKeyWindow];
 	} else [super selectKeyViewPrecedingView:aView];
 }
 

@@ -30,8 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-#define PGMaxVisibleColumns (unsigned)3
-
 @interface PGThumbnailBrowser (Private)
 
 - (void)_addColumnWithItem:(id)item;
@@ -123,7 +121,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([lastView representedObject] == [path lastObject]) [lastView setSelection:aSet];
 
 	--_updateCount;
-	if(MIN(initialNumberOfColumns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:initialNumberOfColumns];
 	if([self numberOfColumns] > initialNumberOfColumns) [self scrollToLastColumnAnimate:YES];
 }
 - (void)redisplayItem:(id)item
@@ -183,15 +181,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self delegate] thumbnailBrowserSelectionDidChange:self];
 }
 
-#pragma mark PGBezelPanelContentView Protocol
-
-- (NSRect)bezelPanel:(PGBezelPanel *)sender
-          frameForContentRect:(NSRect)aRect
-          scale:(float)scaleFactor
-{
-	return NSMakeRect(NSMinX(aRect), NSMinY(aRect), (MIN([self numberOfColumns], PGMaxVisibleColumns) * [self columnWidth]) * scaleFactor, NSHeight(aRect));
-}
-
 #pragma mark PGColumnView
 
 - (void)insertColumnWithView:(NSView *)aView
@@ -199,13 +188,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	unsigned const columns = [self numberOfColumns];
 	[super insertColumnWithView:aView atIndex:index];
-	if(!_updateCount && MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
 - (void)removeColumnsAfterView:(NSView *)aView
 {
 	unsigned const columns = [self numberOfColumns];
 	[super removeColumnsAfterView:aView];
-	if(!_updateCount && MIN(columns, PGMaxVisibleColumns) != MIN([self numberOfColumns], PGMaxVisibleColumns)) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
 
 @end
@@ -228,5 +217,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @implementation NSObject (PGThumbnailBrowserDelegate)
 
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender {}
+- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount {}
 
 @end

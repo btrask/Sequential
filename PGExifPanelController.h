@@ -38,6 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (IBAction)changeSearch:(id)sender;
 - (IBAction)copy:(id)sender;
 
-- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif;
+- (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif;
 
 @end

@@ -38,20 +38,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Controllers
 #import "PGDisplayControlling.h"
+@class PGThumbnailController;
 
 // Other
 #import "PGGeometryTypes.h"
 
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
+extern NSString *const PGDisplayControllerActiveNodeWasReadNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 @interface PGDisplayController : NSWindowController <PGDisplayControlling>
 {
-	@protected
-	IBOutlet PGClipView *clipView;
-	PGPageLocation _initialLocation;
-
 	@private
+	IBOutlet PGClipView *clipView;
 	IBOutlet PGFindView *findView;
 	IBOutlet NSSearchField *searchField;
 	IBOutlet NSView *errorView;
@@ -67,13 +66,15 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	PGDocument *_activeDocument;
 	PGNode *_activeNode;
 	PGImageView *_imageView;
+	PGPageLocation _initialLocation;
 	BOOL _reading;
 	unsigned _displayImageIndex;
 
 	PGBezelPanel *_graphicPanel;
 	PGLoadingGraphic *_loadingGraphic;
 	PGBezelPanel *_infoPanel;
-	PGBezelPanel *_thumbnailPanel;
+
+	PGThumbnailController *_thumbnailController;
 
 	PGBezelPanel *_findPanel;
 	PGFindlessTextView *_findFieldEditor;
@@ -134,10 +135,13 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
+- (PGClipView *)clipView;
+- (PGPageLocation)initialLocation;
+- (BOOL)isReading;
+- (BOOL)isDisplayingImage;
+
 - (BOOL)canShowInfo;
 - (BOOL)shouldShowInfo;
-- (BOOL)canShowThumbnails;
-- (BOOL)shouldShowThumbnails;
 
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
@@ -161,7 +165,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
-- (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
 
 - (void)documentShowsInfoDidChange:(NSNotification *)aNotif;
@@ -171,7 +174,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif;
 - (void)documentTimerIntervalDidChange:(NSNotification *)aNotif;
 
-- (void)thumbnailPanelFrameDidChange:(NSNotification *)aNotif;
+- (void)thumbnailControllerContentInsetDidChange:(NSNotification *)aNotif;
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 
 @end

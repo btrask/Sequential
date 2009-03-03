@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFadeOutPanel
 
-#pragma mark Instance Methods
+#pragma mark -PGFadeOutPanel
 
 - (BOOL)isFadingOut
 {
@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)fadeOut
 {
+	[[self retain] autorelease];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(fadeOut) object:nil];
 	if(![self isFadingOut]) {
 		_alphaValue = [self alphaValue];
@@ -57,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_frameCount = 0;
 }
 
-#pragma mark NSWindow
+#pragma mark -NSWindow
 
 - (IBAction)makeKeyAndOrderFront:(id)sender
 {
@@ -78,9 +79,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)close
 {
+	[[self parentWindow] removeChildWindow:self];
 	[super close];
 	[self cancelFadeOut];
 }
+- (NSWindow *)parentWindow
+{
+//	NSAutoreleasePool *const workaroundPool = [[NSAutoreleasePool alloc] init];
+	NSWindow *const w = [super parentWindow];
+//	[workaroundPool release];
+	return w;
+}
+
+#pragma mark -NSObject
+
 - (void)dealloc
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];

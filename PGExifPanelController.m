@@ -67,7 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
+- (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
 	[_allEntries release];
 	_allEntries = [[[[self displayController] activeNode] exifEntries] copy];
@@ -121,9 +121,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	PGDisplayController *const oldController = [self displayController];
 	if(![super setDisplayController:controller]) return NO;
-	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[self displayControllerActiveNodeDidChange:nil];
+	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
+	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
+	[self displayControllerActiveNodeWasRead:nil];
 	return YES;
 }
 - (NSString *)nibName
