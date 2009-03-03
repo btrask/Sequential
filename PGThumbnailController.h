@@ -57,7 +57,6 @@ extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 - (PGDocument *)document;
 - (void)setDocument:(PGDocument *)aDoc;
 
-- (PGFadeOutPanel *)window;
 - (PGInset)contentInset;
 - (NSSet *)selectedNodes;
 - (void)fadeOut;

@@ -78,8 +78,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)setDisplayController:(PGDisplayController *)aController
 {
 	if(aController == _displayController) return;
-	NSDisableScreenUpdates();
-	[[[self window] parentWindow] removeChildWindow:[self window]];
+	[[_window parentWindow] removeChildWindow:_window];
 	[_displayController AE_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
 	[_displayController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
 	[[_displayController clipView] AE_removeObserver:self name:PGClipViewBoundsDidChangeNotification];
@@ -90,12 +89,10 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[[_displayController clipView] AE_addObserver:self selector:@selector(clipViewBoundsDidChange:) name:PGClipViewBoundsDidChangeNotification];
 	[[_displayController window] AE_addObserver:self selector:@selector(parentWindowDidResize:) name:NSWindowDidResizeNotification];
 	[self setDocument:[_displayController activeDocument]];
-	[self displayControllerActiveNodeDidChange:nil];
 	[self _updateWindowFrameWithParentWindow:[aController window]];
-	[[aController window] addChildWindow:[self window] ordered:NSWindowAbove];
-	if(!PGIsTigerOrLater()) [[self window] orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
-	[[self window] display];
-	NSEnableScreenUpdates();
+	[self displayControllerActiveNodeDidChange:nil];
+	[[aController window] addChildWindow:_window ordered:NSWindowAbove];
+	if(!PGIsTigerOrLater()) [_window orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
 - (PGDocument *)document
 {
@@ -109,32 +106,15 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	_document = aDoc;
 	[_document AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_document AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
-	[_browser redisplayItem:nil children:YES];
+	[_browser setSelection:nil reload:YES];
 	[self _updateWindowFrameWithParentWindow:nil];
 }
 
 #pragma mark -
 
-- (PGFadeOutPanel *)window
-{
-	if(!_window) {
-		_browser = [[PGThumbnailBrowser alloc] initWithFrame:NSZeroRect];
-		[_browser setDelegate:self];
-		[_browser setDataSource:self];
-		_window = [[PGFadeOutPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO];
-		[_window setContentView:_browser];
-		[_window setReleasedWhenClosed:NO];
-		[_window setOpaque:NO];
-		[_window useOptimizedDrawing:YES];
-		[_window setDelegate:self];
-		[_window setHasShadow:NO];
-		[_window setHidesOnDeactivate:NO];
-	}
-	return [[_window retain] autorelease];
-}
 - (PGInset)contentInset
 {
-	return PGMakeInset(NSWidth([[self window] frame]), 0.0f, 0.0f, 0.0f);
+	return PGMakeInset(NSWidth([_window frame]), 0.0f, 0.0f, 0.0f);
 }
 - (NSSet *)selectedNodes
 {
@@ -144,7 +124,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	if(!_selfRetained) [self retain];
 	_selfRetained = YES;
-	[[self window] fadeOut];
+	[_window fadeOut];
 }
 
 #pragma mark -
@@ -152,7 +132,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
 {
 	PGNode *const node = [[self displayController] activeNode];
-	[_browser setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
+	[_browser setSelection:(node ? [NSSet setWithObject:node] : nil) reload:NO];
 }
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
@@ -178,14 +158,31 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 - (void)_updateWindowFrameWithParentWindow:(NSWindow *)aWindow
 {
-	NSWindow *const p = aWindow ? aWindow : [[self window] parentWindow];
+	NSWindow *const p = aWindow ? aWindow : [_window parentWindow];
 	if(!p) return;
 	NSRect const r = [p AE_contentRect];
-	[[self window] setFrame:NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [[self window] AE_userSpaceScaleFactor], NSHeight(r)) display:YES];
+	[_window setFrame:NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window AE_userSpaceScaleFactor], NSHeight(r)) display:NO];
 }
 
 #pragma mark -NSObject
 
+- (id)init
+{
+	if((self = [super init])) {
+		_browser = [[PGThumbnailBrowser alloc] initWithFrame:NSZeroRect];
+		[_browser setDelegate:self];
+		[_browser setDataSource:self];
+		_window = [[PGFadeOutPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+		[_window setReleasedWhenClosed:NO];
+		[_window setOpaque:NO];
+		[_window useOptimizedDrawing:YES];
+		[_window setDelegate:self];
+		[_window setHasShadow:NO];
+		[_window setHidesOnDeactivate:NO];
+		[_window setContentView:_browser];
+	}
+	return self;
+}
 - (void)dealloc
 {
 	[self AE_removeObserver];

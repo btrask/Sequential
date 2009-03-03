@@ -686,12 +686,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if([PGThumbnailController shouldShowThumbnailsForDocument:[self activeDocument]]) {
 		if(_thumbnailController) return;
-		NSDisableScreenUpdates();
 		_thumbnailController = [[PGThumbnailController alloc] init];
 		[_thumbnailController setDisplayController:self];
 		[_thumbnailController AE_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
 		[self thumbnailControllerContentInsetDidChange:nil];
-		NSEnableScreenUpdates();
 	} else {
 		[_thumbnailController AE_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
 		[_thumbnailController fadeOut];
