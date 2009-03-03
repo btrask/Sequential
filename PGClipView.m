@@ -312,7 +312,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const b = [self insetBounds];
 	PGRectEdgeMask const pin = [self pinLocation];
 	if([[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
-	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:PGAllowAnimation];
+	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:PGNoAnimation];
 }
 
 #pragma mark -
@@ -648,8 +648,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	[self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES];
-	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 
 #pragma mark NSResponder

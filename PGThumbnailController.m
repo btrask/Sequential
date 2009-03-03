@@ -161,7 +161,10 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	NSWindow *const p = aWindow ? aWindow : [_window parentWindow];
 	if(!p) return;
 	NSRect const r = [p AE_contentRect];
-	[_window setFrame:NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window AE_userSpaceScaleFactor], NSHeight(r)) display:NO];
+	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window AE_userSpaceScaleFactor], NSHeight(r));
+	if(NSEqualRects(newFrame, [_window frame])) return;
+	[_window setFrame:newFrame display:YES];
+	[self AE_postNotificationName:PGThumbnailControllerContentInsetDidChangeNotification];
 }
 
 #pragma mark -NSObject

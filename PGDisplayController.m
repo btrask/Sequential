@@ -689,25 +689,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_thumbnailController = [[PGThumbnailController alloc] init];
 		[_thumbnailController setDisplayController:self];
 		[_thumbnailController AE_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
-		[self thumbnailControllerContentInsetDidChange:nil];
 	} else {
 		[_thumbnailController AE_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
 		[_thumbnailController fadeOut];
 		[_thumbnailController release];
 		_thumbnailController = nil;
 	}
-/*	if([self shouldShowThumbnails]) {
-		NSDisableScreenUpdates();
-		[_thumbnailPanel displayOverWindow:[self window]];
-		PGNode *const node = [self activeNode];
-		[[_thumbnailPanel content] setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
-		[self thumbnailPanelFrameDidChange:nil];
-		[[_thumbnailPanel content] displayIfNeeded];
-		NSEnableScreenUpdates();
-	} else {
-		[self thumbnailPanelFrameDidChange:nil];
-		[_thumbnailPanel fadeOut];
-	}*/
+	[self thumbnailControllerContentInsetDidChange:nil];
 }
 - (void)documentReadingDirectionDidChange:(NSNotification *)aNotif
 {
