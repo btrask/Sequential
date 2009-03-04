@@ -80,7 +80,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return NSMakeSize(MIN(MAX(min.width, size.width), max.width), MIN(MAX(min.height, size.height), max.height));
 }
 
-@interface PGDisplayController (Private)
+@interface PGDisplayController(Private)
 
 - (void)_setImageView:(PGImageView *)aView;
 - (BOOL)_setActiveNode:(PGNode *)aNode;
@@ -96,14 +96,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 @implementation PGDisplayController
 
-#pragma mark Class Methods
+#pragma mark +PGDisplayController
 
 + (NSArray *)pasteboardTypes
 {
 	return [NSArray arrayWithObjects:NSStringPboardType, NSTIFFPboardType, NSRTFDPboardType, NSFileContentsPboardType, nil];
 }
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
@@ -114,7 +114,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return [NSUserDefaultsController sharedUserDefaultsController];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGDisplayController
 
 - (IBAction)reveal:(id)sender
 {
@@ -770,7 +770,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[clipView setBackgroundColor:[[PGPrefController sharedPrefController] backgroundPatternColor]];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGDisplayController(Private)
 
 - (void)_setImageView:(PGImageView *)aView
 {
@@ -875,22 +875,126 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[_infoPanel content] setMessageText:text];
 }
 
-#pragma mark PGDisplayControlling Protocol
+#pragma mark -NSWindowController
 
-- (IBAction)toggleFullscreen:(id)sender
+- (IBAction)showWindow:(id)sender
 {
-	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
-}
-- (IBAction)toggleInfo:(id)sender
-{
-	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
-}
-- (IBAction)toggleThumbnails:(id)sender
-{
-	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
+	[super showWindow:sender];
+	[self documentReadingDirectionDidChange:nil];
+	if([self shouldShowInfo]) [_infoPanel displayOverWindow:[self window]];
+	[_thumbnailController display];
 }
 
-#pragma mark NSMenuValidation Protocol
+#pragma mark -
+
+- (void)windowDidLoad
+{
+	[super windowDidLoad];
+	[passwordView retain];
+	[encodingView retain];
+
+	[[self window] useOptimizedDrawing:YES];
+
+	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
+	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] autorelease] : [NSCursor pointingHandCursor])];
+	[clipView setPostsFrameChangedNotifications:YES];
+	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
+
+	_findPanel = [[PGBezelPanel alloc] initWithContentView:findView];
+	[_findPanel setInitialFirstResponder:searchField];
+	[_findPanel setDelegate:self];
+	[_findPanel setAcceptsEvents:YES];
+	[_findPanel setCanBecomeKey:YES];
+
+	[self prefControllerBackgroundPatternColorDidChange:nil];
+}
+- (void)synchronizeWindowTitleWithDocumentName
+{
+	PGDisplayableIdentifier *const identifier = [[[self activeDocument] node] identifier];
+	NSURL *const URL = [identifier URL];
+	if(PGIsLeopardOrLater() && ![identifier isFileIdentifier]) {
+		[[self window] setRepresentedURL:URL];
+		if(![identifier isFileIdentifier]) {
+			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
+			NSImage *const image = [[[identifier icon] copy] autorelease];
+			[image setFlipped:![docButton isFlipped]];
+			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
+			[image setSize:[docButton bounds].size];
+			[docButton setImage:image];
+		}
+	} else {
+		NSString *const path = [identifier isFileIdentifier] ? [URL path] : nil;
+		[[self window] setRepresentedFilename:(path ? path : @"")];
+	}
+	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
+	NSString *const title = [identifier displayName];
+	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
+	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
+	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
+	[[menuLabel mutableString] appendString:titleDetails];
+	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:menuLabel];
+}
+- (void)close
+{
+	[[self activeDocument] close];
+}
+
+#pragma mark -NSResponder
+
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
+	unsigned short const keyCode = [anEvent keyCode];
+	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
+	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
+		case PGKeyI: return [d performToggleInfo];
+	}
+	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
+}
+- (id)validRequestorForSendType:(NSString *)sendType
+      returnType:(NSString *)returnType
+{
+	return (!returnType || [@"" isEqual:returnType]) && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
+}
+
+#pragma mark -NSObject
+
+- (id)init
+{
+	if((self = [super initWithWindowNibName:@"PGWindow"])) {
+		(void)[self window]; // Just load the window so we don't have to worry about it.
+
+		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
+		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
+		[self _updateInfoPanelText];
+
+		_allowZoomAnimation = YES;
+
+		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[self PG_cancelPreviousPerformRequests];
+	[self AE_removeObserver];
+	[self _setImageView:nil];
+	[passwordView release];
+	[encodingView release];
+	[_activeNode release];
+	[_graphicPanel release];
+	[_loadingGraphic release];
+	[_infoPanel release];
+	[_findPanel release];
+	[_findFieldEditor release];
+	[_thumbnailController release];
+	[_nextTimerFireDate release];
+	[_timer invalidate];
+	[_timer release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSMenuValidation)
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
@@ -981,57 +1085,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return [super validateMenuItem:anItem];
 }
 
-#pragma mark PGDocumentWindowDelegate Protocol
-
-- (void)selectNextOutOfWindowKeyView:(NSWindow *)window
-{
-	NSParameterAssert(window == [self window]);
-	if(![self findPanelShown]) return;
-	[_findPanel makeKeyWindow];
-	[_findPanel makeFirstResponder:[_findPanel initialFirstResponder]];
-}
-- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window
-{
-	NSParameterAssert(window == [self window]);
-	if(![self findPanelShown]) return;
-	[_findPanel makeKeyWindow];
-	NSView *const previousKeyView = [[_findPanel initialFirstResponder] previousValidKeyView];
-	[_findPanel makeFirstResponder:(previousKeyView ? previousKeyView : [_findPanel initialFirstResponder])];
-}
-
-#pragma mark NSWindowNotifications Protocol
-
-- (void)windowDidBecomeMain:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	[[PGDocumentController sharedDocumentController] setCurrentDocument:[self activeDocument]];
-}
-- (void)windowDidResignMain:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	[[PGDocumentController sharedDocumentController] setCurrentDocument:nil];
-}
-
-- (void)windowDidBecomeKey:(NSNotification *)aNotif
-{
-	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:searchField];
-}
-- (void)windowDidResignKey:(NSNotification *)aNotif
-{
-	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:nil];
-}
-
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	if([_findPanel parentWindow]) [_findPanel close];
-	[self close];
-}
-
-#pragma mark NSWindowDelegate Protocol
+#pragma mark -NSObject(NSWindowDelegate)
 
 - (BOOL)window:(NSWindow *)window
         shouldPopUpDocumentPathMenu:(NSMenu *)menu
@@ -1064,7 +1118,84 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return _findFieldEditor;
 }
 
-#pragma mark PGClipViewDelegate Protocol
+#pragma mark -NSObject(NSWindowNotifications)
+
+- (void)windowDidBecomeMain:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	[[PGDocumentController sharedDocumentController] setCurrentDocument:[self activeDocument]];
+}
+- (void)windowDidResignMain:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	[[PGDocumentController sharedDocumentController] setCurrentDocument:nil];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)aNotif
+{
+	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:searchField];
+}
+- (void)windowDidResignKey:(NSNotification *)aNotif
+{
+	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:nil];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	if([_findPanel parentWindow]) [_findPanel close];
+	[self close];
+}
+
+#pragma mark -NSObject(NSServicesRequests)
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+        types:(NSArray *)types
+{
+	BOOL wrote = NO;
+	[pboard declareTypes:[NSArray array] owner:nil];
+	do {
+		if(![types containsObject:NSStringPboardType] || ![self activeNode]) break;
+		wrote = YES;
+		if(!pboard) break;
+		[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+		[pboard setString:[[[self activeNode] identifier] displayName] forType:NSStringPboardType];
+	} while(NO);
+	do {
+		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != _imageView) break;
+		NSImageRep *const rep = [_imageView rep];
+		if(!rep || ![rep respondsToSelector:@selector(TIFFRepresentation)]) break;
+		wrote = YES;
+		if(!pboard) break;
+		[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
+		[pboard setData:[(NSBitmapImageRep *)rep TIFFRepresentation] forType:NSTIFFPboardType];
+	} while(NO);
+	do {
+		if(![[self activeNode] canGetData]) break;
+		if(![types containsObject:NSRTFDPboardType] && ![types containsObject:NSFileContentsPboardType]) break;
+		wrote = YES;
+		if(!pboard) break;
+		NSData *const data = [[self activeNode] data];
+		if(!data) break;
+		if([types containsObject:NSRTFDPboardType]) {
+			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
+			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];
+			[wrapper setPreferredFilename:[[[self activeNode] identifier] displayName]];
+			NSAttributedString *const string = [NSAttributedString attributedStringWithAttachment:[[[NSTextAttachment alloc] initWithFileWrapper:wrapper] autorelease]];
+			[pboard setData:[string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:nil] forType:NSRTFDPboardType];
+		}
+		if([types containsObject:NSFileContentsPboardType]) {
+			[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
+			[pboard setData:data forType:NSFileContentsPboardType];
+		}
+	} while(NO);
+	return wrote;
+}
+
+#pragma mark -NSObject(PGClipViewDelegate)
 
 - (BOOL)clipView:(PGClipView *)sender
         handleMouseEvent:(NSEvent *)anEvent
@@ -1167,176 +1298,45 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
-#pragma mark NSServicesRequests Protocol
+#pragma mark -NSObject(PGDisplayControlling)
 
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
-        types:(NSArray *)types
+- (IBAction)toggleFullscreen:(id)sender
 {
-	BOOL wrote = NO;
-	[pboard declareTypes:[NSArray array] owner:nil];
-	do {
-		if(![types containsObject:NSStringPboardType] || ![self activeNode]) break;
-		wrote = YES;
-		if(!pboard) break;
-		[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-		[pboard setString:[[[self activeNode] identifier] displayName] forType:NSStringPboardType];
-	} while(NO);
-	do {
-		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != _imageView) break;
-		NSImageRep *const rep = [_imageView rep];
-		if(!rep || ![rep respondsToSelector:@selector(TIFFRepresentation)]) break;
-		wrote = YES;
-		if(!pboard) break;
-		[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
-		[pboard setData:[(NSBitmapImageRep *)rep TIFFRepresentation] forType:NSTIFFPboardType];
-	} while(NO);
-	do {
-		if(![[self activeNode] canGetData]) break;
-		if(![types containsObject:NSRTFDPboardType] && ![types containsObject:NSFileContentsPboardType]) break;
-		wrote = YES;
-		if(!pboard) break;
-		NSData *const data = [[self activeNode] data];
-		if(!data) break;
-		if([types containsObject:NSRTFDPboardType]) {
-			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
-			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];
-			[wrapper setPreferredFilename:[[[self activeNode] identifier] displayName]];
-			NSAttributedString *const string = [NSAttributedString attributedStringWithAttachment:[[[NSTextAttachment alloc] initWithFileWrapper:wrapper] autorelease]];
-			[pboard setData:[string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:nil] forType:NSRTFDPboardType];
-		}
-		if([types containsObject:NSFileContentsPboardType]) {
-			[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
-			[pboard setData:data forType:NSFileContentsPboardType];
-		}
-	} while(NO);
-	return wrote;
+	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
+}
+- (IBAction)toggleInfo:(id)sender
+{
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
+}
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
 
-#pragma mark PGEncodingAlertDelegate Protocol
+#pragma mark -NSObject(PGDocumentWindowDelegate)
+
+- (void)selectNextOutOfWindowKeyView:(NSWindow *)window
+{
+	NSParameterAssert(window == [self window]);
+	if(![self findPanelShown]) return;
+	[_findPanel makeKeyWindow];
+	[_findPanel makeFirstResponder:[_findPanel initialFirstResponder]];
+}
+- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window
+{
+	NSParameterAssert(window == [self window]);
+	if(![self findPanelShown]) return;
+	[_findPanel makeKeyWindow];
+	NSView *const previousKeyView = [[_findPanel initialFirstResponder] previousValidKeyView];
+	[_findPanel makeFirstResponder:(previousKeyView ? previousKeyView : [_findPanel initialFirstResponder])];
+}
+
+#pragma mark -NSObject(PGEncodingAlertDelegate)
 
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender
         selectedEncoding:(NSStringEncoding)encoding
 {
 	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:encoding], PGStringEncodingKey, nil]];
-}
-
-#pragma mark NSWindowController
-
-- (IBAction)showWindow:(id)sender
-{
-	[super showWindow:sender];
-	[self documentReadingDirectionDidChange:nil];
-	if([self shouldShowInfo]) [_infoPanel displayOverWindow:[self window]];
-	[_thumbnailController display];
-}
-
-#pragma mark -
-
-- (void)windowDidLoad
-{
-	[super windowDidLoad];
-	[passwordView retain];
-	[encodingView retain];
-
-	[[self window] useOptimizedDrawing:YES];
-
-	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
-	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] autorelease] : [NSCursor pointingHandCursor])];
-	[clipView setPostsFrameChangedNotifications:YES];
-	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
-
-	_findPanel = [[PGBezelPanel alloc] initWithContentView:findView];
-	[_findPanel setInitialFirstResponder:searchField];
-	[_findPanel setDelegate:self];
-	[_findPanel setAcceptsEvents:YES];
-	[_findPanel setCanBecomeKey:YES];
-
-	[self prefControllerBackgroundPatternColorDidChange:nil];
-}
-- (void)synchronizeWindowTitleWithDocumentName
-{
-	PGDisplayableIdentifier *const identifier = [[[self activeDocument] node] identifier];
-	NSURL *const URL = [identifier URL];
-	if(PGIsLeopardOrLater() && ![identifier isFileIdentifier]) {
-		[[self window] setRepresentedURL:URL];
-		if(![identifier isFileIdentifier]) {
-			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
-			NSImage *const image = [[[identifier icon] copy] autorelease];
-			[image setFlipped:![docButton isFlipped]];
-			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
-			[image setSize:[docButton bounds].size];
-			[docButton setImage:image];
-		}
-	} else {
-		NSString *const path = [identifier isFileIdentifier] ? [URL path] : nil;
-		[[self window] setRepresentedFilename:(path ? path : @"")];
-	}
-	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
-	NSString *const title = [identifier displayName];
-	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
-	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
-	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
-	[[menuLabel mutableString] appendString:titleDetails];
-	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:menuLabel];
-}
-- (void)close
-{
-	[[self activeDocument] close];
-}
-
-#pragma mark NSResponder
-
-- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
-{
-	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
-	unsigned short const keyCode = [anEvent keyCode];
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
-		case PGKeyI: return [d performToggleInfo];
-	}
-	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
-}
-- (id)validRequestorForSendType:(NSString *)sendType
-      returnType:(NSString *)returnType
-{
-	return (!returnType || [@"" isEqual:returnType]) && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
-}
-
-#pragma mark NSObject
-
-- (id)init
-{
-	if((self = [super initWithWindowNibName:@"PGWindow"])) {
-		(void)[self window]; // Just load the window so we don't have to worry about it.
-
-		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
-		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
-		[self _updateInfoPanelText];
-
-		_allowZoomAnimation = YES;
-
-		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
-	}
-	return self;
-}
-- (void)dealloc
-{
-	[self PG_cancelPreviousPerformRequests];
-	[self AE_removeObserver];
-	[self _setImageView:nil];
-	[passwordView release];
-	[encodingView release];
-	[_activeNode release];
-	[_graphicPanel release];
-	[_loadingGraphic release];
-	[_infoPanel release];
-	[_findPanel release];
-	[_findFieldEditor release];
-	[_thumbnailController release];
-	[_nextTimerFireDate release];
-	[_timer invalidate];
-	[_timer release];
-	[super dealloc];
 }
 
 @end
