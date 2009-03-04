@@ -133,7 +133,7 @@ enum {
 {
 	if(sender != _load) return;
 	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
-	[[self identifier] setCustomDisplayName:[parser title] notify:YES];
+	[[self identifier] setCustomDisplayName:[parser title]];
 	NSError *const error = [parser error];
 	if(error) [[self node] setError:([parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error)];
 	else if([parser createsMultipleNodes]) {

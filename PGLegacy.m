@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 		result = [[PGDisplayableIdentifier resourceIdentifierWithAliasData:data length:length] retain];
 	}
-	[result setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-	[result setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
+	[result setIcon:[aCoder decodeObjectForKey:@"Icon"]];
+	[result setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"]];
 	return result;
 }
 
@@ -72,8 +72,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGDisplayableIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
 	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
 	PGDisplayableIdentifier *const fileIdent = [[docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]] displayableIdentifier];
-	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"] notify:NO];
-	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"] notify:NO];
+	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"]];
+	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"]];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
 }
 

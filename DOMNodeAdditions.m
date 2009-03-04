@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
 			PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
 			if([results containsObject:ident]) continue;
-			[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] notify:NO];
+			[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
 			[results addObject:ident];
 		} while(NO);
 		[pool release];
@@ -69,7 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
 			if([results containsObject:ident]) continue;
 			NSString *const title = [img title]; // Prefer the title to the alt attribute.
-			[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt]) notify:NO];
+			[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt])];
 			[results addObject:ident];
 		} while(NO);
 		[pool release];

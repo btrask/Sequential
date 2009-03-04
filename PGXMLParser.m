@@ -218,7 +218,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([self isMemberOfClass:[PGXMLParser class]]) return [[_subparsers lastObject] nodeWithParentAdapter:parent];
 	PGDisplayableIdentifier *const ident = [[self URL] PG_displayableIdentifier];
 	if(!ident) return nil;
-	[ident setCustomDisplayName:[self title] notify:NO];
+	[ident setCustomDisplayName:[self title]];
 	PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:ident dataSource:nil] autorelease];
 	[node startLoadWithInfo:[self info]];
 	return node;

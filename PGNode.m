@@ -91,8 +91,6 @@ enum {
 	_parentAdapter = parent;
 	_document = doc;
 	_identifier = [ident retain];
-	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	_dataSource = dataSource;
 	PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
 	_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
@@ -102,6 +100,8 @@ enum {
 	[_menuItem setAction:@selector(jumpToPage:)];
 	_allowMenuItemUpdates = YES;
 	[self _updateMenuItem];
+	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	return self;
 }
 
@@ -472,7 +472,7 @@ enum {
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	[[self identifier] updateNaturalDisplayNameNotify:YES];
+	[[self identifier] updateNaturalDisplayName];
 	[self _updateFileAttributes];
 	[_adapter noteFileEventDidOccurDirect:flag];
 }

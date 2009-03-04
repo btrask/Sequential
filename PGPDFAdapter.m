@@ -93,7 +93,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 	int i = 0;
 	for(; i < [_rep pageCount]; i++) {
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:i] displayableIdentifier];
-		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict] notify:NO];
+		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier dataSource:nil] autorelease];
 		if(!node) continue;
 		[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGPDFPageAdapter class], PGAdapterClassKey, nil]];

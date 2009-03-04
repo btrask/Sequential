@@ -50,12 +50,17 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	AliasHandle _alias;
 	BOOL _hasValidRef;
 	FSRef _ref;
+	NSString *_cachedURL;
 }
+
++ (void)noteCachedIdentifier:(PGAliasIdentifier *)ident;
++ (void)clearCache;
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
 - (BOOL)setAliasWithData:(const uint8_t *)data length:(unsigned)length;
 - (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)follow validate:(BOOL)validate;
+- (void)clearCache;
 
 @end
 
@@ -210,7 +215,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 @implementation PGDisplayableIdentifier
 
-#pragma mark PGResourceIdentifier
+#pragma mark +PGResourceIdentifier
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL
 {
@@ -222,19 +227,29 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [[[self alloc] _initWithIdentifier:[super resourceIdentifierWithAliasData:data length:length]] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGDisplayableIdentifier
+
+- (BOOL)postsNotifications
+{
+	return _postsNotifications;
+}
+- (void)setPostsNotifications:(BOOL)flag
+{
+	if(flag) _postsNotifications = YES;
+}
+
+#pragma mark -
 
 - (NSImage *)icon
 {
 	return _icon ? [[_icon retain] autorelease] : [[self URL] AE_icon];
 }
 - (void)setIcon:(NSImage *)icon
-        notify:(BOOL)flag
 {
 	if(icon == _icon) return;
 	[_icon release];
 	_icon = [icon retain];
-	if(flag) [self AE_postNotificationName:PGDisplayableIdentifierIconDidChangeNotification];
+	if(_postsNotifications) [self AE_postNotificationName:PGDisplayableIdentifierIconDidChangeNotification];
 }
 
 #pragma mark -
@@ -245,28 +260,26 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 }
 - (NSString *)naturalDisplayName
 {
-	if(!_naturalDisplayName) [self updateNaturalDisplayNameNotify:YES];
+	if(!_naturalDisplayName) [self updateNaturalDisplayName];
 	if(_naturalDisplayName) return [[_naturalDisplayName retain] autorelease];
 	return @"";
 }
 - (void)setNaturalDisplayName:(NSString *)aString
-        notify:(BOOL)flag
 {
 	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
-	if(flag && !_customDisplayName) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	if(_postsNotifications && !_customDisplayName) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 - (void)setCustomDisplayName:(NSString *)aString
-        notify:(BOOL)flag
 {
 	NSString *const string = [@"" isEqualToString:aString] ? nil : aString;
 	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
 	[_customDisplayName release];
 	_customDisplayName = [string copy];
-	if(flag) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	if(_postsNotifications) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
-- (void)updateNaturalDisplayNameNotify:(BOOL)flag
+- (void)updateNaturalDisplayName
 {
 	NSString *name = nil;
 	NSURL *const URL = [self URL];
@@ -277,7 +290,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
 		}
 	}
-	[self setNaturalDisplayName:name notify:flag];
+	[self setNaturalDisplayName:name];
 }
 
 #pragma mark -
@@ -306,7 +319,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return (finderFlags & 0x0E) >> 1;
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGDisplayableIdentifier(Private)
 
 - (id)_initWithIdentifier:(PGResourceIdentifier *)ident
 {
@@ -316,34 +329,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return self;
 }
 
-#pragma mark NSCoding Protocol
-
-- (id)initWithCoder:(NSCoder *)aCoder
-{
-	Class class = NSClassFromString([aCoder decodeObjectForKey:@"ClassName"]);
-	if([PGResourceIdentifier class] == class || [PGDisplayableIdentifier class] == class) class = Nil;
-	if((self = [self _initWithIdentifier:[[[class alloc] initWithCoder:aCoder] autorelease]])) {
-		[self setIcon:[aCoder decodeObjectForKey:@"Icon"] notify:NO];
-		[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"] notify:NO];
-	}
-	return self;
-}
-- (void)encodeWithCoder:(NSCoder *)aCoder
-{
-	[super encodeWithCoder:aCoder];
-	[_identifier encodeWithCoder:aCoder]; // For backward compatibility, we can't use encodeObject:forKey:, so encode it directly.
-	[aCoder encodeObject:_icon forKey:@"Icon"];
-	[aCoder encodeObject:_customDisplayName forKey:@"DisplayName"];
-}
-
-#pragma mark NSObject Protocol
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@ %p: %@ (\"%@\")>", [self class], self, _identifier, [self displayName]];
-}
-
-#pragma mark PGResourceIdentifier
+#pragma mark -PGResourceIdentifier
 
 - (PGResourceIdentifier *)identifier
 {
@@ -411,7 +397,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [_identifier subscriptionWithDescendents:flag];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
@@ -422,11 +408,64 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[super dealloc];
 }
 
+#pragma mark -NSObject(AEAdditions)
+
+- (void)AE_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
+{
+	_postsNotifications = YES;
+	[super AE_addObserver:observer selector:aSelector name:aName];
+}
+
+#pragma mark -NSObject(NSCoding)
+
+- (id)initWithCoder:(NSCoder *)aCoder
+{
+	Class class = NSClassFromString([aCoder decodeObjectForKey:@"ClassName"]);
+	if([PGResourceIdentifier class] == class || [PGDisplayableIdentifier class] == class) class = Nil;
+	if((self = [self _initWithIdentifier:[[[class alloc] initWithCoder:aCoder] autorelease]])) {
+		[self setIcon:[aCoder decodeObjectForKey:@"Icon"]];
+		[self setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"]];
+	}
+	return self;
+}
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+	[super encodeWithCoder:aCoder];
+	[_identifier encodeWithCoder:aCoder]; // For backward compatibility, we can't use encodeObject:forKey:, so encode it directly.
+	[aCoder encodeObject:_icon forKey:@"Icon"];
+	[aCoder encodeObject:_customDisplayName forKey:@"DisplayName"];
+}
+
+#pragma mark -NSObject(NSObject)
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p: %@ (\"%@\")>", [self class], self, _identifier, [self displayName]];
+}
+
 @end
 
 @implementation PGAliasIdentifier
+static NSMutableArray *PGCachedAliasIdentifiers;
 
-#pragma mark Instance Methods
+#pragma mark +PGAliasIdentifier
+
++ (void)noteCachedIdentifier:(PGAliasIdentifier *)ident
+{
+	if(!PGCachedAliasIdentifiers) {
+		PGCachedAliasIdentifiers = [[NSMutableArray alloc] init];
+		[self performSelector:@selector(clearCache) withObject:nil afterDelay:0.0f];
+	}
+	[PGCachedAliasIdentifiers addObject:ident];
+}
++ (void)clearCache
+{
+	[PGCachedAliasIdentifiers makeObjectsPerformSelector:@selector(_clearCache)];
+	[PGCachedAliasIdentifiers release];
+	PGCachedAliasIdentifiers = nil;
+}
+
+#pragma mark -PGAliasIdentifier
 
 - (id)initWithURL:(NSURL *)URL
 {
@@ -437,6 +476,8 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 			return [[PGURLIdentifier alloc] initWithURL:URL];
 		}
 		_hasValidRef = YES;
+		[PGAliasIdentifier noteCachedIdentifier:self];
+		_cachedURL = [URL retain];
 	}
 	return self;
 }
@@ -472,8 +513,50 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	*outRef = _ref;
 	return follow ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
+- (void)clearCache
+{
+	[_cachedURL release];
+	_cachedURL = nil;
+}
 
-#pragma mark NSCoding Protocol
+#pragma mark -PGResourceIdentifier
+
+- (NSURL *)URLByFollowingAliases:(BOOL)flag
+{
+	if(!flag && _cachedURL) return [[_cachedURL retain] autorelease];
+	FSRef ref;
+	if(![self getRef:&ref byFollowingAliases:flag]) return nil;
+	NSURL *const URL = [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
+	if(!flag) {
+		[PGAliasIdentifier noteCachedIdentifier:self];
+		_cachedURL = [URL retain];
+	}
+	return URL;
+}
+- (BOOL)getRef:(out FSRef *)outRef
+        byFollowingAliases:(BOOL)flag
+{
+	return [self getRef:outRef byFollowingAliases:flag validate:YES];
+}
+- (BOOL)hasTarget
+{
+	FSRef ref;
+	return [self getRef:&ref byFollowingAliases:NO validate:YES];
+}
+- (BOOL)isFileIdentifier
+{
+	return YES;
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	if(_alias) DisposeHandle((Handle)_alias);
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSCoding)
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
@@ -493,7 +576,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(_alias) [aCoder encodeBytes:(uint8_t const *)*_alias length:GetHandleSize((Handle)_alias) forKey:@"Alias"];
 }
 
-#pragma mark NSObject Protocol
+#pragma mark -NSObject(NSObject)
 
 - (BOOL)isEqual:(id)obj
 {
@@ -502,37 +585,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	FSRef ourRef, theirRef;
 	if(![self getRef:&ourRef byFollowingAliases:NO validate:NO] || ![obj getRef:&theirRef byFollowingAliases:NO validate:NO]) return NO;
 	return FSCompareFSRefs(&ourRef, &theirRef) == noErr;
-}
-
-#pragma mark PGResourceIdentifier
-
-- (NSURL *)URLByFollowingAliases:(BOOL)flag
-{
-	FSRef ref;
-	if(![self getRef:&ref byFollowingAliases:flag]) return nil;
-	return [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
-}
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)flag
-{
-	return [self getRef:outRef byFollowingAliases:flag validate:YES];
-}
-- (BOOL)hasTarget
-{
-	FSRef ref;
-	return [self getRef:&ref byFollowingAliases:NO validate:YES];
-}
-- (BOOL)isFileIdentifier
-{
-	return YES;
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	if(_alias) DisposeHandle((Handle)_alias);
-	[super dealloc];
 }
 
 @end

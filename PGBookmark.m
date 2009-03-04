@@ -59,8 +59,8 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 		_fileSubscription = [[_fileIdentifier subscriptionWithDescendents:NO] retain];
 		[_fileSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		if(aString) {
-			[_fileIdentifier setNaturalDisplayName:aString notify:YES];
-			[_fileIdentifier updateNaturalDisplayNameNotify:YES];
+			[_fileIdentifier setNaturalDisplayName:aString];
+			[_fileIdentifier updateNaturalDisplayName];
 		}
 	}
 	return self;
@@ -88,8 +88,8 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 - (void)eventDidOccur:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	if([aNotif object] == _documentSubscription) [_documentIdentifier updateNaturalDisplayNameNotify:NO];
-	else if([aNotif object] == _fileSubscription) [_fileIdentifier updateNaturalDisplayNameNotify:NO];
+	if([aNotif object] == _documentSubscription) [_documentIdentifier updateNaturalDisplayName];
+	else if([aNotif object] == _fileSubscription) [_fileIdentifier updateNaturalDisplayName];
 	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
 }
 - (void)identifierDidChange:(NSNotification *)aNotif

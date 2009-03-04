@@ -72,19 +72,23 @@ typedef UInt8 PGLabelColor;
 {
 	@private
 	PGResourceIdentifier *_identifier;
+	BOOL _postsNotifications;
 	NSImage *_icon;
 	NSString *_naturalDisplayName;
 	NSString *_customDisplayName;
 }
 
+- (BOOL)postsNotifications;
+- (void)setPostsNotifications:(BOOL)flag;
+
 - (NSImage *)icon;
-- (void)setIcon:(NSImage *)icon notify:(BOOL)flag;
+- (void)setIcon:(NSImage *)icon;
 
 - (NSString *)displayName;
 - (NSString *)naturalDisplayName;
-- (void)setNaturalDisplayName:(NSString *)aString notify:(BOOL)flag; // The name from the filesystem or raw address of the URL.
-- (void)setCustomDisplayName:(NSString *)aString notify:(BOOL)flag; // A custom name, like a webpage title.
-- (void)updateNaturalDisplayNameNotify:(BOOL)flag;
+- (void)setNaturalDisplayName:(NSString *)aString; // The name from the filesystem or raw address of the URL.
+- (void)setCustomDisplayName:(NSString *)aString; // A custom name, like a webpage title.
+- (void)updateNaturalDisplayName;
 
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
 - (PGLabelColor)labelColor;

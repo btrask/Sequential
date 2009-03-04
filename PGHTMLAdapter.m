@@ -76,14 +76,14 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
         forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setCustomDisplayName:title notify:YES];
+	[[self identifier] setCustomDisplayName:title];
 }
 - (void)webView:(WebView *)sender
         didReceiveIcon:(NSImage *)image
         forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setIcon:image notify:YES];
+	[[self identifier] setIcon:image];
 }
 
 - (void)webView:(WebView *)sender
