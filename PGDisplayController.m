@@ -89,7 +89,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation;
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode factor:(float)factor;
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
-- (void)_noteViewableNodeCountDidChange;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelText;
 
@@ -654,7 +653,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
-	[self _noteViewableNodeCountDidChange];
+	[self documentShowsInfoDidChange:nil];
 	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
 }
@@ -673,7 +672,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	}
 	if(aNotif) {
-		[self _noteViewableNodeCountDidChange];
+		[self documentShowsInfoDidChange:nil];
 		[self _updateNodeIndex];
 	}
 }
@@ -857,11 +856,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag
 {
 	[_imageView setSize:[self _sizeForImageRep:[_imageView rep] orientation:[_imageView orientation]] allowAnimation:flag];
-}
-- (void)_noteViewableNodeCountDidChange
-{
-	[self documentShowsInfoDidChange:nil];
-	[self documentShowsThumbnailsDidChange:nil];
 }
 - (void)_updateNodeIndex
 {

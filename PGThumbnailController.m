@@ -100,9 +100,13 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	if(aDoc == _document) return;
 	[_document AE_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_document AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+	[_document AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
+	[_document AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 	_document = aDoc;
 	[_document AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
 	[_document AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
+	[_document AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
+	[_document AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[self _updateWindowFrame];
 	[self displayControllerActiveNodeDidChange:nil];
 	[self _updateWindowFrame];
@@ -151,6 +155,9 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	[self _updateWindowFrame];
 }
+
+#pragma mark -
+
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
 	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
@@ -158,6 +165,14 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
 	[_browser setThumbnailOrientation:[[self document] baseOrientation]];
+}
+- (void)documentSortedNodesDidChange:(NSNotification *)aNotif
+{
+	[_browser setSelection:[_browser selection] reload:YES];
+}
+- (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif
+{
+	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:NO];
 }
 
 #pragma mark -PGThumbnailController(Private)
