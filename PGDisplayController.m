@@ -133,9 +133,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)saveImagesTo:(id)sender
 {
-	NSSet *set = [_thumbnailController selectedNodes];
-	if(![set count] && [self activeNode]) set = [NSSet setWithObject:[self activeNode]];
-	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:(set ? set : [NSSet set])] autorelease] beginSheetForWindow:nil];
+	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:[self selectedNodes]] autorelease] beginSheetForWindow:nil];
 }
 - (IBAction)setAsDesktopPicture:(id)sender
 {
@@ -157,7 +155,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)moveToTrash:(id)sender
 {
 	int tag;
-	NSString *const path = [[[[self activeNode] identifier] URL] path];
+	NSString *const path = [[[[self selectedNode] identifier] URL] path];
 	if(![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:&tag] || tag < 0) NSBeep();
 }
 
@@ -454,6 +452,17 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (NSSet *)selectedNodes
+{
+	NSSet *const thumbnailSelection = [_thumbnailController selectedNodes];
+	if([thumbnailSelection count]) return thumbnailSelection;
+	return [self activeNode] ? [NSSet setWithObject:[self activeNode]] : [NSSet set];
+}
+- (PGNode *)selectedNode
+{
+	NSSet *const selectedNodes = [self selectedNodes];
+	return [selectedNodes count] == 1 ? [selectedNodes anyObject] : nil;
+}
 - (PGClipView *)clipView
 {
 	return [[clipView retain] autorelease];
@@ -916,9 +925,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(![[self activeNode] canSaveData]) {
 		if(@selector(setCopyAsDesktopPicture:) == action) return NO;
 	}
-	PGResourceIdentifier *const ident = [[self activeNode] identifier];
-	if(![ident isFileIdentifier] || ![ident URL]) {
+	PGResourceIdentifier *const activeNodeIdent = [[self activeNode] identifier];
+	if(![activeNodeIdent isFileIdentifier] || ![activeNodeIdent URL]) {
 		if(@selector(setAsDesktopPicture:) == action) return NO;
+	}
+	PGResourceIdentifier *const selectedNodeIdent = [[self selectedNode] identifier];
+	if(![selectedNodeIdent isFileIdentifier] || ![selectedNodeIdent URL]) {
 		if(@selector(moveToTrash:) == action) return NO;
 	}
 	if(@selector(performFindPanelAction:) == action) switch([anItem tag]) {
