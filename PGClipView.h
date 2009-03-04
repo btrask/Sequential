@@ -36,31 +36,38 @@ enum {
 typedef unsigned PGScrollType;
 
 enum {
-	PGNoAnimation     = 0,
-	PGAllowAnimation  = 1,
+	PGNoAnimation = 0,
+	PGAllowAnimation = 1,
 	PGPreferAnimation = 2
 };
 typedef unsigned PGAnimationType;
 
+enum {
+	PGScrollLeastToRect = 0,
+	PGScrollCenterToRect = 1,
+	PGScrollMostToRect = 2
+};
+typedef unsigned PGScrollToRectType;
+
 @interface PGClipView : NSView
 {
 	@private
-	IBOutlet id              delegate;
-	IBOutlet NSView         *documentView;
-	         NSRect         _documentFrame;
-	         PGInset        _boundsInset;
-	         NSColor       *_backgroundColor;
-	         BOOL           _backgroundIsComplex;
-	         BOOL           _showsBorder;
-	         NSCursor      *_cursor;
-	         NSPoint        _immediatePosition;
-	         NSPoint        _position;
-	         NSTimer       *_scrollTimer;
-	         NSTimeInterval _lastScrollTime;
-	         PGRectEdgeMask _pinLocation;
-	         unsigned       _documentViewIsResizing;
-	         BOOL           _firstMouse;
-	         unsigned       _scrollCount;
+	IBOutlet id delegate;
+	IBOutlet NSView *documentView;
+	NSRect _documentFrame;
+	PGInset _boundsInset;
+	NSColor *_backgroundColor;
+	BOOL _backgroundIsComplex;
+	BOOL _showsBorder;
+	NSCursor *_cursor;
+	NSPoint _immediatePosition;
+	NSPoint _position;
+	NSTimer *_scrollTimer;
+	NSTimeInterval _lastScrollTime;
+	PGRectEdgeMask _pinLocation;
+	unsigned _documentViewIsResizing;
+	BOOL _firstMouse;
+	unsigned _scrollCount;
 }
 
 - (id)delegate;
@@ -131,8 +138,8 @@ typedef unsigned PGAnimationType;
 - (PGClipView *)PG_enclosingClipView;
 - (PGClipView *)PG_clipView;
 
-- (void)PG_scrollRectToVisible:(NSRect)aRect;
-- (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view;
+- (void)PG_scrollRectToVisible:(NSRect)aRect type:(PGScrollToRectType)type;
+- (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view type:(PGScrollToRectType)type;
 
 - (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender;
 - (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender;

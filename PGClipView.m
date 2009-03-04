@@ -552,20 +552,33 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark -
 
-- (void)PG_scrollRectToVisible:(NSRect)aRect
-        forView:(NSView *)view
+- (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view type:(PGScrollToRectType)type
 {
 	NSRect const r = [self convertRect:aRect fromView:view];
 	NSRect const b = [self insetBounds];
 	NSSize o = NSZeroSize;
-	if(NSWidth(r) > NSWidth(b)) {
-		// TODO: Use the current pin location to pick an edge of the rect to show.
-	} else if(NSMinX(r) < NSMinX(b)) o.width = NSMaxX(r) - NSMaxX(b);
-	else if(NSMaxX(r) > NSMaxX(b)) o.width = NSMinX(r) - NSMinX(b);
-	if(NSHeight(r) > NSHeight(b)) {
-		// TODO: Same as above.
-	} else if(NSMinY(r) < NSMinY(b)) o.height = NSMaxY(r) - NSMaxY(b);
-	else if(NSMaxY(r) > NSMaxY(b)) o.height = NSMinY(r) - NSMinY(b);
+	NSPoint const preferredVisiblePoint = PGPointOfPartOfRect(r, [self pinLocation]);
+	NSPoint const preferredTargetLocation = PGPointOfPartOfRect(b, [self pinLocation]);
+	if(NSWidth(r) > NSWidth(b)) o.width = preferredVisiblePoint.x - preferredTargetLocation.x;
+	else if(NSMinX(r) < NSMinX(b)) switch(type) {
+		case PGScrollLeastToRect:  o.width = NSMinX(r) - NSMinX(b); break;
+		case PGScrollCenterToRect: o.width = NSMidX(r) - NSMidX(b); break;
+		case PGScrollMostToRect:   o.width = NSMaxX(r) - NSMaxX(b); break;
+	} else if(NSMaxX(r) > NSMaxX(b)) switch(type) {
+		case PGScrollLeastToRect:  o.width = NSMaxX(r) - NSMaxX(b); break;
+		case PGScrollCenterToRect: o.width = NSMidX(r) - NSMidX(b); break;
+		case PGScrollMostToRect:   o.width = NSMinX(r) - NSMinX(b); break;
+	}
+	if(NSHeight(r) > NSHeight(b)) o.height = preferredVisiblePoint.y - preferredTargetLocation.y;
+	else if(NSMinY(r) < NSMinY(b)) switch(type) {
+		case PGScrollLeastToRect:  o.height = NSMinY(r) - NSMinY(b); break;
+		case PGScrollCenterToRect: o.height = NSMidY(r) - NSMidY(b); break;
+		case PGScrollMostToRect:   o.height = NSMaxY(r) - NSMaxY(b); break;
+	} else if(NSMaxY(r) > NSMaxY(b)) switch(type) {
+		case PGScrollLeastToRect:  o.height = NSMaxY(r) - NSMaxY(b); break;
+		case PGScrollCenterToRect: o.height = NSMidY(r) - NSMidY(b); break;
+		case PGScrollMostToRect:   o.height = NSMinY(r) - NSMinY(b); break;
+	}
 	[self scrollBy:o animation:PGAllowAnimation];
 }
 - (void)PG_viewWillScrollInClipView:(PGClipView *)clipView
@@ -862,14 +875,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	return [self PG_enclosingClipView];
 }
 
-- (void)PG_scrollRectToVisible:(NSRect)aRect
+- (void)PG_scrollRectToVisible:(NSRect)aRect type:(PGScrollToRectType)type
 {
-	[self PG_scrollRectToVisible:aRect forView:self];
+	[self PG_scrollRectToVisible:aRect forView:self type:type];
 }
-- (void)PG_scrollRectToVisible:(NSRect)aRect
-        forView:(NSView *)view
+- (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view type:(PGScrollToRectType)type
 {
-	[[self superview] PG_scrollRectToVisible:aRect forView:view];
+	[[self superview] PG_scrollRectToVisible:aRect forView:view type:type];
 }
 
 - (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender

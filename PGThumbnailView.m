@@ -164,12 +164,12 @@ static void PGDrawGradient(void)
 - (void)scrollToFirstSelectedItem
 {
 	unsigned const selCount = [_selection count];
-	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES]];
+	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES] type:PGScrollCenterToRect];
 	else if(selCount) {
 		unsigned i = 0;
 		for(; i < [_items count]; i++) {
 			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
-			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES]];
+			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
 			return;
 		}
 	}
@@ -443,7 +443,9 @@ static void PGDrawGradient(void)
 		}
 		if(canSelect && item) [_selection addObject:item];
 	}
-	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:i withMargin:YES]];
+	NSRect const itemFrame = [self frameOfItemAtIndex:i withMargin:YES];
+	[self setNeedsDisplayInRect:itemFrame];
+	[self PG_scrollRectToVisible:itemFrame type:PGScrollLeastToRect];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
