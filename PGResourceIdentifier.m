@@ -460,7 +460,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 }
 + (void)clearCache
 {
-	[PGCachedAliasIdentifiers makeObjectsPerformSelector:@selector(_clearCache)];
+	[PGCachedAliasIdentifiers makeObjectsPerformSelector:@selector(clearCache)];
 	[PGCachedAliasIdentifiers release];
 	PGCachedAliasIdentifiers = nil;
 }
