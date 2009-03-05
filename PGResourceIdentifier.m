@@ -53,13 +53,13 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	NSString *_cachedURL;
 }
 
-+ (void)noteCachedIdentifier:(PGAliasIdentifier *)ident;
 + (void)clearCache;
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
 - (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
 - (BOOL)setAliasWithData:(const uint8_t *)data length:(unsigned)length;
 - (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)follow validate:(BOOL)validate;
+- (void)cacheURL:(NSURL *)URL;
 - (void)clearCache;
 
 @end
@@ -450,14 +450,6 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 
 #pragma mark +PGAliasIdentifier
 
-+ (void)noteCachedIdentifier:(PGAliasIdentifier *)ident
-{
-	if(!PGCachedAliasIdentifiers) {
-		PGCachedAliasIdentifiers = [[NSMutableArray alloc] init];
-		[self performSelector:@selector(clearCache) withObject:nil afterDelay:0.0f];
-	}
-	[PGCachedAliasIdentifiers addObject:ident];
-}
 + (void)clearCache
 {
 	[PGCachedAliasIdentifiers makeObjectsPerformSelector:@selector(clearCache)];
@@ -476,8 +468,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 			return [[PGURLIdentifier alloc] initWithURL:URL];
 		}
 		_hasValidRef = YES;
-		[PGAliasIdentifier noteCachedIdentifier:self];
-		_cachedURL = [URL retain];
+		[self cacheURL:URL];
 	}
 	return self;
 }
@@ -513,6 +504,17 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	*outRef = _ref;
 	return follow ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
+- (void)cacheURL:(NSURL *)URL
+{
+	if(!URL) return;
+	[_cachedURL release];
+	_cachedURL = [URL retain];
+	if(!PGCachedAliasIdentifiers) {
+		PGCachedAliasIdentifiers = [[NSMutableArray alloc] init];
+		[PGAliasIdentifier performSelector:@selector(clearCache) withObject:nil afterDelay:0.0f];
+	}
+	[PGCachedAliasIdentifiers addObject:self];
+}
 - (void)clearCache
 {
 	[_cachedURL release];
@@ -527,10 +529,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	FSRef ref;
 	if(![self getRef:&ref byFollowingAliases:flag]) return nil;
 	NSURL *const URL = [(NSURL *)CFURLCreateFromFSRef(kCFAllocatorDefault, &ref) autorelease];
-	if(!flag) {
-		[PGAliasIdentifier noteCachedIdentifier:self];
-		_cachedURL = [URL retain];
-	}
+	if(!flag) [self cacheURL:URL];
 	return URL;
 }
 - (BOOL)getRef:(out FSRef *)outRef
