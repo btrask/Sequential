@@ -654,6 +654,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
 	[self documentShowsInfoDidChange:nil];
+	[self documentShowsThumbnailsDidChange:nil];
 	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
 	else [self _updateNodeIndex];
 }
@@ -673,6 +674,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if(aNotif) {
 		[self documentShowsInfoDidChange:nil];
+		[self documentShowsThumbnailsDidChange:nil];
 		[self _updateNodeIndex];
 	}
 }
