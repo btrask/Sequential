@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSAttributedString *)displayText
 {
 	NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-	[style setAlignment:([self origin] == PGMinXMinYCorner ? NSLeftTextAlignment : NSRightTextAlignment)];
+	[style setAlignment:NSCenterTextAlignment];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
 	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%u/%u)", [self messageText], [self index] + 1, [self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
