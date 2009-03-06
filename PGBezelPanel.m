@@ -134,7 +134,12 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 	float const s = [self AE_userSpaceScaleFactor];
 	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
 	if(NSEqualRects([self frame], f)) return;
-	[self setFrame:f display:flag];
+	if(flag) NSDisableScreenUpdates();
+	[self setFrame:f display:NO];
+	if(flag) {
+		[[self content] display]; // Do this instead of sending -setFrame:display:YES to force redisplay no matter what.
+		NSEnableScreenUpdates();
+	}
 	[self AE_postNotificationName:PGBezelPanelFrameDidChangeNotification];
 }
 

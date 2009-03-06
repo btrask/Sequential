@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGTotalPaddingSize        (PGPaddingSize * 2.0)
 #define PGTextBottomPadding       (PGPaddingSize - 1.0)
 #define PGTextTotalVertPadding    (PGPaddingSize + PGTextBottomPadding)
-#define PGTextHorzPadding         1.0
+#define PGTextHorzPadding         4.0
 #define PGTextTotalHorzPadding    (PGTextHorzPadding * 2.0)
 #define PGIndicatorHeight         11.0
 #define PGIndicatorRadius         (PGIndicatorHeight / 2.0)
-#define PGIndicatorWidth          150.0
+#define PGIndicatorWidth          100.0
 #define PGCornerRadius            (PGPaddingSize + PGIndicatorRadius)
 
 @implementation PGInfoView
@@ -132,8 +132,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSMakeRect(
 			NSMinX(aRect) + scaledMarginSize,
 			NSMinY(aRect) + scaledMarginSize,
-			ceilf(MAX(messageSize.width + PGTextTotalHorzPadding, ([self displaysProgressIndicator] ? PGIndicatorWidth : 0)) + PGTotalPaddingSize) * scaleFactor,
-			ceilf(messageSize.height + PGTextTotalVertPadding + ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor),
+			ceilf((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0) + PGTotalPaddingSize) * scaleFactor),
+			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor)),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
 	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
@@ -167,8 +167,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[indicator lineToPoint:NSMakePoint(x + 5, 1.5 + PGPaddingSize)];
 		[indicator fill];
 	}
-	float const indicatorHeight = [self displaysProgressIndicator] ? PGIndicatorHeight : 0;
-	[[self displayText] drawInRect:NSMakeRect(PGPaddingSize + PGTextHorzPadding, PGTextBottomPadding + indicatorHeight, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding, NSHeight(b) - PGTextTotalVertPadding - indicatorHeight)];
+	float const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0;
+	float const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0;
+	[[self displayText] drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
 }
 
 #pragma mark NSObject
