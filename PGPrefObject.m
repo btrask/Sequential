@@ -71,7 +71,7 @@ NSArray *PGScaleModes(void)
 	if([PGPrefObject class] != self) return;
 	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSNumber numberWithBool:YES], PGShowsInfoKey,
-		[NSNumber numberWithBool:NO], PGShowsThumbnailsKey,
+		[NSNumber numberWithBool:YES], PGShowsThumbnailsKey,
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
 		[NSNumber numberWithInt:PGConstantFactorScale], PGImageScaleModeKey,
 		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
