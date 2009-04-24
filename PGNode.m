@@ -518,7 +518,9 @@ enum {
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	// Using our generic -AE_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
+	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
 	[_identifier release];
 	[_menuItem release];
