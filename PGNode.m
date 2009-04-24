@@ -121,7 +121,10 @@ enum {
 	}
 	if(data) return data;
 	PGResourceIdentifier *const identifier = [info objectForKey:PGIdentifierKey];
-	if([identifier isFileIdentifier]) data = [NSData dataWithContentsOfMappedFile:[[identifier URLByFollowingAliases:YES] path]];
+	if([identifier isFileIdentifier]) {
+		NSURL *const URL = [identifier URLByFollowingAliases:YES];
+		if(URL) data = [NSData dataWithContentsOfURL:URL options:NSMappedRead | NSUncachedRead error:NULL];
+	}
 	return data;
 }
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info
