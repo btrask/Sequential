@@ -229,6 +229,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (IBAction)firstOfPreviousFolder:(id)sender
+{
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO inclusive:NO] initialLocation:PGHomeLocation]) return;
+	[self prepareToLoop]; // -firstOfPreviousFolder: is an exception to our usual looping mechanic, so we can't use -loopForward:.
+	PGNode *const last = [[[self activeDocument] node] sortedViewableNodeFirst:NO];
+	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO inclusive:YES]) initialLocation:PGHomeLocation allowAlerts:YES];
+}
+- (IBAction)firstOfNextFolder:(id)sender
+{
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES inclusive:NO] initialLocation:PGHomeLocation]) return;
+	[self loopForward:YES];
+}
 - (IBAction)skipBeforeFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) return;
@@ -237,18 +249,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)skipPastFolder:(id)sender
 {
 	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) return;
-	[self loopForward:YES];
-}
-- (IBAction)firstOfPreviousFolder:(id)sender
-{
-	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO] initialLocation:PGHomeLocation]) return;
-	[self prepareToLoop]; // -firstOfPreviousFolder: is an exception to our usual looping mechanic, so we can't use -loopForward:.
-	PGNode *const last = [[[self activeDocument] node] sortedViewableNodeFirst:NO];
-	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO]) initialLocation:PGHomeLocation allowAlerts:YES];
-}
-- (IBAction)firstOfNextFolder:(id)sender
-{
-	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES] initialLocation:PGHomeLocation]) return;
 	[self loopForward:YES];
 }
 - (IBAction)firstOfFolder:(id)sender

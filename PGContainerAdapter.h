@@ -45,7 +45,7 @@ extern NSString *const PGMaxDepthKey;
 
 - (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent;
 - (unsigned)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)outwardSearchForward:(BOOL)flag fromChild:(PGNode *)start withSelector:(SEL)sel context:(id)context;
+- (PGNode *)outwardSearchForward:(BOOL)forward fromChild:(PGNode *)start inclusive:(BOOL)inclusive withSelector:(SEL)sel context:(id)context;
 /* The selector 'sel' should have one of the following forms:
 - (PGNode *)selector;
 - (PGNode *)selectorForward:(BOOL)flag;

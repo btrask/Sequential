@@ -111,21 +111,20 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	}
 	return 0;
 }
-- (PGNode *)outwardSearchForward:(BOOL)flag
-            fromChild:(PGNode *)start
-            withSelector:(SEL)sel
-            context:(id)context
+- (PGNode *)outwardSearchForward:(BOOL)forward fromChild:(PGNode *)start inclusive:(BOOL)inclusive withSelector:(SEL)sel context:(id)context
 {
 	NSArray *const children = [self sortedChildren];
-	int i = [children indexOfObjectIdenticalTo:start];
+	NSUInteger i = [children indexOfObjectIdenticalTo:start];
 	if(NSNotFound == i) return nil;
-	int const max = [children count], increment = flag ? 1 : -1;
-	for(i += increment; i >= 0 && i < max; i += increment) {
+	NSInteger const increment = forward ? 1 : -1;
+	NSRange const range = NSMakeRange(0, [children count]);
+	if(!inclusive) i += increment;
+	for(; NSLocationInRange(i, range); i += increment) {
 		PGNode *const child = [children objectAtIndex:i];
-		PGNode *const node = [child methodForSelector:sel](child, sel, flag, context, nil);
+		PGNode *const node = [child methodForSelector:sel](child, sel, forward, context, nil);
 		if(node) return node;
 	}
-	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:sel context:context];
+	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context];
 }
 - (void)noteChild:(PGNode *)child
         didChangeForSortOrder:(PGSortOrder)order

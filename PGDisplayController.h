@@ -106,10 +106,10 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)firstPage:(id)sender;
 - (IBAction)lastPage:(id)sender;
 
-- (IBAction)skipBeforeFolder:(id)sender;
-- (IBAction)skipPastFolder:(id)sender;
 - (IBAction)firstOfPreviousFolder:(id)sender;
 - (IBAction)firstOfNextFolder:(id)sender;
+- (IBAction)skipBeforeFolder:(id)sender;
+- (IBAction)skipPastFolder:(id)sender;
 - (IBAction)firstOfFolder:(id)sender;
 - (IBAction)lastOfFolder:(id)sender;
 

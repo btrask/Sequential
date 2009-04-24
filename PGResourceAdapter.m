@@ -538,7 +538,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
             includeChildren:(BOOL)children
 {
-	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:) context:nil];
+	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:) context:nil];
 }
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
             afterRemovalOfChildren:(NSArray *)removedChildren
@@ -550,10 +550,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return [[self sortedViewableNodeNext:flag] sortedViewableNodeNext:flag afterRemovalOfChildren:removedChildren fromNode:changedNode];
 }
 
-- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)flag
+- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)forward inclusive:(BOOL)inclusive
 {
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
-	return node || flag ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
+	return node || forward ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];
 }
 - (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
 {
@@ -563,7 +563,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
 	    matchSearchTerms:(NSArray *)terms
 {
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
 	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
