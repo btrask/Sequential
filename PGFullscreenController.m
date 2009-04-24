@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSScreenAdditions.h"
 #import "NSStringAdditions.h"
 
-@interface PGFullscreenController (Private)
+@interface PGFullscreenController(Private)
 
 - (void)_hideMenuBar;
 
@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFullscreenController
 
-#pragma mark Class Methods
+#pragma mark +PGFullscreenController
 
 + (id)sharedFullscreenController
 {
@@ -57,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return sharedFullscreenController;
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGFullscreenController
 
 - (void)prepareToExitFullscreen
 {
@@ -76,70 +76,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	else SetSystemUIMode(kUIModeNormal, kNilOptions);
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGFullscreenController(Private)
 
 - (void)_hideMenuBar
 {
 	SetSystemUIMode(kUIModeAllSuppressed, kNilOptions);
 }
 
-#pragma mark PGFullscreenWindowDelegate Protocol
-
-- (void)closeWindowContent:(PGFullscreenWindow *)sender
-{
-	[[self activeDocument] close];
-}
-
-#pragma mark NSWindowNotifications Protocol
-
-- (void)windowDidBecomeMain:(NSNotification *)aNotif
-{
-	[super windowDidBecomeMain:aNotif];
-	[NSCursor setHiddenUntilMouseMoves:YES];
-}
-- (void)windowDidResignMain:(NSNotification *)aNotif
-{
-	if(!_isExitingFullscreen) [super windowDidResignMain:aNotif];
-}
-
-- (void)windowDidBecomeKey:(NSNotification *)aNotif
-{
-	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0 retain:NO]; // Prevents the menu bar from messing up when the application unhides on Leopard.
-}
-- (void)windowDidResignKey:(NSNotification *)aNotif
-{
-	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
-	SetSystemUIMode(kUIModeNormal, kNilOptions);
-}
-
-#pragma mark PGDocumentWindowDelegate Protocol
-
-- (NSDragOperation)window:(PGDocumentWindow *)window
-                   dragOperationForInfo:(id<NSDraggingInfo>)info
-{
-	if(!([info draggingSourceOperationMask] & NSDragOperationGeneric)) return NSDragOperationNone;
-	NSPasteboard *const pboard = [info draggingPasteboard];
-	NSArray *const types = [pboard types];
-	if([types containsObject:NSFilenamesPboardType]) {
-		NSArray *const paths = [pboard propertyListForType:NSFilenamesPboardType];
-		return [paths count] == 1 ? NSDragOperationGeneric : NSDragOperationNone;
-	} else if([types containsObject:NSURLPboardType]) {
-		return [NSURL URLFromPasteboard:pboard] ? NSDragOperationGeneric : NSDragOperationNone;
-	}
-	return NSDragOperationNone;
-}
-- (BOOL)window:(PGDocumentWindow *)window
-        performDragOperation:(id<NSDraggingInfo>)info
-{
-	NSPasteboard *const pboard = [info draggingPasteboard];
-	NSArray *const types = [pboard types];
-	if([types containsObject:NSFilenamesPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[[[pboard propertyListForType:NSFilenamesPboardType] lastObject] AE_fileURL] display:YES];
-	else if([types containsObject:NSURLPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL URLFromPasteboard:pboard] display:YES];
-	return NO;
-}
-
-#pragma mark PGDisplayController
+#pragma mark -PGDisplayController
 
 - (BOOL)setActiveDocument:(PGDocument *)document
         closeIfAppropriate:(BOOL)flag
@@ -152,8 +96,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super setActiveDocument:nextDoc closeIfAppropriate:NO]; // PGDocumentController knows when to close us, so don't close ourselves.
 	return NO;
 }
+- (NSWindow *)windowForSheet
+{
+	return nil;
+}
 
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (BOOL)shouldCascadeWindows
 {
@@ -180,7 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	while((doc = [docEnum nextObject])) [doc close];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -194,6 +142,62 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
 	[super dealloc];
+}
+
+#pragma mark -NSObject(NSWindowNotifications)
+
+- (void)windowDidBecomeMain:(NSNotification *)aNotif
+{
+	[super windowDidBecomeMain:aNotif];
+	[NSCursor setHiddenUntilMouseMoves:YES];
+}
+- (void)windowDidResignMain:(NSNotification *)aNotif
+{
+	if(!_isExitingFullscreen) [super windowDidResignMain:aNotif];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)aNotif
+{
+	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0 retain:NO]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+}
+- (void)windowDidResignKey:(NSNotification *)aNotif
+{
+	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
+	SetSystemUIMode(kUIModeNormal, kNilOptions);
+}
+
+#pragma mark -NSObject(PGDocumentWindowDelegate)
+
+- (NSDragOperation)window:(PGDocumentWindow *)window
+                   dragOperationForInfo:(id<NSDraggingInfo>)info
+{
+	if(!([info draggingSourceOperationMask] & NSDragOperationGeneric)) return NSDragOperationNone;
+	NSPasteboard *const pboard = [info draggingPasteboard];
+	NSArray *const types = [pboard types];
+	if([types containsObject:NSFilenamesPboardType]) {
+		NSArray *const paths = [pboard propertyListForType:NSFilenamesPboardType];
+		return [paths count] == 1 ? NSDragOperationGeneric : NSDragOperationNone;
+	} else if([types containsObject:NSURLPboardType]) {
+		return [NSURL URLFromPasteboard:pboard] ? NSDragOperationGeneric : NSDragOperationNone;
+	}
+	return NSDragOperationNone;
+}
+- (BOOL)window:(PGDocumentWindow *)window
+        performDragOperation:(id<NSDraggingInfo>)info
+{
+	NSPasteboard *const pboard = [info draggingPasteboard];
+	NSArray *const types = [pboard types];
+	if([types containsObject:NSFilenamesPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[[[pboard propertyListForType:NSFilenamesPboardType] lastObject] AE_fileURL] display:YES];
+	else if([types containsObject:NSURLPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL URLFromPasteboard:pboard] display:YES];
+	return NO;
+}
+
+#pragma mark -NSObject(PGFullscreenWindowDelegate)
+
+- (void)closeWindowContent:(PGFullscreenWindow *)sender
+{
+	[[self activeDocument] close];
 }
 
 @end

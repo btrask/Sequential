@@ -135,6 +135,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
+- (NSWindow *)windowForSheet;
 - (NSSet *)selectedNodes;
 - (PGNode *)selectedNode;
 - (PGClipView *)clipView;

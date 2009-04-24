@@ -91,6 +91,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_updateImageViewSizeAllowAnimation:(BOOL)flag;
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelText;
+- (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 
 @end
 
@@ -132,7 +133,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)saveImagesTo:(id)sender
 {
-	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:[self selectedNodes]] autorelease] beginSheetForWindow:nil];
+	[[[[PGImageSaveAlert alloc] initWithRoot:[[self activeDocument] node] initialSelection:[self selectedNodes]] autorelease] beginSheetForWindow:[self windowForSheet]];
 }
 - (IBAction)setAsDesktopPicture:(id)sender
 {
@@ -146,10 +147,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGDisplayableIdentifier *const ident = [[self activeNode] identifier];
 	[savePanel setRequiredFileType:[[ident naturalDisplayName] pathExtension]];
 	[savePanel setCanSelectHiddenExtension:YES];
-	if([savePanel runModalForDirectory:nil file:[[ident naturalDisplayName] stringByDeletingPathExtension]] != NSFileHandlingPanelOKButton) return;
-	NSString *const path = [savePanel filename];
-	[[[self activeNode] data] writeToFile:path atomically:NO];
-	if(![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:path]) NSBeep();
+	NSWindow *const window = [self windowForSheet];
+	NSString *const file = [[ident naturalDisplayName] stringByDeletingPathExtension];
+	if(window) [savePanel beginSheetForDirectory:nil file:file modalForWindow:window modalDelegate:self didEndSelector:@selector(_setCopyAsDesktopPicturePanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
+	else [self _setCopyAsDesktopPicturePanelDidEnd:savePanel returnCode:[savePanel runModalForDirectory:nil file:file] contextInfo:NULL];
 }
 - (IBAction)moveToTrash:(id)sender
 {
@@ -301,7 +302,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	NSDictionary *const errInfo = [[[self activeNode] error] userInfo];
 	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntValue]] autorelease];
-	[alert beginSheetForWindow:nil withDelegate:self];
+	[alert beginSheetForWindow:[self windowForSheet] withDelegate:self];
 }
 
 #pragma mark -
@@ -451,6 +452,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (NSWindow *)windowForSheet
+{
+	return [self window];
+}
 - (NSSet *)selectedNodes
 {
 	NSSet *const thumbnailSelection = [_thumbnailController selectedNodes];
@@ -876,6 +881,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
 	[[_infoPanel content] setMessageText:text];
 }
+- (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
+{
+	if(NSFileHandlingPanelOKButton != returnCode) return;
+	NSString *const path = [savePanel filename];
+	[[[self activeNode] data] writeToFile:path atomically:NO];
+	if(![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:path]) NSBeep();
+}
 
 #pragma mark -NSWindowController
 
@@ -1038,6 +1050,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case NSFindPanelActionNext:
 		case NSFindPanelActionPrevious: break;
 		default: return NO;
+	}
+	if(![[PGDocumentController sharedDocumentController] canToggleFullscreen]) {
+		if(@selector(toggleFullscreen:) == action) return NO;
 	}
 	if(![self canShowInfo]) {
 		if(@selector(toggleInfo:) == action) return NO;

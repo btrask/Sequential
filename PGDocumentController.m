@@ -334,6 +334,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGFullscreenKey];
 	[self _setFullscreen:flag];
 }
+- (BOOL)canToggleFullscreen
+{
+	if(_fullscreen) return YES;
+	PGDocument *doc;
+	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
+	while((doc = [docEnum nextObject])) if([[[doc displayController] window] attachedSheet]) return NO;
+	return YES;
+}
 
 #pragma mark -
 

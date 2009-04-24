@@ -150,6 +150,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (PGDisplayController *)displayControllerForNewDocument; // Returns either the shared fullscreen controller or a new regular window controller.
 - (BOOL)fullscreen;
 - (void)setFullscreen:(BOOL)flag;
+- (BOOL)canToggleFullscreen;
 
 - (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;
