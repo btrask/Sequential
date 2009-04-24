@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGErrorAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return PGNotAMatch;
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark -PGResourceAdapter
 
 - (BOOL)adapterIsViewable
 {

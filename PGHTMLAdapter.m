@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
-@interface PGHTMLAdapter (Private)
+@interface PGHTMLAdapter(Private)
 
 - (void)_clearWebView;
 
@@ -44,7 +44,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 @implementation PGHTMLAdapter
 
-#pragma mark Private Protocol
+#pragma mark -PGHTMLAdapter(Private)
 
 - (void)_clearWebView
 {
@@ -54,55 +54,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	_webView = nil;
 }
 
-#pragma mark WebFrameLoadDelegate Protocol
-
-- (void)webView:(WebView *)sender
-        didFailProvisionalLoadWithError:(NSError *)error
-        forFrame:(WebFrame *)frame
-{
-	[self webView:sender didFailLoadWithError:error forFrame:frame];
-}
-- (void)webView:(WebView *)sender
-        didFailLoadWithError:(NSError *)error
-        forFrame:(WebFrame *)frame
-{
-	if(frame != [_webView mainFrame]) return;
-	[self _clearWebView];
-	[[self node] loadFinished];
-}
-
-- (void)webView:(WebView *)sender
-        didReceiveTitle:(NSString *)title
-        forFrame:(WebFrame *)frame
-{
-	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setCustomDisplayName:title];
-}
-- (void)webView:(WebView *)sender
-        didReceiveIcon:(NSImage *)image
-        forFrame:(WebFrame *)frame
-{
-	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setIcon:image];
-}
-
-- (void)webView:(WebView *)sender
-        didFinishLoadForFrame:(WebFrame *)frame
-{
-	if(frame != [_webView mainFrame]) return;
-	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
-	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
-	[self _clearWebView];
-}
-
-#pragma mark PGResourceAdapting Protocol
-
-- (float)loadProgress
-{
-	return 1.0;
-}
-
-#pragma mark PGResourceAdapter
+#pragma mark -PGResourceAdapter
 
 - (PGLoadPolicy)descendentLoadPolicy
 {
@@ -144,12 +96,60 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 }
 - (void)read {}
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
 	[self _clearWebView];
 	[super dealloc];
+}
+
+#pragma mark -NSObject(WebFrameLoadDelegate)
+
+- (void)webView:(WebView *)sender
+        didFailProvisionalLoadWithError:(NSError *)error
+        forFrame:(WebFrame *)frame
+{
+	[self webView:sender didFailLoadWithError:error forFrame:frame];
+}
+- (void)webView:(WebView *)sender
+        didFailLoadWithError:(NSError *)error
+        forFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[self _clearWebView];
+	[[self node] loadFinished];
+}
+
+- (void)webView:(WebView *)sender
+        didReceiveTitle:(NSString *)title
+        forFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[[self identifier] setCustomDisplayName:title];
+}
+- (void)webView:(WebView *)sender
+        didReceiveIcon:(NSImage *)image
+        forFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[[self identifier] setIcon:image];
+}
+
+- (void)webView:(WebView *)sender
+        didFinishLoadForFrame:(WebFrame *)frame
+{
+	if(frame != [_webView mainFrame]) return;
+	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
+	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
+	[self _clearWebView];
+}
+
+#pragma mark -<PGResourceAdapting>
+
+- (float)loadProgress
+{
+	return 1.0;
 }
 
 @end

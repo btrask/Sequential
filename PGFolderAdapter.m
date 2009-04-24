@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFolderAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [[NSFileManager defaultManager] fileExistsAtPath:[[ident URLByFollowingAliases:YES] path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGFolderAdapter
 
 - (void)createChildren
 {
@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self document] setProcessingNodes:NO];
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark -PGResourceAdapter
 
 - (void)load
 {

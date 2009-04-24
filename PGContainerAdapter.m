@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
-@interface PGContainerAdapter (Private)
+@interface PGContainerAdapter(Private)
 
 - (PGNode *)_nodeForSelectorOrSelfIfViewable:(SEL)sel forward:(BOOL)flag;
 
@@ -39,14 +39,14 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 @implementation PGContainerAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (BOOL)alwaysLoads
 {
 	return NO;
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGContainerAdapter
 
 - (NSArray *)sortedChildren
 {
@@ -136,7 +136,26 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	[[self document] noteSortedChildrenDidChange];
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark -PGResourceAdapter
+
+- (void)setNode:(PGNode *)aNode
+{
+	[[[self node] menuItem] setSubmenu:nil];
+	[super setNode:aNode];
+	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
+	[_sortedChildren release];
+	[_unsortedChildren release];
+	[super dealloc];
+}
+
+#pragma mark -<PGResourceAdapting>
 
 - (PGContainerAdapter *)containerAdapter
 {
@@ -284,25 +303,6 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	PGNode *child;
 	NSEnumerator *childEnum = [_unsortedChildren objectEnumerator];
 	while((child = [childEnum nextObject])) [child noteSortOrderDidChange];
-}
-
-#pragma mark PGResourceAdapter
-
-- (void)setNode:(PGNode *)aNode
-{
-	[[[self node] menuItem] setSubmenu:nil];
-	[super setNode:aNode];
-	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
-	[_sortedChildren release];
-	[_unsortedChildren release];
-	[super dealloc];
 }
 
 @end

@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface PGXMLParser (PGXMLParserNodeCreation)
+@interface PGXMLParser(PGXMLParserNodeCreation)
 
 - (BOOL)createsMultipleNodes;
 

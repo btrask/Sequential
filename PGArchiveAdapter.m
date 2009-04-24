@@ -42,13 +42,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 static id PGArchiveAdapterList = nil;
 
-@interface PGArchiveAdapter (Private)
+@interface PGArchiveAdapter(Private)
 
 - (void)_updateThumbnailsOfChildren;
 
 @end
 
-@interface XADArchive (PGAdditions)
+@interface XADArchive(PGAdditions)
 
 - (NSString *)OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
 - (NSString *)typeForEntry:(int)index preferOSType:(BOOL)flag;
@@ -57,7 +57,7 @@ static id PGArchiveAdapterList = nil;
 
 @implementation PGArchiveAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
@@ -65,14 +65,14 @@ static id PGArchiveAdapterList = nil;
 	return [[info objectForKey:PGKnownToBeArchiveKey] boolValue] ? PGMatchByIntrinsicAttribute : [super matchPriorityForNode:node withInfo:info];
 }
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
 	if([PGArchiveAdapter class] == self) PGArchiveAdapterList = [[PGCancelableProxy storage] retain];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGArchiveAdapter
 
 - (XADArchive *)archive
 {
@@ -115,36 +115,54 @@ static id PGArchiveAdapterList = nil;
 	return children;
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGArchiveAdapter(Private)
 
 - (void)_updateThumbnailsOfChildren
 {
 	[[self document] noteNodeThumbnailDidChange:[self node] children:YES];
 }
 
-#pragma mark XADArchiveDelegate Protocol
+#pragma mark -PGResourceAdapter
 
-- (NSStringEncoding)archive:(XADArchive *)archive
-                    encodingForName:(const char *)bytes
-                    guess:(NSStringEncoding)guess
-                    confidence:(float)confidence
+- (PGLoadPolicy)descendentLoadPolicy
 {
-	if(confidence < 0.8 && !_encodingError) {
-		_encodingError = YES;
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSData dataWithBytes:bytes length:strlen(bytes)], PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]]];
-		[[self node] loadFinished];
+	return PGLoadAll;
+}
+- (void)load
+{
+	if(!_archive) {
+		XADError error;
+		PGResourceIdentifier *const ident = [[self info] objectForKey:PGIdentifierKey];
+		if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
+		else {
+			NSData *const data = [self data];
+			if(!data) return [[self node] loadFinished];
+			_archive = [[XADArchive alloc] initWithData:data error:&error];
+			[_archive setDelegate:self];
+		}
+		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
-	return guess;
+	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
+	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
+	NSString *const root = [_archive commonTopDirectory];
+	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
+	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
+	if(!_encodingError) [[self node] loadFinished];
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark -NSObject
 
-- (BOOL)canSaveData
+- (void)dealloc
 {
-	return YES;
+	[self PG_cancelPerformsWithStorage:PGArchiveAdapterList];
+	@synchronized(_archive) {
+		[_archive release];
+		_archive = nil;
+	}
+	[super dealloc];
 }
 
-#pragma mark PGNodeDataSource Protocol
+#pragma mark -NSObject(PGNodeDataSource)
 
 - (NSDate *)dateCreatedForNode:(PGNode *)sender
 {
@@ -205,49 +223,31 @@ static id PGArchiveAdapterList = nil;
 	return YES;
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark -NSObject(XADArchiveDelegate)
 
-- (PGLoadPolicy)descendentLoadPolicy
+- (NSStringEncoding)archive:(XADArchive *)archive
+                    encodingForName:(const char *)bytes
+                    guess:(NSStringEncoding)guess
+                    confidence:(float)confidence
 {
-	return PGLoadAll;
-}
-- (void)load
-{
-	if(!_archive) {
-		XADError error;
-		PGResourceIdentifier *const ident = [[self info] objectForKey:PGIdentifierKey];
-		if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
-		else {
-			NSData *const data = [self data];
-			if(!data) return [[self node] loadFinished];
-			_archive = [[XADArchive alloc] initWithData:data error:&error];
-			[_archive setDelegate:self];
-		}
-		if(!_archive || error != XADERR_OK || [_archive isCorrupted]) return [[self node] loadFinished];
+	if(confidence < 0.8 && !_encodingError) {
+		_encodingError = YES;
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSData dataWithBytes:bytes length:strlen(bytes)], PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]]];
+		[[self node] loadFinished];
 	}
-	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
-	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
-	NSString *const root = [_archive commonTopDirectory];
-	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
-	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	if(!_encodingError) [[self node] loadFinished];
+	return guess;
 }
 
-#pragma mark NSObject
+#pragma mark -<PGResourceAdapting>
 
-- (void)dealloc
+- (BOOL)canSaveData
 {
-	[self PG_cancelPerformsWithStorage:PGArchiveAdapterList];
-	@synchronized(_archive) {
-		[_archive release];
-		_archive = nil;
-	}
-	[super dealloc];
+	return YES;
 }
 
 @end
 
-@implementation XADArchive (PGAdditions)
+@implementation XADArchive(PGAdditions)
 
 - (NSString *)OSTypeForEntry:(int)index
               standardFormat:(BOOL)flag

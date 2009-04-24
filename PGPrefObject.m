@@ -55,7 +55,7 @@ NSArray *PGScaleModes(void)
 
 @implementation PGPrefObject
 
-#pragma mark Class Methods
+#pragma mark +PGPrefObject
 
 + (id)globalPrefObject
 {
@@ -64,7 +64,7 @@ NSArray *PGScaleModes(void)
 	return obj;
 }
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
@@ -82,7 +82,7 @@ NSArray *PGScaleModes(void)
 		nil]];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGPrefObject
 
 - (BOOL)showsInfo
 {
@@ -205,7 +205,7 @@ NSArray *PGScaleModes(void)
 	[self AE_postNotificationName:PGPrefObjectTimerIntervalDidChangeNotification];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {

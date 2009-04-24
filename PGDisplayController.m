@@ -1315,21 +1315,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
-#pragma mark -NSObject(PGDisplayControlling)
-
-- (IBAction)toggleFullscreen:(id)sender
-{
-	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
-}
-- (IBAction)toggleInfo:(id)sender
-{
-	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
-}
-- (IBAction)toggleThumbnails:(id)sender
-{
-	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
-}
-
 #pragma mark -NSObject(PGDocumentWindowDelegate)
 
 - (void)selectNextOutOfWindowKeyView:(NSWindow *)window
@@ -1354,6 +1339,21 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
         selectedEncoding:(NSStringEncoding)encoding
 {
 	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:encoding], PGStringEncodingKey, nil]];
+}
+
+#pragma mark -<PGDisplayControlling>
+
+- (IBAction)toggleFullscreen:(id)sender
+{
+	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
+}
+- (IBAction)toggleInfo:(id)sender
+{
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
+}
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
 
 @end

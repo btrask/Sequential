@@ -146,7 +146,7 @@ typedef xadERROR XADError;
 
 
 
-@interface NSObject (XADArchiveDelegate)
+@interface NSObject(XADArchiveDelegate)
 
 -(NSStringEncoding)archive:(XADArchive *)archive encodingForName:(const char *)bytes guess:(NSStringEncoding)guess confidence:(float)confidence;
 -(XADAction)archive:(XADArchive *)archive nameDecodingDidFailForEntry:(int)n bytes:(const char *)bytes;

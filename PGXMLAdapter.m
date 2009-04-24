@@ -51,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGXMLAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
@@ -87,7 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return PGNotAMatch;
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark -PGResourceAdapter
 
 - (void)load
 {
@@ -117,7 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGOEmbedParser
 
-#pragma mark PGXMLParser
+#pragma mark +PGXMLParser
 
 + (BOOL)canParseTagPath:(NSString *)p
         attributes:(NSDictionary *)attrs
@@ -125,7 +125,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [p hasPrefix:@"/oembed"];
 }
 
-#pragma mark PGXMLParserNodeCreation Protocol
+#pragma mark -PGXMLParser
+
+- (NSMutableString *)contentStringForTagPath:(NSString *)p
+{
+	if([@"/oembed/version" isEqualToString:p]) return _version;
+	if([@"/oembed/type" isEqualToString:p]) return _type;
+	if([@"/oembed/title" isEqualToString:p]) return _title;
+	if([@"/oembed/url" isEqualToString:p]) return _URLString;
+	return [super contentStringForTagPath:p];
+}
+
+#pragma mark -PGXMLParser(PGXMLParserNodeCreation)
 
 - (BOOL)createsMultipleNodes
 {
@@ -140,18 +151,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _URLString : nil;
 }
 
-#pragma mark PGXMLParser
-
-- (NSMutableString *)contentStringForTagPath:(NSString *)p
-{
-	if([@"/oembed/version" isEqualToString:p]) return _version;
-	if([@"/oembed/type" isEqualToString:p]) return _type;
-	if([@"/oembed/title" isEqualToString:p]) return _title;
-	if([@"/oembed/url" isEqualToString:p]) return _URLString;
-	return [super contentStringForTagPath:p];
-}
-
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -191,7 +191,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGMediaRSSParser
 
-#pragma mark PGXMLParser
+#pragma mark +PGXMLParser
 
 + (BOOL)canParseTagPath:(NSString *)p
         attributes:(NSDictionary *)attrs
@@ -199,14 +199,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [p hasPrefix:@"/rss"] && [[attrs objectForKey:@"xmlns:media"] hasPrefix:@"http://search.yahoo.com/mrss"];
 }
 
-#pragma mark PGXMLParserNodeCreation Protocol
-
-- (NSString *)title
-{
-	return [[_title copy] autorelease];
-}
-
-#pragma mark PGXMLParser
+#pragma mark -PGXMLParser
 
 - (void)beganTagPath:(NSString *)p
         attributes:(NSDictionary *)attrs
@@ -218,7 +211,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [@"/rss/channel/title" isEqualToString:p] ? _title : nil;
 }
 
-#pragma mark NSObject
+#pragma mark -PGXMLParser(PGXMLParserNodeCreation)
+
+- (NSString *)title
+{
+	return [[_title copy] autorelease];
+}
+
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -237,7 +237,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGMediaRSSItemParser
 
-#pragma mark PGXMLParserNodeCreation Protocol
+#pragma mark -PGXMLParser
+
+- (void)beganTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	if([@"/rss/channel/item/media:content" isEqualToString:p] || [@"rss/channel/item/media:group/media:content" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemContentParser alloc] init] autorelease]];
+}
+- (NSMutableString *)contentStringForTagPath:(NSString *)p
+{
+	if([@"/rss/channel/item/title" isEqualToString:p]) return _title;
+	return nil;
+}
+
+#pragma mark -PGXMLParser(PGXMLParserNodeCreation)
 
 - (BOOL)createsMultipleNodes
 {
@@ -253,20 +266,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [subparsers count] ? [[subparsers objectAtIndex:0] URL] : nil;
 }
 
-#pragma mark PGXMLParser
-
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
-{
-	if([@"/rss/channel/item/media:content" isEqualToString:p] || [@"rss/channel/item/media:group/media:content" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemContentParser alloc] init] autorelease]];
-}
-- (NSMutableString *)contentStringForTagPath:(NSString *)p
-{
-	if([@"/rss/channel/item/title" isEqualToString:p]) return _title;
-	return nil;
-}
-
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -285,7 +285,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGMediaRSSItemContentParser
 
-#pragma mark PGXMLParserNodeCreation Protocol
+#pragma mark -PGXMLParser
+
+- (void)beganTagPath:(NSString *)p
+        attributes:(NSDictionary *)attrs
+{
+	[_URLString autorelease];
+	_URLString = [[attrs objectForKey:@"url"] copy];
+	[_MIMEType autorelease];
+	_MIMEType = [[attrs objectForKey:@"type"] copy];
+}
+
+#pragma mark -PGXMLParser(PGXMLParserNodeCreation)
 
 - (BOOL)createsMultipleNodes
 {
@@ -300,18 +311,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
 }
 
-#pragma mark PGXMLParser
-
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
-{
-	[_URLString autorelease];
-	_URLString = [[attrs objectForKey:@"url"] copy];
-	[_MIMEType autorelease];
-	_MIMEType = [[attrs objectForKey:@"type"] copy];
-}
-
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {

@@ -59,7 +59,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 #define PGDocumentMaxCachedNodes 3
 
-@interface PGDocument (Private)
+@interface PGDocument(Private)
 
 - (PGNode *)_initialNode;
 - (void)_setInitialIdentifier:(PGResourceIdentifier *)ident;
@@ -68,7 +68,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 @implementation PGDocument
 
-#pragma mark Instance Methods
+#pragma mark -PGDocument
 
 - (id)initWithIdentifier:(PGDisplayableIdentifier *)ident
 {
@@ -310,7 +310,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGDocument(Private)
 
 - (PGNode *)_initialNode
 {
@@ -324,7 +324,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	_initialIdentifier = [ident retain];
 }
 
-#pragma mark PGPrefObject
+#pragma mark -PGPrefObject
 
 - (void)setShowsInfo:(BOOL)flag
 {
@@ -376,7 +376,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[[PGPrefObject globalPrefObject] setTimerInterval:interval];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {

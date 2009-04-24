@@ -56,7 +56,7 @@ enum {
 	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading
 }; // PGNodeStatus.
 
-@interface PGNode (Private)
+@interface PGNode(Private)
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
 - (NSArray *)_standardizedInfo:(id)info;
@@ -68,14 +68,14 @@ enum {
 
 @implementation PGNode
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
 	srandom(time(NULL)); // Used by our shuffle sort.
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGNode
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent
       document:(PGDocument *)doc
@@ -334,7 +334,7 @@ enum {
 	[[self document] noteNodeDisplayNameDidChange:self];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGNode(Private)
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter
 {
@@ -445,7 +445,65 @@ enum {
 	if(menuNeedsUpdate) [self _updateMenuItem];
 }
 
-#pragma mark PGResourceAdapting Proxy
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	// Using our generic -AE_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
+	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
+	[_identifier release];
+	[_menuItem release];
+	[_adapters release];
+	[_error release];
+	[_dateModified release];
+	[_dateCreated release];
+	[_dataLength release];
+	[super dealloc];
+}
+
+#pragma mark -
+
+- (IMP)methodForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_adapter methodForSelector:sel];
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+	return [_adapter methodSignatureForSelector:sel];
+}
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+	[invocation invokeWithTarget:_adapter];
+}
+
+#pragma mark -NSObject(NSObject)
+
+- (unsigned)hash
+{
+	return [[self class] hash] ^ [[self identifier] hash];
+}
+- (BOOL)isEqual:(id)anObject
+{
+	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
+}
+
+#pragma mark -
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
+}
+
+#pragma mark -
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? YES : [_adapter respondsToSelector:sel];
+}
+
+#pragma mark -<PGResourceAdapting>
 
 - (PGNode *)parentNode
 {
@@ -492,67 +550,9 @@ enum {
 	[[self document] noteNodeIsViewableDidChange:self];
 }
 
-#pragma mark NSObject Protocol
-
-- (unsigned)hash
-{
-	return [[self class] hash] ^ [[self identifier] hash];
-}
-- (BOOL)isEqual:(id)anObject
-{
-	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
-}
-
-#pragma mark -
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
-}
-
-#pragma mark -
-
-- (BOOL)respondsToSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? YES : [_adapter respondsToSelector:sel];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	// Using our generic -AE_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
-	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
-	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
-	[_identifier release];
-	[_menuItem release];
-	[_adapters release];
-	[_error release];
-	[_dateModified release];
-	[_dateCreated release];
-	[_dataLength release];
-	[super dealloc];
-}
-
-#pragma mark -
-
-- (IMP)methodForSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_adapter methodForSelector:sel];
-}
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
-{
-	return [_adapter methodSignatureForSelector:sel];
-}
-- (void)forwardInvocation:(NSInvocation *)invocation
-{
-	[invocation invokeWithTarget:_adapter];
-}
-
 @end
 
-@implementation NSObject (PGNodeDataSource)
+@implementation NSObject(PGNodeDataSource)
 
 - (NSDate *)dateModifiedForNode:(PGNode *)sender
 {

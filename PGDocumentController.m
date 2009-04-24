@@ -786,13 +786,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[self readingDirectionDidChange:nil];
 }
 
-#pragma mark -NSObject(PGDisplayControlling)
-
-- (IBAction)reveal:(id)sender {}
-- (IBAction)toggleFullscreen:(id)sender {}
-- (IBAction)toggleInfo:(id)sender {}
-- (IBAction)toggleThumbnails:(id)sender {}
-
 #pragma mark -NSObject(SUUpdaterDelegateInformalProtocol)
 
 - (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
@@ -807,6 +800,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
 }
+
+#pragma mark -<PGDisplayControlling>
+
+- (IBAction)reveal:(id)sender {}
+- (IBAction)toggleFullscreen:(id)sender {}
+- (IBAction)toggleInfo:(id)sender {}
+- (IBAction)toggleThumbnails:(id)sender {}
 
 @end
 

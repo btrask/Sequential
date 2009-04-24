@@ -58,7 +58,7 @@ static NSMutableArray  *PGAdaptersThatRequestedThumbnails = nil;
 static NSMutableArray  *PGAdaptersWaitingForThumbnails    = nil;
 static NSMutableArray  *PGInfoDictionaries                = nil;
 
-@interface PGResourceAdapter (Private)
+@interface PGResourceAdapter(Private)
 
 + (void)_threaded_generateRealThumbnails;
 + (void)_setRealThumbnailWithDictionary:(NSDictionary *)aDict;
@@ -72,7 +72,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 @implementation PGResourceAdapter
 
-#pragma mark Class Methods
+#pragma mark +PGResourceAdapter
 
 + (NSDictionary *)typesDictionary
 {
@@ -181,7 +181,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return thumbRep;
 }
 
-#pragma mark Private Protocol
+#pragma mark +PGResourceAdapter(Private)
 
 + (void)_threaded_generateRealThumbnails
 {
@@ -210,7 +210,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	if(thumbnail) [adapter setRealThumbnail:thumbnail validAsOf:[aDict objectForKey:PGDateKey]];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGResourceAdapter
 
 - (PGNode *)node
 {
@@ -382,7 +382,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (void)noteResourceDidChange {}
 
-#pragma mark Private Protocol
+#pragma mark -PGResourceAdapter(Private)
 
 - (id)_initWithPriority:(PGMatchPriority)priority
       info:(NSDictionary *)info
@@ -413,7 +413,73 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[pool release];
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark -NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		_info = [[NSMutableDictionary alloc] init];
+		_subloads = [[NSMutableArray alloc] initWithCallbacks:NULL];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[self cancelThumbnailGeneration];
+	[_info release];
+	[_fastThumbnail release];
+	[_realThumbnail release];
+	[_lastThumbnailInvalidation release];
+	[_subloads release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSObject)
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
+}
+
+#pragma mark -<PGLoading>
+
+- (NSString *)loadDescription
+{
+	return [[self identifier] displayName];
+}
+- (float)loadProgress
+{
+	return 0;
+}
+- (id<PGLoading>)parentLoad
+{
+	return [self parentAdapter] ? [self parentAdapter] : [PGLoadManager sharedLoadManager];
+}
+- (NSArray *)subloads
+{
+	return [[_subloads retain] autorelease];
+}
+- (void)setSubload:(id<PGLoading>)obj
+        isLoading:(BOOL)flag
+{
+	if(!flag) [_subloads removeObjectIdenticalTo:obj];
+	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
+	[[self parentLoad] setSubload:[self node] isLoading:[_subloads count] != 0];
+}
+- (void)prioritizeSubload:(id<PGLoading>)obj
+{
+	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
+	if(NSNotFound == i) return;
+	[_subloads removeObjectAtIndex:i];
+	[_subloads insertObject:obj atIndex:0];
+	[[self parentLoad] prioritizeSubload:[self node]];
+}
+- (void)cancelLoad
+{
+	[_subloads makeObjectsPerformSelector:@selector(cancelLoad)];
+}
+
+#pragma mark -<PGResourceAdapting>
 
 - (PGNode *)parentNode
 {
@@ -604,72 +670,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (void)noteIsViewableDidChange
 {
 	[[self node] noteIsViewableDidChange];
-}
-
-#pragma mark PGLoading Protocol
-
-- (NSString *)loadDescription
-{
-	return [[self identifier] displayName];
-}
-- (float)loadProgress
-{
-	return 0;
-}
-- (id<PGLoading>)parentLoad
-{
-	return [self parentAdapter] ? [self parentAdapter] : [PGLoadManager sharedLoadManager];
-}
-- (NSArray *)subloads
-{
-	return [[_subloads retain] autorelease];
-}
-- (void)setSubload:(id<PGLoading>)obj
-        isLoading:(BOOL)flag
-{
-	if(!flag) [_subloads removeObjectIdenticalTo:obj];
-	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
-	[[self parentLoad] setSubload:[self node] isLoading:[_subloads count] != 0];
-}
-- (void)prioritizeSubload:(id<PGLoading>)obj
-{
-	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
-	if(NSNotFound == i) return;
-	[_subloads removeObjectAtIndex:i];
-	[_subloads insertObject:obj atIndex:0];
-	[[self parentLoad] prioritizeSubload:[self node]];
-}
-- (void)cancelLoad
-{
-	[_subloads makeObjectsPerformSelector:@selector(cancelLoad)];
-}
-
-#pragma mark NSObject Protocol
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
-}
-
-#pragma mark NSObject
-
-- (id)init
-{
-	if((self = [super init])) {
-		_info = [[NSMutableDictionary alloc] init];
-		_subloads = [[NSMutableArray alloc] initWithCallbacks:NULL];
-	}
-	return self;
-}
-- (void)dealloc
-{
-	[self cancelThumbnailGeneration];
-	[_info release];
-	[_fastThumbnail release];
-	[_realThumbnail release];
-	[_lastThumbnailInvalidation release];
-	[_subloads release];
-	[super dealloc];
 }
 
 @end

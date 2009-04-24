@@ -220,7 +220,7 @@ static unsigned PGSimultaneousConnections = 0;
 
 @end
 
-@implementation NSObject (PGURLLoadDelegate)
+@implementation NSObject(PGURLLoadDelegate)
 
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender {}
 - (void)loadDidReceiveResponse:(PGURLLoad *)sender {}
@@ -230,10 +230,10 @@ static unsigned PGSimultaneousConnections = 0;
 
 @end
 
-@interface NSObject (PGLoadingCategoryHack) <PGLoading>
+@interface NSObject(PGLoadingCategoryHack) <PGLoading>
 @end
 
-@implementation NSObject (PGURLLoadStarting)
+@implementation NSObject(PGURLLoadStarting)
 
 - (BOOL)PG_startNextURLLoad
 {

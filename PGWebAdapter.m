@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGWebAdapter
 
-#pragma mark PGResourceAdapter
+#pragma mark +PGResourceAdapter
 
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
@@ -46,7 +46,38 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return !ident || [[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [ident isFileIdentifier] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
-#pragma mark PGURLLoadDelegate Protocol
+#pragma mark -PGResourceAdapter
+
+- (void)load
+{
+	NSParameterAssert(![self canGetData]);
+	_triedLoad = YES;
+	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URL];
+	[_faviconLoad cancelAndNotify:NO];
+	[_faviconLoad release];
+	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] parentLoad:self delegate:self];
+	[_mainLoad cancelAndNotify:NO];
+	[_mainLoad release];
+	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] parentLoad:self delegate:self];
+}
+- (void)fallbackLoad
+{
+	if(_triedLoad) [[self node] setError:nil];
+	else [self load];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_mainLoad cancelAndNotify:NO];
+	[_mainLoad release];
+	[_faviconLoad cancelAndNotify:NO];
+	[_faviconLoad release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(PGURLLoadDelegate)
 
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
@@ -90,42 +121,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self node] loadFinished];
 }
 
-#pragma mark PGLoading Protocol
+#pragma mark -<PGLoading>
 
 - (float)loadProgress
 {
 	return [_mainLoad loadProgress];
-}
-
-#pragma mark PGResourceAdapter
-
-- (void)load
-{
-	NSParameterAssert(![self canGetData]);
-	_triedLoad = YES;
-	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URL];
-	[_faviconLoad cancelAndNotify:NO];
-	[_faviconLoad release];
-	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0] parentLoad:self delegate:self];
-	[_mainLoad cancelAndNotify:NO];
-	[_mainLoad release];
-	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0] parentLoad:self delegate:self];
-}
-- (void)fallbackLoad
-{
-	if(_triedLoad) [[self node] setError:nil];
-	else [self load];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[_mainLoad cancelAndNotify:NO];
-	[_mainLoad release];
-	[_faviconLoad cancelAndNotify:NO];
-	[_faviconLoad release];
-	[super dealloc];
 }
 
 @end
