@@ -186,6 +186,7 @@
 		0EEE58380DB55B61006E5B9C /* timevary.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58200DB55B61006E5B9C /* timevary.c */; };
 		0EF5431E0DC128B600905391 /* PGNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EF5431D0DC128B600905391 /* PGNode.m */; };
 		0EF543240DC1291600905391 /* PGFolderAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EF543230DC1291600905391 /* PGFolderAdapter.m */; };
+		0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EF9B2540FA348F700B7E16A /* PGIconTextFieldCell.m */; };
 		8D15AC2C0486D014006FF6A4 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */; };
 		8D15AC2D0486D014006FF6A4 /* PGMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 2A37F4B6FDCFA73011CA2CEA /* PGMenu.nib */; };
 		8D15AC2F0486D014006FF6A4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165FFE840EACC02AAC07 /* InfoPlist.strings */; };
@@ -646,6 +647,8 @@
 		0EF5431D0DC128B600905391 /* PGNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNode.m; sourceTree = "<group>"; };
 		0EF543220DC1291600905391 /* PGFolderAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFolderAdapter.h; sourceTree = "<group>"; };
 		0EF543230DC1291600905391 /* PGFolderAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFolderAdapter.m; sourceTree = "<group>"; };
+		0EF9B2530FA348F700B7E16A /* PGIconTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGIconTextFieldCell.h; sourceTree = "<group>"; };
+		0EF9B2540FA348F700B7E16A /* PGIconTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGIconTextFieldCell.m; sourceTree = "<group>"; };
 		1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FBA07B3F13500E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		2A37F4ACFDCFA73011CA2CEA /* PGDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDocument.m; sourceTree = "<group>"; };
@@ -713,6 +716,8 @@
 				0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */,
 				0E255BA50E3A9D2E00EDF04C /* PGTimerButton.h */,
 				0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */,
+				0EF9B2530FA348F700B7E16A /* PGIconTextFieldCell.h */,
+				0EF9B2540FA348F700B7E16A /* PGIconTextFieldCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -1409,6 +1414,7 @@
 				0E8877EB0F3AB9C000B79DDC /* NSImageAdditions.m in Sources */,
 				0E5872200F44ACC300D12D91 /* NSAffineTransformAdditions.m in Sources */,
 				0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */,
+				0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

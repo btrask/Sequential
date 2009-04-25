@@ -224,7 +224,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         forTableColumn:(NSTableColumn *)tableColumn
         item:(id)item
 {
-	if(tableColumn == nameColumn) [cell setTextColor:([item canSaveData] ? [NSColor controlTextColor] : [NSColor disabledControlTextColor])];
+	if(tableColumn == nameColumn) {
+		[cell setIcon:[[item identifier] icon]];
+		[cell setEnabled:[item canSaveData]];
+	}
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView
         shouldEditTableColumn:(NSTableColumn *)tableColumn
