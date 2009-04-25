@@ -190,6 +190,10 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[_displayController setActiveDocument:self closeIfAppropriate:NO];
 	[_displayController synchronizeWindowTitleWithDocumentName];
 }
+- (BOOL)displayControllerIsModal
+{
+	return [[self displayController] activeDocument] == self && [[[self displayController] window] attachedSheet];
+}
 
 #pragma mark -
 

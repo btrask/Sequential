@@ -91,6 +91,7 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 
 - (PGDisplayController *)displayController;
 - (void)setDisplayController:(PGDisplayController *)controller;
+- (BOOL)displayControllerIsModal;
 
 - (void)createUI;
 - (void)close;

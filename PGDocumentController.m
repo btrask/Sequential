@@ -744,7 +744,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if(@selector(selectPreviousDocument:) == action) return NO;
 		if(@selector(selectNextDocument:) == action) return NO;
 	}
-	if(![self currentDocument]) {
+	if(![self currentDocument] || [[self currentDocument] displayControllerIsModal]) {
 		if(@selector(changeReadingDirection:) == action) return NO;
 		if(@selector(changeImageScaleMode:) == action) return NO;
 		if(@selector(changeImageScaleFactor:) == action) return NO;
