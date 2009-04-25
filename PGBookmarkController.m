@@ -58,12 +58,14 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 @implementation PGBookmarkController
 
+#pragma mark +PGBookmarkController
+
 + (id)sharedBookmarkController
 {
 	return sharedBookmarkController ? sharedBookmarkController : [[[self alloc] init] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGBookmarkController
 
 - (IBAction)open:(id)sender
 {
@@ -137,7 +139,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[self _saveBookmarks];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGBookmarkController(Private)
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark
 {
@@ -169,17 +171,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_bookmarks] forKey:PGPausedDocumentsKey];
 }
 
-#pragma mark NSNibAwaking Protocol
-
-- (void)awakeFromNib
-{
-	[emptyMenuItem retain];
-	PGBookmark *bookmark;
-	NSEnumerator *const bookmarkEnum = [_bookmarks objectEnumerator];
-	while((bookmark = [bookmarkEnum nextObject])) [self addMenuItemForBookmark:bookmark];
-}
-
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -210,6 +202,16 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[emptyMenuItem release];
 	[_bookmarks release];
 	[super dealloc];
+}
+
+#pragma mark -NSObject(NSNibAwaking)
+
+- (void)awakeFromNib
+{
+	[emptyMenuItem retain];
+	PGBookmark *bookmark;
+	NSEnumerator *const bookmarkEnum = [_bookmarks objectEnumerator];
+	while((bookmark = [bookmarkEnum nextObject])) [self addMenuItemForBookmark:bookmark];
 }
 
 @end
