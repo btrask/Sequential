@@ -59,6 +59,18 @@
 "GB" = "GB";
 "TB" = "TB";
 
+/* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
+"This document has a bookmark for the file %@." = "This document has a bookmark for the file “%@.”";
+
+/* Offer to resume from bookmark alert informative text. */
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
+
+/* Don't resume from bookmark button. */
+"Don't Resume" = "Don't Resume";
+
+/* Do resume from bookmark button. */
+"Resume" = "Resume";
+
 /* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %u %@ was generated while loading the URL %@." = "Произошла ошибка “%u %@” при загрузке URL “%@.”";
 

@@ -67,6 +67,7 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 	NSRect _storedFrame;
 
 	PGDisplayableIdentifier *_initialIdentifier;
+	BOOL _openedBookmark;
 	PGDisplayController *_displayController;
 	NSMenu *_pageMenu;
 	PGOrientation _baseOrientation;

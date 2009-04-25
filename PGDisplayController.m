@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGContainerAdapter.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
+#import "PGBookmark.h"
 
 // Views
 #import "PGDocumentWindow.h"
@@ -92,6 +93,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_updateNodeIndex;
 - (void)_updateInfoPanelText;
 - (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
+- (void)_offerToOpenBookmarkAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode bookmark:(PGBookmark *)bookmark;
 
 @end
 
@@ -494,9 +496,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return [[self activeDocument] showsInfo] && [self canShowInfo];
 }
-
-#pragma mark -
-
 - (BOOL)loadingIndicatorShown
 {
 	return _loadingGraphic != nil;
@@ -526,6 +525,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[self documentReadingDirectionDidChange:nil];
 		[[self window] makeKeyWindow];
 	}
+}
+- (void)offerToOpenBookmark:(PGBookmark *)bookmark
+{
+	NSAlert *const alert = [[NSAlert alloc] init];
+	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"This document has a bookmark for the file %@.", @"Offer to resume from bookmark alert message text. %@ is replaced with the page name."), [[bookmark fileIdentifier] displayName]]];
+	[alert setInformativeText:NSLocalizedString(@"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.", @"Offer to resume from bookmark alert informative text.")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Don't Resume", @"Don't resume from bookmark button.")];
+	[alert addButtonWithTitle:NSLocalizedString(@"Resume", @"Do resume from bookmark button.")];
+	NSWindow *const window = [self windowForSheet];
+	[bookmark retain];
+	if(window) [alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:@selector(_offerToOpenBookmarkAlertDidEnd:returnCode:bookmark:) contextInfo:bookmark];
+	else [self _offerToOpenBookmarkAlertDidEnd:alert returnCode:[alert runModal] bookmark:bookmark];
 }
 
 #pragma mark -
@@ -887,6 +898,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSString *const path = [savePanel filename];
 	[[[self activeNode] data] writeToFile:path atomically:NO];
 	if(![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:path]) NSBeep();
+}
+- (void)_offerToOpenBookmarkAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode bookmark:(PGBookmark *)bookmark
+{
+	[bookmark autorelease];
+	if(NSAlertSecondButtonReturn == returnCode) [[self activeDocument] openBookmark:bookmark];
 }
 
 #pragma mark -NSWindowController

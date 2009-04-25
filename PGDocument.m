@@ -121,6 +121,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[self _setInitialIdentifier:[aBookmark fileIdentifier]];
 	PGNode *const initialNode = [self _initialNode];
 	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
+		_openedBookmark = YES;
 		[[self displayController] activateNode:initialNode];
 		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
 	} else NSBeep();
@@ -194,9 +195,14 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 
 - (void)createUI
 {
-	if(![self displayController]) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
+	BOOL const new = ![self displayController];
+	if(new) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
+	if(new && !_openedBookmark) {
+		PGBookmark *const bookmark = [[PGBookmarkController sharedBookmarkController] bookmarkForIdentifier:[self originalIdentifier]];
+		if(bookmark) [[self displayController] offerToOpenBookmark:bookmark];
+	}
 }
 - (void)close
 {

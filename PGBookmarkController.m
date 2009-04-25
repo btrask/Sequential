@@ -120,6 +120,16 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 #pragma mark -
 
+- (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident
+{
+	PGBookmark *bookmark;
+	NSEnumerator *const bookmarkEnum = [_bookmarks objectEnumerator];
+	while((bookmark = [bookmarkEnum nextObject])) if([ident isEqual:[bookmark documentIdentifier]]) return bookmark;
+	return nil;
+}
+
+#pragma mark -
+
 - (BOOL)deletesBookmarks
 {
 	return _deletesBookmarks;

@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGDocument;
 @class PGNode;
+@class PGBookmark;
 
 // Views
 @class PGClipView;
@@ -145,11 +146,11 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 - (BOOL)canShowInfo;
 - (BOOL)shouldShowInfo;
-
 - (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
 - (BOOL)findPanelShown;
 - (void)setFindPanelShown:(BOOL)flag;
+- (void)offerToOpenBookmark:(PGBookmark *)bookmark;
 
 - (NSDate *)nextTimerFireDate;
 - (BOOL)isTimerRunning;

@@ -25,6 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
 // Models
+@class PGResourceIdentifier;
 @class PGBookmark;
 
 @interface PGBookmarkController : NSObject
@@ -44,6 +45,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)addBookmark:(PGBookmark *)aBookmark;
 - (void)removeBookmark:(PGBookmark *)aBookmark;
 - (void)addMenuItemForBookmark:(PGBookmark *)aBookmark;
+
+- (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident;
 
 - (BOOL)deletesBookmarks;
 - (void)setDeletesBookmarks:(BOOL)flag; // If YES, the "Resume" menu becomes a "Delete" menu.
