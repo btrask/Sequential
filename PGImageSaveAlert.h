@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSString *_destination;
 	NSMutableDictionary *_saveNamesByNodePointer;
 	BOOL _saveOnSheetClose;
+	BOOL _firstTime;
 }
 
 - (id)initWithRoot:(PGNode *)root initialSelection:(NSSet *)aSet;

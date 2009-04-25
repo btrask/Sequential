@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)beginSheetForWindow:(NSWindow *)window
 {
 	(void)[self window];
+	_firstTime = YES;
 	[_openPanel release];
 	_openPanel = [[NSOpenPanel alloc] init];
 	[_openPanel AE_addObserver:self selector:@selector(windowDidEndSheet:) name:NSWindowDidEndSheetNotification];
@@ -154,7 +155,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_destination release];
 	_destination = [path retain];
 	[nodesOutline reloadData];
-	[nodesOutline expandItem:_rootNode expandChildren:YES];
+	if(_firstTime) {
+		[nodesOutline expandItem:_rootNode expandChildren:YES];
+		_firstTime = NO;
+	}
 
 	if(!_initialSelection) return;
 	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
