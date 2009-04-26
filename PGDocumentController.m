@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other
 #import "PGAttachments.h"
+#import "PGDelayedPerforming.h"
 #import "PGKeyboardLayout.h"
 #import "PGLegacy.h"
 
@@ -96,7 +97,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)_setPageMenu:(NSMenu *)aMenu;
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
 - (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date;
-- (void)_checkForUpdates:(NSTimer *)timer;
+- (void)_checkForUpdates;
 
 @end
 
@@ -555,10 +556,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
 	[_updateTimer invalidate];
 	[_updateTimer release];
-	_updateTimer = [[NSTimer alloc] initWithFireDate:d interval:0.0f target:self selector:@selector(_checkForUpdates:) userInfo:nil repeats:NO];
-	[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
+	_updateTimer = [self PG_performSelector:@selector(_checkForUpdates:) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget];
 }
-- (void)_checkForUpdates:(NSTimer *)timer
+- (void)_checkForUpdates
 {
 	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGCheckForUpdatesKey]) return;
 	[[SUUpdater sharedUpdater] checkForUpdateInformation];
@@ -609,7 +609,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 			NSDate *updateDate = [[NSUserDefaults standardUserDefaults] objectForKey:PGNextUpdateCheckDateKey];
 			if(updateDate && [updateDate earlierDate:[NSDate date]] == updateDate) {
-				[self _checkForUpdates:nil];
+				[self _checkForUpdates];
 				updateDate = nil;
 			}
 			[self _scheduleNextUpdateCheckWithDate:updateDate];

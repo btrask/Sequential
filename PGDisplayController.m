@@ -51,9 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGEncodingAlert.h"
 
 // Other
+#import "PGDelayedPerforming.h"
 #import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
-#import "PGNonretainedObjectProxy.h"
 
 // Categories
 #import "NSControlAdditions.h"
@@ -266,7 +266,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)jumpToPage:(id)sender
 {
-	PGNode *node = [[sender representedObject] PG_nonretainedObjectValue];
+	PGNode *node = [[sender representedObject] nonretainedObjectValue];
 	if(![node isViewable]) node = [node sortedViewableNodeFirst:YES];
 	if([self activeNode] == node || !node) return;
 	[self setActiveNode:node initialLocation:PGHomeLocation];
@@ -556,15 +556,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_timer release];
 	if(run) {
 		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
-		_timer = [[NSTimer alloc] initWithFireDate:_nextTimerFireDate interval:0 target:[self PG_nonretainedObjectProxy] selector:@selector(advanceOnTimer:) userInfo:nil repeats:NO];
-		[[NSRunLoop currentRunLoop] addTimer:_timer forMode:PGCommonRunLoopsMode];
+		_timer = [self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:0];
 	} else {
 		_nextTimerFireDate = nil;
 		_timer = nil;
 	}
 	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
-- (void)advanceOnTimer:(NSTimer *)timer
+- (void)advanceOnTimer
 {
 	if(![self tryToGoForward:YES allowAlerts:YES]) [self setTimerRunning:NO];
 }
@@ -601,7 +600,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		switch(dir) {
 			case PGZoomNone: stop = YES; break;
 			case PGZoomIn:  [self zoomBy:1.1f]; break;
-			case PGZoomOut: [self zoomBy:1 / 1.1f]; break;
+			case PGZoomOut: [self zoomBy:1.0f / 1.1f]; break;
 		}
 	} while(!stop && (latestEvent = [[self window] nextEventMatchingMask:NSKeyDownMask | NSKeyUpMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
@@ -818,7 +817,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
 	_reading = YES;
-	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil afterDelay:0.5 retain:NO];
+	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:-0.5f options:0];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
@@ -1031,7 +1030,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	(void)[[PGDocumentController sharedDocumentController] validateMenuItem:anItem];
 	SEL const action = [anItem action];
 	if(@selector(jumpToPage:) == action) {
-		PGNode *const node = [[anItem representedObject] PG_nonretainedObjectValue];
+		PGNode *const node = [[anItem representedObject] nonretainedObjectValue];
 		NSCellStateValue state = NSOffState;
 		if(node && node == [self activeNode]) state = NSOnState;
 		else if([[self activeNode] isDescendantOfNode:node]) state = NSMixedState;

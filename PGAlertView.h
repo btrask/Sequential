@@ -52,7 +52,7 @@ typedef unsigned PGAlertGraphicType;
 - (void)popGraphicsOfType:(PGAlertGraphicType)type;
 
 - (unsigned)frameCount;
-- (void)animateOneFrame:(NSTimer *)aTimer;
+- (void)animateOneFrame:(PGAlertView *)anAlertView;
 
 - (void)windowWillClose:(NSNotification *)aNotif;
 

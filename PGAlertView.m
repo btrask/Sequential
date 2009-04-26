@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBezelPanel.h"
 
 // Other
+#import "PGDelayedPerforming.h"
 #import "PGGeometry.h"
-#import "PGNonretainedObjectProxy.h"
 
 // Categories
 #import "NSBezierPathAdditions.h"
@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGAlertView (Private)
 
-- (void)_delayed_popGraphic:(NSValue *)aGraphicValue; // +cancelPreviousPerformRequestsWithTarget:selector:object: unfortunately compares with -isEqual:, so we wrap the object in NSValue.
 - (void)_updateCurrentGraphic;
 
 @end
@@ -59,13 +58,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSParameterAssert(aGraphic);
 	unsigned const i = [_graphicStack indexOfObject:aGraphic];
 	if(0 == i) {
-		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayed_popGraphic:) object:[NSValue valueWithNonretainedObject:_currentGraphic]];
+		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(popGraphicIdenticalTo:) object:_currentGraphic];
 	} else {
 		[_graphicStack insertObject:aGraphic atIndex:0];
 		[self _updateCurrentGraphic];
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
-	if(fadeOutDelay >= 0.01) [self PG_performSelector:@selector(_delayed_popGraphic:) withObject:[NSValue valueWithNonretainedObject:_currentGraphic] afterDelay:fadeOutDelay retain:NO];
+	if(fadeOutDelay >= 0.01) [self PG_performSelector:@selector(popGraphicIdenticalTo:) withObject:_currentGraphic fireDate:nil interval:-fadeOutDelay options:PGCompareArgumentPointer];
 	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
@@ -98,7 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return _frameCount;
 }
-- (void)animateOneFrame:(NSTimer *)aTimer
+- (void)animateOneFrame:(PGAlertView *)anAlertView
 {
 	NSParameterAssert(_currentGraphic);
 	_frameCount++;
@@ -117,10 +116,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark Private Protocol
 
-- (void)_delayed_popGraphic:(NSValue *)aGraphicValue
-{
-	[self popGraphicIdenticalTo:[aGraphicValue nonretainedObjectValue]];
-}
 - (void)_updateCurrentGraphic
 {
 	if(![_graphicStack count]) {
@@ -133,8 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_frameTimer invalidate];
 	_frameCount = 0;
 	NSTimeInterval const animationDelay = [_currentGraphic animationDelay];
-	_frameTimer = animationDelay > 0 ? [NSTimer timerWithTimeInterval:animationDelay target:self selector:@selector(animateOneFrame:) userInfo:nil repeats:YES] : nil;
-	if(_frameTimer) [[NSRunLoop currentRunLoop] addTimer:_frameTimer forMode:PGCommonRunLoopsMode];
+	_frameTimer = animationDelay > 0 ? [self PG_performSelector:@selector(animateOneFrame:) withObject:self fireDate:nil interval:animationDelay options:PGRetainTarget] : nil;
 	[self setNeedsDisplay:YES];
 }
 

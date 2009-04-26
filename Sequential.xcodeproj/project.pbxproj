@@ -69,10 +69,10 @@
 		0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */; };
 		0E20AF640EA702A1002A7854 /* NSImageRepAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF630EA702A1002A7854 /* NSImageRepAdditions.m */; };
 		0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */; };
+		0E2500C20FA4755A002CCCBA /* PGDelayedPerforming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2500C10FA4755A002CCCBA /* PGDelayedPerforming.m */; };
 		0E255B960E3A99AA00EDF04C /* PGTimer.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E255B940E3A99AA00EDF04C /* PGTimer.nib */; };
 		0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */; };
 		0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */; };
-		0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E255DED0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m */; };
 		0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E27080D0E2E222700D65876 /* NSControlAdditions.m */; };
 		0E2D08790DD2B4F800EC128A /* PGRoundedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */; };
 		0E4793930DF15FD90083B7CA /* PGAttachments.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E4793920DF15FD90083B7CA /* PGAttachments.m */; };
@@ -379,13 +379,13 @@
 		0E20AF630EA702A1002A7854 /* NSImageRepAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSImageRepAdditions.m; sourceTree = "<group>"; };
 		0E2237A60EC2096D002F09C8 /* PGDisplayControlling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDisplayControlling.h; sourceTree = "<group>"; };
 		0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDisplayControlling.m; sourceTree = "<group>"; };
+		0E2500C00FA4755A002CCCBA /* PGDelayedPerforming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDelayedPerforming.h; sourceTree = "<group>"; };
+		0E2500C10FA4755A002CCCBA /* PGDelayedPerforming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDelayedPerforming.m; sourceTree = "<group>"; };
 		0E255B950E3A99AA00EDF04C /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGTimer.nib; sourceTree = "<group>"; };
 		0E255B990E3A9A1E00EDF04C /* PGTimerPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimerPanelController.h; sourceTree = "<group>"; };
 		0E255B9A0E3A9A1E00EDF04C /* PGTimerPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimerPanelController.m; sourceTree = "<group>"; };
 		0E255BA50E3A9D2E00EDF04C /* PGTimerButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGTimerButton.h; sourceTree = "<group>"; };
 		0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGTimerButton.m; sourceTree = "<group>"; };
-		0E255DEC0E3BC85D00EDF04C /* PGNonretainedObjectProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNonretainedObjectProxy.h; sourceTree = "<group>"; };
-		0E255DED0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGNonretainedObjectProxy.m; sourceTree = "<group>"; };
 		0E255F080E3C07D100EDF04C /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGTimer.nib; sourceTree = "<group>"; };
 		0E255F090E3C07D400EDF04C /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = it_IT; path = it_IT.lproj/PGTimer.nib; sourceTree = "<group>"; };
 		0E255F0A0E3C07D700EDF04C /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGTimer.nib; sourceTree = "<group>"; };
@@ -869,6 +869,8 @@
 				0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */,
 				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
 				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
+				0E2500C00FA4755A002CCCBA /* PGDelayedPerforming.h */,
+				0E2500C10FA4755A002CCCBA /* PGDelayedPerforming.m */,
 				0E92E1340E2CA88400276801 /* PGGeometry.h */,
 				0E92E1350E2CA88400276801 /* PGGeometry.m */,
 				0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */,
@@ -879,8 +881,6 @@
 				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
 				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
 				0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */,
-				0E255DEC0E3BC85D00EDF04C /* PGNonretainedObjectProxy.h */,
-				0E255DED0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m */,
 				0EC11DEE0CA02B7B003E492C /* PGZooming.h */,
 				0EC11DEF0CA02B7B003E492C /* PGZooming.m */,
 			);
@@ -1394,7 +1394,6 @@
 				0E27080E0E2E222700D65876 /* NSControlAdditions.m in Sources */,
 				0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */,
 				0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */,
-				0E255DEE0E3BC85D00EDF04C /* PGNonretainedObjectProxy.m in Sources */,
 				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
 				0E675E3B0E8BA38D008C57C9 /* NSMutableDictionaryAdditions.m in Sources */,
 				0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */,
@@ -1415,6 +1414,7 @@
 				0E5872200F44ACC300D12D91 /* NSAffineTransformAdditions.m in Sources */,
 				0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */,
 				0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */,
+				0E2500C20FA4755A002CCCBA /* PGDelayedPerforming.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

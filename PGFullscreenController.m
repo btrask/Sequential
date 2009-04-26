@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGPrefController.h"
 
 // Other
-#import "PGNonretainedObjectProxy.h"
+#import "PGDelayedPerforming.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -158,7 +158,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
 {
-	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil afterDelay:0 retain:NO]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {

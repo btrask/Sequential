@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 
 // Other
-#import "PGNonretainedObjectProxy.h"
+#import "PGDelayedPerforming.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (PGPrefObject *)_currentPrefObject;
 - (void)_update;
-- (void)_updateOnTimer:(NSTimer *)timer;
+- (void)_updateOnTimer:(NSNumber *)changed;
 
 @end
 
@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSTimeInterval const interval = round([sender doubleValue]);
 	[[self _currentPrefObject] setTimerInterval:interval];
-	[self _updateOnTimer:nil];
+	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
 }
 
 #pragma mark -
@@ -87,15 +87,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_updateTimer release];
 		_updateTimer = nil;
 	} else if(!_updateTimer) {
-		_updateTimer = [[NSTimer timerWithTimeInterval:1.0 / 24.0 target:[self PG_nonretainedObjectProxy] selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES] retain];
-		[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
+		_updateTimer = [self PG_performSelector:@selector(_updateOnTimer:) withObject:[NSNumber numberWithBool:NO] fireDate:nil interval:1.0f / 24.0f options:0];
 	}
 	[timerButton setEnabled:!!d];
 	[timerButton setIconType:run ? AEStopIcon : AEPlayIcon];
-	[self _updateOnTimer:nil];
+	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
 }
-- (void)_updateOnTimer:(NSTimer *)timer
+- (void)_updateOnTimer:(NSNumber *)changed
 {
+	NSParameterAssert(changed);
 	NSTimeInterval const interval = [[self _currentPrefObject] timerInterval];
 	BOOL const running = [[self displayController] isTimerRunning];
 	NSTimeInterval timeRemaining = interval;
@@ -105,7 +105,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[timerButton setProgress:(running ? (interval - timeRemaining) / interval : 0)];
 	[remainingField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), timeRemaining]];
-	if(!timer) {
+	if([changed boolValue]) {
 		[totalField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), interval]];
 		[intervalSlider setDoubleValue:interval];
 		[intervalSlider setEnabled:!![self displayController]];
@@ -139,7 +139,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[self _updateOnTimer:nil];
+	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
 }
 
 #pragma mark NSObject

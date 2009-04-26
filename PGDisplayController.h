@@ -155,7 +155,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (NSDate *)nextTimerFireDate;
 - (BOOL)isTimerRunning;
 - (void)setTimerRunning:(BOOL)run;
-- (void)advanceOnTimer:(NSTimer *)timer;
+- (void)advanceOnTimer;
 
 - (void)zoomBy:(float)aFloat;
 - (void)zoomKeyDown:(NSEvent *)firstEvent;

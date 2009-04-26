@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other
 #import "PGGeometry.h"
-#import "PGNonretainedObjectProxy.h"
+#import "PGDelayedPerforming.h"
 
 // Categories
 #import "NSAffineTransformAdditions.h"
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
 - (BOOL)_setSize:(NSSize)size;
-- (void)_sizeTransitionOneFrame:(NSTimer *)timer;
+- (void)_sizeTransitionOneFrame;
 - (void)_updateFrameSize;
 
 @end
@@ -118,10 +118,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	if(NSEqualSizes(size, [self size])) return;
 	_size = size;
-	if(!_sizeTransitionTimer) {
-		_sizeTransitionTimer = [NSTimer timerWithTimeInterval:PGAnimationFramerate target:[self PG_nonretainedObjectProxy] selector:@selector(_sizeTransitionOneFrame:) userInfo:nil repeats:YES];
-		[[NSRunLoop currentRunLoop] addTimer:_sizeTransitionTimer forMode:PGCommonRunLoopsMode];
-	}
+	if(!_sizeTransitionTimer) _sizeTransitionTimer = [self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0];
 }
 - (void)stopAnimatedSizeTransition
 {
@@ -259,7 +256,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_runAnimationTimer
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
-	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil afterDelay:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] retain:NO];
+	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] options:0];
 }
 - (void)_animate
 {
@@ -296,7 +293,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 
-	if(![view lockFocusIfCanDraw]) return [self PG_performSelector:@selector(_cache) withObject:nil afterDelay:0 retain:NO];
+	if(![view lockFocusIfCanDraw]) return (void)[self PG_performSelector:@selector(_cache) withObject:nil fireDate:nil interval:0 options:0];
 	NSRect const cacheRect = [_cache rect];
 	if(_isPDF) {
 		[[NSColor whiteColor] set];
@@ -370,7 +367,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _updateFrameSize];
 	return YES;
 }
-- (void)_sizeTransitionOneFrame:(NSTimer *)timer
+- (void)_sizeTransitionOneFrame
 {
 	NSSize const r = NSMakeSize(_size.width - _immediateSize.width, _size.height - _immediateSize.height);
 	float const dist = hypotf(r.width, r.height);

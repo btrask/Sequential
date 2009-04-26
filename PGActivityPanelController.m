@@ -30,12 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGProgressIndicatorCell.h"
 
+// Other
+#import "PGDelayedPerforming.h"
+
 // Categories
 #import "NSObjectAdditions.h"
 
 @interface PGActivityPanelController (Private)
 
-- (void)_updateOnTimer:(NSTimer *)timer;
+- (void)_update;
 
 @end
 
@@ -52,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark Private Protocol
 
-- (void)_updateOnTimer:(NSTimer *)timer
+- (void)_update
 {
 	[activityOutline reloadData];
 	if(PGIsLeopardOrLater()) [activityOutline expandItem:nil expandChildren:YES];
@@ -121,9 +124,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowWillShow
 {
-	_updateTimer = [NSTimer timerWithTimeInterval:(1.0 / 12.0) target:self selector:@selector(_updateOnTimer:) userInfo:nil repeats:YES];
-	[[NSRunLoop currentRunLoop] addTimer:_updateTimer forMode:PGCommonRunLoopsMode];
-	[self _updateOnTimer:nil];
+	_updateTimer = [self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f / 12.0f options:PGRetainTarget];
+	[self _update];
 }
 - (void)windowDidClose
 {

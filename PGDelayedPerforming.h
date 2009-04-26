@@ -24,25 +24,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface PGNonretainedObjectProxy : NSObject // Only objects support NSDelayedPerforming.
-{
-	@private
-	id _target;
-}
+enum {
+	PGRetainTarget = 1 << 0,
+	PGCompareArgumentPointer = 1 << 1
+};
+typedef NSUInteger PGDelayedPerformingOptions;
 
-- (id)initWithTarget:(id)anObject;
+@interface NSObject (PGDelayedPerforming)
 
-@end
-
-@interface NSObject (PGNonretainedObjectProxy)
-
-- (id)PG_nonretainedObjectProxy;
-- (id)PG_nonretainedObjectValue;
-
-- (void)PG_performSelector:(SEL)aSel withObject:(id)anObject afterDelay:(NSTimeInterval)interval retain:(BOOL)flag;
-- (void)PG_performSelector:(SEL)aSel withObject:(id)anObject afterDelay:(NSTimeInterval)interval inModes:(NSArray *)runLoopModes retain:(BOOL)flag;
-
+- (NSTimer *)PG_performSelector:(SEL)aSel withObject:(id)anArgument fireDate:(NSDate *)date interval:(NSTimeInterval)interval options:(PGDelayedPerformingOptions)opts;
+- (NSTimer *)PG_performSelector:(SEL)aSel withObject:(id)anArgument fireDate:(NSDate *)date interval:(NSTimeInterval)interval options:(PGDelayedPerformingOptions)opts mode:(NSString *)mode;
 - (void)PG_cancelPreviousPerformRequests;
-- (void)PG_cancelPreviousPerformRequestsWithSelector:(SEL)aSel object:(id)anObject;
+- (void)PG_cancelPreviousPerformRequestsWithSelector:(SEL)aSel object:(id)anArgument;
 
 @end

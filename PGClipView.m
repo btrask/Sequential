@@ -28,9 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <HMDTAppKit/HMAppKitEx.h>
 
 // Other
+#import "PGDelayedPerforming.h"
 #import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
-#import "PGNonretainedObjectProxy.h"
 #import "PGZooming.h"
 
 // Categories
@@ -66,7 +66,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (BOOL)_setPosition:(NSPoint)aPoint scrollEnclosingClipViews:(BOOL)scroll markForRedisplay:(BOOL)redisplay;
 - (BOOL)_scrollTo:(NSPoint)aPoint;
-- (void)_scrollOneFrame:(NSTimer *)timer;
+- (void)_scrollOneFrame;
 - (void)_beginPreliminaryDrag:(NSValue *)val;
 - (void)_delayedEndGesture;
 
@@ -256,8 +256,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_position = newTargetPosition;
 	if(!_scrollTimer) {
 		[self beginScrolling];
-		_scrollTimer = [NSTimer timerWithTimeInterval:PGAnimationFramerate target:[self PG_nonretainedObjectProxy] selector:@selector(_scrollOneFrame:) userInfo:nil repeats:YES];
-		[[NSRunLoop currentRunLoop] addTimer:_scrollTimer forMode:PGCommonRunLoopsMode];
+		_scrollTimer = [self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0];
 	}
 	return YES;
 }
@@ -348,7 +347,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	}
 	PGDragMode dragMode = PGNotDragging;
 	NSValue *const dragModeValue = [NSValue valueWithPointer:&dragMode];
-	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue afterDelay:(GetDblTime() / 60.0) inModes:[NSArray arrayWithObject:NSEventTrackingRunLoopMode] retain:NO]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
+	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue fireDate:nil interval:GetDblTime() / -60.0f options:0 mode:NSEventTrackingRunLoopMode]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = originalPoint; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
 	NSRect const availableDragRect = [self convertRect:NSInsetRect([self insetBounds], 4, 4) toView:nil];
@@ -523,7 +522,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self setNeedsDisplayInRect:[[self window] HM_resizeRectForView:self]]; // The window needs to draw this itself.
 	return YES;
 }
-- (void)_scrollOneFrame:(NSTimer *)timer
+- (void)_scrollOneFrame
 {
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
 	float const dist = hypotf(r.width, r.height);
@@ -686,7 +685,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if([anEvent modifierFlags] & NSCommandKeyMask) {
 		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayedEndGesture) object:nil];
 		[[self delegate] clipView:self magnifyBy:y * PGMouseWheelZoomFactor];
-		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil afterDelay:1.0f inModes:[NSArray arrayWithObject:PGCommonRunLoopsMode] retain:NO]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
+		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil fireDate:nil interval:-1.0f options:0]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
 	} else [self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
 }
 
