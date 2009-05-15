@@ -124,12 +124,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowWillShow
 {
-	_updateTimer = [self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f / 12.0f options:PGRetainTarget];
+	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f / 12.0f options:PGRetainTarget] retain];
 	[self _update];
 }
 - (void)windowDidClose
 {
 	[_updateTimer invalidate];
+	[_updateTimer release];
 	_updateTimer = nil;
 }
 

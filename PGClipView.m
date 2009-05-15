@@ -256,7 +256,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_position = newTargetPosition;
 	if(!_scrollTimer) {
 		[self beginScrolling];
-		_scrollTimer = [self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0];
+		_scrollTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0] retain];
 	}
 	return YES;
 }
@@ -281,6 +281,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	if(!_scrollTimer) return;
 	[_scrollTimer invalidate];
+	[_scrollTimer release];
 	_scrollTimer = nil;
 	_lastScrollTime = 0;
 	[self endScrolling];

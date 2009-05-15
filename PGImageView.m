@@ -118,11 +118,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	if(NSEqualSizes(size, [self size])) return;
 	_size = size;
-	if(!_sizeTransitionTimer) _sizeTransitionTimer = [self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0];
+	if(!_sizeTransitionTimer) _sizeTransitionTimer = [[self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0] retain];
 }
 - (void)stopAnimatedSizeTransition
 {
 	[_sizeTransitionTimer invalidate];
+	[_sizeTransitionTimer release];
 	_sizeTransitionTimer = nil;
 	_lastSizeAnimationTime = 0;
 	[self _setSize:_size];

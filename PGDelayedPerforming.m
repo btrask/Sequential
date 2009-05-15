@@ -85,16 +85,13 @@ static void PGTimerCallback(CFRunLoopTimerRef timer, PGTimerContextObject *conte
 	CFRunLoopTimerRef timer;
 	NSEnumerator *const timerEnum = [[[timers copy] autorelease] objectEnumerator];
 	while((timer = (CFRunLoopTimerRef)[timerEnum nextObject])) {
-		if(!CFRunLoopTimerIsValid(timer)) {
-			[timers removeObjectIdenticalTo:(NSTimer *)timer];
-			continue;
-		}
-		CFRunLoopTimerContext context;
-		CFRunLoopTimerGetContext(timer, &context);
-		if([(PGTimerContextObject *)context.info matchesSelector:aSel object:anArgument]) {
+		if(CFRunLoopTimerIsValid(timer)) {
+			CFRunLoopTimerContext context;
+			CFRunLoopTimerGetContext(timer, &context);
+			if(![(PGTimerContextObject *)context.info matchesSelector:aSel object:anArgument]) continue;
 			[(NSTimer *)timer invalidate];
-			[timers removeObjectIdenticalTo:(NSTimer *)timer];
 		}
+		[timers removeObjectIdenticalTo:(NSTimer *)timer];
 	}
 }
 

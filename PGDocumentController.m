@@ -556,7 +556,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
 	[_updateTimer invalidate];
 	[_updateTimer release];
-	_updateTimer = [self PG_performSelector:@selector(_checkForUpdates:) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget];
+	_updateTimer = [[self PG_performSelector:@selector(_checkForUpdates:) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget] retain];
 }
 - (void)_checkForUpdates
 {

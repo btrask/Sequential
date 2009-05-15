@@ -24,9 +24,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGURLLoad.h"
 
-// Other
-#import "PGNonretainedObjectProxy.h"
-
 // Categories
 #import "NSObjectAdditions.h"
 
@@ -137,7 +134,7 @@ static unsigned PGSimultaneousConnections = 0;
 	if([[self class] userAgent]) [request setValue:[[self class] userAgent] forHTTPHeaderField:@"User-Agent"];
 	if(PGIsLeopardOrLater()) { // Ensure the connections keep loading in the various run loop modes on Leopard.
 		_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-		[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:PGCommonRunLoopsMode];
+		[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:(NSString *)kCFRunLoopCommonModes];
 		[_connection start];
 	} else _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
 	PGSimultaneousConnections++;
