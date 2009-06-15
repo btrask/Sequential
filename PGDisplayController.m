@@ -556,7 +556,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_timer release];
 	if(run) {
 		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
-		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:0] retain];
+		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:0 mode:NSDefaultRunLoopMode] retain];
 	} else {
 		_nextTimerFireDate = nil;
 		_timer = nil;
@@ -565,7 +565,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)advanceOnTimer
 {
-	if(![self tryToGoForward:YES allowAlerts:YES]) [self setTimerRunning:NO];
+	[self setTimerRunning:[self tryToGoForward:YES allowAlerts:YES]];
 }
 
 #pragma mark -
@@ -829,7 +829,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
-	[self setTimerRunning:[self isTimerRunning]];
 	[self AE_postNotificationName:PGDisplayControllerActiveNodeWasReadNotification];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep
