@@ -60,7 +60,7 @@
 "TB" = "TB";
 
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
-"This document has a bookmark for the file %@." = "This document has a bookmark for the file “%@.”";
+"This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
 "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";

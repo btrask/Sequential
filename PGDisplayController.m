@@ -529,10 +529,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)offerToOpenBookmark:(PGBookmark *)bookmark
 {
 	NSAlert *const alert = [[NSAlert alloc] init];
-	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"This document has a bookmark for the file %@.", @"Offer to resume from bookmark alert message text. %@ is replaced with the page name."), [[bookmark fileIdentifier] displayName]]];
+	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"This document has a bookmark for the page %@.", @"Offer to resume from bookmark alert message text. %@ is replaced with the page name."), [[bookmark fileIdentifier] displayName]]];
 	[alert setInformativeText:NSLocalizedString(@"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.", @"Offer to resume from bookmark alert informative text.")];
-	[alert addButtonWithTitle:NSLocalizedString(@"Don't Resume", @"Don't resume from bookmark button.")];
-	[alert addButtonWithTitle:NSLocalizedString(@"Resume", @"Do resume from bookmark button.")];
+	[[alert addButtonWithTitle:NSLocalizedString(@"Resume", @"Do resume from bookmark button.")] setKeyEquivalent:@"\r"];
+	[[alert addButtonWithTitle:NSLocalizedString(@"Don't Resume", @"Don't resume from bookmark button.")] setKeyEquivalent:@"\e"];
 	NSWindow *const window = [self windowForSheet];
 	[bookmark retain];
 	if(window) [alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:@selector(_offerToOpenBookmarkAlertDidEnd:returnCode:bookmark:) contextInfo:bookmark];
@@ -901,7 +901,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_offerToOpenBookmarkAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode bookmark:(PGBookmark *)bookmark
 {
 	[bookmark autorelease];
-	if(NSAlertSecondButtonReturn == returnCode) [[self activeDocument] openBookmark:bookmark];
+	if(NSAlertFirstButtonReturn == returnCode) [[self activeDocument] openBookmark:bookmark];
 }
 
 #pragma mark -NSWindowController
