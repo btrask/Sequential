@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface NSColor (AEAdditions)
 
++ (NSColor *)AE_bezelBackgroundColor;
++ (NSColor *)AE_bezelForegroundColor;
 - (NSColor *)AE_checkerboardPatternColor;
 
 @end

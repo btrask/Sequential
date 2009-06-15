@@ -29,6 +29,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSColor (AEAdditions)
 
+#pragma mark +NSColor(AEAdditions)
+
++ (NSColor *)AE_bezelBackgroundColor
+{
+	return [NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f];
+}
++ (NSColor *)AE_bezelForegroundColor
+{
+	return [NSColor colorWithDeviceWhite:0.95f alpha:0.9f];
+}
+
+#pragma mark -NSColor(AEAdditions)
+
 - (NSColor *)AE_checkerboardPatternColor
 {
 	NSImage *const checkerboard = [[[NSImage alloc] initWithSize:NSMakeSize(PGCheckerboardSize, PGCheckerboardSize)] autorelease];

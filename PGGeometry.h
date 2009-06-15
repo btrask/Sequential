@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSPoint
 
+extern NSPoint PGIntegralPoint(NSPoint aPoint);
 extern NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
 extern NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
 extern NSSize PGPointDiff(NSPoint p1, NSPoint p2);

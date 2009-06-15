@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSBezierPathAdditions.h"
+#import "NSColorAdditions.h"
 #import "NSObjectAdditions.h"
 
 #define PGGraphicalIndicatorStyle YES
@@ -150,10 +151,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSRect const b = [self bounds];
 	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
-	[[NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f] set];
+	[[NSColor AE_bezelBackgroundColor] set];
 	[bezel fill];
 	if([self displaysProgressIndicator]) {
-		[[NSColor colorWithDeviceWhite:0.95 alpha:0.9] set];
+		[[NSColor AE_bezelForegroundColor] set];
 		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5 + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5), 0.5 + PGPaddingSize, PGIndicatorWidth - 1, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
 		unsigned const maxValue = [self count] - 1;

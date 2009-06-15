@@ -67,7 +67,7 @@ NSString *const PGDisplayControllerTimerDidChangeNotification = @"PGDisplayContr
 
 #define PGScaleMax      16.0f
 #define PGScaleMin      (1.0f / 8.0f)
-#define PGWindowMinSize 400.0f
+#define PGWindowMinSize ((NSSize){350.0f, 200.0f})
 
 enum {
 	PGZoomNone = 0,
@@ -759,7 +759,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	NSDisableScreenUpdates();
 	PGInset inset = PGZeroInset;
-	NSSize minSize = NSMakeSize(PGWindowMinSize, PGWindowMinSize);
+	NSSize minSize = PGWindowMinSize;
 	if(_thumbnailController) {
 		PGInset const thumbnailInset = [_thumbnailController contentInset];
 		inset = PGAddInsets(inset, thumbnailInset);
@@ -922,6 +922,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[encodingView retain];
 
 	[[self window] useOptimizedDrawing:YES];
+	[[self window] setMinSize:PGWindowMinSize];
 
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
 	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] autorelease] : [NSCursor pointingHandCursor])];

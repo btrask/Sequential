@@ -26,6 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSPoint
 
+NSPoint PGIntegralPoint(NSPoint aPoint)
+{
+	return NSMakePoint(roundf(aPoint.x), roundf(aPoint.y));
+}
 NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize)
 {
 	return NSMakePoint(aPoint.x + aSize.width, aPoint.y + aSize.height);

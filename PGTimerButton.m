@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometry.h"
 
+// Categories
+#import "NSColorAdditions.h"
+
 @implementation PGTimerButton
 
 #pragma mark NSControl
@@ -88,7 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)drawWithFrame:(NSRect)b inView:(NSView *)v
 {
-	[[NSColor colorWithDeviceWhite:0.9 alpha:0.8] set];
+	[[NSColor AE_bezelForegroundColor] set];
 	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5, 0.5)] stroke];
 	[self drawInteriorWithFrame:b inView:v];
 }

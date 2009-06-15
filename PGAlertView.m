@@ -33,15 +33,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSBezierPathAdditions.h"
+#import "NSColorAdditions.h"
 #import "NSObjectAdditions.h"
 
-#define PGAlertViewSize     300.0f
-#define PGAlertMinTopMargin 20.0f
+#define PGAlertViewSize 100.0f
+#define PGMarginSize 4.0
 
 @interface PGAlertView (Private)
 
 - (void)_updateCurrentGraphic;
 
+@end
+
+@interface PGCannotGoRightGraphic : PGAlertGraphic
+@end
+@interface PGCannotGoLeftGraphic : PGCannotGoRightGraphic
+@end
+@interface PGLoopedLeftGraphic : PGAlertGraphic
+@end
+@interface PGLoopedRightGraphic : PGLoopedLeftGraphic
 @end
 
 @implementation PGAlertView
@@ -139,7 +149,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           scale:(float)scaleFactor
 {
 	float const scaledPanelSize = scaleFactor * PGAlertViewSize;
-	return PGIntegralRect(NSMakeRect(NSMidX(aRect) - scaledPanelSize / 2, MIN(NSMaxY(aRect) - scaledPanelSize - PGAlertMinTopMargin * scaleFactor, NSMinY(aRect) + NSHeight(aRect) * (2.0 / 3.0) - scaledPanelSize / 2), scaledPanelSize, scaledPanelSize));
+	return PGIntegralRect(NSMakeRect(
+		NSMinX(aRect) + PGMarginSize,
+		NSMaxY(aRect) - scaledPanelSize - PGMarginSize,
+		scaledPanelSize,
+		scaledPanelSize
+	));
 }
 
 #pragma mark NSView
@@ -182,15 +197,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface PGCannotGoRightGraphic : PGAlertGraphic
-@end
-@interface PGCannotGoLeftGraphic : PGCannotGoRightGraphic
-@end
-@interface PGLoopedLeftGraphic : PGAlertGraphic
-@end
-@interface PGLoopedRightGraphic : PGLoopedLeftGraphic
-@end
-
 @implementation PGAlertGraphic
 
 #pragma mark Class Methods
@@ -226,29 +232,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	int count, i;
 	NSRect const *rects;
 	[anAlertView getRectsBeingDrawn:&rects count:&count];
-	[[NSColor colorWithDeviceWhite:0 alpha:0.5] set];
+	[[NSColor AE_bezelBackgroundColor] set];
+	float const f = PGAlertViewSize / 300.0f;
 	for(i = count; i--;) {
-		NSRectFill(NSIntersectionRect(rects[i], NSMakeRect(0, 50, 50, 200)));
-		NSRectFill(NSIntersectionRect(rects[i], NSMakeRect(50, 0, 200, 300)));
-		NSRectFill(NSIntersectionRect(rects[i], NSMakeRect(250, 50, 50, 200)));
+		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect(  0.0f * f, 50.0f * f,  50.0f * f, 200.0f * f))));
+		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect( 50.0f * f,  0.0f * f, 200.0f * f, 300.0f * f))));
+		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect(250.0f * f, 50.0f * f,  50.0f * f, 200.0f * f))));
 	}
-	NSRect const corners[4] = {NSMakeRect(250, 250, 50, 50),
-		NSMakeRect(0, 250, 50, 50),
-		NSMakeRect(0, 0, 50, 50),
-		NSMakeRect(250, 0, 50, 50)};
-	NSPoint const centers[4] = {NSMakePoint(250, 250),
-		NSMakePoint(50, 250),
-		NSMakePoint(50, 50),
-		NSMakePoint(250, 50)};
-	for(i = 4; i--;) {
+	NSRect const corners[] = {
+		PGIntegralRect(NSMakeRect(250.0f * f, 250.0f * f, 50.0f * f, 50.0f * f)),
+		PGIntegralRect(NSMakeRect(  0.0f * f, 250.0f * f, 50.0f * f, 50.0f * f)),
+		PGIntegralRect(NSMakeRect(  0.0f * f,   0.0f * f, 50.0f * f, 50.0f * f)),
+		PGIntegralRect(NSMakeRect(250.0f * f,   0.0f * f, 50.0f * f, 50.0f * f))
+	};
+	NSPoint const centers[] = {
+		PGIntegralPoint(NSMakePoint(250.0f * f, 250.0f * f)),
+		PGIntegralPoint(NSMakePoint( 50.0f * f, 250.0f * f)),
+		PGIntegralPoint(NSMakePoint( 50.0f * f,  50.0f * f)),
+		PGIntegralPoint(NSMakePoint(250.0f * f,  50.0f * f))
+	};
+	for(i = sizeof(corners) / sizeof(*corners); i--;) {
 		NSRect const corner = corners[i];
 		if(!PGIntersectsRectList(corner, rects, count)) continue;
 		[[NSColor clearColor] set];
 		NSRectFill(corners[i]);
-		[[NSColor colorWithDeviceWhite:0 alpha:0.5] set];
+		[[NSColor AE_bezelBackgroundColor] set];
 		NSBezierPath *const path = [NSBezierPath bezierPath];
 		[path moveToPoint:centers[i]];
-		[path appendBezierPathWithArcWithCenter:centers[i] radius:50 startAngle:90 * i endAngle:90 * (i + 1)];
+		[path appendBezierPathWithArcWithCenter:centers[i] radius:50.0f * f startAngle:90 * i endAngle:90 * (i + 1)];
 		[path closePath];
 		[path fill];
 	}
@@ -262,7 +273,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)flipHorizontally
 {
 	NSAffineTransform *const flip = [[[NSAffineTransform alloc] init] autorelease];
-	[flip translateXBy:300 yBy:0];
+	[flip translateXBy:PGAlertViewSize yBy:0];
 	[flip scaleXBy:-1 yBy:1];
 	[flip concat];
 }
@@ -304,27 +315,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 
-	float const small = 5;
-	float const large = 10;
-	[[NSColor whiteColor] set];
+	float const f = PGAlertViewSize / 300.0f;
+	float const small = 5.0f * f;
+	float const large = 10.0f * f;
+	[[NSColor AE_bezelForegroundColor] set];
 
 	NSBezierPath *const arrow = [NSBezierPath bezierPath];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(180, 150) radius:large startAngle:315 endAngle:45];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140, 200) radius:small startAngle:45 endAngle:90];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125, 200) radius:small startAngle:90 endAngle:180];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115, 180) radius:small startAngle:0 endAngle:270 clockwise:YES];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(75, 170) radius:small startAngle:90 endAngle:180];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(75, 130) radius:small startAngle:180 endAngle:270];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115, 120) radius:small startAngle:90 endAngle:0 clockwise:YES];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125, 100) radius:small startAngle:180 endAngle:270];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140, 100) radius:small startAngle:270 endAngle:315];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(180.0f * f, 150.0f * f) radius:large startAngle:315 endAngle:45];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 200.0f * f) radius:small startAngle:45 endAngle:90];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 200.0f * f) radius:small startAngle:90 endAngle:180];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 180.0f * f) radius:small startAngle:0 endAngle:270 clockwise:YES];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 170.0f * f) radius:small startAngle:90 endAngle:180];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 130.0f * f) radius:small startAngle:180 endAngle:270];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 120.0f * f) radius:small startAngle:90 endAngle:0 clockwise:YES];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 100.0f * f) radius:small startAngle:180 endAngle:270];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 100.0f * f) radius:small startAngle:270 endAngle:315];
 	[arrow fill];
 
 	NSBezierPath *const wall = [NSBezierPath bezierPath];
-	[wall setLineWidth:20];
+	[wall setLineWidth:20.0f * f];
 	[wall setLineCapStyle:NSRoundLineCapStyle];
-	[wall moveToPoint:NSMakePoint(210, 220)];
-	[wall lineToPoint:NSMakePoint(210, 80)];
+	[wall moveToPoint:NSMakePoint(210.0f * f, 220.0f * f)];
+	[wall lineToPoint:NSMakePoint(210.0f * f,  80.0f * f)];
 	[wall stroke];
 }
 
@@ -354,21 +366,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 
-	[[NSColor whiteColor] set];
+	[[NSColor AE_bezelForegroundColor] set];
 
 	NSBezierPath *const s = [NSBezierPath bezierPath];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(105, 155) radius:65 startAngle:90 endAngle:270 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(150, 85) radius:5 startAngle:90 endAngle:0 clockwise:YES];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(160, 65) radius:5 startAngle:180 endAngle:270 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(165, 65) radius:5 startAngle:270 endAngle:-45 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(200, 105) radius:10 startAngle:-45 endAngle:45 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(165, 145) radius:5 startAngle:45 endAngle:90 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(160, 145) radius:5 startAngle:90 endAngle:180 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(150, 125) radius:5 startAngle:0 endAngle:270 clockwise:YES];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(105, 155) radius:35 startAngle:270 endAngle:90 clockwise:YES];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(195, 155) radius:35 startAngle:90 endAngle:0 clockwise:YES];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(245, 155) radius:15 startAngle:180 endAngle:0 clockwise:NO];
-	[s appendBezierPathWithArcWithCenter:NSMakePoint(195, 155) radius:65 startAngle:0 endAngle:90 clockwise:NO];
+	float const f = PGAlertViewSize / 300.0f;
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(105.0f * f, 155.0f * f) radius:65.0f * f startAngle: 90.0f endAngle:270.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(150.0f * f,  85.0f * f) radius: 5.0f * f startAngle: 90.0f endAngle:  0.0f clockwise:YES];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(160.0f * f,  65.0f * f) radius: 5.0f * f startAngle:180.0f endAngle:270.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(165.0f * f,  65.0f * f) radius: 5.0f * f startAngle:270.0f endAngle:-45.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(200.0f * f, 105.0f * f) radius:10.0f * f startAngle:-45.0f endAngle: 45.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(165.0f * f, 145.0f * f) radius: 5.0f * f startAngle: 45.0f endAngle: 90.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(160.0f * f, 145.0f * f) radius: 5.0f * f startAngle: 90.0f endAngle:180.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(150.0f * f, 125.0f * f) radius: 5.0f * f startAngle:  0.0f endAngle:270.0f clockwise:YES];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(105.0f * f, 155.0f * f) radius:35.0f * f startAngle:270.0f endAngle: 90.0f clockwise:YES];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(195.0f * f, 155.0f * f) radius:35.0f * f startAngle: 90.0f endAngle:  0.0f clockwise:YES];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(245.0f * f, 155.0f * f) radius:15.0f * f startAngle:180.0f endAngle:  0.0f clockwise:NO];
+	[s appendBezierPathWithArcWithCenter:NSMakePoint(195.0f * f, 155.0f * f) radius:65.0f * f startAngle:  0.0f endAngle: 90.0f clockwise:NO];
 	[s fill];
 }
 - (NSTimeInterval)fadeOutDelay
@@ -426,21 +439,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawInView:(PGAlertView *)anAlertView
 {
 	[super drawInView:anAlertView];
-	[NSBezierPath AE_drawSpinnerInRect:(_progress ? NSMakeRect(50, 60, 200, 200) : NSMakeRect(40, 40, 220, 220)) startAtPetal:[anAlertView frameCount]];
+	float const f = PGAlertViewSize / 300.0f;
+	[NSBezierPath AE_drawSpinnerInRect:(_progress ? NSMakeRect(50.0f * f, 60.0f * f, 200.0f * f, 200.0f * f) : NSMakeRect(40.0f * f, 40.0f * f, 220.0f * f, 220.0f * f)) startAtPetal:[anAlertView frameCount]];
 	if(!_progress) return;
 	BOOL switched = NO;
-	[[NSColor whiteColor] set];
+	[[NSColor AE_bezelForegroundColor] set];
 	unsigned i = 0;
 	for(; i < 22; i++) {
 		if(!switched && i >= _progress * 22) {
 			NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 			[shadow setShadowColor:nil];
 			[shadow set];
-			[[NSColor colorWithDeviceWhite:1.0 alpha:0.25] set];
+			[[[NSColor AE_bezelForegroundColor] colorWithAlphaComponent:0.25] set];
 			switched = YES;
 		}
-		if(switched) [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(52 + i * 9, 32, 5, 5)] fill];
-		else NSRectFill(NSMakeRect(51 + i * 9, 30, 7, 9));
+		if(switched) [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(52.0f * f + i * 9.0f * f, 32.0f * f, 5.0f * f, 5.0f * f)] fill];
+		else NSRectFill(NSMakeRect(51.0f * f + i * 9.0f * f, 30.0f * f, 7.0f * f, 9.0f * f));
 	}
 }
 - (NSTimeInterval)fadeOutDelay
@@ -460,9 +474,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)animateOneFrame:(PGAlertView *)anAlertView
 {
-	[anAlertView setNeedsDisplayInRect:NSMakeRect(25, 50, 25, 200)];
-	[anAlertView setNeedsDisplayInRect:NSMakeRect(50, 25, 200, 250)];
-	[anAlertView setNeedsDisplayInRect:NSMakeRect(250, 50, 25, 200)];
+	float const f = PGAlertViewSize / 300.0f;
+	[anAlertView setNeedsDisplayInRect:NSMakeRect( 25.0f * f, 50.0f * f,  25.0f * f, 200.0f * f)];
+	[anAlertView setNeedsDisplayInRect:NSMakeRect( 50.0f * f, 25.0f * f, 200.0f * f, 250.0f * f)];
+	[anAlertView setNeedsDisplayInRect:NSMakeRect(250.0f * f, 50.0f * f,  25.0f * f, 200.0f * f)];
 }
 
 @end
@@ -492,7 +507,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 	NSRect const b = [anAlertView bounds];
-	[[NSColor whiteColor] set];
+	[[NSColor AE_bezelForegroundColor] set];
 	[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
 }
 - (NSTimeInterval)fadeOutDelay
