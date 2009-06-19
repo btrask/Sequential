@@ -1,3 +1,14 @@
+2.0.3 (February 23rd, 2009)
+- The visible portion of the current image is now highlighted in the thumbnail sidebar.
+- It is now possible to set images as the desktop picture from within Sequential.
+- Mighty Mouse support is improved.
+- Holding command while scrolling the mouse wheel now zooms in and out.
+- Zooming with the + and - keys is now smooth.
+- The timer can now be started and stopped without changing its duration.
+- Thumbnails now use the image orientation.
+- The thumbnail sidebar's performance is improved.
+- Other minor improvements.
+
 2.0.2v2 (December 10th, 2008)
 - Solves issues that could cause some bookmarks to be unopenable.
 - Other minor improvements.
