@@ -160,8 +160,11 @@ BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask)
 PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, PGReadingDirection dir)
 {
 	BOOL const ltr = dir == PGReadingDirectionLeftToRight;
-	if(PGHomeLocation == loc) return PGMaxYEdgeMask | (ltr ? PGMinXEdgeMask : PGMaxXEdgeMask);
-	else return PGMinYEdgeMask | (ltr ? PGMaxXEdgeMask : PGMinXEdgeMask);
+	switch(loc) {
+		case PGHomeLocation: return PGMaxYEdgeMask | (ltr ? PGMinXEdgeMask : PGMaxXEdgeMask);
+		case PGEndLocation: return PGMinYEdgeMask | (ltr ? PGMaxXEdgeMask : PGMinXEdgeMask);
+	}
+	return PGNoEdges;
 }
 
 #pragma mark PGOrientation

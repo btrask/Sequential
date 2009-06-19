@@ -94,7 +94,6 @@ typedef unsigned PGScrollToRectType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
 - (NSPoint)position;
-- (NSPoint)positionForScrollAnimation:(PGAnimationType)type;
 - (BOOL)scrollTo:(NSPoint)aPoint animation:(PGAnimationType)type;
 - (BOOL)scrollBy:(NSSize)aSize animation:(PGAnimationType)type;
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask animation:(PGAnimationType)type;
@@ -108,6 +107,8 @@ typedef unsigned PGScrollToRectType;
 
 - (NSPoint)center;
 - (BOOL)scrollCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
+- (NSPoint)relativeCenter;
+- (BOOL)scrollRelativeCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
 
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;

@@ -45,7 +45,8 @@ typedef int PGReadingDirection;
 
 enum {
 	PGHomeLocation = 0,
-	PGEndLocation  = 1
+	PGEndLocation = 1,
+	PGPreserveLocation = 2
 };
 typedef int PGPageLocation;
 

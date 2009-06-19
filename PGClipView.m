@@ -239,11 +239,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return _scrollTimer ? _position : _immediatePosition;
 }
-- (NSPoint)positionForScrollAnimation:(PGAnimationType)type
-{
-	return [self position];
-}
-
 - (BOOL)scrollTo:(NSPoint)aPoint
         animation:(PGAnimationType)type
 {
@@ -263,7 +258,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)scrollBy:(NSSize)aSize
         animation:(PGAnimationType)type
 {
-	return [self scrollTo:PGOffsetPointBySize([self positionForScrollAnimation:type], aSize) animation:type];
+	return [self scrollTo:PGOffsetPointBySize([self position], aSize) animation:type];
 }
 - (BOOL)scrollToEdge:(PGRectEdgeMask)mask
         animation:(PGAnimationType)type
@@ -329,6 +324,15 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const b = [self insetBounds];
 	PGInset const inset = [self boundsInset];
 	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2, -inset.minY - NSHeight(b) / 2) animation:type];
+}
+- (NSPoint)relativeCenter
+{
+	NSPoint const p = [self center];
+	return NSMakePoint((p.x - NSMinX(_documentFrame)) / NSWidth(_documentFrame), (p.y - NSMinY(_documentFrame)) / NSHeight(_documentFrame));
+}
+- (BOOL)scrollRelativeCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type
+{
+	return [self scrollCenterTo:NSMakePoint(aPoint.x * NSWidth(_documentFrame) + NSMinX(_documentFrame), aPoint.y * NSHeight(_documentFrame) + NSMinY(_documentFrame)) animation:type];
 }
 
 #pragma mark -

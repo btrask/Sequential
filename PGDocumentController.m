@@ -569,7 +569,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSControlKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
+	if(!([anEvent modifierFlags] & (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask))) switch([anEvent keyCode]) {
 		case PGKeyEscape: [self performEscapeKeyAction]; break;
 		case PGKeyQ: [NSApp terminate:self]; return YES;
 	}
@@ -876,7 +876,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if([equiv length] != 1) continue;
 		unsigned short const keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0]);
 		if(PGKeyUnknown == keyCode || [anEvent keyCode] != keyCode) continue; // Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
-		unsigned const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask;
+		unsigned const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask;
 		if(([anEvent modifierFlags] & modifiersMask) != ([item keyEquivalentModifierMask] & modifiersMask)) continue;
 		return [item AE_performAction];
 	}

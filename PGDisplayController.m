@@ -400,7 +400,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
         initialLocation:(PGPageLocation)location
 {
 	if(![self _setActiveNode:aNode]) return;
-	_initialLocation = location;
+	_initialLocation = [[[self window] currentEvent] modifierFlags] & NSControlKeyMask ? PGPreserveLocation : location;
 	[self _readActiveNode];
 }
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode
@@ -644,11 +644,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
+		NSPoint const relativeCenter = [clipView relativeCenter];
 		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
 		PGOrientation const orientation = [[self activeNode] orientationWithBase:YES];
 		[_imageView setImageRep:rep orientation:orientation size:[self _sizeForImageRep:rep orientation:orientation]];
 		[clipView setDocumentView:_imageView];
-		[clipView scrollToLocation:_initialLocation animation:PGNoAnimation];
+		if(PGPreserveLocation == _initialLocation) [clipView scrollRelativeCenterTo:relativeCenter animation:PGNoAnimation];
+		else [clipView scrollToLocation:_initialLocation animation:PGNoAnimation];
 		[[self window] makeFirstResponder:clipView];
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
@@ -972,7 +974,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
+	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
 	unsigned short const keyCode = [anEvent keyCode];
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
@@ -1250,14 +1252,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
 {
-	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask | NSControlKeyMask) & [anEvent modifierFlags];
+	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
 	unsigned short const keyCode = [anEvent keyCode];
 	if(!modifiers) switch(keyCode) {
 		case PGKeyEscape: return [[PGDocumentController sharedDocumentController] performEscapeKeyAction];
 		case PGKeyPadPlus: [self nextPage:self]; return YES;
 		case PGKeyPadMinus: [self previousPage:self]; return YES;
 	}
-	if(!modifiers || NSShiftKeyMask & modifiers) switch(keyCode) {
+	if(!modifiers || NSShiftKeyMask == modifiers) switch(keyCode) {
 		case PGKeySpace:
 		{
 			if(![_imageView canAnimateRep]) return NO;
@@ -1267,13 +1269,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			return YES;
 		}
 	}
-	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
+	if(!modifiers || NSCommandKeyMask == modifiers) switch(keyCode) {
 		case PGKeyEquals:
 		case PGKeyMinus: [self zoomKeyDown:anEvent]; return YES;
 	}
-	float const timerFactor = NSAlternateKeyMask & modifiers ? 10.0f : 1.0f;
+	float const timerFactor = NSAlternateKeyMask == modifiers ? 10.0f : 1.0f;
 	PGDocument *const d = [self activeDocument];
-	if(!modifiers || NSAlternateKeyMask & modifiers) switch(keyCode) {
+	if(!modifiers || NSAlternateKeyMask == modifiers) switch(keyCode) {
 		case PGKey0: [self setTimerRunning:NO]; return YES;
 		case PGKey1: [d setTimerInterval:1 * timerFactor]; [self setTimerRunning:YES]; return YES;
 		case PGKey2: [d setTimerInterval:2 * timerFactor]; [self setTimerRunning:YES]; return YES;
