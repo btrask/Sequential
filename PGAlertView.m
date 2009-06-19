@@ -440,21 +440,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 	float const f = PGAlertViewSize / 300.0f;
-	[NSBezierPath AE_drawSpinnerInRect:(_progress ? NSMakeRect(50.0f * f, 60.0f * f, 200.0f * f, 200.0f * f) : NSMakeRect(40.0f * f, 40.0f * f, 220.0f * f, 220.0f * f)) startAtPetal:[anAlertView frameCount]];
-	if(!_progress) return;
-	BOOL switched = NO;
-	[[NSColor AE_bezelForegroundColor] set];
-	unsigned i = 0;
-	for(; i < 22; i++) {
-		if(!switched && i >= _progress * 22) {
-			NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-			[shadow setShadowColor:nil];
-			[shadow set];
-			[[[NSColor AE_bezelForegroundColor] colorWithAlphaComponent:0.25] set];
-			switched = YES;
-		}
-		if(switched) [[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(52.0f * f + i * 9.0f * f, 32.0f * f, 5.0f * f, 5.0f * f)] fill];
-		else NSRectFill(NSMakeRect(51.0f * f + i * 9.0f * f, 30.0f * f, 7.0f * f, 9.0f * f));
+	if(_progress) {
+		NSBezierPath *const progressPath = [NSBezierPath bezierPath];
+		NSPoint const center = NSMakePoint(150.0f * f, 150.0f * f);
+		[progressPath appendBezierPathWithArcWithCenter:center radius:110.0f * f startAngle:90.0f endAngle:90.0f - _progress * 360.0f clockwise:YES];
+		[progressPath appendBezierPathWithArcWithCenter:center radius:55.0f * f startAngle:90.0f - _progress * 360.0f endAngle:90.0f clockwise:NO];
+		[[NSColor AE_bezelForegroundColor] set];
+		[progressPath fill];
+	} else {
+		[NSBezierPath AE_drawSpinnerInRect:NSMakeRect(40.0f * f, 40.0f * f, 220.0f * f, 220.0f * f) startAtPetal:[anAlertView frameCount]];
 	}
 }
 - (NSTimeInterval)fadeOutDelay

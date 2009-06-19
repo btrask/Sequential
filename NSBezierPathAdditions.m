@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSBezierPathAdditions.h"
 
+// Categories
+#import "NSColorAdditions.h"
+
 @implementation NSBezierPath (AEAdditions)
 
 #pragma mark Class Methods
@@ -76,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[NSBezierPath setDefaultLineCapStyle:NSRoundLineCapStyle];
 	unsigned i = 0;
 	for(; i < 12; i++) {
-		[[NSColor colorWithDeviceWhite:1 alpha:(petal < 0 ? 0.1f : ((petal + i) % 12) / -12.0f + 1)] set];
+		[[[NSColor AE_bezelForegroundColor] colorWithAlphaComponent:petal < 0 ? 0.1f : ((petal + i) % 12) / -12.0f + 1] set];
 		[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2.0f * i / 12.0f) * NSWidth(r) / 4.0f, NSMidY(r) + sinf(pi * 2.0f * i / 12.0f) * NSHeight(r) / 4.0f) toPoint:NSMakePoint(NSMidX(r) + cosf(pi * 2.0f * i / 12.0f) * NSWidth(r) / 2.0f, NSMidY(r) + sinf(pi * 2.0f * i / 12.0f) * NSHeight(r) / 2.0f)];
 	}
 	[NSBezierPath setDefaultLineWidth:1];
