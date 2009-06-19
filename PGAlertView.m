@@ -279,7 +279,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 1;
+	return 1.0f;
 }
 
 #pragma mark -
@@ -386,7 +386,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0.5;
+	return 1.0f;
 }
 
 @end
@@ -459,7 +459,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0;
+	return 0.0f;
 }
 
 #pragma mark -
@@ -508,11 +508,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super drawInView:anAlertView];
 	NSRect const b = [anAlertView bounds];
 	[[NSColor AE_bezelForegroundColor] set];
-	[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(150.0f, 150.0f), b)];
+	[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(PGAlertViewSize / 2.0f, PGAlertViewSize / 2.0f), b)];
 }
 - (NSTimeInterval)fadeOutDelay
 {
-	return 0.25;
+	return 1.0f;
 }
 
 #pragma mark NSObject Protocol
