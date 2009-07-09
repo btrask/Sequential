@@ -141,6 +141,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[self PG_cancelPreviousPerformRequests];
 	[self AE_removeObserver];
+	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
+	[_shieldWindows release];
 	[super dealloc];
 }
 
@@ -159,12 +161,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
 {
 	if([[PGPrefController sharedPrefController] displayScreen] == [NSScreen AE_mainScreen]) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+
+	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGDimOtherScreensKey]) return; // We shouldn't need to observe this value because our fullscreen window isn't going to be key while the user is adjusting the setting in the prefs window.
+	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
+	[_shieldWindows release];
+	_shieldWindows = [[NSMutableArray alloc] init];
+	NSScreen *screen;
+	NSEnumerator *const screenEnum = [[NSScreen screens] objectEnumerator];
+	while((screen = [screenEnum nextObject])) {
+		NSWindow *const w = [[[NSWindow alloc] initWithContentRect:[screen frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES] autorelease]; // Use borderless windows instead of CGSetDisplayTransferByFormula() so that 1. the menu bar remains visible (if it's on a different screen), and 2. the user can't click on things that can't be seen.
+		[w setReleasedWhenClosed:NO];
+		[w setBackgroundColor:[NSColor blackColor]];
+		[w setHasShadow:NO];
+		[w setLevel:NSFloatingWindowLevel];
+		[w orderFront:self];
+		[_shieldWindows addObject:w];
+	}
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
 	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
 	SetSystemUIMode(kUIModeNormal, kNilOptions);
+	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
+	[_shieldWindows release];
+	_shieldWindows = nil;
 }
 
 #pragma mark -NSObject(PGDocumentWindowDelegate)

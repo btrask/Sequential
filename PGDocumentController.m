@@ -67,6 +67,7 @@ NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey = @"PGBackgroundPattern";
 NSString *const PGMouseClickActionKey = @"PGMouseClickAction";
 NSString *const PGEscapeKeyMappingKey = @"PGEscapeKeyMapping";
+NSString *const PGDimOtherScreensKey = @"PGDimOtherScreens";
 
 static NSString *const PGRecentItemsKey = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
@@ -128,6 +129,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
 		[NSNumber numberWithInt:PGFullscreenMapping], PGEscapeKeyMappingKey,
+		no, PGDimOtherScreensKey,
 		yes, PGCheckForUpdatesKey,
 		no, PGUpdateAvailableKey,
 		nil]];

@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	BOOL _isExitingFullscreen;
+	NSMutableArray *_shieldWindows;
 }
 
 - (void)prepareToExitFullscreen;
