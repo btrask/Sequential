@@ -83,11 +83,16 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[_displayController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
 	[[_displayController clipView] AE_removeObserver:self name:PGClipViewBoundsDidChangeNotification];
 	[[_displayController window] AE_removeObserver:self name:NSWindowDidResizeNotification];
+	[[_displayController windowForSheet] AE_removeObserver:self name:NSWindowWillBeginSheetNotification];
+	[[_displayController windowForSheet] AE_removeObserver:self name:NSWindowDidEndSheetNotification];
 	_displayController = aController;
 	[_displayController AE_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
 	[_displayController AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
 	[[_displayController clipView] AE_addObserver:self selector:@selector(clipViewBoundsDidChange:) name:PGClipViewBoundsDidChangeNotification];
 	[[_displayController window] AE_addObserver:self selector:@selector(parentWindowDidResize:) name:NSWindowDidResizeNotification];
+	[[_displayController windowForSheet] AE_addObserver:self selector:@selector(parentWindowWillBeginSheet:) name:NSWindowWillBeginSheetNotification];
+	[[_displayController windowForSheet] AE_addObserver:self selector:@selector(parentWindowDidEndSheet:) name:NSWindowDidEndSheetNotification];
+	[_window setIgnoresMouseEvents:!![[_displayController windowForSheet] attachedSheet]];
 	[self setDocument:[_displayController activeDocument]];
 	[self display];
 }
@@ -154,6 +159,14 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)parentWindowDidResize:(NSNotification *)aNotif
 {
 	[self _updateWindowFrame];
+}
+- (void)parentWindowWillBeginSheet:(NSNotification *)aNotif
+{
+	[_window setIgnoresMouseEvents:YES];
+}
+- (void)parentWindowDidEndSheet:(NSNotification *)aNotif
+{
+	[_window setIgnoresMouseEvents:NO];
 }
 
 #pragma mark -

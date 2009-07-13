@@ -66,7 +66,12 @@ extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif;
 - (void)clipViewBoundsDidChange:(NSNotification *)aNotif;
 - (void)parentWindowDidResize:(NSNotification *)aNotif;
+- (void)parentWindowWillBeginSheet:(NSNotification *)aNotif;
+- (void)parentWindowDidEndSheet:(NSNotification *)aNotif;
+
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif;
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
+- (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
+- (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
 
 @end
