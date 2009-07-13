@@ -1176,6 +1176,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:nil];
 }
 
+- (void)windowWillBeginSheet:(NSNotification *)aNotif
+{
+	[_findPanel setIgnoresMouseEvents:YES];
+}
+- (void)windowDidEndSheet:(NSNotification *)aNotif
+{
+	[_findPanel setIgnoresMouseEvents:NO];
+}
+
 - (void)windowWillClose:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
