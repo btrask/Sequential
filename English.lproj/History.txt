@@ -1,3 +1,11 @@
+2.0.4 (Current)
+- Improved image saving.
+- Smaller and less obtrusive alerts.
+- Built-in update checking.
+- Opening a document with a bookmark will offer to resume from that bookmark.
+- Holding the Control key will preserve the scroll location when changing between images to make comparison easier.
+- Other minor improvements.
+
 2.0.3 (February 23rd, 2009)
 - The visible portion of the current image is now highlighted in the thumbnail sidebar.
 - It is now possible to set images as the desktop picture from within Sequential.

@@ -164,3 +164,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 
 @end
+
+@implementation NSTextView (PGZooming)
+
+- (NSSize)PG_zoomedBoundsSize
+{
+	return [self bounds].size;
+}
+
+@end

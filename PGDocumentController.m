@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmark.h"
 
 // Controllers
+#import "PGReleaseNotesController.h"
 #import "PGPrefController.h"
 #import "PGDisplayController.h"
 #import "PGWindowController.h"
@@ -137,6 +138,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -PGDocumentController
 
+- (IBAction)showReleaseNotes:(id)sender
+{
+	[[PGReleaseNotesController sharedReleaseNotesController] showWindow:self];
+}
 - (IBAction)installUpdate:(id)sender
 {
 	[[SUUpdater sharedUpdater] checkForUpdates:sender]; // We validate this menu item specially but its behavior can just use the normal Sparkle mechanism.
@@ -726,7 +731,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 
 	if(@selector(installUpdate:) == action) {
-		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check For Update...", @"Update menu item title. One of two states."))];
+		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states."))];
 	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {

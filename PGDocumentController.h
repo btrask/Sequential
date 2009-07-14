@@ -108,6 +108,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 + (PGDocumentController *)sharedDocumentController;
 
+- (IBAction)showReleaseNotes:(id)sender;
 - (IBAction)installUpdate:(id)sender;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)switchToFileManager:(id)sender;

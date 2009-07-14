@@ -493,6 +493,8 @@
 				<string>id</string>
 				<key>showPreferences</key>
 				<string>id</string>
+				<key>showReleaseNotes</key>
+				<string>id</string>
 				<key>switchToFileManager</key>
 				<string>id</string>
 				<key>toggleActivity</key>
