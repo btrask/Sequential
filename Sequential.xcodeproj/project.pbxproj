@@ -77,7 +77,6 @@
 		0E2D08790DD2B4F800EC128A /* PGRoundedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2D08780DD2B4F800EC128A /* PGRoundedBackgroundView.m */; };
 		0E337875100C783B00373E83 /* PGReleaseNotesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E337874100C783B00373E83 /* PGReleaseNotesController.m */; };
 		0E33787B100C78FB00373E83 /* PGReleaseNotes.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0E337879100C78FB00373E83 /* PGReleaseNotes.nib */; };
-		0E3378E9100C82B700373E83 /* History.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0E3378E7100C82B700373E83 /* History.txt */; };
 		0E3378FA100C83C400373E83 /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0E3378F9100C83C400373E83 /* License.txt */; };
 		0E4793930DF15FD90083B7CA /* PGAttachments.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E4793920DF15FD90083B7CA /* PGAttachments.m */; };
 		0E4794290DF182C40083B7CA /* Silhouette-Black.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E4794280DF182C40083B7CA /* Silhouette-Black.png */; };
@@ -122,6 +121,7 @@
 		0E9016AB0DF44A7E004B6F69 /* PGColorWell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E9016AA0DF44A7E004B6F69 /* PGColorWell.m */; };
 		0E90195C0DF55F50004B6F69 /* PGDocumentWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E90195A0DF55F50004B6F69 /* PGDocumentWindow.m */; };
 		0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E92E1350E2CA88400276801 /* PGGeometry.m */; };
+		0E933D18100DD53800B58A9E /* History.txt in Resources */ = {isa = PBXBuildFile; fileRef = 0E3378E8100C82B700373E83 /* History.txt */; };
 		0E94F5250DAA6B0F00A23F73 /* PGWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94F5240DAA6B0F00A23F73 /* PGWindowController.m */; };
 		0E94F9CC0DAD37D000A23F73 /* PGPrefObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94F9CB0DAD37D000A23F73 /* PGPrefObject.m */; };
 		0E94FBAF0DAE739700A23F73 /* PGDisplayController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E94FBAE0DAE739700A23F73 /* PGDisplayController.m */; };
@@ -401,7 +401,7 @@
 		0E337873100C783B00373E83 /* PGReleaseNotesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGReleaseNotesController.h; sourceTree = "<group>"; };
 		0E337874100C783B00373E83 /* PGReleaseNotesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGReleaseNotesController.m; sourceTree = "<group>"; };
 		0E33787A100C78FB00373E83 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/PGReleaseNotes.nib; sourceTree = "<group>"; };
-		0E3378E8100C82B700373E83 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = English; path = English.lproj/History.txt; sourceTree = "<group>"; };
+		0E3378E8100C82B700373E83 /* History.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = History.txt; sourceTree = "<group>"; };
 		0E3378F9100C83C400373E83 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
 		0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HMBlkAppKit.xcodeproj; path = HMBlkAppKit/HMBlkAppKit.xcodeproj; sourceTree = "<group>"; };
 		0E4793910DF15FD90083B7CA /* PGAttachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAttachments.h; sourceTree = "<group>"; };
@@ -1065,7 +1065,7 @@
 				8D15AC360486D014006FF6A4 /* Info.plist */,
 				089C165FFE840EACC02AAC07 /* InfoPlist.strings */,
 				2A37F4B9FDCFA73011CA2CEA /* Credits.rtf */,
-				0E3378E7100C82B700373E83 /* History.txt */,
+				0E3378E8100C82B700373E83 /* History.txt */,
 				0E3378F9100C83C400373E83 /* License.txt */,
 				0EB167DF0A82AD89001999E7 /* Localizable.strings */,
 				2A37F4B6FDCFA73011CA2CEA /* PGMenu.nib */,
@@ -1300,7 +1300,7 @@
 				0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */,
 				0E1BE0CA0F59E61B007421EE /* Pref-Images.icns in Resources */,
 				0E33787B100C78FB00373E83 /* PGReleaseNotes.nib in Resources */,
-				0E3378E9100C82B700373E83 /* History.txt in Resources */,
+				0E933D18100DD53800B58A9E /* History.txt in Resources */,
 				0E3378FA100C83C400373E83 /* License.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1516,14 +1516,6 @@
 				0E33787A100C78FB00373E83 /* English */,
 			);
 			name = PGReleaseNotes.nib;
-			sourceTree = "<group>";
-		};
-		0E3378E7100C82B700373E83 /* History.txt */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0E3378E8100C82B700373E83 /* English */,
-			);
-			name = History.txt;
 			sourceTree = "<group>";
 		};
 		0E56B8D70E24917C00987F57 /* PGActivity.nib */ = {
