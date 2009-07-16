@@ -47,6 +47,7 @@ extern NSString *const PGBackgroundPatternKey;
 extern NSString *const PGMouseClickActionKey;
 extern NSString *const PGEscapeKeyMappingKey;
 extern NSString *const PGDimOtherScreensKey;
+extern NSString *const PGBackwardsInitialLocationKey;
 
 enum {
 	PGNextPreviousAction = 0,

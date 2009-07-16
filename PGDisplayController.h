@@ -128,12 +128,12 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)activateDocument:(PGDocument *)document;
 
 - (PGNode *)activeNode;
-- (void)setActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
-- (BOOL)tryToSetActiveNode:(PGNode *)aNode initialLocation:(PGPageLocation)location;
+- (void)setActiveNode:(PGNode *)aNode forward:(BOOL)flag;
+- (BOOL)tryToSetActiveNode:(PGNode *)aNode forward:(BOOL)flag;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
 - (void)loopForward:(BOOL)flag;
 - (void)prepareToLoop; // Call this before sending -tryToLoop….
-- (BOOL)tryToLoopForward:(BOOL)forward toNode:(PGNode *)node initialLocation:(PGPageLocation)loc allowAlerts:(BOOL)flag;
+- (BOOL)tryToLoopForward:(BOOL)loopForward toNode:(PGNode *)node pageForward:(BOOL)pageForward allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
 - (NSWindow *)windowForSheet;

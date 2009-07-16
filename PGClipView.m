@@ -269,6 +269,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)scrollToLocation:(PGPageLocation)location
         animation:(PGAnimationType)type
 {
+	NSParameterAssert(PGPreserveLocation != location);
 	return [self scrollToEdge:[[self delegate] clipView:self directionFor:location] animation:type];
 }
 

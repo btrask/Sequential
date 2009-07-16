@@ -249,7 +249,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	NSSet *const selection = [sender selection];
 	id const item = [selection anyObject];
-	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [item parentNode]) viewableAncestor] initialLocation:PGHomeLocation];
+	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [item parentNode]) viewableAncestor] forward:YES];
 }
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount
 {

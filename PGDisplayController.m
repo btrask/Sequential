@@ -185,7 +185,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case NSFindPanelActionPrevious:
 		{
 			NSArray *const terms = [[searchField stringValue] AE_searchTerms];
-			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:([sender tag] == NSFindPanelActionNext) matchSearchTerms:terms] initialLocation:PGHomeLocation]) NSBeep();
+			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:([sender tag] == NSFindPanelActionNext) matchSearchTerms:terms] forward:YES]) NSBeep();
 			break;
 		}
 		default:
@@ -222,44 +222,44 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)firstPage:(id)sender
 {
-	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] forward:YES];
 }
 - (IBAction)lastPage:(id)sender
 {
-	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation];
+	[self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:NO] forward:NO];
 }
 
 #pragma mark -
 
 - (IBAction)firstOfPreviousFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO inclusive:NO] initialLocation:PGHomeLocation]) return;
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO inclusive:NO] forward:YES]) return;
 	[self prepareToLoop]; // -firstOfPreviousFolder: is an exception to our usual looping mechanic, so we can't use -loopForward:.
 	PGNode *const last = [[[self activeDocument] node] sortedViewableNodeFirst:NO];
-	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO inclusive:YES]) initialLocation:PGHomeLocation allowAlerts:YES];
+	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO inclusive:YES]) pageForward:YES allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES inclusive:NO] initialLocation:PGHomeLocation]) return;
+	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:YES inclusive:NO] forward:YES]) return;
 	[self loopForward:YES];
 }
 - (IBAction)skipBeforeFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] initialLocation:PGEndLocation]) return;
+	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:NO includeChildren:NO] forward:NO]) return;
 	[self loopForward:NO];
 }
 - (IBAction)skipPastFolder:(id)sender
 {
-	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] initialLocation:PGHomeLocation]) return;
+	if([self tryToSetActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeNext:YES includeChildren:NO] forward:YES]) return;
 	[self loopForward:YES];
 }
 - (IBAction)firstOfFolder:(id)sender
 {
-	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES] forward:YES];
 }
 - (IBAction)lastOfFolder:(id)sender
 {
-	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO] initialLocation:PGEndLocation];
+	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO] forward:NO];
 }
 
 #pragma mark -
@@ -269,7 +269,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGNode *node = [[sender representedObject] nonretainedObjectValue];
 	if(![node isViewable]) node = [node sortedViewableNodeFirst:YES];
 	if([self activeNode] == node || !node) return;
-	[self setActiveNode:node initialLocation:PGHomeLocation];
+	[self setActiveNode:node forward:YES];
 }
 
 #pragma mark -
@@ -371,7 +371,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[self _readFinished];
 		} else {
 			[clipView setDocumentView:view];
-			[self setActiveNode:node initialLocation:PGHomeLocation];
+			[self setActiveNode:node forward:YES];
 		}
 		[self documentNodeIsViewableDidChange:nil]; // In case the node has become unviewable in the meantime.
 		[searchField setStringValue:query];
@@ -396,32 +396,30 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	return [[_activeNode retain] autorelease];
 }
-- (void)setActiveNode:(PGNode *)aNode
-        initialLocation:(PGPageLocation)location
+- (void)setActiveNode:(PGNode *)aNode forward:(BOOL)flag
 {
 	if(![self _setActiveNode:aNode]) return;
-	_initialLocation = [[[self window] currentEvent] modifierFlags] & NSControlKeyMask ? PGPreserveLocation : location;
+	if([[[self window] currentEvent] modifierFlags] & NSControlKeyMask) _initialLocation = PGPreserveLocation;
+	else _initialLocation = flag ? PGHomeLocation : [[[NSUserDefaults standardUserDefaults] objectForKey:PGBackwardsInitialLocationKey] intValue];
 	[self _readActiveNode];
 }
-- (BOOL)tryToSetActiveNode:(PGNode *)aNode
-        initialLocation:(PGPageLocation)location
+- (BOOL)tryToSetActiveNode:(PGNode *)aNode forward:(BOOL)flag
 {
 	if(!aNode) return NO;
-	[self setActiveNode:aNode initialLocation:location];
+	[self setActiveNode:aNode forward:flag];
 	return YES;
 }
 - (BOOL)tryToGoForward:(BOOL)forward
         allowAlerts:(BOOL)flag
 {
-	PGPageLocation const l = forward ? PGHomeLocation : PGEndLocation;
-	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] initialLocation:l]) return YES;
+	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] forward:forward]) return YES;
 	[self prepareToLoop];
-	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] initialLocation:l allowAlerts:flag];
+	return [self tryToLoopForward:forward toNode:[[[self activeDocument] node] sortedViewableNodeFirst:forward] pageForward:forward allowAlerts:flag];
 }
 - (void)loopForward:(BOOL)flag
 {
 	[self prepareToLoop];
-	[self tryToLoopForward:flag toNode:[[[self activeDocument] node] sortedViewableNodeFirst:flag] initialLocation:(flag ? PGHomeLocation : PGEndLocation) allowAlerts:YES];
+	[self tryToLoopForward:flag toNode:[[[self activeDocument] node] sortedViewableNodeFirst:flag] pageForward:flag allowAlerts:YES];
 }
 - (void)prepareToLoop
 {
@@ -431,15 +429,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[doc node] noteSortOrderDidChange]; // Reshuffle.
 	[doc noteSortedChildrenDidChange];
 }
-- (BOOL)tryToLoopForward:(BOOL)forward
-        toNode:(PGNode *)node
-	initialLocation:(PGPageLocation)loc
-        allowAlerts:(BOOL)flag
+- (BOOL)tryToLoopForward:(BOOL)loopForward toNode:(PGNode *)node pageForward:(BOOL)pageForward allowAlerts:(BOOL)flag
 {
 	PGDocument *const doc = [self activeDocument];
-	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !forward;
+	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !loopForward;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
-	if(PGSortRepeatMask & o && [self tryToSetActiveNode:node initialLocation:loc]) {
+	if(PGSortRepeatMask & o && [self tryToSetActiveNode:node forward:pageForward]) {
 		if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
 		return YES;
 	}
@@ -449,7 +444,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)activateNode:(PGNode *)node
 {
 	[self setActiveDocument:[node document] closeIfAppropriate:NO];
-	[self setActiveNode:node initialLocation:PGHomeLocation];
+	[self setActiveNode:node forward:YES];
 }
 
 #pragma mark -
@@ -666,13 +661,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSArray *const removedChildren = [[aNotif userInfo] objectForKey:PGDocumentRemovedChildrenKey];
 	PGNode *node = [[self activeNode] sortedViewableNodeNext:YES afterRemovalOfChildren:removedChildren fromNode:changedNode];
 	if(!node) node = [[self activeNode] sortedViewableNodeNext:NO afterRemovalOfChildren:removedChildren fromNode:changedNode];
-	[self setActiveNode:node initialLocation:PGHomeLocation];
+	[self setActiveNode:node forward:YES];
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
 	[self documentShowsInfoDidChange:nil];
 	[self documentShowsThumbnailsDidChange:nil];
-	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+	if(![self activeNode]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] forward:YES];
 	else [self _updateNodeIndex];
 }
 - (void)documentNodeDisplayNameDidChange:(NSNotification *)aNotif
@@ -685,9 +680,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	PGNode *const node = aNotif ? [[aNotif userInfo] objectForKey:PGDocumentNodeKey] : [self activeNode];
 	if(![self activeNode]) {
-		if([node isViewable]) [self setActiveNode:node initialLocation:PGHomeLocation];
+		if([node isViewable]) [self setActiveNode:node forward:YES];
 	} else if([self activeNode] == node) {
-		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] initialLocation:PGHomeLocation];
+		if(![node isViewable] && ![self tryToGoForward:YES allowAlerts:NO] && ![self tryToGoForward:NO allowAlerts:NO]) [self setActiveNode:[[[self activeDocument] node] sortedViewableNodeFirst:YES] forward:YES];
 	}
 	if(aNotif) {
 		[self documentShowsInfoDidChange:nil];
