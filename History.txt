@@ -3,6 +3,8 @@
 - Smaller and less obtrusive alerts.
 - Built-in update checking.
 - Opening a document with a bookmark will offer to resume from that bookmark.
+- Option to dim secondary monitors in full screen mode.
+- Option to scroll to different locations when going backwards between images.
 - Holding the Control key will preserve the scroll location when changing between images to make comparison easier.
 - Other minor improvements.
 
