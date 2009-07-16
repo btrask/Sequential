@@ -299,13 +299,15 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
           highlightRectForItem:(id)item
 {
 	PGDisplayController *const d = [self displayController];
-	if([d isReading] || [d activeNode] != item || ![d isDisplayingImage]) return NSZeroRect;
+	NSRect const fullHighlight = NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f);
+	if([d activeNode] != item || ![d isDisplayingImage]) return fullHighlight;
+	if([d isReading]) return NSZeroRect;
 	PGClipView *const clipView = [d clipView];
 	NSRect const scrollableRect = [clipView scrollableRectWithBorder:NO];
-	if(NSWidth(scrollableRect) <= 0.01 && NSHeight(scrollableRect) <= 0.01) return NSZeroRect; // We can't use NSIsEmptyRect() because it can be 0 in one direction but not the other.
+	if(NSWidth(scrollableRect) <= 0.0001f && NSHeight(scrollableRect) <= 0.0001f) return fullHighlight; // We can't use NSIsEmptyRect() because it can be 0 in one direction but not the other.
 	NSRect const f = [clipView documentFrame];
-	NSRect r = PGScaleRect(NSOffsetRect(NSIntersectionRect(f, [clipView insetBounds]), -NSMinX(f), -NSMinY(f)), 1 / NSWidth(f), 1 / NSHeight(f));
-	r.origin.y = 1 - NSMaxY(r);
+	NSRect r = PGScaleRect(NSOffsetRect(NSIntersectionRect(f, [clipView insetBounds]), -NSMinX(f), -NSMinY(f)), 1.0f / NSWidth(f), 1.0f / NSHeight(f));
+	r.origin.y = 1.0f - NSMaxY(r);
 	return r;
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item

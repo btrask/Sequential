@@ -335,7 +335,8 @@ static void PGDrawGradient(void)
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
 
 		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
-		if(!NSIsEmptyRect(highlight)) {
+		BOOL const entirelyHighlighted = NSEqualRects(highlight, NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f));
+		if(!entirelyHighlighted) {
 			CGContextBeginTransparencyLayer(context, NULL);
 			[nilShadow set];
 		}
@@ -345,7 +346,7 @@ static void PGDrawGradient(void)
 		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
 		[transform invert];
 		[transform concat];
-		if(!NSIsEmptyRect(highlight)) {
+		if(!entirelyHighlighted) {
 			NSRect rects[4];
 			unsigned count = 0;
 			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
@@ -491,7 +492,7 @@ static void PGDrawGradient(void)
 - (NSRect)thumbnailView:(PGThumbnailView *)sender
           highlightRectForItem:(id)item
 {
-	return NSZeroRect;
+	return NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f);
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item
 {
