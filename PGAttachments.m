@@ -87,7 +87,7 @@ static void PGEnsureWindowCreatedHack(void)
 {
 	NSImage *const image = [NSImage imageNamed:[self imageNameHighlighted:highlighted]];
 	[image setFlipped:YES];
-	[image drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0 : 0.5)];
+	[image drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.5f];
 }
 - (NSString *)imageNameHighlighted:(BOOL)flag
 {
@@ -110,11 +110,11 @@ static void PGEnsureWindowCreatedHack(void)
 }
 - (NSSize)cellSize
 {
-	return NSMakeSize(16, 16);
+	return NSMakeSize(16.0f, 16.0f);
 }
 - (NSPoint)cellBaselineOffset
 {
-	return NSMakePoint(0, -3);
+	return NSMakePoint(0.0f, -3.0f);
 }
 
 @end
@@ -151,16 +151,16 @@ static void PGEnsureWindowCreatedHack(void)
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	[[self image] setFlipped:YES];
-	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSSize)cellSize
 {
-	return NSMakeSize(16, 16);
+	return NSMakeSize(16.0f, 16.0f);
 }
 - (NSPoint)cellBaselineOffset
 {
-	return NSMakePoint(0, -3);
+	return NSMakePoint(0.0f, -3.0f);
 }
 
 #pragma mark NSCell

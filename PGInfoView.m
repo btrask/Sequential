@@ -33,16 +33,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 
 #define PGGraphicalIndicatorStyle YES
-#define PGMarginSize              4.0 // Outside the window.
-#define PGPaddingSize             3.0 // Inside the window.
-#define PGTotalPaddingSize        (PGPaddingSize * 2.0)
-#define PGTextBottomPadding       (PGPaddingSize - 1.0)
+#define PGMarginSize              4.0f // Outside the window.
+#define PGPaddingSize             3.0f // Inside the window.
+#define PGTotalPaddingSize        (PGPaddingSize * 2.0f)
+#define PGTextBottomPadding       (PGPaddingSize - 1.0f)
 #define PGTextTotalVertPadding    (PGPaddingSize + PGTextBottomPadding)
-#define PGTextHorzPadding         4.0
-#define PGTextTotalHorzPadding    (PGTextHorzPadding * 2.0)
-#define PGIndicatorHeight         11.0
-#define PGIndicatorRadius         (PGIndicatorHeight / 2.0)
-#define PGIndicatorWidth          100.0
+#define PGTextHorzPadding         4.0f
+#define PGTextTotalHorzPadding    (PGTextHorzPadding * 2.0f)
+#define PGIndicatorHeight         11.0f
+#define PGIndicatorRadius         (PGIndicatorHeight / 2.0f)
+#define PGIndicatorWidth          100.0f
 #define PGCornerRadius            (PGPaddingSize + PGIndicatorRadius)
 
 @implementation PGInfoView
@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
 	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%u/%u)", [self messageText], [self index] + 1, [self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
-		[NSFont labelFontOfSize:0], NSFontAttributeName,
+		[NSFont labelFontOfSize:0.0f], NSFontAttributeName,
 		[NSColor whiteColor], NSForegroundColorAttributeName,
 		style, NSParagraphStyleAttributeName, nil]] autorelease];
 }
@@ -133,8 +133,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSMakeRect(
 			NSMinX(aRect) + scaledMarginSize,
 			NSMinY(aRect) + scaledMarginSize,
-			ceilf((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0) + PGTotalPaddingSize) * scaleFactor),
-			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0)) * scaleFactor)),
+			ceilf((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
+			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
 	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
@@ -155,21 +155,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[bezel fill];
 	if([self displaysProgressIndicator]) {
 		[[NSColor AE_bezelForegroundColor] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5 + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5), 0.5 + PGPaddingSize, PGIndicatorWidth - 1, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
 		unsigned const maxValue = [self count] - 1;
 		NSBezierPath *const indicator = [NSBezierPath bezierPath];
 		float x = roundf(((float)MIN([self index], maxValue) / maxValue) * (PGIndicatorWidth - 1 - PGIndicatorHeight) + 1);
-		if([self origin] == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10 - PGPaddingSize;
+		if([self origin] == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10.0f - PGPaddingSize;
 		else x += PGPaddingSize;
-		[indicator moveToPoint:NSMakePoint(x + 0.5, 6 + PGPaddingSize)];
-		[indicator lineToPoint:NSMakePoint(x + 5, 10.5 + PGPaddingSize)];
-		[indicator lineToPoint:NSMakePoint(x + 9.5, 6 + PGPaddingSize)];
-		[indicator lineToPoint:NSMakePoint(x + 5, 1.5 + PGPaddingSize)];
+		[indicator moveToPoint:NSMakePoint(x + 0.5f, PGPaddingSize + 6.0f)];
+		[indicator lineToPoint:NSMakePoint(x + 5.0f, PGPaddingSize + 10.5f)];
+		[indicator lineToPoint:NSMakePoint(x + 9.5f, PGPaddingSize + 6.0f)];
+		[indicator lineToPoint:NSMakePoint(x + 5.0f, PGPaddingSize + 1.5f)];
 		[indicator fill];
 	}
-	float const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0;
-	float const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0;
+	float const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f;
+	float const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0.0f;
 	[[self displayText] drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
 }
 

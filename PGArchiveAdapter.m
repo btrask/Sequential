@@ -230,7 +230,7 @@ static id PGArchiveAdapterList = nil;
                     guess:(NSStringEncoding)guess
                     confidence:(float)confidence
 {
-	if(confidence < 0.8 && !_encodingError) {
+	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
 		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSData dataWithBytes:bytes length:strlen(bytes)], PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]]];
 		[[self node] loadFinished];

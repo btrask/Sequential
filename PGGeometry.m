@@ -82,15 +82,15 @@ void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect
 		return;
 	}
 	unsigned i = 0;
-	diff[i] = NSMakeRect(NSMinX(minuend), NSMaxY(subtrahend), NSWidth(minuend), MAX(NSMaxY(minuend) - NSMaxY(subtrahend), 0));
+	diff[i] = NSMakeRect(NSMinX(minuend), NSMaxY(subtrahend), NSWidth(minuend), MAX(NSMaxY(minuend) - NSMaxY(subtrahend), 0.0f));
 	if(!NSIsEmptyRect(diff[i])) i++;
-	diff[i] = NSMakeRect(NSMinX(minuend), NSMinY(minuend), NSWidth(minuend), MAX(NSMinY(subtrahend) - NSMinY(minuend), 0));
+	diff[i] = NSMakeRect(NSMinX(minuend), NSMinY(minuend), NSWidth(minuend), MAX(NSMinY(subtrahend) - NSMinY(minuend), 0.0f));
 	if(!NSIsEmptyRect(diff[i])) i++;
 	float const sidesMinY = MAX(NSMinY(minuend), NSMinY(subtrahend));
 	float const sidesHeight = NSMaxY(subtrahend) - MAX(NSMinY(minuend), NSMinY(subtrahend));
-	diff[i] = NSMakeRect(NSMinX(minuend), sidesMinY, MAX(NSMinX(subtrahend) - NSMinX(minuend), 0), sidesHeight);
+	diff[i] = NSMakeRect(NSMinX(minuend), sidesMinY, MAX(NSMinX(subtrahend) - NSMinX(minuend), 0.0f), sidesHeight);
 	if(!NSIsEmptyRect(diff[i])) i++;
-	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0), sidesHeight);
+	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0.0f), sidesHeight);
 	if(!NSIsEmptyRect(diff[i])) i++;
 	*count = i;
 }
@@ -135,7 +135,7 @@ NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask)
 }
 PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold)
 {
-	float const t = fabs(threshhold);
+	float const t = fabsf(threshhold);
 	PGRectEdgeMask direction = PGNoEdges;
 	if(p.x <= -t) direction |= PGMinXEdgeMask;
 	else if(p.x >= t) direction |= PGMaxXEdgeMask;
@@ -182,7 +182,7 @@ PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
 
 #pragma mark PGInset
 
-PGInset const PGZeroInset = {0, 0, 0, 0};
+PGInset const PGZeroInset = {0.0f, 0.0f, 0.0f, 0.0f};
 
 PGInset PGMakeInset(float minX, float minY, float maxX, float maxY)
 {
@@ -202,7 +202,7 @@ NSPoint PGInsetPoint(NSPoint p, PGInset i)
 }
 NSSize PGInsetSize(NSSize s, PGInset i)
 {
-	return NSMakeSize(MAX(0, s.width - i.minX - i.maxX), MAX(0, s.height - i.minY - i.maxY));
+	return NSMakeSize(MAX(0.0f, s.width - i.minX - i.maxX), MAX(0.0f, s.height - i.minY - i.maxY));
 }
 NSRect PGInsetRect(NSRect r, PGInset i)
 {
@@ -217,13 +217,13 @@ PGInset PGAddInsets(PGInset a, PGInset b)
 
 NSTimeInterval PGUptime(void)
 {
-	return (NSTimeInterval)UnsignedWideToUInt64(AbsoluteToNanoseconds(UpTime())) * 1e-9;
+	return (NSTimeInterval)UnsignedWideToUInt64(AbsoluteToNanoseconds(UpTime())) * 1e-9f;
 }
 float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate)
 {
 	NSCParameterAssert(timeOfFrame);
 	NSTimeInterval const currentTime = PGUptime();
-	float const speedup = *timeOfFrame ? desiredFramerate / (currentTime - *timeOfFrame) : 1;
+	float const speedup = (float)(*timeOfFrame ? (currentTime - *timeOfFrame) / desiredFramerate : 1.0f);
 	*timeOfFrame = currentTime;
 	return speedup;
 }

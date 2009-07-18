@@ -73,11 +73,11 @@ static void PGDrawGradient(void)
 	static CGShadingRef shade = NULL;
 	if(!shade) {
 		CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
-		float const domain[] = {0, 1};
-		float const range[] = {0, 1, 0, 1};
+		float const domain[] = {0.0f, 1.0f};
+		float const range[] = {0.0f, 1.0f, 0.0f, 1.0f};
 		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
 		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
-		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0, 0), CGPointMake(PGInnerTotalWidth, 0), function, NO, NO);
+		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0.0f, 0.0f), CGPointMake(PGInnerTotalWidth, 0.0f), function, NO, NO);
 		CFRelease(function);
 		CFRelease(colorSpace);
 	}
@@ -204,7 +204,7 @@ static void PGDrawGradient(void)
 }
 - (void)sizeToFit
 {
-	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0;
+	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0.0f;
 	[super setFrameSize:NSMakeSize(PGOuterTotalWidth, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
@@ -231,12 +231,12 @@ static void PGDrawGradient(void)
 	[background lockFocus];
 
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowOffset:NSMakeSize(0, 2)];
+	[shadow setShadowOffset:NSMakeSize(0.0f, 2.0f)];
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 	CGContextRef const imageContext = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextBeginTransparencyLayer(imageContext, NULL);
-	NSRect const r = NSMakeRect(0, 0, PGInnerTotalWidth, PGBackgroundHeight);
+	NSRect const r = NSMakeRect(0.0f, 0.0f, PGInnerTotalWidth, PGBackgroundHeight);
 	if(PGThumbnailGlossStyleEnabled) {
 		[[NSColor blackColor] set];
 		NSRectFill(r);
@@ -247,11 +247,11 @@ static void PGDrawGradient(void)
 	}
 	if(PGThumbnailGlossStyleEnabled) PGDrawGradient();
 
-	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0, PGBackgroundHoleSize, PGBackgroundHoleSize);
-	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0, PGBackgroundHoleSize, PGBackgroundHoleSize);
+	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
+	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
 	[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0, 1) cornerRadius:2] fill];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0, 1) cornerRadius:2] fill];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0.0f, 1.0f) cornerRadius:2] fill];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0.0f, 1.0f) cornerRadius:2] fill];
 	[[NSColor clearColor] set];
 	[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
 	[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
@@ -308,7 +308,7 @@ static void PGDrawGradient(void)
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowOffset:NSMakeSize(0, -2)];
+	[shadow setShadowOffset:NSMakeSize(0.0f, -2.0f)];
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 
@@ -325,7 +325,7 @@ static void PGDrawGradient(void)
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		if(!thumb) {
-			[NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20, 20) startAtPetal:-1];
+			[NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20.0f, 20.0f) startAtPetal:-1];
 			continue;
 		}
 		NSSize originalSize = [thumb size];
@@ -351,7 +351,7 @@ static void PGDrawGradient(void)
 			unsigned count = 0;
 			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
 			PGGetRectDifference(rects, &count, thumbnailRect, r);
-			[[NSColor colorWithDeviceWhite:0 alpha:0.5f] set];
+			[[NSColor colorWithDeviceWhite:0.0f alpha:0.5f] set];
 			NSRectFillListUsingOperation(rects, count, NSCompositeSourceAtop);
 			CGContextEndTransparencyLayer(context);
 			[nilShadow set];
@@ -370,8 +370,8 @@ static void PGDrawGradient(void)
 				[style setLineBreakMode:NSLineBreakByWordWrapping];
 				[style setAlignment:NSCenterTextAlignment];
 				NSShadow *const textShadow = [[[NSShadow alloc] init] autorelease];
-				[textShadow setShadowBlurRadius:2];
-				[textShadow setShadowOffset:NSMakeSize(0, -1)];
+				[textShadow setShadowBlurRadius:2.0f];
+				[textShadow setShadowOffset:NSMakeSize(0.0f, -1.0f)];
 				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:textShadow, NSShadowAttributeName, [NSFont systemFontOfSize:11], NSFontAttributeName, style, NSParagraphStyleAttributeName, nil];
 			}
 			[attributes setObject:(enabled ? [NSColor alternateSelectedControlTextColor] : [NSColor disabledControlTextColor]) forKey:NSForegroundColorAttributeName];
@@ -388,25 +388,25 @@ static void PGDrawGradient(void)
 			}
 			[[textStorage mutableString] setString:label];
 			[textStorage setAttributes:attributes range:NSMakeRange(0, [textStorage length])];
-			[textContainer setContainerSize:NSMakeSize(PGThumbnailSize - 12, PGThumbnailSize - 8)];
+			[textContainer setContainerSize:NSMakeSize(PGThumbnailSize - 12.0f, PGThumbnailSize - 8.0f)];
 			NSRange const glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
 			NSSize const labelSize = [layoutManager usedRectForTextContainer:textContainer].size;
 			[textContainer setContainerSize:labelSize]; // We center the text in the text container, so the final size has to be the right width.
-			NSRect const labelRect = NSIntegralRect(NSMakeRect(NSMidX(frame) - labelSize.width / 2, NSMidY(frame) - labelSize.height / 2, labelSize.width, labelSize.height));
-			[[(labelColor ? labelColor : [NSColor blackColor]) colorWithAlphaComponent:0.5] set];
-			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(labelRect, -4, -2) cornerRadius:6] fill];
+			NSRect const labelRect = NSIntegralRect(NSMakeRect(NSMidX(frame) - labelSize.width / 2.0f, NSMidY(frame) - labelSize.height / 2.0f, labelSize.width, labelSize.height));
+			[[(labelColor ? labelColor : [NSColor blackColor]) colorWithAlphaComponent:0.5f] set];
+			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(labelRect, -4.0f, -2.0f) cornerRadius:6.0f] fill];
 			[layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:labelRect.origin];
 			[shadow set];
 		} else if(labelColor) {
-			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16, roundf(MAX(NSMaxY(thumbnailRect) - 16, NSMidY(thumbnailRect) - 6)), 12, 12);
+			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16.0f, roundf(MAX(NSMaxY(thumbnailRect) - 16.0f, NSMidY(thumbnailRect) - 6.0f)), 12.0f, 12.0f);
 			[NSGraphicsContext saveGraphicsState];
-			NSRectClip(NSInsetRect(labelRect, -5, -5)); // By adding a clipping rect we tell the system how big the transparency layer has to be.
+			NSRectClip(NSInsetRect(labelRect, -5.0f, -5.0f)); // By adding a clipping rect we tell the system how big the transparency layer has to be.
 			CGContextBeginTransparencyLayer(context, NULL);
 			NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
 			[labelColor set];
 			[labelDot fill];
 			[[NSColor whiteColor] set];
-			[labelDot setLineWidth:2];
+			[labelDot setLineWidth:2.0f];
 			[labelDot stroke];
 			CGContextEndTransparencyLayer(context);
 			[NSGraphicsContext restoreGraphicsState];

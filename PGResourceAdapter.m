@@ -174,7 +174,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	NSGraphicsContext *const ctx = [NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]];
 	[NSGraphicsContext setCurrentContext:ctx];
 	[ctx setImageInterpolation:NSImageInterpolationHigh];
-	NSRect rect = NSMakeRect(0, 0, s.width, s.height);
+	NSRect rect = NSMakeRect(0.0f, 0.0f, s.width, s.height);
 	if(PGUpright != orientation) [[NSAffineTransform AE_transformWithRect:&rect orientation:orientation] concat];
 	[rep drawInRect:rect];
 	[NSGraphicsContext setCurrentContext:nil];
@@ -310,7 +310,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 				ReleaseIconRef(iconRef);
 				break;
 			}
-			CGRect rect = CGRectMake(0, 0, PGThumbnailSize, PGThumbnailSize);
+			CGRect rect = CGRectMake(0.0f, 0.0f, PGThumbnailSize, PGThumbnailSize);
 			PlotIconRefInContext([[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]] graphicsPort], &rect, kAlignNone, kTransformNone, NULL, kPlotIconRefNormalFlags, iconRef);
 			ReleaseIconRef(iconRef);
 			thumbnail = [[[NSImage alloc] initWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize)] autorelease];
@@ -449,7 +449,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 }
 - (float)loadProgress
 {
-	return 0;
+	return 0.0f;
 }
 - (id<PGLoading>)parentLoad
 {

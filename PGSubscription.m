@@ -244,7 +244,7 @@ static id  PGActiveSubscriptions = nil;
 - (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum
 {
 	if([self rootSubscription] == self) [super noteFileEventDidOccurWithFlags:flagsNum];
-	else if(NOTE_WRITE & [flagsNum unsignedIntValue]) [super noteFileEventDidOccurWithFlags:0];
+	else if(NOTE_WRITE & [flagsNum unsignedIntValue]) [super noteFileEventDidOccurWithFlags:nil];
 }
 
 #pragma mark NSObject
@@ -280,7 +280,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 	if(_eventStream) [self unsubscribe];
 	if(!path) return;
 	FSEventStreamContext context = {0, self, NULL, NULL, NULL};
-	_eventStream = FSEventStreamCreate(kCFAllocatorDefault, PGEventStreamCallback, &context, (CFArrayRef)[NSArray arrayWithObject:path], kFSEventStreamEventIdSinceNow, 0, kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagNoDefer);
+	_eventStream = FSEventStreamCreate(kCFAllocatorDefault, PGEventStreamCallback, &context, (CFArrayRef)[NSArray arrayWithObject:path], kFSEventStreamEventIdSinceNow, 0.0f, kFSEventStreamCreateFlagUseCFTypes | kFSEventStreamCreateFlagNoDefer);
 	FSEventStreamScheduleWithRunLoop(_eventStream, [[NSRunLoop currentRunLoop] getCFRunLoop], kCFRunLoopCommonModes);
 	FSEventStreamStart(_eventStream);
 }

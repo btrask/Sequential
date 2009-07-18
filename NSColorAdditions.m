@@ -24,8 +24,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSColorAdditions.h"
 
-#define PGCheckerboardSquareSize 8
-#define PGCheckerboardSize (PGCheckerboardSquareSize * 2)
+#define PGCheckerboardSquareSize 8.0f
+#define PGCheckerboardSize (PGCheckerboardSquareSize * 2.0f)
 
 @implementation NSColor (AEAdditions)
 
@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 + (NSColor *)AE_bezelBackgroundColor
 {
-	return [NSColor colorWithDeviceWhite:(48.0f / 255.0f) alpha:0.75f];
+	return [NSColor colorWithDeviceWhite:48.0f / 255.0f alpha:0.75f];
 }
 + (NSColor *)AE_bezelForegroundColor
 {
@@ -47,13 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSImage *const checkerboard = [[[NSImage alloc] initWithSize:NSMakeSize(PGCheckerboardSize, PGCheckerboardSize)] autorelease];
 	[checkerboard lockFocus];
 	[self set];
-	NSRectFill(NSMakeRect(0, 0, PGCheckerboardSize, PGCheckerboardSize));
-	[[NSColor colorWithDeviceWhite:1 alpha:0.07] set];
+	NSRectFill(NSMakeRect(0.0f, 0.0f, PGCheckerboardSize, PGCheckerboardSize));
+	[[NSColor colorWithDeviceWhite:1.0f alpha:0.07f] set];
 	NSRectFillUsingOperation(NSMakeRect(0, 0, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
 	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	[[NSColor colorWithDeviceWhite:0 alpha:0.07] set];
-	NSRectFillUsingOperation(NSMakeRect(0, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, 0, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
+	[[NSColor colorWithDeviceWhite:0.0f alpha:0.07f] set];
+	NSRectFillUsingOperation(NSMakeRect(0.0f, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
+	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, 0.0f, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
 	[checkerboard unlockFocus];
 	return [NSColor colorWithPatternImage:checkerboard];
 }

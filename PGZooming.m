@@ -64,10 +64,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	r.size.width = MIN(MAX(MIN(NSWidth(r), NSWidth(b)), [self minSize].width), [self maxSize].width);
 	r.size.height = MIN(MAX(MIN(NSHeight(r), NSHeight(b)), [self minSize].height), [self maxSize].height);
 	r.origin.y += NSHeight(aRect) - NSHeight(r);
-	r.origin.x -= MAX(NSMaxX(r) - NSMaxX(b), 0);
-	r.origin.y += MAX(NSMinY(b) - NSMinY(r), 0);
-	r.origin.x += MAX(NSMinX(b) - NSMinX(r), 0);
-	r.origin.y -= MAX(NSMaxY(r) - NSMaxY(b), 0);
+	r.origin.x -= MAX(NSMaxX(r) - NSMaxX(b), 0.0f);
+	r.origin.y += MAX(NSMinY(b) - NSMinY(r), 0.0f);
+	r.origin.x += MAX(NSMinX(b) - NSMinX(r), 0.0f);
+	r.origin.y -= MAX(NSMaxY(r) - NSMaxY(b), 0.0f);
 	return r;
 }
 
@@ -91,10 +91,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSRect const f = [subview frame];
 		if(!(m & NSViewWidthSizable)) s.width = NSWidth(f);
 		if(!(m & NSViewHeightSizable)) s.height = NSHeight(f);
-		if(!(m & NSViewMinXMargin)) s.width += MAX(NSMinX(f), 0);
-		if(!(m & NSViewMinYMargin)) s.height += MAX(NSMinY(f), 0);
-		if(!(m & NSViewMaxXMargin) && m & (NSViewMinXMargin | NSViewWidthSizable)) s.width += MAX(NSMaxX(bounds) - NSMaxX(f), 0);
-		if(!(m & NSViewMaxYMargin) && m & (NSViewMinYMargin | NSViewHeightSizable)) s.height += MAX(NSMaxY(bounds) - NSMaxY(f), 0);
+		if(!(m & NSViewMinXMargin)) s.width += MAX(NSMinX(f), 0.0f);
+		if(!(m & NSViewMinYMargin)) s.height += MAX(NSMinY(f), 0.0f);
+		if(!(m & NSViewMaxXMargin) && m & (NSViewMinXMargin | NSViewWidthSizable)) s.width += MAX(NSMaxX(bounds) - NSMaxX(f), 0.0f);
+		if(!(m & NSViewMaxYMargin) && m & (NSViewMinYMargin | NSViewHeightSizable)) s.height += MAX(NSMaxY(bounds) - NSMaxY(f), 0.0f);
 		size.width = MAX(size.width, s.width);
 		size.height = MAX(size.height, s.height);
 	}
@@ -107,7 +107,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSSize)PG_zoomedBoundsSize
 {
-	return [[self cell] cellSizeForBounds:NSMakeRect(0, 0, [self autoresizingMask] & NSViewWidthSizable ? FLT_MAX : NSWidth([self bounds]), FLT_MAX)];
+	return [[self cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, [self autoresizingMask] & NSViewWidthSizable ? FLT_MAX : NSWidth([self bounds]), FLT_MAX)];
 }
 
 @end
@@ -128,7 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSSize)PG_zoomedBoundsSize
 {
-	float totalWidth = 0;
+	float totalWidth = 0.0f;
 	NSArray *const columns = [self tableColumns];
 	BOOL const resizesAllColumns = [self respondsToSelector:@selector(columnAutoresizingStyle)] ? NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle] : [self autoresizesAllColumnsToFit];
 	if(resizesAllColumns) {
@@ -158,9 +158,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(; i < [[self tableView] numberOfRows]; i++) {
 		NSCell *const cell = [self dataCellForRow:i];
 		[cell setObjectValue:[[[self tableView] dataSource] tableView:[self tableView] objectValueForTableColumn:self row:i]];
-		width = MAX(width, [cell cellSizeForBounds:NSMakeRect(0, 0, FLT_MAX, FLT_MAX)].width);
+		width = MAX(width, [cell cellSizeForBounds:NSMakeRect(0.0f, 0.0f, FLT_MAX, FLT_MAX)].width);
 	}
-	return MIN(MAX(ceilf(width + 3), [self minWidth]), [self maxWidth]);
+	return MIN(MAX(ceilf(width + 3.0f), [self minWidth]), [self maxWidth]);
 }
 
 @end

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (float)AE_userSpaceScaleFactor
 {
-	return [self respondsToSelector:@selector(userSpaceScaleFactor)] ? [self userSpaceScaleFactor] : 1.0;
+	return [self respondsToSelector:@selector(userSpaceScaleFactor)] ? [self userSpaceScaleFactor] : 1.0f;
 }
 - (NSRect)AE_contentRect
 {

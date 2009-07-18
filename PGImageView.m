@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 
 #define PGAnimateSizeChanges true
-#define PGMaxWindowSize      5000 // 10,000 is a hard limit imposed by the window server.
+#define PGMaxWindowSize      5000.0f // 10,000 is a hard limit imposed by the window server.
 #define PGDebugDrawingModes  false
 
 @interface PGImageView (Private)
@@ -125,14 +125,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	if(NSEqualSizes(size, [self size])) return;
 	_size = size;
-	if(!_sizeTransitionTimer) _sizeTransitionTimer = [[self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0] retain];
+	if(!_sizeTransitionTimer) _sizeTransitionTimer = [[self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
 }
 - (void)stopAnimatedSizeTransition
 {
 	[_sizeTransitionTimer invalidate];
 	[_sizeTransitionTimer release];
 	_sizeTransitionTimer = nil;
-	_lastSizeAnimationTime = 0;
+	_lastSizeAnimationTime = 0.0f;
 	[self _setSize:_size];
 	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
@@ -170,7 +170,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setRotationInDegrees:(float)val
 {
 	if(val == _rotationInDegrees) return;
-	_rotationInDegrees = remainderf(val, 360);
+	_rotationInDegrees = remainderf(val, 360.0f);
 	[self _updateFrameSize];
 	[self setNeedsDisplay:YES];
 }
@@ -275,7 +275,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_runAnimationTimer
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
-	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] options:0];
+	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] options:kNilOptions];
 }
 - (void)_animate
 {
@@ -312,7 +312,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[cacheWindow setFrame:cacheWindowFrame display:NO];
 	NSView *const view = [cacheWindow contentView];
 
-	if(![view lockFocusIfCanDraw]) return (void)[self PG_performSelector:@selector(_cache) withObject:nil fireDate:nil interval:0 options:0];
+	if(![view lockFocusIfCanDraw]) return (void)[self PG_performSelector:@selector(_cache) withObject:nil fireDate:nil interval:0.0f options:kNilOptions];
 	NSRect const cacheRect = [_cache rect];
 	if(_isPDF) {
 		[[NSColor whiteColor] set];
@@ -351,7 +351,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	if(count && PGUpright == _orientation) {
 		int i = count;
-		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:operation fraction:1.0];
+		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:operation fraction:1.0f];
 	} else [_image drawInRect:r fromRect:NSZeroRect operation:operation fraction:1];
 	if(actualSize) {
 		[transform invert];
@@ -390,14 +390,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSSize const r = NSMakeSize(_size.width - _immediateSize.width, _size.height - _immediateSize.height);
 	float const dist = hypotf(r.width, r.height);
-	float const factor = MIN(1, MAX(0.33, 20 / dist) / PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
+	float const factor = MIN(1.0f, MAX(0.33f, 20.0f / dist) * PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
 	if(dist < 1 || ![self _setSize:NSMakeSize(_immediateSize.width + r.width * factor, _immediateSize.height + r.height * factor)]) [self stopAnimatedSizeTransition];
 }
 - (void)_updateFrameSize
 {
 	NSSize s = _immediateSize;
-	float const r = [self rotationInDegrees] / 180.0 * pi;
-	if(r) s = NSMakeSize(ceilf(fabs(cosf(r)) * s.width + fabs(sinf(r)) * s.height), ceilf(fabs(cosf(r)) * s.height + fabs(sinf(r)) * s.width));
+	float const r = [self rotationInDegrees] / 180.0f * (float)pi;
+	if(r) s = NSMakeSize(ceilf(fabsf(cosf(r)) * s.width + fabsf(sinf(r)) * s.height), ceilf(fabsf(cosf(r)) * s.height + fabsf(sinf(r)) * s.width));
 	if(NSEqualSizes(s, [self frame].size)) return;
 	[super setFrameSize:s];
 	[self _cache];
@@ -482,9 +482,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		_cache = [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:depth separate:YES alpha:YES];
 		NSView *const contentView = [[self window] contentView];
 		if([contentView lockFocusIfCanDraw]) {
-			[_cache drawInRect:NSMakeRect(0, 0, 1, 1)]; // This may look like voodoo, but somehow drawing the cache when it's small dramatically improves the speed of the initial draw when it's large.
+			[_cache drawInRect:NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f)]; // This may look like voodoo, but somehow drawing the cache when it's small dramatically improves the speed of the initial draw when it's large.
 			[contentView unlockFocus];
-			[contentView setNeedsDisplayInRect:NSMakeRect(0, 0, 1, 1)]; // We didn't actually want to do that, so redraw it back to normal.
+			[contentView setNeedsDisplayInRect:NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f)]; // We didn't actually want to do that, so redraw it back to normal.
 		}
 	} else if([[_cache window] depthLimit] != depth) [[_cache window] setDepthLimit:depth];
 	else return;

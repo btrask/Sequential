@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawRect:(NSRect)aRect
 {
 	[[NSColor windowBackgroundColor] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self bounds], 1, 1) cornerRadius:20] fill];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self bounds], 1.0f, 1.0f) cornerRadius:20.0f] fill];
 }
 
 #pragma mark NSResponder

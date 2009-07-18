@@ -47,20 +47,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if([self hidden]) return;
 
-	[[NSColor colorWithDeviceWhite:0.9 alpha:0.8] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5, 0.5) cornerRadius:(NSHeight(aRect) - 1) / 2] stroke];
+	[[NSColor colorWithDeviceWhite:0.9f alpha:0.8f] set];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5f, 0.5f) cornerRadius:(NSHeight(aRect) - 1.0f) / 2.0f] stroke];
 
 	NSRect r = aRect;
 	r.size.width = ceilf(NSWidth(aRect) * [[self objectValue] floatValue]); // For some reason -[NSCell floatValue] doesn't work.
 	[NSGraphicsContext saveGraphicsState];
 	NSRectClip(r);
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2, 2) cornerRadius:(NSHeight(aRect) - 4) / 2] addClip];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2.0f, 2.0f) cornerRadius:(NSHeight(aRect) - 4.0f) / 2.0f] addClip];
 	
-	r.size.height = ceilf(NSHeight(r) / 2);
-	[[NSColor colorWithDeviceWhite:0.95 alpha:0.8] set];
+	r.size.height = ceilf(NSHeight(r) / 2.0f);
+	[[NSColor colorWithDeviceWhite:0.95f alpha:0.8f] set];
 	NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	r.origin.y += NSHeight(r);
-	[[NSColor colorWithDeviceWhite:0.85 alpha:0.8] set];
+	[[NSColor colorWithDeviceWhite:0.85f alpha:0.8f] set];
 	NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	
 	[NSGraphicsContext restoreGraphicsState];

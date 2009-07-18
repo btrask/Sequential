@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other
 #import "PGDelayedPerforming.h"
+#import "PGGeometry.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -92,7 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		static NSDictionary *attrs = nil;
 		if(!attrs) {
 			NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
-			[style setTighteningFactorForTruncation:0.3];
+			[style setTighteningFactorForTruncation:0.3f];
 			[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 			attrs = [[NSDictionary alloc] initWithObjectsAndKeys:style, NSParagraphStyleAttributeName, nil];
 		}
@@ -124,7 +125,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowWillShow
 {
-	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f / 12.0f options:PGRetainTarget] retain];
+	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:PGAnimationFramerate / 2.0f options:PGRetainTarget] retain];
 	[self _update];
 }
 - (void)windowDidClose

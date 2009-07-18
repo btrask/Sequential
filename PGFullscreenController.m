@@ -163,7 +163,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL const dim = [[NSUserDefaults standardUserDefaults] boolForKey:PGDimOtherScreensKey]; // We shouldn't need to observe this value because our fullscreen window isn't going to be key while the user is adjusting the setting in the prefs window.
 	NSScreen *const displayScreen = [[PGPrefController sharedPrefController] displayScreen];
 
-	if(dim || [NSScreen AE_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:0]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if(dim || [NSScreen AE_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 
 	if(!dim) return;
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];

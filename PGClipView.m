@@ -169,10 +169,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (NSRect)scrollableRectWithBorder:(BOOL)flag
 {
 	NSSize const boundsSize = [self insetBounds].size;
-	NSSize margin = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2, (boundsSize.height - NSHeight(_documentFrame)) / 2);
-	float const padding = _showsBorder && flag ? PGBorderPadding : 0;
-	if(margin.width < 0) margin.width = padding;
-	if(margin.height < 0) margin.height = padding;
+	NSSize margin = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2.0f, (boundsSize.height - NSHeight(_documentFrame)) / 2.0f);
+	float const padding = _showsBorder && flag ? PGBorderPadding : 0.0f;
+	if(margin.width < 0.0f) margin.width = padding;
+	if(margin.height < 0.0f) margin.height = padding;
 	NSRect r = NSInsetRect(_documentFrame, -margin.width, -margin.height);
 	r.size.width -= boundsSize.width;
 	r.size.height -= boundsSize.height;
@@ -193,7 +193,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	switch(scrollType) {
 		case PGScrollByLine:
 		{
-			if(PGHorzEdgesMask & direction && PGVertEdgesMask & direction) s = NSMakeSize(sqrtf(powf(max.width, 2) / 2.0f), sqrtf(powf(max.height, 2) / 2.0f));
+			if(PGHorzEdgesMask & direction && PGVertEdgesMask & direction) s = NSMakeSize(sqrtf(powf(max.width, 2.0f) / 2.0f), sqrtf(powf(max.height, 2.0f) / 2.0f));
 			else if(PGHorzEdgesMask & direction) s.width = max.width;
 			else if(PGVertEdgesMask & direction) s.height = max.height;
 			break;
@@ -251,7 +251,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_position = newTargetPosition;
 	if(!_scrollTimer) {
 		[self beginScrolling];
-		_scrollTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:0] retain];
+		_scrollTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
 	}
 	return YES;
 }
@@ -279,7 +279,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[_scrollTimer invalidate];
 	[_scrollTimer release];
 	_scrollTimer = nil;
-	_lastScrollTime = 0;
+	_lastScrollTime = 0.0f;
 	[self endScrolling];
 }
 
@@ -317,14 +317,14 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSRect const b = [self insetBounds];
 	PGInset const inset = [self boundsInset];
-	return PGOffsetPointByXY([self position], inset.minX + NSWidth(b) / 2, inset.minY + NSHeight(b) / 2);
+	return PGOffsetPointByXY([self position], inset.minX + NSWidth(b) / 2.0f, inset.minY + NSHeight(b) / 2.0f);
 }
 - (BOOL)scrollCenterTo:(NSPoint)aPoint
         animation:(PGAnimationType)type
 {
 	NSRect const b = [self insetBounds];
 	PGInset const inset = [self boundsInset];
-	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2, -inset.minY - NSHeight(b) / 2) animation:type];
+	return [self scrollTo:PGOffsetPointByXY(aPoint, -inset.minX - NSWidth(b) / 2.0f, -inset.minY - NSHeight(b) / 2.0f) animation:type];
 }
 - (NSPoint)relativeCenter
 {
@@ -353,7 +353,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	}
 	PGDragMode dragMode = PGNotDragging;
 	NSValue *const dragModeValue = [NSValue valueWithPointer:&dragMode];
-	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue fireDate:nil interval:GetDblTime() / -60.0f options:0 mode:NSEventTrackingRunLoopMode]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
+	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue fireDate:nil interval:GetDblTime() / -60.0f options:kNilOptions mode:NSEventTrackingRunLoopMode]; // GetDblTime() is not available in 64-bit, but the only alternative for now seems to be checking the "com.apple.mouse.doubleClickThreshold" default.
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
 	NSPoint finalPoint = originalPoint; // We use CGAssociateMouseAndMouseCursorPosition() to prevent the mouse from moving during the drag, so we have to keep track of where it should reappear ourselves.
 	NSRect const availableDragRect = [self convertRect:NSInsetRect([self insetBounds], 4, 4) toView:nil];
@@ -395,17 +395,17 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSParameterAssert(NSKeyDown == [firstEvent type]);
 	[self beginScrolling];
-	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFramerate];
+	[NSEvent startPeriodicEventsAfterDelay:0.0f withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGRectEdgeMask pressedDirections = PGNoEdges;
-	NSTimeInterval pageTurnTime = 0, lastScrollTime = 0;
+	NSTimeInterval pageTurnTime = 0.0f, lastScrollTime = 0.0f;
 	do {
 		NSEventType const type = [latestEvent type];
 		if(NSPeriodic == type) {
 			NSTimeInterval const currentTime = PGUptime();
 			if(currentTime > pageTurnTime + PGPageTurnMovementDelay) {
 				NSSize const d = [self distanceInDirection:PGNonContradictoryRectEdges(pressedDirections) forScrollType:PGScrollByLine];
-				float const timeAdjustment = lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1;
+				float const timeAdjustment = (float)(lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1.0f);
 				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) animation:PGNoAnimation];
 			}
 			lastScrollTime = currentTime;
@@ -532,8 +532,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
 	float const dist = hypotf(r.width, r.height);
-	float const factor = MIN(1, MAX(0.25, 10 / dist) / PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
-	if(![self _scrollTo:(dist < 1 ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
+	float const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
+	if(![self _scrollTo:(dist < 1.0f ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
 }
 
 - (void)_beginPreliminaryDrag:(NSValue *)val
@@ -666,7 +666,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	float const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 
 #pragma mark NSResponder
@@ -691,7 +691,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if([anEvent modifierFlags] & NSCommandKeyMask) {
 		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayedEndGesture) object:nil];
 		[[self delegate] clipView:self magnifyBy:y * PGMouseWheelZoomFactor];
-		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil fireDate:nil interval:-1.0f options:0]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
+		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil fireDate:nil interval:-1.0f options:kNilOptions]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
 	} else [self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
 }
 
@@ -704,7 +704,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)swipeWithEvent:(NSEvent *)anEvent
 {
-	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint(-[anEvent deltaX], [anEvent deltaY]), 0.1)];
+	[[self delegate] clipView:self shouldExitEdges:PGPointToRectEdgeMaskWithThreshhold(NSMakePoint(-[anEvent deltaX], [anEvent deltaY]), 0.1f)];
 }
 - (void)magnifyWithEvent:(NSEvent *)anEvent
 {

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (float)loadProgress
 {
-	return 0;
+	return 0.0f;
 }
 - (id<PGLoading>)parentLoad
 {

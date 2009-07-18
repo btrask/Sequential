@@ -207,7 +207,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)zoomOut:(id)sender
 {
-	[self zoomBy:1 / 2.0f];
+	[self zoomBy:0.5f];
 }
 
 #pragma mark -
@@ -552,7 +552,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_timer release];
 	if(run) {
 		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
-		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:0 mode:NSDefaultRunLoopMode] retain];
+		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:kNilOptions mode:NSDefaultRunLoopMode] retain];
 	} else {
 		_nextTimerFireDate = nil;
 		_timer = nil;
@@ -576,7 +576,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	[_imageView setUsesCaching:NO];
 	_allowZoomAnimation = NO;
-	[NSEvent startPeriodicEventsAfterDelay:0 withPeriod:PGAnimationFramerate];
+	[NSEvent startPeriodicEventsAfterDelay:0.0f withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGZoomDirection dir = PGZoomNone;
 	BOOL stop = NO;
@@ -626,7 +626,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGGenericError) {
 		[errorLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
-		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0, 0, NSWidth([errorMessage frame]), FLT_MAX)].height)];
+		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), FLT_MAX)].height)];
 		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
 	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
@@ -730,8 +730,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
 	PGInset inset = PGZeroInset;
 	switch(corner) {
-		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0; break;
-		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0; break;
+		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0.0f; break;
+		case PGMaxXMinYCorner: inset.minX = [self findPanelShown] ? NSWidth([_findPanel frame]) : 0.0f; break;
 	}
 	if(_thumbnailController) inset = PGAddInsets(inset, [_thumbnailController contentInset]);
 	[_infoPanel setFrameInset:inset];
@@ -815,7 +815,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
 	_reading = YES;
-	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:-0.5f options:0];
+	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:-0.5f options:kNilOptions];
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
@@ -861,8 +861,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		float scaleY = NSHeight(bounds) / roundf(newSize.height);
 		if(PGAutomaticScale == scaleMode) {
 			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
-			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floorf(newSize.height * scaleX / scrollMax.height + 0.3) * scrollMax.height) / newSize.height));
-			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floorf(newSize.width * scaleY / scrollMax.width + 0.3) * scrollMax.width) / newSize.width));
+			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floorf(newSize.height * scaleX / scrollMax.height + 0.3f) * scrollMax.height) / newSize.height));
+			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floorf(newSize.width * scaleY / scrollMax.width + 0.3f) * scrollMax.width) / newSize.width));
 		} else if(PGViewFitScale == scaleMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
@@ -924,7 +924,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self window] setMinSize:PGWindowMinSize];
 
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
-	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5, 0)] autorelease] : [NSCursor pointingHandCursor])];
+	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5.0f, 0.0f)] autorelease] : [NSCursor pointingHandCursor])];
 	[clipView setPostsFrameChangedNotifications:YES];
 	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 
@@ -1079,8 +1079,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScaleMode] == PGConstantFactorScale) {
-		if(@selector(zoomIn:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMax) < 0.01) return NO;
-		if(@selector(zoomOut:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMin) < 0.01) return NO;
+		if(@selector(zoomIn:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMax) < 0.01f) return NO;
+		if(@selector(zoomOut:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMin) < 0.01f) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
 	if(!firstNode) { // We might have to get -firstNode anyway.
@@ -1250,15 +1250,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGDocument *const d = [self activeDocument];
 	if(!modifiers || NSAlternateKeyMask == modifiers) switch(keyCode) {
 		case PGKey0: [self setTimerRunning:NO]; return YES;
-		case PGKey1: [d setTimerInterval:1 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey2: [d setTimerInterval:2 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey3: [d setTimerInterval:3 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey4: [d setTimerInterval:4 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey5: [d setTimerInterval:5 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey6: [d setTimerInterval:6 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey7: [d setTimerInterval:7 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey8: [d setTimerInterval:8 * timerFactor]; [self setTimerRunning:YES]; return YES;
-		case PGKey9: [d setTimerInterval:9 * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey1: [d setTimerInterval:1.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey2: [d setTimerInterval:2.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey3: [d setTimerInterval:3.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey4: [d setTimerInterval:4.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey5: [d setTimerInterval:5.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey6: [d setTimerInterval:6.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey7: [d setTimerInterval:7.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey8: [d setTimerInterval:8.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
+		case PGKey9: [d setTimerInterval:9.0f * timerFactor]; [self setTimerRunning:YES]; return YES;
 	}
 	return [self performKeyEquivalent:anEvent];
 }
@@ -1282,7 +1282,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
         magnifyBy:(float)amount
 {
 	[_imageView setUsesCaching:NO];
-	[[self activeDocument] setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500 + 1), PGScaleMax))];
+	[[self activeDocument] setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500.0f + 1.0f), PGScaleMax))];
 }
 - (void)clipView:(PGClipView *)sender
         rotateByDegrees:(float)amount
@@ -1293,9 +1293,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[_imageView setUsesCaching:YES];
 	float const deg = [_imageView rotationInDegrees];
-	[_imageView setRotationInDegrees:0];
+	[_imageView setRotationInDegrees:0.0f];
 	PGOrientation o;
-	switch((int)roundf((deg + 360) / 90) % 4) {
+	switch((int)roundf((deg + 360.0f) / 90.0f) % 4) {
 		case 0: o = PGUpright; break;
 		case 1: o = PGRotated90CC; break;
 		case 2: o = PGUpsideDown; break;

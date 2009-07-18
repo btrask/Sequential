@@ -149,10 +149,10 @@ static unsigned PGSimultaneousConnections = 0;
 }
 - (float)loadProgress
 {
-	if([self loaded]) return 1;
-	if(!_response) return 0;
+	if([self loaded]) return 1.0f;
+	if(!_response) return 0.0f;
 	long long const expectedLength = [_response expectedContentLength];
-	if(-1 == expectedLength) return 0;
+	if(-1 == expectedLength) return 0.0f;
 	return (float)[_data length] / expectedLength;
 }
 - (id<PGLoading>)parentLoad

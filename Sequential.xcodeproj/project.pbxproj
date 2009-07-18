@@ -175,7 +175,6 @@
 		0EEE58270DB55B61006E5B9C /* exifgps.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE580C0DB55B61006E5B9C /* exifgps.c */; };
 		0EEE582A0DB55B61006E5B9C /* exifutil.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58100DB55B61006E5B9C /* exifutil.c */; };
 		0EEE582B0DB55B61006E5B9C /* fuji.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58110DB55B61006E5B9C /* fuji.c */; };
-		0EEE582C0DB55B61006E5B9C /* getopt.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58120DB55B61006E5B9C /* getopt.c */; };
 		0EEE582D0DB55B61006E5B9C /* jpeg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58130DB55B61006E5B9C /* jpeg.c */; };
 		0EEE582E0DB55B61006E5B9C /* leica.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58150DB55B61006E5B9C /* leica.c */; };
 		0EEE58300DB55B61006E5B9C /* makers.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58170DB55B61006E5B9C /* makers.c */; };
@@ -634,7 +633,6 @@
 		0EEE580D0DB55B61006E5B9C /* exifint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = exifint.h; path = exiftags/exifint.h; sourceTree = "<group>"; };
 		0EEE58100DB55B61006E5B9C /* exifutil.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = exifutil.c; path = exiftags/exifutil.c; sourceTree = "<group>"; };
 		0EEE58110DB55B61006E5B9C /* fuji.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fuji.c; path = exiftags/fuji.c; sourceTree = "<group>"; };
-		0EEE58120DB55B61006E5B9C /* getopt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = getopt.c; path = exiftags/getopt.c; sourceTree = "<group>"; };
 		0EEE58130DB55B61006E5B9C /* jpeg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jpeg.c; path = exiftags/jpeg.c; sourceTree = "<group>"; };
 		0EEE58140DB55B61006E5B9C /* jpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jpeg.h; path = exiftags/jpeg.h; sourceTree = "<group>"; };
 		0EEE58150DB55B61006E5B9C /* leica.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = leica.c; path = exiftags/leica.c; sourceTree = "<group>"; };
@@ -922,7 +920,6 @@
 				0EEE580D0DB55B61006E5B9C /* exifint.h */,
 				0EEE58100DB55B61006E5B9C /* exifutil.c */,
 				0EEE58110DB55B61006E5B9C /* fuji.c */,
-				0EEE58120DB55B61006E5B9C /* getopt.c */,
 				0EEE58130DB55B61006E5B9C /* jpeg.c */,
 				0EEE58140DB55B61006E5B9C /* jpeg.h */,
 				0EEE58150DB55B61006E5B9C /* leica.c */,
@@ -1360,7 +1357,6 @@
 				0EEE58270DB55B61006E5B9C /* exifgps.c in Sources */,
 				0EEE582A0DB55B61006E5B9C /* exifutil.c in Sources */,
 				0EEE582B0DB55B61006E5B9C /* fuji.c in Sources */,
-				0EEE582C0DB55B61006E5B9C /* getopt.c in Sources */,
 				0EEE582D0DB55B61006E5B9C /* jpeg.c in Sources */,
 				0EEE582E0DB55B61006E5B9C /* leica.c in Sources */,
 				0EEE58300DB55B61006E5B9C /* makers.c in Sources */,
@@ -1734,10 +1730,17 @@
 				GCC_FAST_OBJC_DISPATCH = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PFE_FILE_C_DIALECTS = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/**\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;
@@ -1758,10 +1761,17 @@
 				GCC_FAST_OBJC_DISPATCH = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PFE_FILE_C_DIALECTS = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
+				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES;
 				GCC_WARN_MISSING_PARENTHESES = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
+				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.3;

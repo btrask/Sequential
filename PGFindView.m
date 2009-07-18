@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           frameForContentRect:(NSRect)aRect
           scale:(float)s
 {
-	return (NSRect){aRect.origin, NSWidth([self frame]) * s, NSHeight([self frame]) * s};
+	return (NSRect){aRect.origin, {NSWidth([self frame]) * s, NSHeight([self frame]) * s}};
 }
 
 #pragma mark NSResponder

@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawRect:(NSRect)aRect
 {
 	if(!_highlightPath) {
-		_highlightPath = [[NSBezierPath bezierPathWithRect:NSInsetRect([self bounds], 2, 2)] retain];
+		_highlightPath = [[NSBezierPath bezierPathWithRect:NSInsetRect([self bounds], 2.0f, 2.0f)] retain];
 		[_highlightPath setLineWidth:4];
 		[_highlightPath setLineJoinStyle:NSRoundLineJoinStyle];
 	}

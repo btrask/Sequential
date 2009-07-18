@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 
 #define PGAlertViewSize 100.0f
-#define PGMarginSize 4.0
+#define PGMarginSize 4.0f
 
 @interface PGAlertView (Private)
 
@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[self _updateCurrentGraphic];
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
-	if(fadeOutDelay >= 0.01) [self PG_performSelector:@selector(popGraphicIdenticalTo:) withObject:_currentGraphic fireDate:nil interval:-fadeOutDelay options:PGCompareArgumentPointer];
+	if(fadeOutDelay >= 0.01f) [self PG_performSelector:@selector(popGraphicIdenticalTo:) withObject:_currentGraphic fireDate:nil interval:-fadeOutDelay options:PGCompareArgumentPointer];
 	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
@@ -138,7 +138,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_frameTimer invalidate];
 	_frameCount = 0;
 	NSTimeInterval const animationDelay = [_currentGraphic animationDelay];
-	_frameTimer = animationDelay > 0 ? [self PG_performSelector:@selector(animateOneFrame:) withObject:self fireDate:nil interval:animationDelay options:PGRetainTarget] : nil;
+	_frameTimer = animationDelay > 0.0f ? [self PG_performSelector:@selector(animateOneFrame:) withObject:self fireDate:nil interval:animationDelay options:PGRetainTarget] : nil;
 	[self setNeedsDisplay:YES];
 }
 
@@ -259,22 +259,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[[NSColor AE_bezelBackgroundColor] set];
 		NSBezierPath *const path = [NSBezierPath bezierPath];
 		[path moveToPoint:centers[i]];
-		[path appendBezierPathWithArcWithCenter:centers[i] radius:50.0f * f startAngle:90 * i endAngle:90 * (i + 1)];
+		[path appendBezierPathWithArcWithCenter:centers[i] radius:50.0f * f startAngle:90.0f * i endAngle:90.0f * (i + 1)];
 		[path closePath];
 		[path fill];
 	}
 
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowBlurRadius:4];
-	[shadow setShadowOffset:NSMakeSize(0, -1)];
+	[shadow setShadowBlurRadius:4.0f];
+	[shadow setShadowOffset:NSMakeSize(0.0f, -1.0f)];
 	[shadow setShadowColor:[NSColor blackColor]];
 	[shadow set];
 }
 - (void)flipHorizontally
 {
 	NSAffineTransform *const flip = [[[NSAffineTransform alloc] init] autorelease];
-	[flip translateXBy:PGAlertViewSize yBy:0];
-	[flip scaleXBy:-1 yBy:1];
+	[flip translateXBy:PGAlertViewSize yBy:0.0f];
+	[flip scaleXBy:-1.0f yBy:1.0f];
 	[flip concat];
 }
 - (NSTimeInterval)fadeOutDelay
@@ -286,7 +286,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSTimeInterval)animationDelay
 {
-	return 0;
+	return 0.0f;
 }
 - (unsigned)frameMax
 {
@@ -321,15 +321,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[NSColor AE_bezelForegroundColor] set];
 
 	NSBezierPath *const arrow = [NSBezierPath bezierPath];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(180.0f * f, 150.0f * f) radius:large startAngle:315 endAngle:45];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 200.0f * f) radius:small startAngle:45 endAngle:90];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 200.0f * f) radius:small startAngle:90 endAngle:180];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 180.0f * f) radius:small startAngle:0 endAngle:270 clockwise:YES];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 170.0f * f) radius:small startAngle:90 endAngle:180];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 130.0f * f) radius:small startAngle:180 endAngle:270];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 120.0f * f) radius:small startAngle:90 endAngle:0 clockwise:YES];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 100.0f * f) radius:small startAngle:180 endAngle:270];
-	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 100.0f * f) radius:small startAngle:270 endAngle:315];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(180.0f * f, 150.0f * f) radius:large startAngle:315.0f endAngle:45.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 200.0f * f) radius:small startAngle:45.0f endAngle:90.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 200.0f * f) radius:small startAngle:90.0f endAngle:180.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 180.0f * f) radius:small startAngle:0.0f endAngle:270.0f clockwise:YES];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 170.0f * f) radius:small startAngle:90.0f endAngle:180.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint( 75.0f * f, 130.0f * f) radius:small startAngle:180.0f endAngle:270.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(115.0f * f, 120.0f * f) radius:small startAngle:90.0f endAngle:0.0f clockwise:YES];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(125.0f * f, 100.0f * f) radius:small startAngle:180.0f endAngle:270.0f];
+	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(140.0f * f, 100.0f * f) radius:small startAngle:270.0f endAngle:315.0f];
 	[arrow fill];
 
 	NSBezierPath *const wall = [NSBezierPath bezierPath];
@@ -420,7 +420,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)setProgress:(float)progress
 {
-	_progress = MIN(MAX(progress, 0), 1);
+	_progress = MIN(MAX(progress, 0.0f), 1.0f);
 }
 
 #pragma mark NSObject Protocol
@@ -460,7 +460,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSTimeInterval)animationDelay
 {
-	return 1.0 / 12.0;
+	return 1.0f / 12.0f;
 }
 - (unsigned)frameMax
 {

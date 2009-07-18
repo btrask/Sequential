@@ -678,7 +678,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (BOOL)menu:(NSMenu *)menu
         updateItem:(NSMenuItem *)item
-        atIndex:(int)index
+        atIndex:(int)anInt
         shouldCancel:(BOOL)shouldCancel
 {
 	NSString *title = @"";
@@ -687,8 +687,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	id representedObject = nil;
 	if(menu == recentMenu) {
 		NSArray *const identifiers = [self recentDocumentIdentifiers];
-		if((unsigned)index < [identifiers count]) {
-			PGDisplayableIdentifier *const identifier = [identifiers objectAtIndex:index];
+		if((unsigned)anInt < [identifiers count]) {
+			PGDisplayableIdentifier *const identifier = [identifiers objectAtIndex:anInt];
 			NSString *const name = [identifier displayName];
 
 			BOOL uniqueName = YES;
@@ -701,9 +701,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			representedObject = identifier;
 		} else {
 			title = NSLocalizedString(@"Clear Menu", @"Clear the Open Recent menu. Should be the same as the standard text.");
-			if(index) {
+			if(anInt) {
 				if(!_recentMenuSeparatorItem) _recentMenuSeparatorItem = [[NSMenuItem separatorItem] retain];
-				[menu insertItem:_recentMenuSeparatorItem atIndex:index];
+				[menu insertItem:_recentMenuSeparatorItem atIndex:anInt];
 				action = @selector(clearRecentDocuments:);
 			}
 		}

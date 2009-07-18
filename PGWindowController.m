@@ -119,7 +119,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:PGMainWindowFrameKey];
 	if(savedFrame) [window setFrameFromString:savedFrame];
 	else {
-		[window setFrame:NSMakeRect(0, 0, 500, 500) display:NO];
+		[window setFrame:NSMakeRect(0.0f, 0.0f, 500.0f, 500.0f) display:NO];
 		[window center];
 	}
 	_shouldZoomOnNextImageLoad = [[NSUserDefaults standardUserDefaults] boolForKey:PGAutozoomsWindowsKey];

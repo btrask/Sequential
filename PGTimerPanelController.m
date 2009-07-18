@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other
 #import "PGDelayedPerforming.h"
+#import "PGGeometry.h"
 
 // Categories
 #import "NSObjectAdditions.h"
@@ -87,7 +88,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_updateTimer release];
 		_updateTimer = nil;
 	} else if(!_updateTimer) {
-		_updateTimer = [[self PG_performSelector:@selector(_updateOnTimer:) withObject:[NSNumber numberWithBool:NO] fireDate:nil interval:1.0f / 24.0f options:0] retain];
+		_updateTimer = [[self PG_performSelector:@selector(_updateOnTimer:) withObject:[NSNumber numberWithBool:NO] fireDate:nil interval:PGAnimationFramerate options:0] retain];
 	}
 	[timerButton setEnabled:!!d];
 	[timerButton setIconType:run ? AEStopIcon : AEPlayIcon];
@@ -103,7 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSDate *const fireDate = [[self displayController] nextTimerFireDate];
 		timeRemaining = MAX(0.0f, fireDate ? [fireDate timeIntervalSinceNow] : 0.0f);
 	}
-	[timerButton setProgress:(running ? (interval - timeRemaining) / interval : 0)];
+	[timerButton setProgress:running ? (float)((interval - timeRemaining) / interval) : 0.0f];
 	[remainingField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), timeRemaining]];
 	if([changed boolValue]) {
 		[totalField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), interval]];

@@ -406,7 +406,7 @@ static struct exiftag minolta_unkn[] = {
 /*
  * Process maker note tag 0x0001 and 0x0003 fields.
  */
-void
+static void
 minolta_cprop(struct exifprop *prop, unsigned char *off, struct exiftags *t,
     struct exiftag *thetags)
 {

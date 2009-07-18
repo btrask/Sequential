@@ -149,7 +149,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 - (float)loadProgress
 {
-	return 1.0;
+	return 1.0f;
 }
 
 @end

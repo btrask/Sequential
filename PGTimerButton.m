@@ -92,7 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawWithFrame:(NSRect)b inView:(NSView *)v
 {
 	[[NSColor AE_bezelForegroundColor] set];
-	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5, 0.5)] stroke];
+	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5f, 0.5f)] stroke];
 	[self drawInteriorWithFrame:b inView:v];
 }
 - (void)drawInteriorWithFrame:(NSRect)b inView:(NSView *)v
@@ -102,14 +102,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSBezierPath *path = [NSBezierPath bezierPath];
 		NSPoint const center = NSMakePoint(NSMidX(b), NSMidY(b));
 		[path moveToPoint:center];
-		[path appendBezierPathWithArcWithCenter:center radius:NSWidth(b) / 2 - 2 startAngle:270 endAngle:[self progress] * 360.0 + 270 clockwise:NO];
+		[path appendBezierPathWithArcWithCenter:center radius:NSWidth(b) / 2.0f - 2.0f startAngle:270.0f endAngle:[self progress] * 360.0f + 270.0f clockwise:NO];
 		[path addClip];
 
 		[[NSColor colorWithDeviceWhite:0.85f alpha:0.8f] set];
 		NSRectFillUsingOperation(b, NSCompositeSourceOver);
 
 		[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
-		[[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(NSMinX(b), NSMinY(b) - NSHeight(b) * 0.25, NSWidth(b), NSHeight(b) * 0.75)] fill];
+		[[NSBezierPath bezierPathWithOvalInRect:NSMakeRect(NSMinX(b), NSMinY(b) - NSHeight(b) * 0.25f, NSWidth(b), NSHeight(b) * 0.75f)] fill];
 		[NSGraphicsContext restoreGraphicsState];
 	}
 

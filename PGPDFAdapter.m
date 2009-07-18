@@ -135,8 +135,8 @@ static NSString *const PGIndexKey = @"PGIndex";
 		[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
 		[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 		[[NSColor whiteColor] set];
-		NSRectFill(NSMakeRect(0, 0, s.width, s.height));
-		[rep drawInRect:NSMakeRect(0, 0, s.width, s.height)];
+		NSRectFill(NSMakeRect(0.0f, 0.0f, s.width, s.height));
+		[rep drawInRect:NSMakeRect(0.0f, 0.0f, s.width, s.height)];
 		[NSGraphicsContext setCurrentContext:nil];
 	}
 	return thumbRep;
