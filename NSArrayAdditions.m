@@ -29,6 +29,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSArray (AEAdditions)
 
+#pragma mark +NSArray(AEAdditions)
+
++ (id)AE_arrayWithContentsOfArrays:(NSArray *)first, ...
+{
+	if(!first) return [self array];
+	NSMutableArray *const result = [[first mutableCopy] autorelease];
+	NSArray *array;
+	va_list list;
+	va_start(list, first);
+	while((array = va_arg(list, NSArray *))) [result addObjectsFromArray:array];
+	va_end(list);
+	return result;
+}
+
+#pragma mark -NSArray(AEAdditions)
+
 - (NSArray *)AE_arrayWithUniqueObjects
 {
 	NSMutableArray *const array = [[self mutableCopy] autorelease];

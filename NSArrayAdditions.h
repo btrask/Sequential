@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface NSArray (AEAdditions)
 
++ (id)AE_arrayWithContentsOfArrays:(NSArray *)first, ... NS_REQUIRES_NIL_TERMINATION;
+
 - (NSArray *)AE_arrayWithUniqueObjects;
 - (void)AE_addObjectObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName;
 - (void)AE_removeObjectObserver:(id)observer name:(NSString *)aName;

@@ -52,6 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL              _drawsRoundedCorners;
 }
 
++ (NSArray *)pasteboardTypes;
+
 - (NSImageRep *)rep;
 - (PGOrientation)orientation;
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
@@ -81,6 +83,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)drawsRoundedCorners;
 - (void)setDrawsRoundedCorners:(BOOL)flag;
+
+- (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types;
 
 - (void)appDidHide:(NSNotification *)aNotif;
 - (void)appDidUnhide:(NSNotification *)aNotif;

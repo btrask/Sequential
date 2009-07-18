@@ -132,7 +132,6 @@
 		0EB167E00A82AD89001999E7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0EB167DF0A82AD89001999E7 /* Localizable.strings */; };
 		0EBF5A160C44DF56004584D2 /* NSMenuItemAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */; };
 		0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DEF0CA02B7B003E492C /* PGZooming.m */; };
-		0EC11DF30CA02B98003E492C /* PGByteOrdering.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DF20CA02B98003E492C /* PGByteOrdering.m */; };
 		0EC11EA20CA14F0C003E492C /* NSColorAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */; };
 		0EC33E3F0E29B0A700450CF8 /* PGProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */; };
 		0EC614F50BE43B1100D04615 /* NSWindowAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC614F40BE43B1100D04615 /* NSWindowAdditions.m */; };
@@ -536,8 +535,6 @@
 		0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMenuItemAdditions.m; sourceTree = "<group>"; };
 		0EC11DEE0CA02B7B003E492C /* PGZooming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGZooming.h; sourceTree = "<group>"; };
 		0EC11DEF0CA02B7B003E492C /* PGZooming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGZooming.m; sourceTree = "<group>"; };
-		0EC11DF10CA02B98003E492C /* PGByteOrdering.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGByteOrdering.h; sourceTree = "<group>"; };
-		0EC11DF20CA02B98003E492C /* PGByteOrdering.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGByteOrdering.m; sourceTree = "<group>"; };
 		0EC11EA00CA14F0C003E492C /* NSColorAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSColorAdditions.h; sourceTree = "<group>"; };
 		0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSColorAdditions.m; sourceTree = "<group>"; };
 		0EC1C5330E366FB700E911E7 /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGActivity.nib; sourceTree = "<group>"; };
@@ -874,8 +871,6 @@
 			children = (
 				0E4793910DF15FD90083B7CA /* PGAttachments.h */,
 				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
-				0EC11DF10CA02B98003E492C /* PGByteOrdering.h */,
-				0EC11DF20CA02B98003E492C /* PGByteOrdering.m */,
 				0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */,
 				0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */,
 				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
@@ -1348,7 +1343,6 @@
 				0ECF36E80C7DC4FC0009EB00 /* PGSubscription.m in Sources */,
 				0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */,
 				0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */,
-				0EC11DF30CA02B98003E492C /* PGByteOrdering.m in Sources */,
 				0EC11EA20CA14F0C003E492C /* NSColorAdditions.m in Sources */,
 				0ECD9FFE0CB3961B0059C754 /* PGFindView.m in Sources */,
 				0E5EC04B0CEB850300E7FF9A /* PGMainThreadProxy.m in Sources */,

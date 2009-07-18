@@ -68,6 +68,13 @@ enum {
 
 @implementation PGNode
 
+#pragma mark +PGNode
+
++ (NSArray *)pasteboardTypes
+{
+	return [NSArray arrayWithObjects:NSStringPboardType, NSRTFDPboardType, NSFileContentsPboardType, nil];
+}
+
 #pragma mark +NSObject
 
 + (void)initialize
@@ -319,6 +326,36 @@ enum {
 - (PGBookmark *)bookmark
 {
 	return [[[PGBookmark alloc] initWithNode:self] autorelease];
+}
+
+#pragma mark -
+
+- (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
+{
+	if(!pboard) return NO;
+	BOOL wrote = NO;
+	if([types containsObject:NSStringPboardType]) {
+		[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+		[pboard setString:[[self identifier] displayName] forType:NSStringPboardType];
+		wrote = YES;
+	}
+	NSData *const data = [self canGetData] ? [self data] : nil;
+	if(data) {
+		if([types containsObject:NSRTFDPboardType]) {
+			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
+			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];
+			[wrapper setPreferredFilename:[[self identifier] displayName]];
+			NSAttributedString *const string = [NSAttributedString attributedStringWithAttachment:[[[NSTextAttachment alloc] initWithFileWrapper:wrapper] autorelease]];
+			[pboard setData:[string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:nil] forType:NSRTFDPboardType];
+			wrote = YES;
+		}
+		if([types containsObject:NSFileContentsPboardType]) {
+			[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
+			[pboard setData:data forType:NSFileContentsPboardType];
+			wrote = YES;
+		}
+	}
+	return wrote;
 }
 
 #pragma mark -

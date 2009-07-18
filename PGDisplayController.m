@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGKeyboardLayout.h"
 
 // Categories
+#import "NSArrayAdditions.h"
 #import "NSControlAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSScreenAdditions.h"
@@ -103,7 +104,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 + (NSArray *)pasteboardTypes
 {
-	return [NSArray arrayWithObjects:NSStringPboardType, NSTIFFPboardType, NSRTFDPboardType, NSFileContentsPboardType, nil];
+	return [NSArray AE_arrayWithContentsOfArrays:[PGNode pasteboardTypes], [PGImageView pasteboardTypes], nil];
 }
 
 #pragma mark +NSObject
@@ -1196,41 +1197,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	BOOL wrote = NO;
 	[pboard declareTypes:[NSArray array] owner:nil];
-	do {
-		if(![types containsObject:NSStringPboardType] || ![self activeNode]) break;
-		wrote = YES;
-		if(!pboard) break;
-		[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-		[pboard setString:[[[self activeNode] identifier] displayName] forType:NSStringPboardType];
-	} while(NO);
-	do {
-		if(![types containsObject:NSTIFFPboardType] || [clipView documentView] != _imageView) break;
-		NSImageRep *const rep = [_imageView rep];
-		if(!rep || ![rep respondsToSelector:@selector(TIFFRepresentation)]) break;
-		wrote = YES;
-		if(!pboard) break;
-		[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
-		[pboard setData:[(NSBitmapImageRep *)rep TIFFRepresentation] forType:NSTIFFPboardType];
-	} while(NO);
-	do {
-		if(![[self activeNode] canGetData]) break;
-		if(![types containsObject:NSRTFDPboardType] && ![types containsObject:NSFileContentsPboardType]) break;
-		wrote = YES;
-		if(!pboard) break;
-		NSData *const data = [[self activeNode] data];
-		if(!data) break;
-		if([types containsObject:NSRTFDPboardType]) {
-			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
-			NSFileWrapper *const wrapper = [[[NSFileWrapper alloc] initRegularFileWithContents:data] autorelease];
-			[wrapper setPreferredFilename:[[[self activeNode] identifier] displayName]];
-			NSAttributedString *const string = [NSAttributedString attributedStringWithAttachment:[[[NSTextAttachment alloc] initWithFileWrapper:wrapper] autorelease]];
-			[pboard setData:[string RTFDFromRange:NSMakeRange(0, [string length]) documentAttributes:nil] forType:NSRTFDPboardType];
-		}
-		if([types containsObject:NSFileContentsPboardType]) {
-			[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
-			[pboard setData:data forType:NSFileContentsPboardType];
-		}
-	} while(NO);
+	if([clipView documentView] == _imageView && [_imageView writeToPasteboard:pboard types:types]) wrote = YES;
+	if([[self activeNode] writeToPasteboard:pboard types:types]) wrote = YES;
 	return wrote;
 }
 

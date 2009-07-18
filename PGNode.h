@@ -71,6 +71,8 @@ typedef unsigned PGNodeStatus;
 	NSNumber *_dataLength;
 }
 
++ (NSArray *)pasteboardTypes;
+
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(id)dataSource;
 
 - (id)dataSource;
@@ -108,6 +110,8 @@ typedef unsigned PGNodeStatus;
 
 - (BOOL)canBookmark;
 - (PGBookmark *)bookmark;
+
+- (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types;
 
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;

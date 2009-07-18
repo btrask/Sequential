@@ -57,7 +57,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGImageView
 
-#pragma mark NSObject
+#pragma mark +PGImageView
+
++ (NSArray *)pasteboardTypes
+{
+	return [NSArray arrayWithObjects:NSTIFFPboardType, nil];
+}
+
+#pragma mark +NSObject
 
 + (void)initialize
 {
@@ -67,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self exposeBinding:@"drawsRoundedCorners"];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGImageView
 
 - (NSImageRep *)rep
 {
@@ -243,6 +250,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
+- (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
+{
+	if(!pboard || ![types containsObject:NSTIFFPboardType]) return NO;
+	if(!_rep || ![_rep respondsToSelector:@selector(TIFFRepresentation)]) return NO;
+	[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
+	[pboard setData:[(NSBitmapImageRep *)_rep TIFFRepresentation] forType:NSTIFFPboardType];
+	return YES;
+}
+
+#pragma mark -
+
 - (void)appDidHide:(NSNotification *)aNotif
 {
 	[self pauseAnimation];
@@ -252,7 +270,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self resumeAnimation];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGImageView(Private)
 
 - (void)_runAnimationTimer
 {
@@ -385,18 +403,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _cache];
 }
 
-#pragma mark PGClipViewAdditions Protocol
-
-- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
-{
-	return NO;
-}
-- (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender
-{
-	return YES;
-}
-
-#pragma mark NSView
+#pragma mark -NSView
 
 - (id)initWithFrame:(NSRect)aRect
 {
@@ -484,7 +491,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _cache];
 }
 
-#pragma mark NSObject
+#pragma mark -NSView(PGClipViewAdditions)
+
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
+{
+	return NO;
+}
+- (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender
+{
+	return YES;
+}
+
+#pragma mark -NSObject
 
 - (id)init
 {
