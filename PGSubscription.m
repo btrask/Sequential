@@ -122,10 +122,9 @@ static id  PGActiveSubscriptions = nil;
 {
 	for(;;) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		struct kevent ev[5]; // Group up to 5 events at once.
-		unsigned const count = kevent(PGKQueue, NULL, 0, ev, 5, NULL);
-		unsigned i = 0;
-		for(; i < count; i++) [[PGLeafSubscription PG_performOn:(id)ev[i].udata allowOnce:NO withStorage:PGActiveSubscriptions] performSelectorOnMainThread:@selector(noteFileEventDidOccurWithFlags:) withObject:[NSNumber numberWithUnsignedInt:ev[i].fflags] waitUntilDone:NO];
+		struct kevent ev;
+		(void)kevent(PGKQueue, NULL, 0, &ev, 1, NULL);
+		[[PGLeafSubscription PG_performOn:(id)ev.udata allowOnce:NO withStorage:PGActiveSubscriptions] performSelectorOnMainThread:@selector(noteFileEventDidOccurWithFlags:) withObject:[NSNumber numberWithUnsignedInt:ev.fflags] waitUntilDone:NO];
 		[pool release];
 	}
 }
