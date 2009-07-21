@@ -364,7 +364,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
 				[NSCursor hide];
-				CGAssociateMouseAndMouseCursorPosition(false); // Prevents the cursor from being moved over the dock, which makes it reappear when it shouldn't.
+				CGAssociateMouseAndMouseCursorPosition(false);
 			} else [[NSCursor closedHandCursor] push];
 			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag:) object:dragModeValue];
 		}
