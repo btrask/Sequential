@@ -581,9 +581,11 @@ enum {
 }
 - (void)noteIsViewableDidChange
 {
-	BOOL const flag = PGNodeLoading & _status || (_error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading) || [_adapter adapterIsViewable]; // If we're loading, we should display a loading indicator, meaning we must be viewable.
-	if(flag == _viewable) return;
-	_viewable = flag;
+	BOOL const showsLoadingIndicator = !!(PGNodeLoading & _status);
+	BOOL const showsError = _error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading;
+	BOOL const viewable = showsLoadingIndicator || showsError || [_adapter adapterIsViewable];
+	if(viewable == _viewable) return;
+	_viewable = viewable;
 	[[self document] noteNodeIsViewableDidChange:self];
 }
 
