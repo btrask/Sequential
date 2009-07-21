@@ -51,9 +51,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self draggingExited:nil];
 	return [[self delegate] window:self performDragOperation:sender];
 }
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+- (void)concludeDragOperation:(id<NSDraggingInfo>)sender
 {
-	[self draggingExited:nil]; // Just in case.
+	[self draggingExited:nil];
 }
 
 #pragma mark NSKeyboardUI Protocol
