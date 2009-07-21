@@ -132,7 +132,6 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	if(_selfRetained) [self autorelease];
 	_selfRetained = NO;
 	[[[self displayController] window] addChildWindow:_window ordered:NSWindowAbove];
-	if(!PGIsTigerOrLater()) [_window orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
 - (void)fadeOut
 {

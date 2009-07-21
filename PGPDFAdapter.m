@@ -40,12 +40,6 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 @end
 
-@interface NSPDFImageRep (PGAdditions)
-
-- (void)PG_setCurrentPage:(int)index;
-
-@end
-
 @implementation PGPDFAdapter
 
 #pragma mark Private Protocol
@@ -128,7 +122,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 	if(!rep) return nil;
 	NSBitmapImageRep *thumbRep = nil;
 	@synchronized(rep) {
-		[rep PG_setCurrentPage:[[dict objectForKey:PGIndexKey] intValue]];
+		[rep setCurrentPage:[[dict objectForKey:PGIndexKey] intValue]];
 		NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height)));
 		thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
@@ -172,7 +166,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 - (void)read
 {
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
-	[rep PG_setCurrentPage:[[self identifier] index]];
+	[rep setCurrentPage:[[self identifier] index]];
 	[[self node] readFinishedWithImageRep:rep error:nil];
 }
 
@@ -188,18 +182,6 @@ static NSString *const PGIndexKey = @"PGIndex";
 		return [NSDictionary dictionaryWithObjectsAndKeys:[(PGPDFAdapter *)[self parentAdapter] _threaded_rep], PGImageRepKey, [NSNumber numberWithInt:[[self identifier] index]], PGIndexKey, nil];
 	}
 	return nil;
-}
-
-@end
-
-@implementation NSPDFImageRep (PGAdditions)
-
-- (void)PG_setCurrentPage:(int)index
-{
-	[self setCurrentPage:index];
-	NSRect const b = [self bounds];
-	[self setPixelsWide:NSWidth(b)]; // Important on Panther, where this doesn't get set automatically.
-	[self setPixelsHigh:NSHeight(b)];
 }
 
 @end

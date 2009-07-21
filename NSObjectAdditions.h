@@ -25,7 +25,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
 extern BOOL PGIsLeopardOrLater(void);
-extern BOOL PGIsTigerOrLater(void);
 
 @interface NSObject (AEAdditions)
 

@@ -137,7 +137,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (void)setDeletesBookmarks:(BOOL)flag
 {
 	_deletesBookmarks = flag;
-	[bookmarkItem setTitle:NSLocalizedString((flag && PGIsTigerOrLater() ? @"Delete" : @"Resume"), @"The title of the bookmarks menu. Two states.")]; // The alternate state doesn't really work on Panther.
+	[bookmarkItem setTitle:NSLocalizedString(flag ? @"Delete" : @"Resume", @"The title of the bookmarks menu. Two states.")];
 }
 
 #pragma mark -

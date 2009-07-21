@@ -72,7 +72,6 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 	[self setIgnoresMouseEvents:!_acceptsEvents];
 	[self _updateFrameWithWindow:aWindow display:NO];
 	[aWindow addChildWindow:self ordered:NSWindowAbove];
-	if(!PGIsTigerOrLater()) [self orderFront:self]; // This makes the parent window -orderFront: as well, which is obnoxious, but unfortunately it seems necessary on Panther.
 }
 
 #pragma mark -

@@ -91,13 +91,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)AE_fillUsingOperation:(NSCompositingOperation)op
 {
 	[NSGraphicsContext saveGraphicsState];
-	if(PGIsTigerOrLater()) {
-		[[NSGraphicsContext currentContext] setCompositingOperation:op];
-		[self fill];
-	} else {
-		[self addClip];
-		NSRectFillUsingOperation([self bounds], op);
-	}
+	[[NSGraphicsContext currentContext] setCompositingOperation:op];
+	[self fill];
 	[NSGraphicsContext restoreGraphicsState];
 }
 
