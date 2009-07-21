@@ -50,16 +50,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)createChildren
 {
-	[[self document] setProcessingNodes:YES];
 	NSParameterAssert([self shouldLoad]);
-	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
-	NSMutableArray *const newPages = [NSMutableArray array];
 	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URLByFollowingAliases:YES];
 	LSItemInfoRecord info;
-	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) {
-		[[self document] setProcessingNodes:NO];
-		return; // Don't go into packages.
-	}
+	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) return;
+
+	[[self document] setProcessingNodes:YES];
+	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
+	NSMutableArray *const newPages = [NSMutableArray array];
 	NSString *const path = [URL path];
 	NSString *pathComponent;
 	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
