@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmark.h"
 
 // Controllers
-#import "PGReleaseNotesController.h"
+#import "PGAboutBoxController.h"
 #import "PGPrefController.h"
 #import "PGDisplayController.h"
 #import "PGWindowController.h"
@@ -140,9 +140,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -PGDocumentController
 
-- (IBAction)showReleaseNotes:(id)sender
+- (IBAction)orderFrontStandardAboutPanel:(id)sender
 {
-	[[PGReleaseNotesController sharedReleaseNotesController] showWindow:self];
+	[[PGAboutBoxController sharedAboutBoxController] showWindow:self];
 }
 - (IBAction)installUpdate:(id)sender
 {

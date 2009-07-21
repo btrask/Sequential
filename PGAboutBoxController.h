@@ -24,14 +24,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface PGReleaseNotesController : NSWindowController
+@interface PGAboutBoxController : NSWindowController
 {
 	@private
 	IBOutlet NSSegmentedControl *paneControl;
 	IBOutlet NSTextView *textView;
 }
 
-+ (id)sharedReleaseNotesController;
++ (id)sharedAboutBoxController;
 
 - (IBAction)changePane:(id)sender;
 

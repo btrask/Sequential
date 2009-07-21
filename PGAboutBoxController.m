@@ -22,36 +22,45 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGReleaseNotesController.h"
+#import "PGAboutBoxController.h"
 
 // Other
 #import "PGZooming.h"
 
+// Categories
+#import "NSStringAdditions.h"
+
 static NSString *const PGPaneItemKey = @"PGPaneItem";
 
-static PGReleaseNotesController *PGSharedReleaseNotesController;
+static PGAboutBoxController *PGSharedAboutBoxController;
 
-@implementation PGReleaseNotesController
+@implementation PGAboutBoxController
 
-#pragma mark +PGReleaseNotesController
+#pragma mark +PGAboutBoxController
 
-+ (id)sharedReleaseNotesController
++ (id)sharedAboutBoxController
 {
-	return PGSharedReleaseNotesController ? PGSharedReleaseNotesController : [[[self alloc] init] autorelease];
+	return PGSharedAboutBoxController ? PGSharedAboutBoxController : [[[self alloc] init] autorelease];
 }
 
-#pragma mark -PGReleaseNotesController
+#pragma mark -PGAboutBoxController
 
 - (IBAction)changePane:(id)sender
 {
 	NSString *path = nil;
 	switch([paneControl selectedSegment]) {
-		case 0: path = [[NSBundle mainBundle] pathForResource:@"History" ofType:@"txt"]; break;
-		case 1: path = [[NSBundle mainBundle] pathForResource:@"License" ofType:@"txt"]; break;
+		case 0: path = [[NSBundle mainBundle] pathForResource:@"Credits" ofType:@"rtf"]; break;
+		case 1: path = [[NSBundle mainBundle] pathForResource:@"History" ofType:@"txt"]; break;
+		case 2: path = [[NSBundle mainBundle] pathForResource:@"License" ofType:@"txt"]; break;
 	}
 	if(!path) return;
 	[[textView textStorage] removeLayoutManager:[textView layoutManager]];
-	[[[NSTextStorage alloc] initWithPath:path documentAttributes:NULL] addLayoutManager:[textView layoutManager]];
+	NSDictionary *attrs = nil;
+	[[[NSTextStorage alloc] initWithURL:[path AE_fileURL] options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:NSUTF8StringEncoding], NSCharacterEncodingDocumentAttribute, nil] documentAttributes:&attrs error:NULL] addLayoutManager:[textView layoutManager]];
+	if([NSPlainTextDocumentType isEqualToString:[attrs objectForKey:NSDocumentTypeDocumentAttribute]]) {
+		NSFont *const font = [NSFont fontWithName:@"Monaco" size:10.0f]; // There's no way to ask for the system-wide fixed pitch font, so we use 10pt Monaco since it's the default for TextEdit.
+		if(font) [textView setFont:font];
+	}
 }
 
 #pragma mark -NSWindowController
@@ -61,7 +70,7 @@ static PGReleaseNotesController *PGSharedReleaseNotesController;
 	[paneControl retain];
 	[paneControl removeFromSuperview];
 	if([paneControl respondsToSelector:@selector(setSegmentStyle:)]) [paneControl setSegmentStyle:NSSegmentStyleTexturedRounded];
-	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGReleaseNotesControllerToolbar"] autorelease];
+	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGAboutBoxControllerToolbar"] autorelease];
 	[toolbar setDisplayMode:NSToolbarDisplayModeIconOnly];
 	[toolbar setSizeMode:NSToolbarSizeModeRegular];
 	[toolbar setAllowsUserCustomization:NO];
@@ -77,11 +86,11 @@ static PGReleaseNotesController *PGSharedReleaseNotesController;
 
 - (id)init
 {
-	if((self = [super initWithWindowNibName:@"PGReleaseNotes"])) {
-		if(PGSharedReleaseNotesController) {
+	if((self = [super initWithWindowNibName:@"PGAboutBox"])) {
+		if(PGSharedAboutBoxController) {
 			[self release];
-			return [PGSharedReleaseNotesController retain];
-		} else PGSharedReleaseNotesController = [self retain];
+			return [PGSharedAboutBoxController retain];
+		} else PGSharedAboutBoxController = [self retain];
 	}
 	return self;
 }

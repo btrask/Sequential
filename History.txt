@@ -57,7 +57,7 @@
 - Too much more to list.
 
 1.3.2 (March 22nd, 2008)
-- Adds a “Move to Trash” command for local images.
+- Adds a ‚ÄúMove to Trash‚Äù command for local images.
 - It is now possible to zoom in and out from the keyboard.
 - The screen-relative scaling modes can now be set to upscale.
 - Online images stop loading when the document is closed.
@@ -96,7 +96,7 @@
 1.2.2 (November 3rd, 2007)
 - Italian localization by Gabriele Callari.
 - Several sort modes are now available.
-- Pages can now be searched. Choose Edit > Find > Find… or press Command-F to show the search field.
+- Pages can now be searched. Choose Edit > Find > Find‚Ä¶ or press Command-F to show the search field.
 - More responsive when loading large images.
 - Improves sorting in some languages.
 - Fixes an uncommon crasher when pausing and resuming.
@@ -140,7 +140,7 @@
 - Fixes a bug where smooth scrolling could go very slowly on older machines.
 - Fixes a drawing bug when going from a displayable to a corrupted image.
 - Improves navigating between pages with the scroll wheel.
-- Extract As… now has Command-E as a keyboard shortcut.
+- Extract As‚Ä¶ now has Command-E as a keyboard shortcut.
 - Scaling mode keyboard shortcuts are now A, F, and S.
 - Properly handles folders being changed while open.
 - Faster scrolling for some images.
@@ -169,7 +169,7 @@
 
 1.0.4 (May 11th, 2007)
 - Animated GIF support.
-- Extract Image… option.
+- Extract Image‚Ä¶ option.
 - Automatic Fit scaling mode, which fits tall pages horizontally and wide pages vertically.
 - Better image scaling quality.
 - Stays visible while inactive (unless hidden).

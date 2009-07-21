@@ -485,6 +485,8 @@
 				<string>id</string>
 				<key>openURL</key>
 				<string>id</string>
+				<key>orderFrontStandardAboutPanel</key>
+				<string>id</string>
 				<key>provideFeedback</key>
 				<string>id</string>
 				<key>selectNextDocument</key>
@@ -494,8 +496,6 @@
 				<key>showKeyboardShortcuts</key>
 				<string>id</string>
 				<key>showPreferences</key>
-				<string>id</string>
-				<key>showReleaseNotes</key>
 				<string>id</string>
 				<key>switchToFileManager</key>
 				<string>id</string>

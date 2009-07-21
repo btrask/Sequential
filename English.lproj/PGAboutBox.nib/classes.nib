@@ -83,6 +83,26 @@
 			<string>NSView</string>
 		</dict>
 		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>changePane</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>PGAboutBoxController</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>paneControl</key>
+				<string>NSSegmentedControl</string>
+				<key>textView</key>
+				<string>NSTextView</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSWindowController</string>
+		</dict>
+		<dict>
 			<key>CLASS</key>
 			<string>PGFullscreenWindow</string>
 			<key>LANGUAGE</key>
@@ -128,26 +148,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>PGColumnView</string>
-		</dict>
-		<dict>
-			<key>ACTIONS</key>
-			<dict>
-				<key>changePane</key>
-				<string>id</string>
-			</dict>
-			<key>CLASS</key>
-			<string>PGReleaseNotesController</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>OUTLETS</key>
-			<dict>
-				<key>paneControl</key>
-				<string>NSSegmentedControl</string>
-				<key>textView</key>
-				<string>NSTextView</string>
-			</dict>
-			<key>SUPERCLASS</key>
-			<string>NSWindowController</string>
 		</dict>
 		<dict>
 			<key>CLASS</key>

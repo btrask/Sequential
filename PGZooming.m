@@ -165,11 +165,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+#define PGNSTextViewHorizontalBorder 8.0f
+
 @implementation NSTextView (PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
 {
-	return [self bounds].size;
+	NSSize s = [[self textStorage] size];
+	s.width += [self textContainerInset].width + PGNSTextViewHorizontalBorder;
+	s.height += [self textContainerInset].height;
+	return s;
 }
 
 @end

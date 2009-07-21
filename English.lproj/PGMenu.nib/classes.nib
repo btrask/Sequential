@@ -485,6 +485,8 @@
 				<string>id</string>
 				<key>openURL</key>
 				<string>id</string>
+				<key>orderFrontStandardAboutPanel</key>
+				<string>id</string>
 				<key>provideFeedback</key>
 				<string>id</string>
 				<key>selectNextDocument</key>
