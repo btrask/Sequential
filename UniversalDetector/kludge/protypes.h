@@ -112,15 +112,11 @@ typedef PRUint64 uint64;
  * uint32
  */
 
-#if !defined(_UINT32)
 #if !defined(XP_BEOS) && !defined(VMS)
 #if !defined(XP_MAC) && !defined(_WIN32) && !defined(XP_OS2) && !defined(NTO)
 typedef PRUint32 uint32;
-#define _UINT32
 #else
 typedef unsigned long uint32;
-#define _UINT32
-#endif
 #endif
 #endif
 
