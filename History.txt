@@ -1,4 +1,5 @@
 2.0.4 (Current)
+- Dramatically improved support for all archive file formats.
 - Improved image saving.
 - Smaller and less obtrusive alerts.
 - Built-in update checking.

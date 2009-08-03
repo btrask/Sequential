@@ -265,7 +265,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E82DCF810277867003DC044 /* XADMaster.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* XADMaster */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = XADMaster;
 		};
 		0EBAD5910F569E2B0014BA11 /* PBXContainerItemProxy */ = {
