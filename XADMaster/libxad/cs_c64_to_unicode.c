@@ -23,7 +23,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#ifndef UUNDEF
 #define UUNDEF 0xFFFF  /* Unicode undefined character code */
+#endif
 
 /*  The code 0xFFFF is illegal in Unicode. This means it may never
  *  be part of a Unicode string.

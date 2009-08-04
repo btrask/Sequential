@@ -580,7 +580,7 @@ XADGETINFO(SPack)
   if(ai->xai_MultiVolume)
   {
     struct xadSkipInfo *si = 0, *si2;
-    xadUINT32 *a;
+    xadSize *a;
 
     for(a = ai->xai_MultiVolume+1; *a; ++a)
     {
