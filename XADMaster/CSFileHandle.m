@@ -129,11 +129,8 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 {
 	if(num==0) return 0;
 	if(multi) fseeko(fh,pos,SEEK_SET);
-	int n=num;
-	if(buffer) {
-		n=fread(buffer,1,num,fh);
-		if(n<=0&&!feof(fh)) [self _raiseError];
-	} else if(-1==fseeko(fh,num,SEEK_CUR)) [self _raiseError];
+	int n=fread(buffer,1,num,fh);
+	if(n<=0&&!feof(fh)) [self _raiseError];
 	if(multi) pos=ftello(fh);
 	return n;
 }

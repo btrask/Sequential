@@ -82,7 +82,7 @@
 	unsigned int len=[backingdata length];
 	if(memorypos==len) return 0;
 	if(memorypos+num>len) num=len-memorypos;
-	if(buffer) memcpy(buffer,(uint8_t *)[backingdata bytes]+memorypos,num);
+	memcpy(buffer,(uint8_t *)[backingdata bytes]+memorypos,num);
 	memorypos+=num;
 	return num;
 }

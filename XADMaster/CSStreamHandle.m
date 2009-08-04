@@ -132,7 +132,7 @@
 	int offs=0;
 	if(nextstreambyte>=0)
 	{
-		if(buffer) ((uint8_t *)buffer)[0]=nextstreambyte;
+		((uint8_t *)buffer)[0]=nextstreambyte;
 		streampos++;
 		nextstreambyte=-1;
 		offs=1;

@@ -44,7 +44,7 @@
 	off_t pos=[parent offsetInFile];
 	int actual=[parent readAtMost:num toBuffer:buffer];
 
-	if(passwordlength && buffer)
+	if(passwordlength)
 	{
 		uint8_t *buf=(uint8_t *)buffer;
 		for(int i=0;i<actual;i++) buf[i]^=passwordbytes[(pos+i)%passwordlength];

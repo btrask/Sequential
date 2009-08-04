@@ -57,7 +57,7 @@ correctCRC:(uint32_t)correctcrc CRCTable:(const uint32_t *)crctable
 -(int)streamAtMost:(int)num toBuffer:(void *)buffer
 {
 	int actual=[parent readAtMost:num toBuffer:buffer];
-	if(buffer) crc=XADCalculateCRC(crc,buffer,actual,table);
+	crc=XADCalculateCRC(crc,buffer,actual,table);
 	return actual;
 }
 
