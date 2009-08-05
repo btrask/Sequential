@@ -144,6 +144,7 @@ static id PGArchiveAdapterList = nil;
 			[_archive setDelegate:self];
 		}
 		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFinished];
+		[_archive setWantsChecksum:NO];
 	}
 	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
 	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
