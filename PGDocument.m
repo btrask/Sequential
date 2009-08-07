@@ -205,7 +205,7 @@ NSString *const PGDocumentUpdateChildrenKey  = @"PGDocumentUpdateChildren";
 	[[self displayController] showWindow:self];
 	if(new && !_openedBookmark) {
 		PGBookmark *const bookmark = [[PGBookmarkController sharedBookmarkController] bookmarkForIdentifier:[self originalIdentifier]];
-		if(bookmark) [[self displayController] offerToOpenBookmark:bookmark];
+		if(bookmark && [[self node] nodeForIdentifier:[bookmark fileIdentifier]]) [[self displayController] offerToOpenBookmark:bookmark];
 	}
 }
 - (void)close
