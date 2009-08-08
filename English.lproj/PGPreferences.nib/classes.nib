@@ -155,9 +155,7 @@
 			<dict>
 				<key>generalView</key>
 				<string>NSView</string>
-				<key>imageView</key>
-				<string>NSView</string>
-				<key>keyboardView</key>
+				<key>navigationView</key>
 				<string>NSView</string>
 				<key>screensPopUp</key>
 				<string>NSPopUpButton</string>

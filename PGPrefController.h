@@ -34,9 +34,7 @@ extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
 	IBOutlet NSPopUpButton *screensPopUp;
 	NSScreen *_displayScreen;
 
-	IBOutlet NSView *imageView;
-
-	IBOutlet NSView *keyboardView;
+	IBOutlet NSView *navigationView;
 	IBOutlet NSTextField *secondaryMouseActionLabel;
 
 	IBOutlet NSView *updateView;

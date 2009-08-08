@@ -39,8 +39,7 @@ NSString *const PGPrefControllerDisplayScreenDidChangeNotification          = @"
 static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
 static NSString *const PGGeneralPaneIdentifier = @"PGGeneralPane";
-static NSString *const PGImagePaneIdentifier = @"PGImagePane";
-static NSString *const PGKeyboardPaneIdentifier = @"PGKeyboardPane";
+static NSString *const PGNavigationPaneIdentifier = @"PGNavigationPaneIdentifier";
 static NSString *const PGUpdatePaneIdentifier = @"PGUpdatePane";
 
 static PGPrefController *PGSharedPrefController = nil;
@@ -102,10 +101,8 @@ static PGPrefController *PGSharedPrefController = nil;
 {
 	if([PGGeneralPaneIdentifier isEqualToString:identifier]) {
 		return NSLocalizedString(@"General", @"Title of general pref pane.");
-	} else if([PGImagePaneIdentifier isEqualToString:identifier]) {
-		return NSLocalizedString(@"Images", @"Title of image pref pane.");
-	} else if([PGKeyboardPaneIdentifier isEqualToString:identifier]) {
-		return NSLocalizedString(@"Keyboard & Mouse", @"Title of keyboard/mouse pref pane.");
+	} else if([PGNavigationPaneIdentifier isEqualToString:identifier]) {
+		return NSLocalizedString(@"Navigation", @"Title of navigation pref pane.");
 	} else if([PGUpdatePaneIdentifier isEqualToString:identifier]) {
 		return NSLocalizedString(@"Update", @"Title of update pref pane.");
 	}
@@ -115,8 +112,7 @@ static PGPrefController *PGSharedPrefController = nil;
 {
 	NSView *view = nil;
 	if([PGGeneralPaneIdentifier isEqualToString:identifier]) view = generalView;
-	else if([PGImagePaneIdentifier isEqualToString:identifier]) view = imageView;
-	else if([PGKeyboardPaneIdentifier isEqualToString:identifier]) view = keyboardView;
+	else if([PGNavigationPaneIdentifier isEqualToString:identifier]) view = navigationView;
 	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) view = updateView;
 	NSWindow *const w = [self window];
 	[w setTitle:NSLocalizedString(@"Preferences", nil)];
@@ -240,10 +236,8 @@ static PGPrefController *PGSharedPrefController = nil;
 	[item setLabel:[self _titleForPane:ident]];
 	if([PGGeneralPaneIdentifier isEqualToString:ident]) {
 		[item setImage:[NSImage imageNamed:@"Pref-General"]];
-	} else if([PGImagePaneIdentifier isEqualToString:ident]) {
-		[item setImage:[NSImage imageNamed:@"Pref-Images"]];
-	} else if([PGKeyboardPaneIdentifier isEqualToString:ident]) {
-		[item setImage:[NSImage imageNamed:@"Pref-Keyboard"]];
+	} else if([PGNavigationPaneIdentifier isEqualToString:ident]) {
+		[item setImage:[NSImage imageNamed:@"Pref-Navigation"]];
 	} else if([PGUpdatePaneIdentifier isEqualToString:ident]) {
 		[item setImage:[NSImage imageNamed:@"Pref-Update"]];
 	}
@@ -251,7 +245,7 @@ static PGPrefController *PGSharedPrefController = nil;
 }
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-	return [NSArray arrayWithObjects:PGGeneralPaneIdentifier, PGImagePaneIdentifier, PGKeyboardPaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, PGUpdatePaneIdentifier, nil];
+	return [NSArray arrayWithObjects:PGGeneralPaneIdentifier, PGNavigationPaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, PGUpdatePaneIdentifier, nil];
 }
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {

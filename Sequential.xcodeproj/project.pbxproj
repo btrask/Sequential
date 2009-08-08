@@ -55,11 +55,10 @@
 		0E06CBDD0CF9B3B8004124B0 /* Document-XBM.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC30CF9B3B8004124B0 /* Document-XBM.icns */; };
 		0E06CBDE0CF9B3B8004124B0 /* Document-ZIP.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC40CF9B3B8004124B0 /* Document-ZIP.icns */; };
 		0E06CBDF0CF9B3B8004124B0 /* Document-PIC.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E06CBC50CF9B3B8004124B0 /* Document-PIC.icns */; };
+		0E14D868102E0F0B0006940C /* Pref-Navigation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E14D867102E0F0B0006940C /* Pref-Navigation.icns */; };
 		0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */; };
 		0E1BE06B0F59DFBB007421EE /* Pref-Update.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */; };
-		0E1BE06F0F59DFDD007421EE /* Pref-Keyboard.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE06E0F59DFDD007421EE /* Pref-Keyboard.icns */; };
 		0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE07B0F59E113007421EE /* Pref-General.icns */; };
-		0E1BE0CA0F59E61B007421EE /* Pref-Images.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE0C90F59E61B007421EE /* Pref-Images.icns */; };
 		0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1BE0E20F5AA246007421EE /* PGThumbnailController.m */; };
 		0E1D37510A7E319100C542A6 /* PGFullscreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D37500A7E319100C542A6 /* PGFullscreenController.m */; };
 		0E1D379B0A7E532300C542A6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E1D379A0A7E532300C542A6 /* Carbon.framework */; };
@@ -377,12 +376,11 @@
 		0E12117D0D31A5D10055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGURL.nib; sourceTree = "<group>"; };
 		0E12117E0D31A5D70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGImageSave.nib; sourceTree = "<group>"; };
 		0E1211800D31A5E70055F587 /* Polish */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Polish; path = Polish.lproj/PGEncoding.nib; sourceTree = "<group>"; };
+		0E14D867102E0F0B0006940C /* Pref-Navigation.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Navigation.icns"; sourceTree = "<group>"; };
 		0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGGeometryTypes.h; sourceTree = "<group>"; };
 		0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGGeometryTypes.m; sourceTree = "<group>"; };
 		0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Update.icns"; sourceTree = "<group>"; };
-		0E1BE06E0F59DFDD007421EE /* Pref-Keyboard.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Keyboard.icns"; sourceTree = "<group>"; };
 		0E1BE07B0F59E113007421EE /* Pref-General.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-General.icns"; sourceTree = "<group>"; };
-		0E1BE0C90F59E61B007421EE /* Pref-Images.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Images.icns"; sourceTree = "<group>"; };
 		0E1BE0E10F5AA246007421EE /* PGThumbnailController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGThumbnailController.h; sourceTree = "<group>"; };
 		0E1BE0E20F5AA246007421EE /* PGThumbnailController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGThumbnailController.m; sourceTree = "<group>"; };
 		0E1D374F0A7E319100C542A6 /* PGFullscreenController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFullscreenController.h; sourceTree = "<group>"; };
@@ -1100,8 +1098,7 @@
 				0E4794280DF182C40083B7CA /* Silhouette-Black.png */,
 				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
 				0E1BE07B0F59E113007421EE /* Pref-General.icns */,
-				0E1BE0C90F59E61B007421EE /* Pref-Images.icns */,
-				0E1BE06E0F59DFDD007421EE /* Pref-Keyboard.icns */,
+				0E14D867102E0F0B0006940C /* Pref-Navigation.icns */,
 				0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */,
 				0E04EF990F558FE7002FD4F2 /* dsa_pub.pem */,
 			);
@@ -1324,13 +1321,12 @@
 				0E255B960E3A99AA00EDF04C /* PGTimer.nib in Resources */,
 				0E04EF9A0F558FE7002FD4F2 /* dsa_pub.pem in Resources */,
 				0E1BE06B0F59DFBB007421EE /* Pref-Update.icns in Resources */,
-				0E1BE06F0F59DFDD007421EE /* Pref-Keyboard.icns in Resources */,
 				0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */,
-				0E1BE0CA0F59E61B007421EE /* Pref-Images.icns in Resources */,
 				0E933D18100DD53800B58A9E /* History.txt in Resources */,
 				0E3378FA100C83C400373E83 /* License.txt in Resources */,
 				0E8A1B8610155DDE00C23B34 /* Credits.rtf in Resources */,
 				0E8A1C1510157AC100C23B34 /* PGAboutBox.nib in Resources */,
+				0E14D868102E0F0B0006940C /* Pref-Navigation.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
