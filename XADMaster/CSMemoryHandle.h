@@ -24,7 +24,7 @@
 -(void)seekToFileOffset:(off_t)offs;
 -(void)seekToEndOfFile;
 //-(void)pushBackByte:(int)byte;
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer;
+-(int)readAtMost:(int)num toBuffer:(void *)buffer;
 -(void)writeBytes:(int)num fromBuffer:(const void *)buffer;
 
 -(NSData *)fileContents;

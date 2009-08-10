@@ -190,7 +190,7 @@ enum {
 	[self noteIsViewableDidChange];
 	[self _updateFileAttributes];
 	[self readIfNecessary];
-	[[self document] noteNodeThumbnailDidChange:self children:NO];
+	[[self document] noteNodeThumbnailDidChange:self recursively:NO];
 }
 
 #pragma mark -

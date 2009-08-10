@@ -63,7 +63,7 @@ NSString *CSNotSupportedException=@"CSNotSupportedException";
 
 -(void)pushBackByte:(int)byte { [self _raiseNotImplemented:_cmd]; }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer { [self _raiseNotImplemented:_cmd]; return 0; }
+-(int)readAtMost:(int)num toBuffer:(void *)buffer { [self _raiseNotImplemented:_cmd]; return 0; }
 
 -(void)writeBytes:(int)num fromBuffer:(const void *)buffer { [self _raiseNotImplemented:_cmd]; }
 

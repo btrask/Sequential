@@ -50,7 +50,7 @@ extern NSString *const PGDocumentBaseOrientationDidChangeNotification;
 
 extern NSString *const PGDocumentNodeKey;
 extern NSString *const PGDocumentRemovedChildrenKey;
-extern NSString *const PGDocumentUpdateChildrenKey;
+extern NSString *const PGDocumentUpdateRecursivelyKey;
 
 @interface PGDocument : PGPrefObject
 {
@@ -108,7 +108,7 @@ extern NSString *const PGDocumentUpdateChildrenKey;
 - (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray;
 - (void)noteSortedChildrenDidChange;
 - (void)noteNodeIsViewableDidChange:(PGNode *)node;
-- (void)noteNodeThumbnailDidChange:(PGNode *)node children:(BOOL)flag;
+- (void)noteNodeThumbnailDidChange:(PGNode *)node recursively:(BOOL)flag;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;
 

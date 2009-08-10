@@ -75,7 +75,7 @@
 	}
 }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	off_t curr=[parent offsetInFile];
 	if(curr+num>end) num=end-curr;

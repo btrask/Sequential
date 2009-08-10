@@ -184,7 +184,7 @@ static off_t ActualOffsetToSkip(XADSkipHandle *self,off_t pos)
 	// TODO: handle skips at EOF
 }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	off_t pos=[parent offsetInFile];
 	int index=FindIndexOfRegionContainingActualOffset(self,pos);

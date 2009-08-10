@@ -103,7 +103,7 @@ NSString *CSByteStreamEOFReachedException=@"CSByteStreamEOFReachedException";
 
 -(off_t)offsetInFile { return pos; }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	if(!num) return 0;
 

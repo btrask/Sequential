@@ -123,7 +123,7 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 	[(CSHandle *)[handles objectAtIndex:currhandle] seekToEndOfFile];
 }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	off_t total=0;
 	for(;;)

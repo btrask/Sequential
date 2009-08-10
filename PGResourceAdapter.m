@@ -343,7 +343,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		[_fastThumbnail release];
 		_fastThumbnail = nil;
 	}
-	[[self document] noteNodeThumbnailDidChange:[self node] children:NO];
+	[[self document] noteNodeThumbnailDidChange:[self node] recursively:NO];
 }
 - (BOOL)canGenerateRealThumbnail
 {

@@ -17,7 +17,7 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 
 @implementation CSFileHandle
 
-//static int filesopen=0;
+static int filesopen=0;
 
 +(CSFileHandle *)fileHandleForReadingAtPath:(NSString *)path
 { return [self fileHandleForPath:path modes:@"rb"]; }
@@ -125,7 +125,7 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 	if(ungetc(byte,fh)==EOF) [self _raiseError];
 }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	if(num==0) return 0;
 	if(multi) fseeko(fh,pos,SEEK_SET);

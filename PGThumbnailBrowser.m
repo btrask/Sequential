@@ -124,9 +124,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:initialNumberOfColumns];
 	if([self numberOfColumns] > initialNumberOfColumns) [self scrollToLastColumnAnimate:YES];
 }
-- (void)redisplayItem:(id)item
-        children:(BOOL)flag
+- (void)redisplayItem:(id)item recursively:(BOOL)flag
 {
+	if(flag) return [self setNeedsDisplay:YES];
 	id const parent = [[self dataSource] thumbnailBrowser:self parentOfItem:item];
 	PGThumbnailView *view;
 	NSEnumerator *const viewEnum = [[self views] objectEnumerator];
@@ -135,7 +135,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(rep == parent) {
 			unsigned const i = [[view items] indexOfObjectIdenticalTo:item];
 			if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
-		} else if(flag && rep == item) [view setNeedsDisplay:YES];
+		}
 	}
 }
 

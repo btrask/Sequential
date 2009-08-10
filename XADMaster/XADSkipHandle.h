@@ -29,7 +29,7 @@ typedef struct XADSkipRegion
 
 -(void)seekToFileOffset:(off_t)offs;
 -(void)seekToEndOfFile;
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer;
+-(int)readAtMost:(int)num toBuffer:(void *)buffer;
 
 @end
 
@@ -57,7 +57,7 @@ typedef struct XADSkipRegion
 
 -(void)seekToFileOffset:(off_t)offs;
 -(void)seekToEndOfFile;
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer;
+-(int)readAtMost:(int)num toBuffer:(void *)buffer;
 
 @end
 */

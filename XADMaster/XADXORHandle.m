@@ -39,7 +39,7 @@
 
 -(void)seekToEndOfFile { [parent seekToEndOfFile]; }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	off_t pos=[parent offsetInFile];
 	int actual=[parent readAtMost:num toBuffer:buffer];

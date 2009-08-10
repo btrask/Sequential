@@ -423,11 +423,6 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 
 
 
-- (BOOL)wantsChecksum { return wantsChecksum; }
-
-- (void)setWantsChecksum:(BOOL)flag { wantsChecksum = flag; }
-
-
 
 -(XADError)lastError { return lasterror; }
 
@@ -631,7 +626,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 			{
 				@try
 				{
-					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:wantsChecksum];
+					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:NO];
 					if(!handle) [XADException raiseDecrunchException];
 					NSData *forkdata=[handle remainingFileContents];
 					if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];
@@ -664,7 +659,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(!dict) return [CSMemoryHandle memoryHandleForReadingData:[NSData data]]; // Special case for files with only a resource fork
 
 	@try
-	{ return [parser handleForEntryWithDictionary:dict wantChecksum:wantsChecksum]; }
+	{ return [parser handleForEntryWithDictionary:dict wantChecksum:NO]; }
 	@catch(id e)
 	{
 		lasterror=[self _parseException:e];
@@ -686,7 +681,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(isdir&&[isdir boolValue]) return nil;
 
 	@try
-	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:wantsChecksum]; }
+	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:NO]; }
 	@catch(id e)
 	{
 		lasterror=[self _parseException:e];
@@ -702,7 +697,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 
 	@try
 	{
-		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:wantsChecksum];
+		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:NO];
 		if(!handle) [XADException raiseDecrunchException];
 		NSData *data=[handle remainingFileContents];
 		if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];

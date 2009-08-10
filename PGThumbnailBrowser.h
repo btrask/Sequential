@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSSet *)selection;
 - (void)setSelection:(NSSet *)aSet reload:(BOOL)flag;
-- (void)redisplayItem:(id)item children:(BOOL)flag;
+- (void)redisplayItem:(id)item recursively:(BOOL)flag;
 
 @end
 

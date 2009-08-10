@@ -58,7 +58,7 @@ static xadUINT8 xadIOGetFunc(struct xadInOut *io);
 	[super seekToEndOfFile];
 }
 
--(int)readAtMost:(off_t)num toBuffer:(void *)buffer
+-(int)readAtMost:(int)num toBuffer:(void *)buffer
 {
 	if(!unpacked) [self runUnpacker];
 	return [super readAtMost:num toBuffer:buffer];

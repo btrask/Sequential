@@ -119,7 +119,7 @@ static id PGArchiveAdapterList = nil;
 
 - (void)_updateThumbnailsOfChildren
 {
-	[[self document] noteNodeThumbnailDidChange:[self node] children:YES];
+	[[self document] noteNodeThumbnailDidChange:[self node] recursively:YES];
 }
 
 #pragma mark -PGResourceAdapter
@@ -144,7 +144,6 @@ static id PGArchiveAdapterList = nil;
 			[_archive setDelegate:self];
 		}
 		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFinished];
-		[_archive setWantsChecksum:NO];
 	}
 	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
 	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
@@ -200,25 +199,14 @@ static id PGArchiveAdapterList = nil;
 	}
 	NSData *data = nil;
 	@synchronized(_archive) {
-		[_archive clearLastError];
 		NSString *const pass = [info objectForKey:PGPasswordKey];
 		if(pass) [_archive setPassword:pass];
+		BOOL const neededPassword = _needsPassword;
+		_needsPassword = NO;
+		_currentSubnode = sender;
 		data = [_archive contentsOfEntry:i];
-		switch([_archive lastError]) {
-			case XADNoError:
-			{
-				if(_needsPassword) {
-					_needsPassword = NO;
-					[[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
-				}
-				break;
-			}
-			case XADPasswordError:
-				_needsPassword = YES;
-				[sender performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
-			default:
-				return NO;
-		}
+		_currentSubnode = nil;
+		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
 	}
 	if(outData) *outData = data;
 	return YES;
@@ -226,14 +214,16 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark -NSObject(XADArchiveDelegate)
 
-- (NSStringEncoding)archive:(XADArchive *)archive
-                    encodingForName:(const char *)bytes
-                    guess:(NSStringEncoding)guess
-                    confidence:(float)confidence
+- (void)archiveNeedsPassword:(XADArchive *)archive
+{
+	_needsPassword = YES;
+	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
+}
+- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
 {
 	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSData dataWithBytes:bytes length:strlen(bytes)], PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]]];
+		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
 		[[self node] loadFinished];
 	}
 	return guess;

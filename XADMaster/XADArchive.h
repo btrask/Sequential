@@ -36,8 +36,6 @@ extern NSString *XADFinderFlags;
 	BOOL immediatesubarchives,immediatefailed;
 	off_t immediatesize;
 	XADArchive *parentarchive;
-
-	BOOL wantsChecksum;
 }
 
 +(XADArchive *)archiveForFile:(NSString *)filename;
@@ -84,9 +82,6 @@ extern NSString *XADFinderFlags;
 
 -(NSStringEncoding)nameEncoding;
 -(void)setNameEncoding:(NSStringEncoding)encoding;
-
-- (BOOL)wantsChecksum;
-- (void)setWantsChecksum:(BOOL)flag;
 
 -(XADError)lastError;
 -(void)clearLastError;

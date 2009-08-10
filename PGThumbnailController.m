@@ -153,7 +153,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)clipViewBoundsDidChange:(NSNotification *)aNotif
 {
-	[_browser redisplayItem:[[self displayController] activeNode] children:NO];
+	[_browser redisplayItem:[[self displayController] activeNode] recursively:NO];
 }
 - (void)parentWindowDidResize:(NSNotification *)aNotif
 {
@@ -172,7 +172,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 - (void)documentNodeThumbnailDidChange:(NSNotification *)aNotif
 {
-	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:[[[aNotif userInfo] objectForKey:PGDocumentUpdateChildrenKey] boolValue]];
+	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] recursively:[[[aNotif userInfo] objectForKey:PGDocumentUpdateRecursivelyKey] boolValue]];
 }
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif
 {
@@ -184,7 +184,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif
 {
-	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] children:NO];
+	[_browser redisplayItem:[[aNotif userInfo] objectForKey:PGDocumentNodeKey] recursively:NO];
 }
 
 #pragma mark -PGThumbnailController(Private)
