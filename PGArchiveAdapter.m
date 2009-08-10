@@ -50,8 +50,9 @@ static id PGArchiveAdapterList = nil;
 
 @interface XADArchive(PGAdditions)
 
-- (NSString *)OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
-- (NSString *)typeForEntry:(int)index preferOSType:(BOOL)flag;
+- (NSString *)PG_commonRootPath;
+- (NSString *)PG_OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
+- (NSString *)PG_typeForEntry:(int)index preferOSType:(BOOL)flag;
 
 @end
 
@@ -98,10 +99,10 @@ static id PGArchiveAdapterList = nil;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)] displayableIdentifier];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive typeForEntry:i preferOSType:YES])]];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_typeForEntry:i preferOSType:YES])]];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
-		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:(isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive OSTypeForEntry:i standardFormat:NO]), PGOSTypeKey, nil];
+		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:(isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_OSTypeForEntry:i standardFormat:NO]), PGOSTypeKey, nil];
 		if(isFile) [node startLoadWithInfo:info];
 		else {
 			[info setObject:[PGContainerAdapter class] forKey:PGAdapterClassKey];
@@ -147,8 +148,7 @@ static id PGArchiveAdapterList = nil;
 	}
 	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
 	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
-	NSString *const root = [_archive commonTopDirectory];
-	NSArray *const children = [self nodesUnderPath:(root ? root : @"") parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
+	NSArray *const children = [self nodesUnderPath:[_archive PG_commonRootPath] parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
 	if(!_encodingError) [[self node] loadFinished];
 }
@@ -184,7 +184,7 @@ static id PGArchiveAdapterList = nil;
 	unsigned const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
 	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
-	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
+	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
 	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }
 - (BOOL)node:(PGNode *)sender
@@ -240,7 +240,19 @@ static id PGArchiveAdapterList = nil;
 
 @implementation XADArchive(PGAdditions)
 
-- (NSString *)OSTypeForEntry:(int)index
+- (NSString *)PG_commonRootPath
+{
+	int i;
+	NSString *root = nil;
+	for(i = 0; i < [self numberOfEntries]; i++) {
+		NSString *entryName = [self nameOfEntry:i];
+		if(![self entryIsDirectory:i]) entryName = [entryName stringByDeletingLastPathComponent];
+		if(root) root = [root commonPrefixWithString:entryName options:kNilOptions];
+		else root = entryName;
+	}
+	return root ? root : @"";
+}
+- (NSString *)PG_OSTypeForEntry:(int)index
               standardFormat:(BOOL)flag
 {
 	OSType value;
@@ -252,10 +264,10 @@ static id PGArchiveAdapterList = nil;
 	}
 	return flag ? NSFileTypeForHFSTypeCode(value) : PGPseudoFileTypeForHFSTypeCode(value);
 }
-- (NSString *)typeForEntry:(int)index
+- (NSString *)PG_typeForEntry:(int)index
               preferOSType:(BOOL)flag
 {
-	NSString *const osType = flag ? [self OSTypeForEntry:index standardFormat:YES] : nil;
+	NSString *const osType = flag ? [self PG_OSTypeForEntry:index standardFormat:YES] : nil;
 	return osType ? osType : [[self nameOfEntry:index] pathExtension];
 }
 
