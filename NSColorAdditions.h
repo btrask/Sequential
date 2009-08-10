@@ -29,5 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (NSColor *)AE_bezelBackgroundColor;
 + (NSColor *)AE_bezelForegroundColor;
 - (NSColor *)AE_checkerboardPatternColor;
+- (NSColor *)AE_patternColorWithImage:(NSImage *)image fraction:(float)fraction;
 
 @end

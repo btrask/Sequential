@@ -24,8 +24,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSColorAdditions.h"
 
-#define PGCheckerboardSquareSize 8.0f
-#define PGCheckerboardSize (PGCheckerboardSquareSize * 2.0f)
+//#define PGCheckerboardSquareSize 14.0f
+//#define PGCheckerboardSize (PGCheckerboardSquareSize * 2.0f)
 
 @implementation NSColor (AEAdditions)
 
@@ -44,18 +44,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSColor *)AE_checkerboardPatternColor
 {
-	NSImage *const checkerboard = [[[NSImage alloc] initWithSize:NSMakeSize(PGCheckerboardSize, PGCheckerboardSize)] autorelease];
-	[checkerboard lockFocus];
+	return [self AE_patternColorWithImage:[NSImage imageNamed:@"Checkerboard"] fraction:0.05f];
+}
+- (NSColor *)AE_patternColorWithImage:(NSImage *)image fraction:(float)fraction
+{
+	NSSize const s = [image size];
+	NSRect const r = (NSRect){NSZeroPoint, s};
+	NSImage *const pattern = [[[NSImage alloc] initWithSize:s] autorelease];
+	[pattern lockFocus];
 	[self set];
-	NSRectFill(NSMakeRect(0.0f, 0.0f, PGCheckerboardSize, PGCheckerboardSize));
-	[[NSColor colorWithDeviceWhite:1.0f alpha:0.07f] set];
-	NSRectFillUsingOperation(NSMakeRect(0, 0, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	[[NSColor colorWithDeviceWhite:0.0f alpha:0.07f] set];
-	NSRectFillUsingOperation(NSMakeRect(0.0f, PGCheckerboardSquareSize, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	NSRectFillUsingOperation(NSMakeRect(PGCheckerboardSquareSize, 0.0f, PGCheckerboardSquareSize, PGCheckerboardSquareSize), NSCompositeSourceOver);
-	[checkerboard unlockFocus];
-	return [NSColor colorWithPatternImage:checkerboard];
+	NSRectFill(r);
+	[image drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceAtop fraction:0.05f];
+	[pattern unlockFocus];
+	return [NSColor colorWithPatternImage:pattern];
 }
 
 @end

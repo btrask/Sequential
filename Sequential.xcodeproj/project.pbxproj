@@ -130,6 +130,7 @@
 		0EA540FF0DB717C300F60F0E /* PGExifEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA540FE0DB717C300F60F0E /* PGExifEntry.m */; };
 		0EA89C9E0BD540E60077BEEE /* PGImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA89C9D0BD540E60077BEEE /* PGImageView.m */; };
 		0EB167E00A82AD89001999E7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0EB167DF0A82AD89001999E7 /* Localizable.strings */; };
+		0EBED53B102FE2070013748A /* Checkerboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 0EBED53A102FE2070013748A /* Checkerboard.png */; };
 		0EBF5A160C44DF56004584D2 /* NSMenuItemAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */; };
 		0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DEF0CA02B7B003E492C /* PGZooming.m */; };
 		0EC11EA20CA14F0C003E492C /* NSColorAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */; };
@@ -545,6 +546,7 @@
 		0EA89C9D0BD540E60077BEEE /* PGImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGImageView.m; sourceTree = "<group>"; };
 		0EB167CA0A82ACC0001999E7 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = Sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
+		0EBED53A102FE2070013748A /* Checkerboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Checkerboard.png; sourceTree = "<group>"; };
 		0EBF5A140C44DF56004584D2 /* NSMenuItemAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSMenuItemAdditions.h; sourceTree = "<group>"; };
 		0EBF5A150C44DF56004584D2 /* NSMenuItemAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSMenuItemAdditions.m; sourceTree = "<group>"; };
 		0EC11DEE0CA02B7B003E492C /* PGZooming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGZooming.h; sourceTree = "<group>"; };
@@ -1097,6 +1099,7 @@
 				0E9012A40DF22636004B6F69 /* Mirror-White.png */,
 				0E4794280DF182C40083B7CA /* Silhouette-Black.png */,
 				0E47942A0DF1832E0083B7CA /* Silhouette-White.png */,
+				0EBED53A102FE2070013748A /* Checkerboard.png */,
 				0E1BE07B0F59E113007421EE /* Pref-General.icns */,
 				0E14D867102E0F0B0006940C /* Pref-Navigation.icns */,
 				0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */,
@@ -1327,6 +1330,7 @@
 				0E8A1B8610155DDE00C23B34 /* Credits.rtf in Resources */,
 				0E8A1C1510157AC100C23B34 /* PGAboutBox.nib in Resources */,
 				0E14D868102E0F0B0006940C /* Pref-Navigation.icns in Resources */,
+				0EBED53B102FE2070013748A /* Checkerboard.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
