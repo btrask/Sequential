@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAttachments.h"
 
 // Categories
+#import "NSCharacterSetAdditions.h"
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSURLAdditions.h"
@@ -290,6 +291,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
 		}
 	}
+	name = [name AE_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet AE_newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
 	[self setNaturalDisplayName:name];
 }
 

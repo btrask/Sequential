@@ -24,7 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSStringAdditions.h"
 
-@implementation NSString (AEAdditions)
+@implementation NSString(AEAdditions)
+
+#pragma mark -NSString(AEAdditions)
 
 - (NSComparisonResult)AE_localizedCaseInsensitiveNumericCompare:(NSString *)aString
 {
@@ -44,10 +46,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSAssert(str1 && str2, @"Couldn't allocate.");
 	[self getCharacters:str1];
 	[aString getCharacters:str2];
-	SInt32 result;
-	UCCompareTextDefault(kUCCollateComposeInsensitiveMask | kUCCollateWidthInsensitiveMask | kUCCollateCaseInsensitiveMask | kUCCollateDigitsOverrideMask | kUCCollateDigitsAsNumberMask | kUCCollatePunctuationSignificantMask, str1, length1, str2, length2, NULL, &result);
+	SInt32 result = NSOrderedSame;
+	(void)UCCompareTextDefault(kUCCollateComposeInsensitiveMask | kUCCollateWidthInsensitiveMask | kUCCollateCaseInsensitiveMask | kUCCollateDigitsOverrideMask | kUCCollateDigitsAsNumberMask | kUCCollatePunctuationSignificantMask, str1, length1, str2, length2, NULL, &result);
 	return (NSComparisonResult)result;
 }
+- (NSString *)AE_stringByReplacingOccurrencesOfCharactersInSet:(NSCharacterSet *)set withString:(NSString *)replacement
+{
+	NSMutableString *const result = [NSMutableString string];
+	NSScanner *const scanner = [NSScanner scannerWithString:self];
+	[scanner setCharactersToBeSkipped:[NSCharacterSet characterSetWithCharactersInString:@""]];
+	while(![scanner isAtEnd]) {
+		NSString *substring = nil;
+		if([scanner scanUpToCharactersFromSet:set intoString:&substring] && substring) [result appendString:substring];
+		if([scanner scanCharactersFromSet:set intoString:NULL] && replacement) [result appendString:replacement];
+	}
+	return result;
+}
+
+#pragma mark -
+
 - (NSString *)AE_firstPathComponent
 {
 	NSString *component;
@@ -55,7 +72,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	while((component = [componentEnum nextObject])) if(![component isEqualToString:@"/"]) return component;
 	return @"";
 }
-
 - (NSURL *)AE_fileURL
 {
 	return [NSURL fileURLWithPath:self];
@@ -66,6 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(LSCopyDisplayNameForURL((CFURLRef)[self AE_fileURL], (CFStringRef *)&displayName) == noErr && displayName) return [displayName autorelease];
 	return [[NSFileManager defaultManager] displayNameAtPath:self];
 }
+
+#pragma mark -
 
 - (NSArray *)AE_searchTerms
 {

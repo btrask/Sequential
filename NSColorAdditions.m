@@ -24,9 +24,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSColorAdditions.h"
 
-//#define PGCheckerboardSquareSize 14.0f
-//#define PGCheckerboardSize (PGCheckerboardSquareSize * 2.0f)
-
 @implementation NSColor (AEAdditions)
 
 #pragma mark +NSColor(AEAdditions)
@@ -54,7 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[pattern lockFocus];
 	[self set];
 	NSRectFill(r);
-	[image drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceAtop fraction:0.05f];
+	[image drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceAtop fraction:fraction];
 	[pattern unlockFocus];
 	return [NSColor colorWithPatternImage:pattern];
 }

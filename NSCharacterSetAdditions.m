@@ -22,18 +22,23 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import <Cocoa/Cocoa.h>
+#import "NSCharacterSetAdditions.h"
 
-@interface NSString(AEAdditions)
+@interface NSCharacterSet(AELeopardAndLater)
++ (id)newlineCharacterSet;
+@end
 
-- (NSComparisonResult)AE_localizedCaseInsensitiveNumericCompare:(NSString *)aString;
-- (NSString *)AE_stringByReplacingOccurrencesOfCharactersInSet:(NSCharacterSet *)set withString:(NSString *)replacement;
+@implementation NSCharacterSet(AEAdditions)
 
-- (NSString *)AE_firstPathComponent;
-- (NSURL *)AE_fileURL;
-- (NSString *)AE_displayName;
+#pragma mark -NSCharacterSet(AEAdditions)
 
-- (NSArray *)AE_searchTerms;
-- (BOOL)AE_matchesSearchTerms:(NSArray *)terms;
++ (id)AE_newlineCharacterSet
+{
+	if([self respondsToSelector:@selector(newlineCharacterSet)]) return [self newlineCharacterSet];
+	NSMutableCharacterSet *const newlineCharacterSet = [[[self whitespaceAndNewlineCharacterSet] mutableCopy] autorelease];
+	[newlineCharacterSet invert];
+	[newlineCharacterSet formUnionWithCharacterSet:[self whitespaceCharacterSet]];
+	return newlineCharacterSet;
+}
 
 @end

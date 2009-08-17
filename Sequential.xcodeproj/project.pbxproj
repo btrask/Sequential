@@ -22,6 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0E0442F210396EF3005D7074 /* NSCharacterSetAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E0442F110396EF3005D7074 /* NSCharacterSetAdditions.m */; };
 		0E04E98E0C23BA7100078EC2 /* PGBezelPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */; };
 		0E04EBD00C253BB100078EC2 /* PGAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCD0C253BB000078EC2 /* PGAlertView.m */; };
 		0E04EBD10C253BB100078EC2 /* PGInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCF0C253BB000078EC2 /* PGInfoView.m */; };
@@ -322,6 +323,8 @@
 
 /* Begin PBXFileReference section */
 		089C1660FE840EACC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0E0442F010396EF3005D7074 /* NSCharacterSetAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSCharacterSetAdditions.h; sourceTree = "<group>"; };
+		0E0442F110396EF3005D7074 /* NSCharacterSetAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSCharacterSetAdditions.m; sourceTree = "<group>"; };
 		0E04504E0F06884D00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv_SE; path = sv_SE.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		0E0450500F06886100441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv_SE; path = sv_SE.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0E0450510F06886F00441263 /* sv_SE */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = sv_SE; path = sv_SE.lproj/PGMenu.nib; sourceTree = "<group>"; };
@@ -795,6 +798,8 @@
 				0E808D680D7CC46A003C9DE1 /* NSArrayAdditions.m */,
 				0E04EC080C254C1300078EC2 /* NSBezierPathAdditions.h */,
 				0E04EC090C254C1300078EC2 /* NSBezierPathAdditions.m */,
+				0E0442F010396EF3005D7074 /* NSCharacterSetAdditions.h */,
+				0E0442F110396EF3005D7074 /* NSCharacterSetAdditions.m */,
 				0EC11EA00CA14F0C003E492C /* NSColorAdditions.h */,
 				0EC11EA10CA14F0C003E492C /* NSColorAdditions.m */,
 				0E27080C0E2E222700D65876 /* NSControlAdditions.h */,
@@ -1454,6 +1459,7 @@
 				0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */,
 				0E2500C20FA4755A002CCCBA /* PGDelayedPerforming.m in Sources */,
 				0E8A1C0610157A5200C23B34 /* PGAboutBoxController.m in Sources */,
+				0E0442F210396EF3005D7074 /* NSCharacterSetAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
