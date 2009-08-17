@@ -247,8 +247,12 @@ static id PGArchiveAdapterList = nil;
 	for(i = 0; i < [self numberOfEntries]; i++) {
 		NSString *entryName = [self nameOfEntry:i];
 		if(![self entryIsDirectory:i]) entryName = [entryName stringByDeletingLastPathComponent];
-		if(root) root = [root commonPrefixWithString:entryName options:kNilOptions];
-		else root = entryName;
+		else if([entryName hasSuffix:@"/"]) entryName = [entryName substringToIndex:[entryName length] - 1];
+		if(!root) root = entryName;
+		else while(![root isEqualToString:entryName]) {
+			if([root length] > [entryName length]) root = [root stringByDeletingLastPathComponent];
+			else entryName = [entryName stringByDeletingLastPathComponent];
+		}
 	}
 	return root ? root : @"";
 }
