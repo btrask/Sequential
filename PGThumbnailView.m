@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSAffineTransformAdditions.h"
 #import "NSBezierPathAdditions.h"
-#import "NSImageAdditions.h"
 #import "NSObjectAdditions.h"
 
 #define PGBackgroundHoleSize 6.0f
@@ -48,13 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 static NSString *const PGThumbnailGlossStyleEnabledKey = @"PGThumbnailGlossStyleEnabled";
 static BOOL PGThumbnailGlossStyleEnabled = NO;
-static NSImage *PGBackground = nil;
-static NSImage *PGHighlightedBackground = nil;
+static NSColor *PGBackgroundColor = nil;
+static NSColor *PGHighlightedBackgroundColor = nil;
 
 @interface PGThumbnailView (Private)
 
 - (void)_validateSelection;
-- (NSImage *)_backgroundWithHighlight:(BOOL)highlight;
+- (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight;
 
 @end
 
@@ -212,8 +211,8 @@ static void PGDrawGradient(void)
 
 - (void)systemColorsDidChange:(NSNotification *)aNotif
 {
-	[PGHighlightedBackground release];
-	PGHighlightedBackground = nil;
+	[PGHighlightedBackgroundColor release];
+	PGHighlightedBackgroundColor = nil;
 	[self setNeedsDisplay:YES];
 }
 
@@ -225,13 +224,13 @@ static void PGDrawGradient(void)
 	NSEnumerator *const selectedItemEnum = [[[_selection copy] autorelease] objectEnumerator];
 	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
-- (NSImage *)_backgroundWithHighlight:(BOOL)highlight
+- (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight
 {
 	NSImage *const background = [[[NSImage alloc] initWithSize:NSMakeSize(PGOuterTotalWidth, PGBackgroundHeight)] autorelease];
 	[background lockFocus];
 
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowOffset:NSMakeSize(0.0f, 2.0f)];
+	[shadow setShadowOffset:NSMakeSize(0.0f, -2.0f)];
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 	CGContextRef const imageContext = [[NSGraphicsContext currentContext] graphicsPort];
@@ -249,16 +248,16 @@ static void PGDrawGradient(void)
 
 	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
 	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
-	[[NSColor colorWithDeviceWhite:1 alpha:0.1f] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0.0f, 1.0f) cornerRadius:2] fill];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0.0f, 1.0f) cornerRadius:2] fill];
+	[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
+	[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2.0f] fill];
+	[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2.0f] fill];
 	[[NSColor clearColor] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
-	[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2] AE_fillUsingOperation:NSCompositeCopy];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] AE_fillUsingOperation:NSCompositeCopy];
+	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] AE_fillUsingOperation:NSCompositeCopy];
 
 	CGContextEndTransparencyLayer(imageContext);
 	[background unlockFocus];
-	return background;
+	return [NSColor colorWithPatternImage:background];
 }
 
 #pragma mark PGClipViewAdditions Protocol
@@ -296,14 +295,17 @@ static void PGDrawGradient(void)
 - (void)drawRect:(NSRect)aRect
 {
 	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
+
+	NSRect const patternRect = [self convertRect:[self bounds] toView:nil];
+	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), NSMinY(patternRect) - PGBackgroundHoleSize / 2.0f));
+
 	int count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
 
-	if(!PGBackground) PGBackground = [[self _backgroundWithHighlight:NO] retain]; 
-	NSRect const b = [self bounds];
-	NSPoint patternPhase = NSMakePoint(NSMinX(b), NSMinY(b) - PGBackgroundHoleSize / 2.0f);
-	[PGBackground AE_tileInRect:aRect phase:patternPhase operation:NSCompositeCopy clip:NO];
+	if(!PGBackgroundColor) PGBackgroundColor = [[self _backgroundColorWithHighlight:NO] retain];
+	[PGBackgroundColor set];
+	NSRectFillList(rects, count);
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
 	[nilShadow setShadowColor:nil];
@@ -319,8 +321,9 @@ static void PGDrawGradient(void)
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[nilShadow set];
-			if(!PGHighlightedBackground) PGHighlightedBackground = [[self _backgroundWithHighlight:YES] retain];
-			[PGHighlightedBackground AE_tileInRect:frameWithMargin phase:patternPhase operation:NSCompositeCopy clip:YES];
+			if(!PGHighlightedBackgroundColor) PGHighlightedBackgroundColor = [[self _backgroundColorWithHighlight:YES] retain];
+			[PGHighlightedBackgroundColor set];
+			NSRectFill(frameWithMargin);
 			[shadow set];
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
