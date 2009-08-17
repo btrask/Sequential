@@ -630,12 +630,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)drawRect:(NSRect)aRect
 {
-	NSColor *const color = [self backgroundColor];
-	if(!color) return;
+	if(!_backgroundColor) return;
+	CGContextSetPatternPhase([[NSGraphicsContext currentContext] graphicsPort], CGSizeMake(0, NSHeight([self bounds])));
+	[_backgroundColor set];
+
 	int count;
 	NSRect const *rects;
 	[self getRectsBeingDrawn:&rects count:&count];
-	[color set];
 	NSRectFillList(rects, count);
 }
 
