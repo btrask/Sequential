@@ -625,6 +625,16 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return nil;
 }
+- (PGNode *)sortedViewableNodeInFolderFirst:(BOOL)flag
+{
+	PGContainerAdapter *ancestor = [self parentAdapter];
+	while(ancestor) {
+		PGNode *const node = [ancestor sortedViewableNodeFirst:flag];
+		if([self node] != node) return node;
+		ancestor = [ancestor parentAdapter];
+	}
+	return nil;
+}
 
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag
 	    matchSearchTerms:(NSArray *)terms

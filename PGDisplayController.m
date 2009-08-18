@@ -256,11 +256,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)firstOfFolder:(id)sender
 {
-	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES] forward:YES];
+	[self setActiveNode:[[self activeNode] sortedViewableNodeInFolderFirst:YES] forward:YES];
 }
 - (IBAction)lastOfFolder:(id)sender
 {
-	[self setActiveNode:[[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO] forward:NO];
+	[self setActiveNode:[[self activeNode] sortedViewableNodeInFolderFirst:NO] forward:NO];
 }
 
 #pragma mark -
@@ -1097,21 +1097,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if([self activeNode] == firstNode) {
 		if(@selector(firstPage:) == action) return NO;
+		if(@selector(firstOfFolder:) == action) return NO;
 	}
 	if([self activeNode] == [[[self activeDocument] node] sortedViewableNodeFirst:NO]) {
 		if(@selector(lastPage:) == action) return NO;
+		if(@selector(lastOfFolder:) == action) return NO;
 	}
 	if(![[[self activeNode] containerAdapter] parentAdapter]) {
 		if(@selector(skipBeforeFolder:) == action) return NO;
 		if(@selector(skipPastFolder:) == action) return NO;
-	}
-	if(@selector(firstOfFolder:) == action) {
-		PGNode *const firstOfFolder = [[[self activeNode] containerAdapter] sortedViewableNodeFirst:YES];
-		if(!firstOfFolder || [self activeNode] == firstOfFolder) return NO;
-	}
-	if(@selector(lastOfFolder:) == action) {
-		PGNode *const lastOfFolder = [[[self activeNode] containerAdapter] sortedViewableNodeFirst:NO];
-		if(!lastOfFolder || [self activeNode] == lastOfFolder) return NO;
 	}
 	return [super validateMenuItem:anItem];
 }
