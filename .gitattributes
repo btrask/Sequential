@@ -1,1 +1,4 @@
 *.pbxproj -crlf -diff -merge
+*.nib -crlf -diff -merge
+*.helpindex -crlf -diff -merge
+* idx -crlf -diff -merge
