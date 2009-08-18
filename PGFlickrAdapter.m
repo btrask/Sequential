@@ -121,7 +121,7 @@ enum {
 {
 	if(sender != _load) return;
 	NSHTTPURLResponse *const resp = (NSHTTPURLResponse *)[sender response];
-	if(![@"text/xml" isEqualToString:[resp MIMEType]]) {
+	if(![[NSArray arrayWithObjects:@"text/xml", @"application/xml", nil] containsObject:[resp MIMEType]]) {
 		[_load cancelAndNotify:NO];
 		[[self node] loadFinished];
 	} else if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] > 300)) {
@@ -294,7 +294,7 @@ enum {
 {
 	if([@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) {
 		[_farm release];
-		_farm = [@"1" copy]; // The docs don't mention this getting sent.
+		_farm = [[attrs objectForKey:@"farm"] copy];
 		[_server release];
 		_server = [[attrs objectForKey:@"server"] copy];
 		[_id release];
