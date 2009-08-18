@@ -148,7 +148,6 @@ static PGPrefController *PGSharedPrefController = nil;
 	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGPrefControllerToolbar"] autorelease];
 	[toolbar setDelegate:self];
 	[w setToolbar:toolbar];
-	[w setShowsToolbarButton:NO];
 
 	[self _setCurrentPane:PGGeneralPaneIdentifier];
 	[w center];
