@@ -54,6 +54,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 		case 2: path = [[NSBundle mainBundle] pathForResource:@"License" ofType:@"txt"]; break;
 	}
 	if(!path) return;
+	[textView setSelectedRange:NSMakeRange(0, 0)];
 	[[textView textStorage] removeLayoutManager:[textView layoutManager]];
 	NSDictionary *attrs = nil;
 	[[[NSTextStorage alloc] initWithURL:[path AE_fileURL] options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:NSUTF8StringEncoding], NSCharacterEncodingDocumentAttribute, nil] documentAttributes:&attrs error:NULL] addLayoutManager:[textView layoutManager]];
