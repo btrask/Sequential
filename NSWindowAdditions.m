@@ -43,7 +43,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)AE_setContentRect:(NSRect)aRect
 {
-	[self setFrame:[self frameRectForContentRect:aRect] display:YES];
+	NSSize const min = [self minSize];
+	NSSize const max = [self maxSize];
+	NSRect r = [self frameRectForContentRect:aRect];
+	r.size.width = MIN(MAX(min.width, NSWidth(r)), max.width);
+	float const newHeight = MIN(MAX(min.height, NSHeight(r)), max.height);
+	r.origin.y += NSHeight(r) - newHeight;
+	r.size.height = newHeight;
+	[self setFrame:r display:YES];
 }
 
 @end
