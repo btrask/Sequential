@@ -32,7 +32,7 @@
 	[appcast setDelegate:self];
 	NSString *userAgent = [NSString stringWithFormat: @"%@/%@ Sparkle/%@", [aHost name], [aHost displayVersion], ([SPARKLE_BUNDLE objectForInfoDictionaryKey:@"CFBundleVersion"] ?: nil)];
 	NSData * cleanedAgent = [userAgent dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
-	userAgent = [NSString stringWithCString:[cleanedAgent bytes] length:[cleanedAgent length]];
+	userAgent = [[[NSString alloc] initWithBytes:[cleanedAgent bytes] length:[cleanedAgent length] encoding:NSUTF8StringEncoding] autorelease];
 	[appcast setUserAgentString:userAgent];
 	[appcast fetchAppcastFromURL:URL];
 }
