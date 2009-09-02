@@ -252,10 +252,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
-	if(!pboard || ![types containsObject:NSTIFFPboardType]) return NO;
+	if(![types containsObject:NSTIFFPboardType]) return NO;
 	if(!_rep || ![_rep respondsToSelector:@selector(TIFFRepresentation)]) return NO;
-	[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
-	[pboard setData:[(NSBitmapImageRep *)_rep TIFFRepresentation] forType:NSTIFFPboardType];
+	if(pboard) {
+		[pboard addTypes:[NSArray arrayWithObject:NSTIFFPboardType] owner:nil];
+		[pboard setData:[(NSBitmapImageRep *)_rep TIFFRepresentation] forType:NSTIFFPboardType];
+	}
 	return YES;
 }
 

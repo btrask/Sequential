@@ -332,11 +332,12 @@ enum {
 
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
-	if(!pboard) return NO;
 	BOOL wrote = NO;
 	if([types containsObject:NSStringPboardType]) {
-		[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
-		[pboard setString:[[self identifier] displayName] forType:NSStringPboardType];
+		if(pboard) {
+			[pboard addTypes:[NSArray arrayWithObject:NSStringPboardType] owner:nil];
+			[pboard setString:[[self identifier] displayName] forType:NSStringPboardType];
+		}
 		wrote = YES;
 	}
 	NSData *const data = [self canGetData] ? [self data] : nil;
@@ -350,8 +351,10 @@ enum {
 			wrote = YES;
 		}
 		if([types containsObject:NSFileContentsPboardType]) {
-			[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
-			[pboard setData:data forType:NSFileContentsPboardType];
+			if(pboard) {
+				[pboard addTypes:[NSArray arrayWithObject:NSFileContentsPboardType] owner:nil];
+				[pboard setData:data forType:NSFileContentsPboardType];
+			}
 			wrote = YES;
 		}
 	}
