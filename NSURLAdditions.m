@@ -124,7 +124,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(![self isFileURL]) return [NSImage imageNamed:@"URL"];
 	NSImage *const icon = [[NSWorkspace sharedWorkspace] iconForFile:[self path]];
 	[icon setDataRetained:YES];
-	if(!PGIsLeopardOrLater()) [icon setSize:NSMakeSize(128, 128)];
 	return icon;
 }
 

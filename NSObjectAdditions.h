@@ -24,8 +24,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-extern BOOL PGIsLeopardOrLater(void);
-
 @interface NSObject (AEAdditions)
 
 - (void)AE_postNotificationName:(NSString *)aName;
@@ -36,6 +34,8 @@ extern BOOL PGIsLeopardOrLater(void);
 - (void)AE_removeObserver:(id)observer name:(NSString *)aName;
 
 - (NSArray *)AE_asArray;
+
++ (void *)AE_useImplementationFromClass:(Class)class forSelector:(SEL)aSel;
 
 @end
 

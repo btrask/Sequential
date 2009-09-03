@@ -43,7 +43,7 @@
 
 -(XADStringSource *)source;
 
--(BOOL)isEqual:(XADString *)other;
+-(BOOL)isEqual:(id)other;
 -(unsigned)hash;
 -(id)copyWithZone:(NSZone *)zone;
 

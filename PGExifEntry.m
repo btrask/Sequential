@@ -81,7 +81,7 @@ enum {
 			case 7: orientation = PGRotated90CC | PGFlippedVert; break;
 			case 8: orientation = PGRotated90CC; break;
 		}
-		[entries addObject:[[[self alloc] initWithLabel:[NSString stringWithCString:(entry->descr ? entry->descr : entry->name)] value:(entry->str ? [NSString stringWithCString:entry->str] : [NSString stringWithFormat:@"%u", entry->value])] autorelease]];
+		[entries addObject:[[[self alloc] initWithLabel:[NSString stringWithUTF8String:(entry->descr ? entry->descr : entry->name)] value:(entry->str ? [NSString stringWithUTF8String:entry->str] : [NSString stringWithFormat:@"%u", entry->value])] autorelease]];
 	}
 
 	exiffree(tags);

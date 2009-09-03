@@ -41,7 +41,6 @@ NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidCha
 
 #define PGMouseHiddenDraggingStyle true
 #define PGAnimateScrolling true
-#define PGCopiesOnScroll true // Only used prior to Leopard.
 #define PGClickSlopDistance 3.0f
 #define PGPageTurnMovementDelay 0.5f
 #define PGGameStyleArrowScrolling true
@@ -504,29 +503,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
 {
-	if(!PGCopiesOnScroll || PGIsLeopardOrLater() || _documentViewIsResizing || (_backgroundIsComplex && ![documentView isOpaque])) return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
-	NSRect const oldBounds = [self bounds];
-	NSRect const oldResizeRect = [[self window] HM_resizeRectForView:self];
-	if(![self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:NO]) return NO;
-	NSRect const bounds = [self bounds];
-	float const x = NSMinX(bounds) - NSMinX(oldBounds);
-	float const y = NSMinY(bounds) - NSMinY(oldBounds);
-	NSRect const copiedRect = NSIntersectionRect(NSIntersectionRect(bounds, oldBounds), _documentFrame);
-	if(![self lockFocusIfCanDraw]) {
-		[self setNeedsDisplay:YES];
-		return YES;
-	}
-	NSCopyBits(0, NSOffsetRect(copiedRect, x, y), copiedRect.origin);
-	[self unlockFocus];
-
-	unsigned i;
-	NSRect rects[4];
-	PGGetRectDifference(rects, &i, NSUnionRect(NSOffsetRect(_documentFrame, x, y), _documentFrame), copiedRect);
-	while(i--) [self setNeedsDisplayInRect:rects[i]];
-	[self setNeedsDisplayInRect:oldResizeRect];
-	[self displayIfNeededIgnoringOpacity];
-	[self setNeedsDisplayInRect:[[self window] HM_resizeRectForView:self]]; // The window needs to draw this itself.
-	return YES;
+	return [self _setPosition:aPoint scrollEnclosingClipViews:YES markForRedisplay:YES];
 }
 - (void)_scrollOneFrame
 {

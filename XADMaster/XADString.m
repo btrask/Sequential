@@ -113,14 +113,14 @@
 	return [self string];
 }
 
--(BOOL)isEqual:(XADString *)other
+-(BOOL)isEqual:(id)other
 {
 	if([other isKindOfClass:[NSString class]]) return [[self string] isEqual:other];
 	else if([other isKindOfClass:[self class]])
 	{
 		if(string) return [string isEqual:[other string]];
-		else if(other->string) return [other->string isEqual:[self string]];
-		else if(source==other->source||[source encoding]==[other->source encoding]) return [data isEqual:other->data];
+		else if(((XADString *)other)->string) return [((XADString *)other)->string isEqual:[self string]];
+		else if(source==((XADString *)other)->source||[source encoding]==[((XADString *)other)->source encoding]) return [data isEqual:((XADString *)other)->data];
 		else return [[self string] isEqual:[other string]];
 	}
 	else return NO;

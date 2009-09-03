@@ -940,19 +940,17 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	PGDisplayableIdentifier *const identifier = [[[self activeDocument] node] identifier];
 	NSURL *const URL = [identifier URL];
-	if(PGIsLeopardOrLater() && ![identifier isFileIdentifier]) {
-		[[self window] setRepresentedURL:URL];
-		if(![identifier isFileIdentifier]) {
-			NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
-			NSImage *const image = [[[identifier icon] copy] autorelease];
-			[image setFlipped:![docButton isFlipped]];
-			[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
-			[image setSize:[docButton bounds].size];
-			[docButton setImage:image];
-		}
-	} else {
+	if([identifier isFileIdentifier]) {
 		NSString *const path = [identifier isFileIdentifier] ? [URL path] : nil;
 		[[self window] setRepresentedFilename:(path ? path : @"")];
+	} else {
+		[[self window] setRepresentedURL:URL];
+		NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
+		NSImage *const image = [[[identifier icon] copy] autorelease];
+		[image setFlipped:![docButton isFlipped]];
+		[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
+		[image setSize:[docButton bounds].size];
+		[docButton setImage:image];
 	}
 	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = [identifier displayName];

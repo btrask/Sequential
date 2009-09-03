@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -674,7 +674,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "Sparkle" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -961,7 +961,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941CA0D94A70100DD942E /* ConfigFrameworkDebug.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
 			};
 			name = Debug;
 		};
@@ -969,8 +968,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA1941D50D94A70100DD942E /* ConfigFrameworkRelease.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				GCC_DEBUGGING_SYMBOLS = full;
 			};
 			name = Release;
@@ -978,6 +975,10 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.5;
 				SYMROOT = ../build;
 				WARNING_CFLAGS = "-Wundeclared-selector";
 			};
@@ -986,8 +987,9 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				SDKROOT = macosx10.5;
 				SYMROOT = ../build;
 				WARNING_CFLAGS = "-Wundeclared-selector";
 			};
@@ -996,7 +998,9 @@
 		61072EAD0DF263BD008FE88B /* Release (GC dual-mode; 10.5-only) */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_VERSION = "";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				SDKROOT = macosx10.5;
 				SYMROOT = ../build;
 				WARNING_CFLAGS = "-Wundeclared-selector";
 			};

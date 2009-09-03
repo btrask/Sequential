@@ -195,7 +195,7 @@ struct exifprop {
 	u_int16_t tag;		/* The Exif tag. */
 	u_int16_t type;
 	u_int32_t count;
-	u_int32_t value;
+	int32_t value;
 	const char *name;
 	const char *descr;
 	char *str;		/* String representation of value (dynamic). */

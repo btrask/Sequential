@@ -1,6 +1,7 @@
 #include "RARUnpacker.h"
 #include "SystemSpecific.h"
 #include "unrar/rar.hpp"
+#include <stdint.h>
 
 
 extern "C" {

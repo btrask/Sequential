@@ -23,11 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
-
-BOOL PGIsLeopardOrLater(void)
-{
-	return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_4;
-}
+#import <objc/runtime.h>
 
 @implementation NSObject (AEAdditions)
 
@@ -66,6 +62,17 @@ BOOL PGIsLeopardOrLater(void)
 - (NSArray *)AE_asArray
 {
 	return [NSArray arrayWithObject:self];
+}
+
+#pragma mark -
+
++ (void *)AE_useImplementationFromClass:(Class)class forSelector:(SEL)aSel
+{
+	Method const newMethod = class_getInstanceMethod(class, aSel);
+	if(!newMethod) return NULL;
+	IMP const originalImplementation = class_getMethodImplementation(self, aSel); // Make sure the IMP we return is gotten using the normal method lookup mechanism.
+	(void)class_replaceMethod(self, aSel, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)); // If this specific class doesn't provide its own implementation of aSel--even if a superclass does--class_replaceMethod() adds the method without replacing anything and returns NULL. This behavior is good because it prevents our change from spreading to a superclass, but it means the return value is worthless.
+	return originalImplementation;
 }
 
 #pragma mark NSMenuValidation Protocol

@@ -59,12 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_update
 {
 	[activityOutline reloadData];
-	if(PGIsLeopardOrLater()) [activityOutline expandItem:nil expandChildren:YES];
-	else {
-		id load;
-		NSEnumerator *const loadEnum = [[[PGLoadManager sharedLoadManager] subloads] objectEnumerator];
-		while((load = [loadEnum nextObject])) [activityOutline expandItem:load expandChildren:YES];
-	}
+	[activityOutline expandItem:nil expandChildren:YES];
 }
 
 #pragma mark NSOutlineView Protocol

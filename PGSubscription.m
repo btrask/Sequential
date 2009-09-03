@@ -55,17 +55,6 @@ static id  PGActiveSubscriptions = nil;
 
 @end
 
-@interface PGKQueueBranchSubscription : PGLeafSubscription
-{
-	@private
-	PGKQueueBranchSubscription *_parent;
-	NSArray *_children;
-}
-
-- (id)initWithPath:(NSString *)path parent:(PGKQueueBranchSubscription *)parent;
-
-@end
-
 @interface PGFSEventBranchSubscription : PGSubscription
 {
 	@private
@@ -89,8 +78,7 @@ static id  PGActiveSubscriptions = nil;
 {
 	id result;
 	if(!flag) result = [PGLeafSubscription alloc];
-	else if(PGIsLeopardOrLater()) result = [PGFSEventBranchSubscription alloc];
-	else result = [PGKQueueBranchSubscription alloc];
+	else result = [PGFSEventBranchSubscription alloc];
 	return [[result initWithPath:path] autorelease];
 }
 + (id)subscriptionWithPath:(NSString *)path
@@ -194,63 +182,6 @@ static id  PGActiveSubscriptions = nil;
 {
 	[self PG_cancelPerformsWithStorage:PGActiveSubscriptions];
 	if(-1 != _descriptor) close(_descriptor);
-	[super dealloc];
-}
-
-@end
-
-@implementation PGKQueueBranchSubscription
-
-#pragma mark Instance Methods
-
-- (id)initWithPath:(NSString *)path
-      parent:(PGKQueueBranchSubscription *)parent
-{
-	if((self = [self initWithPath:path])) {
-		_parent = parent;
-	}
-	return self;
-}
-- (PGSubscription *)rootSubscription
-{
-	return _parent ? [_parent rootSubscription] : self;
-}
-
-#pragma mark PGLeafSubscription
-
-- (id)initWithPath:(NSString *)path
-{
-	if(!(self = [super initWithPath:path])) return nil;
-	BOOL isDir;
-	if(![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir] || !isDir) {
-		[self release];
-		return nil;
-	}
-	NSMutableArray *const children = [NSMutableArray array];
-	NSString *pathComponent;
-	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
-	while((pathComponent = [pathComponentEnum nextObject])) {
-		PGSubscription *const child = [[[PGKQueueBranchSubscription alloc] initWithPath:[path stringByAppendingPathComponent:pathComponent] parent:self] autorelease];
-		if(child) [children addObject:child];
-		else if(EMFILE == errno) {
-			[self release];
-			return nil;
-		}
-	}
-	_children = [children retain];
-	return self;
-}
-- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum
-{
-	if([self rootSubscription] == self) [super noteFileEventDidOccurWithFlags:flagsNum];
-	else if(NOTE_WRITE & [flagsNum unsignedIntValue]) [super noteFileEventDidOccurWithFlags:nil];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[_children release];
 	[super dealloc];
 }
 

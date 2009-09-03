@@ -87,7 +87,7 @@ exifwarn2(const char *msg1, const char *msg2)
 int
 offsanity(struct exifprop *prop, u_int16_t size, struct ifd *dir)
 {
-	u_int32_t tifflen;
+	int32_t tifflen;
 	const char *name;
 
 	/* XXX Hrm.  Should be OK with 64-bit addresses. */
@@ -124,7 +124,7 @@ offsanity(struct exifprop *prop, u_int16_t size, struct ifd *dir)
 
 	/* Is the offset valid? */
 
-	if (prop->value + prop->count * size > tifflen) {
+	if (prop->value + (int32_t)prop->count * size > tifflen) {
 		exifwarn2("invalid field offset", name);
 		prop->lvl = ED_BAD;
 		return (1);

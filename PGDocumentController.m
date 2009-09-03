@@ -82,6 +82,11 @@ static NSString *const PGNextUpdateCheckDateKey = @"PGNextUpdateCheckDate";
 
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 
+static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
+static NSView *(*PGNSViewNextValidKeyView)(id, SEL);
+static NSView *(*PGNSViewPreviousValidKeyView)(id, SEL);
+static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
+
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type)
 {
 	return type ? CFSwapInt32BigToHost(*(OSType *)[[type dataUsingEncoding:NSUTF8StringEncoding] bytes]) : '????';
@@ -533,20 +538,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)_setPageMenu:(NSMenu *)aMenu
 {
-	NSMenu *const mainMenu = [NSApp mainMenu];
-	unsigned const pageMenuItemIndex = [mainMenu indexOfItem:[[pageMenuItem retain] autorelease]];
-	if(!PGIsLeopardOrLater()) [mainMenu removeItemAtIndex:pageMenuItemIndex]; // Works around a Tiger bug where two Page menus appear.
-
 	NSMenu *const oldMenu = [pageMenuItem submenu];
 	NSMenu *const newMenu = aMenu ? aMenu : defaultPageMenu;
-	if(!PGIsLeopardOrLater()) [newMenu setTitle:[pageMenuItem title]]; // Otherwise the title can get changed.
 	firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
 	previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
 	nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
 	lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
 	[pageMenuItem setSubmenu:newMenu];
 
-	if(!PGIsLeopardOrLater()) [mainMenu insertItem:pageMenuItem atIndex:pageMenuItemIndex];
 	[self readingDirectionDidChange:nil];
 }
 - (PGDocument *)_openNew:(BOOL)flag
@@ -724,7 +723,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	SEL const action = [anItem action];
 	int const tag = [anItem tag];
 
-	if([@protocol(PGDisplayControlling) descriptionForInstanceMethod:action]) {
+	if(protocol_getMethodDescription(@protocol(PGDisplayControlling), action, YES, YES).name) {
 		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
 		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
@@ -833,9 +832,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 + (void)initialize
 {
 	if([PGApplication class] != self) return;
-	[PGWindow poseAsClass:[NSWindow class]];
-	[PGView poseAsClass:[NSView class]];
-	[PGMenu poseAsClass:[NSMenu class]];
+
+	PGNSWindowValidateMenuItem = [NSWindow AE_useImplementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
+	PGNSViewNextValidKeyView = [NSView AE_useImplementationFromClass:[PGView class] forSelector:@selector(nextValidKeyView)];
+	PGNSViewPreviousValidKeyView = [NSView AE_useImplementationFromClass:[PGView class] forSelector:@selector(previousValidKeyView)];
+	PGNSMenuPerformKeyEquivalent = [NSMenu AE_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
+
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
 }
@@ -851,7 +853,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask); // Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
-	return [super validateMenuItem:anItem];
+	return PGNSWindowValidateMenuItem(self, _cmd, anItem);
 }
 
 @end
@@ -861,12 +863,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 // Help tab between windows.
 - (NSView *)nextValidKeyView
 {
-	NSView *const view = [super nextValidKeyView];
+	NSView *const view = PGNSViewNextValidKeyView(self, _cmd);
 	return view ? view : self;
 }
 - (NSView *)previousValidKeyView
 {
-	NSView *const view = [super previousValidKeyView];
+	NSView *const view = PGNSViewPreviousValidKeyView(self, _cmd);
 	return view ? view : self;
 }
 
@@ -890,7 +892,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		return [item AE_performAction];
 	}
 	for(i = 0; i < count; i++) if([[[self itemAtIndex:i] submenu] performKeyEquivalent:anEvent]) return YES;
-	return [NSApp mainMenu] == self ? [super performKeyEquivalent:anEvent] : NO;
+	return [NSApp mainMenu] == self ? PGNSMenuPerformKeyEquivalent(self, _cmd, anEvent) : NO;
 }
 
 @end

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1577,7 +1577,7 @@
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1DEB91B108733DA50010E9CD /* Build configuration list for PBXProject "XADMaster" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			hasScannedForEncodings = 1;
 			mainGroup = 0867D691FE84028FC02AAC07 /* XADMaster */;
 			productRefGroup = 034768DFFF38A50411DB9C8B /* Products */;
@@ -1921,7 +1921,6 @@
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = XADTest;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1930,7 +1929,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SYMROOT)";
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
@@ -1969,7 +1967,6 @@
 				OTHER_LDFLAGS = "";
 				PREBINDING = NO;
 				PRODUCT_NAME = XADTest2;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2045,7 +2042,6 @@
 				GCC_PREFIX_HEADER = XADMaster_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.2;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
 					"-DUNIX",
@@ -2069,10 +2065,6 @@
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_LOCATION = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -2092,7 +2084,6 @@
 				GCC_PREFIX_HEADER = XADMaster_Prefix.pch;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.2;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
 					"-DUNIX",
@@ -2116,21 +2107,19 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_VERSION = 4.0;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
-				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
-				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-Wno-pointer-to-int-cast",
 					"-Wno-int-to-pointer-cast",
 				);
 				OTHER_CPLUSPLUSFLAGS = "";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = macosx10.5;
 				SYMROOT = ../build;
 			};
 			name = Debug;
@@ -2138,25 +2127,18 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
-				GCC_VERSION = 4.0;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
-				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
-				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
 				OTHER_CFLAGS = (
 					"-Wno-pointer-to-int-cast",
 					"-Wno-int-to-pointer-cast",
 				);
 				OTHER_CPLUSPLUSFLAGS = "";
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
-				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = macosx10.5;
 				SYMROOT = ../build;
 			};
 			name = Release;

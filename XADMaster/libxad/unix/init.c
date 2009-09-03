@@ -205,7 +205,7 @@ struct xadMasterBase *xadOpenLibrary( xadINT32 version )
   if (xadMasterBase == NULL)
     xadMasterBase = InitXADMasterBaseP(calloc(1, sizeof(struct xadMasterBaseP)));
 
-  if ((xmb = (struct xadMasterBase *) xadMasterBase));
+  if ((xmb = (struct xadMasterBase *) xadMasterBase))
     xadMasterBase->xmb_Unix_AccessCount++;
 
   pthread_mutex_unlock(&GlobalMutex);

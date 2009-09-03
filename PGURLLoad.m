@@ -132,11 +132,9 @@ static unsigned PGSimultaneousConnections = 0;
 	if(_connection || [self loaded]) return NO;
 	NSMutableURLRequest *const request = [[_request mutableCopy] autorelease];
 	if([[self class] userAgent]) [request setValue:[[self class] userAgent] forHTTPHeaderField:@"User-Agent"];
-	if(PGIsLeopardOrLater()) { // Ensure the connections keep loading in the various run loop modes on Leopard.
-		_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-		[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:(NSString *)kCFRunLoopCommonModes];
-		[_connection start];
-	} else _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+	_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+	[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:(NSString *)kCFRunLoopCommonModes];
+	[_connection start];
 	PGSimultaneousConnections++;
 	return YES;
 }
@@ -153,7 +151,7 @@ static unsigned PGSimultaneousConnections = 0;
 	if(!_response) return 0.0f;
 	long long const expectedLength = [_response expectedContentLength];
 	if(-1 == expectedLength) return 0.0f;
-	return (float)[_data length] / expectedLength;
+	return (float)[_data length] / (float)expectedLength;
 }
 - (id<PGLoading>)parentLoad
 {
