@@ -292,7 +292,7 @@ static void PGDrawGradient(void)
 	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
 
 	NSRect const patternRect = [self convertRect:[self bounds] toView:nil];
-	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), NSMinY(patternRect) - PGBackgroundHoleSize / 2.0f));
+	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), NSMaxY(patternRect) - PGBackgroundHoleSize / 2.0f));
 
 	NSInteger count = 0;
 	NSRect const *rects = NULL;
