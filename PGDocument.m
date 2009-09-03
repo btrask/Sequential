@@ -104,6 +104,9 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	}
 	return self;
 }
+
+#pragma mark -
+
 - (PGDisplayableIdentifier *)originalIdentifier
 {
 	return [[_originalIdentifier retain] autorelease];
@@ -116,15 +119,50 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	return [[_node retain] autorelease];
 }
-- (void)openBookmark:(PGBookmark *)aBookmark
+- (PGDisplayController *)displayController
 {
-	[self _setInitialIdentifier:[aBookmark fileIdentifier]];
-	PGNode *const initialNode = [self _initialNode];
-	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
-		_openedBookmark = YES;
-		[[self displayController] activateNode:initialNode];
-		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
-	} else NSBeep();
+	return [[_displayController retain] autorelease];
+}
+- (void)setDisplayController:(PGDisplayController *)controller
+{
+	if(controller == _displayController) return;
+	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
+	[_displayController release];
+	_displayController = [controller retain];
+	[_displayController setActiveDocument:self closeIfAppropriate:NO];
+	[_displayController synchronizeWindowTitleWithDocumentName];
+}
+- (BOOL)displayControllerIsModal
+{
+	return [[self displayController] activeDocument] == self && [[[self displayController] window] attachedSheet];
+}
+- (BOOL)isOnline
+{
+	return ![[self rootIdentifier] isFileIdentifier];
+}
+- (NSMenu *)pageMenu
+{
+	return _pageMenu;
+}
+- (PGOrientation)baseOrientation
+{
+	return _baseOrientation;
+}
+- (void)setBaseOrientation:(PGOrientation)anOrientation
+{
+	if(anOrientation == _baseOrientation) return;
+	_baseOrientation = anOrientation;
+	[self AE_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
+}
+- (BOOL)isProcessingNodes
+{
+	return _processingNodeCount > 0;
+}
+- (void)setProcessingNodes:(BOOL)flag
+{
+	NSParameterAssert(flag || _processingNodeCount);
+	_processingNodeCount += flag ? 1 : -1;
+	if(!_processingNodeCount && _sortedChildrenChanged) [self noteSortedChildrenDidChange];
 }
 
 #pragma mark -
@@ -177,26 +215,6 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 
 #pragma mark -
 
-- (PGDisplayController *)displayController
-{
-	return [[_displayController retain] autorelease];
-}
-- (void)setDisplayController:(PGDisplayController *)controller
-{
-	if(controller == _displayController) return;
-	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
-	[_displayController release];
-	_displayController = [controller retain];
-	[_displayController setActiveDocument:self closeIfAppropriate:NO];
-	[_displayController synchronizeWindowTitleWithDocumentName];
-}
-- (BOOL)displayControllerIsModal
-{
-	return [[self displayController] activeDocument] == self && [[[self displayController] window] attachedSheet];
-}
-
-#pragma mark -
-
 - (void)createUI
 {
 	BOOL const new = ![self displayController];
@@ -214,42 +232,15 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[self setDisplayController:nil];
 	[[PGDocumentController sharedDocumentController] removeDocument:self];
 }
-
-#pragma mark -
-
-- (BOOL)isOnline
+- (void)openBookmark:(PGBookmark *)aBookmark
 {
-	return ![[self rootIdentifier] isFileIdentifier];
-}
-- (NSMenu *)pageMenu
-{
-	return _pageMenu;
-}
-
-#pragma mark -
-
-- (PGOrientation)baseOrientation
-{
-	return _baseOrientation;
-}
-- (void)setBaseOrientation:(PGOrientation)anOrientation
-{
-	if(anOrientation == _baseOrientation) return;
-	_baseOrientation = anOrientation;
-	[self AE_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
-}
-
-#pragma mark -
-
-- (BOOL)isProcessingNodes
-{
-	return _processingNodeCount > 0;
-}
-- (void)setProcessingNodes:(BOOL)flag
-{
-	NSParameterAssert(flag || _processingNodeCount);
-	_processingNodeCount += flag ? 1 : -1;
-	if(!_processingNodeCount && _sortedChildrenChanged) [self noteSortedChildrenDidChange];
+	[self _setInitialIdentifier:[aBookmark fileIdentifier]];
+	PGNode *const initialNode = [self _initialNode];
+	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
+		_openedBookmark = YES;
+		[[self displayController] activateNode:initialNode];
+		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];
+	} else NSBeep();
 }
 
 #pragma mark -

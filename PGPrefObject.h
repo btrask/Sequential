@@ -90,28 +90,14 @@ typedef int PGSortOrder;
 
 + (id)globalPrefObject;
 
-- (BOOL)showsInfo;
-- (void)setShowsInfo:(BOOL)flag;
-- (BOOL)showsThumbnails;
-- (void)setShowsThumbnails:(BOOL)flag;
-
-- (PGReadingDirection)readingDirection;
-- (void)setReadingDirection:(PGReadingDirection)aDirection;
-
-- (PGImageScaleMode)imageScaleMode;
-- (void)setImageScaleMode:(PGImageScaleMode)aMode;
-- (float)imageScaleFactor;
-- (void)setImageScaleFactor:(float)aFloat;
-- (PGImageScaleConstraint)imageScaleConstraint;
-- (void)setImageScaleConstraint:(PGImageScaleConstraint)flag;
-
-- (BOOL)animatesImages;
-- (void)setAnimatesImages:(BOOL)flag;
-
-- (PGSortOrder)sortOrder;
-- (void)setSortOrder:(PGSortOrder)anOrder;
-
-- (NSTimeInterval)timerInterval;
-- (void)setTimerInterval:(NSTimeInterval)interval;
+@property BOOL showsInfo;
+@property BOOL showsThumbnails;
+@property PGReadingDirection readingDirection;
+@property PGImageScaleMode imageScaleMode;
+@property float imageScaleFactor;
+@property PGImageScaleConstraint imageScaleConstraint;
+@property BOOL animatesImages;
+@property PGSortOrder sortOrder;
+@property NSTimeInterval timerInterval;
 
 @end

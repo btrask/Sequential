@@ -63,32 +63,32 @@ typedef int PGLoadPolicy;
 
 @protocol PGResourceAdapting <PGLoading>
 
-- (PGNode *)parentNode;
-- (PGContainerAdapter *)parentAdapter;
-- (PGContainerAdapter *)containerAdapter;
-- (PGNode *)rootNode;
-- (PGContainerAdapter *)rootContainerAdapter;
-- (PGDocument *)document;
+@property(readonly) PGNode *parentNode;
+@property(readonly) PGContainerAdapter *parentAdapter;
+@property(readonly) PGContainerAdapter *containerAdapter;
+@property(readonly) PGNode *rootNode;
+@property(readonly) PGContainerAdapter *rootContainerAdapter;
+@property(readonly) PGDocument *document;
 
-- (PGDisplayableIdentifier *)identifier;
-- (NSMutableDictionary *)info;
-- (NSData *)data;
-- (BOOL)canGetData;
-- (BOOL)hasNodesWithData;
+@property(readonly) PGDisplayableIdentifier *identifier;
+@property(readonly) NSMutableDictionary *info;
+@property(readonly) NSData *data;
+@property(readonly) BOOL canGetData;
+@property(readonly) BOOL hasNodesWithData;
 
-- (BOOL)isContainer;
-- (BOOL)isSortedFirstViewableNodeOfFolder;
-- (BOOL)hasRealThumbnail;
-- (BOOL)isResolutionIndependent;
-- (BOOL)canSaveData;
-- (BOOL)hasSavableChildren;
+@property(readonly) BOOL isContainer;
+@property(readonly) BOOL isSortedFirstViewableNodeOfFolder;
+@property(readonly) BOOL hasRealThumbnail;
+@property(readonly, getter = isResolutionIndependent) BOOL resolutionIndependent;
+@property(readonly) BOOL canSaveData;
+@property(readonly) BOOL hasSavableChildren;
 
-- (NSArray *)exifEntries;
+@property(readonly) NSArray *exifEntries;
+@property(readonly) NSUInteger viewableNodeIndex;
+@property(readonly) NSUInteger viewableNodeCount;
+
 - (PGOrientation)orientationWithBase:(BOOL)flag;
 - (void)clearCache;
-
-- (unsigned)viewableNodeIndex;
-- (unsigned)viewableNodeCount;
 - (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt;
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;

@@ -75,12 +75,25 @@ typedef unsigned PGNodeStatus;
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(id)dataSource;
 
-- (id)dataSource;
+@property(readonly) id dataSource;
+@property(readonly) PGResourceAdapter *resourceAdapter;
+@property(readonly) PGLoadPolicy ancestorLoadPolicy;
+@property(retain) NSError *error;
+@property(readonly) NSImage *thumbnail;
+@property(readonly) BOOL isViewable;
+@property(readonly) NSUInteger depth;
+@property(readonly) PGNode *viewableAncestor;
+@property(readonly) NSMenuItem *menuItem;
+@property(readonly) BOOL canBookmark;
+@property(readonly) PGBookmark *bookmark;
+
+@property(readonly) NSDate *dateModified;
+@property(readonly) NSDate *dateCreated;
+@property(readonly) NSNumber *dataLength;
+
 - (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info;
 
-- (PGResourceAdapter *)resourceAdapter;
-- (PGLoadPolicy)ancestorLoadPolicy;
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
 - (void)startLoadWithInfo:(id)info;
 - (void)continueLoadWithInfo:(id)info;
@@ -90,27 +103,9 @@ typedef unsigned PGNodeStatus;
 - (void)readIfNecessary;
 - (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
 
-- (NSError *)error;
-- (void)setError:(NSError *)error;
-
-- (NSImage *)thumbnail;
-
-- (BOOL)isViewable;
-- (unsigned)depth;
-- (PGNode *)viewableAncestor;
-- (NSMenuItem *)menuItem;
-
 - (void)removeFromDocument;
 - (void)detachFromTree;
-
-- (NSDate *)dateModified;
-- (NSDate *)dateCreated;
-- (NSNumber *)dataLength;
 - (NSComparisonResult)compare:(PGNode *)node; // Uses the document's sort mode.
-
-- (BOOL)canBookmark;
-- (PGBookmark *)bookmark;
-
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types;
 
 - (void)identifierIconDidChange:(NSNotification *)aNotif;

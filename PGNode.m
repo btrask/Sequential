@@ -118,6 +118,80 @@ enum {
 {
 	return _dataSource;
 }
+- (PGResourceAdapter *)resourceAdapter
+{
+	return [[_adapter retain] autorelease];
+}
+- (PGLoadPolicy)ancestorLoadPolicy
+{
+	PGContainerAdapter *const p = [self parentAdapter];
+	return p ? MAX([[p node] ancestorLoadPolicy], [p descendentLoadPolicy]) : PGLoadToMaxDepth;
+}
+- (NSError *)error
+{
+	return [[_error retain] autorelease];
+}
+- (void)setError:(NSError *)error
+{
+	if(PGNodeNothing == _status) return;
+	if(!_error) {
+		_error = [error copy];
+		_errorPhase = _status;
+	}
+	if(PGNodeLoading & _status && [_adapters count] > 1) {
+		(void)[[[_adapters lastObject] retain] autorelease];
+		if([_adapter shouldFallbackOnError]) [_adapters removeLastObject];
+		else [_adapters removeObjectsInRange:NSMakeRange(1, [_adapters count] - 1)];
+		[self _setResourceAdapter:[_adapters lastObject]];
+		[_adapter fallbackLoad];
+	}
+}
+- (NSImage *)thumbnail
+{
+	return PGNodeLoading & _status ? nil : [[self resourceAdapter] thumbnail];
+}
+- (BOOL)isViewable
+{
+	return _viewable;
+}
+- (unsigned)depth
+{
+	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
+}
+- (PGNode *)viewableAncestor
+{
+	return _viewable ? self : [[self parentNode] viewableAncestor];
+}
+- (NSMenuItem *)menuItem
+{
+	return [[_menuItem retain] autorelease];
+}
+- (BOOL)canBookmark
+{
+	return [self isViewable] && [[self identifier] hasTarget];
+}
+- (PGBookmark *)bookmark
+{
+	return [[[PGBookmark alloc] initWithNode:self] autorelease];
+}
+
+#pragma mark -
+
+- (NSDate *)dateModified
+{
+	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
+}
+- (NSDate *)dateCreated
+{
+	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
+}
+- (NSNumber *)dataLength
+{
+	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
+}
+
+#pragma mark -
+
 - (NSData *)dataWithInfo:(NSDictionary *)info
             fast:(BOOL)flag
 {
@@ -141,15 +215,6 @@ enum {
 
 #pragma mark -
 
-- (PGResourceAdapter *)resourceAdapter
-{
-	return [[_adapter retain] autorelease];
-}
-- (PGLoadPolicy)ancestorLoadPolicy
-{
-	PGContainerAdapter *const p = [self parentAdapter];
-	return p ? MAX([[p node] ancestorLoadPolicy], [p descendentLoadPolicy]) : PGLoadToMaxDepth;
-}
 - (BOOL)shouldLoadAdapterClass:(Class)aClass
 {
 	if([aClass alwaysLoads]) return YES;
@@ -224,54 +289,6 @@ enum {
 
 #pragma mark -
 
-- (NSError *)error
-{
-	return [[_error retain] autorelease];
-}
-- (void)setError:(NSError *)error
-{
-	if(PGNodeNothing == _status) return;
-	if(!_error) {
-		_error = [error copy];
-		_errorPhase = _status;
-	}
-	if(PGNodeLoading & _status && [_adapters count] > 1) {
-		(void)[[[_adapters lastObject] retain] autorelease];
-		if([_adapter shouldFallbackOnError]) [_adapters removeLastObject];
-		else [_adapters removeObjectsInRange:NSMakeRange(1, [_adapters count] - 1)];
-		[self _setResourceAdapter:[_adapters lastObject]];
-		[_adapter fallbackLoad];
-	}
-}
-
-#pragma mark -
-
-- (NSImage *)thumbnail
-{
-	return PGNodeLoading & _status ? nil : [[self resourceAdapter] thumbnail];
-}
-
-#pragma mark -
-
-- (BOOL)isViewable
-{
-	return _viewable;
-}
-- (unsigned)depth
-{
-	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
-}
-- (PGNode *)viewableAncestor
-{
-	return _viewable ? self : [[self parentNode] viewableAncestor];
-}
-- (NSMenuItem *)menuItem
-{
-	return [[_menuItem retain] autorelease];
-}
-
-#pragma mark -
-
 - (void)removeFromDocument
 {
 	if([[self document] node] == self) [[self document] close];
@@ -284,21 +301,6 @@ enum {
 		_document = nil;
 		_dataSource = nil;
 	}
-}
-
-#pragma mark -
-
-- (NSDate *)dateModified
-{
-	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
-}
-- (NSDate *)dateCreated
-{
-	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
-}
-- (NSNumber *)dataLength
-{
-	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
 }
 - (NSComparisonResult)compare:(PGNode *)node
 {
@@ -316,20 +318,6 @@ enum {
 	}
 	return (NSOrderedSame == r ? [[[self identifier] displayName] AE_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
 }
-
-#pragma mark -
-
-- (BOOL)canBookmark
-{
-	return [self isViewable] && [[self identifier] hasTarget];
-}
-- (PGBookmark *)bookmark
-{
-	return [[[PGBookmark alloc] initWithNode:self] autorelease];
-}
-
-#pragma mark -
-
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
 	BOOL wrote = NO;

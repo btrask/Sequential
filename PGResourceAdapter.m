@@ -555,14 +555,6 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return nil;
 }
-- (PGOrientation)orientationWithBase:(BOOL)flag
-{
-	return flag ? [[self document] baseOrientation] : PGUpright;
-}
-- (void)clearCache {}
-
-#pragma mark -
-
 - (unsigned)viewableNodeIndex
 {
 	return [[self parentAdapter] viewableIndexOfChild:[self node]];
@@ -571,6 +563,14 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[self node] isViewable] ? 1 : 0;
 }
+
+#pragma mark -
+
+- (PGOrientation)orientationWithBase:(BOOL)flag
+{
+	return flag ? [[self document] baseOrientation] : PGUpright;
+}
+- (void)clearCache {}
 - (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt
 {
 	return [self viewableNodeCount] > anInt;

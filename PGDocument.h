@@ -79,31 +79,25 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 - (id)initWithIdentifier:(PGDisplayableIdentifier *)ident;
 - (id)initWithURL:(NSURL *)aURL;
 - (id)initWithBookmark:(PGBookmark *)aBookmark;
-- (PGDisplayableIdentifier *)originalIdentifier;
-- (PGDisplayableIdentifier *)rootIdentifier;
-- (PGNode *)node;
-- (void)openBookmark:(PGBookmark *)aBookmark;
+
+@property(readonly) PGDisplayableIdentifier *originalIdentifier;
+@property(readonly) PGDisplayableIdentifier *rootIdentifier;
+@property(readonly) PGNode *node;
+@property(retain) PGDisplayController *displayController;
+@property(readonly) BOOL displayControllerIsModal;
+@property(readonly, getter = isOnline) BOOL online;
+@property(readonly) NSMenu *pageMenu;
+@property PGOrientation baseOrientation;
+@property(getter = isProcessingNodes) BOOL processingNodes; // Batch changes for performance.
 
 - (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView offset:(out NSSize *)outOffset query:(out NSString **)outQuery; // No arguments may be NULL.
 - (void)storeNode:(PGNode *)node imageView:(PGImageView *)imageView offset:(NSSize)offset query:(NSString *)query;
 - (BOOL)getStoredWindowFrame:(out NSRect *)outFrame;
 - (void)storeWindowFrame:(NSRect)frame;
 
-- (PGDisplayController *)displayController;
-- (void)setDisplayController:(PGDisplayController *)controller;
-- (BOOL)displayControllerIsModal;
-
 - (void)createUI;
 - (void)close;
-
-- (BOOL)isOnline;
-- (NSMenu *)pageMenu;
-
-- (PGOrientation)baseOrientation;
-- (void)setBaseOrientation:(PGOrientation)anOrientation;
-
-- (BOOL)isProcessingNodes;
-- (void)setProcessingNodes:(BOOL)flag; // Batch changes for performance.
+- (void)openBookmark:(PGBookmark *)aBookmark;
 
 - (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray;
 - (void)noteSortedChildrenDidChange;
