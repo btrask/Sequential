@@ -586,8 +586,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(NSKeyDown == type || NSKeyUp == type) {
 			PGZoomDirection newDir = PGZoomNone;
 			switch([latestEvent keyCode]) {
-				case PGKeyEquals: newDir = PGZoomIn;  break;
-				case PGKeyMinus:  newDir = PGZoomOut; break;
+				case PGKeyEquals:
+				case PGKeyPadPlus:  newDir = PGZoomIn ; break;
+				case PGKeyMinus:
+				case PGKeyPadMinus: newDir = PGZoomOut; break;
 			}
 			switch(type) {
 				case NSKeyDown: dir |= newDir;  break;
@@ -1222,8 +1224,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	unsigned short const keyCode = [anEvent keyCode];
 	if(!modifiers) switch(keyCode) {
 		case PGKeyEscape: return [[PGDocumentController sharedDocumentController] performEscapeKeyAction];
-		case PGKeyPadPlus: [self nextPage:self]; return YES;
-		case PGKeyPadMinus: [self previousPage:self]; return YES;
 	}
 	if(!modifiers || NSShiftKeyMask == modifiers) switch(keyCode) {
 		case PGKeySpace:
@@ -1235,7 +1235,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			return YES;
 		}
 	}
-	if(!modifiers || NSCommandKeyMask == modifiers) switch(keyCode) {
+	if(!modifiers || !(~(NSCommandKeyMask | NSShiftKeyMask) & modifiers)) switch(keyCode) {
+		case PGKeyPadPlus:
+		case PGKeyPadMinus:
 		case PGKeyEquals:
 		case PGKeyMinus: [self zoomKeyDown:anEvent]; return YES;
 	}
