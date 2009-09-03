@@ -192,9 +192,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)closeAll:(id)sender
 {
 	[[_fullscreenController window] close];
-	PGDocument *doc;
-	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
-	while((doc = [docEnum nextObject])) [[[doc displayController] window] performClose:self];
+	for(PGDocument *const doc in [self documents]) [[[doc displayController] window] performClose:self];
 }
 
 #pragma mark -
@@ -299,9 +297,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)pathFinderRunning
 {
-	NSDictionary *dict;
-	NSEnumerator *const dictEnum = [[[NSWorkspace sharedWorkspace] launchedApplications] objectEnumerator];
-	while((dict = [dictEnum nextObject])) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
+	for(NSDictionary *const dict in [[NSWorkspace sharedWorkspace] launchedApplications]) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
 	return NO;
 }
 
@@ -352,9 +348,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)canToggleFullscreen
 {
 	if(_fullscreen) return YES;
-	PGDocument *doc;
-	NSEnumerator *const docEnum = [[self documents] objectEnumerator];
-	while((doc = [docEnum nextObject])) if([[[doc displayController] window] attachedSheet]) return NO;
+	for(PGDocument *const doc in [self documents]) if([[[doc displayController] window] attachedSheet]) return NO;
 	return YES;
 }
 
@@ -389,9 +383,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident
 {
-	PGDocument *doc;
-	NSEnumerator *const docEnum = [_documents objectEnumerator];
-	while((doc = [docEnum nextObject])) if([[doc originalIdentifier] isEqual:ident]) return doc;
+	for(PGDocument *const doc in _documents) if([[doc originalIdentifier] isEqual:ident]) return doc;
 	return nil;
 }
 - (PGDocument *)next:(BOOL)flag
@@ -510,9 +502,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			[docs removeObjectIdenticalTo:currentDoc];
 			[docs addObject:currentDoc];
 		}
-		PGDocument *doc;
-		NSEnumerator *const docEnum = [docs objectEnumerator];
-		while((doc = [docEnum nextObject])) {
+		for(PGDocument *const doc in docs) {
 			[doc setDisplayController:[self displayControllerForNewDocument]];
 			[[doc displayController] showWindow:self];
 		}
@@ -523,9 +513,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		_inFullscreen = flag;
 		PGDocument *const currentDoc = [self currentDocument];
 		_fullscreenController = [[PGFullscreenController alloc] init];
-		PGDocument *doc;
-		NSEnumerator *const docEnum = [[self documents] objectEnumerator];
-		while((doc = [docEnum nextObject])) {
+		for(PGDocument *const doc in [self documents]) {
 			PGDisplayController *const oldController = [doc displayController];
 			if(!oldController) continue;
 			[doc setDisplayController:_fullscreenController];
@@ -654,9 +642,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)application:(NSApplication *)sender
         openFiles:(NSArray *)filenames
 {
-	NSString *filename;
-	NSEnumerator *filenameEnum = [filenames objectEnumerator];
-	while((filename = [filenameEnum nextObject])) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
+	for(NSString *const filename in filenames) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
 	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
 }
 
@@ -667,9 +653,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(menu == recentMenu) {
 		[_recentMenuSeparatorItem AE_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
 		NSMutableArray *const identifiers = [NSMutableArray array];
-		PGDisplayableIdentifier *identifier;
-		NSEnumerator *const identifierEnum = [[self recentDocumentIdentifiers] objectEnumerator];
-		while((identifier = [identifierEnum nextObject])) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
+		for(PGDisplayableIdentifier *const identifier in [self recentDocumentIdentifiers]) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
 		[self setRecentDocumentIdentifiers:identifiers];
 		return [identifiers count] + 1;
 	}
@@ -691,9 +675,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			NSString *const name = [identifier displayName];
 
 			BOOL uniqueName = YES;
-			PGDisplayableIdentifier *comparisonIdentifier;
-			NSEnumerator *const comparisonIdentifierEnum = [identifiers objectEnumerator];
-			while(uniqueName && (comparisonIdentifier = [comparisonIdentifierEnum nextObject])) if(comparisonIdentifier != identifier && [[comparisonIdentifier displayName] isEqual:name]) uniqueName = NO;
+			for(PGDisplayableIdentifier *const comparisonIdentifier in identifiers) if(comparisonIdentifier != identifier && [[comparisonIdentifier displayName] isEqual:name]) {
+				uniqueName = NO;
+				break;
+			}
 
 			attributedTitle = [identifier attributedStringWithWithAncestory:!uniqueName];
 			action = @selector(openRecentDocument:);

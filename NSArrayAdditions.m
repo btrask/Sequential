@@ -56,16 +56,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         selector:(SEL)aSelector
         name:(NSString *)aName
 {
-	id obj;
-	NSEnumerator *const objEnum = [self objectEnumerator];
-	while((obj = [objEnum nextObject])) [obj AE_addObserver:observer selector:aSelector name:aName];
+	for(id const obj in self) [obj AE_addObserver:observer selector:aSelector name:aName];
 }
 - (void)AE_removeObjectObserver:(id)observer
         name:(NSString *)aName
 {
-	id obj;
-	NSEnumerator *const objEnum = [self objectEnumerator];
-	while((obj = [objEnum nextObject])) [obj AE_removeObserver:observer name:aName];
+	for(id const obj in self) [obj AE_removeObserver:observer name:aName];
 }
 
 @end

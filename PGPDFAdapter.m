@@ -149,11 +149,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 	if(![[self node] isViewable] || [self node] == descendent) return nil;
 	int const index = [[self identifier] index];
 	if(NSNotFound == index) return nil;
-	id term;
-	NSEnumerator *const termEnum = [terms objectEnumerator];
-	while((term = [termEnum nextObject])) {
-		if(![term isKindOfClass:[NSNumber class]] || [term intValue] - 1 != index) return nil;
-	}
+	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term intValue] - 1 != index) return nil;
 	return [self node];
 }
 

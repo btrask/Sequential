@@ -147,14 +147,10 @@ static void PGDrawGradient(void)
 	if(items == _selection) return;
 	NSMutableSet *const removedItems = [[_selection mutableCopy] autorelease];
 	[removedItems minusSet:items];
-	id removedItem;
-	NSEnumerator *const removedItemEnum = [removedItems objectEnumerator];
-	while((removedItem = [removedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
+	for(id const removedItem in removedItems) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:removedItem] withMargin:YES]];
 	NSMutableSet *const addedItems = [[items mutableCopy] autorelease];
 	[addedItems minusSet:_selection];
-	id addedItem;
-	NSEnumerator *const addedItemEnum = [addedItems objectEnumerator];
-	while((addedItem = [addedItemEnum nextObject])) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
+	for(id const addedItem in addedItems) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
 	[_selection setSet:items];
 	[self _validateSelection];
 	[self scrollToFirstSelectedItem];
@@ -220,9 +216,7 @@ static void PGDrawGradient(void)
 
 - (void)_validateSelection
 {
-	id selectedItem;
-	NSEnumerator *const selectedItemEnum = [[[_selection copy] autorelease] objectEnumerator];
-	while((selectedItem = [selectedItemEnum nextObject])) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
+	for(id const selectedItem in [[_selection copy] autorelease]) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
 - (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight
 {

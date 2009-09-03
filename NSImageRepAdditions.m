@@ -32,9 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSArray *const reps = [NSBitmapImageRep imageRepsWithData:data];
 	if(1 == [reps count]) return [reps objectAtIndex:0];
 	int bestPixelCount = 0;
-	NSBitmapImageRep *rep, *bestRep = nil;
-	NSEnumerator *const repEnum = data ? [reps objectEnumerator] : nil;
-	while((rep = [repEnum nextObject])) {
+	NSBitmapImageRep *bestRep = nil;
+	if(data) for(NSBitmapImageRep *const rep in reps) {
 		int const w = [rep pixelsWide], h = [rep pixelsHigh];
 		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
 			bestRep = rep;

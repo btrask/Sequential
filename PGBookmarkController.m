@@ -122,9 +122,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident
 {
-	PGBookmark *bookmark;
-	NSEnumerator *const bookmarkEnum = [_bookmarks objectEnumerator];
-	while((bookmark = [bookmarkEnum nextObject])) if([ident isEqual:[bookmark documentIdentifier]]) return bookmark;
+	for(PGBookmark *const bookmark in _bookmarks) if([ident isEqual:[bookmark documentIdentifier]]) return bookmark;
 	return nil;
 }
 
@@ -219,9 +217,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (void)awakeFromNib
 {
 	[emptyMenuItem retain];
-	PGBookmark *bookmark;
-	NSEnumerator *const bookmarkEnum = [_bookmarks objectEnumerator];
-	while((bookmark = [bookmarkEnum nextObject])) [self addMenuItemForBookmark:bookmark];
+	for(PGBookmark *const bookmark in _bookmarks) [self addMenuItemForBookmark:bookmark];
 }
 
 @end

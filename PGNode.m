@@ -387,9 +387,7 @@ enum {
 - (NSArray *)_standardizedInfo:(id)info
 {
 	NSMutableArray *const results = [NSMutableArray array];
-	NSDictionary *dict;
-	NSEnumerator *const dictEnum = [[info AE_asArray] objectEnumerator];
-	while((dict = [dictEnum nextObject])) [results addObject:[self _standardizedInfoDictionary:dict]];
+	for(NSDictionary *const dict in [info AE_asArray]) [results addObject:[self _standardizedInfoDictionary:dict]];
 	if(![results count]) [results addObject:[self _standardizedInfoDictionary:nil]];
 	return results;
 }

@@ -67,9 +67,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSString *)AE_firstPathComponent
 {
-	NSString *component;
-	NSEnumerator *const componentEnum = [[self pathComponents] objectEnumerator];
-	while((component = [componentEnum nextObject])) if(![component isEqualToString:@"/"]) return component;
+	for(NSString *const component in [self pathComponents]) if(![component isEqualToString:@"/"]) return component;
 	return @"";
 }
 - (NSURL *)AE_fileURL
@@ -89,9 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSArray *const components = [self componentsSeparatedByString:@" "];
 	NSMutableArray *const terms = [NSMutableArray arrayWithCapacity:[components count]];
-	NSString *component;
-	NSEnumerator *const componentEnum = [components objectEnumerator];
-	while((component = [componentEnum nextObject])) {
+	for(NSString *const component in components) {
 		if([component isEqualToString:@""]) continue;
 		NSScanner *const scanner = [NSScanner localizedScannerWithString:component];
 		int index;
@@ -104,9 +100,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSScanner *const scanner = [NSScanner localizedScannerWithString:self];
 	[scanner setCharactersToBeSkipped:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]];
-	id term;
-	NSEnumerator *const termEnum = [terms objectEnumerator];
-	while((term = [termEnum nextObject])) {
+	for(id const term in terms) {
 		if([term isKindOfClass:[NSNumber class]]) {
 			[scanner setScanLocation:0];
 			BOOL foundNumber = NO;

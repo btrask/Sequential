@@ -95,9 +95,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)popGraphicsOfType:(PGAlertGraphicType)type
 {
-	PGAlertGraphic *graphic;
-	NSEnumerator *const graphicEnum = [[[_graphicStack copy] autorelease] objectEnumerator];
-	while((graphic = [graphicEnum nextObject])) if([graphic graphicType] == type) [_graphicStack removeObjectIdenticalTo:graphic];
+	for(PGAlertGraphic *const graphic in [[_graphicStack copy] autorelease]) if([graphic graphicType] == type) [_graphicStack removeObjectIdenticalTo:graphic];
 	[self _updateCurrentGraphic];
 }
 

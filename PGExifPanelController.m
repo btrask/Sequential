@@ -44,9 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSMutableArray *const e = [NSMutableArray array];
 	NSArray *const terms = [[searchField stringValue] AE_searchTerms];
-	PGExifEntry *entry;
-	NSEnumerator *const entryEnum = [_allEntries objectEnumerator];
-	while((entry = [entryEnum nextObject])) if([[entry label] AE_matchesSearchTerms:terms] || [[entry value] AE_matchesSearchTerms:terms]) [e addObject:entry];
+	for(PGExifEntry *const entry in _allEntries) if([[entry label] AE_matchesSearchTerms:terms] || [[entry value] AE_matchesSearchTerms:terms]) [e addObject:entry];
 	[_matchingEntries release];
 	_matchingEntries = [e retain];
 	[entriesTable reloadData];

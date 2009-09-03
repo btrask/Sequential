@@ -122,10 +122,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)close
 {
-	if(_isExitingFullscreen) return;
-	PGDocument *doc;
-	NSEnumerator *const docEnum = [[[PGDocumentController sharedDocumentController] documents] objectEnumerator];
-	while((doc = [docEnum nextObject])) [doc close];
+	if(!_isExitingFullscreen) for(PGDocument *const doc in [[PGDocumentController sharedDocumentController] documents]) [doc close];
 }
 
 #pragma mark -NSObject
@@ -169,9 +166,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
 	[_shieldWindows release];
 	_shieldWindows = [[NSMutableArray alloc] init];
-	NSScreen *screen;
-	NSEnumerator *const screenEnum = [[NSScreen screens] objectEnumerator];
-	while((screen = [screenEnum nextObject])) {
+	for(NSScreen *const screen in [NSScreen screens]) {
 		if(displayScreen == screen) continue;
 		NSWindow *const w = [[[NSWindow alloc] initWithContentRect:[screen frame] styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES] autorelease]; // Use borderless windows instead of CGSetDisplayTransferByFormula() so that 1. the menu bar remains visible (if it's on a different screen), and 2. the user can't click on things that can't be seen.
 		[w setReleasedWhenClosed:NO];

@@ -83,9 +83,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	NSArray *identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
 	if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
 	NSMutableArray *const pages = [NSMutableArray array];
-	PGDisplayableIdentifier *ident;
-	NSEnumerator *const identEnum = [identifiers objectEnumerator];
-	while((ident = [identEnum nextObject])) {
+	for(PGDisplayableIdentifier *const ident in identifiers) {
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident dataSource:nil] autorelease];
 		if(!node) continue;
 		[node startLoadWithInfo:nil];

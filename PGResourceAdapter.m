@@ -86,18 +86,14 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	NSMutableArray *const exts = [NSMutableArray array];
 	NSDictionary *const types = [self typesDictionary];
-	NSString *classString;
-	NSEnumerator *const classStringEnum = [types keyEnumerator];
-	while((classString = [classStringEnum nextObject])) {
+	for(NSString *const classString in types) {
 		id const adapterClass = NSClassFromString(classString);
 		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
 		NSArray *const OSTypes = [typeDict objectForKey:PGCFBundleTypeOSTypesKey];
 		if(!OSTypes || ![OSTypes count]) continue;
-		NSString *type;
-		NSEnumerator *const typeEnum = [OSTypes objectEnumerator];
-		while((type = [typeEnum nextObject])) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
+		for(NSString *const type in OSTypes) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
 	}
 	return exts;
 }
@@ -109,17 +105,13 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	NSParameterAssert(dicts);
 	NSMutableArray *const adapters = [NSMutableArray array];
 	NSDictionary *const types = [self typesDictionary];
-	NSDictionary *info;
-	NSEnumerator *const infoEnum = [dicts objectEnumerator];
-	while((info = [infoEnum nextObject])) {
+	for(NSDictionary *const info in dicts) {
 		Class const agreedClass = [info objectForKey:PGAdapterClassKey];
 		if(agreedClass) {
 			[adapters addObject:(flag ? [[[agreedClass alloc] _initWithPriority:PGMatchByPriorAgreement info:info] autorelease] : agreedClass)];
 			continue;
 		}
-		NSString *classString;
-		NSEnumerator *const classStringEnum = [types keyEnumerator];
-		while((classString = [classStringEnum nextObject])) {
+		for(NSString *const classString in types) {
 			Class const class = NSClassFromString(classString);
 			if(![node shouldLoadAdapterClass:class]) continue;
 			NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];

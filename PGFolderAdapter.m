@@ -59,9 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableArray *const oldPages = [[[self unsortedChildren] mutableCopy] autorelease];
 	NSMutableArray *const newPages = [NSMutableArray array];
 	NSString *const path = [URL path];
-	NSString *pathComponent;
-	NSEnumerator *const pathComponentEnum = [[[NSFileManager defaultManager] directoryContentsAtPath:path] objectEnumerator];
-	while((pathComponent = [pathComponentEnum nextObject])) {
+	for(NSString *const pathComponent in [[NSFileManager defaultManager] directoryContentsAtPath:path]) {
 		NSString *const pagePath = [path stringByAppendingPathComponent:pathComponent];
 		static NSArray *ignoredPaths = nil;
 		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];

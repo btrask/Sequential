@@ -117,9 +117,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)beganTagPath:(NSString *)p
         attributes:(NSDictionary *)attrs
 {
-	Class class;
-	NSEnumerator *const classEnum = [[self _classes] objectEnumerator];
-	while((class = [classEnum nextObject])) {
+	for(Class const class in [self _classes]) {
 		if([self isKindOfClass:class] || ![class canParseTagPath:p attributes:attrs]) continue;
 		[self useSubparser:[[[class alloc] init] autorelease]];
 		return;
@@ -182,9 +180,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:[URL PG_resourceIdentifier], PGIdentifierKey, nil] : nil;
 	}
 	NSMutableArray *const dicts = [NSMutableArray array];
-	PGXMLParser *parser;
-	NSEnumerator *const parserEnum = [_subparsers objectEnumerator];
-	while((parser = [parserEnum nextObject])) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
+	for(PGXMLParser *const parser in _subparsers) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
 	return dicts;
 }
 
@@ -208,9 +204,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		return node ? [NSArray arrayWithObject:node] : nil;
 	}
 	NSMutableArray *const nodes = [NSMutableArray array];
-	PGXMLParser *subparser;
-	NSEnumerator *const subparserEnum = [[self subparsers] objectEnumerator];
-	while((subparser = [subparserEnum nextObject])) [nodes addObjectsFromArray:[subparser nodesWithParentAdapter:parent]];
+	for(PGXMLParser *const subparser in [self subparsers]) [nodes addObjectsFromArray:[subparser nodesWithParentAdapter:parent]];
 	return nodes;
 }
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent

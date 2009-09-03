@@ -128,9 +128,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if(flag) return [self setNeedsDisplay:YES];
 	id const parent = [[self dataSource] thumbnailBrowser:self parentOfItem:item];
-	PGThumbnailView *view;
-	NSEnumerator *const viewEnum = [[self views] objectEnumerator];
-	while((view = [viewEnum nextObject])) {
+	for(PGThumbnailView *const view in [self views]) {
 		id const rep = [view representedObject];
 		if(rep == parent) {
 			unsigned const i = [[view items] indexOfObjectIdenticalTo:item];

@@ -233,9 +233,7 @@ static unsigned PGSimultaneousConnections = 0;
 - (BOOL)PG_startNextURLLoad
 {
 	if(PGSimultaneousConnections >= PGMaxSimultaneousConnections) return YES;
-	NSObject<PGLoading> *subload;
-	NSEnumerator *const subloadEnum = [[self subloads] objectEnumerator];
-	while((subload = [subloadEnum nextObject])) if([subload PG_startNextURLLoad]) return YES;
+	for(NSObject<PGLoading> *const subload in [self subloads]) if([subload PG_startNextURLLoad]) return YES;
 	return NO;
 }
 

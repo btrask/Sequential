@@ -224,9 +224,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 }
 - (void)noteFileEventsDidOccurAtPaths:(NSArray *)paths
 {
-	NSString *path;
-	NSEnumerator *pathEnum = [paths objectEnumerator];
-	while((path = [pathEnum nextObject])) [self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path, PGSubscriptionPathKey, nil]];
+	for(NSString *const path in paths) [self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path, PGSubscriptionPathKey, nil]];
 }
 - (void)rootSubscriptionEventDidOccur:(NSNotification *)aNotif
 {

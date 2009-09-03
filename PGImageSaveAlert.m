@@ -162,9 +162,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 	if(!_initialSelection) return;
 	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
-	PGNode *node;
-	NSEnumerator *const nodeEnum = [_initialSelection objectEnumerator];
-	while((node = [nodeEnum nextObject])) {
+	for(PGNode *const node in _initialSelection) {
 		if(![node canSaveData]) continue;
 		int const rowIndex = [nodesOutline rowForItem:node];
 		if(-1 != rowIndex) [indexes addIndex:(unsigned)rowIndex];

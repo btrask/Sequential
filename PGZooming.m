@@ -83,9 +83,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSSize size = NSZeroSize;
 	NSRect const bounds = [self bounds];
-	NSView *subview;
-	NSEnumerator *const subviewEnum = [[self subviews] objectEnumerator];
-	while((subview = [subviewEnum nextObject])) {
+	for(NSView *const subview in [self subviews]) {
 		NSSize s = [subview PG_zoomedFrameSize];
 		unsigned const m = [subview autoresizingMask];
 		NSRect const f = [subview frame];
@@ -131,14 +129,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	float totalWidth = 0.0f;
 	NSArray *const columns = [self tableColumns];
 	BOOL const resizesAllColumns = [self respondsToSelector:@selector(columnAutoresizingStyle)] ? NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle] : [self autoresizesAllColumnsToFit];
-	if(resizesAllColumns) {
-		NSTableColumn *column;
-		NSEnumerator *const columnEnum = [columns objectEnumerator];
-		while((column = [columnEnum nextObject])) {
-			float const width = [column PG_zoomedWidth];
-			[column setWidth:width];
-			totalWidth += width;
-		}
+	if(resizesAllColumns) for(NSTableColumn *const column in columns) {
+		float const width = [column PG_zoomedWidth];
+		[column setWidth:width];
+		totalWidth += width;
 	} else {
 		unsigned i = 0;
 		for(; i < [columns count] - 1; i++) totalWidth += NSWidth([self rectOfColumn:i]);

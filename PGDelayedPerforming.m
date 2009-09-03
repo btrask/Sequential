@@ -82,16 +82,14 @@ static void PGTimerCallback(CFRunLoopTimerRef timer, PGTimerContextObject *conte
 - (void)PG_cancelPreviousPerformRequestsWithSelector:(SEL)aSel object:(id)anArgument
 {
 	NSMutableArray *const timers = [PGTimersByNonretainedObjectValue objectForKey:self];
-	CFRunLoopTimerRef timer;
-	NSEnumerator *const timerEnum = [[[timers copy] autorelease] objectEnumerator];
-	while((timer = (CFRunLoopTimerRef)[timerEnum nextObject])) {
-		if(CFRunLoopTimerIsValid(timer)) {
+	for(NSTimer *const timer in [[timers copy] autorelease]) {
+		if([timer isValid]) {
 			CFRunLoopTimerContext context;
-			CFRunLoopTimerGetContext(timer, &context);
+			CFRunLoopTimerGetContext((CFRunLoopTimerRef)timer, &context);
 			if(![(PGTimerContextObject *)context.info matchesSelector:aSel object:anArgument]) continue;
-			[(NSTimer *)timer invalidate];
+			[timer invalidate];
 		}
-		[timers removeObjectIdenticalTo:(NSTimer *)timer];
+		[timers removeObjectIdenticalTo:timer];
 	}
 }
 

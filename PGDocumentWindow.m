@@ -74,9 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)close
 {
 	NSDisableScreenUpdates();
-	NSWindow *childWindow;
-	NSEnumerator *const childWindowEnum = [[self childWindows] objectEnumerator];
-	while((childWindow = [childWindowEnum nextObject])) [childWindow close];
+	for(NSWindow *const childWindow in [self childWindows]) [childWindow close];
 	[super close];
 	NSEnableScreenUpdates();
 }
