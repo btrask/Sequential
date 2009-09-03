@@ -154,7 +154,7 @@ enum {
 {
 	return _viewable;
 }
-- (unsigned)depth
+- (NSUInteger)depth
 {
 	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
 }
@@ -187,7 +187,7 @@ enum {
 }
 - (NSNumber *)dataLength
 {
-	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInt:0];
+	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInteger:0];
 }
 
 #pragma mark -
@@ -219,7 +219,7 @@ enum {
 {
 	if([aClass alwaysLoads]) return YES;
 	switch([self ancestorLoadPolicy]) {
-		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntValue];
+		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntegerValue];
 		case PGLoadAll: return YES;
 		default: return NO;
 	}
@@ -307,7 +307,7 @@ enum {
 	NSParameterAssert(node);
 	NSParameterAssert([self document]);
 	PGSortOrder const o = [[self document] sortOrder];
-	int const d = PGSortDescendingMask & o ? -1 : 1;
+	NSInteger const d = PGSortDescendingMask & o ? -1 : 1;
 	NSComparisonResult r = NSOrderedSame;
 	switch(PGSortOrderMask & o) {
 		case PGUnsorted:           return NSOrderedSame;
@@ -396,7 +396,7 @@ enum {
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
-	[mutableInfo setObject:[NSNumber numberWithInt:([self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist)] forKey:PGDataExistenceKey];
+	[mutableInfo setObject:[NSNumber numberWithInteger:([self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist)] forKey:PGDataExistenceKey];
 	return mutableInfo;
 }
 - (void)_updateMenuItem
@@ -453,7 +453,7 @@ enum {
 	do {
 		if(dataLength) break;
 		NSData *const data = [self data];
-		if(data) dataLength = [NSNumber numberWithUnsignedInt:[data length]];
+		if(data) dataLength = [NSNumber numberWithUnsignedInteger:[data length]];
 		if(dataLength) break;
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {
@@ -506,7 +506,7 @@ enum {
 
 #pragma mark -NSObject(NSObject)
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
 	return [[self class] hash] ^ [[self identifier] hash];
 }

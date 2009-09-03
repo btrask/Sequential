@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (IBAction)cancel:(id)sender;
 
 - (void)beginSheetForWindow:(NSWindow *)window withDelegate:(id)anObject; // If 'window' is nil, uses a modal alert instead of a sheet.
-- (void)sheetDidEnd:(NSWindow *)sheet returnCode:(int)returnCode contextInfo:(void *)contextInfo;
+- (void)sheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo;
 
 @end
 

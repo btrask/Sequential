@@ -253,7 +253,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	if(_storedNode != newStoredNode) {
 		[_storedNode release];
 		_storedNode = [newStoredNode retain];
-		_storedOffset = PGRectEdgeMaskToSizeWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), FLT_MAX);
+		_storedOffset = PGRectEdgeMaskToSizeWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), CGFLOAT_MAX);
 	}
 	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
 }
@@ -263,7 +263,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		_sortedChildrenChanged = YES;
 		return;
 	}
-	int const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
+	NSInteger const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
 	[[self node] addMenuItemsToMenu:_pageMenu];
@@ -304,7 +304,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
+	NSUInteger const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntegerValue];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] PG_resourceIdentifier];
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
@@ -346,7 +346,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[super setImageScaleMode:aMode];
 	[[PGPrefObject globalPrefObject] setImageScaleMode:aMode];
 }
-- (void)setImageScaleFactor:(float)aFloat
+- (void)setImageScaleFactor:(CGFloat)aFloat
 {
 	[super setImageScaleFactor:aFloat];
 	[[PGPrefObject globalPrefObject] setImageScaleFactor:aFloat];

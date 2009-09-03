@@ -112,7 +112,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
 	return [[self class] hash] ^ [_documentIdentifier hash] ^ [_fileIdentifier hash];
 }

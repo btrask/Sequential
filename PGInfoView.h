@@ -28,14 +28,14 @@ enum {
 	PGMinXMinYCorner = 0,
 	PGMaxXMinYCorner = 1
 };
-typedef int PGInfoCorner;
+typedef NSInteger PGInfoCorner;
 
 @interface PGInfoView : NSView
 {
 	@private
 	NSString    *_messageText;
-	unsigned     _index;
-	unsigned     _count;
+	NSUInteger     _index;
+	NSUInteger     _count;
 	PGInfoCorner _origin;
 }
 
@@ -44,10 +44,10 @@ typedef int PGInfoCorner;
 - (NSString *)messageText;
 - (void)setMessageText:(NSString *)aString;
 
-- (unsigned)index;
-- (void)setIndex:(unsigned)anInt;
-- (unsigned)count;
-- (void)setCount:(unsigned)anInt;
+- (NSUInteger)index;
+- (void)setIndex:(NSUInteger)anInt;
+- (NSUInteger)count;
+- (void)setCount:(NSUInteger)anInt;
 - (BOOL)displaysProgressIndicator;
 
 - (PGInfoCorner)origin;

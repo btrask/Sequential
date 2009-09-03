@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @protocol AECarbonMenuImpl
 
-- (void)performActionWithHighlightingForItemAtIndex:(int)integer;
+- (void)performActionWithHighlightingForItemAtIndex:(NSInteger)integer;
 
 @end
 
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMenu *const menu = [self menu];
 	[menu update];
 	if(![self isEnabled]) return NO;
-	int const i = [menu indexOfItem:self];
+	NSInteger const i = [menu indexOfItem:self];
 	if([menu respondsToSelector:@selector(_menuImpl)]) {
 		id const menuImpl = [menu _menuImpl];
 		if([menuImpl respondsToSelector:@selector(performActionWithHighlightingForItemAtIndex:)]) {

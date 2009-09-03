@@ -61,6 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSScreenAdditions.h"
 #import "NSStringAdditions.h"
+#include <tgmath.h>
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 NSString *const PGDisplayControllerActiveNodeWasReadNotification = @"PGDisplayControllerActiveNodeWasRead";
@@ -75,7 +76,7 @@ enum {
 	PGZoomIn   = 1 << 0,
 	PGZoomOut  = 1 << 1
 };
-typedef unsigned PGZoomDirection;
+typedef NSUInteger PGZoomDirection;
 
 static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
@@ -157,7 +158,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (IBAction)moveToTrash:(id)sender
 {
-	int tag;
+	NSInteger tag;
 	NSString *const path = [[[[self selectedNode] identifier] URL] path];
 	if(![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:&tag] || tag < 0) NSBeep();
 }
@@ -304,7 +305,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)chooseEncoding:(id)sender
 {
 	NSDictionary *const errInfo = [[[self activeNode] error] userInfo];
-	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntValue]] autorelease];
+	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntegerValue]] autorelease];
 	[alert beginSheetForWindow:[self windowForSheet] withDelegate:self];
 }
 
@@ -401,7 +402,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if(![self _setActiveNode:aNode]) return;
 	if([[[self window] currentEvent] modifierFlags] & NSControlKeyMask) _initialLocation = PGPreserveLocation;
-	else _initialLocation = flag ? PGHomeLocation : [[[NSUserDefaults standardUserDefaults] objectForKey:PGBackwardsInitialLocationKey] intValue];
+	else _initialLocation = flag ? PGHomeLocation : [[[NSUserDefaults standardUserDefaults] objectForKey:PGBackwardsInitialLocationKey] integerValue];
 	[self _readActiveNode];
 }
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode forward:(BOOL)flag
@@ -566,7 +567,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (void)zoomBy:(float)aFloat
+- (void)zoomBy:(CGFloat)aFloat
 {
 	PGDocument *const doc = [self activeDocument];
 	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * aFloat, PGScaleMax))];
@@ -626,7 +627,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGGenericError) {
 		[errorLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
-		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), FLT_MAX)].height)];
+		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
 		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
 	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
@@ -843,7 +844,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(!rep) return NSZeroSize;
 	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	if(orientation & PGRotated90CC) {
-		float const w = originalSize.width;
+		CGFloat const w = originalSize.width;
 		originalSize.width = originalSize.height;
 		originalSize.height = w;
 	}
@@ -855,14 +856,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		PGImageScaleConstraint const constraint = [[self activeDocument] imageScaleConstraint];
 		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
 		NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
-		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(FLT_MAX, FLT_MAX) : newSize;
+		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) : newSize;
 		NSRect const bounds = [clipView insetBounds];
-		float scaleX = NSWidth(bounds) / roundf(newSize.width);
-		float scaleY = NSHeight(bounds) / roundf(newSize.height);
+		CGFloat scaleX = NSWidth(bounds) / round(newSize.width);
+		CGFloat scaleY = NSHeight(bounds) / round(newSize.height);
 		if(PGAutomaticScale == scaleMode) {
 			NSSize const scrollMax = [clipView maximumDistanceForScrollType:PGScrollByPage];
-			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floorf(newSize.height * scaleX / scrollMax.height + 0.3f) * scrollMax.height) / newSize.height));
-			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floorf(newSize.width * scaleY / scrollMax.width + 0.3f) * scrollMax.width) / newSize.width));
+			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floor(newSize.height * scaleX / scrollMax.height + 0.3f) * scrollMax.height) / newSize.height));
+			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floor(newSize.width * scaleY / scrollMax.width + 0.3f) * scrollMax.width) / newSize.width));
 		} else if(PGViewFitScale == scaleMode) scaleX = scaleY = MIN(scaleX, scaleY);
 		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
@@ -952,9 +953,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[image setSize:[docButton bounds].size];
 		[docButton setImage:image];
 	}
-	unsigned const count = [[[self activeDocument] node] viewableNodeCount];
+	NSUInteger const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = [identifier displayName];
-	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%u/%u)", _displayImageIndex + 1, count] : @"";
+	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%lu/%lu)", (unsigned long)_displayImageIndex + 1, (unsigned long)count] : @"";
 	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
 	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
 	[[menuLabel mutableString] appendString:titleDetails];
@@ -969,7 +970,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
-	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
+	NSUInteger const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
 	unsigned short const keyCode = [anEvent keyCode];
 	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
 	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
@@ -1077,8 +1078,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScaleMode] == PGConstantFactorScale) {
-		if(@selector(zoomIn:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMax) < 0.01f) return NO;
-		if(@selector(zoomOut:) == action && fabsf([_imageView averageScaleFactor] - PGScaleMin) < 0.01f) return NO;
+		if(@selector(zoomIn:) == action && fabs([_imageView averageScaleFactor] - PGScaleMax) < 0.01f) return NO;
+		if(@selector(zoomOut:) == action && fabs([_imageView averageScaleFactor] - PGScaleMin) < 0.01f) return NO;
 	}
 	PGNode *const firstNode = [[[self activeDocument] node] sortedViewableNodeFirst:YES];
 	if(!firstNode) { // We might have to get -firstNode anyway.
@@ -1204,7 +1205,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	BOOL const primary = [anEvent type] == NSLeftMouseDown;
 	BOOL const rtl = [[self activeDocument] readingDirection] == PGReadingDirectionRightToLeft;
 	BOOL forward;
-	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] intValue]) {
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] integerValue]) {
 		case PGLeftRightAction: forward = primary == rtl; break;
 		case PGRightLeftAction: forward = primary != rtl; break;
 		default: forward = primary; break;
@@ -1217,7 +1218,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)clipView:(PGClipView *)sender
         handleKeyDown:(NSEvent *)anEvent
 {
-	unsigned const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
+	NSUInteger const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
 	unsigned short const keyCode = [anEvent keyCode];
 	if(!modifiers) switch(keyCode) {
 		case PGKeyEscape: return [[PGDocumentController sharedDocumentController] performEscapeKeyAction];
@@ -1238,7 +1239,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case PGKeyEquals:
 		case PGKeyMinus: [self zoomKeyDown:anEvent]; return YES;
 	}
-	float const timerFactor = NSAlternateKeyMask == modifiers ? 10.0f : 1.0f;
+	CGFloat const timerFactor = NSAlternateKeyMask == modifiers ? 10.0f : 1.0f;
 	PGDocument *const d = [self activeDocument];
 	if(!modifiers || NSAlternateKeyMask == modifiers) switch(keyCode) {
 		case PGKey0: [self setTimerRunning:NO]; return YES;
@@ -1271,23 +1272,23 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
 }
 - (void)clipView:(PGClipView *)sender
-        magnifyBy:(float)amount
+        magnifyBy:(CGFloat)amount
 {
 	[_imageView setUsesCaching:NO];
 	[[self activeDocument] setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500.0f + 1.0f), PGScaleMax))];
 }
 - (void)clipView:(PGClipView *)sender
-        rotateByDegrees:(float)amount
+        rotateByDegrees:(CGFloat)amount
 {
 	[clipView scrollCenterTo:[clipView convertPoint:[_imageView rotateByDegrees:amount adjustingPoint:[_imageView convertPoint:[clipView center] fromView:clipView]] fromView:_imageView] animation:PGNoAnimation];
 }
 - (void)clipViewGestureDidEnd:(PGClipView *)sender
 {
 	[_imageView setUsesCaching:YES];
-	float const deg = [_imageView rotationInDegrees];
+	CGFloat const deg = [_imageView rotationInDegrees];
 	[_imageView setRotationInDegrees:0.0f];
 	PGOrientation o;
-	switch((int)roundf((deg + 360.0f) / 90.0f) % 4) {
+	switch((NSInteger)round((deg + 360.0f) / 90.0f) % 4) {
 		case 0: o = PGUpright; break;
 		case 1: o = PGRotated90CC; break;
 		case 2: o = PGUpsideDown; break;
@@ -1320,7 +1321,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender
         selectedEncoding:(NSStringEncoding)encoding
 {
-	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInt:encoding], PGStringEncodingKey, nil]];
+	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
 }
 
 #pragma mark -<PGDisplayControlling>

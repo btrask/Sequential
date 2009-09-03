@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @protocol PGLoading <NSObject>
 
 - (NSString *)loadDescription;
-- (float)loadProgress;
+- (CGFloat)loadProgress;
 - (id<PGLoading>)parentLoad;
 - (NSArray *)subloads;
 - (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag;

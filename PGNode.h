@@ -46,7 +46,7 @@ enum {
 extern NSString *const PGUnencodedStringDataKey;
 extern NSString *const PGDefaultEncodingKey;
 
-typedef unsigned PGNodeStatus;
+typedef NSUInteger PGNodeStatus;
 
 @interface PGNode : NSObject
 {

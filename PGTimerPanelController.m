@@ -104,7 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSDate *const fireDate = [[self displayController] nextTimerFireDate];
 		timeRemaining = MAX(0.0f, fireDate ? [fireDate timeIntervalSinceNow] : 0.0f);
 	}
-	[timerButton setProgress:running ? (float)((interval - timeRemaining) / interval) : 0.0f];
+	[timerButton setProgress:running ? (CGFloat)((interval - timeRemaining) / interval) : 0.0f];
 	[remainingField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), timeRemaining]];
 	if([changed boolValue]) {
 		[totalField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), interval]];

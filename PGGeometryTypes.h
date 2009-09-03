@@ -35,13 +35,13 @@ enum {
 	PGMinEdgesMask  = PGMinXEdgeMask | PGMinYEdgeMask,
 	PGMaxEdgesMask  = PGMaxXEdgeMask | PGMaxYEdgeMask
 };
-typedef unsigned PGRectEdgeMask;
+typedef NSUInteger PGRectEdgeMask;
 
 enum {
 	PGReadingDirectionLeftToRight = 0,
 	PGReadingDirectionRightToLeft = 1
 };
-typedef int PGReadingDirection;
+typedef NSInteger PGReadingDirection;
 
 enum {
 	PGPreserveLocation = -1,
@@ -49,7 +49,7 @@ enum {
 	PGEndLocation = 1,
 	PGEndTopLocation = 2
 };
-typedef int PGPageLocation;
+typedef NSInteger PGPageLocation;
 
 enum {
 	PGUpright      = 0,
@@ -59,11 +59,11 @@ enum {
 	PGUpsideDown   = PGFlippedVert | PGFlippedHorz,
 	PGRotated270CC = PGFlippedVert | PGFlippedHorz | PGRotated90CC
 };
-typedef unsigned PGOrientation;
+typedef NSUInteger PGOrientation;
 
 typedef struct {
-	float minX;
-	float minY;
-	float maxX;
-	float maxY;
+	CGFloat minX;
+	CGFloat minY;
+	CGFloat maxX;
+	CGFloat maxY;
 } PGInset;

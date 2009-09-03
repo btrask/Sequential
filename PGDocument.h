@@ -72,7 +72,7 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 	NSMenu *_pageMenu;
 	PGOrientation _baseOrientation;
 
-	unsigned _processingNodeCount;
+	NSUInteger _processingNodeCount;
 	BOOL _sortedChildrenChanged;
 }
 

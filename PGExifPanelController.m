@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSMutableString *const string = [NSMutableString string];
 	NSIndexSet *const indexes = [entriesTable selectedRowIndexes];
-	unsigned i = [indexes firstIndex];
+	NSUInteger i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		PGExifEntry *const entry = [_matchingEntries objectAtIndex:i];
 		[string appendFormat:@"%@: %@\n", [entry label], [entry value]];
@@ -86,7 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)tableView:(NSTableView *)tableView
 		willDisplayCell:(id)cell
         forTableColumn:(NSTableColumn *)tableColumn
-        row:(int)row
+        row:(NSInteger)row
 {
 	if(tableColumn == tagColumn) {
 		[cell setAlignment:NSRightTextAlignment];
@@ -96,13 +96,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSTableDataSource Protocol
 
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [_matchingEntries count];
 }
 - (id)tableView:(NSTableView *)tableView
       objectValueForTableColumn:(NSTableColumn *)tableColumn
-      row:(int)row
+      row:(NSInteger)row
 {
 	PGExifEntry *const entry = [_matchingEntries objectAtIndex:row];
 	if(tableColumn == tagColumn) {

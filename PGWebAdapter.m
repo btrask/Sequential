@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
                    withInfo:(NSMutableDictionary *)info
 {
 	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
-	return !ident || [[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [ident isFileIdentifier] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
+	return !ident || [[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [ident isFileIdentifier] ? PGNotAMatch : PGMatchByIntrinsicAttribute;
 }
 
 #pragma mark -PGResourceAdapter
@@ -91,8 +91,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
 		[_mainLoad cancelAndNotify:NO];
 		[_faviconLoad cancelAndNotify:NO];
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
-	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfoDicts:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithInt:PGWillSoonExist], PGDataExistenceKey, nil]]] count]) {
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
+	} else if(![[PGResourceAdapter adapterClassesInstantiated:NO forNode:[self node] withInfoDicts:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:[resp MIMEType], PGMIMETypeKey, [NSNumber numberWithInteger:PGWillSoonExist], PGDataExistenceKey, nil]]] count]) {
 		[_mainLoad cancelAndNotify:YES];
 		[_faviconLoad cancelAndNotify:YES];
 	}
@@ -123,7 +123,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<PGLoading>
 
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	return [_mainLoad loadProgress];
 }

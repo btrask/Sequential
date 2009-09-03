@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSImageRep       *_rep;
 	BOOL              _isPDF;
 	PGOrientation     _orientation;
-	unsigned          _numberOfFrames;
+	NSUInteger          _numberOfFrames;
 
 	NSSize            _size;
 	NSSize            _immediateSize;
@@ -45,9 +45,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL              _usesCaching;
 	BOOL              _cached;
 
-	float             _rotationInDegrees;
+	CGFloat             _rotationInDegrees;
 	BOOL              _animates;
-	unsigned          _pauseCount;
+	NSUInteger          _pauseCount;
 	BOOL              _antialias;
 	BOOL              _drawsRoundedCorners;
 }
@@ -62,14 +62,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setSize:(NSSize)size allowAnimation:(BOOL)flag;
 - (void)stopAnimatedSizeTransition;
 - (NSSize)originalSize;
-- (float)averageScaleFactor;
+- (CGFloat)averageScaleFactor;
 
 - (BOOL)usesCaching;
 - (void)setUsesCaching:(BOOL)flag;
 
-- (float)rotationInDegrees;
-- (void)setRotationInDegrees:(float)val;
-- (NSPoint)rotateByDegrees:(float)val adjustingPoint:(NSPoint)aPoint;
+- (CGFloat)rotationInDegrees;
+- (void)setRotationInDegrees:(CGFloat)val;
+- (NSPoint)rotateByDegrees:(CGFloat)val adjustingPoint:(NSPoint)aPoint;
 
 - (BOOL)canAnimateRep;
 - (BOOL)animates;

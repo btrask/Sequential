@@ -90,8 +90,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(NSString *const component in components) {
 		if([component isEqualToString:@""]) continue;
 		NSScanner *const scanner = [NSScanner localizedScannerWithString:component];
-		int index;
-		if([scanner scanInt:&index] && [scanner isAtEnd] && index != INT_MAX && index != INT_MIN) [terms addObject:[NSNumber numberWithInt:index]];
+		NSInteger index;
+		if([scanner scanInteger:&index] && [scanner isAtEnd] && index != NSIntegerMax && index != NSIntegerMin) [terms addObject:[NSNumber numberWithInteger:index]];
 		else [terms addObject:component];
 	}
 	return terms;
@@ -105,9 +105,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[scanner setScanLocation:0];
 			BOOL foundNumber = NO;
 			while(!foundNumber && ![scanner isAtEnd]) {
-				int index;
-				if(![scanner scanInt:&index]) return NO;
-				if([term intValue] == index) foundNumber = YES;
+				NSInteger index;
+				if(![scanner scanInteger:&index]) return NO;
+				if([term integerValue] == index) foundNumber = YES;
 			}
 			if(!foundNumber) return NO;
 		} else {

@@ -1,7 +1,5 @@
-//
-// Prefix header for all source files of the 'Sequential' target in the 'Sequential' project
-//
-
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
 #endif
+
+#define numberof(x) (sizeof(x) / sizeof(*x))

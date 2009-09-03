@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSAffineTransformAdditions.h"
 #import "NSBezierPathAdditions.h"
 #import "NSObjectAdditions.h"
+#include <tgmath.h>
 
 #define PGBackgroundHoleSize 6.0f
 #define PGBackgroundHoleSpacing 3.0f
@@ -57,13 +58,13 @@ static NSColor *PGHighlightedBackgroundColor = nil;
 
 @end
 
-static void PGGradientCallback(void *info, float const *inData, float *outData)
+static void PGGradientCallback(void *info, CGFloat const *inData, CGFloat *outData)
 {
 	if(PGThumbnailGlossStyleEnabled) {
 		outData[0] = 1.0f;
 		outData[1] = inData[0] < 0.5f ? 0.1f * inData[0] + 0.15f : -0.3f * inData[0] + 0.45f;
 	} else {
-		outData[0] = (0.25f - powf(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
+		outData[0] = (0.25f - pow(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
 		outData[1] = 0.95f;
 	}
 }
@@ -72,8 +73,8 @@ static void PGDrawGradient(void)
 	static CGShadingRef shade = NULL;
 	if(!shade) {
 		CGColorSpaceRef const colorSpace = CGColorSpaceCreateDeviceGray();
-		float const domain[] = {0.0f, 1.0f};
-		float const range[] = {0.0f, 1.0f, 0.0f, 1.0f};
+		CGFloat const domain[] = {0.0f, 1.0f};
+		CGFloat const range[] = {0.0f, 1.0f, 0.0f, 1.0f};
 		CGFunctionCallbacks const callbacks = {0, PGGradientCallback, NULL};
 		CGFunctionRef const function = CGFunctionCreate(NULL, 1, domain, 2, range, &callbacks);
 		shade = CGShadingCreateAxial(colorSpace, CGPointMake(0.0f, 0.0f), CGPointMake(PGInnerTotalWidth, 0.0f), function, NO, NO);
@@ -158,10 +159,10 @@ static void PGDrawGradient(void)
 }
 - (void)scrollToFirstSelectedItem
 {
-	unsigned const selCount = [_selection count];
+	NSUInteger const selCount = [_selection count];
 	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES] type:PGScrollCenterToRect];
 	else if(selCount) {
-		unsigned i = 0;
+		NSUInteger i = 0;
 		for(; i < [_items count]; i++) {
 			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
 			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
@@ -173,11 +174,11 @@ static void PGDrawGradient(void)
 
 #pragma mark -
 
-- (unsigned)indexOfItemAtPoint:(NSPoint)p
+- (NSUInteger)indexOfItemAtPoint:(NSPoint)p
 {
-	return floorf(p.y / PGThumbnailTotalHeight);
+	return floor(p.y / PGThumbnailTotalHeight);
 }
-- (NSRect)frameOfItemAtIndex:(unsigned)index
+- (NSRect)frameOfItemAtIndex:(NSUInteger)index
           withMargin:(BOOL)flag
 {
 	NSRect frame = NSMakeRect(PGThumbnailMarginWidth, index * PGThumbnailTotalHeight + PGThumbnailMarginHeight, PGThumbnailSize, PGThumbnailSize);
@@ -199,7 +200,7 @@ static void PGDrawGradient(void)
 }
 - (void)sizeToFit
 {
-	float const height = [self superview] ? NSHeight([[self superview] bounds]) : 0.0f;
+	CGFloat const height = [self superview] ? NSHeight([[self superview] bounds]) : 0.0f;
 	[super setFrameSize:NSMakeSize(PGOuterTotalWidth, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
 
@@ -293,7 +294,7 @@ static void PGDrawGradient(void)
 	NSRect const patternRect = [self convertRect:[self bounds] toView:nil];
 	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), NSMinY(patternRect) - PGBackgroundHoleSize / 2.0f));
 
-	int count = 0;
+	NSInteger count = 0;
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
 
@@ -308,7 +309,7 @@ static void PGDrawGradient(void)
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 
-	unsigned i = 0;
+	NSUInteger i = 0;
 	for(; i < [_items count]; i++) {
 		NSRect const frameWithMargin = [self frameOfItemAtIndex:i withMargin:YES];
 		if(!PGIntersectsRectList(frameWithMargin, rects, count)) continue;
@@ -345,7 +346,7 @@ static void PGDrawGradient(void)
 		[transform concat];
 		if(!entirelyHighlighted) {
 			NSRect rects[4];
-			unsigned count = 0;
+			NSUInteger count = 0;
 			NSRect const r = NSIntersectionRect(thumbnailRect, PGIntegralRect(NSOffsetRect(PGScaleRect(highlight, NSWidth(thumbnailRect), NSHeight(thumbnailRect)), NSMinX(thumbnailRect), NSMinY(thumbnailRect))));
 			PGGetRectDifference(rects, &count, thumbnailRect, r);
 			[[NSColor colorWithDeviceWhite:0.0f alpha:0.5f] set];
@@ -395,7 +396,7 @@ static void PGDrawGradient(void)
 			[layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:labelRect.origin];
 			[shadow set];
 		} else if(labelColor) {
-			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16.0f, roundf(MAX(NSMaxY(thumbnailRect) - 16.0f, NSMidY(thumbnailRect) - 6.0f)), 12.0f, 12.0f);
+			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16.0f, round(MAX(NSMaxY(thumbnailRect) - 16.0f, NSMidY(thumbnailRect) - 6.0f)), 12.0f, 12.0f);
 			[NSGraphicsContext saveGraphicsState];
 			NSRectClip(NSInsetRect(labelRect, -5.0f, -5.0f)); // By adding a clipping rect we tell the system how big the transparency layer has to be.
 			CGContextBeginTransparencyLayer(context, NULL);
@@ -424,7 +425,7 @@ static void PGDrawGradient(void)
 - (void)mouseDown:(NSEvent *)anEvent
 {
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
-	unsigned const i = [self indexOfItemAtPoint:p];
+	NSUInteger const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
 	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
 	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));

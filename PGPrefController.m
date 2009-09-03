@@ -81,7 +81,7 @@ static PGPrefController *PGSharedPrefController = nil;
 - (NSColor *)backgroundPatternColor
 {
 	NSColor *const color = [[NSUserDefaults standardUserDefaults] AE_decodedObjectForKey:@"PGBackgroundColor"];
-	return [[[NSUserDefaults standardUserDefaults] objectForKey:@"PGBackgroundPattern"] unsignedIntValue] == PGCheckerboardPattern ? [color AE_checkerboardPatternColor] : color;
+	return [[[NSUserDefaults standardUserDefaults] objectForKey:@"PGBackgroundPattern"] unsignedIntegerValue] == PGCheckerboardPattern ? [color AE_checkerboardPatternColor] : color;
 }
 - (NSScreen *)displayScreen
 {
@@ -91,7 +91,7 @@ static PGPrefController *PGSharedPrefController = nil;
 {
 	[_displayScreen autorelease];
 	_displayScreen = [aScreen retain];
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInt:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
 	[self AE_postNotificationName:PGPrefControllerDisplayScreenDidChangeNotification];
 }
 
@@ -120,7 +120,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	if([w contentView] != view) {
 		[w setContentView:[[[NSView alloc] initWithFrame:NSZeroRect] autorelease]];
 		NSRect r = [w contentRectForFrameRect:[w frame]];
-		float const h = NSHeight([view frame]);
+		CGFloat const h = NSHeight([view frame]);
 		r.origin.y += NSHeight(r) - h;
 		r.size.height = h;
 		[w setFrame:[w frameRectForContentRect:r] display:YES animate:YES];
@@ -130,7 +130,7 @@ static PGPrefController *PGSharedPrefController = nil;
 - (void)_updateSecondaryMouseActionLabel
 {
 	NSString *label = @"";
-	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] intValue]) {
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGMouseClickActionKey] integerValue]) {
 		case PGNextPreviousAction: label = @"Secondary click goes to the previous page."; break;
 		case PGLeftRightAction: label = @"Secondary click goes right."; break;
 		case PGRightLeftAction: label = @"Secondary click goes left."; break;
@@ -166,7 +166,7 @@ static PGPrefController *PGSharedPrefController = nil;
 		} else PGSharedPrefController = [self retain];
 
 		NSArray *const screens = [NSScreen screens];
-		unsigned const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntValue];
+		NSUInteger const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntegerValue];
 		[self setDisplayScreen:(screenIndex >= [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex])];
 
 		[NSApp AE_addObserver:self selector:@selector(applicationDidChangeScreenParameters:) name:NSApplicationDidChangeScreenParametersNotification];
@@ -196,7 +196,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	if(!hasScreens) return [self setDisplayScreen:nil];
 
 	NSScreen *const currentScreen = [self displayScreen];
-	unsigned i = [screens indexOfObjectIdenticalTo:currentScreen];
+	NSUInteger i = [screens indexOfObjectIdenticalTo:currentScreen];
 	if(NSNotFound == i) {
 		i = [screens indexOfObject:currentScreen];
 		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
@@ -205,7 +205,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	NSMenu *const screensMenu = [screensPopUp menu];
 	for(i = 0; i < [screens count]; i++) {
 		NSScreen *const screen = [screens objectAtIndex:i];
-		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%ux%u)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %u", @"Non-primary screens. %u is replaced with the screen number."), i + 1] : NSLocalizedString(@"Main Screen", @"The primary screen.")), (unsigned)NSWidth([screen frame]), (unsigned)NSHeight([screen frame])] action:@selector(changeDisplayScreen:) keyEquivalent:@""] autorelease];
+		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%lux%lu)", (i ? [NSString stringWithFormat:NSLocalizedString(@"Screen %lu", @"Non-primary screens. %lu is replaced with the screen number."), (unsigned long)i + 1] : NSLocalizedString(@"Main Screen", @"The primary screen.")), (unsigned long)NSWidth([screen frame]), (unsigned long)NSHeight([screen frame])] action:@selector(changeDisplayScreen:) keyEquivalent:@""] autorelease];
 		[item setRepresentedObject:screen];
 		[item setTarget:self];
 		[screensMenu addItem:item];

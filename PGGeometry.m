@@ -23,18 +23,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
+#include <tgmath.h>
 
 #pragma mark NSPoint
 
 NSPoint PGIntegralPoint(NSPoint aPoint)
 {
-	return NSMakePoint(roundf(aPoint.x), roundf(aPoint.y));
+	return NSMakePoint(round(aPoint.x), round(aPoint.y));
 }
 NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize)
 {
 	return NSMakePoint(aPoint.x + aSize.width, aPoint.y + aSize.height);
 }
-NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y)
+NSPoint PGOffsetPointByXY(NSPoint aPoint, CGFloat x, CGFloat y)
 {
 	return NSMakePoint(aPoint.x + x, aPoint.y + y);
 }
@@ -45,17 +46,17 @@ NSSize PGPointDiff(NSPoint p1, NSPoint p2)
 
 #pragma mark NSSize
 
-NSSize PGScaleSizeByXY(NSSize size, float scaleX, float scaleY)
+NSSize PGScaleSizeByXY(NSSize size, CGFloat scaleX, CGFloat scaleY)
 {
 	return NSMakeSize(size.width * scaleX, size.height * scaleY);
 }
-NSSize PGScaleSizeByFloat(NSSize size, float scale)
+NSSize PGScaleSizeByFloat(NSSize size, CGFloat scale)
 {
 	return PGScaleSizeByXY(size, scale, scale);
 }
 NSSize PGIntegralSize(NSSize s)
 {
-	return NSMakeSize(roundf(s.width), roundf(s.height));
+	return NSMakeSize(round(s.width), round(s.height));
 }
 
 #pragma mark NSRect
@@ -64,44 +65,44 @@ NSRect PGCenteredSizeInRect(NSSize s, NSRect r)
 {
 	return NSMakeRect(NSMidX(r) - s.width / 2, NSMidY(r) - s.height / 2, s.width, s.height);
 }
-BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count)
+BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, NSUInteger count)
 {
-	unsigned i = count;
+	NSUInteger i = count;
 	while(i--) if(NSIntersectsRect(rect, list[i])) return YES;
 	return NO;
 }
 NSRect PGIntegralRect(NSRect r)
 {
-	return NSMakeRect(roundf(NSMinX(r)), roundf(NSMinY(r)), roundf(NSWidth(r)), roundf(NSHeight(r)));
+	return NSMakeRect(round(NSMinX(r)), round(NSMinY(r)), round(NSWidth(r)), round(NSHeight(r)));
 }
-void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend)
+void PGGetRectDifference(NSRect diff[4], NSUInteger *count, NSRect minuend, NSRect subtrahend)
 {
 	if(NSIsEmptyRect(subtrahend)) {
 		diff[0] = minuend;
 		*count = 1;
 		return;
 	}
-	unsigned i = 0;
+	NSUInteger i = 0;
 	diff[i] = NSMakeRect(NSMinX(minuend), NSMaxY(subtrahend), NSWidth(minuend), MAX(NSMaxY(minuend) - NSMaxY(subtrahend), 0.0f));
 	if(!NSIsEmptyRect(diff[i])) i++;
 	diff[i] = NSMakeRect(NSMinX(minuend), NSMinY(minuend), NSWidth(minuend), MAX(NSMinY(subtrahend) - NSMinY(minuend), 0.0f));
 	if(!NSIsEmptyRect(diff[i])) i++;
-	float const sidesMinY = MAX(NSMinY(minuend), NSMinY(subtrahend));
-	float const sidesHeight = NSMaxY(subtrahend) - MAX(NSMinY(minuend), NSMinY(subtrahend));
+	CGFloat const sidesMinY = MAX(NSMinY(minuend), NSMinY(subtrahend));
+	CGFloat const sidesHeight = NSMaxY(subtrahend) - MAX(NSMinY(minuend), NSMinY(subtrahend));
 	diff[i] = NSMakeRect(NSMinX(minuend), sidesMinY, MAX(NSMinX(subtrahend) - NSMinX(minuend), 0.0f), sidesHeight);
 	if(!NSIsEmptyRect(diff[i])) i++;
 	diff[i] = NSMakeRect(NSMaxX(subtrahend), sidesMinY, MAX(NSMaxX(minuend) - NSMaxX(subtrahend), 0.0f), sidesHeight);
 	if(!NSIsEmptyRect(diff[i])) i++;
 	*count = i;
 }
-NSRect PGScaleRect(NSRect r, float scaleX, float scaleY)
+NSRect PGScaleRect(NSRect r, CGFloat scaleX, CGFloat scaleY)
 {
 	return NSMakeRect(NSMinX(r) * scaleX, NSMinY(r) * scaleY, NSWidth(r) * scaleX, NSHeight(r) * scaleY);
 }
 
 #pragma mark PGRectEdgeMask
 
-NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude)
+NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, CGFloat magnitude)
 {
 	NSCParameterAssert(!PGHasContradictoryRectEdges(mask));
 	NSSize size = NSZeroSize;
@@ -111,7 +112,7 @@ NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude)
 	else if(mask & PGMaxYEdgeMask) size.height = magnitude;
 	return size;
 }
-NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude)
+NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, CGFloat magnitude)
 {
 	NSSize const s = PGRectEdgeMaskToSizeWithMagnitude(mask, magnitude);
 	return NSMakePoint(s.width, s.height);
@@ -133,9 +134,9 @@ NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask)
 	}
 	return p;
 }
-PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold)
+PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, CGFloat threshhold)
 {
-	float const t = fabsf(threshhold);
+	CGFloat const t = fabs(threshhold);
 	PGRectEdgeMask direction = PGNoEdges;
 	if(p.x <= -t) direction |= PGMinXEdgeMask;
 	else if(p.x >= t) direction |= PGMaxXEdgeMask;
@@ -184,11 +185,11 @@ PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
 
 PGInset const PGZeroInset = {0.0f, 0.0f, 0.0f, 0.0f};
 
-PGInset PGMakeInset(float minX, float minY, float maxX, float maxY)
+PGInset PGMakeInset(CGFloat minX, CGFloat minY, CGFloat maxX, CGFloat maxY)
 {
 	return (PGInset){minX, minY, maxX, maxY};
 }
-PGInset PGScaleInset(PGInset i, float s)
+PGInset PGScaleInset(PGInset i, CGFloat s)
 {
 	return PGMakeInset(i.minX * s, i.minY * s, i.maxX * s, i.maxY * s);
 }
@@ -219,11 +220,11 @@ NSTimeInterval PGUptime(void)
 {
 	return (NSTimeInterval)UnsignedWideToUInt64(AbsoluteToNanoseconds(UpTime())) * 1e-9f;
 }
-float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate)
+CGFloat PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, CGFloat desiredFramerate)
 {
 	NSCParameterAssert(timeOfFrame);
 	NSTimeInterval const currentTime = PGUptime();
-	float const speedup = (float)(*timeOfFrame ? (currentTime - *timeOfFrame) / desiredFramerate : 1.0f);
+	CGFloat const speedup = (CGFloat)(*timeOfFrame ? (currentTime - *timeOfFrame) / desiredFramerate : 1.0f);
 	*timeOfFrame = currentTime;
 	return speedup;
 }

@@ -38,13 +38,13 @@ NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventD
 NSString *const PGSubscriptionPathKey      = @"PGSubscriptionPath";
 NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
-static int PGKQueue              = -1;
+static NSInteger PGKQueue              = -1;
 static id  PGActiveSubscriptions = nil;
 
 @interface PGLeafSubscription : PGSubscription
 {
 	@private
-	int _descriptor;
+	NSInteger _descriptor;
 }
 
 + (void)threaded_sendFileEvents;
@@ -229,7 +229,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 - (void)rootSubscriptionEventDidOccur:(NSNotification *)aNotif
 {
 	NSParameterAssert(aNotif);
-	unsigned const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntValue];
+	NSUInteger const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntegerValue];
 	if(!(flags & (NOTE_RENAME | NOTE_REVOKE | NOTE_DELETE))) return;
 	[self subscribeWithPath:[[aNotif userInfo] objectForKey:PGSubscriptionPathKey]];
 	[self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];

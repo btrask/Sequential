@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSWindowAdditions.h"
+#include <tgmath.h>
 
 @implementation NSWindow (PGZooming)
 
@@ -85,7 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSRect const bounds = [self bounds];
 	for(NSView *const subview in [self subviews]) {
 		NSSize s = [subview PG_zoomedFrameSize];
-		unsigned const m = [subview autoresizingMask];
+		NSUInteger const m = [subview autoresizingMask];
 		NSRect const f = [subview frame];
 		if(!(m & NSViewWidthSizable)) s.width = NSWidth(f);
 		if(!(m & NSViewHeightSizable)) s.height = NSHeight(f);
@@ -105,7 +106,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSSize)PG_zoomedBoundsSize
 {
-	return [[self cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, [self autoresizingMask] & NSViewWidthSizable ? FLT_MAX : NSWidth([self bounds]), FLT_MAX)];
+	return [[self cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, [self autoresizingMask] & NSViewWidthSizable ? CGFLOAT_MAX : NSWidth([self bounds]), CGFLOAT_MAX)];
 }
 
 @end
@@ -126,15 +127,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSSize)PG_zoomedBoundsSize
 {
-	float totalWidth = 0.0f;
+	CGFloat totalWidth = 0.0f;
 	NSArray *const columns = [self tableColumns];
 	BOOL const resizesAllColumns = [self respondsToSelector:@selector(columnAutoresizingStyle)] ? NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle] : [self autoresizesAllColumnsToFit];
 	if(resizesAllColumns) for(NSTableColumn *const column in columns) {
-		float const width = [column PG_zoomedWidth];
+		CGFloat const width = [column PG_zoomedWidth];
 		[column setWidth:width];
 		totalWidth += width;
 	} else {
-		unsigned i = 0;
+		NSUInteger i = 0;
 		for(; i < [columns count] - 1; i++) totalWidth += NSWidth([self rectOfColumn:i]);
 		totalWidth += [[columns lastObject] PG_zoomedWidth];
 	}
@@ -145,16 +146,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSTableColumn (PGZooming)
 
-- (float)PG_zoomedWidth
+- (CGFloat)PG_zoomedWidth
 {
-	float width = 0;
-	int i = 0;
+	CGFloat width = 0;
+	NSInteger i = 0;
 	for(; i < [[self tableView] numberOfRows]; i++) {
 		NSCell *const cell = [self dataCellForRow:i];
 		[cell setObjectValue:[[[self tableView] dataSource] tableView:[self tableView] objectValueForTableColumn:self row:i]];
-		width = MAX(width, [cell cellSizeForBounds:NSMakeRect(0.0f, 0.0f, FLT_MAX, FLT_MAX)].width);
+		width = MAX(width, [cell cellSizeForBounds:NSMakeRect(0.0f, 0.0f, CGFLOAT_MAX, CGFLOAT_MAX)].width);
 	}
-	return MIN(MAX(ceilf(width + 3.0f), [self minWidth]), [self maxWidth]);
+	return MIN(MAX(ceil(width + 3.0f), [self minWidth]), [self maxWidth]);
 }
 
 @end

@@ -40,14 +40,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableArray *const usedEncodings = [[NSMutableArray alloc] init];
 	NSMutableArray *const encodingNames = [[NSMutableArray alloc] init];
 	NSMutableArray *const samples = [[NSMutableArray alloc] init];
-	unsigned i = 0, defaultRow = 0;
+	NSUInteger i = 0, defaultRow = 0;
 	for(; encodings[i]; i++) {
 		NSString *const sample = [[[NSString alloc] initWithBytes:[data bytes] length:[data length] encoding:encodings[i]] autorelease];
 		if(!sample) continue;
 		if(encodings[i] == guess) defaultRow = [encodingNames count];
 		[encodingNames addObject:[NSString localizedNameOfStringEncoding:encodings[i]]];
 		[samples addObject:sample];
-		[usedEncodings addObject:[NSNumber numberWithInt:encodings[i]]];
+		[usedEncodings addObject:[NSNumber numberWithInteger:encodings[i]]];
 	}
 	_encodings = usedEncodings;
 	_encodingNames = encodingNames;
@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (IBAction)ok:(id)sender
 {
 	if(sender == encodingsTable && [encodingsTable clickedRow] < 0) return; // We get sent row -1 if the user double-clicks the header.
-	NSStringEncoding const encoding = [[_encodings objectAtIndex:[encodingsTable selectedRow]] intValue];
+	NSStringEncoding const encoding = [[_encodings objectAtIndex:[encodingsTable selectedRow]] integerValue];
 	if(_delegate) [NSApp endSheet:[self window] returnCode:encoding];
 	else [NSApp stopModalWithCode:encoding];
 }
@@ -91,7 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 }
 - (void)sheetDidEnd:(NSWindow *)sheet
-	returnCode:(int)returnCode
+	returnCode:(NSInteger)returnCode
         contextInfo:(void *)contextInfo
 {
 	[_delegate encodingAlertDidEnd:[self autorelease] selectedEncoding:returnCode];
@@ -108,13 +108,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSTableDataSource Protocol
 
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [_encodings count];
 }
 - (id)tableView:(NSTableView *)tableView
       objectValueForTableColumn:(NSTableColumn *)tableColumn
-      row:(int)row
+      row:(NSInteger)row
 {
 	if(tableColumn == encodingColumn) return [_encodingNames objectAtIndex:row];
 	if(tableColumn == sampleColumn) return [_samples objectAtIndex:row];

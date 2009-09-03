@@ -26,12 +26,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Views
 #import "PGClipView.h"
+#include <tgmath.h>
 
 @implementation PGColumnView
 
 #pragma mark Instance Methods
 
-- (unsigned)numberOfColumns
+- (NSUInteger)numberOfColumns
 {
 	return [_views count];
 }
@@ -43,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [_views lastObject];
 }
-- (id)viewAtIndex:(unsigned)index
+- (id)viewAtIndex:(NSUInteger)index
 {
 	return [_views objectAtIndex:index];
 }
@@ -55,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self insertColumnWithView:aView atIndex:[_views count]];
 }
 - (void)insertColumnWithView:(NSView *)aView
-        atIndex:(unsigned)index
+        atIndex:(NSUInteger)index
 {
 	NSParameterAssert(aView);
 	NSParameterAssert([_views indexOfObjectIdenticalTo:aView] == NSNotFound);
@@ -74,7 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)removeColumnsAfterView:(NSView *)aView
 {
-	unsigned const i = aView ? [_views indexOfObject:aView] : 0;
+	NSUInteger const i = aView ? [_views indexOfObject:aView] : 0;
 	NSParameterAssert(NSNotFound != i);
 	if([_views count] <= i + 1) return;
 	while([_views count] > i + 1) {
@@ -90,13 +91,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (float)columnWidth
+- (CGFloat)columnWidth
 {
 	return _columnWidth;
 }
-- (void)setColumnWidth:(float)width
+- (void)setColumnWidth:(CGFloat)width
 {
-	_columnWidth = roundf(width);
+	_columnWidth = round(width);
 	[self layout];
 }
 
@@ -118,8 +119,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSRect const b = [self bounds];
 	[_view setFrameSize:NSMakeSize(MAX(_columnWidth * [_views count], NSWidth(b)), NSHeight(b))];
 	NSRect const vb = [_view bounds];
-	unsigned i = 0;
-	unsigned const count = [_clipViews count];
+	NSUInteger i = 0;
+	NSUInteger const count = [_clipViews count];
 	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
 }
@@ -130,7 +131,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         handleMouseEvent:(NSEvent *)anEvent
         first:(BOOL)flag
 {
-	unsigned const i = [_clipViews indexOfObjectIdenticalTo:sender];
+	NSUInteger const i = [_clipViews indexOfObjectIdenticalTo:sender];
 	if(NSNotFound == i) return NO;
 	[[_views objectAtIndex:i] mouseDown:anEvent];
 	return YES;

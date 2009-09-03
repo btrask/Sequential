@@ -50,11 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self cell] setIconType:state];
 	[self setNeedsDisplay:YES];
 }
-- (float)progress
+- (CGFloat)progress
 {
 	return [[self cell] progress];
 }
-- (void)setProgress:(float)aFloat
+- (void)setProgress:(CGFloat)aFloat
 {
 	[[self cell] setProgress:aFloat];
 	[self setNeedsDisplay:YES];
@@ -74,11 +74,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	_iconType = state;
 }
-- (float)progress
+- (CGFloat)progress
 {
 	return _progress;
 }
-- (void)setProgress:(float)aFloat
+- (void)setProgress:(CGFloat)aFloat
 {
 	_progress = aFloat;
 }

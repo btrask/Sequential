@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
 	if(p) return p;
 	do {
-		if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist) break;
+		if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist) break;
 		NSURL *const URL = [[info objectForKey:PGIdentifierKey] URL];
 		if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) break;
 		if(![[URL path] hasPrefix:@"/photos"]) break;
@@ -72,7 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(!doc || ![doc isKindOfClass:[DOMHTMLDocument class]]) break;
 		NSURL *const docURL = [NSURL URLWithString:[doc URL]];
 		DOMNodeList *const elements = [doc getElementsByTagName:@"LINK"];
-		unsigned i = 0;
+		NSUInteger i = 0;
 		for(; i < [elements length]; i++) {
 			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
 			if(![@"alternate" isEqualToString:[[link rel] lowercaseString]]) continue;
@@ -308,7 +308,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (id)info
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
 }
 
 #pragma mark -NSObject

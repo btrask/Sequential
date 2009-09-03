@@ -76,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	else [self openPanelDidEnd:_openPanel returnCode:[_openPanel runModalForTypes:nil] contextInfo:NULL];
 }
 - (void)openPanelDidEnd:(NSOpenPanel *)panel
-        returnCode:(int)returnCode
+        returnCode:(NSInteger)returnCode
         contextInfo:(void *)contextInfo
 {
 	[panel orderOut:self];
@@ -93,7 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return modifiedName ? [[modifiedName retain] autorelease] : [[node identifier] naturalDisplayName];
 }
 - (void)replaceAlertDidEnd:(NSAlert *)alert
-	returnCode:(int)returnCode
+	returnCode:(NSInteger)returnCode
 	contextInfo:(void *)contextInfo
 {
 	if(NSAlertFirstButtonReturn == returnCode) _saveOnSheetClose = YES;
@@ -104,11 +104,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)panel:(id)sender
         isValidFilename:(NSString *)filename
 {
-	unsigned existingFileCount = 0;
+	NSUInteger existingFileCount = 0;
 	NSString *existingFilename = nil;
 	{
 		NSIndexSet *const rows = [nodesOutline selectedRowIndexes];
-		unsigned i = [rows firstIndex];
+		NSUInteger i = [rows firstIndex];
 		for(; NSNotFound != i; i = [rows indexGreaterThanIndex:i]) {
 			NSString *const name = [self saveNameForNode:[nodesOutline itemAtRow:i]];
 			if(![[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:name]]) continue;
@@ -120,7 +120,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
 		[alert setAlertStyle:NSCriticalAlertStyle];
 		if(1 == existingFileCount) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%@ already exists in %@. Do you want to replace it?", @"Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), existingFilename, [_destination AE_displayName]]];
-		else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u pages already exist in %@. Do you want to replace them?", @"Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name."), existingFileCount, [_destination AE_displayName]]];
+		else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%lu pages already exist in %@. Do you want to replace them?", @"Replace multiple files alert. %lu is replaced with a number greater than 1, %@ is replaced with the destination name."), (unsigned long)existingFileCount, [_destination AE_displayName]]];
 		[alert setInformativeText:NSLocalizedString(@"Replacing a file overwrites its current contents.", @"Informative text for replacement alerts.")];
 		[[alert addButtonWithTitle:NSLocalizedString(@"Replace", nil)] setKeyEquivalent:@""];
 		[[alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)] setKeyEquivalent:@"\r"];
@@ -130,7 +130,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableArray *const unsavedNodes = [NSMutableArray array];
 	NSMutableIndexSet *const unsavedRows = [NSMutableIndexSet indexSet];
 	NSIndexSet *const rows = [[[nodesOutline selectedRowIndexes] copy] autorelease];
-	unsigned i = [rows firstIndex];
+	NSUInteger i = [rows firstIndex];
 	for(; NSNotFound != i; i = [rows indexGreaterThanIndex:i]) {
 		id const node = [nodesOutline itemAtRow:i];
 		NSData *const data = [node data];
@@ -143,7 +143,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[nodesOutline selectRowIndexes:unsavedRows byExtendingSelection:NO];
 	NSAlert *const alert = [[[NSAlert alloc] init] autorelease];
 	if(1 == [unsavedNodes count]) [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The image %@ could not be saved to %@.", @"Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name."), [self saveNameForNode:[unsavedNodes objectAtIndex:0]], [_destination AE_displayName]]];
-	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%u images could not be saved to %@.", @"Multiple image save failure alert. %u is replaced with the number of files, %@ is replaced with the destination name."), [unsavedNodes count], [_destination AE_displayName]]];
+	else [alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"%lu images could not be saved to %@.", @"Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name."), (unsigned long)[unsavedNodes count], [_destination AE_displayName]]];
 	[alert setInformativeText:NSLocalizedString(@"Make sure the volume is writable and has enough free space.", @"Informative text for save failure alerts.")];
 	[alert addButtonWithTitle:NSLocalizedString(@"OK", nil)];
 	[alert beginSheetModalForWindow:_openPanel modalDelegate:nil didEndSelector:NULL contextInfo:nil];
@@ -164,11 +164,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
 	for(PGNode *const node in _initialSelection) {
 		if(![node canSaveData]) continue;
-		int const rowIndex = [nodesOutline rowForItem:node];
-		if(-1 != rowIndex) [indexes addIndex:(unsigned)rowIndex];
+		NSInteger const rowIndex = [nodesOutline rowForItem:node];
+		if(-1 != rowIndex) [indexes addIndex:(NSUInteger)rowIndex];
 	}
 	[nodesOutline selectRowIndexes:indexes byExtendingSelection:NO];
-	unsigned const firstRow = [indexes firstIndex];
+	NSUInteger const firstRow = [indexes firstIndex];
 	if(NSNotFound != firstRow) [nodesOutline scrollRowToVisible:firstRow];
 	[_initialSelection release];
 	_initialSelection = nil;
@@ -186,7 +186,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #pragma mark NSOutlineViewDataSource Protocol
 
 - (id)outlineView:(NSOutlineView *)outlineView
-      child:(int)index
+      child:(NSInteger)index
       ofItem:(id)item
 {
 	return item ? [[item sortedChildren] objectAtIndex:index] : _rootNode;
@@ -196,7 +196,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [item hasSavableChildren];
 }
-- (int)outlineView:(NSOutlineView *)outlineView
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
        numberOfChildrenOfItem:(id)item
 {
 	return item ? [[item unsortedChildren] count] : 1;
@@ -239,7 +239,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[outlineView editColumn:0 row:[outlineView rowForItem:item] withEvent:nil select:NO];
 	NSText *const fieldEditor = [[outlineView window] fieldEditor:NO forObject:outlineView];
 	if(!fieldEditor) return NO;
-	unsigned const extStart = [[fieldEditor string] rangeOfString:@"." options:NSBackwardsSearch].location;
+	NSUInteger const extStart = [[fieldEditor string] rangeOfString:@"." options:NSBackwardsSearch].location;
 	if(NSNotFound != extStart) [fieldEditor setSelectedRange:NSMakeRange(0, extStart)];
 	return NO;
 }

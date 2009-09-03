@@ -34,20 +34,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSView         *_view;
 	NSMutableArray *_clipViews;
 	NSMutableArray *_views;
-	float           _columnWidth;
+	CGFloat           _columnWidth;
 }
 
-- (unsigned)numberOfColumns;
+- (NSUInteger)numberOfColumns;
 - (NSArray *)views;
 - (id)lastView;
-- (id)viewAtIndex:(unsigned)index;
+- (id)viewAtIndex:(NSUInteger)index;
 
 - (void)addColumnWithView:(NSView *)aView;
-- (void)insertColumnWithView:(NSView *)aView atIndex:(unsigned)index;
+- (void)insertColumnWithView:(NSView *)aView atIndex:(NSUInteger)index;
 - (void)removeColumnsAfterView:(NSView *)aView;
 
-- (float)columnWidth;
-- (void)setColumnWidth:(float)width;
+- (CGFloat)columnWidth;
+- (void)setColumnWidth:(CGFloat)width;
 
 - (void)scrollToTopOfColumnWithView:(NSView *)aView;
 - (void)scrollToLastColumnAnimate:(BOOL)flag;

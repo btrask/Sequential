@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSRect)bezelPanel:(PGBezelPanel *)sender
           frameForContentRect:(NSRect)aRect
-          scale:(float)scaleFactor
+          scale:(CGFloat)scaleFactor
 {
 	[_highlightPath release];
 	_highlightPath = nil;
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_highlightPath setLineJoinStyle:NSRoundLineJoinStyle];
 	}
 
-	int i;
+	NSInteger i;
 	NSRect const *rects;
 	[self getRectsBeingDrawn:&rects count:&i];
 	[[NSColor clearColor] set];

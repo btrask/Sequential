@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[URL appendFormat:@"%@://", scheme];
 
-	unsigned const schemeEnd = [scanner scanLocation];
+	NSUInteger const schemeEnd = [scanner scanLocation];
 	NSString *login = nil;
 	[scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"@/"] intoString:&login];
 	if([scanner scanString:@"@" intoString:NULL]) [URL appendFormat:@"%@@", login];
@@ -76,9 +76,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 	if([scanner scanString:@":" intoString:NULL]) {
 		if([@"file" isEqualToString:scheme]) return nil;
-		int port;
-		if(![scanner scanInt:&port]) return nil;
-		[URL appendFormat:@":%d", port];
+		NSInteger port;
+		if(![scanner scanInteger:&port]) return nil;
+		[URL appendFormat:@":%ld", (long)port];
 	}
 
 	NSMutableString *const path = [NSMutableString string];
@@ -93,7 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[path appendString:pathPart];
 		}
 		if(![scanner scanString:@"%" intoString:NULL]) break;
-		unsigned const percentLoc = [scanner scanLocation];
+		NSUInteger const percentLoc = [scanner scanLocation];
 		NSString *hex = nil;
 		if(![scanner scanCharactersFromSet:hexCharacterSet intoString:&hex] || [hex length] < 2) {
 			[hexData setLength:0];

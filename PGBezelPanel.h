@@ -63,6 +63,6 @@ extern NSString *const PGBezelPanelFrameDidChangeNotification;
 + (id)PG_bezelPanel; // Returns a bezel panel with an instance of the receiver as the content view.
 
 // To be overridden.
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(float)scaleFactor; // By default, returns aRect.
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor; // By default, returns aRect.
 
 @end

@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (AEIconType)iconType;
 - (void)setIconType:(AEIconType)state;
-- (float)progress;
-- (void)setProgress:(float)aFloat;
+- (CGFloat)progress;
+- (void)setProgress:(CGFloat)aFloat;
 
 @end
 
@@ -40,12 +40,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	AEIconType _iconType;
-	float _progress;
+	CGFloat _progress;
 }
 
 - (AEIconType)iconType;
 - (void)setIconType:(AEIconType)state;
-- (float)progress;
-- (void)setProgress:(float)aFloat;
+- (CGFloat)progress;
+- (void)setProgress:(CGFloat)aFloat;
 
 @end

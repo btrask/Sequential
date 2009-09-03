@@ -65,16 +65,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setThumbnailOrientation:(PGOrientation)orientation
 {
 	_thumbnailOrientation = orientation;
-	unsigned i = [self numberOfColumns];
+	NSUInteger i = [self numberOfColumns];
 	while(i--) [[self viewAtIndex:i] setThumbnailOrientation:orientation];
 }
 
 #pragma mark -
 
-- (unsigned)indexOfColumnForItem:(id)item
+- (NSUInteger)indexOfColumnForItem:(id)item
 {
 	NSArray *const views = [self views];
-	unsigned i = 0;
+	NSUInteger i = 0;
 	for(; i < [views count]; i++) if([[views objectAtIndex:i] representedObject] == item) return i;
 	return NSNotFound;
 }
@@ -93,7 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         reload:(BOOL)flag
 {
 	++_updateCount;
-	unsigned const initialNumberOfColumns = [self numberOfColumns];
+	NSUInteger const initialNumberOfColumns = [self numberOfColumns];
 	if(!initialNumberOfColumns) [self _addColumnWithItem:nil];
 	else if(flag) [[self viewAtIndex:0] reloadData];
 
@@ -101,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	id obj = [aSet anyObject];
 	while((obj = [[self dataSource] thumbnailBrowser:self parentOfItem:obj])) [path insertObject:obj atIndex:0];
 
-	unsigned i = 0;
+	NSUInteger i = 0;
 	for(; i < [path count]; i++) {
 		PGThumbnailView *const view = [self viewAtIndex:i];
 		id const item = [path objectAtIndex:i];
@@ -131,7 +131,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(PGThumbnailView *const view in [self views]) {
 		id const rep = [view representedObject];
 		if(rep == parent) {
-			unsigned const i = [[view items] indexOfObjectIdenticalTo:item];
+			NSUInteger const i = [[view items] indexOfObjectIdenticalTo:item];
 			if(NSNotFound != i) [view setNeedsDisplayInRect:[view frameOfItemAtIndex:i withMargin:YES]];
 		}
 	}
@@ -165,7 +165,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		return;
 	}
 	NSArray *const views = [self views];
-	unsigned const col = [views indexOfObjectIdenticalTo:sender];
+	NSUInteger const col = [views indexOfObjectIdenticalTo:sender];
 	NSParameterAssert(NSNotFound != col);
 	if(col + 1 < [views count]) {
 		PGThumbnailView *const nextView = [views objectAtIndex:col + 1];
@@ -182,15 +182,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #pragma mark PGColumnView
 
 - (void)insertColumnWithView:(NSView *)aView
-        atIndex:(unsigned)index
+        atIndex:(NSUInteger)index
 {
-	unsigned const columns = [self numberOfColumns];
+	NSUInteger const columns = [self numberOfColumns];
 	[super insertColumnWithView:aView atIndex:index];
 	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
 - (void)removeColumnsAfterView:(NSView *)aView
 {
-	unsigned const columns = [self numberOfColumns];
+	NSUInteger const columns = [self numberOfColumns];
 	[super removeColumnsAfterView:aView];
 	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
@@ -215,6 +215,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @implementation NSObject (PGThumbnailBrowserDelegate)
 
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender {}
-- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount {}
+- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount {}
 
 @end

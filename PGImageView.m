@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSAffineTransformAdditions.h"
 #import "NSObjectAdditions.h"
+#include <tgmath.h>
 
 #define PGAnimateSizeChanges true
 #define PGMaxWindowSize      5000.0f // 10,000 is a hard limit imposed by the window server.
@@ -46,9 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)_drawsRoundedCorners;
 - (void)_cache;
 - (BOOL)_imageIsOpaque;
-- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(unsigned)count;
+- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count;
 - (void)_drawCornersOnRect:(NSRect)r;
-- (NSAffineTransform *)_transformWithRotationInDegrees:(float)val;
+- (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val;
 - (BOOL)_setSize:(NSSize)size;
 - (void)_sizeTransitionOneFrame;
 - (void)_updateFrameSize;
@@ -103,7 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		_rep = [rep retain];
 		[_image addRepresentation:_rep];
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
-		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntValue] : 1;
+		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntegerValue] : 1;
 
 		[self _runAnimationTimer];
 	} else [self setSize:size allowAnimation:NO];
@@ -141,7 +142,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return PGRotated90CC & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 }
-- (float)averageScaleFactor
+- (CGFloat)averageScaleFactor
 {
 	NSSize const s = [self size];
 	NSSize const o = [self originalSize];
@@ -163,18 +164,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (float)rotationInDegrees
+- (CGFloat)rotationInDegrees
 {
 	return _rotationInDegrees;
 }
-- (void)setRotationInDegrees:(float)val
+- (void)setRotationInDegrees:(CGFloat)val
 {
 	if(val == _rotationInDegrees) return;
 	_rotationInDegrees = remainderf(val, 360.0f);
 	[self _updateFrameSize];
 	[self setNeedsDisplay:YES];
 }
-- (NSPoint)rotateByDegrees:(float)val
+- (NSPoint)rotateByDegrees:(CGFloat)val
            adjustingPoint:(NSPoint)aPoint
 {
 	NSRect const b1 = [self bounds];
@@ -277,12 +278,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_runAnimationTimer
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
-	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] floatValue] options:kNilOptions];
+	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] doubleValue] options:kNilOptions];
 }
 - (void)_animate
 {
-	unsigned const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntValue] + 1;
-	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInt:(i < _numberOfFrames ? i : 0)]];
+	NSUInteger const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntegerValue] + 1;
+	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:(i < _numberOfFrames ? i : 0)]];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
@@ -336,7 +337,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_drawWithFrame:(NSRect)aRect
         operation:(NSCompositingOperation)operation
         rects:(NSRect const *)rects
-        count:(unsigned)count
+        count:(NSUInteger)count
 {
 	NSSize const imageSize = [_image size];
 	NSSize const s = NSMakeSize(imageSize.width / _immediateSize.width, imageSize.height / _immediateSize.height);
@@ -352,7 +353,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[transform concat];
 	}
 	if(count && PGUpright == _orientation) {
-		int i = count;
+		NSInteger i = count;
 		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:operation fraction:1.0f];
 	} else [_image drawInRect:r fromRect:NSZeroRect operation:operation fraction:1];
 	if(actualSize) {
@@ -372,7 +373,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[br drawAtPoint:NSMakePoint(NSMaxX(r) - [br size].width, NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 	[bl drawAtPoint:NSMakePoint(NSMinX(r), NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 }
-- (NSAffineTransform *)_transformWithRotationInDegrees:(float)val
+- (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val
 {
 	NSRect const b = [self bounds];
 	NSAffineTransform *const t = [NSAffineTransform transform];
@@ -391,15 +392,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_sizeTransitionOneFrame
 {
 	NSSize const r = NSMakeSize(_size.width - _immediateSize.width, _size.height - _immediateSize.height);
-	float const dist = hypotf(r.width, r.height);
-	float const factor = MIN(1.0f, MAX(0.33f, 20.0f / dist) * PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
+	CGFloat const dist = hypotf(r.width, r.height);
+	CGFloat const factor = MIN(1.0f, MAX(0.33f, 20.0f / dist) * PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
 	if(dist < 1 || ![self _setSize:NSMakeSize(_immediateSize.width + r.width * factor, _immediateSize.height + r.height * factor)]) [self stopAnimatedSizeTransition];
 }
 - (void)_updateFrameSize
 {
 	NSSize s = _immediateSize;
-	float const r = [self rotationInDegrees] / 180.0f * (float)pi;
-	if(r) s = NSMakeSize(ceilf(fabsf(cosf(r)) * s.width + fabsf(sinf(r)) * s.height), ceilf(fabsf(cosf(r)) * s.height + fabsf(sinf(r)) * s.width));
+	CGFloat const r = [self rotationInDegrees] / 180.0f * (CGFloat)pi;
+	if(r) s = NSMakeSize(ceil(fabs(cosf(r)) * s.width + fabs(sinf(r)) * s.height), ceil(fabs(cosf(r)) * s.height + fabs(sinf(r)) * s.width));
 	if(NSEqualSizes(s, [self frame].size)) return;
 	[super setFrameSize:s];
 	[self _cache];
@@ -431,16 +432,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if(!_rep) return;
 	NSRect b = (NSRect){NSZeroPoint, _immediateSize};
-	b.origin.x = roundf(NSMidX([self bounds]) - NSWidth(b) / 2);
-	b.origin.y = roundf(NSMidY([self bounds]) - NSHeight(b) / 2);
-	float const deg = [self rotationInDegrees];
+	b.origin.x = round(NSMidX([self bounds]) - NSWidth(b) / 2);
+	b.origin.y = round(NSMidY([self bounds]) - NSHeight(b) / 2);
+	CGFloat const deg = [self rotationInDegrees];
 	if(deg) {
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
 	BOOL const drawCorners = !_cached && [self _drawsRoundedCorners];
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
-	int count = 0;
+	NSInteger count = 0;
 	NSRect const *rects = NULL;
 	if(!deg) [self getRectsBeingDrawn:&rects count:&count];
 	if(_isPDF && !_cached) {

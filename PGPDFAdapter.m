@@ -84,10 +84,10 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
-	int i = 0;
+	NSInteger i = 0;
 	for(; i < [_rep pageCount]; i++) {
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:i] displayableIdentifier];
-		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInt:i + 1] descriptionWithLocale:localeDict]];
+		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInteger:i + 1] descriptionWithLocale:localeDict]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier dataSource:nil] autorelease];
 		if(!node) continue;
 		[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGPDFPageAdapter class], PGAdapterClassKey, nil]];
@@ -115,14 +115,14 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 #pragma mark PGResourceAdapter
 
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(float)size
++ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size
                 withCreationDictionary:(NSDictionary *)dict
 {
 	NSPDFImageRep *const rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) return nil;
 	NSBitmapImageRep *thumbRep = nil;
 	@synchronized(rep) {
-		[rep setCurrentPage:[[dict objectForKey:PGIndexKey] intValue]];
+		[rep setCurrentPage:[[dict objectForKey:PGIndexKey] integerValue]];
 		NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height)));
 		thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
@@ -147,9 +147,9 @@ static NSString *const PGIndexKey = @"PGIndex";
             stopAtNode:(PGNode *)descendent
 {
 	if(![[self node] isViewable] || [self node] == descendent) return nil;
-	int const index = [[self identifier] index];
+	NSInteger const index = [[self identifier] index];
 	if(NSNotFound == index) return nil;
-	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term intValue] - 1 != index) return nil;
+	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
 	return [self node];
 }
 
@@ -175,7 +175,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 - (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
 {
 	@synchronized(self) {
-		return [NSDictionary dictionaryWithObjectsAndKeys:[(PGPDFAdapter *)[self parentAdapter] _threaded_rep], PGImageRepKey, [NSNumber numberWithInt:[[self identifier] index]], PGIndexKey, nil];
+		return [NSDictionary dictionaryWithObjectsAndKeys:[(PGPDFAdapter *)[self parentAdapter] _threaded_rep], PGImageRepKey, [NSNumber numberWithInteger:[[self identifier] index]], PGIndexKey, nil];
 	}
 	return nil;
 }

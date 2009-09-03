@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface NSWindow (AEAdditions)
 
 - (BOOL)AE_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.
-- (float)AE_userSpaceScaleFactor; // Returns 1.0 if not supported.
+- (CGFloat)AE_userSpaceScaleFactor; // Returns 1.0 if not supported.
 - (NSRect)AE_contentRect;
 - (void)AE_setContentRect:(NSRect)aRect;
 

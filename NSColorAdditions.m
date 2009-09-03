@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [self AE_patternColorWithImage:[NSImage imageNamed:@"Checkerboard"] fraction:0.05f];
 }
-- (NSColor *)AE_patternColorWithImage:(NSImage *)image fraction:(float)fraction
+- (NSColor *)AE_patternColorWithImage:(NSImage *)image fraction:(CGFloat)fraction
 {
 	NSSize const s = [image size];
 	NSRect const r = (NSRect){NSZeroPoint, s};

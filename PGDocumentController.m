@@ -59,6 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSStringAdditions.h"
 #import "NSUserDefaultsAdditions.h"
+#include <tgmath.h>
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGRoundsImageCornersKey = @"PGRoundsImageCorners";
@@ -131,13 +132,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		yes, PGAutozoomsWindowsKey,
 		yes, PGOnlyAutozoomsSingleImagesKey,
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
-		[NSNumber numberWithUnsignedInt:PGNoPattern], PGBackgroundPatternKey,
-		[NSNumber numberWithInt:PGNextPreviousAction], PGMouseClickActionKey,
-		[NSNumber numberWithUnsignedInt:1], PGMaxDepthKey,
+		[NSNumber numberWithUnsignedInteger:PGNoPattern], PGBackgroundPatternKey,
+		[NSNumber numberWithInteger:PGNextPreviousAction], PGMouseClickActionKey,
+		[NSNumber numberWithUnsignedInteger:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
-		[NSNumber numberWithInt:PGFullscreenMapping], PGEscapeKeyMappingKey,
+		[NSNumber numberWithInteger:PGFullscreenMapping], PGEscapeKeyMappingKey,
 		no, PGDimOtherScreensKey,
-		[NSNumber numberWithInt:PGEndLocation], PGBackwardsInitialLocationKey,
+		[NSNumber numberWithInteger:PGEndLocation], PGBackwardsInitialLocationKey,
 		yes, PGCheckForUpdatesKey,
 		no, PGUpdateAvailableKey,
 		nil]];
@@ -207,7 +208,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)changeImageScaleFactor:(id)sender
 {
-	[[self currentPrefObject] setImageScaleFactor:powf(2, [sender tag])];
+	[[self currentPrefObject] setImageScaleFactor:(CGFloat)pow(2.0f, (double)[sender tag])];
 }
 
 #pragma mark -
@@ -270,7 +271,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)performEscapeKeyAction
 {
-	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGEscapeKeyMappingKey] intValue]) {
+	switch([[[NSUserDefaults standardUserDefaults] objectForKey:PGEscapeKeyMappingKey] integerValue]) {
 		case PGFullscreenMapping: return [self performToggleFullscreen];
 		case PGQuitMapping: [NSApp terminate:self]; return YES;
 	}
@@ -319,7 +320,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];
 }
-- (unsigned)maximumRecentDocumentCount
+- (NSUInteger)maximumRecentDocumentCount
 {
 	return 10;
 }
@@ -376,7 +377,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(document == [self currentDocument]) [self setCurrentDocument:nil];
 	if(!document) return;
 	[_documents removeObject:document];
-	unsigned const i = [windowsMenu indexOfItemWithRepresentedObject:document];
+	NSUInteger const i = [windowsMenu indexOfItemWithRepresentedObject:document];
 	if(NSNotFound != i) [windowsMenu removeItemAtIndex:i];
 	if(![_documents count]) [windowsMenuSeparator AE_removeFromMenu];
 	[self _setFullscreen:[_documents count] > 0];
@@ -390,9 +391,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
                 documentBeyond:(PGDocument *)document
 {
 	NSArray *const docs = [[PGDocumentController sharedDocumentController] documents];
-	unsigned const count = [docs count];
+	NSUInteger const count = [docs count];
 	if(count <= 1) return nil;
-	unsigned i = [docs indexOfObjectIdenticalTo:[self currentDocument]];
+	NSUInteger i = [docs indexOfObjectIdenticalTo:[self currentDocument]];
 	if(NSNotFound == i) return nil;
 	if(flag) {
 		if([docs count] == ++i) i = 0;
@@ -401,7 +402,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (NSMenuItem *)windowsMenuItemForDocument:(PGDocument *)document
 {
-	int const i = [windowsMenu indexOfItemWithRepresentedObject:document];
+	NSInteger const i = [windowsMenu indexOfItemWithRepresentedObject:document];
 	return -1 == i ? nil : [windowsMenu itemAtIndex:i];
 }
 
@@ -648,7 +649,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -NSObject(NSMenuDelegate)
 
-- (int)numberOfItemsInMenu:(NSMenu *)menu
+- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
 {
 	if(menu == recentMenu) {
 		[_recentMenuSeparatorItem AE_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
@@ -661,7 +662,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (BOOL)menu:(NSMenu *)menu
         updateItem:(NSMenuItem *)item
-        atIndex:(int)anInt
+        atIndex:(NSInteger)anInt
         shouldCancel:(BOOL)shouldCancel
 {
 	NSString *title = @"";
@@ -670,7 +671,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	id representedObject = nil;
 	if(menu == recentMenu) {
 		NSArray *const identifiers = [self recentDocumentIdentifiers];
-		if((unsigned)anInt < [identifiers count]) {
+		if((NSUInteger)anInt < [identifiers count]) {
 			PGDisplayableIdentifier *const identifier = [identifiers objectAtIndex:anInt];
 			NSString *const name = [identifier displayName];
 
@@ -706,7 +707,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
-	int const tag = [anItem tag];
+	NSInteger const tag = [anItem tag];
 
 	if(protocol_getMethodDescription(@protocol(PGDisplayControlling), action, YES, YES).name) {
 		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
@@ -722,9 +723,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {
 		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2f([pref imageScaleFactor])) : NSOffState)];
+		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2([pref imageScaleFactor])) : NSOffState)];
 		else [anItem setState:[pref imageScaleMode] == tag];
-	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2f([pref imageScaleFactor]))];
+	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2([pref imageScaleFactor]))];
 	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
 	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
 	else if(@selector(changeSortDirection:) == action) {
@@ -864,15 +865,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
 	if([anEvent type] != NSKeyDown) return NO;
-	int i;
-	int const count = [self numberOfItems];
+	NSInteger i;
+	NSInteger const count = [self numberOfItems];
 	for(i = 0; i < count; i++) {
 		NSMenuItem *const item = [self itemAtIndex:i];
 		NSString *const equiv = [item keyEquivalent];
 		if([equiv length] != 1) continue;
 		unsigned short const keyCode = PGKeyCodeFromUnichar([equiv characterAtIndex:0]);
 		if(PGKeyUnknown == keyCode || [anEvent keyCode] != keyCode) continue; // Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
-		unsigned const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask;
+		NSUInteger const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask;
 		if(([anEvent modifierFlags] & modifiersMask) != ([item keyEquivalentModifierMask] & modifiersMask)) continue;
 		return [item AE_performAction];
 	}

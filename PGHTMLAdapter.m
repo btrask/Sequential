@@ -139,13 +139,13 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 {
 	if(frame != [_webView mainFrame]) return;
 	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
-	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInt:PGExists], PGDataExistenceKey, nil]];
+	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInteger:PGExists], PGDataExistenceKey, nil]];
 	[self _clearWebView];
 }
 
 #pragma mark -<PGResourceAdapting>
 
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	return 1.0f;
 }

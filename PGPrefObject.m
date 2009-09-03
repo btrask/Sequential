@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSObjectAdditions.h"
+#include <tgmath.h>
 
 NSString *const PGPrefObjectShowsInfoDidChangeNotification = @"PGPrefObjectShowsInfoDidChange";
 NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification = @"PGPrefObjectShowsThumbnailsDidChange";
@@ -50,7 +51,7 @@ static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated 
 
 NSArray *PGScaleModes(void)
 {
-	return [NSArray arrayWithObjects:[NSNumber numberWithInt:PGConstantFactorScale], [NSNumber numberWithInt:PGAutomaticScale], [NSNumber numberWithInt:PGViewFitScale], [NSNumber numberWithInt:PGActualSizeWithDPI], nil];
+	return [NSArray arrayWithObjects:[NSNumber numberWithInteger:PGConstantFactorScale], [NSNumber numberWithInteger:PGAutomaticScale], [NSNumber numberWithInteger:PGViewFitScale], [NSNumber numberWithInteger:PGActualSizeWithDPI], nil];
 }
 
 @implementation PGPrefObject
@@ -73,11 +74,11 @@ NSArray *PGScaleModes(void)
 		[NSNumber numberWithBool:YES], PGShowsInfoKey,
 		[NSNumber numberWithBool:YES], PGShowsThumbnailsKey,
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
-		[NSNumber numberWithInt:PGConstantFactorScale], PGImageScaleModeKey,
-		[NSNumber numberWithFloat:1.0f], PGImageScaleFactorKey,
-		[NSNumber numberWithInt:PGScaleFreely], PGImageScaleConstraintKey,
+		[NSNumber numberWithInteger:PGConstantFactorScale], PGImageScaleModeKey,
+		[NSNumber numberWithDouble:1.0f], PGImageScaleFactorKey,
+		[NSNumber numberWithInteger:PGScaleFreely], PGImageScaleConstraintKey,
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
-		[NSNumber numberWithInt:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
+		[NSNumber numberWithInteger:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
 		[NSNumber numberWithDouble:30.0f], PGTimerIntervalKey,
 		nil]];
 }
@@ -131,23 +132,23 @@ NSArray *PGScaleModes(void)
 {
 	_imageScaleMode = aMode;
 	_imageScaleFactor = 1;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:aMode] forKey:PGImageScaleModeKey];
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:1] forKey:PGImageScaleFactorKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:aMode] forKey:PGImageScaleModeKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:1] forKey:PGImageScaleFactorKey];
 	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
-- (float)imageScaleFactor
+- (CGFloat)imageScaleFactor
 {
 	return _imageScaleFactor;
 }
-- (void)setImageScaleFactor:(float)aFloat
+- (void)setImageScaleFactor:(CGFloat)aFloat
 {
 	NSParameterAssert(aFloat > 0.0f);
-	float const newFactor = fabsf(1.0f - aFloat) < 0.01f ? 1.0f : aFloat; // If it's close to 1, fudge it.
+	CGFloat const newFactor = fabs(1.0f - aFloat) < 0.01f ? 1.0f : aFloat; // If it's close to 1, fudge it.
 	_imageScaleFactor = newFactor;
 	_imageScaleMode = PGConstantFactorScale;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithFloat:newFactor] forKey:PGImageScaleFactorKey];
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:PGConstantFactorScale] forKey:PGImageScaleModeKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:newFactor] forKey:PGImageScaleFactorKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:PGConstantFactorScale] forKey:PGImageScaleModeKey];
 	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
@@ -159,7 +160,7 @@ NSArray *PGScaleModes(void)
 {
 	if(constraint == _imageScaleConstraint) return;
 	_imageScaleConstraint = constraint;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:constraint] forKey:PGImageScaleConstraintKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:constraint] forKey:PGImageScaleConstraintKey];
 	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
 }
 
@@ -187,7 +188,7 @@ NSArray *PGScaleModes(void)
 {
 	if(anOrder == _sortOrder) return;
 	_sortOrder = anOrder;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:anOrder] forKey:PGSortOrderKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:anOrder] forKey:PGSortOrderKey];
 	[self AE_postNotificationName:PGPrefObjectSortOrderDidChangeNotification];
 }
 
@@ -214,14 +215,14 @@ NSArray *PGScaleModes(void)
 		_showsInfo = [[d objectForKey:PGShowsInfoKey] boolValue];
 		_showsThumbnails = [[d objectForKey:PGShowsThumbnailsKey] boolValue];
 		_readingDirection = [[d objectForKey:PGReadingDirectionRightToLeftKey] boolValue] ? PGReadingDirectionRightToLeft : PGReadingDirectionLeftToRight;
-		_imageScaleMode = [[d objectForKey:PGImageScaleModeKey] intValue];
+		_imageScaleMode = [[d objectForKey:PGImageScaleModeKey] integerValue];
 		if(_imageScaleMode < 0 || _imageScaleMode > 4) _imageScaleMode = PGConstantFactorScale;
 		if(PGDeprecatedVerticalFitScale == _imageScaleMode) _imageScaleMode = PGAutomaticScale;
-		_imageScaleFactor = [[d objectForKey:PGImageScaleFactorKey] floatValue];
-		_imageScaleConstraint = [[d objectForKey:PGImageScaleConstraintKey] intValue];
+		_imageScaleFactor = (CGFloat)[[d objectForKey:PGImageScaleFactorKey] doubleValue];
+		_imageScaleConstraint = [[d objectForKey:PGImageScaleConstraintKey] integerValue];
 		if(_imageScaleConstraint < PGDownscale || _imageScaleConstraint > PGUpscale) _imageScaleConstraint = PGDownscale;
 		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
-		_sortOrder = [[d objectForKey:PGSortOrderKey] intValue];
+		_sortOrder = [[d objectForKey:PGSortOrderKey] integerValue];
 		_timerInterval = [[d objectForKey:PGTimerIntervalKey] doubleValue];
 	}
 	return self;

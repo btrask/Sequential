@@ -30,13 +30,13 @@ enum {
 	AEPauseIcon = 2,
 	AEStopIcon = 3
 };
-typedef unsigned AEIconType;
+typedef NSUInteger AEIconType;
 
 @interface NSBezierPath (AEAdditions)
 
-+ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(float)radius;
++ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(CGFloat)radius;
 + (void)AE_drawIcon:(AEIconType)type inRect:(NSRect)r;
-+ (void)AE_drawSpinnerInRect:(NSRect)aRect startAtPetal:(int)petal;
++ (void)AE_drawSpinnerInRect:(NSRect)aRect startAtPetal:(NSInteger)petal;
 
 - (void)AE_fillUsingOperation:(NSCompositingOperation)op;
 

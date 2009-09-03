@@ -51,7 +51,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 @interface PGBookmarkController (Private)
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark;
-- (void)_removeBookmarkAtIndex:(unsigned)index; // Removes without updating.
+- (void)_removeBookmarkAtIndex:(NSUInteger)index; // Removes without updating.
 - (void)_saveBookmarks;
 
 @end
@@ -91,7 +91,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (void)addBookmark:(PGBookmark *)aBookmark
 {
-	unsigned i;
+	NSUInteger i;
 	while((i = [_bookmarks indexOfObject:aBookmark]) != NSNotFound) [self _removeBookmarkAtIndex:i];
 	[_bookmarks addObject:aBookmark];
 	[self addMenuItemForBookmark:aBookmark];
@@ -151,7 +151,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark
 {
-	int const index = [bookmarkMenu indexOfItemWithRepresentedObject:aBookmark];
+	NSInteger const index = [bookmarkMenu indexOfItemWithRepresentedObject:aBookmark];
 	if(-1 == index) return; // Fail gracefully.
 	NSMenuItem *const item = [bookmarkMenu itemAtIndex:index];
 	if(![aBookmark isValid]) {
@@ -167,7 +167,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	}
 	[item setAttributedTitle:title];
 }
-- (void)_removeBookmarkAtIndex:(unsigned)index
+- (void)_removeBookmarkAtIndex:(NSUInteger)index
 {
 	[[_bookmarks objectAtIndex:index] AE_removeObserver:self name:PGBookmarkDidUpdateNotification];
 	[_bookmarks removeObjectAtIndex:index];

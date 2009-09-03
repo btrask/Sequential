@@ -34,14 +34,14 @@ enum {
 	PGSingleImageGraphic,
 	PGInterImageGraphic
 };
-typedef unsigned PGAlertGraphicType;
+typedef NSUInteger PGAlertGraphicType;
 
 @interface PGAlertView : NSView
 {
 	@private
 	NSMutableArray *_graphicStack;
 	PGAlertGraphic *_currentGraphic;
-	unsigned        _frameCount;
+	NSUInteger        _frameCount;
 	NSTimer        *_frameTimer;
 }
 
@@ -51,7 +51,7 @@ typedef unsigned PGAlertGraphicType;
 - (void)popGraphicIdenticalTo:(PGAlertGraphic *)aGraphic;
 - (void)popGraphicsOfType:(PGAlertGraphicType)type;
 
-- (unsigned)frameCount;
+- (NSUInteger)frameCount;
 - (void)animateOneFrame:(PGAlertView *)anAlertView;
 
 - (void)windowWillClose:(NSNotification *)aNotif;
@@ -72,7 +72,7 @@ typedef unsigned PGAlertGraphicType;
 - (NSTimeInterval)fadeOutDelay; // Less than 0.01 means forever.
 
 - (NSTimeInterval)animationDelay; // Less than or equal to 0 means don't animate.
-- (unsigned)frameMax;
+- (NSUInteger)frameMax;
 - (void)animateOneFrame:(PGAlertView *)anAlertView;
 
 @end
@@ -80,13 +80,13 @@ typedef unsigned PGAlertGraphicType;
 @interface PGLoadingGraphic : PGAlertGraphic
 {
 	@private
-	float _progress;
+	CGFloat _progress;
 }
 
 + (id)loadingGraphic;
 
-- (float)progress;
-- (void)setProgress:(float)progress;
+- (CGFloat)progress;
+- (void)setProgress:(CGFloat)progress;
 
 @end
 

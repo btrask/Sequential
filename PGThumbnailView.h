@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setSelection:(NSSet *)items;
 - (void)scrollToFirstSelectedItem;
 
-- (unsigned)indexOfItemAtPoint:(NSPoint)p;
-- (NSRect)frameOfItemAtIndex:(unsigned)index withMargin:(BOOL)flag;
+- (NSUInteger)indexOfItemAtPoint:(NSPoint)p;
+- (NSRect)frameOfItemAtIndex:(NSUInteger)index withMargin:(BOOL)flag;
 
 - (void)reloadData;
 - (void)sizeToFit;

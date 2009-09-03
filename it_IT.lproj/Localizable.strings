@@ -1,8 +1,8 @@
 ﻿/* The primary screen. */
 "Main Screen" = "Schermo principale";
 
-/* Non-primary screens. %u is replaced with the screen number. */
-"Screen %u" = "Schermo %u";
+/* Non-primary screens. %lu is replaced with the screen number. */
+"Screen %lu" = "Schermo %lu";
 
 /* Clear the Open Recent menu. Should be the same as the standard text. */
 "Clear Menu" = "Cancella Menu";
@@ -71,8 +71,8 @@
 /* Do resume from bookmark button. */
 "Resume" = "Resume";
 
-/* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
-"The error %u %@ was generated while loading the URL %@." = "L'errore “%u %@” è stato generato caricando l'URL “%@.”";
+/* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
+"The error %ld %@ was generated while loading the URL %@." = "L'errore “%ld %@” è stato generato caricando l'URL “%@.”";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
 "The URL %@ could not be loaded." = "L'URL “%@” non può essere caricato.";
@@ -80,8 +80,8 @@
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "%@ already exists in %@. Do you want to replace it?" = "“%@” esiste già in “%@.” Vuoi sostituirlo?";
 
-/* Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name. */
-"%u pages already exist in %@. Do you want to replace them?" = "%u pagine esistono già “%@.” Vuoi sostituirle?";
+/* Replace multiple files alert. %lu is replaced with a number greater than 1, %@ is replaced with the destination name. */
+"%lu pages already exist in %@. Do you want to replace them?" = "%lu pagine esistono già “%@.” Vuoi sostituirle?";
 
 /* Informative text for replacement alerts. */
 "Replacing a file overwrites its current contents." = "Sostituire un file ne sovrascrive i contenuti attuali.";
@@ -89,8 +89,8 @@
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
 
-/* Multiple image save failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
-"%u images could not be saved to %@." = "%u images could not be saved to “%@.”";
+/* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
+"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Assicurati che il volume sia scrivibile e abbia abbastanza spazio libero.";

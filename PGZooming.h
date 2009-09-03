@@ -42,6 +42,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface NSTableColumn (PGZooming)
 
-- (float)PG_zoomedWidth;
+- (CGFloat)PG_zoomedWidth;
 
 @end

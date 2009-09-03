@@ -128,7 +128,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node
                    withInfo:(NSMutableDictionary *)info
 {
-	if([[info objectForKey:PGDataExistenceKey] intValue] == PGDoesNotExist) return PGNotAMatch;
+	if([[info objectForKey:PGDataExistenceKey] integerValue] == PGDoesNotExist) return PGNotAMatch;
 	NSDictionary *const type = [self typeDictionary];
 	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
 	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
@@ -143,7 +143,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-+ (NSImage *)threaded_thumbnailOfSize:(float)size
++ (NSImage *)threaded_thumbnailOfSize:(CGFloat)size
              withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *const rep = [self threaded_thumbnailRepOfSize:size withCreationDictionary:dict];
@@ -152,13 +152,13 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[image addRepresentation:rep];
 	return image;
 }
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(float)size
++ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size
                 withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGDataKey]];
 	if(!rep) return nil;
-	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntValue];
+	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntegerValue];
 	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	NSSize s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1, MIN(size / originalSize.width, size / originalSize.height))));
 	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
@@ -195,7 +195,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 + (void)_setRealThumbnailWithDictionary:(NSDictionary *)aDict
 {
 	PGResourceAdapter *const adapter = [[aDict objectForKey:@"AdapterValue"] nonretainedObjectValue];
-	unsigned const i = [PGAdaptersWaitingForThumbnails indexOfObject:adapter];
+	NSUInteger const i = [PGAdaptersWaitingForThumbnails indexOfObject:adapter];
 	if(NSNotFound == i) return;
 	[PGAdaptersWaitingForThumbnails removeObjectAtIndex:i];
 	NSImage *const thumbnail = [aDict objectForKey:@"Thumbnail"];
@@ -272,7 +272,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		}
 		[PGAdaptersWaitingForThumbnails addObject:self];
 		NSMutableDictionary *const info = [[[self info] mutableCopy] autorelease];
-		[info setObject:[NSNumber numberWithUnsignedInt:[self orientationWithBase:NO]] forKey:PGOrientationKey];
+		[info setObject:[NSNumber numberWithUnsignedInteger:[self orientationWithBase:NO]] forKey:PGOrientationKey];
 		[info setObject:[NSDate date] forKey:PGDateKey];
 		[NSThread detachNewThreadSelector:@selector(_threaded_requestThumbnailGenerationWithInfo:) toTarget:self withObject:info];
 	}
@@ -353,7 +353,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	[PGAdaptersWaitingForThumbnails removeObject:self];
 	[PGThumbnailsNeededLock lock];
-	unsigned const i = [PGAdaptersThatRequestedThumbnails indexOfObject:self];
+	NSUInteger const i = [PGAdaptersThatRequestedThumbnails indexOfObject:self];
 	if(NSNotFound != i) {
 		[PGAdaptersThatRequestedThumbnails removeObjectAtIndex:i];
 		[PGInfoDictionaries removeObjectAtIndex:i];
@@ -439,7 +439,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[self identifier] displayName];
 }
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	return 0.0f;
 }
@@ -460,7 +460,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 }
 - (void)prioritizeSubload:(id<PGLoading>)obj
 {
-	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
+	NSUInteger const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
 	if(NSNotFound == i) return;
 	[_subloads removeObjectAtIndex:i];
 	[_subloads insertObject:obj atIndex:0];
@@ -555,11 +555,11 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return nil;
 }
-- (unsigned)viewableNodeIndex
+- (NSUInteger)viewableNodeIndex
 {
 	return [[self parentAdapter] viewableIndexOfChild:[self node]];
 }
-- (unsigned)viewableNodeCount
+- (NSUInteger)viewableNodeCount
 {
 	return [[self node] isViewable] ? 1 : 0;
 }
@@ -571,7 +571,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return flag ? [[self document] baseOrientation] : PGUpright;
 }
 - (void)clearCache {}
-- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt
+- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt
 {
 	return [self viewableNodeCount] > anInt;
 }

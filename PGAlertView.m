@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         window:(NSWindow *)window
 {
 	NSParameterAssert(aGraphic);
-	unsigned const i = [_graphicStack indexOfObject:aGraphic];
+	NSUInteger const i = [_graphicStack indexOfObject:aGraphic];
 	if(0 == i) {
 		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(popGraphicIdenticalTo:) object:_currentGraphic];
 	} else {
@@ -80,7 +80,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
 {
 	NSParameterAssert(aGraphic);
-	unsigned const i = [_graphicStack indexOfObject:aGraphic];
+	NSUInteger const i = [_graphicStack indexOfObject:aGraphic];
 	if(NSNotFound == i) return;
 	[_graphicStack removeObjectAtIndex:i];
 	[self _updateCurrentGraphic];
@@ -88,7 +88,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)popGraphicIdenticalTo:(PGAlertGraphic *)aGraphic
 {
 	NSParameterAssert(aGraphic);
-	unsigned const i = [_graphicStack indexOfObjectIdenticalTo:aGraphic];
+	NSUInteger const i = [_graphicStack indexOfObjectIdenticalTo:aGraphic];
 	if(NSNotFound == i) return;
 	[_graphicStack removeObjectAtIndex:i];
 	[self _updateCurrentGraphic];
@@ -101,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (unsigned)frameCount
+- (NSUInteger)frameCount
 {
 	return _frameCount;
 }
@@ -144,9 +144,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSRect)bezelPanel:(PGBezelPanel *)sender
           frameForContentRect:(NSRect)aRect
-          scale:(float)scaleFactor
+          scale:(CGFloat)scaleFactor
 {
-	float const scaledPanelSize = scaleFactor * PGAlertViewSize;
+	CGFloat const scaledPanelSize = scaleFactor * PGAlertViewSize;
 	return PGIntegralRect(NSMakeRect(
 		NSMinX(aRect) + PGMarginSize,
 		NSMaxY(aRect) - scaledPanelSize - PGMarginSize,
@@ -227,11 +227,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)drawInView:(PGAlertView *)anAlertView
 {
-	int count, i;
+	NSInteger count, i;
 	NSRect const *rects;
 	[anAlertView getRectsBeingDrawn:&rects count:&count];
 	[[NSColor AE_bezelBackgroundColor] set];
-	float const f = PGAlertViewSize / 300.0f;
+	CGFloat const f = PGAlertViewSize / 300.0f;
 	for(i = count; i--;) {
 		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect(  0.0f * f, 50.0f * f,  50.0f * f, 200.0f * f))));
 		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect( 50.0f * f,  0.0f * f, 200.0f * f, 300.0f * f))));
@@ -249,7 +249,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		PGIntegralPoint(NSMakePoint( 50.0f * f,  50.0f * f)),
 		PGIntegralPoint(NSMakePoint(250.0f * f,  50.0f * f))
 	};
-	for(i = sizeof(corners) / sizeof(*corners); i--;) {
+	for(i = numberof(corners); i--;) {
 		NSRect const corner = corners[i];
 		if(!PGIntersectsRectList(corner, rects, count)) continue;
 		[[NSColor clearColor] set];
@@ -286,7 +286,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return 0.0f;
 }
-- (unsigned)frameMax
+- (NSUInteger)frameMax
 {
 	return 0;
 }
@@ -294,7 +294,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
 	return [[self class] hash];
 }
@@ -313,9 +313,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 
-	float const f = PGAlertViewSize / 300.0f;
-	float const small = 5.0f * f;
-	float const large = 10.0f * f;
+	CGFloat const f = PGAlertViewSize / 300.0f;
+	CGFloat const small = 5.0f * f;
+	CGFloat const large = 10.0f * f;
 	[[NSColor AE_bezelForegroundColor] set];
 
 	NSBezierPath *const arrow = [NSBezierPath bezierPath];
@@ -367,7 +367,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[NSColor AE_bezelForegroundColor] set];
 
 	NSBezierPath *const s = [NSBezierPath bezierPath];
-	float const f = PGAlertViewSize / 300.0f;
+	CGFloat const f = PGAlertViewSize / 300.0f;
 	[s appendBezierPathWithArcWithCenter:NSMakePoint(105.0f * f, 155.0f * f) radius:65.0f * f startAngle: 90.0f endAngle:270.0f clockwise:NO];
 	[s appendBezierPathWithArcWithCenter:NSMakePoint(150.0f * f,  85.0f * f) radius: 5.0f * f startAngle: 90.0f endAngle:  0.0f clockwise:YES];
 	[s appendBezierPathWithArcWithCenter:NSMakePoint(160.0f * f,  65.0f * f) radius: 5.0f * f startAngle:180.0f endAngle:270.0f clockwise:NO];
@@ -412,20 +412,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark Instance methods
 
-- (float)progress
+- (CGFloat)progress
 {
 	return _progress;
 }
-- (void)setProgress:(float)progress
+- (void)setProgress:(CGFloat)progress
 {
 	_progress = MIN(MAX(progress, 0.0f), 1.0f);
 }
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
-	return (unsigned)self;
+	return (NSUInteger)self;
 }
 - (BOOL)isEqual:(id)anObject
 {
@@ -437,7 +437,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawInView:(PGAlertView *)anAlertView
 {
 	[super drawInView:anAlertView];
-	float const f = PGAlertViewSize / 300.0f;
+	CGFloat const f = PGAlertViewSize / 300.0f;
 	if(_progress) {
 		NSBezierPath *const progressPath = [NSBezierPath bezierPath];
 		NSPoint const center = NSMakePoint(150.0f * f, 150.0f * f);
@@ -460,13 +460,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return 1.0f / 12.0f;
 }
-- (unsigned)frameMax
+- (NSUInteger)frameMax
 {
 	return 12;
 }
 - (void)animateOneFrame:(PGAlertView *)anAlertView
 {
-	float const f = PGAlertViewSize / 300.0f;
+	CGFloat const f = PGAlertViewSize / 300.0f;
 	[anAlertView setNeedsDisplayInRect:NSMakeRect( 25.0f * f, 50.0f * f,  25.0f * f, 200.0f * f)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect( 50.0f * f, 25.0f * f, 200.0f * f, 250.0f * f)];
 	[anAlertView setNeedsDisplayInRect:NSMakeRect(250.0f * f, 50.0f * f,  25.0f * f, 200.0f * f)];
@@ -509,7 +509,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
 	return [[self class] hash] ^ _iconType;
 }

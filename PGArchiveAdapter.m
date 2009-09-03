@@ -51,8 +51,8 @@ static id PGArchiveAdapterList = nil;
 @interface XADArchive(PGAdditions)
 
 - (NSString *)PG_commonRootPath;
-- (NSString *)PG_OSTypeForEntry:(int)index standardFormat:(BOOL)flag;
-- (NSString *)PG_typeForEntry:(int)index preferOSType:(BOOL)flag;
+- (NSString *)PG_OSTypeForEntry:(NSInteger)index standardFormat:(BOOL)flag;
+- (NSString *)PG_typeForEntry:(NSInteger)index preferOSType:(BOOL)flag;
 
 @end
 
@@ -87,7 +87,7 @@ static id PGArchiveAdapterList = nil;
 	NSParameterAssert(parent);
 	NSParameterAssert(_archive);
 	NSMutableArray *const children = [NSMutableArray array];
-	int i = [indexes firstIndex];
+	NSInteger i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
 		if(_encodingError) return nil;
@@ -147,7 +147,7 @@ static id PGArchiveAdapterList = nil;
 		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
 	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
-	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntValue]];
+	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntegerValue]];
 	NSArray *const children = [self nodesUnderPath:[_archive PG_commonRootPath] parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
 	if(!_encodingError) [[self node] loadFinished];
@@ -169,19 +169,19 @@ static id PGArchiveAdapterList = nil;
 
 - (NSDate *)dateCreatedForNode:(PGNode *)sender
 {
-	unsigned const i = [[sender identifier] index];
+	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i) return nil;
 	return [[_archive attributesOfEntry:i] objectForKey:XADCreationDateKey];
 }
 - (NSNumber *)dataLengthForNode:(PGNode *)sender
 {
-	unsigned const i = [[sender identifier] index];
+	NSUInteger const i = [[sender identifier] index];
 	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]];
 }
 - (void)node:(PGNode *)sender
         willLoadWithInfo:(NSMutableDictionary *)info
 {
-	unsigned const i = [[sender identifier] index];
+	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
 	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
 	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
@@ -192,7 +192,7 @@ static id PGArchiveAdapterList = nil;
         info:(NSDictionary *)info
         fast:(BOOL)flag
 {
-	unsigned const i = [[sender identifier] index];
+	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i || flag) {
 		if(outData) *outData = nil;
 		return YES;
@@ -219,11 +219,11 @@ static id PGArchiveAdapterList = nil;
 	_needsPassword = YES;
 	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
 }
-- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
+- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(CGFloat)confidence
 {
 	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
-		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInt:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
+		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
 		[[self node] loadFinished];
 	}
 	return guess;
@@ -242,7 +242,7 @@ static id PGArchiveAdapterList = nil;
 
 - (NSString *)PG_commonRootPath
 {
-	int i;
+	NSInteger i;
 	NSString *root = nil;
 	for(i = 0; i < [self numberOfEntries]; i++) {
 		NSString *entryName = [self nameOfEntry:i];
@@ -256,7 +256,7 @@ static id PGArchiveAdapterList = nil;
 	}
 	return root ? root : @"";
 }
-- (NSString *)PG_OSTypeForEntry:(int)index
+- (NSString *)PG_OSTypeForEntry:(NSInteger)index
               standardFormat:(BOOL)flag
 {
 	OSType value;
@@ -268,7 +268,7 @@ static id PGArchiveAdapterList = nil;
 	}
 	return flag ? NSFileTypeForHFSTypeCode(value) : PGPseudoFileTypeForHFSTypeCode(value);
 }
-- (NSString *)PG_typeForEntry:(int)index
+- (NSString *)PG_typeForEntry:(NSInteger)index
               preferOSType:(BOOL)flag
 {
 	NSString *const osType = flag ? [self PG_OSTypeForEntry:index standardFormat:YES] : nil;

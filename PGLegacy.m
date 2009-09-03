@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSURL *URL = [aCoder decodeObjectForKey:@"URL"];
 	if(URL) result = [[URL PG_displayableIdentifier] retain];
 	else {
-		unsigned length;
+		NSUInteger length;
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 		result = [[PGDisplayableIdentifier resourceIdentifierWithAliasData:data length:length] retain];
 	}
@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)initWithCoder:(NSCoder *)aCoder
 {
 	[[self init] release];
-	unsigned length;
+	NSUInteger length;
 	uint8_t const *data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 	if(!data) data = [aCoder decodeBytesForKey:@"HandleData" returnedLength:&length];
 	return [[PGDisplayableIdentifier resourceIdentifierWithAliasData:data length:length] retain];
@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self init] release];
 	PGDisplayableIdentifier *docIdent = [aCoder decodeObjectForKey:@"DocumentURL"];
 	if(!docIdent) docIdent = [aCoder decodeObjectForKey:@"DocumentAlias"];
-	PGDisplayableIdentifier *const fileIdent = [[docIdent subidentifierWithIndex:[aCoder decodeIntForKey:@"PageIndex"]] displayableIdentifier];
+	PGDisplayableIdentifier *const fileIdent = [[docIdent subidentifierWithIndex:[aCoder decodeIntegerForKey:@"PageIndex"]] displayableIdentifier];
 	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"]];
 	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"]];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];

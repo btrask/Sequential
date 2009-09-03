@@ -38,7 +38,7 @@ enum {
 + (NSData *)exifDataWithImageData:(NSData *)data
 {
 	if([data length] < 2 || 0xFFD8 != CFSwapInt16BigToHost(*(uint16_t *)[data bytes])) return nil;
-	unsigned offset = 2;
+	NSUInteger offset = 2;
 	while(offset + 18 < [data length]) {
 		void const *const bytes = [data bytes] + offset;
 		uint16_t const type = CFSwapInt16BigToHost(*(uint16_t *)(bytes + 0));

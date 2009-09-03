@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (IBAction)cancelLoad:(id)sender
 {
 	NSIndexSet *const indexes = [activityOutline selectedRowIndexes];
-	unsigned i = [indexes firstIndex];
+	NSUInteger i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [[activityOutline itemAtRow:i] cancelLoad];
 }
 
@@ -69,13 +69,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return item ? [[item subloads] count] > 0 : YES;
 }
-- (int)outlineView:(NSOutlineView *)outlineView
+- (NSInteger)outlineView:(NSOutlineView *)outlineView
        numberOfChildrenOfItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] count];
 }
 - (id)outlineView:(NSOutlineView *)outlineView
-      child:(int)index
+      child:(NSInteger)index
       ofItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] objectAtIndex:index];
@@ -94,7 +94,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		}
 		return [[[NSAttributedString alloc] initWithString:[item loadDescription] attributes:attrs] autorelease];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithFloat:[item loadProgress]];
+		return [NSNumber numberWithDouble:[item loadProgress]];
 	}
 	return nil;
 }

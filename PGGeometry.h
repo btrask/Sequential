@@ -29,29 +29,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 extern NSPoint PGIntegralPoint(NSPoint aPoint);
 extern NSPoint PGOffsetPointBySize(NSPoint aPoint, NSSize aSize);
-extern NSPoint PGOffsetPointByXY(NSPoint aPoint, float x, float y);
+extern NSPoint PGOffsetPointByXY(NSPoint aPoint, CGFloat x, CGFloat y);
 extern NSSize PGPointDiff(NSPoint p1, NSPoint p2);
 
 #pragma mark NSSize
 
-extern NSSize PGScaleSizeByXY(NSSize size, float scaleX, float scaleY);
-extern NSSize PGScaleSizeByFloat(NSSize size, float scale);
+extern NSSize PGScaleSizeByXY(NSSize size, CGFloat scaleX, CGFloat scaleY);
+extern NSSize PGScaleSizeByFloat(NSSize size, CGFloat scale);
 extern NSSize PGIntegralSize(NSSize s);
 
 #pragma mark NSRect
 
 extern NSRect PGCenteredSizeInRect(NSSize s, NSRect r);
-extern BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, unsigned count);
+extern BOOL PGIntersectsRectList(NSRect rect, NSRect const *list, NSUInteger count);
 extern NSRect PGIntegralRect(NSRect r); // NSIntegralRect() expands the rectangle in all directions. It's better to round the origin and width separately.
-extern void PGGetRectDifference(NSRect diff[4], unsigned *count, NSRect minuend, NSRect subtrahend);
-extern NSRect PGScaleRect(NSRect r, float scaleX, float scaleY);
+extern void PGGetRectDifference(NSRect diff[4], NSUInteger *count, NSRect minuend, NSRect subtrahend);
+extern NSRect PGScaleRect(NSRect r, CGFloat scaleX, CGFloat scaleY);
 
 #pragma mark PGRectEdgeMask
 
-extern NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, float magnitude);
-extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, float magnitude);
+extern NSSize PGRectEdgeMaskToSizeWithMagnitude(PGRectEdgeMask mask, CGFloat magnitude);
+extern NSPoint PGRectEdgeMaskToPointWithMagnitude(PGRectEdgeMask mask, CGFloat magnitude);
 extern NSPoint PGPointOfPartOfRect(NSRect r, PGRectEdgeMask mask);
-extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, float threshhold);
+extern PGRectEdgeMask PGPointToRectEdgeMaskWithThreshhold(NSPoint p, CGFloat threshhold);
 extern PGRectEdgeMask PGNonContradictoryRectEdges(PGRectEdgeMask mask);
 extern BOOL PGHasContradictoryRectEdges(PGRectEdgeMask mask);
 
@@ -67,8 +67,8 @@ extern PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
 
 extern PGInset const PGZeroInset;
 
-extern PGInset PGMakeInset(float minX, float minY, float maxX, float maxY);
-extern PGInset PGScaleInset(PGInset i, float s);
+extern PGInset PGMakeInset(CGFloat minX, CGFloat minY, CGFloat maxX, CGFloat maxY);
+extern PGInset PGScaleInset(PGInset i, CGFloat s);
 extern PGInset PGInvertInset(PGInset inset);
 extern NSPoint PGInsetPoint(NSPoint p, PGInset i);
 extern NSSize PGInsetSize(NSSize s, PGInset i);
@@ -81,4 +81,4 @@ extern PGInset PGAddInsets(PGInset a, PGInset b);
 #define PGAnimationFramerate       (1.0f / PGAnimationFramesPerSecond)
 
 extern NSTimeInterval PGUptime(void);
-extern float PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, float desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().
+extern CGFloat PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, CGFloat desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().

@@ -59,7 +59,7 @@ enum {
 	PGLoadAll        = 1,
 	PGLoadNone       = 2
 };
-typedef int PGLoadPolicy;
+typedef NSInteger PGLoadPolicy;
 
 @protocol PGResourceAdapting <PGLoading>
 
@@ -89,7 +89,7 @@ typedef int PGLoadPolicy;
 
 - (PGOrientation)orientationWithBase:(BOOL)flag;
 - (void)clearCache;
-- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt;
+- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;

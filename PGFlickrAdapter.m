@@ -64,10 +64,10 @@ enum {
 	NSString *_secret;
 	NSString *_originalFormat;
 	NSString *_errorString;
-	int       _errorCode;
+	NSInteger       _errorCode;
 }
 
-- (int)errorCode;
+- (NSInteger)errorCode;
 
 @end
 
@@ -81,7 +81,7 @@ enum {
 	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
 	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
 	NSURL *const URL = [ident URL];
-	if([[info objectForKey:PGDataExistenceKey] intValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
+	if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
 	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
 
 	NSString *photo = nil;
@@ -126,7 +126,7 @@ enum {
 		[[self node] loadFinished];
 	} else if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] > 300)) {
 		[_load cancelAndNotify:NO];
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %u %@ was generated while loading the URL %@.", @"The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), [resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
+		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
 	}
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
@@ -159,7 +159,7 @@ enum {
 
 #pragma mark PGLoading Protocol
 
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	return [_load loadProgress];
 }
@@ -253,7 +253,7 @@ enum {
 
 #pragma mark Instance Methods
 
-- (int)errorCode
+- (NSInteger)errorCode
 {
 	return _errorCode;
 }
@@ -314,7 +314,7 @@ enum {
 	} else if([@"/rsp/err" isEqualToString:p]) {
 		[_errorString release];
 		_errorString = [[attrs objectForKey:@"msg"] copy];
-		_errorCode = [[attrs objectForKey:@"code"] intValue];
+		_errorCode = [[attrs objectForKey:@"code"] integerValue];
 	}
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p

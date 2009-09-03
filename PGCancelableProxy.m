@@ -78,14 +78,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)forwardInvocation:(NSInvocation *)invocation
 {
 	@synchronized(_storage) {
-		unsigned const i = [_storage indexOfObject:_target];
+		NSUInteger const i = [_storage indexOfObject:_target];
 		if(NSNotFound != i) {
 			if(_allowOnce) [_storage removeObjectAtIndex:i];
 			[invocation invokeWithTarget:_target];
 			return;
 		}
 	}
-	unsigned const length = [[invocation methodSignature] methodReturnLength];
+	NSUInteger const length = [[invocation methodSignature] methodReturnLength];
 	if(!length) return;
 	void *const blank = calloc(1, length);
 	[invocation setReturnValue:blank];

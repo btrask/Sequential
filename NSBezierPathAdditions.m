@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #pragma mark Class Methods
 
 + (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect
-                  cornerRadius:(float)radius
+                  cornerRadius:(CGFloat)radius
 {
 	NSBezierPath *const path = [self bezierPath];
 	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(aRect) - radius, NSMaxY(aRect) - radius) radius:radius startAngle:0.0f endAngle:90.0f];
@@ -46,11 +46,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         inRect:(NSRect)b
 {
 	NSBezierPath *const p = [self bezierPath];
-	float const scale = MIN(NSWidth(b), NSHeight(b));
+	CGFloat const scale = MIN(NSWidth(b), NSHeight(b));
 	switch(type) {
 		case AEPlayIcon:
 		{
-			float const r = scale / 10.0f;
+			CGFloat const r = scale / 10.0f;
 			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(b) - r, NSMidY(b)) radius:r startAngle:60.0f endAngle:-60.0f clockwise:YES];
 			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(b) + NSWidth(b) * 0.1f + r, NSMinY(b) + NSHeight(b) * 0.05f + r * 1.0f) radius:r startAngle:-60.0f endAngle:180.0f clockwise:YES];
 			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(b) + NSWidth(b) * 0.1f + r, NSMinY(b) + NSHeight(b) * 0.95f - r * 1.0f) radius:r startAngle:180.0f endAngle:60.0f clockwise:YES];
@@ -73,14 +73,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 }
 + (void)AE_drawSpinnerInRect:(NSRect)r
-        startAtPetal:(int)petal
+        startAtPetal:(NSInteger)petal
 {
 	[NSBezierPath setDefaultLineWidth:MIN(NSWidth(r), NSHeight(r)) / 11.0f];
 	[NSBezierPath setDefaultLineCapStyle:NSRoundLineCapStyle];
-	unsigned i = 0;
+	NSUInteger i = 0;
 	for(; i < 12; i++) {
 		[[[NSColor AE_bezelForegroundColor] colorWithAlphaComponent:petal < 0.0f ? 0.1f : ((petal + i) % 12) / -12.0f + 1.0f] set];
-		[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMidX(r) + cosf((float)pi * 2.0f * i / 12.0f) * NSWidth(r) / 4.0f, NSMidY(r) + sinf((float)pi * 2.0f * i / 12.0f) * NSHeight(r) / 4.0f) toPoint:NSMakePoint(NSMidX(r) + cosf((float)pi * 2.0f * i / 12.0f) * NSWidth(r) / 2.0f, NSMidY(r) + sinf((float)pi * 2.0f * i / 12.0f) * NSHeight(r) / 2.0f)];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint(NSMidX(r) + cosf((CGFloat)pi * 2.0f * i / 12.0f) * NSWidth(r) / 4.0f, NSMidY(r) + sinf((CGFloat)pi * 2.0f * i / 12.0f) * NSHeight(r) / 4.0f) toPoint:NSMakePoint(NSMidX(r) + cosf((CGFloat)pi * 2.0f * i / 12.0f) * NSWidth(r) / 2.0f, NSMidY(r) + sinf((CGFloat)pi * 2.0f * i / 12.0f) * NSHeight(r) / 2.0f)];
 	}
 	[NSBezierPath setDefaultLineWidth:1];
 	[NSBezierPath setDefaultLineCapStyle:NSMiterLineJoinStyle];

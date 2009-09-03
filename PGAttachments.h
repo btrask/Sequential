@@ -35,10 +35,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	NSMenuItem *_item;
-	float _angle;
+	CGFloat _angle;
 }
 
-- (id)initWithMenuItem:(NSMenuItem *)anItem rotation:(float)angle;
+- (id)initWithMenuItem:(NSMenuItem *)anItem rotation:(CGFloat)angle;
 - (void)drawWithFrame:(NSRect)aRect enabled:(BOOL)enabled highlighted:(BOOL)highlighted;
 - (NSString *)imageNameHighlighted:(BOOL)flag;
 

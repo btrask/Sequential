@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return nil;
 }
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	return 0.0f;
 }
@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)prioritizeSubload:(id<PGLoading>)obj
 {
-	unsigned const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
+	NSUInteger const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
 	if(NSNotFound == i) return;
 	[_subloads removeObjectAtIndex:i];
 	[_subloads insertObject:obj atIndex:0];

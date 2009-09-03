@@ -46,12 +46,12 @@ typedef UInt8 PGLabelColor;
 @interface PGResourceIdentifier : NSObject <NSCoding>
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL;
-+ (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(unsigned)length; // For backward compatability.
++ (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(NSUInteger)length; // For backward compatability.
 
 - (PGResourceIdentifier *)identifier;
 - (PGDisplayableIdentifier *)displayableIdentifier;
 
-- (PGResourceIdentifier *)subidentifierWithIndex:(int)index;
+- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index;
 - (PGResourceIdentifier *)superidentifier;
 - (PGResourceIdentifier *)rootIdentifier;
 
@@ -59,7 +59,7 @@ typedef UInt8 PGLabelColor;
 - (NSURL *)URLByFollowingAliases:(BOOL)flag;
 - (NSURL *)URL; // Equivalent to -URLByFollowingAliases:NO.
 - (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag;
-- (int)index;
+- (NSInteger)index;
 
 - (BOOL)hasTarget;
 - (BOOL)isFileIdentifier;

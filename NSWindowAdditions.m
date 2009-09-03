@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [NSApp isActive] || ![self hidesOnDeactivate];
 }
-- (float)AE_userSpaceScaleFactor
+- (CGFloat)AE_userSpaceScaleFactor
 {
 	return [self respondsToSelector:@selector(userSpaceScaleFactor)] ? [self userSpaceScaleFactor] : 1.0f;
 }
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	Rect r;
 	GetWindowBounds([self windowRef], kWindowContentRgn, &r); // Updated in realtime, unlike -frame. See hxxp://rentzsch.com/cocoa/nswindowFrameLies.
-	return NSMakeRect(r.left, (float)CGDisplayPixelsHigh(kCGDirectMainDisplay) - r.bottom, r.right - r.left, r.bottom - r.top);
+	return NSMakeRect(r.left, (CGFloat)CGDisplayPixelsHigh(kCGDirectMainDisplay) - r.bottom, r.right - r.left, r.bottom - r.top);
 }
 - (void)AE_setContentRect:(NSRect)aRect
 {
@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSSize const max = [self maxSize];
 	NSRect r = [self frameRectForContentRect:aRect];
 	r.size.width = MIN(MAX(min.width, NSWidth(r)), max.width);
-	float const newHeight = MIN(MAX(min.height, NSHeight(r)), max.height);
+	CGFloat const newHeight = MIN(MAX(min.height, NSHeight(r)), max.height);
 	r.origin.y += NSHeight(r) - newHeight;
 	r.size.height = newHeight;
 	[self setFrame:r display:YES];

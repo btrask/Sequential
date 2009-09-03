@@ -96,9 +96,9 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	for(PGNode *const child in _unsortedChildren) if([anIdent isEqual:[child identifier]]) return child;
 	return nil;
 }
-- (unsigned)viewableIndexOfChild:(PGNode *)aNode
+- (NSUInteger)viewableIndexOfChild:(PGNode *)aNode
 {
-	unsigned index = [[self node] isViewable] ? 1 : 0;
+	NSUInteger index = [[self node] isViewable] ? 1 : 0;
 	for(id const child in [self sortedChildren]) {
 		if(child == aNode) return index + [[self parentAdapter] viewableIndexOfChild:[self node]];
 		index += [[child resourceAdapter] viewableNodeCount];
@@ -183,15 +183,15 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
-- (unsigned)viewableNodeCount
+- (NSUInteger)viewableNodeCount
 {
-	unsigned count = [[self node] isViewable] ? 1 : 0;
+	NSUInteger count = [[self node] isViewable] ? 1 : 0;
 	for(id const child in [self sortedChildren]) count += [[child resourceAdapter] viewableNodeCount];
 	return count;
 }
-- (BOOL)hasViewableNodeCountGreaterThan:(unsigned)anInt
+- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt
 {
-	unsigned count = [[self node] isViewable] ? 1 : 0;
+	NSUInteger count = [[self node] isViewable] ? 1 : 0;
 	if(count > anInt) return YES;
 	for(id const child in [self sortedChildren]) {
 		PGResourceAdapter *const adapter = [child resourceAdapter];

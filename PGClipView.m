@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 #import "NSWindowAdditions.h"
+#include <tgmath.h>
 
 NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidChange";
 
@@ -54,7 +55,7 @@ enum {
 	PGPreliminaryDragging,
 	PGDragging
 };
-typedef unsigned PGDragMode;
+typedef NSUInteger PGDragMode;
 
 static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
@@ -137,7 +138,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_backgroundColor = [aColor copy];
 	_backgroundIsComplex = !_backgroundColor || [NSPatternColorSpace isEqualToString:[_backgroundColor colorSpaceName]];
 	if([[self documentView] isOpaque]) {
-		unsigned i;
+		NSUInteger i;
 		NSRect rects[4];
 		PGGetRectDifference(rects, &i, [self bounds], _documentFrame);
 		while(i--) [self setNeedsDisplayInRect:rects[i]];
@@ -169,7 +170,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSSize const boundsSize = [self insetBounds].size;
 	NSSize margin = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2.0f, (boundsSize.height - NSHeight(_documentFrame)) / 2.0f);
-	float const padding = _showsBorder && flag ? PGBorderPadding : 0.0f;
+	CGFloat const padding = _showsBorder && flag ? PGBorderPadding : 0.0f;
 	if(margin.width < 0.0f) margin.width = padding;
 	if(margin.height < 0.0f) margin.height = padding;
 	NSRect r = NSInsetRect(_documentFrame, -margin.width, -margin.height);
@@ -192,7 +193,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	switch(scrollType) {
 		case PGScrollByLine:
 		{
-			if(PGHorzEdgesMask & direction && PGVertEdgesMask & direction) s = NSMakeSize(sqrtf(powf(max.width, 2.0f) / 2.0f), sqrtf(powf(max.height, 2.0f) / 2.0f));
+			if(PGHorzEdgesMask & direction && PGVertEdgesMask & direction) s = NSMakeSize(sqrtf(pow(max.width, 2.0f) / 2.0f), sqrtf(pow(max.height, 2.0f) / 2.0f));
 			else if(PGHorzEdgesMask & direction) s.width = max.width;
 			else if(PGVertEdgesMask & direction) s.height = max.height;
 			break;
@@ -204,8 +205,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			else if(PGMaxXEdgeMask & direction) s.width = NSMaxX(scrollableRect) - position.x;
 			if(PGMinYEdgeMask & direction) s.height = position.y - NSMinY(scrollableRect);
 			else if(PGMaxYEdgeMask & direction) s.height = NSMaxY(scrollableRect) - position.y;
-			if(s.width) s.width = ceilf(s.width / ceilf(s.width / max.width));
-			if(s.height) s.height = ceilf(s.height / ceilf(s.height / max.height));
+			if(s.width) s.width = ceil(s.width / ceil(s.width / max.width));
+			if(s.height) s.height = ceil(s.height / ceil(s.height / max.height));
 		}
 	}
 	if(PGMinXEdgeMask & direction) s.width *= -1;
@@ -263,7 +264,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
         animation:(PGAnimationType)type
 {
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Can't scroll to contradictory edges.");
-	return [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, FLT_MAX) animation:type];
+	return [self scrollBy:PGRectEdgeMaskToSizeWithMagnitude(mask, CGFLOAT_MAX) animation:type];
 }
 - (BOOL)scrollToLocation:(PGPageLocation)location
         animation:(PGAnimationType)type
@@ -343,7 +344,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self beginScrolling];
 	[self stopAnimatedScrolling];
 	BOOL handled = NO;
-	unsigned dragMask = 0;
+	NSUInteger dragMask = 0;
 	NSEventType stopType = 0;
 	switch([firstEvent type]) {
 		case NSLeftMouseDown:  dragMask = NSLeftMouseDraggedMask;  stopType = NSLeftMouseUp;  break;
@@ -380,7 +381,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
 			NSPoint const screenPoint = PGPointInRect([[self window] convertBaseToScreen:finalPoint], [[self window] AE_contentRect]);
-			IOHIDSetMouseLocation((io_connect_t)handle, roundf(screenPoint.x), roundf(CGDisplayPixelsHigh(kCGDirectMainDisplay) - screenPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
+			IOHIDSetMouseLocation((io_connect_t)handle, round(screenPoint.x), round(CGDisplayPixelsHigh(kCGDirectMainDisplay) - screenPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
 		}
@@ -404,7 +405,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			NSTimeInterval const currentTime = PGUptime();
 			if(currentTime > pageTurnTime + PGPageTurnMovementDelay) {
 				NSSize const d = [self distanceInDirection:PGNonContradictoryRectEdges(pressedDirections) forScrollType:PGScrollByLine];
-				float const timeAdjustment = (float)(lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1.0f);
+				CGFloat const timeAdjustment = (CGFloat)(lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1.0f);
 				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) animation:PGNoAnimation];
 			}
 			lastScrollTime = currentTime;
@@ -450,9 +451,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		position = PGOffsetPointBySize(position, [self distanceInDirection:dir2 forScrollType:PGScrollByPage fromPosition:position]);
 		if([self shouldExitForMovementInDirection:dir2]) {
 			if([[self delegate] clipView:self shouldExitEdges:mask]) return;
-			position = PGRectEdgeMaskToPointWithMagnitude(mask, FLT_MAX); // We can't exit, but make sure we're at the very end.
-		} else if(across) position.x = FLT_MAX * (mask & PGMinXEdgeMask ? 1 : -1);
-		else position.y = FLT_MAX * (mask & PGMinYEdgeMask ? 1 : -1);
+			position = PGRectEdgeMaskToPointWithMagnitude(mask, CGFLOAT_MAX); // We can't exit, but make sure we're at the very end.
+		} else if(across) position.x = CGFLOAT_MAX * (mask & PGMinXEdgeMask ? 1 : -1);
+		else position.y = CGFLOAT_MAX * (mask & PGMinYEdgeMask ? 1 : -1);
 	}
 	[self scrollTo:position animation:PGPreferAnimation];
 }
@@ -495,7 +496,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
 	[self beginScrolling];
 	_immediatePosition = newPosition;
-	[self setBoundsOrigin:NSMakePoint(roundf(_immediatePosition.x), roundf(_immediatePosition.y))];
+	[self setBoundsOrigin:NSMakePoint(round(_immediatePosition.x), round(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	[self endScrolling];
 	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
@@ -508,8 +509,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)_scrollOneFrame
 {
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
-	float const dist = hypotf(r.width, r.height);
-	float const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
+	CGFloat const dist = hypotf(r.width, r.height);
+	CGFloat const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
 	if(![self _scrollTo:(dist < 1.0f ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
 }
 
@@ -611,7 +612,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	CGContextSetPatternPhase([[NSGraphicsContext currentContext] graphicsPort], CGSizeMake(0, NSHeight([self bounds])));
 	[_backgroundColor set];
 
-	int count;
+	NSInteger count;
 	NSRect const *rects;
 	[self getRectsBeingDrawn:&rects count:&count];
 	NSRectFillList(rects, count);
@@ -626,7 +627,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)resetCursorRects
 {
 	if(!_cursor) return;
-	unsigned i;
+	NSUInteger i;
 	NSRect rects[4];
 	NSRect b = [self insetBounds];
 	if([[self window] styleMask] & NSResizableWindowMask) {
@@ -642,7 +643,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)setFrameSize:(NSSize)newSize
 {
-	float const heightDiff = NSHeight([self frame]) - newSize.height;
+	CGFloat const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
 	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
@@ -665,7 +666,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)scrollWheel:(NSEvent *)anEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
-	float const x = -[anEvent deltaX], y = [anEvent deltaY];
+	CGFloat const x = -[anEvent deltaX], y = [anEvent deltaY];
 	if([anEvent modifierFlags] & NSCommandKeyMask) {
 		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayedEndGesture) object:nil];
 		[[self delegate] clipView:self magnifyBy:y * PGMouseWheelZoomFactor];
@@ -708,7 +709,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	if([[self delegate] clipView:self handleKeyDown:anEvent]) return;
 	if([anEvent modifierFlags] & NSCommandKeyMask) return [super keyDown:anEvent];
-	unsigned const modifiers = [anEvent modifierFlags];
+	NSUInteger const modifiers = [anEvent modifierFlags];
 	BOOL const forward = !(NSShiftKeyMask & modifiers);
 	switch([anEvent keyCode]) {
 #if PGGameStyleArrowScrolling
@@ -841,8 +842,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	return PGNoEdges;
 }
-- (void)clipView:(PGClipView *)sender magnifyBy:(float)amount {}
-- (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount {}
+- (void)clipView:(PGClipView *)sender magnifyBy:(CGFloat)amount {}
+- (void)clipView:(PGClipView *)sender rotateByDegrees:(CGFloat)amount {}
 - (void)clipViewGestureDidEnd:(PGClipView *)sender {}
 
 @end

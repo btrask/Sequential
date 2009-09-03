@@ -91,7 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 	OSType const sig = 'MACS'; // The app signature for the Finder.
 	AppleEvent event;
-	if(AEBuildAppleEvent(kAECoreSuite, kAESetData, typeApplSignature, &sig, sizeof(OSType), kAutoGenerateReturnID, kAnyTransactionID, &event, NULL, "'----':'obj '{want:type(prop), form:prop, seld:type('dpic'), from:'null'()}, data:(@)", &descriptor) != noErr) return NO;
+	if(AEBuildAppleEvent(kAECoreSuite, kAESetData, typeApplSignature, &sig, sizeof(sig), kAutoGenerateReturnID, kAnyTransactionID, &event, NULL, "'----':'obj '{want:type(prop), form:prop, seld:type('dpic'), from:'null'()}, data:(@)", &descriptor) != noErr) return NO;
 
 	// Finally we can go ahead and send the Apple Event using AESend.
 	AppleEvent reply = {typeNull, NULL};

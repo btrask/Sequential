@@ -48,7 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThumbnailControllerContentInsetDidChange";
 
-#define PGMaxVisibleColumns (unsigned)3
+#define PGMaxVisibleColumns (NSUInteger)3
 
 @interface PGThumbnailController(Private)
 
@@ -250,7 +250,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	id const item = [selection anyObject];
 	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [item parentNode]) viewableAncestor] forward:YES];
 }
-- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount
+- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount
 {
 	if(MIN(oldCount, PGMaxVisibleColumns) != MIN([sender numberOfColumns], PGMaxVisibleColumns)) [self _updateWindowFrame];
 }

@@ -69,7 +69,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 	PGImageView *_imageView;
 	PGPageLocation _initialLocation;
 	BOOL _reading;
-	unsigned _displayImageIndex;
+	NSUInteger _displayImageIndex;
 
 	PGBezelPanel *_graphicPanel;
 	PGLoadingGraphic *_loadingGraphic;
@@ -157,7 +157,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)setTimerRunning:(BOOL)run;
 - (void)advanceOnTimer;
 
-- (void)zoomBy:(float)aFloat;
+- (void)zoomBy:(CGFloat)aFloat;
 - (void)zoomKeyDown:(NSEvent *)firstEvent;
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif;

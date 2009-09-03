@@ -130,7 +130,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 - (void)_updateFrameWithWindow:(NSWindow *)aWindow
         display:(BOOL)flag
 {
-	float const s = [self AE_userSpaceScaleFactor];
+	CGFloat const s = [self AE_userSpaceScaleFactor];
 	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
 	if(NSEqualRects([self frame], f)) return;
 	if(flag) NSDisableScreenUpdates();
@@ -229,7 +229,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 - (NSRect)bezelPanel:(PGBezelPanel *)sender
           frameForContentRect:(NSRect)aRect
-          scale:(float)scaleFactor
+          scale:(CGFloat)scaleFactor
 {
 	return aRect;
 }

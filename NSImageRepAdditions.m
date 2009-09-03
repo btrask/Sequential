@@ -31,15 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!data) return nil;
 	NSArray *const reps = [NSBitmapImageRep imageRepsWithData:data];
 	if(1 == [reps count]) return [reps objectAtIndex:0];
-	int bestPixelCount = 0;
+	NSInteger bestPixelCount = 0;
 	NSBitmapImageRep *bestRep = nil;
 	if(data) for(NSBitmapImageRep *const rep in reps) {
-		int const w = [rep pixelsWide], h = [rep pixelsHigh];
+		NSInteger const w = [rep pixelsWide], h = [rep pixelsHigh];
 		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
 			bestRep = rep;
 			break;
 		}
-		int const pixelCount = w * h;
+		NSInteger const pixelCount = w * h;
 		if(pixelCount < bestPixelCount) continue;
 		if(pixelCount == bestPixelCount && [bestRep bitsPerPixel] > [rep bitsPerPixel]) continue;
 		bestRep = rep;

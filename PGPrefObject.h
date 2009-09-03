@@ -40,7 +40,7 @@ enum {
 	PGNoPattern = 0,
 	PGCheckerboardPattern = 1
 };
-typedef int PGPatternType;
+typedef NSInteger PGPatternType;
 
 enum {
 	PGConstantFactorScale = 0, // Formerly known as PGNoScale.
@@ -49,7 +49,7 @@ enum {
 	PGViewFitScale = 3, // Fits the entire image inside the screen/window.
 	PGActualSizeWithDPI = 4
 };
-typedef int PGImageScaleMode;
+typedef NSInteger PGImageScaleMode;
 extern NSArray *PGScaleModes(void);
 
 enum {
@@ -57,7 +57,7 @@ enum {
 	PGScaleFreely = 0,
 	PGUpscale     = 1
 };
-typedef int PGImageScaleConstraint;
+typedef NSInteger PGImageScaleConstraint;
 
 enum {
 	PGUnsorted           = 0,
@@ -72,7 +72,7 @@ enum {
 	PGSortDescendingMask = 1 << 16,
 	PGSortRepeatMask     = 1 << 17,
 };
-typedef int PGSortOrder;
+typedef NSInteger PGSortOrder;
 
 @interface PGPrefObject : NSObject
 {
@@ -81,7 +81,7 @@ typedef int PGSortOrder;
 	BOOL _showsThumbnails;
 	PGReadingDirection _readingDirection;
 	PGImageScaleMode _imageScaleMode;
-	float _imageScaleFactor;
+	CGFloat _imageScaleFactor;
 	PGImageScaleConstraint _imageScaleConstraint;
 	BOOL _animatesImages;
 	PGSortOrder _sortOrder;
@@ -94,7 +94,7 @@ typedef int PGSortOrder;
 @property BOOL showsThumbnails;
 @property PGReadingDirection readingDirection;
 @property PGImageScaleMode imageScaleMode;
-@property float imageScaleFactor;
+@property CGFloat imageScaleFactor;
 @property PGImageScaleConstraint imageScaleConstraint;
 @property BOOL animatesImages;
 @property PGSortOrder sortOrder;

@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Categories
 #import "NSBezierPathAdditions.h"
+#include <tgmath.h>
 
 @implementation PGProgressIndicatorCell
 
@@ -51,12 +52,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5f, 0.5f) cornerRadius:(NSHeight(aRect) - 1.0f) / 2.0f] stroke];
 
 	NSRect r = aRect;
-	r.size.width = ceilf(NSWidth(aRect) * [[self objectValue] floatValue]); // For some reason -[NSCell floatValue] doesn't work.
+	r.size.width = (CGFloat)ceil(NSWidth(aRect) * [[self objectValue] doubleValue]);
 	[NSGraphicsContext saveGraphicsState];
 	NSRectClip(r);
 	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2.0f, 2.0f) cornerRadius:(NSHeight(aRect) - 4.0f) / 2.0f] addClip];
 	
-	r.size.height = ceilf(NSHeight(r) / 2.0f);
+	r.size.height = ceil(NSHeight(r) / 2.0f);
 	[[NSColor colorWithDeviceWhite:0.95f alpha:0.8f] set];
 	NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	r.origin.y += NSHeight(r);

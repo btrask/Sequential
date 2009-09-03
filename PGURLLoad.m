@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGMaxSimultaneousConnections 4
 
 static NSString *PGUserAgent = nil;
-static unsigned PGSimultaneousConnections = 0;
+static NSUInteger PGSimultaneousConnections = 0;
 
 @interface NSObject (PGURLLoadStarting)
 
@@ -145,13 +145,13 @@ static unsigned PGSimultaneousConnections = 0;
 {
 	return [[_request URL] absoluteString];
 }
-- (float)loadProgress
+- (CGFloat)loadProgress
 {
 	if([self loaded]) return 1.0f;
 	if(!_response) return 0.0f;
 	long long const expectedLength = [_response expectedContentLength];
 	if(-1 == expectedLength) return 0.0f;
-	return (float)[_data length] / (float)expectedLength;
+	return (CGFloat)[_data length] / (CGFloat)expectedLength;
 }
 - (id<PGLoading>)parentLoad
 {

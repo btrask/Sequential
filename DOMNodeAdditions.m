@@ -34,14 +34,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	DOMHTMLCollection *const links = [self links];
-	unsigned i = 0;
-	unsigned const count = [links length];
+	NSUInteger i = 0;
+	NSUInteger const count = [links length];
 	for(; i < count; i++) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		do {
 			DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
 			NSString *href = [a href];
-			unsigned anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
+			NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
 			if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
 			if(!href || [@"" isEqualToString:href]) continue;
 			NSURL *const URL = [NSURL URLWithString:href];
@@ -59,8 +59,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	DOMHTMLCollection *const images = [self images];
-	unsigned i = 0;
-	unsigned const count = [images length];
+	NSUInteger i = 0;
+	NSUInteger const count = [images length];
 	for(; i < count; i++) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		do {

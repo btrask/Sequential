@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSBezierPathAdditions.h"
 #import "NSColorAdditions.h"
 #import "NSObjectAdditions.h"
+#include <tgmath.h>
 
 #define PGGraphicalIndicatorStyle YES
 #define PGMarginSize              4.0f // Outside the window.
@@ -55,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[style setAlignment:NSCenterTextAlignment];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
-	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%u/%u)", [self messageText], [self index] + 1, [self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%lu/%lu)", [self messageText], (unsigned long)[self index] + 1, (unsigned long)[self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0.0f], NSFontAttributeName,
 		[NSColor whiteColor], NSForegroundColorAttributeName,
 		style, NSParagraphStyleAttributeName, nil]] autorelease];
@@ -79,22 +80,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (unsigned)index
+- (NSUInteger)index
 {
 	return _index;
 }
-- (void)setIndex:(unsigned)anInt
+- (void)setIndex:(NSUInteger)anInt
 {
 	if(anInt == _index) return;
 	_index = anInt;
 	[self setNeedsDisplay:YES];
 }
 
-- (unsigned)count
+- (NSUInteger)count
 {
 	return _count;
 }
-- (void)setCount:(unsigned)anInt
+- (void)setCount:(NSUInteger)anInt
 {
 	if(anInt == _count) return;
 	BOOL const showedIndicator = [self displaysProgressIndicator];
@@ -125,16 +126,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSRect)bezelPanel:(PGBezelPanel *)sender
           frameForContentRect:(NSRect)aRect
-          scale:(float)scaleFactor
+          scale:(CGFloat)scaleFactor
 {
 	NSSize const messageSize = [[self displayText] size];
-	float const scaledMarginSize = PGMarginSize * scaleFactor;
+	CGFloat const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
 		NSMakeRect(
 			NSMinX(aRect) + scaledMarginSize,
 			NSMinY(aRect) + scaledMarginSize,
-			ceilf((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
-			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
+			ceil((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
+			ceil(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
 	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
@@ -157,9 +158,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[[NSColor AE_bezelForegroundColor] set];
 		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
-		unsigned const maxValue = [self count] - 1;
+		NSUInteger const maxValue = [self count] - 1;
 		NSBezierPath *const indicator = [NSBezierPath bezierPath];
-		float x = roundf(((float)MIN([self index], maxValue) / maxValue) * (PGIndicatorWidth - 1 - PGIndicatorHeight) + 1);
+		CGFloat x = round(((CGFloat)MIN([self index], maxValue) / maxValue) * (PGIndicatorWidth - 1 - PGIndicatorHeight) + 1);
 		if([self origin] == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10.0f - PGPaddingSize;
 		else x += PGPaddingSize;
 		[indicator moveToPoint:NSMakePoint(x + 0.5f, PGPaddingSize + 6.0f)];
@@ -168,8 +169,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[indicator lineToPoint:NSMakePoint(x + 5.0f, PGPaddingSize + 1.5f)];
 		[indicator fill];
 	}
-	float const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f;
-	float const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0.0f;
+	CGFloat const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f;
+	CGFloat const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0.0f;
 	[[self displayText] drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
 }
 

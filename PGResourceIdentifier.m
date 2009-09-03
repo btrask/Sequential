@@ -57,8 +57,8 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 + (void)clearCache;
 
 - (id)initWithURL:(NSURL *)URL; // Must be a file URL.
-- (id)initWithAliasData:(const uint8_t *)data length:(unsigned)length;
-- (BOOL)setAliasWithData:(const uint8_t *)data length:(unsigned)length;
+- (id)initWithAliasData:(const uint8_t *)data length:(NSUInteger)length;
+- (BOOL)setAliasWithData:(const uint8_t *)data length:(NSUInteger)length;
 - (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)follow validate:(BOOL)validate;
 - (void)cacheURL:(NSURL *)URL;
 - (void)clearCache;
@@ -79,10 +79,10 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	@private
 	PGResourceIdentifier *_superidentifier;
-	int _index;
+	NSInteger _index;
 }
 
-- (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier index:(int)index;
+- (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier index:(NSInteger)index;
 
 @end
 
@@ -95,7 +95,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [[[([URL isFileURL] ? [PGAliasIdentifier class] : [PGURLIdentifier class]) alloc] initWithURL:URL] autorelease];
 }
 + (id)resourceIdentifierWithAliasData:(const uint8_t *)data
-      length:(unsigned)length
+      length:(NSUInteger)length
 {
 	return [[[PGAliasIdentifier alloc] initWithAliasData:data length:length] autorelease];
 }
@@ -113,7 +113,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark -
 
-- (PGResourceIdentifier *)subidentifierWithIndex:(int)index
+- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
 {
 	return [[[PGIndexIdentifier alloc] initWithSuperidentifier:self index:index] autorelease];
 }
@@ -146,7 +146,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return NO;
 }
-- (int)index
+- (NSInteger)index
 {
 	return NSNotFound;
 }
@@ -193,9 +193,9 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark NSObject Protocol
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
-	return [[PGResourceIdentifier class] hash] ^ (unsigned)[self index];
+	return [[PGResourceIdentifier class] hash] ^ (NSUInteger)[self index];
 }
 - (BOOL)isEqual:(id)obj
 {
@@ -223,7 +223,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [[[self alloc] _initWithIdentifier:[super resourceIdentifierWithURL:URL]] autorelease];
 }
 + (id)resourceIdentifierWithAliasData:(const uint8_t *)data
-      length:(unsigned)length
+      length:(NSUInteger)length
 {
 	return [[[self alloc] _initWithIdentifier:[super resourceIdentifierWithAliasData:data length:length]] autorelease];
 }
@@ -344,7 +344,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark -
 
-- (PGResourceIdentifier *)subidentifierWithIndex:(int)index
+- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
 {
 	return [_identifier subidentifierWithIndex:index];
 }
@@ -376,7 +376,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [_identifier getRef:outRef byFollowingAliases:flag];
 }
-- (int)index
+- (NSInteger)index
 {
 	return [_identifier index];
 }
@@ -475,7 +475,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	return self;
 }
 - (id)initWithAliasData:(const uint8_t *)data
-      length:(unsigned)length
+      length:(NSUInteger)length
 {
 	if((self = [super init])) {
 		if(![self setAliasWithData:data length:length]) {
@@ -486,7 +486,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	return self;
 }
 - (BOOL)setAliasWithData:(const uint8_t *)data
-        length:(unsigned)length
+        length:(NSUInteger)length
 {
 	if(!data || !length) return NO;
 	_alias = (AliasHandle)NewHandle(length);
@@ -562,7 +562,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 - (id)initWithCoder:(NSCoder *)aCoder
 {
 	if((self = [super initWithCoder:aCoder])) {
-		unsigned length;
+		NSUInteger length;
 		uint8_t const *const data = [aCoder decodeBytesForKey:@"Alias" returnedLength:&length];
 		if(![self setAliasWithData:data length:length]) {
 			[self release];
@@ -647,7 +647,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 #pragma mark Instance Methods
 
 - (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier
-      index:(int)index
+      index:(NSInteger)index
 {
 	NSParameterAssert(identifier);
 	if((self = [super init])) {
@@ -663,7 +663,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 {
 	if((self = [super initWithCoder:aCoder])) {
 		_superidentifier = [[aCoder decodeObjectForKey:@"Superidentifier"] retain];
-		_index = [aCoder decodeIntForKey:@"Index"];
+		_index = [aCoder decodeIntegerForKey:@"Index"];
 	}
 	return self;
 }
@@ -671,14 +671,14 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 {
 	[super encodeWithCoder:aCoder];
 	[aCoder encodeObject:_superidentifier forKey:@"Superidentifier"];
-	[aCoder encodeInt:_index forKey:@"Index"];
+	[aCoder encodeInteger:_index forKey:@"Index"];
 }
 
 #pragma mark NSObject Protocol
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"%@:%d", [self superidentifier], [self index]];
+	return [NSString stringWithFormat:@"%@:%ld", [self superidentifier], (long)[self index]];
 }
 
 #pragma mark PGResourceIdentifier
@@ -687,7 +687,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 {
 	return [[_superidentifier retain] autorelease];
 }
-- (int)index
+- (NSInteger)index
 {
 	return _index;
 }

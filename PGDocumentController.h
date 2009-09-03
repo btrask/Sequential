@@ -148,7 +148,7 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (NSArray *)recentDocumentIdentifiers;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray;
-- (unsigned)maximumRecentDocumentCount;
+- (NSUInteger)maximumRecentDocumentCount;
 
 - (PGDisplayController *)displayControllerForNewDocument; // Returns either the shared fullscreen controller or a new regular window controller.
 - (BOOL)fullscreen;

@@ -24,13 +24,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCFMutableArray.h"
 
-static CFIndex PGUnsignedToCFIndex(unsigned i)
+static CFIndex PGUnsignedToCFIndex(NSUInteger i)
 {
 	return NSNotFound == i ? kCFNotFound : (CFIndex)i;
 }
-static unsigned PGCFIndexToUnsigned(CFIndex i)
+static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
-	return kCFNotFound == i ? NSNotFound : (unsigned)i;
+	return kCFNotFound == i ? NSNotFound : (NSUInteger)i;
 }
 
 @implementation PGCFMutableArray
@@ -90,12 +90,12 @@ static unsigned PGCFIndexToUnsigned(CFIndex i)
 {
 	return CFEqual(_array, (CFArrayRef)otherArray);
 }
-- (unsigned)indexOfObject:(id)anObject
+- (NSUInteger)indexOfObject:(id)anObject
               inRange:(NSRange)range
 {
 	return PGCFIndexToUnsigned(CFArrayGetFirstIndexOfValue(_array, CFRangeMake(PGUnsignedToCFIndex(range.location), PGUnsignedToCFIndex(range.length)), anObject));
 }
-- (unsigned)indexOfObjectIdenticalTo:(id)anObject
+- (NSUInteger)indexOfObjectIdenticalTo:(id)anObject
             inRange:(NSRange)range
 {
 	return [self indexOfObject:anObject inRange:range];
@@ -108,20 +108,20 @@ static unsigned PGCFIndexToUnsigned(CFIndex i)
 	CFArrayAppendValue(_array, anObject);
 }
 - (void)insertObject:(id)anObject
-        atIndex:(unsigned)index
+        atIndex:(NSUInteger)index
 {
 	CFArrayInsertValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
 }
 - (void)removeLastObject
 {
-	unsigned const count = [self count];
+	NSUInteger const count = [self count];
 	if(count) CFArrayRemoveValueAtIndex(_array, PGUnsignedToCFIndex(count - 1));
 }
-- (void)removeObjectAtIndex:(unsigned)index
+- (void)removeObjectAtIndex:(NSUInteger)index
 {
 	CFArrayRemoveValueAtIndex(_array, PGUnsignedToCFIndex(index));
 }
-- (void)replaceObjectAtIndex:(unsigned)index
+- (void)replaceObjectAtIndex:(NSUInteger)index
         withObject:(id)anObject
 {
 	CFArraySetValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
@@ -129,11 +129,11 @@ static unsigned PGCFIndexToUnsigned(CFIndex i)
 
 #pragma mark NSArray
 
-- (unsigned)count
+- (NSUInteger)count
 {
 	return PGCFIndexToUnsigned(CFArrayGetCount(_array));
 }
-- (id)objectAtIndex:(unsigned)index
+- (id)objectAtIndex:(NSUInteger)index
 {
 	return (id)CFArrayGetValueAtIndex(_array, PGUnsignedToCFIndex(index));
 }

@@ -1,8 +1,8 @@
 ﻿/* The primary screen. */
 "Main Screen" = "主螢幕";
 
-/* Non-primary screens. %u is replaced with the screen number. */
-"Screen %u" = "螢幕 %u";
+/* Non-primary screens. %lu is replaced with the screen number. */
+"Screen %lu" = "螢幕 %lu";
 
 /* Clear the Open Recent menu. Should be the same as the standard text. */
 "Clear Menu" = "清除選單";
@@ -71,8 +71,8 @@
 /* Do resume from bookmark button. */
 "Resume" = "Resume";
 
-/* The URL returned a error status code. %u is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
-"The error %u %@ was generated while loading the URL %@." = "產生錯誤“%u %@”（載入 URL“%@”時）。";
+/* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
+"The error %ld %@ was generated while loading the URL %@." = "產生錯誤“%ld %@”（載入 URL“%@”時）。";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
 "The URL %@ could not be loaded." = "無法載入 URL“%@”。";
@@ -80,8 +80,8 @@
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "%@ already exists in %@. Do you want to replace it?" = "“%@”已存在於“%@”。您想要取代它嗎？";
 
-/* Replace multiple files alert. %u is replaced with a number greater than 1, %@ is replaced with the destination name. */
-"%u pages already exist in %@. Do you want to replace them?" = "%u 個頁面已存在於“%@”。您要取代它們嗎？";
+/* Replace multiple files alert. %lu is replaced with a number greater than 1, %@ is replaced with the destination name. */
+"%lu pages already exist in %@. Do you want to replace them?" = "%lu 個頁面已存在於“%@”。您要取代它們嗎？";
 
 /* Informative text for replacement alerts. */
 "Replacing a file overwrites its current contents." = "取代檔案會覆寫其目前的內容。";
@@ -89,8 +89,8 @@
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
 
-/* Multiple image save failure alert. %u is replaced with the number of files, %@ is replaced with the destination name. */
-"%u images could not be saved to %@." = "%u images could not be saved to “%@.”";
+/* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
+"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "請確定卷宗可寫入且具有足夠可用空間。";

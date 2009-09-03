@@ -31,8 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSString *)AE_localizedStringAsBytes
 {
-	double b = (double)[self unsignedLongLongValue];
-	unsigned magnitude = 0;
+	CGFloat b = (CGFloat)[self unsignedLongLongValue];
+	NSUInteger magnitude = 0;
 	for(; b >= 1024 && magnitude < 4; magnitude++) b /= 1024;
 	NSString *unit = nil;
 	switch(magnitude) {

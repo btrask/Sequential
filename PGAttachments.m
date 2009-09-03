@@ -68,7 +68,7 @@ static void PGEnsureWindowCreatedHack(void)
 #pragma mark Instance Methods
 
 - (id)initWithMenuItem:(NSMenuItem *)anItem
-      rotation:(float)angle
+      rotation:(CGFloat)angle
 {
 	if((self = [super init])) {
 		PGEnsureWindowCreatedHack();

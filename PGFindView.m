@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSRect)bezelPanel:(PGBezelPanel *)sender
           frameForContentRect:(NSRect)aRect
-          scale:(float)s
+          scale:(CGFloat)s
 {
 	return (NSRect){aRect.origin, {NSWidth([self frame]) * s, NSHeight([self frame]) * s}};
 }

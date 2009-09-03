@@ -33,21 +33,21 @@ enum {
 	PGScrollByLine = 0,
 	PGScrollByPage = 1
 };
-typedef unsigned PGScrollType;
+typedef NSUInteger PGScrollType;
 
 enum {
 	PGNoAnimation = 0,
 	PGAllowAnimation = 1,
 	PGPreferAnimation = 2
 };
-typedef unsigned PGAnimationType;
+typedef NSUInteger PGAnimationType;
 
 enum {
 	PGScrollLeastToRect = 0,
 	PGScrollCenterToRect = 1,
 	PGScrollMostToRect = 2
 };
-typedef unsigned PGScrollToRectType;
+typedef NSUInteger PGScrollToRectType;
 
 @interface PGClipView : NSView
 {
@@ -65,9 +65,9 @@ typedef unsigned PGScrollToRectType;
 	NSTimer *_scrollTimer;
 	NSTimeInterval _lastScrollTime;
 	PGRectEdgeMask _pinLocation;
-	unsigned _documentViewIsResizing;
+	NSUInteger _documentViewIsResizing;
 	BOOL _firstMouse;
-	unsigned _scrollCount;
+	NSUInteger _scrollCount;
 }
 
 - (id)delegate;
@@ -128,8 +128,8 @@ typedef unsigned PGScrollToRectType;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
 - (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation; // Don't provide contradictory directions.
-- (void)clipView:(PGClipView *)sender magnifyBy:(float)amount;
-- (void)clipView:(PGClipView *)sender rotateByDegrees:(float)amount;
+- (void)clipView:(PGClipView *)sender magnifyBy:(CGFloat)amount;
+- (void)clipView:(PGClipView *)sender rotateByDegrees:(CGFloat)amount;
 - (void)clipViewGestureDidEnd:(PGClipView *)sender;
 
 @end

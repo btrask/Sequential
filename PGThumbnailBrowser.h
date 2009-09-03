@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	IBOutlet id dataSource;
 	IBOutlet id delegate;
 	PGOrientation _thumbnailOrientation;
-	unsigned _updateCount;
+	NSUInteger _updateCount;
 }
 
 - (id)dataSource;
@@ -60,6 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface NSObject (PGThumbnailBrowserDelegate)
 
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
-- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(unsigned)oldCount;
+- (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount;
 
 @end
