@@ -114,6 +114,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	if([PGGeneralPaneIdentifier isEqualToString:identifier]) view = generalView;
 	else if([PGNavigationPaneIdentifier isEqualToString:identifier]) view = navigationView;
 	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) view = updateView;
+	NSAssert(view, @"Invalid identifier.");
 	NSWindow *const w = [self window];
 	[w setTitle:NSLocalizedString(@"Preferences", nil)];
 	[[w toolbar] setSelectedItemIdentifier:identifier];

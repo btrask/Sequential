@@ -25,10 +25,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
 @interface PGColorWell : NSColorWell
-{
-	@private
-	IBOutlet NSView *accessory;
-}
 
 - (void)PG_windowWillClose:(NSNotification *)aNotif;
 

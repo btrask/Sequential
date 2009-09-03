@@ -139,13 +139,7 @@ static NSDictionary*    _selectedLabelAttr = nil;
 	if (![self isEnabled]) {
 		fraction = 0.5f;
 	}
-    
-	// Get tracking segment
-	int	trackingSegment = 0;
-	if ([self respondsToSelector:@selector(_trackingSegment)]) {
-		trackingSegment = [self _trackingSegment];
-	}
-	
+    	
     //
     // Draw background
     //
@@ -163,7 +157,7 @@ static NSDictionary*    _selectedLabelAttr = nil;
 		
 		// Create highlighted image
 #if 0
-		if (trackingSegment == 0) {
+		if (![self respondsToSelector:@selector(_trackingSegment)] || [self _trackingSegment] == 0) {
 			leftImage = ESCCHighlightImage(leftImage);
 		}
 #endif
