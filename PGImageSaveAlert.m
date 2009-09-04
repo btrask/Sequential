@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_rootNode = [root retain];
 	_initialSelection = [aSet copy];
 	_saveNamesByNodePointer = [[NSMutableDictionary alloc] init];
+	[[NSProcessInfo processInfo] disableSuddenTermination];
 	return self;
 }
 - (void)beginSheetForWindow:(NSWindow *)window
@@ -103,6 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)dealloc
 {
+	[[NSProcessInfo processInfo] enableSuddenTermination];
 	[nodesOutline setDataSource:nil];
 	[nodesOutline setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
 	[_rootNode release];

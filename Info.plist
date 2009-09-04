@@ -652,6 +652,8 @@
 	<string>PGMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>PGApplication</string>
+	<key>NSSupportsSuddenTermination</key>
+	<string>YES</string>
 	<key>PGResourceAdapterClasses</key>
 	<dict>
 		<key>PGArchiveAdapter</key>
