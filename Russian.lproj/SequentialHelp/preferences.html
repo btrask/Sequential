@@ -1,52 +1,72 @@
 <html>
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<title>Настройки</title>
+		<title>Preferences</title>
 		<link rel="stylesheet" type="text/css" href="main.css" media="all">
 	</head>
 	<body>
 		<a name="preferences"></a>
-		<h1><img src="Sequential.png" class="icon"> Настройки</h1>
+		<h1><img src="Sequential.png" class="icon"> Preferences</h1>
 		<table cellspacing=0 width=100%>
 			<tr class="header">
-				<td width=30%>Пункт меню</td>
-				<td>Описание</td>
+				<td width=30%>General</td>
+				<td>Description</td>
 			</tr>
 			<tr>
-				<td>Сглаживать при увеличении</td>
-				<td>Изображение будет сглаживаться при масштабе больше чем 1:1. Просмотр изображений в масштабе меньше 1:1 всегда сглаживается.</td>
+				<td>Background</td>
+				<td>The color and pattern displayed behind images.</td>
 			</tr>
 			<tr>
-				<td>Округлые углы</td>
-				<td>Сделать углы изображений слегка округлыми.</td>
+				<td>Full screen on</td>
+				<td>The monitor to use in full screen mode.</td>
 			</tr>
 			<tr>
-				<td>Размер окна равен размеру изображения</td>
-				<td>Автоматически менять размер окна в соответствии с размером изображения.</td>
+				<td>Dim other screens</td>
+				<td>Black out other monitors while in full screen mode.</td>
 			</tr>
 			<tr>
-				<td>Только для одиночных изображений</td>
-				<td>Использовать "Размер окна равен размеру изображения” только для документов с одним изображением.</td>
+				<td>Resize to size of first image</td>
+				<td>Automatically resize windows when the first image is loaded.</td>
 			</tr>
 			<tr>
-				<td>Фон</td>
-				<td>Цвет фона и орнамент вокруг изображения.</td>
+				<td>Only for single images</td>
+				<td>Only use “fit windows to initial image size” for documents that have exactly one image. Other document windows are not resized.</td>
 			</tr>
 			<tr>
-				<td>Полноэкранный режим</td>
-				<td>Показ изображений на весь экран.</td>
+				<td>Antialias when upscaling</td>
+				<td>Smooth images when they are drawn at larger than actual size. Images drawn smaller are always smoothed.</td>
 			</tr>
 			<tr>
-				<td>Глубина поиска в подпапках</td>
-				<td>Сколько уровней подпапок использовать для поиска изображений.</td>
+				<td>Round image corners</td>
+				<td>Slightly bevel the corners of images.</td>
 			</tr>
 			<tr>
-				<td>Основной щелчок ведет на</td>
-				<td>Оперделяет функцию правого и левого щелчка мыши. "На следующую страницу" означает вправо или влево (в зависимости от выбранного направления просмотра). "Влево" и "вправо" будут следующая и предыдущая страница соответственно.</td>
+				<td>Escape key</td>
+				<td>The behavior of the Escape key.</td>
+			</tr>
+			<tr class="header">
+				<td width=30%>Navigation</td>
+				<td>Description</td>
 			</tr>
 			<tr>
-				<td>Клавиша Escape</td>
-				<td>Функции клавиши Escape.</td>
+				<td>Primary click goes…</td>
+				<td>Determines the behavior of primary and secondary clicks. “To next page” can be either left or right depending on the reading direction, whereas “left” and “right” can be either the next or previous page.</td>
+			</tr>
+			<tr>
+				<td>When going backward…</td>
+				<td>Which corner of the image to start at when navigating from an image to the image before it.</td>
+			</tr>
+			<tr>
+				<td>Maximum depth</td>
+				<td>The number of levels down into folders to open.</td>
+			</tr>
+			<tr class="header">
+				<td width=30%>Update</td>
+				<td>Description</td>
+			</tr>
+			<tr>
+				<td>Check automatically</td>
+				<td>Check for updates automatically once a week. When an update is available you can install it by choosing Sequential > Install Update…. Requires an internet connection.</td>
 			</tr>
 		</table>
 	</body>
