@@ -424,7 +424,7 @@ enum {
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {
 			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
 			dateModified = [attributes fileModificationDate];
 		}
 	}
@@ -439,7 +439,7 @@ enum {
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {
 			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
 			dateCreated = [attributes fileCreationDate];
 		}
 	}
@@ -458,7 +458,7 @@ enum {
 		PGResourceIdentifier *const identifier = [self identifier];
 		if(path || [identifier isFileIdentifier]) {
 			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] fileAttributesAtPath:path traverseLink:NO];
+			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
 			if(![NSFileTypeDirectory isEqualToString:[attributes fileType]]) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
 		}
 	} while(NO);

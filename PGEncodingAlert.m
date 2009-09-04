@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_encodingNames = encodingNames;
 	_samples = samples;
 	[encodingsTable reloadData];
-	[encodingsTable selectRow:defaultRow byExtendingSelection:NO];
+	[encodingsTable selectRowIndexes:[NSIndexSet indexSetWithIndex:defaultRow] byExtendingSelection:NO];
 	[encodingsTable scrollRowToVisible:defaultRow];
 	[encodingsTable setDoubleAction:@selector(ok:)];
 	[encodingsTable setTarget:self];

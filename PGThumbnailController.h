@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Views
 @class PGFadeOutPanel;
-@class PGThumbnailBrowser;
+#import "PGThumbnailBrowser.h"
 
 // Controllers
 @class PGDisplayController;
@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 
-@interface PGThumbnailController : NSObject
+@interface PGThumbnailController : NSObject <PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource, NSWindowDelegate>
 {
 	@private
 	PGFadeOutPanel *_window;

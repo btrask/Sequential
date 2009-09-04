@@ -251,7 +251,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSMenu*)menuForEvent:(NSEvent*)event
 {
     if ([[self delegate] respondsToSelector:@selector(tableView:menuForEvent:)]) {
-        return [[self delegate] tableView:self menuForEvent:event];
+        return [(NSObject *)[self delegate] tableView:self menuForEvent:event];
     }
     
     return nil;
@@ -294,7 +294,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSMenu*)menuForEvent:(NSEvent*)event
 {
     if ([[self delegate] respondsToSelector:@selector(outlineView:menuForEvent:)]) {
-        return [[self delegate] outlineView:self menuForEvent:event];
+        return [(NSObject *)[self delegate] outlineView:self menuForEvent:event];
     }
     
     return nil;
@@ -305,7 +305,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
         operation:(NSDragOperation)operation
 {
     if ([[self delegate] respondsToSelector:@selector(draggedImage:endedAt:operation:)]) {
-        [[self delegate] draggedImage:image endedAt:point operation:operation];
+        [(NSObject *)[self delegate] draggedImage:image endedAt:point operation:operation];
     }
 }
 

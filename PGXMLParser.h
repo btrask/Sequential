@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGNode;
 @class PGContainerAdapter;
 
-@interface PGXMLParser : NSObject
+@interface PGXMLParser : NSObject <NSXMLParserDelegate>
 {
 	@private
 	NSXMLParser    *_parser;

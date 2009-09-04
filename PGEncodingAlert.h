@@ -46,8 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGEncodingAlertDelegate)
+@protocol PGEncodingAlertDelegate
 
+@optional
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender selectedEncoding:(NSStringEncoding)encoding;
 
 @end

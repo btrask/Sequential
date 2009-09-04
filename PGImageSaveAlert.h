@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGNode;
 
-@interface PGImageSaveAlert : NSWindowController
+@interface PGImageSaveAlert : NSWindowController <NSOpenSavePanelDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate>
 {
 	@private
 	IBOutlet NSView *accessoryView;

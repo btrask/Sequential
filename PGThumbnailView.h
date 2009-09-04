@@ -27,21 +27,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometryTypes.h"
 
+@protocol PGThumbnailViewDataSource;
+@protocol PGThumbnailViewDelegate;
+
 @interface PGThumbnailView : NSView
 {
 	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
+	IBOutlet NSObject<PGThumbnailViewDataSource> * dataSource;
+	IBOutlet NSObject<PGThumbnailViewDelegate> * delegate;
 	id _representedObject;
 	PGOrientation _thumbnailOrientation;
 	NSArray *_items;
 	NSMutableSet *_selection;
 }
 
-- (id)dataSource;
-- (void)setDataSource:(id)obj;
-- (id)delegate;
-- (void)setDelegate:(id)obj;
+- (NSObject<PGThumbnailViewDataSource> *)dataSource;
+- (void)setDataSource:(NSObject<PGThumbnailViewDataSource> *)obj;
+- (NSObject<PGThumbnailViewDelegate> *)delegate;
+- (void)setDelegate:(NSObject<PGThumbnailViewDelegate> *)obj;
 - (id)representedObject;
 - (void)setRepresentedObject:(id)obj;
 - (PGOrientation)thumbnailOrientation;
@@ -62,8 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGThumbnailViewDataSource)
+@protocol PGThumbnailViewDataSource <NSObject>
 
+@optional
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender;
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item;
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
@@ -74,8 +78,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGThumbnailViewDelegate)
+@protocol PGThumbnailViewDelegate <NSObject>
 
+@optional
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender;
 
 @end

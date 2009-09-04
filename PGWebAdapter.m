@@ -77,7 +77,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super dealloc];
 }
 
-#pragma mark -NSObject(PGURLLoadDelegate)
+#pragma mark -<PGLoading>
+
+- (CGFloat)loadProgress
+{
+	return [_mainLoad loadProgress];
+}
+
+#pragma mark -<PGURLLoadDelegate>
 
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
@@ -119,13 +126,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(sender != _mainLoad) return;
 	[_faviconLoad cancelAndNotify:NO];
 	[[self node] loadFinished];
-}
-
-#pragma mark -<PGLoading>
-
-- (CGFloat)loadProgress
-{
-	return [_mainLoad loadProgress];
 }
 
 @end

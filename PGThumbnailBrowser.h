@@ -28,19 +28,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGThumbnailView.h"
 
-@interface PGThumbnailBrowser : PGColumnView
+@protocol PGThumbnailBrowserDataSource;
+@protocol PGThumbnailBrowserDelegate;
+
+@interface PGThumbnailBrowser : PGColumnView <PGThumbnailViewDelegate>
 {
 	@private
-	IBOutlet id dataSource;
-	IBOutlet id delegate;
+	IBOutlet NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *dataSource;
+	IBOutlet NSObject<PGThumbnailBrowserDelegate> *delegate;
 	PGOrientation _thumbnailOrientation;
 	NSUInteger _updateCount;
 }
 
-- (id)dataSource;
-- (void)setDataSource:(id)obj; // Should implement PGThumbnailViewDataSource. Get the item for the column with -[sender representedObject].
-- (id)delegate;
-- (void)setDelegate:(id)obj;
+- (NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)dataSource;
+- (void)setDataSource:(NSObject<PGThumbnailBrowserDataSource> *)obj; // Get the item for the column with -[sender representedObject].
+- (NSObject<PGThumbnailBrowserDelegate> *)delegate;
+- (void)setDelegate:(NSObject<PGThumbnailBrowserDelegate> *)obj;
 - (PGOrientation)thumbnailOrientation;
 - (void)setThumbnailOrientation:(PGOrientation)orientation;
 
@@ -50,15 +53,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGThumbnailBrowserDataSource)
+@protocol PGThumbnailBrowserDataSource <NSObject>
 
+@optional
 - (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item;
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item;
 
 @end
 
-@interface NSObject (PGThumbnailBrowserDelegate)
+@protocol PGThumbnailBrowserDelegate <NSObject>
 
+@optional
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender;
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount;
 

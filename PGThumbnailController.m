@@ -228,7 +228,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[super dealloc];
 }
 
-#pragma mark -NSObject(PGThumbnailBrowserDataSource)
+#pragma mark -<PGThumbnailBrowserDataSource>
 
 - (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
       parentOfItem:(id)item
@@ -242,7 +242,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	return [item isContainer];
 }
 
-#pragma mark -NSObject(PGThumbnailBrowserDelegate)
+#pragma mark -<PGThumbnailBrowserDelegate>
 
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender
 {
@@ -255,7 +255,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	if(MIN(oldCount, PGMaxVisibleColumns) != MIN([sender numberOfColumns], PGMaxVisibleColumns)) [self _updateWindowFrame];
 }
 
-#pragma mark -NSObject(PGThumbnailViewDataSource)
+#pragma mark -<PGThumbnailViewDataSource>
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
@@ -314,7 +314,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	return [item hasRealThumbnail];
 }
 
-#pragma mark -NSObject(NSWindowNotifications)
+#pragma mark -<NSWindowDelegate>
 
 - (void)windowWillClose:(NSNotification *)aNotif
 {

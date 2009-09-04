@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification;
 extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
 
-@interface PGPrefController : NSWindowController
+@interface PGPrefController : NSWindowController <NSApplicationDelegate, NSToolbarDelegate>
 {
 	@private
 	IBOutlet NSView *generalView;

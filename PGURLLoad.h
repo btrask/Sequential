@@ -27,24 +27,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGLoading.h"
 
+@protocol PGURLLoadDelegate;
+
 @interface PGURLLoad : NSObject <PGLoading>
 {
 	@private
-	id<PGLoading>    _parentLoad;
-	id               _delegate;
-	BOOL             _loaded;
+	id<PGLoading> _parentLoad;
+	NSObject<PGURLLoadDelegate> * _delegate;
+	BOOL _loaded;
 	NSURLConnection *_connection;
-	NSURLRequest    *_request;
-	NSURLResponse   *_response;
-	NSMutableData   *_data;
+	NSURLRequest *_request;
+	NSURLResponse *_response;
+	NSMutableData *_data;
 }
 
 + (NSString *)userAgent;
 + (void)setUserAgent:(NSString *)aString;
 
-- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(id)anObject;
+- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(NSObject<PGURLLoadDelegate> *)anObject;
 
-- (id)delegate;
+- (NSObject<PGURLLoadDelegate> *)delegate;
 - (NSURLRequest *)request;
 - (NSURLResponse *)response;
 - (NSMutableData *)data;
@@ -54,8 +56,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGURLLoadDelegate)
+@protocol PGURLLoadDelegate <NSObject>
 
+@optional
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender;
 - (void)loadDidReceiveResponse:(PGURLLoad *)sender;
 - (void)loadDidSucceed:(PGURLLoad *)sender;

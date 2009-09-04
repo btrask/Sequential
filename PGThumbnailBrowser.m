@@ -38,23 +38,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGThumbnailBrowser
 
-#pragma mark Instance Methods
+#pragma mark -PGThumbnailBrowser
 
-- (id)dataSource
+- (NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)dataSource
 {
 	return dataSource;
 }
-- (void)setDataSource:(id)obj
+- (void)setDataSource:(NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)obj
 {
 	if(obj == dataSource) return;
 	dataSource = obj;
 	[[self views] makeObjectsPerformSelector:@selector(setDataSource:) withObject:obj];
 }
-- (id)delegate
+- (NSObject<PGThumbnailBrowserDelegate> *)delegate
 {
 	return delegate;
 }
-- (void)setDelegate:(id)obj
+- (void)setDelegate:(NSObject<PGThumbnailBrowserDelegate> *)obj
 {
 	delegate = obj;
 }
@@ -137,7 +137,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGThumbnailBrowser(Private)
 
 - (void)_addColumnWithItem:(id)item
 {
@@ -152,7 +152,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self addColumnWithView:thumbnailView];
 }
 
-#pragma mark PGThumbnailViewDelegate Protocol
+#pragma mark -PGColumnView
+
+- (void)insertColumnWithView:(NSView *)aView
+        atIndex:(NSUInteger)index
+{
+	NSUInteger const columns = [self numberOfColumns];
+	[super insertColumnWithView:aView atIndex:index];
+	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
+}
+- (void)removeColumnsAfterView:(NSView *)aView
+{
+	NSUInteger const columns = [self numberOfColumns];
+	[super removeColumnsAfterView:aView];
+	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
+}
+
+#pragma mark -<PGThumbnailViewDelegate>
 
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender
 {
@@ -177,22 +193,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	} else [self _addColumnWithItem:selectedItem];
 	[self scrollToLastColumnAnimate:YES];
 	[[self delegate] thumbnailBrowserSelectionDidChange:self];
-}
-
-#pragma mark PGColumnView
-
-- (void)insertColumnWithView:(NSView *)aView
-        atIndex:(NSUInteger)index
-{
-	NSUInteger const columns = [self numberOfColumns];
-	[super insertColumnWithView:aView atIndex:index];
-	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
-}
-- (void)removeColumnsAfterView:(NSView *)aView
-{
-	NSUInteger const columns = [self numberOfColumns];
-	[super removeColumnsAfterView:aView];
-	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
 
 @end

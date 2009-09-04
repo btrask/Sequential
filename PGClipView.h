@@ -49,10 +49,12 @@ enum {
 };
 typedef NSUInteger PGScrollToRectType;
 
+@protocol PGClipViewDelegate;
+
 @interface PGClipView : NSView
 {
 	@private
-	IBOutlet id delegate;
+	IBOutlet NSResponder<PGClipViewDelegate> * delegate;
 	IBOutlet NSView *documentView;
 	NSRect _documentFrame;
 	PGInset _boundsInset;
@@ -70,8 +72,8 @@ typedef NSUInteger PGScrollToRectType;
 	NSUInteger _scrollCount;
 }
 
-- (id)delegate;
-- (void)setDelegate:(id)anObject;
+- (NSResponder<PGClipViewDelegate> *)delegate;
+- (void)setDelegate:(NSResponder<PGClipViewDelegate> *)anObject;
 
 - (NSView *)documentView;
 - (void)setDocumentView:(NSView *)aView;
@@ -122,8 +124,9 @@ typedef NSUInteger PGScrollToRectType;
 
 @end
 
-@interface NSObject (PGClipViewDelegate)
+@protocol PGClipViewDelegate <NSObject>
 
+@optional
 - (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent first:(BOOL)flag;
 - (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent;
 - (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask;
@@ -134,7 +137,7 @@ typedef NSUInteger PGScrollToRectType;
 
 @end
 
-@interface NSView (PGClipViewAdditions)
+@interface NSObject(PGClipViewAdditions)
 
 - (PGClipView *)PG_enclosingClipView;
 - (PGClipView *)PG_clipView;

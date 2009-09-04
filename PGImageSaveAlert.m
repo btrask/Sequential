@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGImageSaveAlert
 
-#pragma mark Instance Methods
+#pragma mark -PGImageSaveAlert
 
 - (id)initWithRoot:(PGNode *)root
       initialSelection:(NSSet *)aSet
@@ -99,7 +99,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(NSAlertFirstButtonReturn == returnCode) _saveOnSheetClose = YES;
 }
 
-#pragma mark NSSavePanelDelegate Protocol
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[nodesOutline setDataSource:nil];
+	[nodesOutline setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
+	[_rootNode release];
+	[_initialSelection release];
+	[_saveNamesByNodePointer release];
+	[_destination release];
+	[_openPanel release];
+	[super dealloc];
+}
+
+#pragma mark -<NSOpenSavePanelDelegate>
 
 - (BOOL)panel:(id)sender
         isValidFilename:(NSString *)filename
@@ -174,16 +188,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_initialSelection = nil;
 }
 
-#pragma mark NSWindowNotifications Protocol
-
-- (void)windowDidEndSheet:(NSNotification *)notification
-{
-	if(!_saveOnSheetClose) return;
-	[_openPanel ok:self];
-	_saveOnSheetClose = NO;
-}
-
-#pragma mark NSOutlineViewDataSource Protocol
+#pragma mark -<NSOutlineViewDataSource>
 
 - (id)outlineView:(NSOutlineView *)outlineView
       child:(NSInteger)index
@@ -219,7 +224,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(object && [object length]) [_saveNamesByNodePointer setObject:object forKey:[NSValue valueWithNonretainedObject:item]];
 }
 
-#pragma mark NSOutlineViewDelegate Protocol
+#pragma mark -<NSOutlineViewDelegate>
 
 - (void)outlineView:(NSOutlineView *)outlineView
         willDisplayCell:(id)cell
@@ -249,18 +254,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [item canSaveData];
 }
 
-#pragma mark NSObject
+#pragma mark -<NSWindowDelegate>
 
-- (void)dealloc
+- (void)windowDidEndSheet:(NSNotification *)notification
 {
-	[nodesOutline setDataSource:nil];
-	[nodesOutline setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
-	[_rootNode release];
-	[_initialSelection release];
-	[_saveNamesByNodePointer release];
-	[_destination release];
-	[_openPanel release];
-	[super dealloc];
+	if(!_saveOnSheetClose) return;
+	[_openPanel ok:self];
+	_saveOnSheetClose = NO;
 }
 
 @end

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGXMLParser
 
-#pragma mark Class Methods
+#pragma mark +PGXMLParser
 
 + (id)parserWithData:(NSData *)data
       baseURL:(NSURL *)URL
@@ -60,7 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return NO;
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGXMLParser
 
 - (NSURL *)baseURL
 {
@@ -129,7 +129,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)endedTagPath:(NSString *)p {}
 
-#pragma mark Private Protocol
+#pragma mark -PGXMLParser(Private)
 
 - (NSArray *)_classes
 {
@@ -149,7 +149,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [self _hasSubparser] ? [_subparsers lastObject] : nil;
 }
 
-#pragma mark PGXMLParserNodeCreation Protocol
+#pragma mark -PGXMLParser(PGXMLParserNodeCreation)
 
 - (BOOL)createsMultipleNodes
 {
@@ -218,7 +218,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return node;
 }
 
-#pragma mark NSXMLParserDelegateEventAdditions Protocol
+#pragma mark -NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		_subparsers = [[NSMutableArray alloc] init];
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[_baseURL release];
+	[_subparsers release];
+	[_initialTagPath release];
+	[_tagPath release];
+	[_classes release];
+	[super dealloc];
+}
+
+#pragma mark -
+
+- (IMP)methodForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [[self _subparser] methodForSelector:sel];
+}
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? [super methodSignatureForSelector:sel] : [[self _subparser] methodSignatureForSelector:sel];
+}
+- (void)forwardInvocation:(NSInvocation *)anInvocation
+{
+	[anInvocation invokeWithTarget:[self _subparser]];
+}
+
+#pragma mark -<NSObject>
+
+- (BOOL)respondsToSelector:(SEL)sel
+{
+	return [super respondsToSelector:sel] ? YES : [[self _subparser] respondsToSelector:sel];
+}
+
+#pragma mark -<NSXMLParserDelegate>
 
 - (void)parser:(NSXMLParser *)parser
         didStartElement:(NSString *)elementName
@@ -258,47 +299,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_tagPath autorelease];
 	_tagPath = [[_tagPath stringByDeletingLastPathComponent] copy];
 	[pool release];
-}
-
-#pragma mark NSObject Protocol
-
-- (BOOL)respondsToSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? YES : [[self _subparser] respondsToSelector:sel];
-}
-
-#pragma mark NSObject
-
-- (id)init
-{
-	if((self = [super init])) {
-		_subparsers = [[NSMutableArray alloc] init];
-	}
-	return self;
-}
-- (void)dealloc
-{
-	[_baseURL release];
-	[_subparsers release];
-	[_initialTagPath release];
-	[_tagPath release];
-	[_classes release];
-	[super dealloc];
-}
-
-#pragma mark -
-
-- (IMP)methodForSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [[self _subparser] methodForSelector:sel];
-}
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? [super methodSignatureForSelector:sel] : [[self _subparser] methodSignatureForSelector:sel];
-}
-- (void)forwardInvocation:(NSInvocation *)anInvocation
-{
-	[anInvocation invokeWithTarget:[self _subparser]];
 }
 
 @end

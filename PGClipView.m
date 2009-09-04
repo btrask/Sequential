@@ -76,11 +76,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark Instance Methods
 
-- (id)delegate
+- (NSResponder<PGClipViewDelegate> *)delegate
 {
 	return delegate;
 }
-- (void)setDelegate:(id)anObject
+- (void)setDelegate:(NSResponder<PGClipViewDelegate> *)anObject
 {
 	delegate = anObject;
 }

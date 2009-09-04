@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
 {
-	NSDragOperation const op = [[self delegate] window:self dragOperationForInfo:sender];
+	NSDragOperation const op = [(id<PGDocumentWindowDelegate>)[self delegate] window:self dragOperationForInfo:sender];
 	if(NSDragOperationNone == op) return NSDragOperationNone;
 	_dragHighlightPanel = [[PGDragHighlightView PG_bezelPanel] retain];
 	[_dragHighlightPanel displayOverWindow:self];
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender
 {
 	[self draggingExited:nil];
-	return [[self delegate] window:self performDragOperation:sender];
+	return [(id<PGDocumentWindowDelegate>)[self delegate] window:self performDragOperation:sender];
 }
 - (void)concludeDragOperation:(id<NSDraggingInfo>)sender
 {
@@ -61,11 +61,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)selectKeyViewFollowingView:(NSView *)aView
 {
 	[super selectKeyViewFollowingView:aView];
-	if([[self firstResponder] isKindOfClass:[NSView class]] && [(NSView *)[self firstResponder] isDescendantOf:[self initialFirstResponder]]) [[self delegate] selectNextOutOfWindowKeyView:self];
+	if([[self firstResponder] isKindOfClass:[NSView class]] && [(NSView *)[self firstResponder] isDescendantOf:[self initialFirstResponder]]) [(id<PGDocumentWindowDelegate>)[self delegate] selectNextOutOfWindowKeyView:self];
 }
 - (void)selectKeyViewPrecedingView:(NSView *)aView
 {
-	if([aView isDescendantOf:[self initialFirstResponder]]) [[self delegate] selectPreviousOutOfWindowKeyView:self];
+	if([aView isDescendantOf:[self initialFirstResponder]]) [(id<PGDocumentWindowDelegate>)[self delegate] selectPreviousOutOfWindowKeyView:self];
 	[super selectKeyViewPrecedingView:aView];
 }
 

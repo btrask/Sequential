@@ -96,19 +96,19 @@ static void PGDrawGradient(void)
 
 #pragma mark Instance Methods
 
-- (id)dataSource
+- (NSObject<PGThumbnailViewDataSource> *)dataSource
 {
 	return dataSource;
 }
-- (void)setDataSource:(id)obj
+- (void)setDataSource:(NSObject<PGThumbnailViewDataSource> *)obj
 {
 	dataSource = obj;
 }
-- (id)delegate
+- (NSObject<PGThumbnailViewDelegate> *)delegate
 {
 	return delegate;
 }
-- (void)setDelegate:(id)obj
+- (void)setDelegate:(NSObject<PGThumbnailViewDelegate> *)obj
 {
 	delegate = obj;
 }

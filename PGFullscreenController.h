@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 #import "PGDisplayController.h"
 
-@interface PGFullscreenController : PGDisplayController
+@interface PGFullscreenController : PGDisplayController <NSWindowDelegate>
 {
 	@private
 	BOOL _isExitingFullscreen;

@@ -26,9 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGContainerAdapter.h"
 
 // Models
-@class PGURLLoad;
+#import "PGURLLoad.h"
 
-@interface PGFlickrAdapter : PGContainerAdapter
+@interface PGFlickrAdapter : PGContainerAdapter <PGURLLoadDelegate>
 {
 	@private
 	PGURLLoad *_load;

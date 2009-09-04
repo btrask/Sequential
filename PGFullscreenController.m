@@ -143,7 +143,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super dealloc];
 }
 
-#pragma mark -NSObject(NSWindowNotifications)
+#pragma mark -<NSWindowDelegate>
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotif
 {

@@ -26,9 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceAdapter.h"
 
 // Models
-@class PGURLLoad;
+#import "PGURLLoad.h"
 
-@interface PGWebAdapter : PGResourceAdapter
+@interface PGWebAdapter : PGResourceAdapter <PGURLLoadDelegate>
 {
 	@private
 	PGURLLoad *_mainLoad;

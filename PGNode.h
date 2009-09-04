@@ -48,13 +48,15 @@ extern NSString *const PGDefaultEncodingKey;
 
 typedef NSUInteger PGNodeStatus;
 
+@protocol PGNodeDataSource;
+
 @interface PGNode : NSObject
 {
 	@private
 	PGContainerAdapter *_parentAdapter;
 	PGDocument *_document;
 	PGDisplayableIdentifier *_identifier;
-	id _dataSource;
+	NSObject<PGNodeDataSource> *_dataSource;
 
 	NSMutableArray *_adapters;
 	PGResourceAdapter *_adapter;
@@ -75,7 +77,7 @@ typedef NSUInteger PGNodeStatus;
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(id)dataSource;
 
-@property(readonly) id dataSource;
+@property(readonly) NSObject<PGNodeDataSource> *dataSource;
 @property(readonly) PGResourceAdapter *resourceAdapter;
 @property(readonly) PGLoadPolicy ancestorLoadPolicy;
 @property(retain) NSError *error;
@@ -116,8 +118,9 @@ typedef NSUInteger PGNodeStatus;
 @interface PGNode (PGResourceAdapterProxy) <PGResourceAdapting>
 @end
 
-@interface NSObject (PGNodeDataSource)
+@protocol PGNodeDataSource <NSObject>
 
+@optional
 - (NSDate *)dateModifiedForNode:(PGNode *)sender;
 - (NSDate *)dateCreatedForNode:(PGNode *)sender;
 - (NSNumber *)dataLengthForNode:(PGNode *)sender;

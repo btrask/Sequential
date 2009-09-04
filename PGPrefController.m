@@ -139,7 +139,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	[secondaryMouseActionLabel setStringValue:NSLocalizedString(label, @"Informative string for secondary mouse button action.")];
 }
 
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (void)windowDidLoad
 {
@@ -156,7 +156,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	[self applicationDidChangeScreenParameters:nil];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -186,7 +186,19 @@ static PGPrefController *PGSharedPrefController = nil;
 	[super dealloc];
 }
 
-#pragma mark -NSObject(NSApplicationNotifications)
+#pragma mark -NSObject(NSKeyValueObserving)
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+        ofObject:(id)object
+        change:(NSDictionary *)change
+	context:(void *)context
+{
+	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
+	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
+}
+
+#pragma mark -<NSApplicationDelegate>
 
 - (void)applicationDidChangeScreenParameters:(NSNotification *)aNotif
 {
@@ -214,19 +226,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	}
 }
 
-#pragma mark -NSObject(NSKeyValueObserving)
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-        ofObject:(id)object
-        change:(NSDictionary *)change
-	context:(void *)context
-{
-	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
-	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
-}
-
-#pragma mark -NSObject(NSToolbarDelegate)
+#pragma mark -<NSToolbarDelegate>
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)ident willBeInsertedIntoToolbar:(BOOL)flag
 {

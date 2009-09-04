@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (IBAction)performClose:(id)sender
 {
-	[[self delegate] closeWindowContent:self];
+	[(NSObject<PGFullscreenWindowDelegate> *)[self delegate] closeWindowContent:self];
 }
 
 #pragma mark -

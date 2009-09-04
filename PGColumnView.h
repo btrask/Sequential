@@ -25,9 +25,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
 // Views
-@class PGClipView;
+#import "PGClipView.h"
 
-@interface PGColumnView : NSView
+@interface PGColumnView : NSView <PGClipViewDelegate>
 {
 	@private
 	PGClipView     *_clipView;

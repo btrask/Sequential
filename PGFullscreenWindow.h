@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGFullscreenWindowDelegate)
+@protocol PGFullscreenWindowDelegate <NSObject>
 
+@optional
 - (void)closeWindowContent:(PGFullscreenWindow *)sender;
 
 @end

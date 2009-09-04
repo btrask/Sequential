@@ -101,7 +101,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 	[super dealloc];
 }
 
-#pragma mark -NSObject(NSToolbarDelegate)
+#pragma mark -<NSToolbarDelegate>
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)ident willBeInsertedIntoToolbar:(BOOL)flag
 {
@@ -120,7 +120,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 	return [self toolbarDefaultItemIdentifiers:toolbar];
 }
 
-#pragma mark -NSObject(NSWindowDelegate)
+#pragma mark -<NSWindowDelegate>
 
 - (NSRect)windowWillUseStandardFrame:(NSWindow *)window defaultFrame:(NSRect)newFrame
 {

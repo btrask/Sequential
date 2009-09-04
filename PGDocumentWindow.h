@@ -35,8 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGDocumentWindowDelegate)
+@protocol PGDocumentWindowDelegate <NSObject>
 
+@optional
 - (NSDragOperation)window:(PGDocumentWindow *)window dragOperationForInfo:(id<NSDraggingInfo>)info;
 - (BOOL)window:(PGDocumentWindow *)window performDragOperation:(id<NSDraggingInfo>)info;
 

@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGColumnView
 
-#pragma mark Instance Methods
+#pragma mark -PGColumnView
 
 - (NSUInteger)numberOfColumns
 {
@@ -125,19 +125,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self setNeedsDisplay:YES];
 }
 
-#pragma mark PGClipViewDelegate Protocol
-
-- (BOOL)clipView:(PGClipView *)sender
-        handleMouseEvent:(NSEvent *)anEvent
-        first:(BOOL)flag
-{
-	NSUInteger const i = [_clipViews indexOfObjectIdenticalTo:sender];
-	if(NSNotFound == i) return NO;
-	[[_views objectAtIndex:i] mouseDown:anEvent];
-	return YES;
-}
-
-#pragma mark NSView
+#pragma mark -NSView
 
 - (id)initWithFrame:(NSRect)aRect
 {
@@ -163,7 +151,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self layout];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -176,6 +164,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_clipViews release];
 	[_views release];
 	[super dealloc];
+}
+
+#pragma mark <PGClipViewDelegate>
+
+- (BOOL)clipView:(PGClipView *)sender
+        handleMouseEvent:(NSEvent *)anEvent
+        first:(BOOL)flag
+{
+	NSUInteger const i = [_clipViews indexOfObjectIdenticalTo:sender];
+	if(NSNotFound == i) return NO;
+	[[_views objectAtIndex:i] mouseDown:anEvent];
+	return YES;
 }
 
 @end

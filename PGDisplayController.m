@@ -1111,80 +1111,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	return [super validateMenuItem:anItem];
 }
 
-#pragma mark -NSObject(NSWindowDelegate)
-
-- (BOOL)window:(NSWindow *)window
-        shouldPopUpDocumentPathMenu:(NSMenu *)menu
-{
-	return ![[self activeDocument] isOnline];
-}
-- (BOOL)window:(NSWindow *)window
-        shouldDragDocumentWithEvent:(NSEvent *)event
-        from:(NSPoint)dragImageLocation
-        withPasteboard:(NSPasteboard *)pboard
-{
-	if([self window] != window) return YES;
-	PGDisplayableIdentifier *const ident = [[[self activeDocument] node] identifier];
-	if(![ident isFileIdentifier]) {
-		[pboard declareTypes:[NSArray arrayWithObject:NSURLPboardType] owner:nil];
-		[[ident URL] writeToPasteboard:pboard];
-	}
-	NSImage *const image = [[[ident icon] copy] autorelease];
-	[[self window] dragImage:image at:PGOffsetPointByXY(dragImageLocation, 24 - [image size].width / 2, 24 - [image size].height / 2) offset:NSZeroSize event:event pasteboard:pboard source:nil slideBack:YES]; // Left to its own devices, OS X will start the drag image 16 pixels down and to the left of the button, which looks bad at both 16x16 and at 32x32, so always do our own drags.
-	return NO;
-}
-- (id)windowWillReturnFieldEditor:(NSWindow *)window
-      toObject:(id)anObject
-{
-	if(window != _findPanel) return nil;
-	if(!_findFieldEditor) {
-		_findFieldEditor = [[PGFindlessTextView alloc] init];
-		[_findFieldEditor setFieldEditor:YES];
-	}
-	return _findFieldEditor;
-}
-
-#pragma mark -NSObject(NSWindowNotifications)
-
-- (void)windowDidBecomeMain:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	[[PGDocumentController sharedDocumentController] setCurrentDocument:[self activeDocument]];
-}
-- (void)windowDidResignMain:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	[[PGDocumentController sharedDocumentController] setCurrentDocument:nil];
-}
-
-- (void)windowDidBecomeKey:(NSNotification *)aNotif
-{
-	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:searchField];
-}
-- (void)windowDidResignKey:(NSNotification *)aNotif
-{
-	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:nil];
-}
-
-- (void)windowWillBeginSheet:(NSNotification *)aNotif
-{
-	[_findPanel setIgnoresMouseEvents:YES];
-}
-- (void)windowDidEndSheet:(NSNotification *)aNotif
-{
-	[_findPanel setIgnoresMouseEvents:NO];
-}
-
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	NSParameterAssert(aNotif);
-	if([aNotif object] != [self window]) return;
-	if([_findPanel parentWindow]) [_findPanel close];
-	[self close];
-}
-
 #pragma mark -NSObject(NSServicesRequests)
 
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
@@ -1300,7 +1226,96 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
 }
 
-#pragma mark -NSObject(PGDocumentWindowDelegate)
+#pragma mark -<NSWindowDelegate>
+
+- (BOOL)window:(NSWindow *)window
+        shouldPopUpDocumentPathMenu:(NSMenu *)menu
+{
+	return ![[self activeDocument] isOnline];
+}
+- (BOOL)window:(NSWindow *)window
+        shouldDragDocumentWithEvent:(NSEvent *)event
+        from:(NSPoint)dragImageLocation
+        withPasteboard:(NSPasteboard *)pboard
+{
+	if([self window] != window) return YES;
+	PGDisplayableIdentifier *const ident = [[[self activeDocument] node] identifier];
+	if(![ident isFileIdentifier]) {
+		[pboard declareTypes:[NSArray arrayWithObject:NSURLPboardType] owner:nil];
+		[[ident URL] writeToPasteboard:pboard];
+	}
+	NSImage *const image = [[[ident icon] copy] autorelease];
+	[[self window] dragImage:image at:PGOffsetPointByXY(dragImageLocation, 24 - [image size].width / 2, 24 - [image size].height / 2) offset:NSZeroSize event:event pasteboard:pboard source:nil slideBack:YES]; // Left to its own devices, OS X will start the drag image 16 pixels down and to the left of the button, which looks bad at both 16x16 and at 32x32, so always do our own drags.
+	return NO;
+}
+- (id)windowWillReturnFieldEditor:(NSWindow *)window
+      toObject:(id)anObject
+{
+	if(window != _findPanel) return nil;
+	if(!_findFieldEditor) {
+		_findFieldEditor = [[PGFindlessTextView alloc] init];
+		[_findFieldEditor setFieldEditor:YES];
+	}
+	return _findFieldEditor;
+}
+
+#pragma mark -
+
+- (void)windowDidBecomeMain:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	[[PGDocumentController sharedDocumentController] setCurrentDocument:[self activeDocument]];
+}
+- (void)windowDidResignMain:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	[[PGDocumentController sharedDocumentController] setCurrentDocument:nil];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)aNotif
+{
+	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:searchField];
+}
+- (void)windowDidResignKey:(NSNotification *)aNotif
+{
+	if([aNotif object] == _findPanel) [_findPanel makeFirstResponder:nil];
+}
+
+- (void)windowWillBeginSheet:(NSNotification *)aNotif
+{
+	[_findPanel setIgnoresMouseEvents:YES];
+}
+- (void)windowDidEndSheet:(NSNotification *)aNotif
+{
+	[_findPanel setIgnoresMouseEvents:NO];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotif
+{
+	NSParameterAssert(aNotif);
+	if([aNotif object] != [self window]) return;
+	if([_findPanel parentWindow]) [_findPanel close];
+	[self close];
+}
+
+#pragma mark -<PGDisplayControlling>
+
+- (IBAction)toggleFullscreen:(id)sender
+{
+	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
+}
+- (IBAction)toggleInfo:(id)sender
+{
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
+}
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
+}
+
+#pragma mark -<PGDocumentWindowDelegate>
 
 - (void)selectNextOutOfWindowKeyView:(NSWindow *)window
 {
@@ -1318,27 +1333,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_findPanel makeFirstResponder:(previousKeyView ? previousKeyView : [_findPanel initialFirstResponder])];
 }
 
-#pragma mark -NSObject(PGEncodingAlertDelegate)
+#pragma mark -<PGEncodingAlertDelegate>
 
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender
         selectedEncoding:(NSStringEncoding)encoding
 {
 	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
-}
-
-#pragma mark -<PGDisplayControlling>
-
-- (IBAction)toggleFullscreen:(id)sender
-{
-	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
-}
-- (IBAction)toggleInfo:(id)sender
-{
-	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
-}
-- (IBAction)toggleThumbnails:(id)sender
-{
-	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
 
 @end

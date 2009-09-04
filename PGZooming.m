@@ -129,8 +129,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	CGFloat totalWidth = 0.0f;
 	NSArray *const columns = [self tableColumns];
-	BOOL const resizesAllColumns = [self respondsToSelector:@selector(columnAutoresizingStyle)] ? NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle] : [self autoresizesAllColumnsToFit];
-	if(resizesAllColumns) for(NSTableColumn *const column in columns) {
+	if(NSTableViewUniformColumnAutoresizingStyle == [self columnAutoresizingStyle]) for(NSTableColumn *const column in columns) {
 		CGFloat const width = [column PG_zoomedWidth];
 		[column setWidth:width];
 		totalWidth += width;

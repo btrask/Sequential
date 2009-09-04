@@ -63,7 +63,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 - (id)initWithRequest:(NSURLRequest *)aRequest
       parentLoad:(id<PGLoading>)parent
-      delegate:(id)anObject
+      delegate:(NSObject<PGURLLoadDelegate> *)anObject
 {
 	if((self = [super init])) {
 		_parentLoad = parent;
@@ -79,7 +79,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 #pragma mark -
 
-- (id)delegate
+- (NSObject<PGURLLoadDelegate> *)delegate
 {
 	return _delegate;
 }
