@@ -165,7 +165,24 @@ static id PGArchiveAdapterList = nil;
 	[super dealloc];
 }
 
-#pragma mark -NSObject(PGNodeDataSource)
+#pragma mark -NSObject(XADArchiveDelegate)
+
+- (void)archiveNeedsPassword:(XADArchive *)archive
+{
+	_needsPassword = YES;
+	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
+}
+- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(CGFloat)confidence
+{
+	if(confidence < 0.8f && !_encodingError) {
+		_encodingError = YES;
+		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
+		[[self node] loadFinished];
+	}
+	return guess;
+}
+
+#pragma mark -<PGNodeDataSource>
 
 - (NSDate *)dateCreatedForNode:(PGNode *)sender
 {
@@ -210,23 +227,6 @@ static id PGArchiveAdapterList = nil;
 	}
 	if(outData) *outData = data;
 	return YES;
-}
-
-#pragma mark -NSObject(XADArchiveDelegate)
-
-- (void)archiveNeedsPassword:(XADArchive *)archive
-{
-	_needsPassword = YES;
-	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
-}
-- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(CGFloat)confidence
-{
-	if(confidence < 0.8f && !_encodingError) {
-		_encodingError = YES;
-		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
-		[[self node] loadFinished];
-	}
-	return guess;
 }
 
 #pragma mark -<PGResourceAdapting>

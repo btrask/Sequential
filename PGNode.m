@@ -50,10 +50,10 @@ NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
 NSString *const PGDefaultEncodingKey     = @"PGDefaultEncoding";
 
 enum {
-	PGNodeNothing               = 0,
-	PGNodeLoading               = 1 << 0,
-	PGNodeReading               = 1 << 1,
-	PGNodeLoadingOrReading      = PGNodeLoading | PGNodeReading
+	PGNodeNothing = 0,
+	PGNodeLoading = 1 << 0,
+	PGNodeReading = 1 << 1,
+	PGNodeLoadingOrReading = PGNodeLoading | PGNodeReading
 }; // PGNodeStatus.
 
 @interface PGNode(Private)
@@ -84,10 +84,7 @@ enum {
 
 #pragma mark -PGNode
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent
-      document:(PGDocument *)doc
-      identifier:(PGDisplayableIdentifier *)ident
-      dataSource:(id)dataSource
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(NSObject<PGNodeDataSource> *)dataSource
 {
 	if(!(self = [super init])) return nil;
 	NSParameterAssert(!parent != !doc);
@@ -114,7 +111,7 @@ enum {
 
 #pragma mark -
 
-- (id)dataSource
+- (NSObject<PGNodeDataSource> *)dataSource
 {
 	return _dataSource;
 }

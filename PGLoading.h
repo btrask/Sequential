@@ -24,6 +24,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
+@protocol PGLoading;
+
+@interface PGLoadManager : NSObject <PGLoading>
+{
+	@private
+	NSMutableArray *_subloads;
+}
+
++ (id)sharedLoadManager;
+
+@end
+
 @protocol PGLoading <NSObject>
 
 @required
@@ -34,15 +46,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag;
 - (void)prioritizeSubload:(id<PGLoading>)obj;
 - (void)cancelLoad;
-
-@end
-
-@interface PGLoadManager : NSObject <PGLoading>
-{
-	@private
-	NSMutableArray *_subloads;
-}
-
-+ (id)sharedLoadManager;
 
 @end

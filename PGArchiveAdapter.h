@@ -26,7 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <XADMaster/XADArchive.h>
 #import "PGContainerAdapter.h"
 
-@interface PGArchiveAdapter : PGContainerAdapter
+// Models
+#import "PGNode.h"
+
+@interface PGArchiveAdapter : PGContainerAdapter <PGNodeDataSource>
 {
 	@private
 	XADArchive *_archive;

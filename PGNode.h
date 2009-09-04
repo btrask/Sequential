@@ -50,7 +50,7 @@ typedef NSUInteger PGNodeStatus;
 
 @protocol PGNodeDataSource;
 
-@interface PGNode : NSObject
+@interface PGNode : NSObject <PGResourceAdapting>
 {
 	@private
 	PGContainerAdapter *_parentAdapter;
@@ -75,7 +75,7 @@ typedef NSUInteger PGNodeStatus;
 
 + (NSArray *)pasteboardTypes;
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(id)dataSource;
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(NSObject<PGNodeDataSource> *)dataSource;
 
 @property(readonly) NSObject<PGNodeDataSource> *dataSource;
 @property(readonly) PGResourceAdapter *resourceAdapter;
@@ -113,9 +113,6 @@ typedef NSUInteger PGNodeStatus;
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;
 
-@end
-
-@interface PGNode (PGResourceAdapterProxy) <PGResourceAdapting>
 @end
 
 @protocol PGNodeDataSource <NSObject>

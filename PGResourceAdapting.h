@@ -63,6 +63,7 @@ typedef NSInteger PGLoadPolicy;
 
 @protocol PGResourceAdapting <PGLoading>
 
+@optional // PGNode doesn't implement all of these, but it does forward them to its resource adapter.
 @property(readonly) PGNode *parentNode;
 @property(readonly) PGContainerAdapter *parentAdapter;
 @property(readonly) PGContainerAdapter *containerAdapter;

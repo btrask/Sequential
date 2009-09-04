@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @protocol PGDisplayControlling
 
+@required
 - (IBAction)reveal:(id)sender;
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)toggleInfo:(id)sender;
