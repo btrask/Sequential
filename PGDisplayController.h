@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Views
 #import "PGDocumentWindow.h"
-@class PGClipView;
+#import "PGClipView.h"
 @class PGImageView;
 @class PGBezelPanel;
 @class PGLoadingGraphic;
@@ -50,7 +50,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerActiveNodeWasReadNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
-@interface PGDisplayController : NSWindowController <NSWindowDelegate, PGDisplayControlling, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
+@interface PGDisplayController : NSWindowController <NSWindowDelegate, PGClipViewDelegate, PGDisplayControlling, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 {
 	@private
 	IBOutlet PGClipView *clipView;

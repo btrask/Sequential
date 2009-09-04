@@ -62,7 +62,7 @@ enum {
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
 
-@interface PGDocumentController : NSResponder <NSApplicationDelegate, PGDisplayControlling>
+@interface PGDocumentController : NSResponder <NSApplicationDelegate, NSMenuDelegate, PGDisplayControlling>
 {
 	@private
 	IBOutlet NSMenu *recentMenu;

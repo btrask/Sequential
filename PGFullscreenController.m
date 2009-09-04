@@ -187,7 +187,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_shieldWindows = nil;
 }
 
-#pragma mark -NSObject(PGDocumentWindowDelegate)
+#pragma mark -<PGDocumentWindowDelegate>
 
 - (NSDragOperation)window:(PGDocumentWindow *)window
                    dragOperationForInfo:(id<NSDraggingInfo>)info
@@ -213,7 +213,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return NO;
 }
 
-#pragma mark -NSObject(PGFullscreenWindowDelegate)
+#pragma mark -<PGFullscreenWindowDelegate>
 
 - (void)closeWindowContent:(PGFullscreenWindow *)sender
 {
