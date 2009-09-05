@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 */
 #import "NSScreenAdditions.h"
 
-@implementation NSScreen (AEAdditions)
+@implementation NSScreen(AEAdditions)
 
 + (NSScreen *)AE_mainScreen
 {

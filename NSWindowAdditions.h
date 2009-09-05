@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSWindow (AEAdditions)
+@interface NSWindow(AEAdditions)
 
 - (BOOL)AE_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.
 - (CGFloat)AE_userSpaceScaleFactor; // Returns 1.0 if not supported.

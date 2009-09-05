@@ -25,14 +25,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 
-@interface DOMHTMLDocument (AEAdditions)
+@interface DOMHTMLDocument(AEAdditions)
 
 - (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts;
 - (NSArray *)AE_imageSrcIdentifiers;
 
 @end
 
-@interface DOMNode (AEAdditions)
+@interface DOMNode(AEAdditions)
 
 - (BOOL)AE_hasAncestorWithNodeName:(NSString *)string;
 

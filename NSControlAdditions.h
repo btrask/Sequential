@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSControl (AEAdditions)
+@interface NSControl(AEAdditions)
 
 - (void)AE_setAttributedStringValue:(NSAttributedString *)str; // Keeps existing attributes.
 

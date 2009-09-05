@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@implementation NSNumber (AEAdditions)
+@implementation NSNumber(AEAdditions)
 
 - (NSString *)AE_localizedStringAsBytes
 {

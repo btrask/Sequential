@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSDateAdditions.h"
 
-@implementation NSDate (AEAdditions)
+@implementation NSDate(AEAdditions)
 
 - (BOOL)AE_isAfter:(NSDate *)date
 {

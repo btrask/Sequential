@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSScannerAdditions.h"
 
-@implementation NSScanner (AEAdditions)
+@implementation NSScanner(AEAdditions)
 
 - (BOOL)AE_scanFromString:(NSString *)start
         toString:(NSString *)end

@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import <objc/runtime.h>
 
-@implementation NSObject (AEAdditions)
+@implementation NSObject(AEAdditions)
 
 #pragma mark Instance Methods
 
@@ -84,7 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSArray (AEArrayCreation)
+@implementation NSArray(AEArrayCreation)
 
 - (NSArray *)AE_asArray
 {

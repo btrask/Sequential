@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGResourceIdentifier.h"
 
-@implementation DOMHTMLDocument (AEAdditions)
+@implementation DOMHTMLDocument(AEAdditions)
 
 - (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes
              extensions:(NSArray *)exts
@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation DOMNode (AEAdditions)
+@implementation DOMNode(AEAdditions)
 
 - (BOOL)AE_hasAncestorWithNodeName:(NSString *)string
 {

@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSMenuItem (AEAdditions)
+@interface NSMenuItem(AEAdditions)
 
 - (void)AE_addAfterItem:(NSMenuItem *)anItem;
 - (void)AE_removeFromMenu;

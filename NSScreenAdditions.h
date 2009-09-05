@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSScreen (AEAdditions)
+@interface NSScreen(AEAdditions)
 
 + (NSScreen *)AE_mainScreen; // Returns the real main screen.
 - (BOOL)AE_setDesktopPicturePath:(NSString *)path; // Based on Apple's sample code. Currently only works for screen 0.

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSColorAdditions.h"
 
-@implementation NSBezierPath (AEAdditions)
+@implementation NSBezierPath(AEAdditions)
 
 #pragma mark Class Methods
 

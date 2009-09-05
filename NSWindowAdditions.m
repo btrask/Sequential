@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSWindowAdditions.h"
 #import <Carbon/Carbon.h>
 
-@implementation NSWindow (AEAdditions)
+@implementation NSWindow(AEAdditions)
 
 - (BOOL)AE_isVisible
 {

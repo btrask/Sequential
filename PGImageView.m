@@ -40,7 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGMaxWindowSize      5000.0f // 10,000 is a hard limit imposed by the window server.
 #define PGDebugDrawingModes  false
 
-@interface PGImageView (Private)
+@interface PGImageView(Private)
 
 @property(readonly) BOOL _usesRoundedCorners;
 @property(readonly) BOOL _imageIsOpaque;

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometryTypes.h"
 
-@interface NSAffineTransform (AEAdditions)
+@interface NSAffineTransform(AEAdditions)
 
 + (id)AE_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation;
 

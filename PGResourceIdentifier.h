@@ -89,7 +89,7 @@ typedef UInt8 PGLabelColor;
 
 @end
 
-@interface NSURL (PGResourceIdentifierCreation)
+@interface NSURL(PGResourceIdentifierCreation)
 
 @property(readonly) PGResourceIdentifier *PG_resourceIdentifier;
 @property(readonly) PGDisplayableIdentifier *PG_displayableIdentifier;

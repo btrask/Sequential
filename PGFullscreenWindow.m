@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSObject (PGFullscreenWindowDelegate)
+@implementation NSObject(PGFullscreenWindowDelegate)
 
 - (void)closeWindowContent:(PGFullscreenWindow *)sender {}
 

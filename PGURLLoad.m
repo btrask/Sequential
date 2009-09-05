@@ -32,13 +32,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 static NSString *PGUserAgent = nil;
 static NSUInteger PGSimultaneousConnections = 0;
 
-@interface NSObject (PGURLLoadStarting)
+@interface NSObject(PGURLLoadStarting)
 
 - (BOOL)PG_startNextURLLoad;
 
 @end
 
-@interface PGURLLoad (Private)
+@interface PGURLLoad(Private)
 
 - (void)_stop;
 

@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSMenuItemAdditions.h"
 
-@interface NSMenu (AEUndocumented)
+@interface NSMenu(AEUndocumented)
 
 - (id)_menuImpl;
 
@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSMenuItem (AEAdditions)
+@implementation NSMenuItem(AEAdditions)
 
 - (void)AE_addAfterItem:(NSMenuItem *)anItem
 {

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGFloatingPanelController (Private)
+@interface PGFloatingPanelController(Private)
 
 - (void)_updateWithDisplayController:(PGDisplayController *)controller;
 

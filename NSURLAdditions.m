@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSStringAdditions.h"
 
-@implementation NSURL (AEAdditions)
+@implementation NSURL(AEAdditions)
 
 #pragma mark Class Methods
 

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@implementation NSArray (AEAdditions)
+@implementation NSArray(AEAdditions)
 
 #pragma mark +NSArray(AEAdditions)
 

@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import "NSNumberAdditions.h"
 
-@interface PGTimerPanelController (Private)
+@interface PGTimerPanelController(Private)
 
 @property(readonly) PGPrefObject *_currentPrefObject;
 - (void)_update;

@@ -48,7 +48,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	return noErr;
 }
 
-@interface PGBookmarkController (Private)
+@interface PGBookmarkController(Private)
 
 - (void)_updateMenuItemForBookmark:(PGBookmark *)aBookmark;
 - (void)_removeBookmarkAtIndex:(NSUInteger)index; // Removes without updating.

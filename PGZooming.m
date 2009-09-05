@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSWindowAdditions.h"
 #include <tgmath.h>
 
-@implementation NSWindow (PGZooming)
+@implementation NSWindow(PGZooming)
 
 #pragma mark -NSWindow(PGZooming)
 
@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSView (PGZooming)
+@implementation NSView(PGZooming)
 
 - (NSSize)PG_zoomedFrameSize
 {
@@ -102,7 +102,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSTextField (PGZooming)
+@implementation NSTextField(PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
 {
@@ -111,7 +111,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSScrollView (PGZooming)
+@implementation NSScrollView(PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
 {
@@ -123,7 +123,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSTableView (PGZooming)
+@implementation NSTableView(PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
 {
@@ -143,7 +143,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSTableColumn (PGZooming)
+@implementation NSTableColumn(PGZooming)
 
 - (CGFloat)PG_zoomedWidth
 {
@@ -161,7 +161,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #define PGNSTextViewHorizontalBorder 8.0f
 
-@implementation NSTextView (PGZooming)
+@implementation NSTextView(PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
 {

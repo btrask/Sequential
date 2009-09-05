@@ -51,7 +51,7 @@ static BOOL PGThumbnailGlossStyleEnabled = NO;
 static NSColor *PGBackgroundColor = nil;
 static NSColor *PGHighlightedBackgroundColor = nil;
 
-@interface PGThumbnailView (Private)
+@interface PGThumbnailView(Private)
 
 - (void)_validateSelection;
 - (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight;
@@ -425,7 +425,7 @@ static void PGDrawGradient(void)
 
 @end
 
-@implementation NSObject (PGThumbnailViewDataSource)
+@implementation NSObject(PGThumbnailViewDataSource)
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
@@ -458,7 +458,7 @@ static void PGDrawGradient(void)
 
 @end
 
-@implementation NSObject (PGThumbnailViewDelegate)
+@implementation NSObject(PGThumbnailViewDelegate)
 
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender {}
 

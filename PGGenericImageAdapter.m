@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSImageRepAdditions.h"
 
-@interface PGGenericImageAdapter (Private)
+@interface PGGenericImageAdapter(Private)
 
 - (void)_threaded_getImageRepWithInfo:(NSDictionary *)info;
 - (void)_readExifWithData:(NSData *)data;

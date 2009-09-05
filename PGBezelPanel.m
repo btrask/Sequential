@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 NSString *const PGBezelPanelFrameShouldChangeNotification = @"PGBezelPanelFrameShouldChange";
 NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameDidChange";
 
-@interface PGBezelPanel (Private)
+@interface PGBezelPanel(Private)
 
 - (void)_updateFrameWithWindow:(NSWindow *)aWindow display:(BOOL)flag;
 

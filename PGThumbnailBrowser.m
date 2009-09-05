@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGThumbnailBrowser (Private)
+@interface PGThumbnailBrowser(Private)
 
 - (void)_addColumnWithItem:(id)item;
 
@@ -177,7 +177,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSObject (PGThumbnailBrowserDataSource)
+@implementation NSObject(PGThumbnailBrowserDataSource)
 
 - (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item
 {
@@ -190,7 +190,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSObject (PGThumbnailBrowserDelegate)
+@implementation NSObject(PGThumbnailBrowserDelegate)
 
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender {}
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount {}

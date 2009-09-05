@@ -426,7 +426,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[super dealloc];
 }
 
-#pragma mark -NSObject(NSObject)
+#pragma mark -<NSObject>
 
 - (NSString *)description
 {

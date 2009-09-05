@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSArray (AEAdditions)
+@interface NSArray(AEAdditions)
 
 + (id)AE_arrayWithContentsOfArrays:(NSArray *)first, ... NS_REQUIRES_NIL_TERMINATION;
 

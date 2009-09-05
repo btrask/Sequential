@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSMutableDictionaryAdditions.h"
 
-@implementation NSMutableDictionary (AEAdditions)
+@implementation NSMutableDictionary(AEAdditions)
 
 - (void)AE_setObject:(id)obj
         forKey:(id)key

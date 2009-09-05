@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSControlAdditions.h"
 
-@implementation NSControl (AEAdditions)
+@implementation NSControl(AEAdditions)
 
 - (void)AE_setAttributedStringValue:(NSAttributedString *)anObject
 {

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGFileIconAttachmentCell : NSTextAttachmentCell
 @end
 
-@implementation NSAttributedString (PGAdditions)
+@implementation NSAttributedString(PGAdditions)
 
 #pragma mark -NSAttributedString(PGAdditions)
 

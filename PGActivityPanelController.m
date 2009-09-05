@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGActivityPanelController (Private)
+@interface PGActivityPanelController(Private)
 
 - (void)_update;
 

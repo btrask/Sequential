@@ -89,7 +89,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSObject (PGDocumentWindowDelegate)
+@implementation NSObject(PGDocumentWindowDelegate)
 
 - (NSDragOperation)window:(PGDocumentWindow *)window
                    dragOperationForInfo:(id<NSDraggingInfo>)info

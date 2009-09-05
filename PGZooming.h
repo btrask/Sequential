@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-@interface NSWindow (PGZooming)
+@interface NSWindow(PGZooming)
 
 - (IBAction)PG_grow:(id)sender; // Like zooming, but never makes the window smaller and has no concept of "user state". Due to shortcomings in Objective-C and Cocoa, we validate this method in PGWindow (in PGDocumentController.h).
 
@@ -33,14 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSView (PGZooming)
+@interface NSView(PGZooming)
 
 - (NSSize)PG_zoomedFrameSize;
 - (NSSize)PG_zoomedBoundsSize;
 
 @end
 
-@interface NSTableColumn (PGZooming)
+@interface NSTableColumn(PGZooming)
 
 - (CGFloat)PG_zoomedWidth;
 

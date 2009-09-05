@@ -58,7 +58,7 @@ extern NSString *const PGBezelPanelFrameDidChangeNotification;
 
 @end
 
-@interface NSView (PGBezelPanelContentView)
+@interface NSView(PGBezelPanelContentView)
 
 + (id)PG_bezelPanel; // Returns a bezel panel with an instance of the receiver as the content view.
 

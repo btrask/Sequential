@@ -44,7 +44,7 @@ static NSString *const PGUpdatePaneIdentifier = @"PGUpdatePane";
 
 static PGPrefController *PGSharedPrefController = nil;
 
-@interface PGPrefController (Private)
+@interface PGPrefController(Private)
 
 - (NSString *)_titleForPane:(NSString *)identifier;
 - (void)_setCurrentPane:(NSString *)identifier;

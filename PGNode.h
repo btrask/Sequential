@@ -115,7 +115,7 @@ typedef NSUInteger PGNodeStatus;
 
 @end
 
-@interface PGNode (PGResourceAdapterProxy) <PGResourceAdapting>
+@interface PGNode(PGResourceAdapterProxy) <PGResourceAdapting>
 @end
 
 @protocol PGNodeDataSource <NSObject>

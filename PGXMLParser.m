@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Categories
 #import "NSObjectAdditions.h"
 
-@interface PGXMLParser (Private)
+@interface PGXMLParser(Private)
 
 @property(copy, setter = _setClasses:) NSArray *_classes;
 @property(readonly) BOOL _hasSubparser;

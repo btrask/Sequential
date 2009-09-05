@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 NSString *const PGDisplayableIdentifierIconDidChangeNotification = @"PGDisplayableIdentifierIconDidChange";
 NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDisplayableIdentifierDisplayNameDidChange";
 
-@interface PGDisplayableIdentifier (Private)
+@interface PGDisplayableIdentifier(Private)
 
 - (id)_initWithIdentifier:(PGResourceIdentifier *)ident;
 
@@ -702,7 +702,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 
 @end
 
-@implementation NSURL (PGResourceIdentifierCreation)
+@implementation NSURL(PGResourceIdentifierCreation)
 
 - (PGResourceIdentifier *)PG_resourceIdentifier
 {

@@ -42,7 +42,7 @@ static NSMutableDictionary *PGTimersByNonretainedObjectValue;
 
 @end
 
-@implementation NSObject (PGDelayedPerforming)
+@implementation NSObject(PGDelayedPerforming)
 
 static void PGTimerCallback(CFRunLoopTimerRef timer, PGTimerContextObject *context)
 {

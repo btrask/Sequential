@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSAffineTransformAdditions.h"
 
-@implementation NSAffineTransform (AEAdditions)
+@implementation NSAffineTransform(AEAdditions)
 
 + (id)AE_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation
 {

@@ -32,7 +32,7 @@ enum {
 };
 typedef NSUInteger AEIconType;
 
-@interface NSBezierPath (AEAdditions)
+@interface NSBezierPath(AEAdditions)
 
 + (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(CGFloat)radius;
 + (void)AE_drawIcon:(AEIconType)type inRect:(NSRect)r;
