@@ -369,7 +369,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[self _setActiveNode:node];
 			[clipView setDocumentView:view];
 			[view setImageRep:[view rep] orientation:[view orientation] size:[self _sizeForImageRep:[view rep] orientation:[view orientation]]];
-			[clipView scrollPinLocationToOffset:offset];
+			[clipView scrollPinLocationToOffset:offset animation:PGNoAnimation];
 			[self _readFinished];
 		} else {
 			[clipView setDocumentView:view];

@@ -72,22 +72,30 @@ typedef NSUInteger PGScrollToRectType;
 	NSUInteger _scrollCount;
 }
 
-- (NSResponder<PGClipViewDelegate> *)delegate;
-- (void)setDelegate:(NSResponder<PGClipViewDelegate> *)anObject;
+@property(assign) NSResponder<PGClipViewDelegate> *delegate;
+@property(retain) NSView *documentView;
+@property(readonly) NSRect documentFrame;
+@property(assign) PGInset boundsInset;
+@property(readonly) NSRect insetBounds;
+@property(retain) NSColor *backgroundColor;
+@property(assign) BOOL showsBorder;
+@property(retain) NSCursor *cursor;
+@property(assign, getter = isScrolling) BOOL scrolling;
+@property(assign) PGRectEdgeMask pinLocation;
 
-- (NSView *)documentView;
-- (void)setDocumentView:(NSView *)aView;
-- (NSRect)documentFrame;
-- (PGInset)boundsInset;
-- (void)setBoundsInset:(PGInset)inset;
-- (NSRect)insetBounds;
+@property(readonly) NSPoint position;
+@property(readonly) NSPoint center;
+@property(readonly) NSPoint relativeCenter;
+@property(readonly) NSSize pinLocationOffset;
 
-- (NSColor *)backgroundColor;
-- (void)setBackgroundColor:(NSColor *)aColor;
-- (BOOL)showsBorder;
-- (void)setShowsBorder:(BOOL)flag;
-- (NSCursor *)cursor;
-- (void)setCursor:(NSCursor *)cursor;
+- (BOOL)scrollTo:(NSPoint)aPoint animation:(PGAnimationType)type;
+- (BOOL)scrollBy:(NSSize)aSize animation:(PGAnimationType)type;
+- (BOOL)scrollToEdge:(PGRectEdgeMask)mask animation:(PGAnimationType)type;
+- (BOOL)scrollToLocation:(PGPageLocation)location animation:(PGAnimationType)type;
+- (BOOL)scrollCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
+- (BOOL)scrollRelativeCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
+- (BOOL)scrollPinLocationToOffset:(NSSize)aSize animation:(PGAnimationType)type;
+- (void)stopAnimatedScrolling;
 
 - (NSRect)scrollableRectWithBorder:(BOOL)flag;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;
@@ -95,30 +103,10 @@ typedef NSUInteger PGScrollToRectType;
 - (NSSize)maximumDistanceForScrollType:(PGScrollType)scrollType;
 - (BOOL)shouldExitForMovementInDirection:(PGRectEdgeMask)mask;
 
-- (NSPoint)position;
-- (BOOL)scrollTo:(NSPoint)aPoint animation:(PGAnimationType)type;
-- (BOOL)scrollBy:(NSSize)aSize animation:(PGAnimationType)type;
-- (BOOL)scrollToEdge:(PGRectEdgeMask)mask animation:(PGAnimationType)type;
-- (BOOL)scrollToLocation:(PGPageLocation)location animation:(PGAnimationType)type;
-- (void)stopAnimatedScrolling;
-
-- (PGRectEdgeMask)pinLocation;
-- (void)setPinLocation:(PGRectEdgeMask)mask;
-- (NSSize)pinLocationOffset;
-- (BOOL)scrollPinLocationToOffset:(NSSize)aSize;
-
-- (NSPoint)center;
-- (BOOL)scrollCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
-- (NSPoint)relativeCenter;
-- (BOOL)scrollRelativeCenterTo:(NSPoint)aPoint animation:(PGAnimationType)type;
-
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent;
 - (void)arrowKeyDown:(NSEvent *)firstEvent;
 - (void)scrollInDirection:(PGRectEdgeMask)direction type:(PGScrollType)scrollType;
 - (void)magicPanForward:(BOOL)forward acrossFirst:(BOOL)across;
-
-- (void)beginScrolling;
-- (void)endScrolling;
 
 - (void)viewFrameDidChange:(NSNotification *)aNotif;
 
@@ -137,10 +125,10 @@ typedef NSUInteger PGScrollToRectType;
 
 @end
 
-@interface NSObject(PGClipViewAdditions)
+@interface NSView(PGClipViewAdditions)
 
-- (PGClipView *)PG_enclosingClipView;
-- (PGClipView *)PG_clipView;
+@property(readonly) PGClipView *PG_enclosingClipView;
+@property(readonly) PGClipView *PG_clipView;
 
 - (void)PG_scrollRectToVisible:(NSRect)aRect type:(PGScrollToRectType)type;
 - (void)PG_scrollRectToVisible:(NSRect)aRect forView:(NSView *)view type:(PGScrollToRectType)type;
