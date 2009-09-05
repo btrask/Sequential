@@ -62,9 +62,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #include <tgmath.h>
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
-NSString *const PGRoundsImageCornersKey = @"PGRoundsImageCorners";
-NSString *const PGAutozoomsWindowsKey = @"PGAutozoomsWindows";
-NSString *const PGOnlyAutozoomsSingleImagesKey = @"PGOnlyAutozoomsSingleImages";
 NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
 NSString *const PGBackgroundPatternKey = @"PGBackgroundPattern";
 NSString *const PGMouseClickActionKey = @"PGMouseClickAction";
@@ -128,9 +125,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	NSUserDefaults *const d = [NSUserDefaults standardUserDefaults];
 	[d registerDefaults:[NSDictionary dictionaryWithObjectsAndKeys:
 		yes, PGAntialiasWhenUpscalingKey,
-		yes, PGRoundsImageCornersKey,
-		yes, PGAutozoomsWindowsKey,
-		yes, PGOnlyAutozoomsSingleImagesKey,
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInteger:PGNoPattern], PGBackgroundPatternKey,
 		[NSNumber numberWithInteger:PGNextPreviousAction], PGMouseClickActionKey,

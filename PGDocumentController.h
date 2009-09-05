@@ -39,9 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGActivityPanelController;
 
 extern NSString *const PGAntialiasWhenUpscalingKey;
-extern NSString *const PGRoundsImageCornersKey;
-extern NSString *const PGAutozoomsWindowsKey;
-extern NSString *const PGOnlyAutozoomsSingleImagesKey;
 extern NSString *const PGBackgroundColorKey;
 extern NSString *const PGBackgroundPatternKey;
 extern NSString *const PGMouseClickActionKey;

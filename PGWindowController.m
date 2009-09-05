@@ -78,7 +78,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 {
 	[super nodeReadyForViewing:aNotif];
 	if(!_shouldZoomOnNextImageLoad) return;
-	if([[NSUserDefaults standardUserDefaults] boolForKey:PGOnlyAutozoomsSingleImagesKey] && [[[self activeDocument] node] viewableNodeCount] != 1) {
+	if([[[self activeDocument] node] viewableNodeCount] != 1) {
 		_shouldZoomOnNextImageLoad = NO;
 		return;
 	}
@@ -102,7 +102,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 		[window setFrame:NSMakeRect(0.0f, 0.0f, 500.0f, 500.0f) display:NO];
 		[window center];
 	}
-	_shouldZoomOnNextImageLoad = [[NSUserDefaults standardUserDefaults] boolForKey:PGAutozoomsWindowsKey];
+	_shouldZoomOnNextImageLoad = YES;
 	_shouldSaveFrame = YES;
 }
 
