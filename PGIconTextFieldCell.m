@@ -36,15 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGIconTextFieldCell
 
-- (NSImage *)icon
-{
-	return [[_icon retain] autorelease];
-}
-- (void)setIcon:(NSImage *)icon
-{
-	[_icon autorelease];
-	_icon = [icon retain];
-}
+@synthesize icon = _icon;
 
 #pragma mark -NSCell
 

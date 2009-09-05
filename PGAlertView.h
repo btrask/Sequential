@@ -36,25 +36,24 @@ enum {
 };
 typedef NSUInteger PGAlertGraphicType;
 
-@interface PGAlertView : NSView
+@interface PGAlertView : NSView <NSWindowDelegate>
 {
 	@private
 	NSMutableArray *_graphicStack;
 	PGAlertGraphic *_currentGraphic;
-	NSUInteger        _frameCount;
-	NSTimer        *_frameTimer;
+	NSUInteger _frameCount;
+	NSTimer *_frameTimer;
 }
 
-- (PGAlertGraphic *)currentGraphic;
+@property(readonly) PGAlertGraphic *currentGraphic;
+@property(readonly) NSUInteger frameCount;
+
 - (void)pushGraphic:(PGAlertGraphic *)aGraphic window:(NSWindow *)window;
 - (void)popGraphic:(PGAlertGraphic *)aGraphic;
 - (void)popGraphicIdenticalTo:(PGAlertGraphic *)aGraphic;
 - (void)popGraphicsOfType:(PGAlertGraphicType)type;
 
-- (NSUInteger)frameCount;
 - (void)animateOneFrame:(PGAlertView *)anAlertView;
-
-- (void)windowWillClose:(NSNotification *)aNotif;
 
 @end
 
@@ -65,14 +64,14 @@ typedef NSUInteger PGAlertGraphicType;
 + (id)loopedRightGraphic;
 + (id)loopedLeftGraphic;
 
-- (PGAlertGraphicType)graphicType;
+@property(readonly) PGAlertGraphicType graphicType;
+@property(readonly) NSTimeInterval fadeOutDelay;
+@property(readonly) NSTimeInterval frameDelay;
+@property(readonly) NSUInteger frameCount;
 
 - (void)drawInView:(PGAlertView *)anAlertView;
 - (void)flipHorizontally;
-- (NSTimeInterval)fadeOutDelay; // Less than 0.01 means forever.
 
-- (NSTimeInterval)animationDelay; // Less than or equal to 0 means don't animate.
-- (NSUInteger)frameMax;
 - (void)animateOneFrame:(PGAlertView *)anAlertView;
 
 @end
@@ -85,8 +84,7 @@ typedef NSUInteger PGAlertGraphicType;
 
 + (id)loadingGraphic;
 
-- (CGFloat)progress;
-- (void)setProgress:(CGFloat)progress;
+@property(assign) CGFloat progress;
 
 @end
 

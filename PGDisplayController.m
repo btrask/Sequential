@@ -738,7 +738,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if(_thumbnailController) inset = PGAddInsets(inset, [_thumbnailController contentInset]);
 	[_infoPanel setFrameInset:inset];
-	[[_infoPanel content] setOrigin:corner];
+	[[_infoPanel content] setOriginCorner:corner];
 	[_infoPanel updateFrameDisplay:YES];
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
@@ -890,7 +890,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		PGNode *const parent = [node parentNode];
 		if([parent parentNode]) text = [NSString stringWithFormat:@"%@ %C %@", [[parent identifier] displayName], 0x25B8, text];
 	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
-	[[_infoPanel content] setMessageText:text];
+	[[_infoPanel content] setStringValue:text];
 }
 - (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {

@@ -216,7 +216,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 @end
 
-@implementation NSView (PGBezelPanelContentView)
+@implementation NSView(PGBezelPanelContentView)
 
 #pragma mark Class Methods
 

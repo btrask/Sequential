@@ -29,10 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGTimerButton : NSButton
 
-- (AEIconType)iconType;
-- (void)setIconType:(AEIconType)state;
-- (CGFloat)progress;
-- (void)setProgress:(CGFloat)aFloat;
+@property(assign) AEIconType iconType;
+@property(assign) CGFloat progress;
 
 @end
 
@@ -43,9 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	CGFloat _progress;
 }
 
-- (AEIconType)iconType;
-- (void)setIconType:(AEIconType)state;
-- (CGFloat)progress;
-- (void)setProgress:(CGFloat)aFloat;
+@property(assign) AEIconType iconType;
+@property(assign) CGFloat progress;
 
 @end

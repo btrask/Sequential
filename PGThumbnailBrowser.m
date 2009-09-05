@@ -40,47 +40,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGThumbnailBrowser
 
-- (NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)dataSource
-{
-	return dataSource;
-}
+@synthesize dataSource;
 - (void)setDataSource:(NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)obj
 {
 	if(obj == dataSource) return;
 	dataSource = obj;
 	[[self views] makeObjectsPerformSelector:@selector(setDataSource:) withObject:obj];
 }
-- (NSObject<PGThumbnailBrowserDelegate> *)delegate
-{
-	return delegate;
-}
-- (void)setDelegate:(NSObject<PGThumbnailBrowserDelegate> *)obj
-{
-	delegate = obj;
-}
-- (PGOrientation)thumbnailOrientation
-{
-	return _thumbnailOrientation;
-}
+@synthesize delegate;
+@synthesize thumbnailOrientation = _thumbnailOrientation;
 - (void)setThumbnailOrientation:(PGOrientation)orientation
 {
 	_thumbnailOrientation = orientation;
 	NSUInteger i = [self numberOfColumns];
 	while(i--) [[self viewAtIndex:i] setThumbnailOrientation:orientation];
 }
-
-#pragma mark -
-
-- (NSUInteger)indexOfColumnForItem:(id)item
-{
-	NSArray *const views = [self views];
-	NSUInteger i = 0;
-	for(; i < [views count]; i++) if([[views objectAtIndex:i] representedObject] == item) return i;
-	return NSNotFound;
-}
-
-#pragma mark -
-
 - (NSSet *)selection
 {
 	PGThumbnailView *const lastView = [[self views] lastObject];
@@ -89,6 +63,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	id const item = [lastView representedObject];
 	return item ? [NSSet setWithObject:item] : nil;
 }
+- (void)setSelection:(NSSet *)aSet
+{
+	[self setSelection:aSet reload:YES];
+}
+
+#pragma mark -
+
 - (void)setSelection:(NSSet *)aSet
         reload:(BOOL)flag
 {
@@ -154,8 +135,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGColumnView
 
-- (void)insertColumnWithView:(NSView *)aView
-        atIndex:(NSUInteger)index
+- (void)insertColumnWithView:(NSView *)aView atIndex:(NSUInteger)index
 {
 	NSUInteger const columns = [self numberOfColumns];
 	[super insertColumnWithView:aView atIndex:index];
@@ -199,13 +179,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSObject (PGThumbnailBrowserDataSource)
 
-- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
-      parentOfItem:(id)item
+- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item
 {
 	return nil;
 }
-- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
-        itemCanHaveChildren:(id)item
+- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item
 {
 	return YES;
 }

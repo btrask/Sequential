@@ -33,24 +33,17 @@ typedef NSInteger PGInfoCorner;
 @interface PGInfoView : NSView
 {
 	@private
-	NSString    *_messageText;
-	NSUInteger     _index;
-	NSUInteger     _count;
-	PGInfoCorner _origin;
+	NSString *_stringValue;
+	NSUInteger _index;
+	NSUInteger _count;
+	PGInfoCorner _originCorner;
 }
 
-- (NSAttributedString *)displayText;
-
-- (NSString *)messageText;
-- (void)setMessageText:(NSString *)aString;
-
-- (NSUInteger)index;
-- (void)setIndex:(NSUInteger)anInt;
-- (NSUInteger)count;
-- (void)setCount:(NSUInteger)anInt;
-- (BOOL)displaysProgressIndicator;
-
-- (PGInfoCorner)origin;
-- (void)setOrigin:(PGInfoCorner)aSide; // Does NOT actually move the window.
+@property(readonly) NSAttributedString *attributedStringValue;
+@property(copy) NSString *stringValue;
+@property(assign) NSUInteger index;
+@property(assign) NSUInteger count;
+@property(readonly) BOOL displaysProgressIndicator;
+@property(assign) PGInfoCorner originCorner;
 
 @end

@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGRoundedBackgroundView
 
-#pragma mark NSView
+#pragma mark -NSView
 
 - (BOOL)isOpaque
 {
@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self bounds], 1.0f, 1.0f) cornerRadius:20.0f] fill];
 }
 
-#pragma mark NSResponder
+#pragma mark -NSResponder
 
 - (void)mouseDown:(NSEvent *)anEvent
 {

@@ -30,21 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGProgressIndicatorCell
 
-#pragma mark Instance Methods
+#pragma mark -PGProgressIndicatorCell
 
-- (BOOL)hidden
-{
-	return _hidden;
-}
-- (void)setHidden:(BOOL)flag
-{
-	_hidden = flag;
-}
+@synthesize hidden = _hidden;
 
-#pragma mark NSCell
+#pragma mark -NSCell
 
-- (void)drawWithFrame:(NSRect)aRect
-        inView:(NSView *)aView
+- (void)drawWithFrame:(NSRect)aRect inView:(NSView *)aView
 {
 	if([self hidden]) return;
 

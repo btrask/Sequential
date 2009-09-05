@@ -86,7 +86,7 @@ static void PGDrawGradient(void)
 
 @implementation PGThumbnailView
 
-#pragma mark NSObject
+#pragma mark +NSObject
 
 + (void)initialize
 {
@@ -94,55 +94,20 @@ static void PGDrawGradient(void)
 	PGThumbnailGlossStyleEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:PGThumbnailGlossStyleEnabledKey];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGThumbnailView
 
-- (NSObject<PGThumbnailViewDataSource> *)dataSource
-{
-	return dataSource;
-}
-- (void)setDataSource:(NSObject<PGThumbnailViewDataSource> *)obj
-{
-	dataSource = obj;
-}
-- (NSObject<PGThumbnailViewDelegate> *)delegate
-{
-	return delegate;
-}
-- (void)setDelegate:(NSObject<PGThumbnailViewDelegate> *)obj
-{
-	delegate = obj;
-}
-- (id)representedObject
-{
-	return [[_representedObject retain] autorelease];
-}
-- (void)setRepresentedObject:(id)obj
-{
-	if(obj == _representedObject) return;
-	[_representedObject release];
-	_representedObject = [obj retain];
-}
-- (PGOrientation)thumbnailOrientation
-{
-	return _thumbnailOrientation;
-}
+@synthesize dataSource;
+@synthesize delegate;
+@synthesize representedObject;
+@synthesize thumbnailOrientation = _thumbnailOrientation;
 - (void)setThumbnailOrientation:(PGOrientation)orientation
 {
 	if(orientation == _thumbnailOrientation) return;
 	_thumbnailOrientation = orientation;
 	[self setNeedsDisplay:YES];
 }
-
-#pragma mark -
-
-- (NSArray *)items
-{
-	return [[_items retain] autorelease];
-}
-- (NSSet *)selection
-{
-	return [[_selection copy] autorelease];
-}
+@synthesize items = _items;
+@synthesize selection = _selection;
 - (void)setSelection:(NSSet *)items
 {
 	if(items == _selection) return;
@@ -157,20 +122,6 @@ static void PGDrawGradient(void)
 	[self scrollToFirstSelectedItem];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
-- (void)scrollToFirstSelectedItem
-{
-	NSUInteger const selCount = [_selection count];
-	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES] type:PGScrollCenterToRect];
-	else if(selCount) {
-		NSUInteger i = 0;
-		for(; i < [_items count]; i++) {
-			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
-			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
-			return;
-		}
-	}
-	[[self PG_enclosingClipView] scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
-}
 
 #pragma mark -
 
@@ -178,8 +129,7 @@ static void PGDrawGradient(void)
 {
 	return floor(p.y / PGThumbnailTotalHeight);
 }
-- (NSRect)frameOfItemAtIndex:(NSUInteger)index
-          withMargin:(BOOL)flag
+- (NSRect)frameOfItemAtIndex:(NSUInteger)index withMargin:(BOOL)flag
 {
 	NSRect frame = NSMakeRect(PGThumbnailMarginWidth, index * PGThumbnailTotalHeight + PGThumbnailMarginHeight, PGThumbnailSize, PGThumbnailSize);
 	return flag ? NSInsetRect(frame, -PGThumbnailMarginWidth, -PGThumbnailMarginHeight) : frame;
@@ -202,6 +152,20 @@ static void PGDrawGradient(void)
 {
 	CGFloat const height = [self superview] ? NSHeight([[self superview] bounds]) : 0.0f;
 	[super setFrameSize:NSMakeSize(PGOuterTotalWidth, MAX(height, [_items count] * PGThumbnailTotalHeight))];
+}
+- (void)scrollToFirstSelectedItem
+{
+	NSUInteger const selCount = [_selection count];
+	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES] type:PGScrollCenterToRect];
+	else if(selCount) {
+		NSUInteger i = 0;
+		for(; i < [_items count]; i++) {
+			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
+			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
+			return;
+		}
+	}
+	[[self PG_enclosingClipView] scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
 }
 
 #pragma mark -
@@ -453,7 +417,7 @@ static void PGDrawGradient(void)
 - (void)dealloc
 {
 	[self AE_removeObserver];
-	[_representedObject release];
+	[representedObject release];
 	[_items release];
 	[_selection release];
 	[super dealloc];
@@ -467,28 +431,23 @@ static void PGDrawGradient(void)
 {
 	return nil;
 }
-- (NSImage *)thumbnailView:(PGThumbnailView *)sender
-             thumbnailForItem:(id)item
+- (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item
 {
 	return nil;
 }
-- (BOOL)thumbnailView:(PGThumbnailView *)sender
-        canSelectItem:(id)item;
+- (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 {
 	return YES;
 }
-- (NSString *)thumbnailView:(PGThumbnailView *)sender
-              labelForItem:(id)item
+- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item
 {
 	return nil;
 }
-- (NSColor *)thumbnailView:(PGThumbnailView *)sender
-             labelColorForItem:(id)item
+- (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item
 {
 	return nil;
 }
-- (NSRect)thumbnailView:(PGThumbnailView *)sender
-          highlightRectForItem:(id)item
+- (NSRect)thumbnailView:(PGThumbnailView *)sender highlightRectForItem:(id)item
 {
 	return NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f);
 }

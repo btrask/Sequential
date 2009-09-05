@@ -36,14 +36,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [_views count];
 }
-- (NSArray *)views
-{
-	return [[_views copy] autorelease];
-}
+@synthesize views = _views;
 - (id)lastView
 {
 	return [_views lastObject];
 }
+@synthesize columnWidth = _columnWidth;
+- (void)setColumnWidth:(CGFloat)width
+{
+	_columnWidth = round(width);
+	[self layout];
+}
+
+#pragma mark-
+
 - (id)viewAtIndex:(NSUInteger)index
 {
 	return [_views objectAtIndex:index];
@@ -55,8 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[self insertColumnWithView:aView atIndex:[_views count]];
 }
-- (void)insertColumnWithView:(NSView *)aView
-        atIndex:(NSUInteger)index
+- (void)insertColumnWithView:(NSView *)aView atIndex:(NSUInteger)index
 {
 	NSParameterAssert(aView);
 	NSParameterAssert([_views indexOfObjectIdenticalTo:aView] == NSNotFound);
@@ -87,18 +92,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[self layout];
 	return;
-}
-
-#pragma mark -
-
-- (CGFloat)columnWidth
-{
-	return _columnWidth;
-}
-- (void)setColumnWidth:(CGFloat)width
-{
-	_columnWidth = round(width);
-	[self layout];
 }
 
 #pragma mark -
@@ -166,11 +159,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[super dealloc];
 }
 
-#pragma mark <PGClipViewDelegate>
+#pragma mark -<PGClipViewDelegate>
 
-- (BOOL)clipView:(PGClipView *)sender
-        handleMouseEvent:(NSEvent *)anEvent
-        first:(BOOL)flag
+- (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent first:(BOOL)flag
 {
 	NSUInteger const i = [_clipViews indexOfObjectIdenticalTo:sender];
 	if(NSNotFound == i) return NO;

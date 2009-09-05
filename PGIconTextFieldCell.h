@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSImage *_icon;
 }
 
-- (NSImage *)icon;
-- (void)setIcon:(NSImage *)icon;
+@property(retain) NSImage *icon;
 
 @end

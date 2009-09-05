@@ -48,53 +48,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGInfoView
 
-#pragma mark Instance Methods
+#pragma mark -PGInfoView
 
-- (NSAttributedString *)displayText
+- (NSAttributedString *)attributedStringValue
 {
 	NSMutableParagraphStyle *const style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
 	[style setAlignment:NSCenterTextAlignment];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
-	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? [self messageText] : [NSString stringWithFormat:@"%@ (%lu/%lu)", [self messageText], (unsigned long)[self index] + 1, (unsigned long)[self count]]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? self.stringValue : [NSString stringWithFormat:@"%@ (%lu/%lu)", self.stringValue, (unsigned long)self.index + 1, (unsigned long)self.count]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0.0f], NSFontAttributeName,
 		[NSColor whiteColor], NSForegroundColorAttributeName,
 		style, NSParagraphStyleAttributeName, nil]] autorelease];
 }
-
-#pragma mark -
-
-- (NSString *)messageText
+- (NSString *)stringValue
 {
-	return _messageText ? [[_messageText retain] autorelease] : @"";
+	return _stringValue ? [[_stringValue retain] autorelease] : @"";
 }
-- (void)setMessageText:(NSString *)aString
+- (void)setStringValue:(NSString *)aString
 {
 	NSString *const string = aString ? aString : @"";
-	if(string == _messageText) return;
-	[_messageText release];
-	_messageText = [string copy];
+	if(string == _stringValue) return;
+	[_stringValue release];
+	_stringValue = [string copy];
 	[self setNeedsDisplay:YES];
 	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
-
-#pragma mark -
-
-- (NSUInteger)index
-{
-	return _index;
-}
+@synthesize index = _index;
 - (void)setIndex:(NSUInteger)anInt
 {
 	if(anInt == _index) return;
 	_index = anInt;
 	[self setNeedsDisplay:YES];
 }
-
-- (NSUInteger)count
-{
-	return _count;
-}
+@synthesize count = _count;
 - (void)setCount:(NSUInteger)anInt
 {
 	if(anInt == _count) return;
@@ -103,24 +90,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!showedIndicator != ![self displaysProgressIndicator]) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 	else [self setNeedsDisplay:YES];
 }
-
-#pragma mark -
-
 - (BOOL)displaysProgressIndicator
 {
 	return PGGraphicalIndicatorStyle && [self count] > 1;
 }
-
-#pragma mark -
-
-- (PGInfoCorner)origin
-{
-	return _origin;
-}
-- (void)setOrigin:(PGInfoCorner)aSide
-{
-	_origin = aSide;
-}
+@synthesize originCorner = _originCorner;
 
 #pragma mark PGBezelPanelContentView Protocol
 
@@ -128,17 +102,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
           frameForContentRect:(NSRect)aRect
           scale:(CGFloat)scaleFactor
 {
-	NSSize const messageSize = [[self displayText] size];
+	NSSize const messageSize = [self.attributedStringValue size];
 	CGFloat const scaledMarginSize = PGMarginSize * scaleFactor;
 	NSRect frame = NSIntersectionRect(
 		NSMakeRect(
 			NSMinX(aRect) + scaledMarginSize,
 			NSMinY(aRect) + scaledMarginSize,
-			ceil((messageSize.width + PGTextTotalHorzPadding + ([self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
-			ceil(MAX(messageSize.height + PGTextTotalVertPadding, ([self displaysProgressIndicator] ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
+			ceil((messageSize.width + PGTextTotalHorzPadding + (self.displaysProgressIndicator ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
+			ceil(MAX(messageSize.height + PGTextTotalVertPadding, (self.displaysProgressIndicator ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
-	if([self origin] == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
+	if(self.originCorner == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
 	return frame;
 }
 
@@ -154,14 +128,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
 	[[NSColor AE_bezelBackgroundColor] set];
 	[bezel fill];
-	if([self displaysProgressIndicator]) {
+	if(self.displaysProgressIndicator) {
 		[[NSColor AE_bezelForegroundColor] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect(([self origin] == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
+		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect((self.originCorner == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
 		NSUInteger const maxValue = [self count] - 1;
 		NSBezierPath *const indicator = [NSBezierPath bezierPath];
 		CGFloat x = round(((CGFloat)MIN([self index], maxValue) / maxValue) * (PGIndicatorWidth - 1 - PGIndicatorHeight) + 1);
-		if([self origin] == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10.0f - PGPaddingSize;
+		if(self.originCorner == PGMaxXMinYCorner) x = NSMaxX(b) - x - 10.0f - PGPaddingSize;
 		else x += PGPaddingSize;
 		[indicator moveToPoint:NSMakePoint(x + 0.5f, PGPaddingSize + 6.0f)];
 		[indicator lineToPoint:NSMakePoint(x + 5.0f, PGPaddingSize + 10.5f)];
@@ -170,15 +144,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[indicator fill];
 	}
 	CGFloat const indicatorWidth = [self displaysProgressIndicator] ? PGIndicatorWidth : 0.0f;
-	CGFloat const textOffset = [self origin] == PGMinXMinYCorner ? indicatorWidth : 0.0f;
-	[[self displayText] drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
+	CGFloat const textOffset = self.originCorner == PGMinXMinYCorner ? indicatorWidth : 0.0f;
+	[self.attributedStringValue drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
 }
 
 #pragma mark NSObject
 
 - (void)dealloc
 {
-	[_messageText release];
+	[_stringValue release];
 	[super dealloc];
 }
 

@@ -35,31 +35,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	@private
 	IBOutlet NSObject<PGThumbnailViewDataSource> * dataSource;
 	IBOutlet NSObject<PGThumbnailViewDelegate> * delegate;
-	id _representedObject;
+	IBOutlet id representedObject;
 	PGOrientation _thumbnailOrientation;
 	NSArray *_items;
 	NSMutableSet *_selection;
 }
 
-- (NSObject<PGThumbnailViewDataSource> *)dataSource;
-- (void)setDataSource:(NSObject<PGThumbnailViewDataSource> *)obj;
-- (NSObject<PGThumbnailViewDelegate> *)delegate;
-- (void)setDelegate:(NSObject<PGThumbnailViewDelegate> *)obj;
-- (id)representedObject;
-- (void)setRepresentedObject:(id)obj;
-- (PGOrientation)thumbnailOrientation;
-- (void)setThumbnailOrientation:(PGOrientation)orientation;
+@property(assign) NSObject<PGThumbnailViewDataSource> *dataSource;
+@property(assign) NSObject<PGThumbnailViewDelegate> *delegate;
+@property(retain) id representedObject;
+@property(assign) PGOrientation thumbnailOrientation;
 
-- (NSArray *)items;
-- (NSSet *)selection;
-- (void)setSelection:(NSSet *)items;
-- (void)scrollToFirstSelectedItem;
+@property(readonly) NSArray *items;
+@property(copy) NSSet *selection;
 
 - (NSUInteger)indexOfItemAtPoint:(NSPoint)p;
 - (NSRect)frameOfItemAtIndex:(NSUInteger)index withMargin:(BOOL)flag;
 
 - (void)reloadData;
 - (void)sizeToFit;
+- (void)scrollToFirstSelectedItem;
 
 - (void)systemColorsDidChange:(NSNotification *)aNotif;
 

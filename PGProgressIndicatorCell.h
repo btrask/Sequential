@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL _hidden;
 }
 
-- (BOOL)hidden;
-- (void)setHidden:(BOOL)flag;
+@property(assign) BOOL hidden;
 
 @end

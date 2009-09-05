@@ -40,14 +40,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSUInteger _updateCount;
 }
 
-- (NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *)dataSource;
-- (void)setDataSource:(NSObject<PGThumbnailBrowserDataSource> *)obj; // Get the item for the column with -[sender representedObject].
-- (NSObject<PGThumbnailBrowserDelegate> *)delegate;
-- (void)setDelegate:(NSObject<PGThumbnailBrowserDelegate> *)obj;
-- (PGOrientation)thumbnailOrientation;
-- (void)setThumbnailOrientation:(PGOrientation)orientation;
+@property(assign) NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *dataSource;
+@property(assign) NSObject<PGThumbnailBrowserDelegate> *delegate;
+@property(assign) PGOrientation thumbnailOrientation;
+@property(copy) NSSet *selection;
 
-- (NSSet *)selection;
 - (void)setSelection:(NSSet *)aSet reload:(BOOL)flag;
 - (void)redisplayItem:(id)item recursively:(BOOL)flag;
 

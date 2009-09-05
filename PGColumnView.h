@@ -37,17 +37,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	CGFloat           _columnWidth;
 }
 
-- (NSUInteger)numberOfColumns;
-- (NSArray *)views;
-- (id)lastView;
+@property(readonly) NSUInteger numberOfColumns;
+@property(readonly) NSArray *views;
+@property(readonly) id lastView;
+@property(assign) CGFloat columnWidth;
+
 - (id)viewAtIndex:(NSUInteger)index;
 
 - (void)addColumnWithView:(NSView *)aView;
 - (void)insertColumnWithView:(NSView *)aView atIndex:(NSUInteger)index;
 - (void)removeColumnsAfterView:(NSView *)aView;
-
-- (CGFloat)columnWidth;
-- (void)setColumnWidth:(CGFloat)width;
 
 - (void)scrollToTopOfColumnWithView:(NSView *)aView;
 - (void)scrollToLastColumnAnimate:(BOOL)flag;

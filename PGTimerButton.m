@@ -32,14 +32,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGTimerButton
 
-#pragma mark NSControl
+#pragma mark +NSControl
 
 + (id)cellClass
 {
 	return [PGTimerButtonCell class];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGTimerButton
 
 - (AEIconType)iconType
 {
@@ -64,26 +64,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGTimerButtonCell
 
-#pragma mark Instance Methods
+#pragma mark -PGTimerButtonCell
 
-- (AEIconType)iconType
-{
-	return _iconType;
-}
-- (void)setIconType:(AEIconType)state
-{
-	_iconType = state;
-}
-- (CGFloat)progress
-{
-	return _progress;
-}
-- (void)setProgress:(CGFloat)aFloat
-{
-	_progress = aFloat;
-}
+@synthesize iconType = _iconType;
+@synthesize progress = _progress;
 
-#pragma mark NSCell
+#pragma mark -NSCell
 
 - (BOOL)isOpaque
 {

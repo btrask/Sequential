@@ -29,16 +29,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFindView
 
-#pragma mark PGBezelPanelContentView Protocol
+#pragma mark -NSView(PGBezelPanelContentView)
 
-- (NSRect)bezelPanel:(PGBezelPanel *)sender
-          frameForContentRect:(NSRect)aRect
-          scale:(CGFloat)s
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)s
 {
 	return (NSRect){aRect.origin, {NSWidth([self frame]) * s, NSHeight([self frame]) * s}};
 }
 
-#pragma mark NSResponder
+#pragma mark -NSResponder
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
@@ -54,25 +52,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFindlessTextView
 
-#pragma mark NSObject Protocol
-
-- (BOOL)respondsToSelector:(SEL)aSelector
-{
-	return @selector(performFindPanelAction:) == aSelector ? NO : [super respondsToSelector:aSelector];
-}
-
-#pragma mark NSTextView
+#pragma mark -NSTextView
 
 - (IBAction)performFindPanelAction:(id)sender
 {
 	[self doesNotRecognizeSelector:_cmd];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 + (BOOL)instancesRespondToSelector:(SEL)aSelector
 {
 	return @selector(performFindPanelAction:) == aSelector ? NO : [super instancesRespondToSelector:aSelector];
+}
+
+#pragma mark -<NSObject>
+
+- (BOOL)respondsToSelector:(SEL)aSelector
+{
+	return @selector(performFindPanelAction:) == aSelector ? NO : [super respondsToSelector:aSelector];
 }
 
 @end
