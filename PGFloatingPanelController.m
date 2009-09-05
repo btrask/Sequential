@@ -90,7 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotif
 {
-	[self _updateWithDisplayController:(aNotif ? [[aNotif object] windowController] : [[NSApp mainWindow] windowController])];
+	[self _updateWithDisplayController:aNotif ? [[aNotif object] windowController] : [[NSApp mainWindow] windowController]];
 }
 - (void)windowDidResignMain:(NSNotification *)aNotif
 {

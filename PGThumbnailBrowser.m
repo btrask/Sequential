@@ -70,8 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)setSelection:(NSSet *)aSet
-        reload:(BOOL)flag
+- (void)setSelection:(NSSet *)aSet reload:(BOOL)flag
 {
 	++_updateCount;
 	NSUInteger const initialNumberOfColumns = [self numberOfColumns];

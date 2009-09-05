@@ -303,9 +303,9 @@ static void PGDrawGradient(void)
 			[nilShadow set];
 		}
 		NSRect transformedThumbnailRect = thumbnailRect;
-		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:([[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert)]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
+		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
 		[transform concat];
-		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:(enabled ? 1.0f : 0.33f)];
+		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.33f];
 		[transform invert];
 		[transform concat];
 		if(!entirelyHighlighted) {
@@ -336,7 +336,7 @@ static void PGDrawGradient(void)
 				[textShadow setShadowOffset:NSMakeSize(0.0f, -1.0f)];
 				attributes = [[NSMutableDictionary alloc] initWithObjectsAndKeys:textShadow, NSShadowAttributeName, [NSFont systemFontOfSize:11], NSFontAttributeName, style, NSParagraphStyleAttributeName, nil];
 			}
-			[attributes setObject:(enabled ? [NSColor alternateSelectedControlTextColor] : [NSColor disabledControlTextColor]) forKey:NSForegroundColorAttributeName];
+			[attributes setObject:enabled ? [NSColor alternateSelectedControlTextColor] : [NSColor disabledControlTextColor] forKey:NSForegroundColorAttributeName];
 			static NSTextStorage *textStorage = nil;
 			static NSLayoutManager *layoutManager = nil;
 			static NSTextContainer *textContainer = nil;

@@ -55,9 +55,7 @@ enum {
 	}
 	return nil;
 }
-+ (void)getEntries:(out NSArray **)outEntries
-        orientation:(out PGOrientation *)outOrientation
-        forImageData:(NSData *)data
++ (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data
 {
 	NSMutableArray *const entries = [NSMutableArray array];
 	PGOrientation orientation = PGUpright;
@@ -81,7 +79,7 @@ enum {
 			case 7: orientation = PGRotated90CC | PGFlippedVert; break;
 			case 8: orientation = PGRotated90CC; break;
 		}
-		[entries addObject:[[[self alloc] initWithLabel:[NSString stringWithUTF8String:(entry->descr ? entry->descr : entry->name)] value:(entry->str ? [NSString stringWithUTF8String:entry->str] : [NSString stringWithFormat:@"%u", entry->value])] autorelease]];
+		[entries addObject:[[[self alloc] initWithLabel:[NSString stringWithUTF8String:entry->descr ? entry->descr : entry->name] value:entry->str ? [NSString stringWithUTF8String:entry->str] : [NSString stringWithFormat:@"%u", entry->value]] autorelease]];
 	}
 
 	exiffree(tags);
@@ -91,8 +89,7 @@ enum {
 
 #pragma mark -PGExifEntry
 
-- (id)initWithLabel:(NSString *)label
-	  value:(NSString *)value
+- (id)initWithLabel:(NSString *)label value:(NSString *)value
 {
 	if((self = [super init])) {
 		_label = [label copy];

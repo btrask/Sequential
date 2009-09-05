@@ -115,8 +115,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 #pragma mark PGResourceAdapter
 
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size
-                withCreationDictionary:(NSDictionary *)dict
++ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict
 {
 	NSPDFImageRep *const rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) return nil;
@@ -142,9 +141,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 {
 	return YES;
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            matchSearchTerms:(NSArray *)terms
-            stopAtNode:(PGNode *)descendent
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
 	if(![[self node] isViewable] || [self node] == descendent) return nil;
 	NSInteger const index = [[self identifier] index];

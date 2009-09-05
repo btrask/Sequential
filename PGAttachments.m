@@ -76,8 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -NSTextAttachmentCell
 
-- (void)drawWithFrame:(NSRect)aRect
-        inView:(NSView *)aView
+- (void)drawWithFrame:(NSRect)aRect inView:(NSView *)aView
 {
 	[NSGraphicsContext saveGraphicsState];
 	NSAffineTransform *const t = [[[NSAffineTransform alloc] init] autorelease];
@@ -85,7 +84,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[t rotateByDegrees:_angle];
 	[t concat];
 	BOOL const highlighted = [_item respondsToSelector:@selector(isHighlighted)] ? [_item isHighlighted] : NO;
-	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:(!_item || [_item isEnabled]) highlighted:highlighted];
+	[self drawWithFrame:NSMakeRect(NSWidth(aRect) / -2, NSHeight(aRect) / -2, NSWidth(aRect), NSHeight(aRect)) enabled:!_item || [_item isEnabled] highlighted:highlighted];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSSize)cellSize

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (id)initWithScreen:(NSScreen *)anObject
 {
-	if((self = [super initWithContentRect:(anObject ? [anObject frame] : NSZeroRect) styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES])) {
+	if((self = [super initWithContentRect:anObject ? [anObject frame] : NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES])) {
 		[self setHasShadow:NO];
 	}
 	return self;

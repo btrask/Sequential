@@ -38,8 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGImageSaveAlert
 
-- (id)initWithRoot:(PGNode *)root
-      initialSelection:(NSSet *)aSet
+- (id)initWithRoot:(PGNode *)root initialSelection:(NSSet *)aSet
 {
 	if(!(self = [super initWithWindowNibName:@"PGImageSave"])) return nil;
 	_rootNode = [root retain];
@@ -76,9 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(window) [_openPanel beginSheetForDirectory:nil file:nil types:nil modalForWindow:window modalDelegate:self didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:) contextInfo:NULL];
 	else [self openPanelDidEnd:_openPanel returnCode:[_openPanel runModalForTypes:nil] contextInfo:NULL];
 }
-- (void)openPanelDidEnd:(NSOpenPanel *)panel
-        returnCode:(NSInteger)returnCode
-        contextInfo:(void *)contextInfo
+- (void)openPanelDidEnd:(NSOpenPanel *)panel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {
 	[panel orderOut:self];
 	[_openPanel AE_removeObserver:self name:NSWindowDidEndSheetNotification];
@@ -93,9 +90,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSString *const modifiedName = [_saveNamesByNodePointer objectForKey:[NSValue valueWithNonretainedObject:node]];
 	return modifiedName ? [[modifiedName retain] autorelease] : [[node identifier] naturalDisplayName];
 }
-- (void)replaceAlertDidEnd:(NSAlert *)alert
-	returnCode:(NSInteger)returnCode
-	contextInfo:(void *)contextInfo
+- (void)replaceAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {
 	if(NSAlertFirstButtonReturn == returnCode) _saveOnSheetClose = YES;
 }
@@ -117,8 +112,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<NSOpenSavePanelDelegate>
 
-- (BOOL)panel:(id)sender
-        isValidFilename:(NSString *)filename
+- (BOOL)panel:(id)sender isValidFilename:(NSString *)filename
 {
 	NSUInteger existingFileCount = 0;
 	NSString *existingFilename = nil;
@@ -165,8 +159,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[alert beginSheetModalForWindow:_openPanel modalDelegate:nil didEndSelector:NULL contextInfo:nil];
 	return NO;
 }
-- (void)panel:(id)sender
-        directoryDidChange:(NSString *)path
+- (void)panel:(id)sender directoryDidChange:(NSString *)path
 {
 	[_destination release];
 	_destination = [path retain];
@@ -192,35 +185,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<NSOutlineViewDataSource>
 
-- (id)outlineView:(NSOutlineView *)outlineView
-      child:(NSInteger)index
-      ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
 	return item ? [[item sortedChildren] objectAtIndex:index] : _rootNode;
 }
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-        isItemExpandable:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
 	return [item hasSavableChildren];
 }
-- (NSInteger)outlineView:(NSOutlineView *)outlineView
-       numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
 	return item ? [[item unsortedChildren] count] : 1;
 }
-- (id)outlineView:(NSOutlineView *)outlineView
-      objectValueForTableColumn:(NSTableColumn *)tableColumn
-      byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	NSString *const saveName = [self saveNameForNode:item];
 	if(tableColumn == nameColumn) return saveName;
 	else if(tableColumn == errorColumn) if([[NSFileManager defaultManager] fileExistsAtPath:[_destination stringByAppendingPathComponent:saveName]]) return NSLocalizedString(@"File already exists.", @"Appears in the image save alert beside each filename that conflicts with an existing file in the destination folder.");
 	return nil;
 }
-- (void)outlineView:(NSOutlineView *)outlineView
-        setObjectValue:(id)object
-        forTableColumn:(NSTableColumn *)tableColumn
-        byItem:(id)item
+- (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	NSParameterAssert(tableColumn == nameColumn);
 	if(object && [object length]) [_saveNamesByNodePointer setObject:object forKey:[NSValue valueWithNonretainedObject:item]];
@@ -228,19 +212,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<NSOutlineViewDelegate>
 
-- (void)outlineView:(NSOutlineView *)outlineView
-        willDisplayCell:(id)cell
-        forTableColumn:(NSTableColumn *)tableColumn
-        item:(id)item
+- (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	if(tableColumn == nameColumn) {
 		[cell setIcon:[[item identifier] icon]];
 		[cell setEnabled:[item canSaveData]];
 	}
 }
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-        shouldEditTableColumn:(NSTableColumn *)tableColumn
-        item:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	if(tableColumn != nameColumn) return NO;
 	[outlineView editColumn:0 row:[outlineView rowForItem:item] withEvent:nil select:NO];
@@ -250,8 +229,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(NSNotFound != extStart) [fieldEditor setSelectedRange:NSMakeRange(0, extStart)];
 	return NO;
 }
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-        shouldSelectItem:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
 	return [item canSaveData];
 }

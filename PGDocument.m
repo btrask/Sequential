@@ -167,10 +167,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 
 #pragma mark -
 
-- (void)getStoredNode:(out PGNode **)outNode
-        imageView:(out PGImageView **)outImageView
-        offset:(out NSSize *)outOffset
-        query:(out NSString **)outQuery
+- (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView offset:(out NSSize *)outOffset query:(out NSString **)outQuery
 {
 	if(_storedNode) {
 		*outNode = [_storedNode autorelease];
@@ -186,10 +183,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		*outQuery = @"";
 	}
 }
-- (void)storeNode:(PGNode *)node
-        imageView:(PGImageView *)imageView
-        offset:(NSSize)offset
-        query:(NSString *)query
+- (void)storeNode:(PGNode *)node imageView:(PGImageView *)imageView offset:(NSSize)offset query:(NSString *)query
 {
 	[_storedNode autorelease];
 	_storedNode = [node retain];
@@ -245,8 +239,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 
 #pragma mark -
 
-- (void)noteNode:(PGNode *)node
-        willRemoveNodes:(NSArray *)anArray
+- (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray
 {
 	PGNode *newStoredNode = [_storedNode sortedViewableNodeNext:YES afterRemovalOfChildren:anArray fromNode:node];
 	if(!newStoredNode) newStoredNode = [_storedNode sortedViewableNodeNext:NO afterRemovalOfChildren:anArray fromNode:node];

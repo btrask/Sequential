@@ -53,8 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark +PGResourceAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
-                   withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
 {
 	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
 	if(p) return p;
@@ -119,8 +118,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark +PGXMLParser
 
-+ (BOOL)canParseTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	return [p hasPrefix:@"/oembed"];
 }
@@ -193,16 +191,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark +PGXMLParser
 
-+ (BOOL)canParseTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	return [p hasPrefix:@"/rss"] && [[attrs objectForKey:@"xmlns:media"] hasPrefix:@"http://search.yahoo.com/mrss"];
 }
 
 #pragma mark -PGXMLParser
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	if([@"/rss/channel/item" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemParser alloc] init] autorelease]];
 }
@@ -239,8 +235,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGXMLParser
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	if([@"/rss/channel/item/media:content" isEqualToString:p] || [@"rss/channel/item/media:group/media:content" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemContentParser alloc] init] autorelease]];
 }
@@ -287,8 +282,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGXMLParser
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	[_URLString autorelease];
 	_URLString = [[attrs objectForKey:@"url"] copy];

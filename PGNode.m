@@ -189,8 +189,7 @@ enum {
 
 #pragma mark -
 
-- (NSData *)dataWithInfo:(NSDictionary *)info
-            fast:(BOOL)flag
+- (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag
 {
 	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
 	if(data) return data;
@@ -268,8 +267,7 @@ enum {
 {
 	if((PGNodeLoadingOrReading & _status) == PGNodeReading) [_adapter read];
 }
-- (void)readFinishedWithImageRep:(NSImageRep *)aRep
-        error:(NSError *)error
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error
 {
 	NSParameterAssert((PGNodeLoadingOrReading & _status) == PGNodeReading);
 	_status &= ~PGNodeReading;
@@ -383,7 +381,7 @@ enum {
 	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	if(![mutableInfo objectForKey:PGIdentifierKey]) {
 		NSURL *const responseURL = [response URL];
-		[mutableInfo AE_setObject:(responseURL ? [responseURL PG_resourceIdentifier] : [self identifier]) forKey:PGIdentifierKey];
+		[mutableInfo AE_setObject:responseURL ? [responseURL PG_resourceIdentifier] : [self identifier] forKey:PGIdentifierKey];
 	}
 	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[response MIMEType] forKey:PGMIMETypeKey];
 	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[[mutableInfo objectForKey:PGIdentifierKey] URL] path] pathExtension] forKey:PGExtensionKey];
@@ -393,7 +391,7 @@ enum {
 		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
-	[mutableInfo setObject:[NSNumber numberWithInteger:([self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist)] forKey:PGDataExistenceKey];
+	[mutableInfo setObject:[NSNumber numberWithInteger:[self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist] forKey:PGDataExistenceKey];
 	return mutableInfo;
 }
 - (void)_updateMenuItem
@@ -592,10 +590,7 @@ enum {
 	return nil;
 }
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info {}
-- (BOOL)node:(PGNode *)sender
-        getData:(out NSData **)outData
-        info:(NSDictionary *)info
-        fast:(BOOL)flag
+- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
 {
 	if(outData) *outData = nil;
 	return YES;

@@ -26,8 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSMutableDictionary(AEAdditions)
 
-- (void)AE_setObject:(id)obj
-        forKey:(id)key
+- (void)AE_setObject:(id)obj forKey:(id)key
 {
 	if(obj) [self setObject:obj forKey:key];
 }

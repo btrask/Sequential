@@ -43,9 +43,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	return [self initWithDocumentIdentifier:[[aNode document] rootIdentifier] fileIdentifier:[aNode identifier] displayName:nil];
 }
-- (id)initWithDocumentIdentifier:(PGDisplayableIdentifier *)docIdent
-      fileIdentifier:(PGDisplayableIdentifier *)fileIdent
-      displayName:(NSString *)aString
+- (id)initWithDocumentIdentifier:(PGDisplayableIdentifier *)docIdent fileIdentifier:(PGDisplayableIdentifier *)fileIdent displayName:(NSString *)aString
 {
 	if((self = [super init])) {
 		_documentIdentifier = [docIdent retain];

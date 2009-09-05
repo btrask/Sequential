@@ -168,7 +168,7 @@ static PGPrefController *PGSharedPrefController = nil;
 
 		NSArray *const screens = [NSScreen screens];
 		NSUInteger const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntegerValue];
-		[self setDisplayScreen:(screenIndex >= [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex])];
+		[self setDisplayScreen:screenIndex >= [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex]];
 
 		[NSApp AE_addObserver:self selector:@selector(applicationDidChangeScreenParameters:) name:NSApplicationDidChangeScreenParametersNotification];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundColorKey options:kNilOptions context:self];
@@ -188,10 +188,7 @@ static PGPrefController *PGSharedPrefController = nil;
 
 #pragma mark -NSObject(NSKeyValueObserving)
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-        ofObject:(id)object
-        change:(NSDictionary *)change
-	context:(void *)context
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
@@ -212,7 +209,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	NSUInteger i = [screens indexOfObjectIdenticalTo:currentScreen];
 	if(NSNotFound == i) {
 		i = [screens indexOfObject:currentScreen];
-		[self setDisplayScreen:[screens objectAtIndex:(NSNotFound == i ? 0 : i)]];
+		[self setDisplayScreen:[screens objectAtIndex:NSNotFound == i ? 0 : i]];
 	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPrefControllerDisplayScreenDidChangeNotification.
 
 	NSMenu *const screensMenu = [screensPopUp menu];

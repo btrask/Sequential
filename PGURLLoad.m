@@ -61,9 +61,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 #pragma mark Instance Methods
 
-- (id)initWithRequest:(NSURLRequest *)aRequest
-      parentLoad:(id<PGLoading>)parent
-      delegate:(NSObject<PGURLLoadDelegate> *)anObject
+- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(NSObject<PGURLLoadDelegate> *)anObject
 {
 	if((self = [super init])) {
 		_parentLoad = parent;
@@ -170,23 +168,20 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 #pragma mark NSURLConnectionDelegate Protocol
 
-- (void)connection:(NSURLConnection *)connection
-        didReceiveResponse:(NSURLResponse *)response
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
 	NSParameterAssert(connection == _connection);
 	[_response autorelease];
 	_response = [response copy];
 	[[self delegate] loadDidReceiveResponse:self];
 }
-- (void)connection:(NSURLConnection *)connection
-	didReceiveData:(NSData *)data
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
 	NSParameterAssert(connection == _connection);
 	[_data appendData:data];
 	[[self delegate] loadLoadingDidProgress:self];
 }
-- (void)connection:(NSURLConnection *)connection
-	didFailWithError:(NSError *)error
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
 {
 	NSParameterAssert(connection == _connection);
 	[self _stop];

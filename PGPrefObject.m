@@ -118,7 +118,7 @@ NSArray *PGScaleModes(void)
 {
 	if(aDirection == _readingDirection) return;
 	_readingDirection = aDirection;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:(aDirection == PGReadingDirectionRightToLeft)] forKey:PGReadingDirectionRightToLeftKey];
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:aDirection == PGReadingDirectionRightToLeft] forKey:PGReadingDirectionRightToLeftKey];
 	[self AE_postNotificationName:PGPrefObjectReadingDirectionDidChangeNotification];
 }
 

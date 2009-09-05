@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[transform rotateByDegrees:90.0f];
 		rectPtr->size = NSMakeSize(NSHeight(*rectPtr), NSWidth(*rectPtr)); // Swap.
 	}
-	[transform scaleXBy:(orientation & PGFlippedHorz ? -1.0f : 1.0f) yBy:(orientation & PGFlippedVert ? -1.0f : 1.0f)];
+	[transform scaleXBy:(orientation & PGFlippedHorz ? -1.0f : 1.0f) yBy:orientation & PGFlippedVert ? -1.0f : 1.0f];
 	[transform translateXBy:-NSMidX(*rectPtr) yBy:-NSMidY(*rectPtr)];
 	return transform;
 }

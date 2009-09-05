@@ -165,9 +165,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)setImageRep:(NSImageRep *)rep
-        orientation:(PGOrientation)orientation
-        size:(NSSize)size
+- (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size
 {
 	[self setNeedsDisplay:YES]; // Always redisplay in case rep is a PDF.
 	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) {
@@ -176,7 +174,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	_orientation = orientation;
 	if(rep != _rep) {
-		[_image removeRepresentation:(_cached ? _cache : _rep)];
+		[_image removeRepresentation:_cached ? _cache : _rep];
 		_cached = NO;
 		[_rep release];
 		_rep = nil;
@@ -190,8 +188,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	} else [self setSize:size allowAnimation:NO];
 	[self _cache];
 }
-- (void)setSize:(NSSize)size
-        allowAnimation:(BOOL)flag
+- (void)setSize:(NSSize)size allowAnimation:(BOOL)flag
 {
 	if(!PGAnimateSizeChanges || !flag) {
 		_size = size;
@@ -211,8 +208,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
 }
-- (NSPoint)rotateByDegrees:(CGFloat)val
-           adjustingPoint:(NSPoint)aPoint
+- (NSPoint)rotateByDegrees:(CGFloat)val adjustingPoint:(NSPoint)aPoint
 {
 	NSRect const b1 = [self bounds];
 	NSPoint const p = PGOffsetPointByXY(aPoint, -NSMidX(b1), -NSMidY(b1)); // Our bounds are going to change to fit the rotated image. Any point we want to remain constant relative to the image, we have to make relative to the bounds' center, since that's where the image is drawn.
@@ -268,7 +264,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_animate
 {
 	NSUInteger const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntegerValue] + 1;
-	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:(i < _numberOfFrames ? i : 0)]];
+	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:i < _numberOfFrames ? i : 0]];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
@@ -276,7 +272,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
 	if(!_cache || !_rep || [self canAnimateRep]) return;
-	[_image removeRepresentation:(_cached ? _cache : _rep)];
+	[_image removeRepresentation:_cached ? _cache : _rep];
 	_cached = NO;
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 	[_image setSize:pixelSize];
@@ -300,7 +296,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[[NSColor whiteColor] set];
 		NSRectFill(cacheRect);
 	}
-	[self _drawWithFrame:cacheRect operation:(_isPDF ? NSCompositeSourceOver : NSCompositeCopy) rects:NULL count:0];
+	[self _drawWithFrame:cacheRect operation:_isPDF ? NSCompositeSourceOver : NSCompositeCopy rects:NULL count:0];
 	if(self.usesRoundedCorners) [self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
 
@@ -309,10 +305,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_image addRepresentation:_cache];
 	_cached = YES;
 }
-- (void)_drawWithFrame:(NSRect)aRect
-        operation:(NSCompositingOperation)operation
-        rects:(NSRect const *)rects
-        count:(NSUInteger)count
+- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count
 {
 	NSSize const imageSize = [_image size];
 	NSSize const s = NSMakeSize(imageSize.width / _immediateSize.width, imageSize.height / _immediateSize.height);
@@ -424,7 +417,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(count) NSRectFillList(rects, count);
 		else NSRectFill(b);
 	}
-	[self _drawWithFrame:b operation:([self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver) rects:rects count:count];
+	[self _drawWithFrame:b operation:[self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver rects:rects count:count];
 #if PGDebugDrawingModes
 	[(_cached ? [NSColor redColor] : [NSColor blueColor]) set];
 	NSFrameRect(b); // Outer frame: Cached

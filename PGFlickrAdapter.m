@@ -75,8 +75,7 @@ enum {
 
 #pragma mark +PGResourceAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
-                   withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
 {
 	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
 	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
@@ -183,7 +182,7 @@ enum {
 	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
 	[[self identifier] setCustomDisplayName:[parser title]];
 	NSError *const error = [parser error];
-	if(error) [[self node] setError:([parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error)];
+	if(error) [[self node] setError:[parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error];
 	else if([parser createsMultipleNodes]) {
 		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
 		[[self node] loadFinished];
@@ -211,16 +210,14 @@ enum {
 
 #pragma mark +PGXMLParser
 
-+ (BOOL)canParseTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	return [@"/rsp/photos" isEqualToString:p] || [@"/rsp/photoset" isEqualToString:p];
 }
 
 #pragma mark -PGXMLParser
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	if([@"/rsp/photoset" isEqualToString:p]) {
 		[_title release];
@@ -253,8 +250,7 @@ enum {
 
 #pragma mark +PGXMLParser
 
-+ (BOOL)canParseTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	return [@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p] || [@"/rsp/err" isEqualToString:p];
 }
@@ -268,8 +264,7 @@ enum {
 
 #pragma mark -PGXMLParser
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	if([@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) {
 		[_farm release];

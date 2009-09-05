@@ -325,7 +325,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const availableDragRect = [self convertRect:NSInsetRect([self insetBounds], 4, 4) toView:nil];
 	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
 	NSEvent *latestEvent;
-	while([(latestEvent = [[self window] nextEventMatchingMask:(dragMask | NSEventMaskFromType(stopType)) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
+	while([(latestEvent = [[self window] nextEventMatchingMask:dragMask | NSEventMaskFromType(stopType) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
 		if(PGPreliminaryDragging == dragMode || (PGNotDragging == dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
 			dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
@@ -405,7 +405,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)magicPanForward:(BOOL)forward acrossFirst:(BOOL)across
 {
-	PGRectEdgeMask const mask = [[self delegate] clipView:self directionFor:(forward ? PGEndLocation : PGHomeLocation)];
+	PGRectEdgeMask const mask = [[self delegate] clipView:self directionFor:forward ? PGEndLocation : PGHomeLocation];
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Delegate returned contradictory directions.");
 	NSPoint position = [self position];
 	PGRectEdgeMask const dir1 = mask & (across ? PGHorzEdgesMask : PGVertEdgesMask);
@@ -459,7 +459,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
 	CGFloat const dist = hypotf(r.width, r.height);
 	CGFloat const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
-	if(![self _scrollTo:(dist < 1.0f ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor))]) [self stopAnimatedScrolling];
+	if(![self _scrollTo:dist < 1.0f ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor)]) [self stopAnimatedScrolling];
 }
 
 - (void)_beginPreliminaryDrag:(NSValue *)val

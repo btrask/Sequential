@@ -127,8 +127,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 #pragma mark Private Protocol
 
-- (void)_updateFrameWithWindow:(NSWindow *)aWindow
-        display:(BOOL)flag
+- (void)_updateFrameWithWindow:(NSWindow *)aWindow display:(BOOL)flag
 {
 	CGFloat const s = [self AE_userSpaceScaleFactor];
 	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
@@ -218,18 +217,16 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 @implementation NSView(PGBezelPanelContentView)
 
-#pragma mark Class Methods
+#pragma mark +NSView(PGBezelPanelContentView)
 
 + (id)PG_bezelPanel
 {
 	return [[[PGBezelPanel alloc] initWithContentView:[[[self alloc] initWithFrame:NSZeroRect] autorelease]] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -NSView(PGBezelPanelContentView)
 
-- (NSRect)bezelPanel:(PGBezelPanel *)sender
-          frameForContentRect:(NSRect)aRect
-          scale:(CGFloat)scaleFactor
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
 {
 	return aRect;
 }

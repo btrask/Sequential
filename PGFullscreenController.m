@@ -85,8 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGDisplayController
 
-- (BOOL)setActiveDocument:(PGDocument *)document
-        closeIfAppropriate:(BOOL)flag
+- (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag
 {
 	if(document || _isExitingFullscreen) return [super setActiveDocument:document closeIfAppropriate:NO];
 	if(![self activeDocument]) return NO;
@@ -189,8 +188,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<PGDocumentWindowDelegate>
 
-- (NSDragOperation)window:(PGDocumentWindow *)window
-                   dragOperationForInfo:(id<NSDraggingInfo>)info
+- (NSDragOperation)window:(PGDocumentWindow *)window dragOperationForInfo:(id<NSDraggingInfo>)info
 {
 	if(!([info draggingSourceOperationMask] & NSDragOperationGeneric)) return NSDragOperationNone;
 	NSPasteboard *const pboard = [info draggingPasteboard];
@@ -203,8 +201,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	return NSDragOperationNone;
 }
-- (BOOL)window:(PGDocumentWindow *)window
-        performDragOperation:(id<NSDraggingInfo>)info
+- (BOOL)window:(PGDocumentWindow *)window performDragOperation:(id<NSDraggingInfo>)info
 {
 	NSPasteboard *const pboard = [info draggingPasteboard];
 	NSArray *const types = [pboard types];

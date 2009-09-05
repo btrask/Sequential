@@ -104,38 +104,29 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 #pragma mark -NSObject(WebFrameLoadDelegate)
 
-- (void)webView:(WebView *)sender
-        didFailProvisionalLoadWithError:(NSError *)error
-        forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didFailProvisionalLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
 {
 	[self webView:sender didFailLoadWithError:error forFrame:frame];
 }
-- (void)webView:(WebView *)sender
-        didFailLoadWithError:(NSError *)error
-        forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didFailLoadWithError:(NSError *)error forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
 	[self _clearWebView];
 	[[self node] loadFinished];
 }
 
-- (void)webView:(WebView *)sender
-        didReceiveTitle:(NSString *)title
-        forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
 	[[self identifier] setCustomDisplayName:title];
 }
-- (void)webView:(WebView *)sender
-        didReceiveIcon:(NSImage *)image
-        forFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didReceiveIcon:(NSImage *)image forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
 	[[self identifier] setIcon:image];
 }
 
-- (void)webView:(WebView *)sender
-        didFinishLoadForFrame:(WebFrame *)frame
+- (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
 	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];

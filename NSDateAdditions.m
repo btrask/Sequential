@@ -30,8 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [self earlierDate:date] != self;
 }
-- (NSString *)AE_localizedStringWithDateStyle:(CFDateFormatterStyle)dateStyle
-              timeStyle:(CFDateFormatterStyle)timeStyle
+- (NSString *)AE_localizedStringWithDateStyle:(CFDateFormatterStyle)dateStyle timeStyle:(CFDateFormatterStyle)timeStyle
 {
 	static CFDateFormatterRef f = nil;
 	if(!f || CFDateFormatterGetDateStyle(f) != dateStyle || CFDateFormatterGetTimeStyle(f) != timeStyle) {

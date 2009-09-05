@@ -106,7 +106,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
 		[shadow setShadowOffset:NSMakeSize(0.0f, -1.0f)];
 		[shadow setShadowBlurRadius:2.0f];
-		[shadow setShadowColor:[NSColor colorWithDeviceWhite:0.0f alpha:(e ? 1.0f : 0.33f)]];
+		[shadow setShadowColor:[NSColor colorWithDeviceWhite:0.0f alpha:e ? 1.0f : 0.33f]];
 		[shadow set];
 		[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(20.0f, 20.0f), b)];
 		[shadow setShadowColor:nil];

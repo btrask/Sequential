@@ -26,9 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSScanner(AEAdditions)
 
-- (BOOL)AE_scanFromString:(NSString *)start
-        toString:(NSString *)end
-        intoString:(out NSString **)outString
+- (BOOL)AE_scanFromString:(NSString *)start toString:(NSString *)end intoString:(out NSString **)outString
 {
 	[self setScanLocation:0];
 	[self scanUpToString:start intoString:NULL];

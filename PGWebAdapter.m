@@ -39,8 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark +PGResourceAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
-                   withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
 {
 	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
 	return !ident || [[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey] || [ident isFileIdentifier] ? PGNotAMatch : PGMatchByIntrinsicAttribute;

@@ -119,8 +119,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 #pragma mark -
 
-- (NSRect)windowWillUseStandardFrame:(NSWindow *)window
-          defaultFrame:(NSRect)newFrame
+- (NSRect)windowWillUseStandardFrame:(NSWindow *)window defaultFrame:(NSRect)newFrame
 {
 	return [window PG_zoomedFrame];
 }

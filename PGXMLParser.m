@@ -43,9 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark +PGXMLParser
 
-+ (id)parserWithData:(NSData *)data
-      baseURL:(NSURL *)URL
-      classes:(NSArray *)classes
++ (id)parserWithData:(NSData *)data baseURL:(NSURL *)URL classes:(NSArray *)classes
 {
 	PGXMLParser *const p = [[[self alloc] init] autorelease];
 	[p setBaseURL:URL];
@@ -53,8 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[p parseWithData:data];
 	return p;
 }
-+ (BOOL)canParseTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
++ (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	return NO;
 }
@@ -110,8 +107,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)beganTagPath:(NSString *)p
-        attributes:(NSDictionary *)attrs
+- (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
 	for(Class const class in [self _classes]) {
 		if([self isKindOfClass:class] || ![class canParseTagPath:p attributes:attrs]) continue;
@@ -251,11 +247,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -<NSXMLParserDelegate>
 
-- (void)parser:(NSXMLParser *)parser
-        didStartElement:(NSString *)elementName
-        namespaceURI:(NSString *)namespaceURI
-        qualifiedName:(NSString *)qName
-        attributes:(NSDictionary *)attributeDict
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[_tagPath autorelease];
@@ -268,17 +260,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_attributes = nil;
 	[pool release];
 }
-- (void)parser:(NSXMLParser *)parser
-        foundCharacters:(NSString *)string
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[[self contentStringForTagPath:_tagPath] appendString:string];
 	[pool release];
 }
-- (void)parser:(NSXMLParser *)parser
-        didEndElement:(NSString *)elementName
-        namespaceURI:(NSString *)namespaceURI
-        qualifiedName:(NSString *)qName
+- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[self endedTagPath:_tagPath];

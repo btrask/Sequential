@@ -64,8 +64,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	return [[_unsortedChildren retain] autorelease];
 }
-- (void)setUnsortedChildren:(NSArray *)anArray
-        presortedOrder:(PGSortOrder)anOrder
+- (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)anOrder
 {
 	if(anArray == _unsortedChildren) return;
 	NSMutableArray *const removedChildren = [[_unsortedChildren mutableCopy] autorelease];
@@ -79,7 +78,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	_unsortedOrder = anOrder;
 	[_sortedChildren release];
 	_sortedChildren = nil;
-	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
+	[[[self node] menuItem] setSubmenu:[[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil];
 	[[self document] noteSortedChildrenDidChange];
 }
 - (void)removeChild:(PGNode *)node
@@ -120,8 +119,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	}
 	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context];
 }
-- (void)noteChild:(PGNode *)child
-        didChangeForSortOrder:(PGSortOrder)order
+- (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order
 {
 	if([_unsortedChildren indexOfObjectIdenticalTo:child] == NSNotFound) return;
 	if((PGSortOrderMask & order) != (PGSortOrderMask & [[self document] sortOrder])) return;
@@ -136,7 +134,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	[[[self node] menuItem] setSubmenu:nil];
 	[super setNode:aNode];
-	[[[self node] menuItem] setSubmenu:([[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil)];
+	[[[self node] menuItem] setSubmenu:[[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil];
 }
 
 #pragma mark -NSObject
@@ -205,15 +203,12 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag
-            includeChildren:(BOOL)children
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children
 {
 	PGNode *const node = children && flag ? [self sortedViewableNodeFirst:YES stopAtNode:nil includeSelf:NO] : nil;
 	return node ? node : [super sortedViewableNodeNext:flag includeChildren:children];
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            stopAtNode:(PGNode *)descendent
-            includeSelf:(BOOL)includeSelf
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf
 {
 	if(descendent == [self node]) return nil;
 	if(flag) {
@@ -239,9 +234,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	for(PGNode *const child in children) if([child isViewable]) return child;
 	return nil;
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            matchSearchTerms:(NSArray *)terms
-            stopAtNode:(PGNode *)descendent
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
 	if(descendent == [self node]) return nil;
 	if(flag) {

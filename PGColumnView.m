@@ -102,7 +102,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)scrollToLastColumnAnimate:(BOOL)flag
 {
-	[_clipView scrollToEdge:PGMaxXEdgeMask animation:(flag ? PGPreferAnimation : PGNoAnimation)];
+	[_clipView scrollToEdge:PGMaxXEdgeMask animation:flag ? PGPreferAnimation : PGNoAnimation];
 }
 
 #pragma mark -

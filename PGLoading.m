@@ -68,8 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [[_subloads retain] autorelease];
 }
-- (void)setSubload:(id<PGLoading>)obj
-        isLoading:(BOOL)flag
+- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag
 {
 	if(!flag) [_subloads removeObjectIdenticalTo:obj];
 	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];

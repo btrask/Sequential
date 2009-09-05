@@ -63,8 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)pushGraphic:(PGAlertGraphic *)aGraphic
-        window:(NSWindow *)window
+- (void)pushGraphic:(PGAlertGraphic *)aGraphic window:(NSWindow *)window
 {
 	NSParameterAssert(aGraphic);
 	NSUInteger const i = [_graphicStack indexOfObject:aGraphic];
@@ -155,9 +154,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -NSView(PGBezelPanelContentView)
 
-- (NSRect)bezelPanel:(PGBezelPanel *)sender
-          frameForContentRect:(NSRect)aRect
-          scale:(CGFloat)scaleFactor
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
 {
 	CGFloat const scaledPanelSize = scaleFactor * PGAlertViewSize;
 	return PGIntegralRect(NSMakeRect(

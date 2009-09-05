@@ -60,8 +60,7 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark +PGResourceAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
-                   withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
 {
 	return [[info objectForKey:PGKnownToBeArchiveKey] boolValue] ? PGMatchByIntrinsicAttribute : [super matchPriorityForNode:node withInfo:info];
 }
@@ -79,9 +78,7 @@ static id PGArchiveAdapterList = nil;
 {
 	return [[_archive retain] autorelease];
 }
-- (NSArray *)nodesUnderPath:(NSString *)path
-             parentAdapter:(PGContainerAdapter *)parent
-             remainingIndexes:(NSMutableIndexSet *)indexes
+- (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes
 {
 	NSParameterAssert(path);
 	NSParameterAssert(parent);
@@ -98,11 +95,11 @@ static id PGArchiveAdapterList = nil;
 		if([path isEqualToString:entryPath]) continue;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
-		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:(isEntrylessFolder ? NSNotFound : i)] displayableIdentifier];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:(isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_typeForEntry:i preferOSType:YES])]];
+		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
+		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_typeForEntry:i preferOSType:YES]]];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
-		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:(isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_OSTypeForEntry:i standardFormat:NO]), PGOSTypeKey, nil];
+		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_OSTypeForEntry:i standardFormat:NO], PGOSTypeKey, nil];
 		if(isFile) [node startLoadWithInfo:info];
 		else {
 			[info setObject:[PGContainerAdapter class] forKey:PGAdapterClassKey];
@@ -195,8 +192,7 @@ static id PGArchiveAdapterList = nil;
 	NSUInteger const i = [[sender identifier] index];
 	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]];
 }
-- (void)node:(PGNode *)sender
-        willLoadWithInfo:(NSMutableDictionary *)info
+- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info
 {
 	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
@@ -204,10 +200,7 @@ static id PGArchiveAdapterList = nil;
 	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
 	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }
-- (BOOL)node:(PGNode *)sender
-        getData:(out NSData **)outData
-        info:(NSDictionary *)info
-        fast:(BOOL)flag
+- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
 {
 	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i || flag) {
@@ -256,8 +249,7 @@ static id PGArchiveAdapterList = nil;
 	}
 	return root ? root : @"";
 }
-- (NSString *)PG_OSTypeForEntry:(NSInteger)index
-              standardFormat:(BOOL)flag
+- (NSString *)PG_OSTypeForEntry:(NSInteger)index standardFormat:(BOOL)flag
 {
 	OSType value;
 	if([self entryIsDirectory:index]) value = kGenericFolderIcon;
@@ -268,8 +260,7 @@ static id PGArchiveAdapterList = nil;
 	}
 	return flag ? NSFileTypeForHFSTypeCode(value) : PGPseudoFileTypeForHFSTypeCode(value);
 }
-- (NSString *)PG_typeForEntry:(NSInteger)index
-              preferOSType:(BOOL)flag
+- (NSString *)PG_typeForEntry:(NSInteger)index preferOSType:(BOOL)flag
 {
 	NSString *const osType = flag ? [self PG_OSTypeForEntry:index standardFormat:YES] : nil;
 	return osType ? osType : [[self nameOfEntry:index] pathExtension];

@@ -56,7 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[style setAlignment:NSCenterTextAlignment];
 	[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 	if(![self displaysProgressIndicator]) [style setAlignment:NSCenterTextAlignment];
-	return [[[NSAttributedString alloc] initWithString:(PGGraphicalIndicatorStyle ? self.stringValue : [NSString stringWithFormat:@"%@ (%lu/%lu)", self.stringValue, (unsigned long)self.index + 1, (unsigned long)self.count]) attributes:[NSDictionary dictionaryWithObjectsAndKeys:
+	return [[[NSAttributedString alloc] initWithString:PGGraphicalIndicatorStyle ? self.stringValue : [NSString stringWithFormat:@"%@ (%lu/%lu)", self.stringValue, (unsigned long)self.index + 1, (unsigned long)self.count] attributes:[NSDictionary dictionaryWithObjectsAndKeys:
 		[NSFont labelFontOfSize:0.0f], NSFontAttributeName,
 		[NSColor whiteColor], NSForegroundColorAttributeName,
 		style, NSParagraphStyleAttributeName, nil]] autorelease];
@@ -98,9 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark PGBezelPanelContentView Protocol
 
-- (NSRect)bezelPanel:(PGBezelPanel *)sender
-          frameForContentRect:(NSRect)aRect
-          scale:(CGFloat)scaleFactor
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
 {
 	NSSize const messageSize = [self.attributedStringValue size];
 	CGFloat const scaledMarginSize = PGMarginSize * scaleFactor;

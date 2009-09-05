@@ -52,14 +52,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(; i < (count = [array count]); i++) [array removeObject:[array objectAtIndex:i] inRange:NSMakeRange(i + 1, count - i - 1)];
 	return array;
 }
-- (void)AE_addObjectObserver:(id)observer
-        selector:(SEL)aSelector
-        name:(NSString *)aName
+- (void)AE_addObjectObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
 {
 	for(id const obj in self) [obj AE_addObserver:observer selector:aSelector name:aName];
 }
-- (void)AE_removeObjectObserver:(id)observer
-        name:(NSString *)aName
+- (void)AE_removeObjectObserver:(id)observer name:(NSString *)aName
 {
 	for(id const obj in self) [obj AE_removeObserver:observer name:aName];
 }

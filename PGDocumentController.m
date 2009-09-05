@@ -160,7 +160,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)switchToFileManager:(id)sender
 {
-	if(![[[[NSAppleScript alloc] initWithSource:(self.pathFinderRunning ? @"tell application \"Path Finder\" to activate" : @"tell application \"Finder\" to activate")] autorelease] executeAndReturnError:NULL]) NSBeep();
+	if(![[[[NSAppleScript alloc] initWithSource:self.pathFinderRunning ? @"tell application \"Path Finder\" to activate" : @"tell application \"Finder\" to activate"] autorelease] executeAndReturnError:NULL]) NSBeep();
 }
 
 #pragma mark -
@@ -215,15 +215,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)changeSortOrder:(id)sender
 {
-	[[self currentPrefObject] setSortOrder:(([sender tag] & PGSortOrderMask) | ([[self currentPrefObject] sortOrder] & PGSortOptionsMask))];
+	[[self currentPrefObject] setSortOrder:([sender tag] & PGSortOrderMask) | ([[self currentPrefObject] sortOrder] & PGSortOptionsMask)];
 }
 - (IBAction)changeSortDirection:(id)sender
 {
-	[[self currentPrefObject] setSortOrder:(([[self currentPrefObject] sortOrder] & ~PGSortDescendingMask) | [sender tag])];
+	[[self currentPrefObject] setSortOrder:([[self currentPrefObject] sortOrder] & ~PGSortDescendingMask) | [sender tag]];
 }
 - (IBAction)changeSortRepeat:(id)sender
 {
-	[[self currentPrefObject] setSortOrder:(([[self currentPrefObject] sortOrder] & ~PGSortRepeatMask) | [sender tag])];
+	[[self currentPrefObject] setSortOrder:([[self currentPrefObject] sortOrder] & ~PGSortRepeatMask) | [sender tag]];
 }
 - (IBAction)changeReadingDirection:(id)sender
 {
@@ -349,7 +349,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	_currentDocument = document;
-	[self _setPageMenu:(_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu])];
+	[self _setPageMenu:_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu]];
 	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[self readingDirectionDidChange:nil];
 }
@@ -389,8 +389,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	for(PGDocument *const doc in _documents) if([[doc originalIdentifier] isEqual:ident]) return doc;
 	return nil;
 }
-- (PGDocument *)next:(BOOL)flag
-                documentBeyond:(PGDocument *)document
+- (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document
 {
 	NSArray *const docs = [[PGDocumentController sharedDocumentController] documents];
 	NSUInteger const count = [docs count];
@@ -410,24 +409,21 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (id)openDocumentWithContentsOfIdentifier:(PGResourceIdentifier *)ident
-      display:(BOOL)flag
+- (id)openDocumentWithContentsOfIdentifier:(PGResourceIdentifier *)ident display:(BOOL)flag
 {
 	if(!ident) return nil;
 	PGDocument *const doc = [self documentForIdentifier:ident];
-	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithIdentifier:[ident displayableIdentifier]] autorelease]) display:flag];
+	return [self _openNew:!doc document:doc ? doc : [[[PGDocument alloc] initWithIdentifier:[ident displayableIdentifier]] autorelease] display:flag];
 }
-- (id)openDocumentWithContentsOfURL:(NSURL *)URL
-      display:(BOOL)flag
+- (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)flag
 {
 	return [self openDocumentWithContentsOfIdentifier:[URL PG_resourceIdentifier] display:flag];
 }
-- (id)openDocumentWithBookmark:(PGBookmark *)aBookmark
-      display:(BOOL)flag
+- (id)openDocumentWithBookmark:(PGBookmark *)aBookmark display:(BOOL)flag
 {
 	PGDocument *const doc = [self documentForIdentifier:[aBookmark documentIdentifier]];
 	[doc openBookmark:aBookmark];
-	return [self _openNew:!doc document:(doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease]) display:flag];
+	return [self _openNew:!doc document:doc ? doc : [[[PGDocument alloc] initWithBookmark:aBookmark] autorelease] display:flag];
 }
 - (void)noteNewRecentDocument:(PGDocument *)document
 {
@@ -441,8 +437,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (void)handleAppleEvent:(NSAppleEventDescriptor *)event
-        withReplyEvent:(NSAppleEventDescriptor *)replyEvent
+- (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent
 {
 	if([event eventClass] == kInternetEventClass && [event eventID] == kAEGetURL) [self openDocumentWithContentsOfURL:[NSURL URLWithString:[[event paramDescriptorForKeyword:keyDirectObject] stringValue]] display:YES];
 }
@@ -516,9 +511,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	[self readingDirectionDidChange:nil];
 }
-- (PGDocument *)_openNew:(BOOL)flag
-                document:(PGDocument *)document
-                display:(BOOL)display
+- (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display
 {
 	if(!document) return nil;
 	if(flag) [self addDocument:document];
@@ -567,7 +560,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			recentItemsData = [defaults objectForKey:PGRecentItemsDeprecatedKey];
 			[defaults removeObjectForKey:PGRecentItemsDeprecatedKey]; // Don't leave unused data around.
 		}
-		[self setRecentDocumentIdentifiers:(recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array])];
+		[self setRecentDocumentIdentifiers:recentItemsData ? [NSKeyedUnarchiver unarchiveObjectWithData:recentItemsData] : [NSArray array]];
 		_fullscreen = [[defaults objectForKey:PGFullscreenKey] boolValue];
 
 		_documents = [[NSMutableArray alloc] init];
@@ -630,12 +623,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 
 	if(@selector(installUpdate:) == action) {
-		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states."))];
+		[anItem setTitle:[[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states.")];
 	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {
 		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScale == tag) [anItem setState:([pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2([pref imageScaleFactor])) : NSOffState)];
+		if(PGConstantFactorScale == tag) [anItem setState:[pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2([pref imageScaleFactor])) : NSOffState];
 		else [anItem setState:[pref imageScaleMode] == tag];
 	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2([pref imageScaleFactor]))];
 	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
@@ -644,7 +637,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
 		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
 	} else if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [pref sortOrder]) == tag];
-	else if(@selector(activateDocument:) == action) [anItem setState:([anItem representedObject] == [self currentDocument])];
+	else if(@selector(activateDocument:) == action) [anItem setState:[anItem representedObject] == [self currentDocument]];
 
 	if([[self documents] count] <= 1) {
 		if(@selector(selectPreviousDocument:) == action) return NO;
@@ -709,13 +702,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -<NSApplicationDelegate>
 
-- (BOOL)application:(NSApplication *)sender
-        openFile:(NSString *)filename
+- (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
 {
 	return !![self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
 }
-- (void)application:(NSApplication *)sender
-        openFiles:(NSArray *)filenames
+- (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
 	for(NSString *const filename in filenames) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
 	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
@@ -734,10 +725,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 	return -1;
 }
-- (BOOL)menu:(NSMenu *)menu
-        updateItem:(NSMenuItem *)item
-        atIndex:(NSInteger)anInt
-        shouldCancel:(BOOL)shouldCancel
+- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)anInt shouldCancel:(BOOL)shouldCancel
 {
 	NSString *title = @"";
 	NSAttributedString *attributedTitle = nil;

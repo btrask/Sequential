@@ -139,7 +139,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
 {
 	PGNode *const node = [[self displayController] activeNode];
-	[_browser setSelection:(node ? [NSSet setWithObject:node] : nil) reload:YES];
+	[_browser setSelection:node ? [NSSet setWithObject:node] : nil reload:YES];
 }
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
@@ -232,14 +232,12 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 #pragma mark -<PGThumbnailBrowserDataSource>
 
-- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
-      parentOfItem:(id)item
+- (id)thumbnailBrowser:(PGThumbnailBrowser *)sender parentOfItem:(id)item
 {
 	PGNode *const parent = [(PGNode *)item parentNode];
 	return [[self document] node] == parent && ![parent isViewable] ? nil : parent;
 }
-- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender
-        itemCanHaveChildren:(id)item
+- (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item
 {
 	return [item isContainer];
 }
@@ -267,23 +265,19 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	if([root isViewable]) return [root AE_asArray];
 	return [root isContainer] ? [(PGContainerAdapter *)root sortedChildren] : nil;
 }
-- (NSImage *)thumbnailView:(PGThumbnailView *)sender
-             thumbnailForItem:(id)item
+- (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item
 {
 	return [item thumbnail];
 }
-- (NSString *)thumbnailView:(PGThumbnailView *)sender
-              labelForItem:(id)item
+- (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item
 {
 	return [item hasRealThumbnail] ? nil : [[item identifier] displayName];
 }
-- (BOOL)thumbnailView:(PGThumbnailView *)sender
-        canSelectItem:(id)item;
+- (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 {
 	return [item hasViewableNodeCountGreaterThan:0];
 }
-- (NSColor *)thumbnailView:(PGThumbnailView *)sender
-             labelColorForItem:(id)item
+- (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item
 {
 	switch([[item identifier] labelColor]) {
 		case PGLabelRed: return [NSColor redColor];
@@ -296,8 +290,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 		default: return nil;
 	}
 }
-- (NSRect)thumbnailView:(PGThumbnailView *)sender
-          highlightRectForItem:(id)item
+- (NSRect)thumbnailView:(PGThumbnailView *)sender highlightRectForItem:(id)item
 {
 	PGDisplayController *const d = [self displayController];
 	NSRect const fullHighlight = NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f);

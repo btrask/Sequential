@@ -33,10 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSData *const data = [self dataForKey:defaultName];
 	return (data ? [NSUnarchiver unarchiveObjectWithData:data] : nil);
 }
-- (void)AE_encodeObject:(id)value
-        forKey:(NSString *)defaultName
+- (void)AE_encodeObject:(id)value forKey:(NSString *)defaultName
 {
-	[self setObject:(value ? [NSArchiver archivedDataWithRootObject:value] : nil) forKey:defaultName];
+	[self setObject:value ? [NSArchiver archivedDataWithRootObject:value] : nil forKey:defaultName];
 }
 
 @end

@@ -54,9 +54,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	NSRect r = NSMakeRect(NSMinX(aRect) + PGIconSpacingLeft, NSMinY(aRect), PGIconSize, PGIconSize);
-	[[NSAffineTransform AE_transformWithRect:&r orientation:([aView isFlipped] ? PGFlippedVert : PGUpright)] concat];
+	[[NSAffineTransform AE_transformWithRect:&r orientation:[aView isFlipped] ? PGFlippedVert : PGUpright] concat];
 	[[self icon] setFlipped:NO];
-	[[self icon] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:([self isEnabled] ? 1.0f : 0.66f)];
+	[[self icon] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:[self isEnabled] ? 1.0f : 0.66f];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (void)editWithFrame:(NSRect)aRect inView:(NSView *)aView editor:(NSText *)textObj delegate:(id)anObject event:(NSEvent *)anEvent

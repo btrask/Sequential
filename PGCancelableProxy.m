@@ -93,9 +93,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSObject(PGCancelable)
 
-+ (id)PG_performOn:(id)target
-      allowOnce:(BOOL)flag
-      withStorage:(id)storage
++ (id)PG_performOn:(id)target allowOnce:(BOOL)flag withStorage:(id)storage
 {
 	if(!target) return nil;
 	NSParameterAssert(storage);

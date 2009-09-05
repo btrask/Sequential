@@ -33,17 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[self AE_postNotificationName:aName userInfo:nil];
 }
-- (void)AE_postNotificationName:(NSString *)aName
-        userInfo:(NSDictionary *)aDict
+- (void)AE_postNotificationName:(NSString *)aName userInfo:(NSDictionary *)aDict
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:aName object:self userInfo:aDict];
 }
 
 #pragma mark -
 
-- (void)AE_addObserver:(id)observer
-        selector:(SEL)aSelector
-        name:(NSString *)aName
+- (void)AE_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
 {
 	[[NSNotificationCenter defaultCenter] addObserver:observer selector:aSelector name:aName object:self];
 }
@@ -51,8 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-- (void)AE_removeObserver:(id)observer
-        name:(NSString *)aName
+- (void)AE_removeObserver:(id)observer name:(NSString *)aName
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:observer name:aName object:self];
 }

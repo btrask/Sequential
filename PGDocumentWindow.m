@@ -91,13 +91,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSObject(PGDocumentWindowDelegate)
 
-- (NSDragOperation)window:(PGDocumentWindow *)window
-                   dragOperationForInfo:(id<NSDraggingInfo>)info
+- (NSDragOperation)window:(PGDocumentWindow *)window dragOperationForInfo:(id<NSDraggingInfo>)info
 {
 	return NSDragOperationNone;
 }
-- (BOOL)window:(PGDocumentWindow *)window
-        performDragOperation:(id<NSDraggingInfo>)info
+- (BOOL)window:(PGDocumentWindow *)window performDragOperation:(id<NSDraggingInfo>)info
 {
 	return NO;
 }

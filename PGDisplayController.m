@@ -187,7 +187,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case NSFindPanelActionPrevious:
 		{
 			NSArray *const terms = [[searchField stringValue] AE_searchTerms];
-			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:([sender tag] == NSFindPanelActionNext) matchSearchTerms:terms] forward:YES]) NSBeep();
+			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:[sender tag] == NSFindPanelActionNext matchSearchTerms:terms] forward:YES]) NSBeep();
 			break;
 		}
 		default:
@@ -238,7 +238,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if([self tryToSetActiveNode:[[self activeNode] sortedFirstViewableNodeInFolderNext:NO inclusive:NO] forward:YES]) return;
 	[self prepareToLoop]; // -firstOfPreviousFolder: is an exception to our usual looping mechanic, so we can't use -loopForward:.
 	PGNode *const last = [[[self activeDocument] node] sortedViewableNodeFirst:NO];
-	[self tryToLoopForward:NO toNode:([last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO inclusive:YES]) pageForward:YES allowAlerts:YES];
+	[self tryToLoopForward:NO toNode:[last isSortedFirstViewableNodeOfFolder] ? last : [last sortedFirstViewableNodeInFolderNext:NO inclusive:YES] pageForward:YES allowAlerts:YES];
 }
 - (IBAction)firstOfNextFolder:(id)sender
 {
@@ -482,8 +482,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self setActiveNode:aNode forward:flag];
 	return YES;
 }
-- (BOOL)tryToGoForward:(BOOL)forward
-        allowAlerts:(BOOL)flag
+- (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag
 {
 	if([self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:forward] forward:forward]) return YES;
 	[self prepareToLoop];
@@ -508,10 +507,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	BOOL const left = ([doc readingDirection] == PGReadingDirectionLeftToRight) == !loopForward;
 	PGSortOrder const o = [[self activeDocument] sortOrder];
 	if(PGSortRepeatMask & o && [self tryToSetActiveNode:node forward:pageForward]) {
-		if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic]) window:[self window]];
+		if(flag) [[_graphicPanel content] pushGraphic:left ? [PGAlertGraphic loopedLeftGraphic] : [PGAlertGraphic loopedRightGraphic] window:[self window]];
 		return YES;
 	}
-	if(flag) [[_graphicPanel content] pushGraphic:(left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic]) window:[self window]];
+	if(flag) [[_graphicPanel content] pushGraphic:left ? [PGAlertGraphic cannotGoLeftGraphic] : [PGAlertGraphic cannotGoRightGraphic] window:[self window]];
 	return NO;
 }
 - (void)activateNode:(PGNode *)node
@@ -814,15 +813,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	_loadingGraphic = nil;
 	[self AE_postNotificationName:PGDisplayControllerActiveNodeWasReadNotification];
 }
-- (NSSize)_sizeForImageRep:(NSImageRep *)rep
-          orientation:(PGOrientation)orientation
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation
 {
 	return [self _sizeForImageRep:rep orientation:orientation scaleMode:[[self activeDocument] imageScaleMode] factor:[[self activeDocument] imageScaleFactor]];
 }
-- (NSSize)_sizeForImageRep:(NSImageRep *)rep
-          orientation:(PGOrientation)orientation
-          scaleMode:(PGImageScaleMode)scaleMode
-          factor:(float)factor
+- (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode factor:(float)factor
 {
 	if(!rep) return NSZeroSize;
 	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
@@ -908,7 +903,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self window] setMinSize:PGWindowMinSize];
 
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
-	[clipView setCursor:(cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5.0f, 0.0f)] autorelease] : [NSCursor pointingHandCursor])];
+	[clipView setCursor:cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5.0f, 0.0f)] autorelease] : [NSCursor pointingHandCursor]];
 	[clipView setPostsFrameChangedNotifications:YES];
 	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 
@@ -926,7 +921,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSURL *const URL = [identifier URL];
 	if([identifier isFileIdentifier]) {
 		NSString *const path = [identifier isFileIdentifier] ? [URL path] : nil;
-		[[self window] setRepresentedFilename:(path ? path : @"")];
+		[[self window] setRepresentedFilename:path ? path : @""];
 	} else {
 		[[self window] setRepresentedURL:URL];
 		NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
@@ -939,7 +934,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSUInteger const count = [[[self activeDocument] node] viewableNodeCount];
 	NSString *const title = [identifier displayName];
 	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%lu/%lu)", (unsigned long)_displayImageIndex + 1, (unsigned long)count] : @"";
-	[[self window] setTitle:(title ? [title stringByAppendingString:titleDetails] : @"")];
+	[[self window] setTitle:title ? [title stringByAppendingString:titleDetails] : @""];
 	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
 	[[menuLabel mutableString] appendString:titleDetails];
 	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:menuLabel];
@@ -961,8 +956,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
 }
-- (id)validRequestorForSendType:(NSString *)sendType
-      returnType:(NSString *)returnType
+- (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
 	return (!returnType || [@"" isEqual:returnType]) && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
 }
@@ -1094,8 +1088,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -NSObject(NSServicesRequests)
 
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
-        types:(NSArray *)types
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
 	BOOL wrote = NO;
 	[pboard declareTypes:[NSArray array] owner:nil];
@@ -1106,15 +1099,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -<NSWindowDelegate>
 
-- (BOOL)window:(NSWindow *)window
-        shouldPopUpDocumentPathMenu:(NSMenu *)menu
+- (BOOL)window:(NSWindow *)window shouldPopUpDocumentPathMenu:(NSMenu *)menu
 {
 	return ![[self activeDocument] isOnline];
 }
-- (BOOL)window:(NSWindow *)window
-        shouldDragDocumentWithEvent:(NSEvent *)event
-        from:(NSPoint)dragImageLocation
-        withPasteboard:(NSPasteboard *)pboard
+- (BOOL)window:(NSWindow *)window shouldDragDocumentWithEvent:(NSEvent *)event from:(NSPoint)dragImageLocation withPasteboard:(NSPasteboard *)pboard
 {
 	if([self window] != window) return YES;
 	PGDisplayableIdentifier *const ident = [[[self activeDocument] node] identifier];
@@ -1126,8 +1115,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[self window] dragImage:image at:PGOffsetPointByXY(dragImageLocation, 24 - [image size].width / 2, 24 - [image size].height / 2) offset:NSZeroSize event:event pasteboard:pboard source:nil slideBack:YES]; // Left to its own devices, OS X will start the drag image 16 pixels down and to the left of the button, which looks bad at both 16x16 and at 32x32, so always do our own drags.
 	return NO;
 }
-- (id)windowWillReturnFieldEditor:(NSWindow *)window
-      toObject:(id)anObject
+- (id)windowWillReturnFieldEditor:(NSWindow *)window toObject:(id)anObject
 {
 	if(window != _findPanel) return nil;
 	if(!_findFieldEditor) {
@@ -1180,9 +1168,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -<PGClipViewDelegate>
 
-- (BOOL)clipView:(PGClipView *)sender
-        handleMouseEvent:(NSEvent *)anEvent
-        first:(BOOL)flag
+- (BOOL)clipView:(PGClipView *)sender handleMouseEvent:(NSEvent *)anEvent first:(BOOL)flag
 {
 	if(flag) return NO;
 	BOOL const primary = [anEvent type] == NSLeftMouseDown;
@@ -1198,8 +1184,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	else [self previousPage:self];
 	return YES;
 }
-- (BOOL)clipView:(PGClipView *)sender
-        handleKeyDown:(NSEvent *)anEvent
+- (BOOL)clipView:(PGClipView *)sender handleKeyDown:(NSEvent *)anEvent
 {
 	NSUInteger const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
 	unsigned short const keyCode = [anEvent keyCode];
@@ -1211,7 +1196,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		{
 			if(![_imageView canAnimateRep]) return NO;
 			BOOL const nowPlaying = ![[self activeDocument] animatesImages];
-			[[_graphicPanel content] pushGraphic:[PGBezierPathIconGraphic graphicWithIconType:(nowPlaying ? AEPlayIcon : AEPauseIcon)] window:[self window]];
+			[[_graphicPanel content] pushGraphic:[PGBezierPathIconGraphic graphicWithIconType:nowPlaying ? AEPlayIcon : AEPauseIcon] window:[self window]];
 			[[self activeDocument] setAnimatesImages:nowPlaying];
 			return YES;
 		}
@@ -1238,8 +1223,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	return [self performKeyEquivalent:anEvent];
 }
-- (BOOL)clipView:(PGClipView *)sender
-        shouldExitEdges:(PGRectEdgeMask)mask
+- (BOOL)clipView:(PGClipView *)sender shouldExitEdges:(PGRectEdgeMask)mask
 {
 	NSAssert(mask, @"At least one edge must be set.");
 	NSAssert(!PGHasContradictoryRectEdges(mask), @"Contradictory edges aren't allowed.");
@@ -1249,19 +1233,16 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	else if(mask & (ltr ? PGMaxXEdgeMask : PGMinXEdgeMask)) [self nextPage:self];
 	return [self activeNode] != activeNode;
 }
-- (PGRectEdgeMask)clipView:(PGClipView *)sender
-                  directionFor:(PGPageLocation)nodeLocation
+- (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)nodeLocation
 {
 	return PGReadingDirectionAndLocationToRectEdgeMask(nodeLocation, [[self activeDocument] readingDirection]);
 }
-- (void)clipView:(PGClipView *)sender
-        magnifyBy:(CGFloat)amount
+- (void)clipView:(PGClipView *)sender magnifyBy:(CGFloat)amount
 {
 	[_imageView setUsesCaching:NO];
 	[[self activeDocument] setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * (amount / 500.0f + 1.0f), PGScaleMax))];
 }
-- (void)clipView:(PGClipView *)sender
-        rotateByDegrees:(CGFloat)amount
+- (void)clipView:(PGClipView *)sender rotateByDegrees:(CGFloat)amount
 {
 	[clipView scrollCenterTo:[clipView convertPoint:[_imageView rotateByDegrees:amount adjustingPoint:[_imageView convertPoint:[clipView center] fromView:clipView]] fromView:_imageView] animation:PGNoAnimation];
 }
@@ -1311,13 +1292,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(![self findPanelShown]) return;
 	[_findPanel makeKeyWindow];
 	NSView *const previousKeyView = [[_findPanel initialFirstResponder] previousValidKeyView];
-	[_findPanel makeFirstResponder:(previousKeyView ? previousKeyView : [_findPanel initialFirstResponder])];
+	[_findPanel makeFirstResponder:previousKeyView ? previousKeyView : [_findPanel initialFirstResponder]];
 }
 
 #pragma mark -<PGEncodingAlertDelegate>
 
-- (void)encodingAlertDidEnd:(PGEncodingAlert *)sender
-        selectedEncoding:(NSStringEncoding)encoding
+- (void)encodingAlertDidEnd:(PGEncodingAlert *)sender selectedEncoding:(NSStringEncoding)encoding
 {
 	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
 }

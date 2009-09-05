@@ -29,8 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation DOMHTMLDocument(AEAdditions)
 
-- (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes
-             extensions:(NSArray *)exts
+- (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	DOMHTMLCollection *const links = [self links];
@@ -69,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
 			if([results containsObject:ident]) continue;
 			NSString *const title = [img title]; // Prefer the title to the alt attribute.
-			[ident setCustomDisplayName:(title && ![@"" isEqualToString:title] ? title : [img alt])];
+			[ident setCustomDisplayName:title && ![@"" isEqualToString:title] ? title : [img alt]];
 			[results addObject:ident];
 		} while(NO);
 		[pool release];

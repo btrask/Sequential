@@ -94,8 +94,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [[[([URL isFileURL] ? [PGAliasIdentifier class] : [PGURLIdentifier class]) alloc] initWithURL:URL] autorelease];
 }
-+ (id)resourceIdentifierWithAliasData:(const uint8_t *)data
-      length:(NSUInteger)length
++ (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(NSUInteger)length
 {
 	return [[[PGAliasIdentifier alloc] initWithAliasData:data length:length] autorelease];
 }
@@ -153,8 +152,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return nil;
 }
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)flag
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag
 {
 	return NO;
 }
@@ -219,8 +217,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [[[self alloc] _initWithIdentifier:[super resourceIdentifierWithURL:URL]] autorelease];
 }
-+ (id)resourceIdentifierWithAliasData:(const uint8_t *)data
-      length:(NSUInteger)length
++ (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(NSUInteger)length
 {
 	return [[[self alloc] _initWithIdentifier:[super resourceIdentifierWithAliasData:data length:length]] autorelease];
 }
@@ -308,7 +305,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	NSString *const parentName = [URL isFileURL] ? [parent lastPathComponent] : parent;
 	if(!parentName || [parentName isEqual:@""]) return result;
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
-	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:([URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil) name:parentName]];
+	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil name:parentName]];
 	return result;
 }
 
@@ -374,8 +371,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [_identifier URLByFollowingAliases:flag];
 }
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)flag
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag
 {
 	return [_identifier getRef:outRef byFollowingAliases:flag];
 }
@@ -462,8 +458,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	}
 	return self;
 }
-- (id)initWithAliasData:(const uint8_t *)data
-      length:(NSUInteger)length
+- (id)initWithAliasData:(const uint8_t *)data length:(NSUInteger)length
 {
 	if((self = [super init])) {
 		if(![self setAliasWithData:data length:length]) {
@@ -473,8 +468,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	}
 	return self;
 }
-- (BOOL)setAliasWithData:(const uint8_t *)data
-        length:(NSUInteger)length
+- (BOOL)setAliasWithData:(const uint8_t *)data length:(NSUInteger)length
 {
 	if(!data || !length) return NO;
 	_alias = (AliasHandle)NewHandle(length);
@@ -482,9 +476,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	memcpy(*_alias, data, length);
 	return YES;
 }
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)follow
-        validate:(BOOL)validate
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)follow validate:(BOOL)validate
 {
 	Boolean dontCare1, dontCare2;
 	if(validate && _hasValidRef && !follow) _hasValidRef = FSIsFSRefValid(&_ref);
@@ -532,8 +524,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	if(!flag) [self cacheURL:URL];
 	return URL;
 }
-- (BOOL)getRef:(out FSRef *)outRef
-        byFollowingAliases:(BOOL)flag
+- (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag
 {
 	return [self getRef:outRef byFollowingAliases:flag validate:YES];
 }
@@ -638,8 +629,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 
 #pragma mark -PGIndexIdentifier
 
-- (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier
-      index:(NSInteger)index
+- (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier index:(NSInteger)index
 {
 	NSParameterAssert(identifier);
 	if((self = [super init])) {

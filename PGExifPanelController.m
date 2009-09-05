@@ -114,9 +114,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [_matchingEntries count];
 }
-- (id)tableView:(NSTableView *)tableView
-      objectValueForTableColumn:(NSTableColumn *)tableColumn
-      row:(NSInteger)row
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	PGExifEntry *const entry = [_matchingEntries objectAtIndex:row];
 	if(tableColumn == tagColumn) {

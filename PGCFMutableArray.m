@@ -65,8 +65,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	return [self removeObject:anObject inRange:NSMakeRange(0, [self count])];
 }
-- (void)removeObjectIdenticalTo:(id)anObject
-        inRange:(NSRange)range
+- (void)removeObjectIdenticalTo:(id)anObject inRange:(NSRange)range
 {
 	return [self removeObject:anObject inRange:range];
 }
@@ -89,13 +88,11 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	return CFEqual(_array, (CFArrayRef)otherArray);
 }
-- (NSUInteger)indexOfObject:(id)anObject
-              inRange:(NSRange)range
+- (NSUInteger)indexOfObject:(id)anObject inRange:(NSRange)range
 {
 	return PGCFIndexToUnsigned(CFArrayGetFirstIndexOfValue(_array, CFRangeMake(PGUnsignedToCFIndex(range.location), PGUnsignedToCFIndex(range.length)), anObject));
 }
-- (NSUInteger)indexOfObjectIdenticalTo:(id)anObject
-            inRange:(NSRange)range
+- (NSUInteger)indexOfObjectIdenticalTo:(id)anObject inRange:(NSRange)range
 {
 	return [self indexOfObject:anObject inRange:range];
 }
@@ -106,8 +103,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	CFArrayAppendValue(_array, anObject);
 }
-- (void)insertObject:(id)anObject
-        atIndex:(NSUInteger)index
+- (void)insertObject:(id)anObject atIndex:(NSUInteger)index
 {
 	CFArrayInsertValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
 }
@@ -120,8 +116,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	CFArrayRemoveValueAtIndex(_array, PGUnsignedToCFIndex(index));
 }
-- (void)replaceObjectAtIndex:(NSUInteger)index
-        withObject:(id)anObject
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject
 {
 	CFArraySetValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
 }

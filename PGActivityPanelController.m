@@ -139,7 +139,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
-	if(tableColumn == progressColumn) [cell setHidden:(![item loadProgress] || [[item subloads] count])];
+	if(tableColumn == progressColumn) [cell setHidden:![item loadProgress] || [[item subloads] count]];
 }
 
 @end

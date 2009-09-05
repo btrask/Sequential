@@ -31,8 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark Class Methods
 
-+ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect
-                  cornerRadius:(CGFloat)radius
++ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(CGFloat)radius
 {
 	NSBezierPath *const path = [self bezierPath];
 	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(aRect) - radius, NSMaxY(aRect) - radius) radius:radius startAngle:0.0f endAngle:90.0f];
@@ -42,8 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[path closePath];
 	return path;
 }
-+ (void)AE_drawIcon:(AEIconType)type
-        inRect:(NSRect)b
++ (void)AE_drawIcon:(AEIconType)type inRect:(NSRect)b
 {
 	NSBezierPath *const p = [self bezierPath];
 	CGFloat const scale = MIN(NSWidth(b), NSHeight(b));
@@ -72,8 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		default: return;
 	}
 }
-+ (void)AE_drawSpinnerInRect:(NSRect)r
-        startAtPetal:(NSInteger)petal
++ (void)AE_drawSpinnerInRect:(NSRect)r startAtPetal:(NSInteger)petal
 {
 	[NSBezierPath setDefaultLineWidth:MIN(NSWidth(r), NSHeight(r)) / 11.0f];
 	[NSBezierPath setDefaultLineCapStyle:NSRoundLineCapStyle];

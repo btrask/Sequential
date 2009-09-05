@@ -97,9 +97,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	}
 	return exts;
 }
-+ (NSArray *)adapterClassesInstantiated:(BOOL)flag
-             forNode:(PGNode *)node
-             withInfoDicts:(NSArray *)dicts
++ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfoDicts:(NSArray *)dicts
 {
 	NSParameterAssert(node);
 	NSParameterAssert(dicts);
@@ -108,7 +106,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	for(NSDictionary *const info in dicts) {
 		Class const agreedClass = [info objectForKey:PGAdapterClassKey];
 		if(agreedClass) {
-			[adapters addObject:(flag ? [[[agreedClass alloc] _initWithPriority:PGMatchByPriorAgreement info:info] autorelease] : agreedClass)];
+			[adapters addObject:flag ? [[[agreedClass alloc] _initWithPriority:PGMatchByPriorAgreement info:info] autorelease] : agreedClass];
 			continue;
 		}
 		for(NSString *const classString in types) {
@@ -119,14 +117,13 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 			if(!p) continue;
 			Class altClass = [mutableInfo objectForKey:PGSubstitutedClassKey];
 			if(!altClass) altClass = class;
-			[adapters addObject:(flag ? [[[altClass alloc] _initWithPriority:p info:mutableInfo] autorelease] : altClass)];
+			[adapters addObject:flag ? [[[altClass alloc] _initWithPriority:p info:mutableInfo] autorelease] : altClass];
 		}
 	}
 	if(flag) [adapters sortUsingSelector:@selector(_matchPriorityCompare:)];
 	return adapters;
 }
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node
-                   withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
 {
 	if([[info objectForKey:PGDataExistenceKey] integerValue] == PGDoesNotExist) return PGNotAMatch;
 	NSDictionary *const type = [self typeDictionary];
@@ -143,8 +140,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -
 
-+ (NSImage *)threaded_thumbnailOfSize:(CGFloat)size
-             withCreationDictionary:(NSDictionary *)dict
++ (NSImage *)threaded_thumbnailOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *const rep = [self threaded_thumbnailRepOfSize:size withCreationDictionary:dict];
 	if(!rep) return nil;
@@ -152,8 +148,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[image addRepresentation:rep];
 	return image;
 }
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size
-                withCreationDictionary:(NSDictionary *)dict
++ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
 	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGDataKey]];
@@ -321,8 +316,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[_realThumbnail retain] autorelease];
 }
-- (void)setRealThumbnail:(NSImage *)anImage
-        validAsOf:(NSDate *)date
+- (void)setRealThumbnail:(NSImage *)anImage validAsOf:(NSDate *)date
 {
 	if(anImage == _realThumbnail) return;
 	if(date && _lastThumbnailInvalidation && [_lastThumbnailInvalidation AE_isAfter:date]) {
@@ -376,8 +370,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 #pragma mark -PGResourceAdapter(Private)
 
-- (id)_initWithPriority:(PGMatchPriority)priority
-      info:(NSDictionary *)info
+- (id)_initWithPriority:(PGMatchPriority)priority info:(NSDictionary *)info
 {
 	if((self = [self init])) {
 		_priority = priority;
@@ -451,8 +444,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [[_subloads retain] autorelease];
 }
-- (void)setSubload:(id<PGLoading>)obj
-        isLoading:(BOOL)flag
+- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag
 {
 	if(!flag) [_subloads removeObjectIdenticalTo:obj];
 	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
@@ -582,9 +574,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [self sortedViewableNodeFirst:flag stopAtNode:nil includeSelf:YES];
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            stopAtNode:(PGNode *)descendent
-            includeSelf:(BOOL)includeSelf
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf
 {
 	return includeSelf && [[self node] isViewable] && [self node] != descendent ? [self node] : nil;
 }
@@ -593,14 +583,11 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 {
 	return [self sortedViewableNodeNext:flag includeChildren:YES];
 }
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag
-            includeChildren:(BOOL)children
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children
 {
 	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:) context:nil];
 }
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag
-            afterRemovalOfChildren:(NSArray *)removedChildren
-            fromNode:(PGNode *)changedNode
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode
 {
 	if(!removedChildren) return [self node];
 	PGNode *const potentiallyRemovedAncestor = [[self node] ancestorThatIsChildOfNode:changedNode];
@@ -628,15 +615,12 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	return nil;
 }
 
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag
-	    matchSearchTerms:(NSArray *)terms
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms
 {
 	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
 	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
 }
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-            matchSearchTerms:(NSArray *)terms
-            stopAtNode:(PGNode *)descendent
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
 	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] AE_matchesSearchTerms:terms] ? [self node] : nil;
 }
