@@ -30,59 +30,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGImageView : NSView
 {
 	@private
-	NSImage          *_image;
-	NSImageRep       *_rep;
-	BOOL              _isPDF;
-	PGOrientation     _orientation;
-	NSUInteger          _numberOfFrames;
+	NSImageRep *_rep;
+	PGOrientation _orientation;
+	NSSize _size;
+	NSSize _immediateSize;
+	NSTimeInterval _lastSizeAnimationTime;
+	NSTimer *_sizeTransitionTimer;
+	CGFloat _rotationInDegrees;
+	BOOL _antialiasWhenUpscaling;
+	BOOL _usesRoundedCorners;
+	BOOL _usesCaching;
 
-	NSSize            _size;
-	NSSize            _immediateSize;
-	NSTimeInterval    _lastSizeAnimationTime;
-	NSTimer          *_sizeTransitionTimer;
+	BOOL _animates;
+	NSUInteger _pauseCount;
 
+	NSImage *_image;
+	BOOL _isPDF;
+	NSUInteger _numberOfFrames;
+	BOOL _cached;
 	NSCachedImageRep *_cache;
-	BOOL              _usesCaching;
-	BOOL              _cached;
-
-	CGFloat             _rotationInDegrees;
-	BOOL              _animates;
-	NSUInteger          _pauseCount;
-	BOOL              _antialias;
-	BOOL              _drawsRoundedCorners;
 }
 
 + (NSArray *)pasteboardTypes;
 
-- (NSImageRep *)rep;
-- (PGOrientation)orientation;
+@property(readonly) NSImageRep *rep;
+@property(readonly) PGOrientation orientation;
+@property(readonly) NSSize size;
+@property(readonly) NSSize originalSize;
+@property(readonly) CGFloat averageScaleFactor;
+@property(assign) CGFloat rotationInDegrees;
+@property(assign) BOOL antialiasWhenUpscaling;
+@property(readonly) NSImageInterpolation interpolation;
+@property(assign) BOOL usesRoundedCorners;
+@property(assign) BOOL usesCaching;
+
+@property(readonly) BOOL canAnimateRep;
+@property(assign) BOOL animates;
+@property(assign, getter = isPaused) BOOL paused;
+
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
-
-- (NSSize)size; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.
-- (void)setSize:(NSSize)size allowAnimation:(BOOL)flag;
+- (void)setSize:(NSSize)size allowAnimation:(BOOL)flag; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.
 - (void)stopAnimatedSizeTransition;
-- (NSSize)originalSize;
-- (CGFloat)averageScaleFactor;
-
-- (BOOL)usesCaching;
-- (void)setUsesCaching:(BOOL)flag;
-
-- (CGFloat)rotationInDegrees;
-- (void)setRotationInDegrees:(CGFloat)val;
 - (NSPoint)rotateByDegrees:(CGFloat)val adjustingPoint:(NSPoint)aPoint;
-
-- (BOOL)canAnimateRep;
-- (BOOL)animates;
-- (void)setAnimates:(BOOL)flag;
-- (void)pauseAnimation;
-- (void)resumeAnimation;
-
-- (BOOL)antialiasWhenUpscaling;
-- (void)setAntialiasWhenUpscaling:(BOOL)flag;
-- (NSImageInterpolation)interpolation; // The image interpolation to use.
-
-- (BOOL)drawsRoundedCorners;
-- (void)setDrawsRoundedCorners:(BOOL)flag;
 
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types;
 

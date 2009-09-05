@@ -794,11 +794,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if(aView == _imageView) return;
 	[_imageView unbind:@"antialiasWhenUpscaling"];
-	[_imageView unbind:@"drawsRoundedCorners"];
+	[_imageView unbind:@"usesRoundedCorners"];
 	[_imageView release];
 	_imageView = [aView retain];
 	[_imageView bind:@"antialiasWhenUpscaling" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGAntialiasWhenUpscalingKey options:nil];
-	[_imageView bind:@"drawsRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
+	[_imageView bind:@"usesRoundedCorners" toObject:[NSUserDefaults standardUserDefaults] withKeyPath:PGRoundsImageCornersKey options:nil];
 	[self documentAnimatesImagesDidChange:nil];
 }
 - (BOOL)_setActiveNode:(PGNode *)aNode

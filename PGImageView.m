@@ -42,11 +42,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGImageView (Private)
 
+@property(readonly) BOOL _usesRoundedCorners;
+@property(readonly) BOOL _imageIsOpaque;
+
 - (void)_runAnimationTimer;
 - (void)_animate;
-- (BOOL)_drawsRoundedCorners;
 - (void)_cache;
-- (BOOL)_imageIsOpaque;
 - (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count;
 - (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val;
@@ -72,19 +73,98 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([PGImageView class] != self) return;
 	[self exposeBinding:@"animates"];
 	[self exposeBinding:@"antialiasWhenUpscaling"];
-	[self exposeBinding:@"drawsRoundedCorners"];
+	[self exposeBinding:@"usesRoundedCorners"];
 }
 
 #pragma mark -PGImageView
 
-- (NSImageRep *)rep
+@synthesize rep = _rep;
+@synthesize orientation = _orientation;
+- (NSSize)size
 {
-	return [[_rep retain] autorelease];
+	return _sizeTransitionTimer ? _size : _immediateSize;
 }
-- (PGOrientation)orientation
+- (NSSize)originalSize
 {
-	return _orientation;
+	return PGRotated90CC & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 }
+- (CGFloat)averageScaleFactor
+{
+	NSSize const s = [self size];
+	NSSize const o = [self originalSize];
+	return (s.width / o.width + s.height / o.height) / 2.0f;
+}
+@synthesize rotationInDegrees = _rotationInDegrees;
+- (void)setRotationInDegrees:(CGFloat)val
+{
+	if(val == _rotationInDegrees) return;
+	_rotationInDegrees = remainderf(val, 360.0f);
+	[self _updateFrameSize];
+	[self setNeedsDisplay:YES];
+}
+@synthesize antialiasWhenUpscaling = _antialiasWhenUpscaling;
+- (void)setAntialiasWhenUpscaling:(BOOL)flag
+{
+	if(flag == _antialiasWhenUpscaling) return;
+	_antialiasWhenUpscaling = flag;
+	[self _cache];
+	[self setNeedsDisplay:YES];
+}
+- (NSImageInterpolation)interpolation
+{
+	if(_sizeTransitionTimer || [self inLiveResize] || ([self canAnimateRep] && [self animates])) return NSImageInterpolationNone;
+	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
+	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
+	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
+}
+@synthesize usesRoundedCorners = _usesRoundedCorners;
+- (void)setUsesRoundedCorners:(BOOL)flag
+{
+	if(flag == _usesRoundedCorners) return;
+	_usesRoundedCorners = flag;
+	[self _cache];
+	[self setNeedsDisplay:YES];
+}
+@synthesize usesCaching = _usesCaching;
+- (void)setUsesCaching:(BOOL)flag
+{
+	if(flag == _usesCaching) return;
+	_usesCaching = flag;
+	if(flag && !_cached) [self _cache];
+}
+
+#pragma mark -
+
+- (BOOL)canAnimateRep
+{
+	return _numberOfFrames > 1;
+}
+@synthesize animates = _animates;
+- (void)setAnimates:(BOOL)flag
+{
+	if(flag == _animates) return;
+	_animates = flag;
+	if(!flag && [self antialiasWhenUpscaling]) [self setNeedsDisplay:YES];
+	[self _runAnimationTimer];
+}
+- (BOOL)isPaused
+{
+	return !_pauseCount;
+}
+- (void)setPaused:(BOOL)flag
+{
+	if(flag) {
+		_pauseCount++;
+		[self _runAnimationTimer];
+	} else {
+		NSParameterAssert(_pauseCount);
+		_pauseCount--;
+		[self _runAnimationTimer];
+	}
+}
+
+#pragma mark -
+
 - (void)setImageRep:(NSImageRep *)rep
         orientation:(PGOrientation)orientation
         size:(NSSize)size
@@ -110,13 +190,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	} else [self setSize:size allowAnimation:NO];
 	[self _cache];
 }
-
-#pragma mark -
-
-- (NSSize)size
-{
-	return _sizeTransitionTimer ? _size : _immediateSize;
-}
 - (void)setSize:(NSSize)size
         allowAnimation:(BOOL)flag
 {
@@ -138,43 +211,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
 }
-- (NSSize)originalSize
-{
-	return PGRotated90CC & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-}
-- (CGFloat)averageScaleFactor
-{
-	NSSize const s = [self size];
-	NSSize const o = [self originalSize];
-	return (s.width / o.width + s.height / o.height) / 2.0f;
-}
-
-#pragma mark -
-
-- (BOOL)usesCaching
-{
-	return _usesCaching;
-}
-- (void)setUsesCaching:(BOOL)flag
-{
-	if(flag == _usesCaching) return;
-	_usesCaching = flag;
-	if(flag && !_cached) [self _cache];
-}
-
-#pragma mark -
-
-- (CGFloat)rotationInDegrees
-{
-	return _rotationInDegrees;
-}
-- (void)setRotationInDegrees:(CGFloat)val
-{
-	if(val == _rotationInDegrees) return;
-	_rotationInDegrees = remainderf(val, 360.0f);
-	[self _updateFrameSize];
-	[self setNeedsDisplay:YES];
-}
 - (NSPoint)rotateByDegrees:(CGFloat)val
            adjustingPoint:(NSPoint)aPoint
 {
@@ -183,70 +219,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self setRotationInDegrees:[self rotationInDegrees] + val];
 	NSRect const b2 = [self bounds];
 	return [[self _transformWithRotationInDegrees:val] transformPoint:PGOffsetPointByXY(p, NSMidX(b2), NSMidY(b2))];
-}
-
-#pragma mark -
-
-- (BOOL)canAnimateRep
-{
-	return _numberOfFrames > 1;
-}
-- (BOOL)animates
-{
-	return _animates;
-}
-- (void)setAnimates:(BOOL)flag
-{
-	if(flag == _animates) return;
-	_animates = flag;
-	if(!flag && [self antialiasWhenUpscaling]) [self setNeedsDisplay:YES];
-	[self _runAnimationTimer];
-}
-- (void)pauseAnimation
-{
-	_pauseCount++;
-	[self _runAnimationTimer];
-}
-- (void)resumeAnimation
-{
-	NSParameterAssert(_pauseCount);
-	_pauseCount--;
-	[self _runAnimationTimer];
-}
-
-#pragma mark -
-
-- (BOOL)antialiasWhenUpscaling
-{
-	return _antialias;
-}
-- (void)setAntialiasWhenUpscaling:(BOOL)flag
-{
-	if(flag == _antialias) return;
-	_antialias = flag;
-	[self _cache];
-	[self setNeedsDisplay:YES];
-}
-- (NSImageInterpolation)interpolation
-{
-	if(_sizeTransitionTimer || [self inLiveResize] || ([self canAnimateRep] && [self animates])) return NSImageInterpolationNone;
-	if([self antialiasWhenUpscaling]) return NSImageInterpolationHigh;
-	NSSize const imageSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]), viewSize = [self size];
-	return imageSize.width < viewSize.width && imageSize.height < viewSize.height ? NSImageInterpolationNone : NSImageInterpolationHigh;
-}
-
-#pragma mark -
-
-- (BOOL)drawsRoundedCorners
-{
-	return _drawsRoundedCorners;
-}
-- (void)setDrawsRoundedCorners:(BOOL)flag
-{
-	if(flag == _drawsRoundedCorners) return;
-	_drawsRoundedCorners = flag;
-	[self _cache];
-	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -
@@ -266,14 +238,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)appDidHide:(NSNotification *)aNotif
 {
-	[self pauseAnimation];
+	self.paused = YES;
 }
 - (void)appDidUnhide:(NSNotification *)aNotif
 {
-	[self resumeAnimation];
+	self.paused = NO;
 }
 
 #pragma mark -PGImageView(Private)
+
+- (BOOL)_usesRoundedCorners
+{
+	if(!_usesRoundedCorners) return NO;
+	NSSize const s = _immediateSize;
+	return s.width >= 16 && s.height >= 16;
+}
+- (BOOL)_imageIsOpaque
+{
+	return (_isPDF && _cached) || [_rep isOpaque];
+}
+
+#pragma mark -
 
 - (void)_runAnimationTimer
 {
@@ -286,12 +271,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:(i < _numberOfFrames ? i : 0)]];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
-}
-- (BOOL)_drawsRoundedCorners
-{
-	if(!_drawsRoundedCorners) return NO;
-	NSSize const s = _immediateSize;
-	return s.width >= 16 && s.height >= 16;
 }
 - (void)_cache
 {
@@ -322,17 +301,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSRectFill(cacheRect);
 	}
 	[self _drawWithFrame:cacheRect operation:(_isPDF ? NSCompositeSourceOver : NSCompositeCopy) rects:NULL count:0];
-	if([self _drawsRoundedCorners]) [self _drawCornersOnRect:cacheRect];
+	if(self.usesRoundedCorners) [self _drawCornersOnRect:cacheRect];
 	[view unlockFocus];
 
 	[_image removeRepresentation:_rep];
 	[_image setSize:_immediateSize];
 	[_image addRepresentation:_cache];
 	_cached = YES;
-}
-- (BOOL)_imageIsOpaque
-{
-	return (_isPDF && _cached) || [_rep isOpaque];
 }
 - (void)_drawWithFrame:(NSRect)aRect
         operation:(NSCompositingOperation)operation
@@ -416,8 +391,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_image setCacheMode:NSImageCacheNever]; // We do our own caching.
 		[_image setDataRetained:YES]; // Seems appropriate.
 		_usesCaching = YES;
-		_antialias = YES;
-		_drawsRoundedCorners = YES;
+		_antialiasWhenUpscaling = YES;
+		_usesRoundedCorners = YES;
 		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
 		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
 	}
@@ -426,7 +401,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)isOpaque
 {
-	return [self _imageIsOpaque] && ![self _drawsRoundedCorners] && ![self rotationInDegrees];
+	return self._imageIsOpaque && !self._usesRoundedCorners && ![self rotationInDegrees];
 }
 - (void)drawRect:(NSRect)aRect
 {
@@ -439,7 +414,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
-	BOOL const drawCorners = !_cached && [self _drawsRoundedCorners];
+	BOOL const drawCorners = !_cached && self._usesRoundedCorners;
 	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	NSInteger count = 0;
 	NSRect const *rects = NULL;
@@ -518,7 +493,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self stopAnimatedSizeTransition];
 	[self unbind:@"animates"];
 	[self unbind:@"antialiasWhenUpscaling"];
-	[self unbind:@"drawsRoundedCorners"];
+	[self unbind:@"usesRoundedCorners"];
 	[self setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	NSParameterAssert(!_rep);
 	[_cache release];

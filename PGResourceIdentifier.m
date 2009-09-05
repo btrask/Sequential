@@ -486,7 +486,6 @@ static NSMutableArray *PGCachedAliasIdentifiers;
         byFollowingAliases:(BOOL)follow
         validate:(BOOL)validate
 {
-	NSParameterAssert(outRef);
 	Boolean dontCare1, dontCare2;
 	if(validate && _hasValidRef && !follow) _hasValidRef = FSIsFSRefValid(&_ref);
 	if(!_hasValidRef && FSResolveAliasWithMountFlags(NULL, _alias, &_ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
