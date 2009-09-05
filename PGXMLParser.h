@@ -44,13 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (id)parserWithData:(NSData *)data baseURL:(NSURL *)URL classes:(NSArray *)classes;
 + (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
 
-- (NSURL *)baseURL;
-- (void)setBaseURL:(NSURL *)URL;
+@property(copy) NSURL *baseURL;
+@property(readonly) PGXMLParser *parentParser;
+@property(readonly) NSArray *subparsers;
 
 - (void)parseWithData:(NSData *)data;
-
-- (PGXMLParser *)parentParser;
-- (NSArray *)subparsers;
 - (void)useSubparser:(PGXMLParser *)parser;
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs;
@@ -61,15 +59,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGXMLParser(PGXMLParserNodeCreation)
 
-- (BOOL)createsMultipleNodes;
-
-- (NSString *)title;
-- (NSURL *)URL;
-- (NSError *)error;
-- (id)info;
-
-- (NSString *)URLString;
-- (NSString *)errorString;
+@property(readonly) BOOL createsMultipleNodes;
+@property(readonly) NSString *title;
+@property(readonly) NSURL *URL;
+@property(readonly) NSError *error;
+@property(readonly) id info;
+@property(readonly) NSString *URLString;
+@property(readonly) NSString *errorString;
 
 - (NSArray *)nodesWithParentAdapter:(PGContainerAdapter *)parent;
 - (PGNode *)nodeWithParentAdapter:(PGContainerAdapter *)parent;

@@ -33,7 +33,7 @@ enum {
 
 @implementation PGExifEntry
 
-#pragma mark Class Methods
+#pragma mark +PGExifEntry
 
 + (NSData *)exifDataWithImageData:(NSData *)data
 {
@@ -89,7 +89,7 @@ enum {
 	if(outOrientation) *outOrientation = orientation;
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGExifEntry
 
 - (id)initWithLabel:(NSString *)label
 	  value:(NSString *)value
@@ -100,20 +100,20 @@ enum {
 	}
 	return self;
 }
-- (NSString *)label
-{
-	return [[_label retain] autorelease];
-}
-- (NSString *)value
-{
-	return [[_value retain] autorelease];
-}
+
+#pragma mark -
+
+@synthesize label = _label;
+@synthesize value = _value;
+
+#pragma mark -
+
 - (NSComparisonResult)compare:(PGExifEntry *)anEntry
 {
 	return [[self label] compare:[anEntry label] options:NSCaseInsensitiveSearch | NSNumericSearch];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {

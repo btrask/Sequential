@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGNode *_currentSubnode;
 }
 
-- (XADArchive *)archive;
+@property(readonly) XADArchive *archive;
 - (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes;
 
 @end

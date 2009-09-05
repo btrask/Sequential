@@ -43,9 +43,9 @@ extern NSString *const PGBookmarkDidUpdateNotification;
 - (id)initWithNode:(PGNode *)aNode;
 - (id)initWithDocumentIdentifier:(PGDisplayableIdentifier *)docIdent fileIdentifier:(PGDisplayableIdentifier *)fileIdent displayName:(NSString *)aString; // For backward compatibility.
 
-- (PGDisplayableIdentifier *)documentIdentifier;
-- (PGDisplayableIdentifier *)fileIdentifier;
-- (BOOL)isValid;
+@property(readonly) PGDisplayableIdentifier *documentIdentifier;
+@property(readonly) PGDisplayableIdentifier *fileIdentifier;
+@property(readonly) BOOL isValid;
 
 - (void)eventDidOccur:(NSNotification *)aNotif;
 - (void)identifierDidChange:(NSNotification *)aNotif;

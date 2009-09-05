@@ -33,10 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGXMLParser (Private)
 
-- (NSArray *)_classes;
-- (void)_setClasses:(NSArray *)anArray;
-- (BOOL)_hasSubparser;
-- (PGXMLParser *)_subparser;
+@property(copy, setter = _setClasses:) NSArray *_classes;
+@property(readonly) BOOL _hasSubparser;
+@property(readonly) PGXMLParser *_subparser;
 
 @end
 
@@ -73,6 +72,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_baseURL release];
 	_baseURL = [URL copy];
 }
+- (PGXMLParser *)parentParser
+{
+	return _parent;
+}
+- (NSArray *)subparsers
+{
+	return [[_subparsers copy] autorelease];
+}
 
 #pragma mark -
 
@@ -86,17 +93,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_parser = nil;
 	[_tagPath release];
 	_tagPath = nil;
-}
-
-#pragma mark -
-
-- (PGXMLParser *)parentParser
-{
-	return _parent;
-}
-- (NSArray *)subparsers
-{
-	return [[_subparsers copy] autorelease];
 }
 - (void)useSubparser:(PGXMLParser *)parser
 {
@@ -155,9 +151,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [self _hasSubparser] ? [[_subparsers lastObject] createsMultipleNodes] : YES;
 }
-
-#pragma mark -
-
 - (NSString *)title
 {
 	return [[self _subparser] title];
@@ -183,9 +176,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(PGXMLParser *const parser in _subparsers) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
 	return dicts;
 }
-
-#pragma mark -
-
 - (NSString *)URLString
 {
 	return [[self _subparser] URLString];

@@ -38,8 +38,8 @@ extern NSString *const PGMaxDepthKey;
 	PGSortOrder     _unsortedOrder;
 }
 
-- (NSArray *)sortedChildren;
-- (NSArray *)unsortedChildren;
+@property(readonly) NSArray *sortedChildren;
+@property(readonly) NSArray *unsortedChildren;
 - (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
 - (void)removeChild:(PGNode *)child;
 

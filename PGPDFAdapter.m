@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 static NSString *const PGIndexKey = @"PGIndex";
 
-@interface PGPDFAdapter (Private)
+@interface PGPDFAdapter(Private)
 
-- (NSPDFImageRep *)_rep;
-- (NSPDFImageRep *)_threaded_rep;
+@property(readonly) NSPDFImageRep *_rep;
+@property(readonly) NSPDFImageRep *_threaded_rep;
 
 @end
 

@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGLoadManager
 
-#pragma mark Class Methods
+#pragma mark +PGLoadManager
 
 + (id)sharedLoadManager
 {
@@ -35,7 +35,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return m;
 }
 
-#pragma mark Instance Methods
+#pragma mark -NSObject
+
+- (id)init
+{
+	if((self = [super init])) {
+		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
+	}
+	return self;
+}
+- (void)dealloc
+{
+	[_subloads release];
+	[super dealloc];
+}
+
+#pragma mark -<PGLoading>
 
 - (NSString *)loadDescription
 {
@@ -67,20 +82,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_subloads insertObject:obj atIndex:0];
 }
 - (void)cancelLoad {}
-
-#pragma mark NSObject
-
-- (id)init
-{
-	if((self = [super init])) {
-		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
-	}
-	return self;
-}
-- (void)dealloc
-{
-	[_subloads release];
-	[super dealloc];
-}
 
 @end

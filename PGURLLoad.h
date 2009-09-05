@@ -46,10 +46,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(NSObject<PGURLLoadDelegate> *)anObject;
 
-- (NSObject<PGURLLoadDelegate> *)delegate;
-- (NSURLRequest *)request;
-- (NSURLResponse *)response;
-- (NSMutableData *)data;
+@property(readonly) NSObject<PGURLLoadDelegate> *delegate;
+@property(readonly) NSURLRequest *request;
+@property(readonly) NSURLResponse *response;
+@property(readonly) NSMutableData *data;
 
 - (void)cancelAndNotify:(BOOL)notify;
 - (BOOL)loaded;

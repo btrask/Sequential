@@ -48,21 +48,20 @@ typedef UInt8 PGLabelColor;
 + (id)resourceIdentifierWithURL:(NSURL *)URL;
 + (id)resourceIdentifierWithAliasData:(const uint8_t *)data length:(NSUInteger)length; // For backward compatability.
 
-- (PGResourceIdentifier *)identifier;
-- (PGDisplayableIdentifier *)displayableIdentifier;
+@property(readonly) PGResourceIdentifier *identifier;
+@property(readonly) PGDisplayableIdentifier *displayableIdentifier;
+@property(readonly) PGResourceIdentifier *superidentifier;
+@property(readonly) PGResourceIdentifier *rootIdentifier;
+@property(readonly) NSURL *URL; // Equivalent to -URLByFollowingAliases:NO.
+@property(readonly) NSInteger index;
+@property(readonly) BOOL hasTarget;
+@property(readonly) BOOL isFileIdentifier;
 
 - (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index;
-- (PGResourceIdentifier *)superidentifier;
-- (PGResourceIdentifier *)rootIdentifier;
 
 - (NSURL *)superURLByFollowingAliases:(BOOL)flag; // Our URL, or our superidentifier's otherwise.
 - (NSURL *)URLByFollowingAliases:(BOOL)flag;
-- (NSURL *)URL; // Equivalent to -URLByFollowingAliases:NO.
 - (BOOL)getRef:(out FSRef *)outRef byFollowingAliases:(BOOL)flag;
-- (NSInteger)index;
-
-- (BOOL)hasTarget;
-- (BOOL)isFileIdentifier;
 
 - (PGSubscription *)subscriptionWithDescendents:(BOOL)flag;
 
@@ -78,26 +77,21 @@ typedef UInt8 PGLabelColor;
 	NSString *_customDisplayName;
 }
 
-- (BOOL)postsNotifications;
-- (void)setPostsNotifications:(BOOL)flag;
+@property(assign) BOOL postsNotifications;
+@property(retain) NSImage *icon;
+@property(readonly) NSString *displayName;
+@property(copy) NSString *naturalDisplayName; // The name from the filesystem or raw address of the URL.
+@property(readonly) PGLabelColor labelColor;
 
-- (NSImage *)icon;
-- (void)setIcon:(NSImage *)icon;
-
-- (NSString *)displayName;
-- (NSString *)naturalDisplayName;
-- (void)setNaturalDisplayName:(NSString *)aString; // The name from the filesystem or raw address of the URL.
 - (void)setCustomDisplayName:(NSString *)aString; // A custom name, like a webpage title.
 - (void)updateNaturalDisplayName;
-
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
-- (PGLabelColor)labelColor;
 
 @end
 
 @interface NSURL (PGResourceIdentifierCreation)
 
-- (PGResourceIdentifier *)PG_resourceIdentifier;
-- (PGDisplayableIdentifier *)PG_displayableIdentifier;
+@property(readonly) PGResourceIdentifier *PG_resourceIdentifier;
+@property(readonly) PGDisplayableIdentifier *PG_displayableIdentifier;
 
 @end

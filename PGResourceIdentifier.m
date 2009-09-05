@@ -88,7 +88,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 @implementation PGResourceIdentifier
 
-#pragma mark Class Methods
+#pragma mark +PGResourceIdentifier
 
 + (id)resourceIdentifierWithURL:(NSURL *)URL
 {
@@ -100,7 +100,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [[[PGAliasIdentifier alloc] initWithAliasData:data length:length] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGResourceIdentifier
 
 - (PGResourceIdentifier *)identifier
 {
@@ -110,13 +110,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [[[PGDisplayableIdentifier alloc] _initWithIdentifier:self] autorelease];
 }
-
-#pragma mark -
-
-- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
-{
-	return [[[PGIndexIdentifier alloc] initWithSuperidentifier:self index:index] autorelease];
-}
 - (PGResourceIdentifier *)superidentifier
 {
 	return nil;
@@ -124,6 +117,29 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 - (PGResourceIdentifier *)rootIdentifier
 {
 	return [self superidentifier] ? [[self superidentifier] rootIdentifier] : self;
+}
+- (NSURL *)URL
+{
+	return [self URLByFollowingAliases:NO];
+}
+- (NSInteger)index
+{
+	return NSNotFound;
+}
+- (BOOL)hasTarget
+{
+	return NO;
+}
+- (BOOL)isFileIdentifier
+{
+	return NO;
+}
+
+#pragma mark -
+
+- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
+{
+	return [[[PGIndexIdentifier alloc] initWithSuperidentifier:self index:index] autorelease];
 }
 
 #pragma mark -
@@ -137,27 +153,8 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return nil;
 }
-- (NSURL *)URL
-{
-	return [self URLByFollowingAliases:NO];
-}
 - (BOOL)getRef:(out FSRef *)outRef
         byFollowingAliases:(BOOL)flag
-{
-	return NO;
-}
-- (NSInteger)index
-{
-	return NSNotFound;
-}
-
-#pragma mark -
-
-- (BOOL)hasTarget
-{
-	return NO;
-}
-- (BOOL)isFileIdentifier
 {
 	return NO;
 }
@@ -169,7 +166,14 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	return [self isFileIdentifier] ? [PGSubscription subscriptionWithPath:[[self URL] path] descendents:flag] : nil;
 }
 
-#pragma mark NSCoding Protocol
+#pragma mark -NSObject(NSKeyedArchiverObjectSubstitution)
+
+- (Class)classForKeyedArchiver
+{
+	return [PGResourceIdentifier class];
+}
+
+#pragma mark -<NSCoding>
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
@@ -184,14 +188,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if([self class] != [PGResourceIdentifier class] && [self class] != [PGDisplayableIdentifier class]) [aCoder encodeObject:NSStringFromClass([self class]) forKey:@"ClassName"];
 }
 
-#pragma mark NSKeyedArchiverObjectSubstitution Protocol
-
-- (Class)classForKeyedArchiver
-{
-	return [PGResourceIdentifier class];
-}
-
-#pragma mark NSObject Protocol
+#pragma mark -<NSObject>
 
 - (NSUInteger)hash
 {
@@ -238,9 +235,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	if(flag) _postsNotifications = YES;
 }
-
-#pragma mark -
-
 - (NSImage *)icon
 {
 	return _icon ? [[_icon retain] autorelease] : [[self URL] AE_icon];
@@ -252,9 +246,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	_icon = [icon retain];
 	if(_postsNotifications) [self AE_postNotificationName:PGDisplayableIdentifierIconDidChangeNotification];
 }
-
-#pragma mark -
-
 - (NSString *)displayName
 {
 	return _customDisplayName ? [[_customDisplayName retain] autorelease] : [self naturalDisplayName];
@@ -272,6 +263,19 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	_naturalDisplayName = [aString copy];
 	if(_postsNotifications && !_customDisplayName) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
+- (PGLabelColor)labelColor
+{
+	FSRef ref;
+	FSCatalogInfo catalogInfo;
+	if(![self getRef:&ref byFollowingAliases:NO] || FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo | kFSCatInfoNodeFlags, &catalogInfo, NULL, NULL, NULL) != noErr) return PGLabelNone;
+	UInt16 finderFlags;
+	if(catalogInfo.nodeFlags & kFSNodeIsDirectoryMask) finderFlags = ((FolderInfo *)&catalogInfo.finderInfo)->finderFlags;
+	else finderFlags = ((FileInfo *)&catalogInfo.finderInfo)->finderFlags;
+	return (finderFlags & 0x0E) >> 1;
+}
+
+#pragma mark -
+
 - (void)setCustomDisplayName:(NSString *)aString
 {
 	NSString *const string = [@"" isEqualToString:aString] ? nil : aString;
@@ -294,9 +298,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	name = [name AE_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet AE_newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
 	[self setNaturalDisplayName:name];
 }
-
-#pragma mark -
-
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag
 {
 	NSMutableAttributedString *const result = [NSMutableAttributedString PG_attributedStringWithFileIcon:[self icon] name:[self displayName]];
@@ -309,16 +310,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
 	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:([URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil) name:parentName]];
 	return result;
-}
-- (PGLabelColor)labelColor
-{
-	FSRef ref;
-	FSCatalogInfo catalogInfo;
-	if(![self getRef:&ref byFollowingAliases:NO] || FSGetCatalogInfo(&ref, kFSCatInfoFinderInfo | kFSCatInfoNodeFlags, &catalogInfo, NULL, NULL, NULL) != noErr) return PGLabelNone;
-	UInt16 finderFlags;
-	if(catalogInfo.nodeFlags & kFSNodeIsDirectoryMask) finderFlags = ((FolderInfo *)&catalogInfo.finderInfo)->finderFlags;
-	else finderFlags = ((FileInfo *)&catalogInfo.finderInfo)->finderFlags;
-	return (finderFlags & 0x0E) >> 1;
 }
 
 #pragma mark -PGDisplayableIdentifier(Private)
@@ -341,13 +332,6 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return self;
 }
-
-#pragma mark -
-
-- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
-{
-	return [_identifier subidentifierWithIndex:index];
-}
 - (PGResourceIdentifier *)superidentifier
 {
 	return [_identifier superidentifier];
@@ -355,6 +339,29 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 - (PGResourceIdentifier *)rootIdentifier
 {
 	return [_identifier rootIdentifier];
+}
+- (NSURL *)URL
+{
+	return [_identifier URL];
+}
+- (NSInteger)index
+{
+	return [_identifier index];
+}
+- (BOOL)hasTarget
+{
+	return [_identifier hasTarget];
+}
+- (BOOL)isFileIdentifier
+{
+	return [_identifier isFileIdentifier];
+}
+
+#pragma mark -
+
+- (PGResourceIdentifier *)subidentifierWithIndex:(NSInteger)index
+{
+	return [_identifier subidentifierWithIndex:index];
 }
 
 #pragma mark -
@@ -367,29 +374,10 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return [_identifier URLByFollowingAliases:flag];
 }
-- (NSURL *)URL
-{
-	return [_identifier URL];
-}
 - (BOOL)getRef:(out FSRef *)outRef
         byFollowingAliases:(BOOL)flag
 {
 	return [_identifier getRef:outRef byFollowingAliases:flag];
-}
-- (NSInteger)index
-{
-	return [_identifier index];
-}
-
-#pragma mark -
-
-- (BOOL)hasTarget
-{
-	return [_identifier hasTarget];
-}
-- (BOOL)isFileIdentifier
-{
-	return [_identifier isFileIdentifier];
 }
 
 #pragma mark -
@@ -418,7 +406,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[super AE_addObserver:observer selector:aSelector name:aName];
 }
 
-#pragma mark -NSObject(NSCoding)
+#pragma mark -<NSCoding>
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
@@ -438,7 +426,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[aCoder encodeObject:_customDisplayName forKey:@"DisplayName"];
 }
 
-#pragma mark -NSObject(NSObject)
+#pragma mark -<NSObject>
 
 - (NSString *)description
 {
@@ -503,7 +491,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	if(validate && _hasValidRef && !follow) _hasValidRef = FSIsFSRefValid(&_ref);
 	if(!_hasValidRef && FSResolveAliasWithMountFlags(NULL, _alias, &_ref, &dontCare1, kResolveAliasFileNoUI) != noErr) return NO;
 	_hasValidRef = YES;
-	*outRef = _ref;
+	if(outRef) *outRef = _ref;
 	return follow ? FSResolveAliasFileWithMountFlags(outRef, true, &dontCare1, &dontCare2, kResolveAliasFileNoUI) == noErr : YES;
 }
 - (void)cacheURL:(NSURL *)URL
@@ -525,6 +513,17 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 
 #pragma mark -PGResourceIdentifier
 
+- (BOOL)hasTarget
+{
+	return [self getRef:NULL byFollowingAliases:NO validate:YES];
+}
+- (BOOL)isFileIdentifier
+{
+	return YES;
+}
+
+#pragma mark -
+
 - (NSURL *)URLByFollowingAliases:(BOOL)flag
 {
 	if(!flag && _cachedURL) return [[_cachedURL retain] autorelease];
@@ -539,15 +538,6 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 {
 	return [self getRef:outRef byFollowingAliases:flag validate:YES];
 }
-- (BOOL)hasTarget
-{
-	FSRef ref;
-	return [self getRef:&ref byFollowingAliases:NO validate:YES];
-}
-- (BOOL)isFileIdentifier
-{
-	return YES;
-}
 
 #pragma mark -NSObject
 
@@ -557,7 +547,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	[super dealloc];
 }
 
-#pragma mark -NSObject(NSCoding)
+#pragma mark -<NSCoding>
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
@@ -577,7 +567,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	if(_alias) [aCoder encodeBytes:(uint8_t const *)*_alias length:GetHandleSize((Handle)_alias) forKey:@"Alias"];
 }
 
-#pragma mark -NSObject(NSObject)
+#pragma mark -<NSObject>
 
 - (BOOL)isEqual:(id)obj
 {
@@ -592,7 +582,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 
 @implementation PGURLIdentifier
 
-#pragma mark Instance Methods
+#pragma mark -PGURLIdentifier
 
 - (id)initWithURL:(NSURL *)URL
 {
@@ -602,7 +592,33 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	return self;
 }
 
-#pragma mark NSCoding Protocol
+#pragma mark -PGResourceIdentifier
+
+- (BOOL)hasTarget
+{
+	return YES;
+}
+- (BOOL)isFileIdentifier
+{
+	return [_URL isFileURL];
+}
+
+#pragma mark -
+
+- (NSURL *)URLByFollowingAliases:(BOOL)flag
+{
+	return [[_URL retain] autorelease];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_URL release];
+	[super dealloc];
+}
+
+#pragma mark -<NSCoding>
 
 - (id)initWithCoder:(NSCoder *)aCoder
 {
@@ -617,34 +633,11 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	[aCoder encodeObject:_URL forKey:@"URL"];
 }
 
-#pragma mark PGResourceIdentifier
-
-- (NSURL *)URLByFollowingAliases:(BOOL)flag
-{
-	return [[_URL retain] autorelease];
-}
-- (BOOL)hasTarget
-{
-	return YES;
-}
-- (BOOL)isFileIdentifier
-{
-	return [_URL isFileURL];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[_URL release];
-	[super dealloc];
-}
-
 @end
 
 @implementation PGIndexIdentifier
 
-#pragma mark Instance Methods
+#pragma mark -PGIndexIdentifier
 
 - (id)initWithSuperidentifier:(PGResourceIdentifier *)identifier
       index:(NSInteger)index
@@ -657,31 +650,7 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	return self;
 }
 
-#pragma mark NSCoding Protocol
-
-- (id)initWithCoder:(NSCoder *)aCoder
-{
-	if((self = [super initWithCoder:aCoder])) {
-		_superidentifier = [[aCoder decodeObjectForKey:@"Superidentifier"] retain];
-		_index = [aCoder decodeIntegerForKey:@"Index"];
-	}
-	return self;
-}
-- (void)encodeWithCoder:(NSCoder *)aCoder
-{
-	[super encodeWithCoder:aCoder];
-	[aCoder encodeObject:_superidentifier forKey:@"Superidentifier"];
-	[aCoder encodeInteger:_index forKey:@"Index"];
-}
-
-#pragma mark NSObject Protocol
-
-- (NSString *)description
-{
-	return [NSString stringWithFormat:@"%@:%ld", [self superidentifier], (long)[self index]];
-}
-
-#pragma mark PGResourceIdentifier
+#pragma mark -PGResourceIdentifier
 
 - (PGResourceIdentifier *)superidentifier
 {
@@ -700,12 +669,36 @@ static NSMutableArray *PGCachedAliasIdentifiers;
 	return [_superidentifier isFileIdentifier];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
 	[_superidentifier release];
 	[super dealloc];
+}
+
+#pragma mark -<NSCoding>
+
+- (id)initWithCoder:(NSCoder *)aCoder
+{
+	if((self = [super initWithCoder:aCoder])) {
+		_superidentifier = [[aCoder decodeObjectForKey:@"Superidentifier"] retain];
+		_index = [aCoder decodeIntegerForKey:@"Index"];
+	}
+	return self;
+}
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+	[super encodeWithCoder:aCoder];
+	[aCoder encodeObject:_superidentifier forKey:@"Superidentifier"];
+	[aCoder encodeInteger:_index forKey:@"Index"];
+}
+
+#pragma mark -<NSObject>
+
+- (NSString *)description
+{
+	return [NSString stringWithFormat:@"%@:%ld", [self superidentifier], (long)[self index]];
 }
 
 @end

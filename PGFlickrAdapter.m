@@ -67,7 +67,7 @@ enum {
 	NSInteger       _errorCode;
 }
 
-- (NSInteger)errorCode;
+@property(readonly) NSInteger errorCode;
 
 @end
 

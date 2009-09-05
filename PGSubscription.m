@@ -50,7 +50,7 @@ static id  PGActiveSubscriptions = nil;
 + (void)threaded_sendFileEvents;
 
 - (id)initWithPath:(NSString *)path;
-- (PGSubscription *)rootSubscription;
+@property(readonly) PGSubscription *rootSubscription;
 - (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum;
 
 @end

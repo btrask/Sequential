@@ -38,8 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 + (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data;
 
 - (id)initWithLabel:(NSString *)label value:(NSString *)value;
-- (NSString *)label;
-- (NSString *)value;
+
+@property(readonly) NSString *label;
+@property(readonly) NSString *value;
+
 - (NSComparisonResult)compare:(PGExifEntry *)anEntry;
 
 @end

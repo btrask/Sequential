@@ -50,7 +50,7 @@ typedef NSUInteger PGNodeStatus;
 
 @protocol PGNodeDataSource;
 
-@interface PGNode : NSObject <PGResourceAdapting>
+@interface PGNode : NSObject
 {
 	@private
 	PGContainerAdapter *_parentAdapter;
@@ -113,6 +113,9 @@ typedef NSUInteger PGNodeStatus;
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;
 
+@end
+
+@interface PGNode (PGResourceAdapterProxy) <PGResourceAdapting>
 @end
 
 @protocol PGNodeDataSource <NSObject>
