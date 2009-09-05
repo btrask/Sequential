@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 
-@interface PGThumbnailController : NSObject <PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource, NSWindowDelegate>
+@interface PGThumbnailController : NSObject <NSWindowDelegate, PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource>
 {
 	@private
 	PGFadeOutPanel *_window;
@@ -52,13 +52,11 @@ extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 + (BOOL)canShowThumbnailsForDocument:(PGDocument *)aDoc;
 + (BOOL)shouldShowThumbnailsForDocument:(PGDocument *)aDoc;
 
-- (PGDisplayController *)displayController;
-- (void)setDisplayController:(PGDisplayController *)aController;
-- (PGDocument *)document;
-- (void)setDocument:(PGDocument *)aDoc;
+@property(assign) PGDisplayController *displayController;
+@property(assign) PGDocument *document;
+@property(readonly) PGInset contentInset;
+@property(readonly) NSSet *selectedNodes;
 
-- (PGInset)contentInset;
-- (NSSet *)selectedNodes;
 - (void)display;
 - (void)fadeOut;
 

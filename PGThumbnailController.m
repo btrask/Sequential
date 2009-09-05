@@ -71,10 +71,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 #pragma mark -PGThumbnailController
 
-- (PGDisplayController *)displayController
-{
-	return _displayController;
-}
+@synthesize displayController = _displayController;
 - (void)setDisplayController:(PGDisplayController *)aController
 {
 	if(aController == _displayController) return;
@@ -96,10 +93,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[self setDocument:[_displayController activeDocument]];
 	[self display];
 }
-- (PGDocument *)document
-{
-	return _document;
-}
+@synthesize document = _document;
 - (void)setDocument:(PGDocument *)aDoc
 {
 	if(aDoc == _document) return;
@@ -116,17 +110,17 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[self displayControllerActiveNodeDidChange:nil];
 	[self _updateWindowFrame];
 }
-
-#pragma mark -
-
 - (PGInset)contentInset
 {
 	return PGMakeInset(NSWidth([_window frame]), 0.0f, 0.0f, 0.0f);
 }
 - (NSSet *)selectedNodes
 {
-	return [_browser selection];
+	return _browser.selection;
 }
+
+#pragma mark -
+
 - (void)display
 {
 	if(_selfRetained) [self autorelease];
@@ -228,6 +222,14 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[super dealloc];
 }
 
+#pragma mark -<NSWindowDelegate>
+
+- (void)windowWillClose:(NSNotification *)aNotif
+{
+	if(_selfRetained) [self autorelease];
+	_selfRetained = NO;
+}
+
 #pragma mark -<PGThumbnailBrowserDataSource>
 
 - (id)thumbnailBrowser:(PGThumbnailBrowser *)sender
@@ -312,14 +314,6 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item
 {
 	return [item hasRealThumbnail];
-}
-
-#pragma mark -<NSWindowDelegate>
-
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	if(_selfRetained) [self autorelease];
-	_selfRetained = NO;
 }
 
 @end

@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGExifPanelController : PGFloatingPanelController
 {
-	IBOutlet NSTableView   *entriesTable;
+	IBOutlet NSTableView *entriesTable;
 	IBOutlet NSTableColumn *tagColumn;
 	IBOutlet NSTableColumn *valueColumn;
 	IBOutlet NSSearchField *searchField;
-	         NSArray      *_allEntries;
-	         NSArray      *_matchingEntries;
+	NSArray *_allEntries;
+	NSArray *_matchingEntries;
 }
 
 - (IBAction)changeSearch:(id)sender;

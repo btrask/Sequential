@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	IBOutlet NSTextField *URLField;
-	IBOutlet NSButton    *OKButton;
+	IBOutlet NSButton *OKButton;
 }
 
 - (IBAction)ok:(id)sender;

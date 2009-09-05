@@ -125,11 +125,25 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)decrypt:(id)sender;
 - (IBAction)chooseEncoding:(id)sender;
 
-- (PGDocument *)activeDocument;
+@property(readonly) PGDocument *activeDocument;
+@property(readonly) PGNode *activeNode;
+@property(readonly) NSWindow *windowForSheet;
+@property(readonly) NSSet *selectedNodes;
+@property(readonly) PGNode *selectedNode;
+@property(readonly) PGClipView *clipView;
+@property(readonly) PGPageLocation initialLocation;
+@property(readonly, getter = isReading) BOOL reading;
+@property(readonly, getter = isDisplayingImage) BOOL displayingImage;
+@property(readonly) BOOL canShowInfo;
+@property(readonly) BOOL shouldShowInfo;
+@property(readonly) BOOL loadingIndicatorShown;
+@property(assign) BOOL findPanelShown;
+@property(readonly) NSDate *nextTimerFireDate;
+@property(assign) BOOL timerRunning;
+
 - (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag; // Returns YES if the window was closed.
 - (void)activateDocument:(PGDocument *)document;
 
-- (PGNode *)activeNode;
 - (void)setActiveNode:(PGNode *)aNode forward:(BOOL)flag;
 - (BOOL)tryToSetActiveNode:(PGNode *)aNode forward:(BOOL)flag;
 - (BOOL)tryToGoForward:(BOOL)forward allowAlerts:(BOOL)flag;
@@ -138,25 +152,8 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (BOOL)tryToLoopForward:(BOOL)loopForward toNode:(PGNode *)node pageForward:(BOOL)pageForward allowAlerts:(BOOL)flag;
 - (void)activateNode:(PGNode *)node;
 
-- (NSWindow *)windowForSheet;
-- (NSSet *)selectedNodes;
-- (PGNode *)selectedNode;
-- (PGClipView *)clipView;
-- (PGPageLocation)initialLocation;
-- (BOOL)isReading;
-- (BOOL)isDisplayingImage;
-
-- (BOOL)canShowInfo;
-- (BOOL)shouldShowInfo;
-- (BOOL)loadingIndicatorShown;
 - (void)showLoadingIndicator;
-- (BOOL)findPanelShown;
-- (void)setFindPanelShown:(BOOL)flag;
 - (void)offerToOpenBookmark:(PGBookmark *)bookmark;
-
-- (NSDate *)nextTimerFireDate;
-- (BOOL)isTimerRunning;
-- (void)setTimerRunning:(BOOL)run;
 - (void)advanceOnTimer;
 
 - (void)zoomBy:(CGFloat)aFloat;

@@ -46,29 +46,16 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 @implementation PGWindowController
 
-#pragma mark NSWindowNotifications Protocol
+#pragma mark -PGDisplayController
 
-- (void)windowDidResize:(NSNotification *)notification
+- (BOOL)canShowInfo
 {
-	if(_shouldSaveFrame) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
-}
-- (void)windowDidMove:(NSNotification *)notification
-{
-	[self windowDidResize:nil];
+	return [self activeNode] != [[self activeDocument] node];
 }
 
-#pragma mark NSWindowDelegate Protocol
+#pragma mark -
 
-- (NSRect)windowWillUseStandardFrame:(NSWindow *)window
-          defaultFrame:(NSRect)newFrame
-{
-	return [window PG_zoomedFrame];
-}
-
-#pragma mark PGDisplayController
-
-- (BOOL)setActiveDocument:(PGDocument *)document
-        closeIfAppropriate:(BOOL)flag
+- (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag
 {
 	[[self activeDocument] storeWindowFrame:[[self window] AE_contentRect]];
 	if([super setActiveDocument:document closeIfAppropriate:flag]) return YES;
@@ -83,13 +70,6 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 {
 	NSParameterAssert([self activeDocument] == document);
 	[[self window] makeKeyAndOrderFront:self];
-}
-
-#pragma mark -
-
-- (BOOL)canShowInfo
-{
-	return [self activeNode] != [[self activeDocument] node];
 }
 
 #pragma mark -
@@ -110,7 +90,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	_shouldZoomOnNextImageLoad = NO;
 }
 
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (void)windowDidLoad
 {
@@ -124,6 +104,25 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 	}
 	_shouldZoomOnNextImageLoad = [[NSUserDefaults standardUserDefaults] boolForKey:PGAutozoomsWindowsKey];
 	_shouldSaveFrame = YES;
+}
+
+#pragma mark -<NSWindowDelegate>
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	if(_shouldSaveFrame) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
+}
+- (void)windowDidMove:(NSNotification *)notification
+{
+	[self windowDidResize:nil];
+}
+
+#pragma mark -
+
+- (NSRect)windowWillUseStandardFrame:(NSWindow *)window
+          defaultFrame:(NSRect)newFrame
+{
+	return [window PG_zoomedFrame];
 }
 
 @end

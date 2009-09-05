@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSWindow (PGZooming)
 
-#pragma mark Instance Methods
+#pragma mark -NSWindow(PGZooming)
 
 - (IBAction)PG_grow:(id)sender
 {

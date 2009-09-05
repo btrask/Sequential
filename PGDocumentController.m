@@ -160,7 +160,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)switchToFileManager:(id)sender
 {
-	if(![[[[NSAppleScript alloc] initWithSource:([self pathFinderRunning] ? @"tell application \"Path Finder\" to activate" : @"tell application \"Finder\" to activate")] autorelease] executeAndReturnError:NULL]) NSBeep();
+	if(![[[[NSAppleScript alloc] initWithSource:(self.pathFinderRunning ? @"tell application \"Path Finder\" to activate" : @"tell application \"Finder\" to activate")] autorelease] executeAndReturnError:NULL]) NSBeep();
 }
 
 #pragma mark -
@@ -296,14 +296,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (BOOL)pathFinderRunning
-{
-	for(NSDictionary *const dict in [[NSWorkspace sharedWorkspace] launchedApplications]) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
-	return NO;
-}
-
-#pragma mark -
-
 - (NSArray *)recentDocumentIdentifiers
 {
 	return [[_recentDocumentIdentifiers retain] autorelease];
@@ -315,7 +307,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
-	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] retain];
+	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] copy];
 	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];
@@ -324,21 +316,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	return 10;
 }
-
-#pragma mark -
-
 - (PGDisplayController *)displayControllerForNewDocument
 {
-	if([self fullscreen]) {
+	if(self.fullscreen) {
 		if(!_fullscreenController) _fullscreenController = [[PGFullscreenController alloc] init];
 		return _fullscreenController;
 	}
 	return [[[PGWindowController alloc] init] autorelease];
 }
-- (BOOL)fullscreen
-{
-	return _fullscreen;
-}
+@synthesize fullscreen = _fullscreen;
 - (void)setFullscreen:(BOOL)flag
 {
 	if(flag == _fullscreen) return;
@@ -352,13 +338,29 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	for(PGDocument *const doc in [self documents]) if([[[doc displayController] window] attachedSheet]) return NO;
 	return YES;
 }
+@synthesize documents = _documents;
+@synthesize defaultPageMenu;
+- (PGPrefObject *)currentPrefObject
+{
+	return _currentDocument ? _currentDocument : [PGPrefObject globalPrefObject];
+}
+@synthesize currentDocument = _currentDocument;
+- (void)setCurrentDocument:(PGDocument *)document
+{
+	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
+	_currentDocument = document;
+	[self _setPageMenu:(_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu])];
+	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
+	[self readingDirectionDidChange:nil];
+}
+- (BOOL)pathFinderRunning
+{
+	for(NSDictionary *const dict in [[NSWorkspace sharedWorkspace] launchedApplications]) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
+	return NO;
+}
 
 #pragma mark -
 
-- (NSArray *)documents
-{
-	return [[_documents copy] autorelease];
-}
 - (void)addDocument:(PGDocument *)document
 {
 	NSParameterAssert([_documents indexOfObjectIdenticalTo:document] == NSNotFound);
@@ -404,29 +406,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSInteger const i = [windowsMenu indexOfItemWithRepresentedObject:document];
 	return -1 == i ? nil : [windowsMenu itemAtIndex:i];
-}
-
-#pragma mark -
-
-- (NSMenu *)defaultPageMenu
-{
-	return [[defaultPageMenu retain] autorelease];
-}
-- (PGPrefObject *)currentPrefObject
-{
-	return _currentDocument ? _currentDocument : [PGPrefObject globalPrefObject];
-}
-- (PGDocument *)currentDocument
-{
-	return _currentDocument;
-}
-- (void)setCurrentDocument:(PGDocument *)document
-{
-	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
-	_currentDocument = document;
-	[self _setPageMenu:(_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu])];
-	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[self readingDirectionDidChange:nil];
 }
 
 #pragma mark -
@@ -510,7 +489,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[[_fullscreenController window] close];
 		[_fullscreenController release];
 		_fullscreenController = nil;
-	} else if([[self documents] count] && [self fullscreen]) {
+	} else if([[self documents] count] && self.fullscreen) {
 		_inFullscreen = flag;
 		PGDocument *const currentDoc = [self currentDocument];
 		_fullscreenController = [[PGFullscreenController alloc] init];
@@ -643,7 +622,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	NSInteger const tag = [anItem tag];
 
 	if(protocol_getMethodDescription(@protocol(PGDisplayControlling), action, YES, YES).name) {
-		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
 		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 		if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
@@ -652,7 +631,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	if(@selector(installUpdate:) == action) {
 		[anItem setTitle:([[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states."))];
-	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString(([self pathFinderRunning] ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
+	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {
 		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];

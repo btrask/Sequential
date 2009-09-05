@@ -24,25 +24,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAttachments.h"
 
-static void PGEnsureWindowCreatedHack(void)
-{
-	// The icons fail to draw on Tiger if there has never been a window loaded. Defer must be NO. The specific error is "-[_NSExistingCGSContext focusView:inWindow:]: selector not recognized" in -drawWithFrame:inView:.
-	static BOOL createdWindow = NO;
-	if(createdWindow) return;
-	(void)[[[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO] autorelease];
-	createdWindow = YES;
-}
-
 @interface PGFileIconAttachmentCell : NSTextAttachmentCell
-
 @end
 
 @implementation NSAttributedString (PGAdditions)
 
-#pragma mark Instance Methods
+#pragma mark -NSAttributedString(PGAdditions)
 
-+ (NSMutableAttributedString *)PG_attributedStringWithAttachmentCell:(NSTextAttachmentCell *)cell
-                               label:(NSString *)label
++ (NSMutableAttributedString *)PG_attributedStringWithAttachmentCell:(NSTextAttachmentCell *)cell label:(NSString *)label
 {
 	NSMutableAttributedString *const result = [[[NSMutableAttributedString alloc] init] autorelease];
 	if(cell) {
@@ -55,8 +44,7 @@ static void PGEnsureWindowCreatedHack(void)
 	[result addAttribute:NSFontAttributeName value:[NSFont menuFontOfSize:14] range:NSMakeRange(0, [result length])]; // Use 14 instead of 0 (default) for the font size because the default seems to be 13, which is wrong.
 	return result;
 }
-+ (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage
-                               name:(NSString *)fileName
++ (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage name:(NSString *)fileName
 {
 	return [self PG_attributedStringWithAttachmentCell:[[[PGFileIconAttachmentCell alloc] initImageCell:anImage] autorelease] label:fileName];
 }
@@ -65,21 +53,17 @@ static void PGEnsureWindowCreatedHack(void)
 
 @implementation PGRotatedMenuIconCell
 
-#pragma mark Instance Methods
+#pragma mark -PGRotatedMenuIconCell
 
-- (id)initWithMenuItem:(NSMenuItem *)anItem
-      rotation:(CGFloat)angle
+- (id)initWithMenuItem:(NSMenuItem *)anItem rotation:(CGFloat)angle
 {
 	if((self = [super init])) {
-		PGEnsureWindowCreatedHack();
 		_item = anItem;
 		_angle = angle;
 	}
 	return self;
 }
-- (void)drawWithFrame:(NSRect)aRect
-        enabled:(BOOL)enabled
-        highlighted:(BOOL)highlighted
+- (void)drawWithFrame:(NSRect)aRect enabled:(BOOL)enabled highlighted:(BOOL)highlighted
 {
 	NSImage *const image = [NSImage imageNamed:[self imageNameHighlighted:highlighted]];
 	[image setFlipped:YES];
@@ -90,7 +74,7 @@ static void PGEnsureWindowCreatedHack(void)
 	return nil;
 }
 
-#pragma mark NSTextAttachmentCell
+#pragma mark -NSTextAttachmentCell
 
 - (void)drawWithFrame:(NSRect)aRect
         inView:(NSView *)aView
@@ -117,7 +101,7 @@ static void PGEnsureWindowCreatedHack(void)
 
 @implementation PGRotationMenuIconCell
 
-#pragma mark PGRotatedMenuIconCell
+#pragma mark -PGRotatedMenuIconCell
 
 - (NSString *)imageNameHighlighted:(BOOL)flag
 {
@@ -128,7 +112,7 @@ static void PGEnsureWindowCreatedHack(void)
 
 @implementation PGMirrorMenuIconCell
 
-#pragma mark PGRotatedMenuIconCell
+#pragma mark -PGRotatedMenuIconCell
 
 - (NSString *)imageNameHighlighted:(BOOL)flag
 {
@@ -139,10 +123,9 @@ static void PGEnsureWindowCreatedHack(void)
 
 @implementation PGFileIconAttachmentCell
 
-#pragma mark NSTextAttachmentCell
+#pragma mark -NSTextAttachmentCell
 
-- (void)drawWithFrame:(NSRect)aRect
-        inView:(NSView *)aView
+- (void)drawWithFrame:(NSRect)aRect inView:(NSView *)aView
 {
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
@@ -159,7 +142,7 @@ static void PGEnsureWindowCreatedHack(void)
 	return NSMakePoint(0.0f, -3.0f);
 }
 
-#pragma mark NSCell
+#pragma mark -NSCell
 
 - (id)initImageCell:(NSImage *)anImage
 {
@@ -168,7 +151,6 @@ static void PGEnsureWindowCreatedHack(void)
 		[self release];
 		return nil;
 	}
-	PGEnsureWindowCreatedHack();
 	return self;
 }
 

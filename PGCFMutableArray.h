@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSMutableArray (PGExtendedMutableArray)
+@interface NSMutableArray(PGExtendedMutableArray)
 
 - (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks;
 

@@ -33,22 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGFloatingPanelController : NSWindowController
 {
 	@private
-	BOOL                 _shown;
+	BOOL _shown;
 	PGDisplayController *_displayController;
 }
 
-- (BOOL)isShown;
-- (void)setShown:(BOOL)flag;
+@property(assign, getter = isShown) BOOL shown;
+- (PGDisplayController *)displayController;
 - (void)toggleShown;
 
+// For overriding:
+@property(readonly) NSString *nibName;
+@property(readonly) NSString *windowFrameAutosaveName;
 - (void)windowWillShow;
 - (void)windowDidClose;
-
-- (PGDisplayController *)displayController;
-- (BOOL)setDisplayController:(PGDisplayController *)controller; // Don't call this, but go ahead and override it. Returns whether it changed.
-
-- (NSString *)nibName; // Overriders should implement this to return the name of the nib.
-- (NSString *)windowFrameAutosaveName; // Automatically generates one using -nibName by default.
+- (BOOL)setDisplayController:(PGDisplayController *)controller;
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotif;
 - (void)windowDidResignMain:(NSNotification *)aNotif;

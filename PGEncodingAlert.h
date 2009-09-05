@@ -27,13 +27,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGEncodingAlert : NSWindowController
 {
 	@private
-	IBOutlet NSTableView      *encodingsTable;
-	IBOutlet NSTableColumn    *encodingColumn;
-	IBOutlet NSTableColumn    *sampleColumn;
-	         NSArray         *_encodings;
-	         NSArray         *_encodingNames;
-	         NSArray         *_samples;
-	         id               _delegate;
+	IBOutlet NSTableView *encodingsTable;
+	IBOutlet NSTableColumn *encodingColumn;
+	IBOutlet NSTableColumn *sampleColumn;
+	NSArray *_encodings;
+	NSArray *_encodingNames;
+	NSArray *_samples;
+	id _delegate;
 }
 
 - (id)initWithStringData:(NSData *)data guess:(NSStringEncoding)guess;

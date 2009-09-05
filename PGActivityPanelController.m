@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGActivityPanelController
 
-#pragma mark Instance Methods
+#pragma mark -PGActivityPanelController
 
 - (IBAction)cancelLoad:(id)sender
 {
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [[activityOutline itemAtRow:i] cancelLoad];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGActivityPanelController(Private)
 
 - (void)_update
 {
@@ -62,27 +62,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[activityOutline expandItem:nil expandChildren:YES];
 }
 
-#pragma mark NSOutlineView Protocol
+#pragma mark -NSObject(NSOutlineViewNotifications)
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView
-        isItemExpandable:(id)item
+- (void)outlineViewSelectionDidChange:(NSNotification *)notification
+{
+	[cancelButton setEnabled:[[activityOutline selectedRowIndexes] count] > 0];
+}
+
+#pragma mark -PGFloatingPanelController
+
+- (NSString *)nibName
+{
+	return @"PGActivity";
+}
+- (void)windowWillShow
+{
+	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:PGAnimationFramerate / 2.0f options:PGRetainTarget] retain];
+	[self _update];
+}
+- (void)windowDidClose
+{
+	[_updateTimer invalidate];
+	[_updateTimer release];
+	_updateTimer = nil;
+}
+
+#pragma mark -NSWindowController
+
+- (void)windowDidLoad
+{
+	[super windowDidLoad];
+	[progressColumn setDataCell:[[[PGProgressIndicatorCell alloc] init] autorelease]];
+	[self outlineViewSelectionDidChange:nil];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[self windowDidClose];
+	[super dealloc];
+}
+
+#pragma mark -<NSOutlineViewDataSource>
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
 	return item ? [[item subloads] count] > 0 : YES;
 }
-- (NSInteger)outlineView:(NSOutlineView *)outlineView
-       numberOfChildrenOfItem:(id)item
+- (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] count];
 }
-- (id)outlineView:(NSOutlineView *)outlineView
-      child:(NSInteger)index
-      ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
 	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] objectAtIndex:index];
 }
-- (id)outlineView:(NSOutlineView *)outlineView
-      objectValueForTableColumn:(NSTableColumn *)tableColumn
-      byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	if(tableColumn == identifierColumn) {
 		static NSDictionary *attrs = nil;
@@ -99,57 +135,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return nil;
 }
 
-#pragma mark NSOutlineViewDelegate Protocol
+#pragma mark -<NSOutlineViewDelegate>
 
-- (void)outlineView:(NSOutlineView *)outlineView
-        willDisplayCell:(id)cell
-        forTableColumn:(NSTableColumn *)tableColumn
-        item:(id)item
+- (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	if(tableColumn == progressColumn) [cell setHidden:(![item loadProgress] || [[item subloads] count])];
-}
-
-#pragma mark NSOutlineViewNotifications Protocol
-
-- (void)outlineViewSelectionDidChange:(NSNotification *)notification
-{
-	[cancelButton setEnabled:[[activityOutline selectedRowIndexes] count] > 0];
-}
-
-#pragma mark PGFloatingPanelController
-
-- (void)windowWillShow
-{
-	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:PGAnimationFramerate / 2.0f options:PGRetainTarget] retain];
-	[self _update];
-}
-- (void)windowDidClose
-{
-	[_updateTimer invalidate];
-	[_updateTimer release];
-	_updateTimer = nil;
-}
-
-- (NSString *)nibName
-{
-	return @"PGActivity";
-}
-
-#pragma mark NSWindowController
-
-- (void)windowDidLoad
-{
-	[super windowDidLoad];
-	[progressColumn setDataCell:[[[PGProgressIndicatorCell alloc] init] autorelease]];
-	[self outlineViewSelectionDidChange:nil];
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[self windowDidClose];
-	[super dealloc];
 }
 
 @end

@@ -30,7 +30,7 @@ enum {
 };
 typedef NSUInteger PGDelayedPerformingOptions;
 
-@interface NSObject (PGDelayedPerforming)
+@interface NSObject(PGDelayedPerforming)
 
 - (NSTimer *)PG_performSelector:(SEL)aSel withObject:(id)anArgument fireDate:(NSDate *)date interval:(NSTimeInterval)interval options:(PGDelayedPerformingOptions)opts;
 - (NSTimer *)PG_performSelector:(SEL)aSel withObject:(id)anArgument fireDate:(NSDate *)date interval:(NSTimeInterval)interval options:(PGDelayedPerformingOptions)opts mode:(NSString *)mode;

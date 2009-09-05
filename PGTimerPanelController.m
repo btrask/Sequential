@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGTimerPanelController (Private)
 
-- (PGPrefObject *)_currentPrefObject;
+@property(readonly) PGPrefObject *_currentPrefObject;
 - (void)_update;
 - (void)_updateOnTimer:(NSNumber *)changed;
 
@@ -52,11 +52,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGTimerPanelController
 
-#pragma mark Instance Methods
+#pragma mark -PGTimerPanelController
 
 - (IBAction)toggleTimer:(id)sender
 {
-	[[self displayController] setTimerRunning:![[self displayController] isTimerRunning]];
+	[[self displayController] setTimerRunning:![self displayController].timerRunning];
 }
 - (IBAction)changeTimerInterval:(id)sender
 {
@@ -72,7 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _update];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGTimerPanelController(Private)
 
 - (PGPrefObject *)_currentPrefObject
 {
@@ -82,7 +82,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)_update
 {
 	PGDisplayController *const d = [self displayController];
-	BOOL const run = [d isTimerRunning];
+	BOOL const run = d.timerRunning;
 	if(![self isShown] || !run) {
 		[_updateTimer invalidate];
 		[_updateTimer release];
@@ -98,7 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSParameterAssert(changed);
 	NSTimeInterval const interval = [[self _currentPrefObject] timerInterval];
-	BOOL const running = [[self displayController] isTimerRunning];
+	BOOL const running = [self displayController].timerRunning;
 	NSTimeInterval timeRemaining = interval;
 	if(running) {
 		NSDate *const fireDate = [[self displayController] nextTimerFireDate];
@@ -113,12 +113,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 }
 
-#pragma mark PGFloatingPanelController
+#pragma mark -PGFloatingPanelController
 
 - (void)setShown:(BOOL)flag
 {
 	[super setShown:flag];
 	[self _update];
+}
+
+#pragma mark -
+
+- (NSString *)nibName
+{
+	return @"PGTimer";
 }
 - (BOOL)setDisplayController:(PGDisplayController *)controller
 {
@@ -130,12 +137,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _update];
 	return YES;
 }
-- (NSString *)nibName
-{
-	return @"PGTimer";
-}
 
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (void)windowDidLoad
 {
@@ -143,7 +146,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {

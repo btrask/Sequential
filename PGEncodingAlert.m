@@ -29,10 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGEncodingAlert
 
-#pragma mark Instance Methods
+#pragma mark -PGEncodingAlert
 
-- (id)initWithStringData:(NSData *)data
-      guess:(NSStringEncoding)guess;
+- (id)initWithStringData:(NSData *)data guess:(NSStringEncoding)guess;
 {
 	if(!(self = [self initWithWindowNibName:@"PGEncoding"])) return nil;
 	(void)[self window]; // Just load it.
@@ -77,8 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -
 
-- (void)beginSheetForWindow:(NSWindow *)window
-	withDelegate:(id)anObject
+- (void)beginSheetForWindow:(NSWindow *)window withDelegate:(id)anObject
 {
 	if(window) {
 		_delegate = anObject;
@@ -90,38 +88,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[anObject encodingAlertDidEnd:self selectedEncoding:encoding];
 	}
 }
-- (void)sheetDidEnd:(NSWindow *)sheet
-	returnCode:(NSInteger)returnCode
-        contextInfo:(void *)contextInfo
+- (void)sheetDidEnd:(NSWindow *)sheet returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {
 	[_delegate encodingAlertDidEnd:[self autorelease] selectedEncoding:returnCode];
 	[sheet orderOut:self];
 }
 
-#pragma mark NSWindowDelegate Protocol
-
-- (NSRect)windowWillUseStandardFrame:(NSWindow *)window
-          defaultFrame:(NSRect)defaultFrame
-{
-	return [window PG_zoomedFrame];
-}
-
-#pragma mark NSTableDataSource Protocol
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
-{
-	return [_encodings count];
-}
-- (id)tableView:(NSTableView *)tableView
-      objectValueForTableColumn:(NSTableColumn *)tableColumn
-      row:(NSInteger)row
-{
-	if(tableColumn == encodingColumn) return [_encodingNames objectAtIndex:row];
-	if(tableColumn == sampleColumn) return [_samples objectAtIndex:row];
-	return nil;
-}
-
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
@@ -129,6 +102,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_encodingNames release];
 	[_samples release];
 	[super dealloc];
+}
+
+#pragma mark -<NSTableViewDataSource>
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+	return [_encodings count];
+}
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	if(tableColumn == encodingColumn) return [_encodingNames objectAtIndex:row];
+	if(tableColumn == sampleColumn) return [_samples objectAtIndex:row];
+	return nil;
+}
+
+#pragma mark -<NSWindowDelegate>
+
+- (NSRect)windowWillUseStandardFrame:(NSWindow *)window defaultFrame:(NSRect)defaultFrame
+{
+	return [window PG_zoomedFrame];
 }
 
 @end

@@ -41,12 +41,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFloatingPanelController
 
-#pragma mark Instance Methods
+#pragma mark -PGFloatingPanelController
 
-- (BOOL)isShown
-{
-	return _shown;
-}
+@synthesize shown = _shown;
 - (void)setShown:(BOOL)flag
 {
 	if(flag == _shown) return;
@@ -59,28 +56,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[self windowDidClose];
 	}
 }
-- (void)toggleShown
-{
-	[self setShown:![self isShown]];
-}
-
-#pragma mark -
-
-- (void)windowWillShow {}
-- (void)windowDidClose {}
-
-#pragma mark -
-
 - (PGDisplayController *)displayController
 {
 	return [[_displayController retain] autorelease];
 }
-- (BOOL)setDisplayController:(PGDisplayController *)controller
+- (void)toggleShown
 {
-	if(controller == _displayController) return NO;
-	[_displayController release];
-	_displayController = [controller retain];
-	return YES;
+	[self setShown:![self isShown]];
 }
 
 #pragma mark -
@@ -94,6 +76,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSString *const name = [self nibName];
 	return name ? [NSString stringWithFormat:@"%@PanelFrame", name] : nil;
 }
+- (void)windowWillShow {}
+- (void)windowDidClose {}
+- (BOOL)setDisplayController:(PGDisplayController *)controller
+{
+	if(controller == _displayController) return NO;
+	[_displayController release];
+	_displayController = [controller retain];
+	return YES;
+}
 
 #pragma mark -
 
@@ -106,7 +97,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self _updateWithDisplayController:nil];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGFloatingPanelController(Private)
 
 - (void)_updateWithDisplayController:(PGDisplayController *)controller
 {
@@ -114,23 +105,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self setDisplayController:[c isKindOfClass:[PGDisplayController class]] ? c : nil];
 }
 
-#pragma mark NSWindowNotifications Protocol
-
-- (void)windowDidResize:(NSNotification *)notification
-{
-	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:[self windowFrameAutosaveName]];
-}
-- (void)windowDidMove:(NSNotification *)notification
-{
-	[self windowDidResize:nil];
-}
-
-- (void)windowWillClose:(NSNotification *)aNotif
-{
-	_shown = NO;
-}
-
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (id)initWithWindowNibName:(NSString *)name
 {
@@ -162,7 +137,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -173,6 +148,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self AE_removeObserver];
 	[_displayController release];
 	[super dealloc];
+}
+
+#pragma mark -<NSWindowDelegate>
+
+- (void)windowDidResize:(NSNotification *)notification
+{
+	[[NSUserDefaults standardUserDefaults] setObject:NSStringFromRect([[self window] frame]) forKey:[self windowFrameAutosaveName]];
+}
+- (void)windowDidMove:(NSNotification *)notification
+{
+	[self windowDidResize:nil];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotif
+{
+	_shown = NO;
 }
 
 @end

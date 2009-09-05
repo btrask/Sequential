@@ -31,25 +31,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGBookmarkController : NSObject
 {
 	@public
-	IBOutlet NSMenuItem      *bookmarkItem;
-	IBOutlet NSMenu          *bookmarkMenu;
-	IBOutlet NSMenuItem      *emptyMenuItem;
-	         NSMutableArray *_bookmarks;
-	         BOOL            _deletesBookmarks;
+	IBOutlet NSMenuItem *bookmarkItem;
+	IBOutlet NSMenu *bookmarkMenu;
+	IBOutlet NSMenuItem *emptyMenuItem;
+	BOOL _deletesBookmarks;
+	NSMutableArray *_bookmarks;
 }
 
 + (id)sharedBookmarkController;
 
 - (IBAction)open:(id)sender;
 
+@property(assign) BOOL deletesBookmarks; // If YES, the "Resume" menu becomes a "Delete" menu.
+
 - (void)addBookmark:(PGBookmark *)aBookmark;
 - (void)removeBookmark:(PGBookmark *)aBookmark;
 - (void)addMenuItemForBookmark:(PGBookmark *)aBookmark;
-
 - (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident;
-
-- (BOOL)deletesBookmarks;
-- (void)setDeletesBookmarks:(BOOL)flag; // If YES, the "Resume" menu becomes a "Delete" menu.
 
 - (void)bookmarkDidUpdate:(NSNotification *)aNotif;
 

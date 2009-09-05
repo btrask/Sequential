@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGURLAlert
 
-#pragma mark Instance Methods
+#pragma mark -PGURLAlert
 
 - (IBAction)ok:(id)sender
 {
@@ -53,22 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [NSURL AE_URLWithString:[URLField stringValue]];
 }
 
-#pragma mark NSControlSubclassNotifications Protocol
-
-- (void)controlTextDidChange:(NSNotification *)aNotification
-{
-	[OKButton setEnabled:[NSURL AE_URLWithString:[URLField stringValue]] != nil];
-}
-
-#pragma mark NSWindowDelegate Protocol
-
-- (NSRect)windowWillUseStandardFrame:(NSWindow *)window
-          defaultFrame:(NSRect)defaultFrame
-{
-	return [window PG_zoomedFrame];
-}
-
-#pragma mark NSWindowController
+#pragma mark -NSWindowController
 
 - (void)windowDidLoad
 {
@@ -76,11 +61,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self controlTextDidChange:nil];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
 	return [self initWithWindowNibName:@"PGURL"];
+}
+
+#pragma mark -NSObject(NSControlSubclassNotifications)
+
+- (void)controlTextDidChange:(NSNotification *)aNotification
+{
+	[OKButton setEnabled:[NSURL AE_URLWithString:[URLField stringValue]] != nil];
+}
+
+#pragma mark -<NSWindowDelegate>
+
+- (NSRect)windowWillUseStandardFrame:(NSWindow *)window defaultFrame:(NSRect)defaultFrame
+{
+	return [window PG_zoomedFrame];
 }
 
 @end

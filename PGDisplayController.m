@@ -311,12 +311,87 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (PGDocument *)activeDocument
+@synthesize activeDocument = _activeDocument;
+@synthesize activeNode = _activeNode;
+- (NSWindow *)windowForSheet
 {
-	return _activeDocument;
+	return [self window];
 }
-- (BOOL)setActiveDocument:(PGDocument *)document
-        closeIfAppropriate:(BOOL)flag
+- (NSSet *)selectedNodes
+{
+	NSSet *const thumbnailSelection = [_thumbnailController selectedNodes];
+	if([thumbnailSelection count]) return thumbnailSelection;
+	return [self activeNode] ? [NSSet setWithObject:[self activeNode]] : [NSSet set];
+}
+- (PGNode *)selectedNode
+{
+	NSSet *const selectedNodes = [self selectedNodes];
+	return [selectedNodes count] == 1 ? [selectedNodes anyObject] : nil;
+}
+@synthesize clipView;
+@synthesize initialLocation = _initialLocation;
+@synthesize reading = _reading;
+- (BOOL)isDisplayingImage
+{
+	return [clipView documentView] == _imageView;
+}
+- (BOOL)canShowInfo
+{
+	return YES;
+}
+- (BOOL)shouldShowInfo
+{
+	return [[self activeDocument] showsInfo] && [self canShowInfo];
+}
+- (BOOL)loadingIndicatorShown
+{
+	return _loadingGraphic != nil;
+}
+- (BOOL)findPanelShown
+{
+	return [_findPanel isVisible] && ![_findPanel isFadingOut];
+}
+- (void)setFindPanelShown:(BOOL)flag
+{
+	if(flag) {
+		NSDisableScreenUpdates();
+		[[self window] orderFront:self];
+		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
+		[_findPanel makeKeyWindow];
+		[self documentReadingDirectionDidChange:nil];
+		NSEnableScreenUpdates();
+	} else {
+		[_findPanel fadeOut];
+		[self documentReadingDirectionDidChange:nil];
+		[[self window] makeKeyWindow];
+	}
+}
+- (NSDate *)nextTimerFireDate
+{
+	return [[_nextTimerFireDate retain] autorelease];
+}
+- (BOOL)timerRunning
+{
+	return !!_timer;
+}
+- (void)setTimerRunning:(BOOL)run
+{
+	[_nextTimerFireDate release];
+	[_timer invalidate];
+	[_timer release];
+	if(run) {
+		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
+		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:kNilOptions mode:NSDefaultRunLoopMode] retain];
+	} else {
+		_nextTimerFireDate = nil;
+		_timer = nil;
+	}
+	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
+}
+
+#pragma mark -
+
+- (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag
 {
 	if(document == _activeDocument) return NO;
 	if(_activeDocument) {
@@ -394,10 +469,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (PGNode *)activeNode
-{
-	return [[_activeNode retain] autorelease];
-}
 - (void)setActiveNode:(PGNode *)aNode forward:(BOOL)flag
 {
 	if(![self _setActiveNode:aNode]) return;
@@ -451,77 +522,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (NSWindow *)windowForSheet
-{
-	return [self window];
-}
-- (NSSet *)selectedNodes
-{
-	NSSet *const thumbnailSelection = [_thumbnailController selectedNodes];
-	if([thumbnailSelection count]) return thumbnailSelection;
-	return [self activeNode] ? [NSSet setWithObject:[self activeNode]] : [NSSet set];
-}
-- (PGNode *)selectedNode
-{
-	NSSet *const selectedNodes = [self selectedNodes];
-	return [selectedNodes count] == 1 ? [selectedNodes anyObject] : nil;
-}
-- (PGClipView *)clipView
-{
-	return [[clipView retain] autorelease];
-}
-- (PGPageLocation)initialLocation
-{
-	return _initialLocation;
-}
-- (BOOL)isReading
-{
-	return _reading;
-}
-- (BOOL)isDisplayingImage
-{
-	return [clipView documentView] == _imageView;
-}
-
-#pragma mark -
-
-- (BOOL)canShowInfo
-{
-	return YES;
-}
-- (BOOL)shouldShowInfo
-{
-	return [[self activeDocument] showsInfo] && [self canShowInfo];
-}
-- (BOOL)loadingIndicatorShown
-{
-	return _loadingGraphic != nil;
-}
 - (void)showLoadingIndicator
 {
 	if(_loadingGraphic) return;
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
 	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
 	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
-}
-- (BOOL)findPanelShown
-{
-	return [_findPanel isVisible] && ![_findPanel isFadingOut];
-}
-- (void)setFindPanelShown:(BOOL)flag
-{
-	if(flag) {
-		NSDisableScreenUpdates();
-		[[self window] orderFront:self];
-		if(![self findPanelShown]) [_findPanel displayOverWindow:[self window]];
-		[_findPanel makeKeyWindow];
-		[self documentReadingDirectionDidChange:nil];
-		NSEnableScreenUpdates();
-	} else {
-		[_findPanel fadeOut];
-		[self documentReadingDirectionDidChange:nil];
-		[[self window] makeKeyWindow];
-	}
 }
 - (void)offerToOpenBookmark:(PGBookmark *)bookmark
 {
@@ -534,31 +540,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[bookmark retain];
 	if(window) [alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:@selector(_offerToOpenBookmarkAlertDidEnd:returnCode:bookmark:) contextInfo:bookmark];
 	else [self _offerToOpenBookmarkAlertDidEnd:alert returnCode:[alert runModal] bookmark:bookmark];
-}
-
-#pragma mark -
-
-- (NSDate *)nextTimerFireDate
-{
-	return [[_nextTimerFireDate retain] autorelease];
-}
-- (BOOL)isTimerRunning
-{
-	return !!_timer;
-}
-- (void)setTimerRunning:(BOOL)run
-{
-	[_nextTimerFireDate release];
-	[_timer invalidate];
-	[_timer release];
-	if(run) {
-		_nextTimerFireDate = [[NSDate alloc] initWithTimeIntervalSinceNow:[[self activeDocument] timerInterval]];
-		_timer = [[self PG_performSelector:@selector(advanceOnTimer) withObject:nil fireDate:_nextTimerFireDate interval:0.0f options:kNilOptions mode:NSDefaultRunLoopMode] retain];
-	} else {
-		_nextTimerFireDate = nil;
-		_timer = nil;
-	}
-	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 - (void)advanceOnTimer
 {
@@ -751,7 +732,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentTimerIntervalDidChange:(NSNotification *)aNotif
 {
-	[self setTimerRunning:[self isTimerRunning]];
+	[self setTimerRunning:self.timerRunning];
 }
 
 #pragma mark -
@@ -822,7 +803,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
-	[self setTimerRunning:[self isTimerRunning]];
+	[self setTimerRunning:self.timerRunning];
 }
 - (void)_readFinished
 {
@@ -1304,7 +1285,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)toggleFullscreen:(id)sender
 {
-	[[PGDocumentController sharedDocumentController] setFullscreen:![[PGDocumentController sharedDocumentController] fullscreen]];
+	[[PGDocumentController sharedDocumentController] setFullscreen:![PGDocumentController sharedDocumentController].fullscreen];
 }
 - (IBAction)toggleInfo:(id)sender
 {

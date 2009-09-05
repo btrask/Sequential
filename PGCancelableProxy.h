@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@interface NSObject (PGCancelable) // These methods guarantee that either the entire method will be performed before anything can cancel it, or the method won't be performed at all. If the method doesn't get invoked, 0 (cast as whatever the return type is) is returned.
+@interface NSObject(PGCancelable) // These methods guarantee that either the entire method will be performed before anything can cancel it, or the method won't be performed at all. If the method doesn't get invoked, 0 (cast as whatever the return type is) is returned.
 
 + (id)PG_performOn:(id)target allowOnce:(BOOL)flag withStorage:(id)storage; // Send this to the class that defines the message you intend to invoke.
 - (void)PG_allowPerformsWithStorage:(id)storage;

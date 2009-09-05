@@ -144,28 +144,22 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 - (BOOL)performToggleFullscreen;
 - (BOOL)performToggleInfo;
 
-- (BOOL)pathFinderRunning;
+@property(copy) NSArray *recentDocumentIdentifiers;
+@property(readonly) NSUInteger maximumRecentDocumentCount;
+@property(readonly) PGDisplayController *displayControllerForNewDocument;
+@property(assign, getter = isFullscreen) BOOL fullscreen;
+@property(readonly) BOOL canToggleFullscreen;
+@property(readonly) NSArray *documents;
+@property(readonly) NSMenu *defaultPageMenu;
+@property(readonly) PGPrefObject *currentPrefObject;
+@property(assign) PGDocument *currentDocument;
+@property(readonly) BOOL pathFinderRunning;
 
-- (NSArray *)recentDocumentIdentifiers;
-- (void)setRecentDocumentIdentifiers:(NSArray *)anArray;
-- (NSUInteger)maximumRecentDocumentCount;
-
-- (PGDisplayController *)displayControllerForNewDocument; // Returns either the shared fullscreen controller or a new regular window controller.
-- (BOOL)fullscreen;
-- (void)setFullscreen:(BOOL)flag;
-- (BOOL)canToggleFullscreen;
-
-- (NSArray *)documents;
 - (void)addDocument:(PGDocument *)document;
 - (void)removeDocument:(PGDocument *)document;
 - (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident;
 - (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document;
 - (NSMenuItem *)windowsMenuItemForDocument:(PGDocument *)document;
-
-- (NSMenu *)defaultPageMenu;
-- (PGPrefObject *)currentPrefObject; // Current doc or +[PGPrefObject globalPrefObject].
-- (PGDocument *)currentDocument;
-- (void)setCurrentDocument:(PGDocument *)document;
 
 - (id)openDocumentWithContentsOfIdentifier:(PGResourceIdentifier *)ident display:(BOOL)flag;
 - (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)flag;

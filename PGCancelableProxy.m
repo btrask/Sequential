@@ -29,19 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGCancelableProxy
 
-#pragma mark Class Methods
+#pragma mark +PGCancelableProxy
 
 + (id)storage
 {
 	return [[[NSMutableArray alloc] initWithCallbacks:NULL] autorelease];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGCancelableProxy
 
-- (id)initWithTarget:(id)target
-      class:(Class)class
-      allowOnce:(BOOL)flag
-      storage:(id)storage
+- (id)initWithTarget:(id)target class:(Class)class allowOnce:(BOOL)flag storage:(id)storage
 {
 	if((self = [super init])) {
 		if(!target) {
@@ -61,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return self;
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
@@ -94,7 +91,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation NSObject (PGCancelable)
+@implementation NSObject(PGCancelable)
 
 + (id)PG_performOn:(id)target
       allowOnce:(BOOL)flag

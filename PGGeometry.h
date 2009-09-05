@@ -78,7 +78,7 @@ extern PGInset PGAddInsets(PGInset a, PGInset b);
 #pragma mark Animation
 
 #define PGAnimationFramesPerSecond 30.0f
-#define PGAnimationFramerate       (1.0f / PGAnimationFramesPerSecond)
+#define PGAnimationFramerate (1.0f / PGAnimationFramesPerSecond)
 
 extern NSTimeInterval PGUptime(void);
 extern CGFloat PGLagCounteractionSpeedup(NSTimeInterval *timeOfFrame, CGFloat desiredFramerate); // On input, timeOfFrame should be the PGUptime() from the last frame or 0. On return, it is the current PGUptime().

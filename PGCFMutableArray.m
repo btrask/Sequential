@@ -35,7 +35,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 
 @implementation PGCFMutableArray
 
-#pragma mark PGExtendedMutableArray Protocol
+#pragma mark -NSMutableArray(PGExtendedMutableArray)
 
 - (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
 {
@@ -45,7 +45,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 	return self;
 }
 
-#pragma mark NSExtendedMutableArray Protocol
+#pragma mark -NSMutableArray(NSExtendedMutableArray)
 
 - (void)removeAllObjects
 {
@@ -55,8 +55,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	CFArrayAppendArray(_array, (CFArrayRef)otherArray, CFRangeMake(0, CFArrayGetCount((CFArrayRef)otherArray)));
 }
-- (void)removeObject:(id)anObject
-        inRange:(NSRange)range
+- (void)removeObject:(id)anObject inRange:(NSRange)range
 {
 	CFIndex const start = PGUnsignedToCFIndex(range.location);
 	CFIndex i = PGUnsignedToCFIndex(NSMaxRange(range));
@@ -76,7 +75,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 	return [self removeObjectIdenticalTo:anObject inRange:NSMakeRange(0, [self count])];
 }
 
-#pragma mark NSExtendedArray Protocol
+#pragma mark -NSArray(NSExtendedArray)
 
 - (BOOL)containsObject:(id)anObject
 {
@@ -101,7 +100,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 	return [self indexOfObject:anObject inRange:range];
 }
 
-#pragma mark NSMutableArray
+#pragma mark -NSMutableArray
 
 - (void)addObject:(id)anObject
 {
@@ -127,7 +126,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 	CFArraySetValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
 }
 
-#pragma mark NSArray
+#pragma mark -NSArray
 
 - (NSUInteger)count
 {
@@ -138,7 +137,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 	return (id)CFArrayGetValueAtIndex(_array, PGUnsignedToCFIndex(index));
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (id)init
 {
@@ -152,7 +151,7 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 
 @end
 
-@implementation NSMutableArray (PGExtendedMutableArray)
+@implementation NSMutableArray(PGExtendedMutableArray)
 
 - (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
 {

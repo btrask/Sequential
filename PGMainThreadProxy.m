@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGMainThreadProxy
 
-#pragma mark Instance Methods
+#pragma mark -PGMainThreadProxy
 
 - (id)initWithTarget:(id)anObject
 {
@@ -34,7 +34,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return self;
 }
 
-#pragma mark NSProxy
+#pragma mark -NSProxy
+
+- (void)dealloc
+{
+	[_target performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO]; // Just because -[NSObject release] is threadsafe doesn't mean -[MyFunkyClass dealloc] is.
+	[super dealloc];
+}
+
+#pragma mark -
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
 {
@@ -44,14 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[invocation setTarget:_target];
 	[invocation performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
-}
-
-#pragma mark NSProxy
-
-- (void)dealloc
-{
-	[_target performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO]; // Just because -[NSObject release] is threadsafe doesn't mean -[MyFunkyClass dealloc] is.
-	[super dealloc];
 }
 
 @end

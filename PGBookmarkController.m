@@ -89,6 +89,18 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 #pragma mark -
 
+- (BOOL)deletesBookmarks
+{
+	return _deletesBookmarks;
+}
+- (void)setDeletesBookmarks:(BOOL)flag
+{
+	_deletesBookmarks = flag;
+	[bookmarkItem setTitle:NSLocalizedString(flag ? @"Delete" : @"Resume", @"The title of the bookmarks menu. Two states.")];
+}
+
+#pragma mark -
+
 - (void)addBookmark:(PGBookmark *)aBookmark
 {
 	NSUInteger i;
@@ -117,25 +129,10 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[aBookmark AE_addObserver:self selector:@selector(bookmarkDidUpdate:) name:PGBookmarkDidUpdateNotification];
 	[self _updateMenuItemForBookmark:aBookmark];
 }
-
-#pragma mark -
-
 - (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident
 {
 	for(PGBookmark *const bookmark in _bookmarks) if([ident isEqual:[bookmark documentIdentifier]]) return bookmark;
 	return nil;
-}
-
-#pragma mark -
-
-- (BOOL)deletesBookmarks
-{
-	return _deletesBookmarks;
-}
-- (void)setDeletesBookmarks:(BOOL)flag
-{
-	_deletesBookmarks = flag;
-	[bookmarkItem setTitle:NSLocalizedString(flag ? @"Delete" : @"Resume", @"The title of the bookmarks menu. Two states.")];
 }
 
 #pragma mark -

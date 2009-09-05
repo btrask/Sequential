@@ -46,8 +46,7 @@ extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
 - (IBAction)showPrefsHelp:(id)sender;
 - (IBAction)changePane:(NSToolbarItem *)sender; // Gets the pane name from [sender itemIdentifier].
 
-- (NSColor *)backgroundPatternColor;
-- (NSScreen *)displayScreen;
-- (void)setDisplayScreen:(NSScreen *)aScreen;
+@property(readonly) NSColor *backgroundPatternColor;
+@property(retain) NSScreen *displayScreen;
 
 @end

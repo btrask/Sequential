@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGExifPanelController
 
-#pragma mark Instance Methods
+#pragma mark -PGExifPanelController
 
 - (IBAction)changeSearch:(id)sender
 {
@@ -72,7 +72,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self changeSearch:nil];
 }
 
-#pragma mark NSMenuValidation Protocol
+#pragma mark -PGFloatingPanelController
+
+- (NSString *)nibName
+{
+	return @"PGExif";
+}
+- (BOOL)setDisplayController:(PGDisplayController *)controller
+{
+	PGDisplayController *const oldController = [self displayController];
+	if(![super setDisplayController:controller]) return NO;
+	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
+	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
+	[self displayControllerActiveNodeWasRead:nil];
+	return YES;
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[entriesTable setDelegate:nil];
+	[entriesTable setDataSource:nil];
+	[_allEntries release];
+	[_matchingEntries release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSMenuValidation)
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
@@ -81,20 +108,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return [super validateMenuItem:anItem];
 }
 
-#pragma mark NSTableViewDelegate Protocol
-
-- (void)tableView:(NSTableView *)tableView
-		willDisplayCell:(id)cell
-        forTableColumn:(NSTableColumn *)tableColumn
-        row:(NSInteger)row
-{
-	if(tableColumn == tagColumn) {
-		[cell setAlignment:NSRightTextAlignment];
-		[cell setFont:[[NSFontManager sharedFontManager] convertFont:[cell font] toHaveTrait:NSBoldFontMask]];
-	}
-}
-
-#pragma mark NSTableDataSource Protocol
+#pragma mark -<NSTableDataSource>
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
@@ -113,31 +127,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return nil;
 }
 
-#pragma mark PGFloatingPanelController
+#pragma mark -<NSTableViewDelegate>
 
-- (BOOL)setDisplayController:(PGDisplayController *)controller
+- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	PGDisplayController *const oldController = [self displayController];
-	if(![super setDisplayController:controller]) return NO;
-	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
-	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
-	[self displayControllerActiveNodeWasRead:nil];
-	return YES;
-}
-- (NSString *)nibName
-{
-	return @"PGExif";
-}
-
-#pragma mark NSObject
-
-- (void)dealloc
-{
-	[entriesTable setDelegate:nil];
-	[entriesTable setDataSource:nil];
-	[_allEntries release];
-	[_matchingEntries release];
-	[super dealloc];
+	if(tableColumn == tagColumn) {
+		[cell setAlignment:NSRightTextAlignment];
+		[cell setFont:[[NSFontManager sharedFontManager] convertFont:[cell font] toHaveTrait:NSBoldFontMask]];
+	}
 }
 
 @end
