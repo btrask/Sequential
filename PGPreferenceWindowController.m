@@ -110,22 +110,36 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 }
 - (void)_setCurrentPane:(NSString *)identifier
 {
-	NSView *view = nil;
-	if([PGGeneralPaneIdentifier isEqualToString:identifier]) view = generalView;
-	else if([PGNavigationPaneIdentifier isEqualToString:identifier]) view = navigationView;
-	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) view = updateView;
-	NSAssert(view, @"Invalid identifier.");
+	NSView *newView = nil;
+	if([PGGeneralPaneIdentifier isEqualToString:identifier]) newView = generalView;
+	else if([PGNavigationPaneIdentifier isEqualToString:identifier]) newView = navigationView;
+	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) newView = updateView;
+	NSAssert(newView, @"Invalid identifier.");
 	NSWindow *const w = [self window];
 	[w setTitle:NSLocalizedString(@"Preferences", nil)];
 	[[w toolbar] setSelectedItemIdentifier:identifier];
-	if([w contentView] != view) {
-		[w setContentView:[[[NSView alloc] initWithFrame:NSZeroRect] autorelease]];
+	NSView *const container = [w contentView];
+	NSView *const oldView = [[container subviews] lastObject];
+	if(oldView != newView) {
+		if(oldView) {
+			[oldView removeFromSuperview]; // We don't let oldView fade out because CoreAnimation insists on pinning it to the bottom of the resizing window (regardless of its autoresizing mask), which looks awful.
+			[container display]; // Even if oldView is removed, if we don't force it to redisplay, it still shows up during the transition.
+		}
+
+		[NSAnimationContext beginGrouping];
+		if([[NSApp currentEvent] modifierFlags] & NSShiftKeyMask) [[NSAnimationContext currentContext] setDuration:1.0f];
+
+		NSRect const b = [container bounds];
+		[newView setFrameOrigin:NSMakePoint(NSMinX(b), NSHeight(b) - NSHeight([newView frame]))];
+		[oldView ? [container animator] : container addSubview:newView];
+
 		NSRect r = [w contentRectForFrameRect:[w frame]];
-		CGFloat const h = NSHeight([view frame]);
+		CGFloat const h = NSHeight([newView frame]);
 		r.origin.y += NSHeight(r) - h;
 		r.size.height = h;
-		[w setFrame:[w frameRectForContentRect:r] display:YES animate:YES];
-		[w setContentView:view];
+		[oldView ? [w animator] : w setFrame:[w frameRectForContentRect:r] display:YES];
+
+		[NSAnimationContext endGrouping];
 	}
 }
 - (void)_updateSecondaryMouseActionLabel
