@@ -79,7 +79,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[panel orderOut:self];
 	[_openPanel AE_removeObserver:self name:NSWindowDidEndSheetNotification];
-	[_openPanel setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
+	[_openPanel setDelegate:nil];
 	[self release];
 }
 
@@ -101,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[[NSProcessInfo processInfo] enableSuddenTermination];
 	[nodesOutline setDataSource:nil];
-	[nodesOutline setDelegate:nil]; // This object should have a shorter lifespan than us, but for some reason it keeps sending us crap long after we've died unless we do this.
+	[nodesOutline setDelegate:nil];
 	[_rootNode release];
 	[_initialSelection release];
 	[_saveNamesByNodePointer release];
