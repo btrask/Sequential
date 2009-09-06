@@ -22,7 +22,7 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGPrefController.h"
+#import "PGPreferenceWindowController.h"
 
 // Controllers
 #import "PGDocumentController.h"
@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSScreenAdditions.h"
 #import "NSUserDefaultsAdditions.h"
 
-NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification = @"PGPrefControllerBackgroundPatternColorDidChange";
-NSString *const PGPrefControllerDisplayScreenDidChangeNotification          = @"PGPrefControllerDisplayScreenDidChange";
+NSString *const PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification = @"PGPreferenceWindowControllerBackgroundPatternColorDidChange";
+NSString *const PGPreferenceWindowControllerDisplayScreenDidChangeNotification          = @"PGPreferenceWindowControllerDisplayScreenDidChange";
 
 static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
@@ -42,9 +42,9 @@ static NSString *const PGGeneralPaneIdentifier = @"PGGeneralPane";
 static NSString *const PGNavigationPaneIdentifier = @"PGNavigationPaneIdentifier";
 static NSString *const PGUpdatePaneIdentifier = @"PGUpdatePane";
 
-static PGPrefController *PGSharedPrefController = nil;
+static PGPreferenceWindowController *PGSharedPrefController = nil;
 
-@interface PGPrefController(Private)
+@interface PGPreferenceWindowController(Private)
 
 - (NSString *)_titleForPane:(NSString *)identifier;
 - (void)_setCurrentPane:(NSString *)identifier;
@@ -52,16 +52,16 @@ static PGPrefController *PGSharedPrefController = nil;
 
 @end
 
-@implementation PGPrefController
+@implementation PGPreferenceWindowController
 
-#pragma mark +PGPrefController
+#pragma mark +PGPreferenceWindowController
 
 + (id)sharedPrefController
 {
 	return PGSharedPrefController ? PGSharedPrefController : [[[self alloc] init] autorelease];
 }
 
-#pragma mark -PGPrefController
+#pragma mark -PGPreferenceWindowController
 
 - (IBAction)changeDisplayScreen:(id)sender
 {
@@ -92,10 +92,10 @@ static PGPrefController *PGSharedPrefController = nil;
 	[_displayScreen autorelease];
 	_displayScreen = [aScreen retain];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
-	[self AE_postNotificationName:PGPrefControllerDisplayScreenDidChangeNotification];
+	[self AE_postNotificationName:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
 }
 
-#pragma mark -PGPrefController(Private)
+#pragma mark -PGPreferenceWindowController(Private)
 
 - (NSString *)_titleForPane:(NSString *)identifier
 {
@@ -146,7 +146,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	[super windowDidLoad];
 	NSWindow *const w = [self window];
 
-	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGPrefControllerToolbar"] autorelease];
+	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGPreferenceWindowControllerToolbar"] autorelease];
 	[toolbar setDelegate:self];
 	[w setToolbar:toolbar];
 
@@ -160,7 +160,7 @@ static PGPrefController *PGSharedPrefController = nil;
 
 - (id)init
 {
-	if((self = [super initWithWindowNibName:@"PGPreferences"])) {
+	if((self = [super initWithWindowNibName:@"PGPreference"])) {
 		if(PGSharedPrefController) {
 			[self release];
 			return [PGSharedPrefController retain];
@@ -192,7 +192,7 @@ static PGPrefController *PGSharedPrefController = nil;
 {
 	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
-	else [self AE_postNotificationName:PGPrefControllerBackgroundPatternColorDidChangeNotification];
+	else [self AE_postNotificationName:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 }
 
 #pragma mark -<NSApplicationDelegate>
@@ -210,7 +210,7 @@ static PGPrefController *PGSharedPrefController = nil;
 	if(NSNotFound == i) {
 		i = [screens indexOfObject:currentScreen];
 		[self setDisplayScreen:[screens objectAtIndex:NSNotFound == i ? 0 : i]];
-	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPrefControllerDisplayScreenDidChangeNotification.
+	} else [self setDisplayScreen:[self displayScreen]]; // Post PGPreferenceWindowControllerDisplayScreenDidChangeNotification.
 
 	NSMenu *const screensMenu = [screensPopUp menu];
 	for(i = 0; i < [screens count]; i++) {

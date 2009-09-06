@@ -24,10 +24,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
 
-extern NSString *const PGPrefControllerBackgroundPatternColorDidChangeNotification;
-extern NSString *const PGPrefControllerDisplayScreenDidChangeNotification;
+extern NSString *const PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification;
+extern NSString *const PGPreferenceWindowControllerDisplayScreenDidChangeNotification;
 
-@interface PGPrefController : NSWindowController <NSApplicationDelegate, NSToolbarDelegate>
+@interface PGPreferenceWindowController : NSWindowController <NSApplicationDelegate, NSToolbarDelegate>
 {
 	@private
 	IBOutlet NSView *generalView;

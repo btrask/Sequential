@@ -87,7 +87,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 
 - (id)init
 {
-	if((self = [super initWithWindowNibName:@"PGAboutBox"])) {
+	if((self = [super initWithWindowNibName:@"PGAbout"])) {
 		if(PGSharedAboutBoxController) {
 			[self release];
 			return [PGSharedAboutBoxController retain];

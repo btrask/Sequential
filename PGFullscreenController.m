@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Controllers
 #import "PGDocumentController.h"
-#import "PGPrefController.h"
+#import "PGPreferenceWindowController.h"
 
 // Other
 #import "PGDelayedPerforming.h"
@@ -69,7 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)displayScreenDidChange:(NSNotification *)aNotif
 {
-	NSScreen *const screen = [[PGPrefController sharedPrefController] displayScreen];
+	NSScreen *const screen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 	[(PGFullscreenWindow *)[self window] moveToScreen:screen];
 	if(![[self window] isKeyWindow]) return;
 	if([NSScreen AE_mainScreen] == screen) [self _hideMenuBar];
@@ -108,7 +108,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowDidLoad
 {
-	NSWindow *const window = [[[PGFullscreenWindow alloc] initWithScreen:[[PGPrefController sharedPrefController] displayScreen]] autorelease];
+	NSWindow *const window = [[[PGFullscreenWindow alloc] initWithScreen:[[PGPreferenceWindowController sharedPrefController] displayScreen]] autorelease];
 	NSView *const content = [[[[self window] contentView] retain] autorelease];
 	[[self window] setContentView:nil];
 	[window setContentView:content];
@@ -129,7 +129,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)init
 {
 	if((self = [super init])) {
-		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(displayScreenDidChange:) name:PGPrefControllerDisplayScreenDidChangeNotification];
+		[[PGPreferenceWindowController sharedPrefController] AE_addObserver:self selector:@selector(displayScreenDidChange:) name:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
 	}
 	return self;
 }
@@ -157,7 +157,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)windowDidBecomeKey:(NSNotification *)aNotif
 {
 	BOOL const dim = [[NSUserDefaults standardUserDefaults] boolForKey:PGDimOtherScreensKey]; // We shouldn't need to observe this value because our fullscreen window isn't going to be key while the user is adjusting the setting in the prefs window.
-	NSScreen *const displayScreen = [[PGPrefController sharedPrefController] displayScreen];
+	NSScreen *const displayScreen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 
 	if(dim || [NSScreen AE_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 
@@ -178,7 +178,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
-	if([[NSApp keyWindow] delegate] == self || [[PGPrefController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
+	if([[NSApp keyWindow] delegate] == self || [[PGPreferenceWindowController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
 	SetSystemUIMode(kUIModeNormal, kNilOptions);
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];

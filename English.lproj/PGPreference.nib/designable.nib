@@ -11,10 +11,10 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="1"/>
-			<integer value="374"/>
-			<integer value="570"/>
 			<integer value="563"/>
+			<integer value="374"/>
+			<integer value="1"/>
+			<integer value="570"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -22,7 +22,7 @@
 		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="123624392">
 			<object class="NSCustomObject" id="955696540">
-				<string key="NSClassName">PGPrefController</string>
+				<string key="NSClassName">PGPreferenceWindowController</string>
 			</object>
 			<object class="NSCustomObject" id="232123450">
 				<string key="NSClassName">FirstResponder</string>
@@ -210,7 +210,7 @@
 								<reference key="NSControlView" ref="510431974"/>
 								<int key="NSTag">1</int>
 								<int key="NSButtonFlags">1211912703</int>
-								<int key="NSButtonFlags2">128</int>
+								<int key="NSButtonFlags2">0</int>
 								<object class="NSButtonImageSource" key="NSAlternateImage" id="467065594">
 									<string key="NSImageName">NSRadioButton</string>
 								</object>
@@ -226,7 +226,7 @@
 								<reference key="NSSupport" ref="78993709"/>
 								<reference key="NSControlView" ref="510431974"/>
 								<int key="NSButtonFlags">1211912703</int>
-								<int key="NSButtonFlags2">128</int>
+								<int key="NSButtonFlags2">0</int>
 								<object class="NSImage" key="NSNormalImage">
 									<int key="NSImageFlags">549453824</int>
 									<string key="NSSize">{18, 18}</string>
@@ -333,7 +333,7 @@ QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
 								<reference key="NSControlView" ref="510431974"/>
 								<int key="NSTag">2</int>
 								<int key="NSButtonFlags">1211912703</int>
-								<int key="NSButtonFlags2">128</int>
+								<int key="NSButtonFlags2">0</int>
 								<object class="NSImage" key="NSNormalImage">
 									<int key="NSImageFlags">549453824</int>
 									<string key="NSSize">{18, 18}</string>
@@ -402,7 +402,7 @@ VEXD1pIAAAAAAAAAAAAAAAAAAAAAAHRleHQAAAAAQ29weXJpZ2h0IEFwcGxlLCBJbmMuLCAyMDA5AA</
 							<string key="NSContents">Radio</string>
 							<reference key="NSSupport" ref="78993709"/>
 							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">128</int>
+							<int key="NSButtonFlags2">0</int>
 							<object class="NSImage" key="NSNormalImage">
 								<int key="NSImageFlags">549453824</int>
 								<string key="NSSize">{18, 18}</string>
@@ -901,7 +901,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference key="NSSupport" ref="78993709"/>
 							<reference key="NSControlView" ref="760957841"/>
 							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">130</int>
+							<int key="NSButtonFlags2">2</int>
 							<reference key="NSNormalImage" ref="809178215"/>
 							<reference key="NSAlternateImage" ref="29139912"/>
 							<string key="NSAlternateContents"/>
@@ -942,7 +942,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<reference key="NSSupport" ref="78993709"/>
 								<reference key="NSControlView" ref="451960719"/>
 								<int key="NSButtonFlags">1211912703</int>
-								<int key="NSButtonFlags2">128</int>
+								<int key="NSButtonFlags2">0</int>
 								<reference key="NSAlternateImage" ref="467065594"/>
 								<string key="NSAlternateContents"/>
 								<string key="NSKeyEquivalent"/>
@@ -957,7 +957,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 								<reference key="NSControlView" ref="451960719"/>
 								<int key="NSTag">1</int>
 								<int key="NSButtonFlags">1211912703</int>
-								<int key="NSButtonFlags2">128</int>
+								<int key="NSButtonFlags2">0</int>
 								<object class="NSImage" key="NSNormalImage">
 									<int key="NSImageFlags">549453824</int>
 									<string key="NSSize">{18, 18}</string>
@@ -1064,7 +1064,7 @@ QXBwbGUgQ29tcHV0ZXIsIEluYy4sIDIwMDUAAAAAA</bytes>
 							<string key="NSContents">Radio</string>
 							<reference key="NSSupport" ref="78993709"/>
 							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">128</int>
+							<int key="NSButtonFlags2">0</int>
 							<object class="NSImage" key="NSNormalImage">
 								<int key="NSImageFlags">549453824</int>
 								<string key="NSSize">{18, 18}</string>
@@ -1173,7 +1173,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference key="NSSupport" ref="78993709"/>
 							<reference key="NSControlView" ref="689027429"/>
 							<int key="NSButtonFlags">1211912703</int>
-							<int key="NSButtonFlags2">130</int>
+							<int key="NSButtonFlags2">2</int>
 							<reference key="NSNormalImage" ref="809178215"/>
 							<reference key="NSAlternateImage" ref="29139912"/>
 							<string key="NSAlternateContents"/>
@@ -2017,7 +2017,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<boolean value="YES" key="430.ImportedFromIB2"/>
 				<string key="44.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="44.ImportedFromIB2"/>
-				<string key="563.IBEditorWindowLastContentRect">{{108, 875}, {540, 201}}</string>
+				<string key="563.IBEditorWindowLastContentRect">{{691, 710}, {540, 201}}</string>
 				<string key="563.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="563.ImportedFromIB2"/>
 				<string key="564.CustomClassName">PGColorWell</string>
@@ -2027,7 +2027,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<boolean value="YES" key="565.ImportedFromIB2"/>
 				<string key="566.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="566.ImportedFromIB2"/>
-				<string key="570.IBEditorWindowLastContentRect">{{87, 979}, {540, 120}}</string>
+				<string key="570.IBEditorWindowLastContentRect">{{711, 1002}, {540, 120}}</string>
 				<string key="570.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="570.ImportedFromIB2"/>
 				<string key="571.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2054,6 +2054,31 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 				<boolean value="YES" key="718.ImportedFromIB2"/>
 				<string key="720.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="720.ImportedFromIB2"/>
+				<string key="797.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="798.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="799.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="800.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="801.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="802.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="803.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="804.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="805.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="806.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="807.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="811.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="812.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="813.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="815.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="816.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="817.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="818.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="819.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="820.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="821.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="822.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="823.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="824.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="825.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
@@ -2267,7 +2292,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">PGPrefController</string>
+					<string key="className">PGPreferenceWindowController</string>
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="changeDisplayScreen:">id</string>
@@ -2283,19 +2308,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">PGPrefController.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">PGPrefController</string>
-					<string key="superclassName">NSWindowController</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">setDisplayScreen:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
+						<string key="minorKey">PGPreferenceWindowController.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">

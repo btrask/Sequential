@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Controllers
 #import "PGDocumentController.h"
-#import "PGPrefController.h"
+#import "PGPreferenceWindowController.h"
 #import "PGBookmarkController.h"
 #import "PGThumbnailController.h"
 #import "PGImageSaveAlert.h"
@@ -765,7 +765,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)prefControllerBackgroundPatternColorDidChange:(NSNotification *)aNotif;
 {
-	[clipView setBackgroundColor:[[PGPrefController sharedPrefController] backgroundPatternColor]];
+	[clipView setBackgroundColor:[[PGPreferenceWindowController sharedPrefController] backgroundPatternColor]];
 }
 
 #pragma mark -PGDisplayController(Private)
@@ -964,7 +964,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (id)init
 {
-	if((self = [super initWithWindowNibName:@"PGWindow"])) {
+	if((self = [super initWithWindowNibName:@"PGDocument"])) {
 		(void)[self window]; // Just load the window so we don't have to worry about it.
 
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
@@ -973,7 +973,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 		_allowZoomAnimation = YES;
 
-		[[PGPrefController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPrefControllerBackgroundPatternColorDidChangeNotification];
+		[[PGPreferenceWindowController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 	}
 	return self;
 }
