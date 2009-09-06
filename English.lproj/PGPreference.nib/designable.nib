@@ -12,9 +12,9 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="570"/>
-			<integer value="563"/>
 			<integer value="374"/>
 			<integer value="1"/>
+			<integer value="563"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -60,7 +60,7 @@
 					<object class="NSSlider" id="139377027">
 						<reference key="NSNextResponder" ref="50431150"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{236, 37}, {250, 25}}</string>
+						<string key="NSFrame">{{236, 37}, {200, 25}}</string>
 						<reference key="NSSuperview" ref="50431150"/>
 						<int key="NSViewLayerContentsRedrawPolicy">2</int>
 						<bool key="NSEnabled">YES</bool>
@@ -145,7 +145,7 @@
 					<object class="NSTextField" id="938825232">
 						<reference key="NSNextResponder" ref="50431150"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{471, 20}, {13, 14}}</string>
+						<string key="NSFrame">{{421, 20}, {13, 14}}</string>
 						<reference key="NSSuperview" ref="50431150"/>
 						<int key="NSViewLayerContentsRedrawPolicy">2</int>
 						<bool key="NSEnabled">YES</bool>
@@ -1545,7 +1545,6 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 						<array class="NSMutableArray" key="children">
 							<reference ref="139377027"/>
 							<reference ref="507716454"/>
-							<reference ref="938825232"/>
 							<reference ref="328663345"/>
 							<reference ref="287091653"/>
 							<reference ref="510431974"/>
@@ -1554,6 +1553,7 @@ AAMAAAABAAEAAAFTAAMAAAAEAAAFwgAAAAAACAAIAAgACAABAAEAAQABA</bytes>
 							<reference ref="716526327"/>
 							<reference ref="1017489899"/>
 							<reference ref="100456921"/>
+							<reference ref="938825232"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Navigation</string>
