@@ -71,6 +71,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	WebPreferences *const prefs = [WebPreferences standardPreferences];
 	[prefs setJavaEnabled:NO];
 	[prefs setPlugInsEnabled:NO];
+	[prefs setJavaScriptEnabled:NO];
 	[prefs setJavaScriptCanOpenWindowsAutomatically:NO];
 	[prefs setLoadsImagesAutomatically:NO];
 	[_webView setPreferences:prefs];
