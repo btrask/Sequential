@@ -442,7 +442,7 @@ static NSSize PGRoundedCornerSizes[4];
 	NSRect const *rects = NULL;
 	if(!deg) [self getRectsBeingDrawn:&rects count:&count];
 	BOOL const drawCorners = [self _needsToDrawRoundedCornersForImageRect:b rects:rects count:count];
-	if(drawCorners) CGContextBeginTransparencyLayerWithRect([[NSGraphicsContext currentContext] graphicsPort], NSRectToCGRect(aRect), NULL);
+	if(drawCorners) CGContextBeginTransparencyLayerWithRect([[NSGraphicsContext currentContext] graphicsPort], NSRectToCGRect(NSIntersectionRect(aRect, b)), NULL);
 	if(_isPDF && !_cached) {
 		[[NSColor whiteColor] set];
 		if(rects) NSRectFillList(rects, count);
