@@ -106,8 +106,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSMakeRect(
 			NSMinX(aRect) + scaledMarginSize,
 			NSMinY(aRect) + scaledMarginSize,
-			ceil((messageSize.width + PGTextTotalHorzPadding + (self.displaysProgressIndicator ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
-			ceil(MAX(messageSize.height + PGTextTotalVertPadding, (self.displaysProgressIndicator ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
+			ceilf((messageSize.width + PGTextTotalHorzPadding + (self.displaysProgressIndicator ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
+			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, (self.displaysProgressIndicator ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
 		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
 	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
 	if(self.originCorner == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);

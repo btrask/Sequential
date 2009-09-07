@@ -67,3 +67,11 @@ typedef struct {
 	CGFloat maxX;
 	CGFloat maxY;
 } PGInset;
+
+enum {
+	PGMinXMinYCorner = 0,
+	PGMaxXMinYCorner = 1,
+	PGMinXMaxYCorner = 2,
+	PGMaxXMaxYCorner = 3
+};
+typedef NSUInteger PGRectCorner;

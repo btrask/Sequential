@@ -40,16 +40,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGMaxWindowSize      5000.0f // 10,000 is a hard limit imposed by the window server.
 #define PGDebugDrawingModes  false
 
+static NSImage *PGRoundedCornerImages[4];
+static NSSize PGRoundedCornerSizes[4];
+
 @interface PGImageView(Private)
 
-@property(readonly) BOOL _usesRoundedCorners;
 @property(readonly) BOOL _imageIsOpaque;
+
+@property(readonly) BOOL _usesRoundedCorners;
+- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count;
+- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r;
+- (void)_drawCornersOnRect:(NSRect)r;
 
 - (void)_runAnimationTimer;
 - (void)_animate;
 - (void)_cache;
 - (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count;
-- (void)_drawCornersOnRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val;
 - (BOOL)_setSize:(NSSize)size;
 - (void)_sizeTransitionOneFrame;
@@ -74,6 +80,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self exposeBinding:@"animates"];
 	[self exposeBinding:@"antialiasWhenUpscaling"];
 	[self exposeBinding:@"usesRoundedCorners"];
+
+	PGRoundedCornerImages[PGMinXMinYCorner] = [[NSImage imageNamed:@"Corner-Bottom-Left"] retain];
+	PGRoundedCornerImages[PGMaxXMinYCorner] = [[NSImage imageNamed:@"Corner-Bottom-Right"] retain];
+	PGRoundedCornerImages[PGMinXMaxYCorner] = [[NSImage imageNamed:@"Corner-Top-Left"] retain];
+	PGRoundedCornerImages[PGMaxXMaxYCorner] = [[NSImage imageNamed:@"Corner-Top-Right"] retain];
+	PGRoundedCornerSizes[PGMinXMinYCorner] = [PGRoundedCornerImages[PGMinXMinYCorner] size];
+	PGRoundedCornerSizes[PGMaxXMinYCorner] = [PGRoundedCornerImages[PGMaxXMinYCorner] size];
+	PGRoundedCornerSizes[PGMinXMaxYCorner] = [PGRoundedCornerImages[PGMinXMaxYCorner] size];
+	PGRoundedCornerSizes[PGMaxXMaxYCorner] = [PGRoundedCornerImages[PGMaxXMaxYCorner] size];
 }
 
 #pragma mark -PGImageView
@@ -243,15 +258,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGImageView(Private)
 
+- (BOOL)_imageIsOpaque
+{
+	return (_isPDF && _cached) || [_rep isOpaque];
+}
+
+#pragma mark -
+
 - (BOOL)_usesRoundedCorners
 {
 	if(!_usesRoundedCorners) return NO;
 	NSSize const s = _immediateSize;
 	return s.width >= 16 && s.height >= 16;
 }
-- (BOOL)_imageIsOpaque
+- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count
 {
-	return (_isPDF && _cached) || [_rep isOpaque];
+	if(_cached || !self._usesRoundedCorners) return NO;
+	if(!rects) return YES;
+	NSRect corners[4];
+	[self _getRoundedCornerRects:corners forRect:r];
+	NSUInteger i, j;
+	for(i = 0; i < count; i++) for(j = 0; j < 4; j++) if(NSIntersectsRect(rects[i], corners[j])) return YES;
+	return NO;
+}
+- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r
+{
+	NSParameterAssert(rects);
+	rects[PGMinXMinYCorner] = NSMakeRect(NSMinX(r), NSMinY(r), PGRoundedCornerSizes[PGMinXMinYCorner].width, PGRoundedCornerSizes[PGMinXMinYCorner].height);
+	rects[PGMaxXMinYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMinYCorner].width, NSMinY(r), PGRoundedCornerSizes[PGMaxXMinYCorner].width, PGRoundedCornerSizes[PGMaxXMinYCorner].height);
+	rects[PGMinXMaxYCorner] = NSMakeRect(NSMinX(r), NSMaxY(r) - PGRoundedCornerSizes[PGMinXMaxYCorner].height, PGRoundedCornerSizes[PGMinXMaxYCorner].width, PGRoundedCornerSizes[PGMinXMaxYCorner].height);
+	rects[PGMaxXMaxYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].width, NSMaxY(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].height, PGRoundedCornerSizes[PGMaxXMaxYCorner].width, PGRoundedCornerSizes[PGMaxXMaxYCorner].height);
+}
+- (void)_drawCornersOnRect:(NSRect)r
+{
+	NSUInteger i;
+	NSRect corners[4];
+	[self _getRoundedCornerRects:corners forRect:r];
+	for(i = 0; i < 4; i++) [PGRoundedCornerImages[i] drawAtPoint:corners[i].origin fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
 }
 
 #pragma mark -
@@ -329,18 +372,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[transform concat];
 	} else [NSGraphicsContext restoreGraphicsState];
 }
-- (void)_drawCornersOnRect:(NSRect)r
-{
-	static NSImage *tl = nil, *tr = nil, *br = nil, *bl = nil;
-	if(!tl) tl = [[NSImage imageNamed:@"Corner-Top-Left"] retain];
-	if(!tr) tr = [[NSImage imageNamed:@"Corner-Top-Right"] retain];
-	if(!br) br = [[NSImage imageNamed:@"Corner-Bottom-Right"] retain];
-	if(!bl) bl = [[NSImage imageNamed:@"Corner-Bottom-Left"] retain];
-	[tl drawAtPoint:NSMakePoint(NSMinX(r), NSMaxY(r) - [tl size].height) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
-	[tr drawAtPoint:NSMakePoint(NSMaxX(r) - [tr size].width, NSMaxY(r) - [tr size].height) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
-	[br drawAtPoint:NSMakePoint(NSMaxX(r) - [br size].width, NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
-	[bl drawAtPoint:NSMakePoint(NSMinX(r), NSMinY(r)) fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
-}
 - (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val
 {
 	NSRect const b = [self bounds];
@@ -407,14 +438,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
-	BOOL const drawCorners = !_cached && self._usesRoundedCorners;
-	if(drawCorners) CGContextBeginTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort], NULL);
 	NSInteger count = 0;
 	NSRect const *rects = NULL;
 	if(!deg) [self getRectsBeingDrawn:&rects count:&count];
+	BOOL const drawCorners = [self _needsToDrawRoundedCornersForImageRect:b rects:rects count:count];
+	if(drawCorners) CGContextBeginTransparencyLayerWithRect([[NSGraphicsContext currentContext] graphicsPort], NSRectToCGRect(aRect), NULL);
 	if(_isPDF && !_cached) {
 		[[NSColor whiteColor] set];
-		if(count) NSRectFillList(rects, count);
+		if(rects) NSRectFillList(rects, count);
 		else NSRectFill(b);
 	}
 	[self _drawWithFrame:b operation:[self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver rects:rects count:count];

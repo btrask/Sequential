@@ -710,7 +710,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if(![self activeDocument]) return;
 	BOOL const ltr = [[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight;
-	PGInfoCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
+	PGRectCorner const corner = ltr ? PGMinXMinYCorner : PGMaxXMinYCorner;
 	PGInset inset = PGZeroInset;
 	switch(corner) {
 		case PGMinXMinYCorner: inset.minY = [self findPanelShown] ? NSHeight([_findPanel frame]) : 0.0f; break;

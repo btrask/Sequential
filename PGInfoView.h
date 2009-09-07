@@ -23,12 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Cocoa/Cocoa.h>
-
-enum {
-	PGMinXMinYCorner = 0,
-	PGMaxXMinYCorner = 1
-};
-typedef NSInteger PGInfoCorner;
+#import "PGGeometryTypes.h"
 
 @interface PGInfoView : NSView
 {
@@ -36,7 +31,7 @@ typedef NSInteger PGInfoCorner;
 	NSString *_stringValue;
 	NSUInteger _index;
 	NSUInteger _count;
-	PGInfoCorner _originCorner;
+	PGRectCorner _originCorner;
 }
 
 @property(readonly) NSAttributedString *attributedStringValue;
@@ -44,6 +39,6 @@ typedef NSInteger PGInfoCorner;
 @property(assign) NSUInteger index;
 @property(assign) NSUInteger count;
 @property(readonly) BOOL displaysProgressIndicator;
-@property(assign) PGInfoCorner originCorner;
+@property(assign) PGRectCorner originCorner;
 
 @end
