@@ -308,7 +308,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (NSUInteger)maximumRecentDocumentCount
 {
-	return 10;
+	return [[[[NSDocumentController alloc] init] autorelease] maximumRecentDocumentCount]; // This is ugly but we don't want to use NSDocumentController.
 }
 - (PGDisplayController *)displayControllerForNewDocument
 {
