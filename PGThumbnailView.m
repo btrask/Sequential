@@ -193,7 +193,7 @@ static void PGDrawGradient(void)
 	[shadow setShadowBlurRadius:4.0f];
 	[shadow set];
 	CGContextRef const imageContext = [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextBeginTransparencyLayer(imageContext, NULL);
+	CGContextBeginTransparencyLayerWithRect(imageContext, CGRectMake(0, 0, PGOuterTotalWidth, PGBackgroundHeight), NULL);
 	NSRect const r = NSMakeRect(0.0f, 0.0f, PGInnerTotalWidth, PGBackgroundHeight);
 	if(PGThumbnailGlossStyleEnabled) {
 		[[NSColor blackColor] set];
@@ -296,14 +296,15 @@ static void PGDrawGradient(void)
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
 
+		NSRect transformedThumbnailRect = thumbnailRect;
+		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
+
 		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
 		BOOL const entirelyHighlighted = NSEqualRects(highlight, NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f));
 		if(!entirelyHighlighted) {
-			CGContextBeginTransparencyLayer(context, NULL);
+			CGContextBeginTransparencyLayerWithRect(context, NSRectToCGRect(transformedThumbnailRect), NULL);
 			[nilShadow set];
 		}
-		NSRect transformedThumbnailRect = thumbnailRect;
-		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
 		[transform concat];
 		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.33f];
 		[transform invert];
@@ -362,8 +363,7 @@ static void PGDrawGradient(void)
 		} else if(labelColor) {
 			NSRect const labelRect = NSMakeRect(NSMaxX(frame) - 16.0f, round(MAX(NSMaxY(thumbnailRect) - 16.0f, NSMidY(thumbnailRect) - 6.0f)), 12.0f, 12.0f);
 			[NSGraphicsContext saveGraphicsState];
-			NSRectClip(NSInsetRect(labelRect, -5.0f, -5.0f)); // By adding a clipping rect we tell the system how big the transparency layer has to be.
-			CGContextBeginTransparencyLayer(context, NULL);
+			CGContextBeginTransparencyLayerWithRect(context, NSRectToCGRect(NSInsetRect(labelRect, -5.0f, -5.0f)), NULL);
 			NSBezierPath *const labelDot = [NSBezierPath bezierPathWithOvalInRect:labelRect];
 			[labelColor set];
 			[labelDot fill];
