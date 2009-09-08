@@ -1,4 +1,5 @@
-2.0.4 (Current)
+2.1 (Current)
+- Mac OS 10.6 Snow Leopard support added. 10.4 support dropped.
 - Dramatically improved support for all archive file formats.
 - Improved image saving.
 - Smaller and less obtrusive alerts.
