@@ -108,6 +108,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[_document AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[self _updateWindowFrame];
 	[self displayControllerActiveNodeDidChange:nil];
+	[self documentBaseOrientationDidChange:nil];
 	[self _updateWindowFrame];
 }
 - (PGInset)contentInset
