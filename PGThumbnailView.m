@@ -296,15 +296,14 @@ static void PGDrawGradient(void)
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];
 
-		NSRect transformedThumbnailRect = thumbnailRect;
-		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
-
 		NSRect const highlight = [self dataSource] ? [[self dataSource] thumbnailView:self highlightRectForItem:item] : NSZeroRect;
 		BOOL const entirelyHighlighted = NSEqualRects(highlight, NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f));
 		if(!entirelyHighlighted) {
-			CGContextBeginTransparencyLayerWithRect(context, NSRectToCGRect(transformedThumbnailRect), NULL);
+			CGContextBeginTransparencyLayerWithRect(context, NSRectToCGRect(thumbnailRect), NULL);
 			[nilShadow set];
 		}
+		NSRect transformedThumbnailRect = thumbnailRect;
+		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
 		[transform concat];
 		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.33f];
 		[transform invert];
