@@ -27,6 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface NSScreen(AEAdditions)
 
 + (NSScreen *)AE_mainScreen; // Returns the real main screen.
-- (BOOL)AE_setDesktopPicturePath:(NSString *)path; // Based on Apple's sample code. Currently only works for screen 0.
+- (BOOL)AE_setDesktopImageURL:(NSURL *)URL;
 
 @end

@@ -142,7 +142,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)setAsDesktopPicture:(id)sender
 {
 	PGResourceIdentifier *const ident = [[self activeNode] identifier];
-	if(![ident isFileIdentifier] || ![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:[[ident URLByFollowingAliases:YES] path]]) NSBeep();
+	if(![ident isFileIdentifier] || ![[NSScreen AE_mainScreen] AE_setDesktopImageURL:[ident URLByFollowingAliases:YES]]) NSBeep();
 }
 - (IBAction)setCopyAsDesktopPicture:(id)sender
 {
@@ -870,9 +870,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {
 	if(NSFileHandlingPanelOKButton != returnCode) return;
-	NSString *const path = [savePanel filename];
-	[[[self activeNode] data] writeToFile:path atomically:NO];
-	if(![[NSScreen AE_mainScreen] AE_setDesktopPicturePath:path]) NSBeep();
+	NSURL *const URL = [[savePanel filename] AE_fileURL];
+	[[[self activeNode] data] writeToURL:URL atomically:NO];
+	if(![[NSScreen AE_mainScreen] AE_setDesktopImageURL:URL]) NSBeep();
 }
 - (void)_offerToOpenBookmarkAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode bookmark:(PGBookmark *)bookmark
 {

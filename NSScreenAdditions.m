@@ -64,6 +64,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 */
 #import "NSScreenAdditions.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 @implementation NSScreen(AEAdditions)
 
 + (NSScreen *)AE_mainScreen
@@ -71,12 +74,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSArray *const screens = [self screens];
 	return [screens count] ? [screens objectAtIndex:0] : nil;
 }
-- (BOOL)AE_setDesktopPicturePath:(NSString *)path
+- (BOOL)AE_setDesktopImageURL:(NSURL *)URL
 {
-	NSAssert([NSScreen AE_mainScreen] == self, @"The desktop picture cannot be set for other screens.");
+	if(PGIsSnowLeopardOrLater()) return [[NSWorkspace sharedWorkspace] setDesktopImageURL:URL forScreen:self options:[[NSWorkspace sharedWorkspace] desktopImageOptionsForScreen:self] error:NULL];
+	NSParameterAssert([URL isFileURL]);
+	NSParameterAssert([NSScreen AE_mainScreen] == self);
 
 	FSRef ref;
-	if(FSPathMakeRef((UInt8 const *)[path fileSystemRepresentation], &ref, NULL) != noErr) return NO;
+	if(FSPathMakeRef((UInt8 const *)[[URL path] fileSystemRepresentation], &ref, NULL) != noErr) return NO;
 	AliasHandle aliasHandle = NULL;
 	if(FSNewAliasMinimal(&ref, &aliasHandle) != noErr || !aliasHandle) return NO;
 
