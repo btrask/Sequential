@@ -61,12 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_openPanel setDelegate:self];
 
 	[_openPanel setAccessoryView:accessoryView];
-	NSBox *const box = (NSBox *)[[accessoryView superview] superview];
-	if([box isKindOfClass:[NSBox class]]) {
-		[accessoryView setFrame:[box frame]];
-		[[box superview] replaceSubview:box with:accessoryView];
-		[accessoryView setAutoresizingMask:NSViewWidthSizable | NSViewMaxYMargin];
-	}
+	[accessoryView setAutoresizingMask:NSViewWidthSizable | NSViewMaxYMargin];
+	[accessoryView setFrame:[[accessoryView superview] bounds]];
 
 	NSSavePanel *const savePanel = [NSSavePanel savePanel];
 	[_openPanel setPrompt:[savePanel prompt]];
