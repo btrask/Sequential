@@ -45,7 +45,6 @@ static NSSize PGRoundedCornerSizes[4];
 @interface PGImageView(Private)
 
 @property(readonly) BOOL _imageIsOpaque;
-
 - (void)_runAnimationTimer;
 - (void)_animate;
 - (void)_invalidateCache;
@@ -167,14 +166,12 @@ static NSSize PGRoundedCornerSizes[4];
 }
 - (void)setPaused:(BOOL)flag
 {
-	if(flag) {
-		_pauseCount++;
-		[self _runAnimationTimer];
-	} else {
+	if(flag) ++_pauseCount;
+	else {
 		NSParameterAssert(_pauseCount);
-		_pauseCount--;
-		[self _runAnimationTimer];
+		--_pauseCount;
 	}
+	[self _runAnimationTimer];
 }
 
 #pragma mark -
@@ -258,9 +255,6 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	return (_isPDF && _cacheLayer) || [_rep isOpaque];
 }
-
-#pragma mark -
-
 - (void)_runAnimationTimer
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
@@ -269,7 +263,7 @@ static NSSize PGRoundedCornerSizes[4];
 - (void)_animate
 {
 	NSUInteger const i = [[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrame] unsignedIntegerValue] + 1;
-	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:i < _numberOfFrames ? i : 0]];
+	[(NSBitmapImageRep *)_rep setProperty:NSImageCurrentFrame withValue:[NSNumber numberWithUnsignedInteger:i % _numberOfFrames]];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
@@ -281,17 +275,14 @@ static NSSize PGRoundedCornerSizes[4];
 - (void)_cache
 {
 	if(_cacheLayer || !_rep || [self canAnimateRep] || ![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
-	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-
 	CGContextRef const context = [[[self window] graphicsContext] graphicsPort];
-	if(!context) return;
+	NSParameterAssert(context);
 	CGLayerRef const layer = CGLayerCreateWithContext(context, NSSizeToCGSize(_immediateSize), NULL);
 	NSGraphicsContext *const oldGraphicsContext = [NSGraphicsContext currentContext];
 	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:CGLayerGetContext(layer) flipped:[self isFlipped]]];
 	NSRect const b = (NSRect){NSZeroPoint, _immediateSize};
 	[self _drawImageWithFrame:b compositeCopy:YES rects:NULL count:0];
 	[NSGraphicsContext setCurrentContext:oldGraphicsContext];
-
 	_cacheLayer = layer;
 }
 - (void)_drawImageWithFrame:(NSRect)aRect compositeCopy:(BOOL)compositeCopy rects:(NSRect const *)rects count:(NSUInteger)count
@@ -383,7 +374,7 @@ static NSSize PGRoundedCornerSizes[4];
 	NSSize const r = NSMakeSize(_size.width - _immediateSize.width, _size.height - _immediateSize.height);
 	CGFloat const dist = hypotf(r.width, r.height);
 	CGFloat const factor = MIN(1.0f, MAX(0.33f, 20.0f / dist) * PGLagCounteractionSpeedup(&_lastSizeAnimationTime, PGAnimationFramerate));
-	if(dist < 1 || ![self _setSize:NSMakeSize(_immediateSize.width + r.width * factor, _immediateSize.height + r.height * factor)]) [self stopAnimatedSizeTransition];
+	if(dist < 1.0f || ![self _setSize:NSMakeSize(_immediateSize.width + r.width * factor, _immediateSize.height + r.height * factor)]) [self stopAnimatedSizeTransition];
 }
 - (void)_updateFrameSize
 {
