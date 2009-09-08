@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGExifEntry.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 // External
 #import "exif.h"
 
@@ -57,8 +60,6 @@ enum {
 }
 + (void)getEntries:(out NSArray **)outEntries orientation:(out PGOrientation *)outOrientation forImageData:(NSData *)data
 {
-	NSMutableArray *const entries = [NSMutableArray array];
-	PGOrientation orientation = PGUpright;
 	NSData *const exifData = [self exifDataWithImageData:data];
 	struct exiftags *const tags = exifData ? exifparse((unsigned char *)[exifData bytes], [exifData length]) : NULL;
 	if(!tags) {
@@ -67,10 +68,12 @@ enum {
 		return;
 	}
 
+	NSMutableArray *const entries = [NSMutableArray array];
+	PGOrientation orientation = PGUpright;
 	struct exifprop *entry = tags->props;
 	for(; entry; entry = entry->next) {
 		if(entry->lvl != ED_CAM && entry->lvl != ED_IMG) continue;
-		if(PGExifOrientationTag == entry->tag) switch(entry->value) {
+		if(PGExifOrientationTag == entry->tag && !PGIsSnowLeopardOrLater()) switch(entry->value) {
 			case 2: orientation = PGFlippedHorz; break;
 			case 3: orientation = PGUpsideDown; break;
 			case 4: orientation = PGFlippedVert; break;

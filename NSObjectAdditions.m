@@ -25,6 +25,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSObjectAdditions.h"
 #import <objc/runtime.h>
 
+BOOL PGIsSnowLeopardOrLater(void)
+{
+       return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5;
+}
+
 @implementation NSObject(AEAdditions)
 
 #pragma mark Instance Methods
