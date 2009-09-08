@@ -147,13 +147,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (CGFloat)PG_zoomedWidth
 {
+	if([self resizingMask] == NSTableColumnNoResizing) return [self width];
 	CGFloat width = 0;
+	NSUInteger const columnIndex = [[[self tableView] tableColumns] indexOfObjectIdenticalTo:self];
 	NSInteger i = 0;
-	for(; i < [[self tableView] numberOfRows]; i++) {
-		NSCell *const cell = [self dataCellForRow:i];
-		[cell setObjectValue:[[[self tableView] dataSource] tableView:[self tableView] objectValueForTableColumn:self row:i]];
-		width = MAX(width, [cell cellSizeForBounds:NSMakeRect(0.0f, 0.0f, CGFLOAT_MAX, CGFLOAT_MAX)].width);
-	}
+	for(; i < [[self tableView] numberOfRows]; i++) width = MAX(width, [[[self tableView] preparedCellAtColumn:columnIndex row:i] cellSize].width);
 	return MIN(MAX(ceil(width + 3.0f), [self minWidth]), [self maxWidth]);
 }
 
