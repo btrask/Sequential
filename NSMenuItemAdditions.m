@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "NSMenuItemAdditions.h"
 
+// Categories
+#import "NSObjectAdditions.h"
+
 @interface NSMenu(AEUndocumented)
 
 - (id)_menuImpl;
@@ -54,7 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[menu update];
 	if(![self isEnabled]) return NO;
 	NSInteger const i = [menu indexOfItem:self];
-	if([menu respondsToSelector:@selector(_menuImpl)]) {
+	if(!PGIsSnowLeopardOrLater() && [menu respondsToSelector:@selector(_menuImpl)]) {
 		id const menuImpl = [menu _menuImpl];
 		if([menuImpl respondsToSelector:@selector(performActionWithHighlightingForItemAtIndex:)]) {
 			[menuImpl performActionWithHighlightingForItemAtIndex:i];

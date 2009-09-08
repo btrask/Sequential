@@ -41,8 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 + (id)AE_counterflipWithRect:(inout NSRectPointer)rectPtr
 {
-	if(![[NSGraphicsContext currentContext] isFlipped]) return;
-	return [self AE_transformWithRect:rectPtr orientation:PGFlippedVert];
+	return [[NSGraphicsContext currentContext] isFlipped] ? [self AE_transformWithRect:rectPtr orientation:PGFlippedVert] : [self transform];
 }
 
 @end
