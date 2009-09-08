@@ -47,8 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSImage *_image;
 	BOOL _isPDF;
 	NSUInteger _numberOfFrames;
-	BOOL _cached;
-	NSCachedImageRep *_cache;
+	CGLayerRef _cacheLayer;
 }
 
 + (NSArray *)pasteboardTypes;

@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #include <tgmath.h>
 
 #define PGAnimateSizeChanges true
-#define PGMaxWindowSize      5000.0f // 10,000 is a hard limit imposed by the window server.
 #define PGDebugDrawingModes  false
 
 static NSImage *PGRoundedCornerImages[4];
@@ -47,15 +46,14 @@ static NSSize PGRoundedCornerSizes[4];
 
 @property(readonly) BOOL _imageIsOpaque;
 
-@property(readonly) BOOL _usesRoundedCorners;
-- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count;
-- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r;
-- (void)_drawCornersOnRect:(NSRect)r;
-
 - (void)_runAnimationTimer;
 - (void)_animate;
+- (void)_invalidateCache;
 - (void)_cache;
-- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count;
+- (void)_drawImageWithFrame:(NSRect)aRect compositeCopy:(BOOL)compositeCopy rects:(NSRect const *)rects count:(NSUInteger)count;
+@property(readonly) BOOL _shouldDrawRoundedCorners;
+- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count;
+- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r;
 - (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val;
 - (BOOL)_setSize:(NSSize)size;
 - (void)_sizeTransitionOneFrame;
@@ -122,7 +120,7 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if(flag == _antialiasWhenUpscaling) return;
 	_antialiasWhenUpscaling = flag;
-	[self _cache];
+	[self _invalidateCache];
 	[self setNeedsDisplay:YES];
 }
 - (NSImageInterpolation)interpolation
@@ -137,7 +135,7 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if(flag == _usesRoundedCorners) return;
 	_usesRoundedCorners = flag;
-	[self _cache];
+	[self _invalidateCache];
 	[self setNeedsDisplay:YES];
 }
 @synthesize usesCaching = _usesCaching;
@@ -145,7 +143,8 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if(flag == _usesCaching) return;
 	_usesCaching = flag;
-	if(flag && !_cached) [self _cache];
+	if(flag) [self setNeedsDisplay:YES];
+	else [self _invalidateCache];
 }
 
 #pragma mark -
@@ -182,26 +181,24 @@ static NSSize PGRoundedCornerSizes[4];
 
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size
 {
-	[self setNeedsDisplay:YES]; // Always redisplay in case rep is a PDF.
-	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) {
-		if(_isPDF) [self _cache];
-		return;
-	}
+	[self _invalidateCache];
+	[self setNeedsDisplay:YES];
+	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
 	_orientation = orientation;
 	if(rep != _rep) {
-		[_image removeRepresentation:_cached ? _cache : _rep];
-		_cached = NO;
+		[_image removeRepresentation:_rep];
 		[_rep release];
 		_rep = nil;
 		[self setSize:size allowAnimation:NO];
 		_rep = [rep retain];
+		[_image setSize:NSMakeSize([_rep pixelsWide], [_rep pixelsHigh])];
 		[_image addRepresentation:_rep];
+
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
 		_numberOfFrames = [_rep isKindOfClass:[NSBitmapImageRep class]] ? [[(NSBitmapImageRep *)_rep valueForProperty:NSImageFrameCount] unsignedIntegerValue] : 1;
 
 		[self _runAnimationTimer];
 	} else [self setSize:size allowAnimation:NO];
-	[self _cache];
 }
 - (void)setSize:(NSSize)size allowAnimation:(BOOL)flag
 {
@@ -220,7 +217,6 @@ static NSSize PGRoundedCornerSizes[4];
 	_sizeTransitionTimer = nil;
 	_lastSizeAnimationTime = 0.0f;
 	[self _setSize:_size];
-	if(!_cached) [self _cache];
 	[self setNeedsDisplay:YES];
 }
 - (NSPoint)rotateByDegrees:(CGFloat)val adjustingPoint:(NSPoint)aPoint
@@ -260,41 +256,7 @@ static NSSize PGRoundedCornerSizes[4];
 
 - (BOOL)_imageIsOpaque
 {
-	return (_isPDF && _cached) || [_rep isOpaque];
-}
-
-#pragma mark -
-
-- (BOOL)_usesRoundedCorners
-{
-	if(!_usesRoundedCorners) return NO;
-	NSSize const s = _immediateSize;
-	return s.width >= 16 && s.height >= 16;
-}
-- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count
-{
-	if(_cached || !self._usesRoundedCorners) return NO;
-	if(!rects) return YES;
-	NSRect corners[4];
-	[self _getRoundedCornerRects:corners forRect:r];
-	NSUInteger i, j;
-	for(i = 0; i < count; i++) for(j = 0; j < 4; j++) if(NSIntersectsRect(rects[i], corners[j])) return YES;
-	return NO;
-}
-- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r
-{
-	NSParameterAssert(rects);
-	rects[PGMinXMinYCorner] = NSMakeRect(NSMinX(r), NSMinY(r), PGRoundedCornerSizes[PGMinXMinYCorner].width, PGRoundedCornerSizes[PGMinXMinYCorner].height);
-	rects[PGMaxXMinYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMinYCorner].width, NSMinY(r), PGRoundedCornerSizes[PGMaxXMinYCorner].width, PGRoundedCornerSizes[PGMaxXMinYCorner].height);
-	rects[PGMinXMaxYCorner] = NSMakeRect(NSMinX(r), NSMaxY(r) - PGRoundedCornerSizes[PGMinXMaxYCorner].height, PGRoundedCornerSizes[PGMinXMaxYCorner].width, PGRoundedCornerSizes[PGMinXMaxYCorner].height);
-	rects[PGMaxXMaxYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].width, NSMaxY(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].height, PGRoundedCornerSizes[PGMaxXMaxYCorner].width, PGRoundedCornerSizes[PGMaxXMaxYCorner].height);
-}
-- (void)_drawCornersOnRect:(NSRect)r
-{
-	NSUInteger i;
-	NSRect corners[4];
-	[self _getRoundedCornerRects:corners forRect:r];
-	for(i = 0; i < 4; i++) [PGRoundedCornerImages[i] drawAtPoint:corners[i].origin fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+	return (_isPDF && _cacheLayer) || [_rep isOpaque];
 }
 
 #pragma mark -
@@ -311,66 +273,94 @@ static NSSize PGRoundedCornerSizes[4];
 	[self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
+- (void)_invalidateCache
+{
+	CGLayerRelease(_cacheLayer);
+	_cacheLayer = NULL;
+}
 - (void)_cache
 {
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_cache) object:nil];
-	if(!_cache || !_rep || [self canAnimateRep]) return;
-	[_image removeRepresentation:_cached ? _cache : _rep];
-	_cached = NO;
+	if(_cacheLayer || !_rep || [self canAnimateRep] || ![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
 	NSSize const pixelSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
-	[_image setSize:pixelSize];
-	[_image addRepresentation:_rep];
-	if(![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
-	if(_immediateSize.width > PGMaxWindowSize || _immediateSize.height > PGMaxWindowSize) return;
 
-	[_cache setSize:_immediateSize];
-	[_cache setPixelsWide:_immediateSize.width];
-	[_cache setPixelsHigh:_immediateSize.height];
-	NSWindow *const cacheWindow = [_cache window];
-	NSRect cacheWindowFrame = [cacheWindow frame];
-	cacheWindowFrame.size.width = MAX(NSWidth(cacheWindowFrame), _immediateSize.width);
-	cacheWindowFrame.size.height = MAX(NSHeight(cacheWindowFrame), _immediateSize.height);
-	[cacheWindow setFrame:cacheWindowFrame display:NO];
-	NSView *const view = [cacheWindow contentView];
+	CGContextRef const context = [[[self window] graphicsContext] graphicsPort];
+	if(!context) return;
+	CGLayerRef const layer = CGLayerCreateWithContext(context, NSSizeToCGSize(_immediateSize), NULL);
+	NSGraphicsContext *const oldGraphicsContext = [NSGraphicsContext currentContext];
+	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:CGLayerGetContext(layer) flipped:[self isFlipped]]];
+	NSRect const b = (NSRect){NSZeroPoint, _immediateSize};
+	[self _drawImageWithFrame:b compositeCopy:YES rects:NULL count:0];
+	[NSGraphicsContext setCurrentContext:oldGraphicsContext];
 
-	if(![view lockFocusIfCanDraw]) return (void)[self PG_performSelector:@selector(_cache) withObject:nil fireDate:nil interval:0.0f options:kNilOptions];
-	NSRect const cacheRect = [_cache rect];
+	_cacheLayer = layer;
+}
+- (void)_drawImageWithFrame:(NSRect)aRect compositeCopy:(BOOL)compositeCopy rects:(NSRect const *)rects count:(NSUInteger)count
+{
+	BOOL const roundedCorners = [self _needsToDrawRoundedCornersForImageRect:aRect rects:rects count:count];
+	BOOL const useTransparencyLayer = roundedCorners && !compositeCopy;
+	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
+	if(useTransparencyLayer) CGContextBeginTransparencyLayer(context, NULL);
+
 	if(_isPDF) {
 		[[NSColor whiteColor] set];
-		NSRectFill(cacheRect);
+		if(rects) NSRectFillList(rects, count);
+		else NSRectFill(aRect);
 	}
-	[self _drawWithFrame:cacheRect operation:_isPDF ? NSCompositeSourceOver : NSCompositeCopy rects:NULL count:0];
-	if(self.usesRoundedCorners) [self _drawCornersOnRect:cacheRect];
-	[view unlockFocus];
-
-	[_image removeRepresentation:_rep];
-	[_image setSize:_immediateSize];
-	[_image addRepresentation:_cache];
-	_cached = YES;
-}
-- (void)_drawWithFrame:(NSRect)aRect operation:(NSCompositingOperation)operation rects:(NSRect const *)rects count:(NSUInteger)count
-{
-	NSSize const imageSize = [_image size];
-	NSSize const s = NSMakeSize(imageSize.width / _immediateSize.width, imageSize.height / _immediateSize.height);
-	BOOL const actualSize = NSEqualSizes(s, NSMakeSize(1, 1));
-	if(!actualSize) {
+	NSSize const actualSize = NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+	NSSize const s = NSMakeSize(actualSize.width / _immediateSize.width, actualSize.height / _immediateSize.height);
+	BOOL const isActualSize = NSEqualSizes(actualSize, _immediateSize);
+	if(!isActualSize) {
 		[NSGraphicsContext saveGraphicsState];
 		[[NSGraphicsContext currentContext] setImageInterpolation:[self interpolation]];
 	}
+
 	NSRect r = aRect;
 	NSAffineTransform *transform = nil;
-	if(!_cached && PGUpright != _orientation) {
+	if(PGUpright != _orientation) {
 		transform = [NSAffineTransform AE_transformWithRect:&r orientation:_orientation];
 		[transform concat];
 	}
-	if(count && PGUpright == _orientation) {
+	NSCompositingOperation const op = !_isPDF && (compositeCopy || [_rep isOpaque]) ? NSCompositeCopy : NSCompositeSourceOver;
+	if(rects && PGUpright == _orientation) {
 		NSInteger i = count;
-		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:operation fraction:1.0f];
-	} else [_image drawInRect:r fromRect:NSZeroRect operation:operation fraction:1];
-	if(actualSize) {
+		while(i--) [_image drawInRect:rects[i] fromRect:NSMakeRect(NSMinX(rects[i]) * s.width, NSMinY(rects[i]) * s.height, NSWidth(rects[i]) * s.width, NSHeight(rects[i]) * s.height) operation:op fraction:1.0f];
+	} else [_image drawInRect:r fromRect:NSZeroRect operation:op fraction:1.0f];
+	if(roundedCorners) {
+		NSUInteger i;
+		NSRect corners[4];
+		[self _getRoundedCornerRects:corners forRect:r];
+		for(i = 0; i < 4; i++) [PGRoundedCornerImages[i] drawAtPoint:corners[i].origin fromRect:NSZeroRect operation:NSCompositeDestinationOut fraction:1];
+	}
+
+	if(!isActualSize) [NSGraphicsContext restoreGraphicsState];
+	else if(transform) {
 		[transform invert];
 		[transform concat];
-	} else [NSGraphicsContext restoreGraphicsState];
+	}
+
+	if(useTransparencyLayer) CGContextEndTransparencyLayer(context);
+}
+- (BOOL)_shouldDrawRoundedCorners
+{
+	return _usesRoundedCorners && _immediateSize.width >= 16.0f && _immediateSize.height >= 16.0f;
+}
+- (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count
+{
+	if(!self._shouldDrawRoundedCorners) return NO;
+	if(!rects) return YES;
+	NSRect corners[4];
+	[self _getRoundedCornerRects:corners forRect:r];
+	NSUInteger i, j;
+	for(i = 0; i < count; i++) for(j = 0; j < 4; j++) if(NSIntersectsRect(rects[i], corners[j])) return YES;
+	return NO;
+}
+- (void)_getRoundedCornerRects:(NSRectArray)rects forRect:(NSRect)r
+{
+	NSParameterAssert(rects);
+	rects[PGMinXMinYCorner] = NSMakeRect(NSMinX(r), NSMinY(r), PGRoundedCornerSizes[PGMinXMinYCorner].width, PGRoundedCornerSizes[PGMinXMinYCorner].height);
+	rects[PGMaxXMinYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMinYCorner].width, NSMinY(r), PGRoundedCornerSizes[PGMaxXMinYCorner].width, PGRoundedCornerSizes[PGMaxXMinYCorner].height);
+	rects[PGMinXMaxYCorner] = NSMakeRect(NSMinX(r), NSMaxY(r) - PGRoundedCornerSizes[PGMinXMaxYCorner].height, PGRoundedCornerSizes[PGMinXMaxYCorner].width, PGRoundedCornerSizes[PGMinXMaxYCorner].height);
+	rects[PGMaxXMaxYCorner] = NSMakeRect(NSMaxX(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].width, NSMaxY(r) - PGRoundedCornerSizes[PGMaxXMaxYCorner].height, PGRoundedCornerSizes[PGMaxXMaxYCorner].width, PGRoundedCornerSizes[PGMaxXMaxYCorner].height);
 }
 - (NSAffineTransform *)_transformWithRotationInDegrees:(CGFloat)val
 {
@@ -402,7 +392,7 @@ static NSSize PGRoundedCornerSizes[4];
 	if(r) s = NSMakeSize(ceil(fabs(cosf(r)) * s.width + fabs(sinf(r)) * s.height), ceil(fabs(cosf(r)) * s.height + fabs(sinf(r)) * s.width));
 	if(NSEqualSizes(s, [self frame].size)) return;
 	[super setFrameSize:s];
-	[self _cache];
+	[self _invalidateCache];
 }
 
 #pragma mark -NSView
@@ -411,9 +401,7 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if((self = [super initWithFrame:aRect])) {
 		_image = [[NSImage alloc] init];
-		[_image setScalesWhenResized:NO]; // NSImage seems to make copies of its reps when resizing despite this, so be careful..
 		[_image setCacheMode:NSImageCacheNever]; // We do our own caching.
-		[_image setDataRetained:YES]; // Seems appropriate.
 		_usesCaching = YES;
 		_antialiasWhenUpscaling = YES;
 		_usesRoundedCorners = YES;
@@ -423,9 +411,13 @@ static NSSize PGRoundedCornerSizes[4];
 	return self;
 }
 
+- (BOOL)wantsDefaultClipping
+{
+	return !!_cacheLayer;
+}
 - (BOOL)isOpaque
 {
-	return self._imageIsOpaque && !self._usesRoundedCorners && ![self rotationInDegrees];
+	return self._imageIsOpaque && !self._shouldDrawRoundedCorners && ![self rotationInDegrees];
 }
 - (void)drawRect:(NSRect)aRect
 {
@@ -438,19 +430,16 @@ static NSSize PGRoundedCornerSizes[4];
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
-	NSInteger count = 0;
-	NSRect const *rects = NULL;
-	if(!deg) [self getRectsBeingDrawn:&rects count:&count];
-	BOOL const drawCorners = [self _needsToDrawRoundedCornersForImageRect:b rects:rects count:count];
-	if(drawCorners) CGContextBeginTransparencyLayerWithRect([[NSGraphicsContext currentContext] graphicsPort], NSRectToCGRect(NSIntersectionRect(aRect, b)), NULL);
-	if(_isPDF && !_cached) {
-		[[NSColor whiteColor] set];
-		if(rects) NSRectFillList(rects, count);
-		else NSRectFill(b);
+	[self _cache];
+	if(_cacheLayer) CGContextDrawLayerAtPoint([[NSGraphicsContext currentContext] graphicsPort], NSPointToCGPoint(b.origin), _cacheLayer);
+	else {
+		NSInteger count = 0;
+		NSRect const *rects = NULL;
+		if(!deg) [self getRectsBeingDrawn:&rects count:&count];
+		[self _drawImageWithFrame:b compositeCopy:NO rects:rects count:count];
 	}
-	[self _drawWithFrame:b operation:[self isOpaque] ? NSCompositeCopy : NSCompositeSourceOver rects:rects count:count];
 #if PGDebugDrawingModes
-	[(_cached ? [NSColor redColor] : [NSColor blueColor]) set];
+	[(_cacheLayer ? [NSColor redColor] : [NSColor blueColor]) set];
 	NSFrameRect(b); // Outer frame: Cached
 	[([self isOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
 	NSFrameRect(NSInsetRect(b, 2, 2)); // Middle frame 1: View opaque
@@ -459,38 +448,26 @@ static NSSize PGRoundedCornerSizes[4];
 	[(deg ? [NSColor blueColor] : [NSColor redColor]) set];
 	NSFrameRect(NSInsetRect(b, 6, 6)); // Inner frame: Rotated
 #endif
-	if(drawCorners) {
-		[self _drawCornersOnRect:b];
-		CGContextEndTransparencyLayer([[NSGraphicsContext currentContext] graphicsPort]);
-	}
 	if(deg) [NSGraphicsContext restoreGraphicsState];
 }
 - (void)setFrameSize:(NSSize)aSize
 {
 	PGAssertNotReached(@"-[PGImageView setFrameSize:] should not be invoked directly. Use -setSize: instead.");
 }
+- (void)viewWillStartLiveResize
+{
+	[super viewWillStartLiveResize];
+	[self _invalidateCache];
+}
 - (void)viewDidEndLiveResize
 {
 	[super viewDidEndLiveResize];
-	if(_cached) return;
-	[self _cache];
 	[self setNeedsDisplay:YES];
 }
-- (void)viewDidMoveToWindow
+- (void)viewWillMoveToWindow:(NSWindow *)aWindow
 {
-	if(![self window]) return; // Without a window to draw in, nothing else matters.
-	NSWindowDepth const depth = [[self window] depthLimit];
-	if(!_cache) {
-		_cache = [[NSCachedImageRep alloc] initWithSize:NSMakeSize(1, 1) depth:depth separate:YES alpha:YES];
-		NSView *const contentView = [[self window] contentView];
-		if([contentView lockFocusIfCanDraw]) {
-			[_cache drawInRect:NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f)]; // This may look like voodoo, but somehow drawing the cache when it's small dramatically improves the speed of the initial draw when it's large.
-			[contentView unlockFocus];
-			[contentView setNeedsDisplayInRect:NSMakeRect(0.0f, 0.0f, 1.0f, 1.0f)]; // We didn't actually want to do that, so redraw it back to normal.
-		}
-	} else if([[_cache window] depthLimit] != depth) [[_cache window] setDepthLimit:depth];
-	else return;
-	[self _cache];
+	[super viewWillMoveToWindow:aWindow];
+	[self _invalidateCache];
 }
 
 #pragma mark -NSView(PGClipViewAdditions)
@@ -520,7 +497,7 @@ static NSSize PGRoundedCornerSizes[4];
 	[self unbind:@"usesRoundedCorners"];
 	[self setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	NSParameterAssert(!_rep);
-	[_cache release];
+	[self _invalidateCache];
 	[self setAnimates:NO];
 	[_image release];
 	[super dealloc];
