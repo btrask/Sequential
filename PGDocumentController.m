@@ -202,7 +202,18 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)changeImageScaleFactor:(id)sender
 {
-	[[self currentPrefObject] setImageScaleFactor:(CGFloat)pow(2.0f, (double)[sender tag])];
+	[[self currentPrefObject] setImageScaleFactor:pow(2.0f, (CGFloat)[sender doubleValue]) animate:NO];
+	[[scaleSliderItem menu] update];
+}
+- (IBAction)minImageScaleFactor:(id)sender
+{
+	[[self currentPrefObject] setImageScaleFactor:PGScaleMin];
+	[[scaleSliderItem menu] update];
+}
+- (IBAction)maxImageScaleFactor:(id)sender
+{
+	[[self currentPrefObject] setImageScaleFactor:PGScaleMax];
+	[[scaleSliderItem menu] update];
 }
 
 #pragma mark -
@@ -622,10 +633,14 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
 	else if(@selector(changeImageScaleMode:) == action) {
 		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScale == tag) [anItem setState:[pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0, log2([pref imageScaleFactor])) : NSOffState];
+		if(PGConstantFactorScale == tag) [anItem setState:[pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([pref imageScaleFactor])) : NSOffState];
 		else [anItem setState:[pref imageScaleMode] == tag];
-	} else if(@selector(changeImageScaleFactor:) == action) [anItem setState:PGFuzzyEqualityToCellState(tag, log2([pref imageScaleFactor]))];
-	else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
+	} else if(@selector(changeImageScaleFactor:) == action) {
+		[scaleSlider setEnabled:YES];
+		[minScale setEnabled:YES];
+		[maxScale setEnabled:YES];
+		[scaleSlider setDoubleValue:log2([pref imageScaleFactor])];
+	} else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
 	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
 	else if(@selector(changeSortDirection:) == action) {
 		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
@@ -640,7 +655,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(![self currentDocument] || [[self currentDocument] displayControllerIsModal]) {
 		if(@selector(changeReadingDirection:) == action) return NO;
 		if(@selector(changeImageScaleMode:) == action) return NO;
-		if(@selector(changeImageScaleFactor:) == action) return NO;
+		if(@selector(changeImageScaleFactor:) == action) {
+			[scaleSlider setEnabled:NO];
+			[minScale setEnabled:NO];
+			[maxScale setEnabled:NO];
+			return NO;
+		}
 		if(@selector(changeImageScaleConstraint:) == action) return NO;
 		if(@selector(changeSortOrder:) == action) return NO;
 		if(@selector(changeSortDirection:) == action) return NO;
@@ -668,6 +688,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[zoomIn setKeyEquivalentModifierMask:0];
 	[zoomOut setKeyEquivalent:@"-"];
 	[zoomOut setKeyEquivalentModifierMask:0];
+
+	[scaleSliderItem setView:[scaleSlider superview]];
+	[scaleSlider setMinValue:log2(PGScaleMin)];
+	[scaleSlider setMaxValue:log2(PGScaleMax)];
 
 	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x21E1]];
 	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];

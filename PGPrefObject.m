@@ -37,6 +37,8 @@ NSString *const PGPrefObjectAnimatesImagesDidChangeNotification = @"PGPrefObject
 NSString *const PGPrefObjectSortOrderDidChangeNotification = @"PGPrefObjectSortOrderDidChange";
 NSString *const PGPrefObjectTimerIntervalDidChangeNotification = @"PGPrefObjectTimerIntervalDidChange";
 
+NSString *const PGPrefObjectAnimateKey = @"PGPrefObjectAnimate";
+
 static NSString *const PGShowsInfoKey = @"PGShowsInfo";
 static NSString *const PGShowsThumbnailsKey = @"PGShowsThumbnails";
 static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRightToLeft";
@@ -134,22 +136,26 @@ NSArray *PGScaleModes(void)
 	_imageScaleFactor = 1;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:aMode] forKey:PGImageScaleModeKey];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:1] forKey:PGImageScaleFactorKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
+	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
 }
 
 - (CGFloat)imageScaleFactor
 {
 	return _imageScaleFactor;
 }
-- (void)setImageScaleFactor:(CGFloat)aFloat
+- (void)setImageScaleFactor:(CGFloat)factor
 {
-	NSParameterAssert(aFloat > 0.0f);
-	CGFloat const newFactor = fabs(1.0f - aFloat) < 0.01f ? 1.0f : aFloat; // If it's close to 1, fudge it.
+	[self setImageScaleFactor:factor animate:YES];
+}
+- (void)setImageScaleFactor:(CGFloat)factor animate:(BOOL)flag
+{
+	NSParameterAssert(factor > 0.0f);
+	CGFloat const newFactor = fabs(1.0f - factor) < 0.01f ? 1.0f : factor; // If it's close to 1, fudge it.
 	_imageScaleFactor = newFactor;
 	_imageScaleMode = PGConstantFactorScale;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:newFactor] forKey:PGImageScaleFactorKey];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:PGConstantFactorScale] forKey:PGImageScaleModeKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
+	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:flag], PGPrefObjectAnimateKey, nil]];
 }
 
 - (PGImageScaleConstraint)imageScaleConstraint
@@ -161,7 +167,7 @@ NSArray *PGScaleModes(void)
 	if(constraint == _imageScaleConstraint) return;
 	_imageScaleConstraint = constraint;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:constraint] forKey:PGImageScaleConstraintKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification];
+	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
 }
 
 #pragma mark -

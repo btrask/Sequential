@@ -36,6 +36,8 @@ extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
 extern NSString *const PGPrefObjectTimerIntervalDidChangeNotification;
 
+extern NSString *const PGPrefObjectAnimateKey;
+
 enum {
 	PGNoPattern = 0,
 	PGCheckerboardPattern = 1
@@ -90,14 +92,15 @@ typedef NSInteger PGSortOrder;
 
 + (id)globalPrefObject;
 
-@property BOOL showsInfo;
-@property BOOL showsThumbnails;
-@property PGReadingDirection readingDirection;
-@property PGImageScaleMode imageScaleMode;
-@property CGFloat imageScaleFactor;
-@property PGImageScaleConstraint imageScaleConstraint;
-@property BOOL animatesImages;
-@property PGSortOrder sortOrder;
-@property NSTimeInterval timerInterval;
+@property(assign) BOOL showsInfo;
+@property(assign) BOOL showsThumbnails;
+@property(assign) PGReadingDirection readingDirection;
+@property(assign) PGImageScaleMode imageScaleMode;
+@property(assign) CGFloat imageScaleFactor;
+- (void)setImageScaleFactor:(CGFloat)factor animate:(BOOL)flag;
+@property(assign) PGImageScaleConstraint imageScaleConstraint;
+@property(assign) BOOL animatesImages;
+@property(assign) PGSortOrder sortOrder;
+@property(assign) NSTimeInterval timerInterval;
 
 @end

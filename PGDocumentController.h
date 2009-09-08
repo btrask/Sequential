@@ -59,6 +59,9 @@ enum {
 OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
 NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
 
+#define PGScaleMax 16.0f
+#define PGScaleMin (1.0f / 16.0f)
+
 @interface PGDocumentController : NSResponder <NSApplicationDelegate, NSMenuDelegate, PGDisplayControlling>
 {
 	@private
@@ -75,6 +78,10 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 	IBOutlet NSMenuItem *toggleInfo;
 	IBOutlet NSMenuItem *zoomIn;
 	IBOutlet NSMenuItem *zoomOut;
+	IBOutlet NSMenuItem *scaleSliderItem;
+	IBOutlet NSSlider *scaleSlider;
+	IBOutlet NSButton *minScale;
+	IBOutlet NSButton *maxScale;
 
 	IBOutlet NSMenuItem *pageMenuItem;
 	IBOutlet NSMenu *defaultPageMenu;
@@ -119,7 +126,9 @@ NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCo
 
 - (IBAction)changeImageScaleMode:(id)sender; // PGImageScaleMode from [sender tag].
 - (IBAction)changeImageScaleConstraint:(id)sender; // PGImageScaleConstraint from [sender tag].
-- (IBAction)changeImageScaleFactor:(id)sender; // 2 to the power of [sender tag].
+- (IBAction)changeImageScaleFactor:(id)sender; // Scale from [sender doubleValue].
+- (IBAction)minImageScaleFactor:(id)sender;
+- (IBAction)maxImageScaleFactor:(id)sender;
 
 - (IBAction)changeSortOrder:(id)sender; // PGSortOrder from [sender tag].
 - (IBAction)changeSortDirection:(id)sender; // PGSortDescendingMask from [sender tag].

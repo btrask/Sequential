@@ -84,8 +84,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
 	NSDate *_nextTimerFireDate;
 	NSTimer *_timer;
-
-	BOOL _allowZoomAnimation;
 }
 
 + (NSArray *)pasteboardTypes;
@@ -156,7 +154,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (void)offerToOpenBookmark:(PGBookmark *)bookmark;
 - (void)advanceOnTimer;
 
-- (void)zoomBy:(CGFloat)aFloat;
+- (void)zoomBy:(CGFloat)factor animate:(BOOL)flag;
 - (void)zoomKeyDown:(NSEvent *)firstEvent;
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif;

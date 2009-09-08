@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL _isPDF;
 	NSUInteger _numberOfFrames;
 	CGLayerRef _cacheLayer;
+	BOOL _awaitingUpdate;
 }
 
 + (NSArray *)pasteboardTypes;

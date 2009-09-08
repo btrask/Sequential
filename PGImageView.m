@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #include <tgmath.h>
 
 #define PGAnimateSizeChanges true
-#define PGDebugDrawingModes  false
+#define PGDebugDrawingModes false
 
 static NSImage *PGRoundedCornerImages[4];
 static NSSize PGRoundedCornerSizes[4];
@@ -57,6 +57,7 @@ static NSSize PGRoundedCornerSizes[4];
 - (BOOL)_setSize:(NSSize)size;
 - (void)_sizeTransitionOneFrame;
 - (void)_updateFrameSize;
+- (void)_update;
 
 @end
 
@@ -274,7 +275,13 @@ static NSSize PGRoundedCornerSizes[4];
 }
 - (void)_cache
 {
-	if(_cacheLayer || !_rep || [self canAnimateRep] || ![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
+	if(_cacheLayer || !_rep || ([self canAnimateRep] && [self animates]) || ![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
+	NSString *const runLoopMode = [[NSRunLoop currentRunLoop] currentMode];
+	if(!runLoopMode || [NSEventTrackingRunLoopMode isEqualToString:runLoopMode]) {
+		if(!_awaitingUpdate) [self performSelector:@selector(_update) withObject:nil afterDelay:0.0f inModes:[NSArray arrayWithObject:NSDefaultRunLoopMode]];
+		_awaitingUpdate = YES;
+		return;
+	}
 	CGContextRef const context = [[[self window] graphicsContext] graphicsPort];
 	NSParameterAssert(context);
 	CGLayerRef const layer = CGLayerCreateWithContext(context, NSSizeToCGSize(_immediateSize), NULL);
@@ -384,6 +391,11 @@ static NSSize PGRoundedCornerSizes[4];
 	if(NSEqualSizes(s, [self frame].size)) return;
 	[super setFrameSize:s];
 	[self _invalidateCache];
+}
+- (void)_update
+{
+	_awaitingUpdate = NO;
+	[self setNeedsDisplay:YES];
 }
 
 #pragma mark -NSView

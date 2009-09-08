@@ -339,10 +339,10 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[super setImageScaleMode:aMode];
 	[[PGPrefObject globalPrefObject] setImageScaleMode:aMode];
 }
-- (void)setImageScaleFactor:(CGFloat)aFloat
+- (void)setImageScaleFactor:(CGFloat)factor animate:(BOOL)flag
 {
-	[super setImageScaleFactor:aFloat];
-	[[PGPrefObject globalPrefObject] setImageScaleFactor:aFloat];
+	[super setImageScaleFactor:factor animate:flag];
+	[[PGPrefObject globalPrefObject] setImageScaleFactor:factor animate:flag];
 }
 - (void)setImageScaleConstraint:(PGImageScaleConstraint)constraint
 {

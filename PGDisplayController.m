@@ -67,8 +67,6 @@ NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplay
 NSString *const PGDisplayControllerActiveNodeWasReadNotification = @"PGDisplayControllerActiveNodeWasRead";
 NSString *const PGDisplayControllerTimerDidChangeNotification = @"PGDisplayControllerTimerDidChange";
 
-#define PGScaleMax      16.0f
-#define PGScaleMin      (1.0f / 8.0f)
 #define PGWindowMinSize ((NSSize){350.0f, 200.0f})
 
 enum {
@@ -204,11 +202,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (IBAction)zoomIn:(id)sender
 {
-	[self zoomBy:2.0f];
+	[self zoomBy:2.0f animate:YES];
 }
 - (IBAction)zoomOut:(id)sender
 {
-	[self zoomBy:0.5f];
+	[self zoomBy:0.5f animate:YES];
 }
 
 #pragma mark -
@@ -547,16 +545,15 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
-- (void)zoomBy:(CGFloat)aFloat
+- (void)zoomBy:(CGFloat)factor animate:(BOOL)flag
 {
 	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * aFloat, PGScaleMax))];
+	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * factor, PGScaleMax)) animate:flag];
 }
 - (void)zoomKeyDown:(NSEvent *)firstEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	[_imageView setUsesCaching:NO];
-	_allowZoomAnimation = NO;
 	[NSEvent startPeriodicEventsAfterDelay:0.0f withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGZoomDirection dir = PGZoomNone;
@@ -578,13 +575,12 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		}
 		switch(dir) {
 			case PGZoomNone: stop = YES; break;
-			case PGZoomIn:  [self zoomBy:1.1f]; break;
-			case PGZoomOut: [self zoomBy:1.0f / 1.1f]; break;
+			case PGZoomIn:  [self zoomBy:1.1f animate:NO]; break;
+			case PGZoomOut: [self zoomBy:1.0f / 1.1f animate:NO]; break;
 		}
 	} while(!stop && (latestEvent = [[self window] nextEventMatchingMask:NSKeyDownMask | NSKeyUpMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
-	_allowZoomAnimation = YES;
 	[_imageView setUsesCaching:YES];
 }
 
@@ -723,7 +719,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
-	[self _updateImageViewSizeAllowAnimation:_allowZoomAnimation];
+	[self _updateImageViewSizeAllowAnimation:[[[aNotif userInfo] objectForKey:PGPrefObjectAnimateKey] boolValue]];
 }
 - (void)documentAnimatesImagesDidChange:(NSNotification *)aNotif
 {
@@ -969,8 +965,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_graphicPanel = [[PGAlertView PG_bezelPanel] retain];
 		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
-
-		_allowZoomAnimation = YES;
 
 		[[PGPreferenceWindowController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 	}
