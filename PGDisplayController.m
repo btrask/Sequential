@@ -925,9 +925,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[self window] setRepresentedURL:URL];
 		NSButton *const docButton = [[self window] standardWindowButton:NSWindowDocumentIconButton];
 		NSImage *const image = [[[identifier icon] copy] autorelease];
-		[image setFlipped:![docButton isFlipped]];
-		[image setScalesWhenResized:YES]; // If we aren't careful about this, it changes randomly sometimes.
 		[image setSize:[docButton bounds].size];
+		[image recache];
 		[docButton setImage:image];
 	}
 	NSUInteger const count = [[[self activeDocument] node] viewableNodeCount];

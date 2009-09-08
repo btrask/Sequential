@@ -30,5 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface NSAffineTransform(AEAdditions)
 
 + (id)AE_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation;
++ (id)AE_counterflipWithRect:(inout NSRectPointer)rectPtr;
 
 @end

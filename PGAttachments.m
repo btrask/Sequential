@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAttachments.h"
 
+// Categories
+#import "NSAffineTransformAdditions.h"
+
 @interface PGFileIconAttachmentCell : NSTextAttachmentCell
 @end
 
@@ -65,9 +68,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)drawWithFrame:(NSRect)aRect enabled:(BOOL)enabled highlighted:(BOOL)highlighted
 {
-	NSImage *const image = [NSImage imageNamed:[self imageNameHighlighted:highlighted]];
-	[image setFlipped:YES];
-	[image drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.5f];
+	[NSGraphicsContext saveGraphicsState];
+	NSRect r = aRect;
+	[[NSAffineTransform AE_counterflipWithRect:&r] concat];
+	[[NSImage imageNamed:[self imageNameHighlighted:highlighted]] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.5f];
+	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSString *)imageNameHighlighted:(BOOL)flag
 {
@@ -128,7 +133,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-	[[self image] setFlipped:YES];
+	NSRect r = aRect;
+	[[NSAffineTransform AE_counterflipWithRect:&r] concat];
 	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
 	[NSGraphicsContext restoreGraphicsState];
 }
