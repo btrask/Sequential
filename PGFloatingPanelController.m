@@ -133,8 +133,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super windowDidLoad];
 	[self windowDidBecomeMain:nil];
-	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:[self windowFrameAutosaveName]]; // We can't use -setFrameFromString: because it doesn't seem to work with NSBorderlessWindowMask.
-	if(savedFrame) [[self window] setFrame:NSRectFromString(savedFrame) display:YES];
+	[(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
+	NSString *const savedFrame = [[NSUserDefaults standardUserDefaults] objectForKey:[self windowFrameAutosaveName]];
+	if(savedFrame) {
+		NSRect r = NSRectFromString(savedFrame);
+		NSSize const min = [[self window] minSize];
+		NSSize const max = [[self window] maxSize];
+		r.size.width = MIN(MAX(min.width, NSWidth(r)), max.width);
+		r.size.height = MIN(MAX(min.height, NSHeight(r)), max.height);
+		[[self window] setFrame:r display:YES];
+	}
 }
 
 #pragma mark -NSObject

@@ -27,38 +27,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation HMBlkSliderCell
 
-#pragma mark NSSliderCell
+#pragma mark -NSSliderCell
 
-- (void)drawWithFrame:(NSRect)aRect
-        inView:(NSView *)aView
+- (void)drawWithFrame:(NSRect)aRect inView:(NSView *)aView
 {
 	BOOL const e = [self isEnabled];
-	NSRect const f = NSInsetRect(aRect, NSHeight(aRect) / 2 - 2, NSHeight(aRect) / 2 - 2);
-	float const r = NSHeight(f) / 2;
+	NSRect const f = NSOffsetRect(NSIntegralRect(NSInsetRect(aRect, NSHeight(aRect) / 2.0f - 1.5f, NSHeight(aRect) / 2.0f - 1.5f)), 0.5f, 0.5f);
+	CGFloat const r = NSHeight(f) / 2.0f;
 	NSBezierPath *const path = [NSBezierPath bezierPath];
-	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(f) + r, NSMinY(f) + r) radius:r startAngle:90 endAngle:270];
-	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(f) - r, NSMinY(f) + r) radius:r startAngle:270 endAngle:90];
+	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(f) + r, NSMinY(f) + r) radius:r startAngle:90.0f endAngle:270.0f];
+	[path appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(f) - r, NSMinY(f) + r) radius:r startAngle:270.0f endAngle:90.0f];
 	[path closePath];
-	[[NSColor colorWithDeviceWhite:0.9 alpha:(e ? 0.3 : 0.1)] set];
+	[[NSColor colorWithDeviceWhite:0.75f alpha:e ? 0.67f : 0.1f] set];
 	[path fill];
-	[[[HMBlkPanel majorGridColor] colorWithAlphaComponent:(e ? 1.0 : 0.33)] set];
+	[[NSColor colorWithDeviceWhite:0.9f alpha:e ? 0.9f : 0.33f] set];
 	[path stroke];
 	[self drawInteriorWithFrame:aRect inView:aView];
 }
 - (void)drawKnob:(NSRect)knobRect
 {
-	BOOL const e = [self isEnabled];
 	[NSGraphicsContext saveGraphicsState];
+
 	NSShadow *const shadow = [[[NSShadow alloc] init] autorelease];
-	[shadow setShadowOffset:NSMakeSize(0, -2)];
-	[shadow setShadowBlurRadius:2];
-	[shadow setShadowColor:[NSColor colorWithDeviceWhite:0 alpha:(e ? 1.0 : 0.33)]];
+	[shadow setShadowOffset:NSMakeSize(0.0f, -1.0f)];
+	[shadow setShadowBlurRadius:2.0f];
 	[shadow set];
-	[[NSColor colorWithDeviceWhite:0.2 alpha:(e ? 0.9 : 0.3)] set];
-	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 4, 4)] fill];
+
+	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
+	CGContextBeginTransparencyLayerWithRect(context, NSRectToCGRect(knobRect), NULL);
+	BOOL const e = [self isEnabled];
+	[[NSColor colorWithDeviceWhite:[self isHighlighted] ? 0.75f : 0.4f alpha:e ? 1.0f : 0.3f] set];
+	NSBezierPath *const p = [NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 2.5f, 2.5f)];
+	[p fill];
+	[[NSColor colorWithDeviceWhite:1.0f alpha:e ? 0.9f : 0.27f] set];
+	[p stroke];
+	CGContextEndTransparencyLayer(context);
+
 	[NSGraphicsContext restoreGraphicsState];
-	[[NSColor colorWithDeviceWhite:1 alpha:(e ? 0.8 : 0.27)] set];
-	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(knobRect, 3.5, 3.5)] stroke];
+
 }
 
 @end

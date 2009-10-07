@@ -48,10 +48,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	switch(type) {
 		case AEPlayIcon:
 		{
-			CGFloat const r = scale / 10.0f;
-			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMaxX(b) - r, NSMidY(b)) radius:r startAngle:60.0f endAngle:-60.0f clockwise:YES];
-			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(b) + NSWidth(b) * 0.1f + r, NSMinY(b) + NSHeight(b) * 0.05f + r * 1.0f) radius:r startAngle:-60.0f endAngle:180.0f clockwise:YES];
-			[p appendBezierPathWithArcWithCenter:NSMakePoint(NSMinX(b) + NSWidth(b) * 0.1f + r, NSMinY(b) + NSHeight(b) * 0.95f - r * 1.0f) radius:r startAngle:180.0f endAngle:60.0f clockwise:YES];
+			CGFloat const r = round(scale / 10.0f);
+			[p appendBezierPathWithArcWithCenter:NSMakePoint(round(NSMaxX(b) - r), round(NSMidY(b))) radius:r startAngle:60.0f endAngle:-60.0f clockwise:YES];
+			[p appendBezierPathWithArcWithCenter:NSMakePoint(round(NSMinX(b) + NSWidth(b) * 0.1f + r), round(NSMinY(b) + NSHeight(b) * 0.05f + r * 1.0f)) radius:r startAngle:-60.0f endAngle:180.0f clockwise:YES];
+			[p appendBezierPathWithArcWithCenter:NSMakePoint(round(NSMinX(b) + NSWidth(b) * 0.1f + r), round(NSMinY(b) + NSHeight(b) * 0.95f - r * 1.0f)) radius:r startAngle:180.0f endAngle:60.0f clockwise:YES];
 			[p fill];
 			break;
 		}
