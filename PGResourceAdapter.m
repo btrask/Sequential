@@ -290,13 +290,10 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 			NSString *const osType = [info objectForKey:PGOSTypeKey];
 			NSString *const mimeType = [info objectForKey:PGMIMETypeKey];
 			if(!osType && !mimeType) break;
+			NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:PGThumbnailSize pixelsHigh:PGThumbnailSize bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+			if(!thumbRep) break;
 			IconRef iconRef = NULL;
 			if(noErr != GetIconRefFromTypeInfo('????', PGHFSTypeCodeForPseudoFileType(osType), NULL, (CFStringRef)mimeType, kIconServicesNormalUsageFlag, &iconRef)) break;
-			NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:PGThumbnailSize pixelsHigh:PGThumbnailSize bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
-			if(!thumbRep) {
-				ReleaseIconRef(iconRef);
-				break;
-			}
 			CGRect rect = CGRectMake(0.0f, 0.0f, PGThumbnailSize, PGThumbnailSize);
 			PlotIconRefInContext([[NSGraphicsContext graphicsContextWithBitmapImageRep:thumbRep] graphicsPort], &rect, kAlignNone, kTransformNone, NULL, kPlotIconRefNormalFlags, iconRef);
 			ReleaseIconRef(iconRef);
