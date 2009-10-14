@@ -298,7 +298,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 				break;
 			}
 			CGRect rect = CGRectMake(0.0f, 0.0f, PGThumbnailSize, PGThumbnailSize);
-			PlotIconRefInContext([[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]] graphicsPort], &rect, kAlignNone, kTransformNone, NULL, kPlotIconRefNormalFlags, iconRef);
+			PlotIconRefInContext([[NSGraphicsContext graphicsContextWithBitmapImageRep:thumbRep] graphicsPort], &rect, kAlignNone, kTransformNone, NULL, kPlotIconRefNormalFlags, iconRef);
 			ReleaseIconRef(iconRef);
 			thumbnail = [[[NSImage alloc] initWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize)] autorelease];
 			[thumbnail addRepresentation:thumbRep];
