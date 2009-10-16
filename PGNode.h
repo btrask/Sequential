@@ -120,9 +120,7 @@ typedef NSUInteger PGNodeStatus;
 @protocol PGNodeDataSource <NSObject>
 
 @optional
-- (NSDate *)dateModifiedForNode:(PGNode *)sender;
-- (NSDate *)dateCreatedForNode:(PGNode *)sender;
-- (NSNumber *)dataLengthForNode:(PGNode *)sender;
+- (NSDictionary *)fileAttributesForNode:(PGNode *)node;
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info;
 - (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag; // Return NO if a problem occurred. Implementations must be thread-safe.
 

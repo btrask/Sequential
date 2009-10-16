@@ -408,51 +408,31 @@ enum {
 - (void)_updateFileAttributes
 {
 	BOOL menuNeedsUpdate = NO;
-	NSString *path = nil;
-	NSDictionary *attributes = nil;
-	NSDate *dateModified = [[self dataSource] dateModifiedForNode:self];
-	if(!dateModified) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if(path || [identifier isFileIdentifier]) {
-			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
-			dateModified = [attributes fileModificationDate];
-		}
-	}
+	NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+	PGResourceIdentifier *const identifier = [self identifier];
+	if([identifier isFileIdentifier]) [attributes addEntriesFromDictionary:[[NSFileManager defaultManager] attributesOfItemAtPath:[[identifier URL] path] error:NULL]];
+	[attributes addEntriesFromDictionary:[[self dataSource] fileAttributesForNode:self]];
+
+	NSDate *const dateModified = [attributes fileModificationDate];
 	if(!PGEqualObjects(_dateModified, dateModified)) {
 		[_dateModified release];
 		_dateModified = [dateModified retain];
 		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
 		menuNeedsUpdate = YES;
 	}
-	NSDate *dateCreated = [[self dataSource] dateCreatedForNode:self];
-	if(!dateCreated) {
-		PGResourceIdentifier *const identifier = [self identifier];
-		if(path || [identifier isFileIdentifier]) {
-			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
-			dateCreated = [attributes fileCreationDate];
-		}
-	}
+	NSDate *const dateCreated = [attributes fileCreationDate];
 	if(!PGEqualObjects(_dateCreated, dateCreated)) {
 		[_dateCreated release];
 		_dateCreated = [dateCreated retain];
 		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
 		menuNeedsUpdate = YES;
 	}
-	NSNumber *dataLength = [[self dataSource] dataLengthForNode:self];
-	do {
-		if(dataLength) break;
+	NSNumber *dataLength = [attributes objectForKey:NSFileSize];
+	if(PGEqualObjects([attributes fileType], NSFileTypeDirectory)) dataLength = nil;
+	else if(!dataLength) {
 		NSData *const data = [self data];
 		if(data) dataLength = [NSNumber numberWithUnsignedInteger:[data length]];
-		if(dataLength) break;
-		PGResourceIdentifier *const identifier = [self identifier];
-		if(path || [identifier isFileIdentifier]) {
-			if(!path) path = [[identifier URL] path];
-			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
-			if(!PGEqualObjects([attributes fileType], NSFileTypeDirectory)) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
-		}
-	} while(NO);
+	}
 	if(!PGEqualObjects(_dataLength, dataLength)) {
 		[_dataLength release];
 		_dataLength = [dataLength retain];
@@ -573,15 +553,7 @@ enum {
 
 @implementation NSObject(PGNodeDataSource)
 
-- (NSDate *)dateModifiedForNode:(PGNode *)sender
-{
-	return nil;
-}
-- (NSDate *)dateCreatedForNode:(PGNode *)sender
-{
-	return nil;
-}
-- (NSNumber *)dataLengthForNode:(PGNode *)sender
+- (NSDictionary *)fileAttributesForNode:(PGNode *)node
 {
 	return nil;
 }

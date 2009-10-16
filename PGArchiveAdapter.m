@@ -181,16 +181,14 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark -<PGNodeDataSource>
 
-- (NSDate *)dateCreatedForNode:(PGNode *)sender
+- (NSDictionary *)fileAttributesForNode:(PGNode *)node
 {
-	NSUInteger const i = [[sender identifier] index];
+	NSUInteger const i = [[node identifier] index];
 	if(NSNotFound == i) return nil;
-	return [[_archive attributesOfEntry:i] objectForKey:XADCreationDateKey];
-}
-- (NSNumber *)dataLengthForNode:(PGNode *)sender
-{
-	NSUInteger const i = [[sender identifier] index];
-	return NSNotFound == i || [_archive entryIsDirectory:i] ? nil : [NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]];
+	NSMutableDictionary *const attributes = [NSMutableDictionary dictionary];
+	[attributes PG_setObject:[[_archive attributesOfEntry:i] objectForKey:XADCreationDateKey] forKey:NSFileCreationDate];
+	if(![_archive entryIsDirectory:i]) [attributes setObject:[NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]] forKey:NSFileSize];
+	return attributes;
 }
 - (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info
 {
@@ -203,7 +201,7 @@ static id PGArchiveAdapterList = nil;
 - (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
 {
 	NSUInteger const i = [[sender identifier] index];
-	if(NSNotFound == i || flag) {
+	if(NSNotFound == i || flag || [_archive entryIsDirectory:i]) {
 		if(outData) *outData = nil;
 		return YES;
 	}
