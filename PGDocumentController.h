@@ -55,9 +55,6 @@ enum {
 	PGQuitMapping       = 1
 };
 
-OSType PGHFSTypeCodeForPseudoFileType(NSString *type);
-NSString *PGPseudoFileTypeForHFSTypeCode(OSType type); // NSFileTypeForHFSTypeCode() uses a private format that's different from what appears in our Info.plist file under CFBundleTypeOSTypes.
-
 #define PGScaleMax 16.0f
 #define PGScaleMin (1.0f / 16.0f)
 

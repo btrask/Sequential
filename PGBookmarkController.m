@@ -157,10 +157,10 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 		return;
 	}
 	NSMutableAttributedString *const title = [[[NSMutableAttributedString alloc] init] autorelease];
-	[title appendAttributedString:[[aBookmark documentIdentifier] attributedStringWithWithAncestory:NO]];
+	[title appendAttributedString:[[aBookmark documentIdentifier] attributedStringWithAncestory:NO]];
 	if(!PGEqualObjects([aBookmark documentIdentifier], [aBookmark fileIdentifier])) {
 		[[title mutableString] appendFormat:@" %C ", 0x25B8];
-		[title appendAttributedString:[[aBookmark fileIdentifier] attributedStringWithWithAncestory:NO]];
+		[title appendAttributedString:[[aBookmark fileIdentifier] attributedStringWithAncestory:NO]];
 	}
 	[item setAttributedTitle:title];
 }

@@ -50,6 +50,7 @@ extern NSString *const PGMaxDepthKey;
 - (PGNode *)selectorForward:(BOOL)flag;
 - (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
 - (PGNode *)selectorForward:(BOOL)flag withContext:(id)context ignored:(id)nil1; */
-- (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order;
+
+- (void)noteChildValueForCurrentSortOrderDidChange:(PGNode *)child;
 
 @end

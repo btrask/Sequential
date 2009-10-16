@@ -70,6 +70,7 @@ typedef NSUInteger PGNodeStatus;
 	NSDate *_dateModified;
 	NSDate *_dateCreated;
 	NSNumber *_dataLength;
+	NSString *_kind;
 }
 
 + (NSArray *)pasteboardTypes;
@@ -91,6 +92,7 @@ typedef NSUInteger PGNodeStatus;
 @property(readonly) NSDate *dateModified;
 @property(readonly) NSDate *dateCreated;
 @property(readonly) NSNumber *dataLength;
+@property(readonly) NSString *kind;
 
 - (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;
 - (BOOL)canGetDataWithInfo:(NSDictionary *)info;

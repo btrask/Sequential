@@ -27,14 +27,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometryTypes.h"
 
-extern BOOL PGIsSnowLeopardOrLater(void);
-
 NS_INLINE BOOL PGEqualObjects(id<NSObject> a, id<NSObject> b)
 {
 	if(a == b) return YES;
 	if(!a || !b) return NO;
 	return [a isEqual:b];
 }
+NS_INLINE BOOL PGIsSnowLeopardOrLater(void)
+{
+       return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5;
+}
+
+extern NSString *PGOSTypeToStringQuoted(OSType, BOOL);
+extern OSType PGOSTypeFromString(NSString *);
 
 @interface NSAffineTransform(PGFoundationAdditions)
 

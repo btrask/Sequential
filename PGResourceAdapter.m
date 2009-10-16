@@ -88,9 +88,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
-		NSArray *const OSTypes = [typeDict objectForKey:PGCFBundleTypeOSTypesKey];
-		if(!OSTypes || ![OSTypes count]) continue;
-		for(NSString *const type in OSTypes) [exts addObject:NSFileTypeForHFSTypeCode(PGHFSTypeCodeForPseudoFileType(type))];
+		for(NSString *const type in [typeDict objectForKey:PGCFBundleTypeOSTypesKey]) [exts addObject:PGOSTypeToStringQuoted(PGOSTypeFromString(type), YES)];
 	}
 	return exts;
 }
@@ -284,18 +282,14 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 		if(thumbnail) break;
 		NSDictionary *const info = [self info];
 		do {
-			NSString *const osType = [info objectForKey:PGOSTypeKey];
+			OSType osType = PGOSTypeFromString([info objectForKey:PGOSTypeKey]);
 			NSString *const mimeType = [info objectForKey:PGMIMETypeKey];
 			if(!osType && !mimeType) break;
-			NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:PGThumbnailSize pixelsHigh:PGThumbnailSize bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
-			if(!thumbRep) break;
+			if('fold' == osType) osType = kGenericFolderIcon;
 			IconRef iconRef = NULL;
-			if(noErr != GetIconRefFromTypeInfo('????', PGHFSTypeCodeForPseudoFileType(osType), NULL, (CFStringRef)mimeType, kIconServicesNormalUsageFlag, &iconRef)) break;
-			CGRect rect = CGRectMake(0.0f, 0.0f, PGThumbnailSize, PGThumbnailSize);
-			PlotIconRefInContext([[NSGraphicsContext graphicsContextWithBitmapImageRep:thumbRep] graphicsPort], &rect, kAlignNone, kTransformNone, NULL, kPlotIconRefNormalFlags, iconRef);
+			if(noErr != GetIconRefFromTypeInfo('????', osType, NULL, (CFStringRef)mimeType, kIconServicesNormalUsageFlag, &iconRef)) break;
+			thumbnail = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
 			ReleaseIconRef(iconRef);
-			thumbnail = [[[NSImage alloc] initWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize)] autorelease];
-			[thumbnail addRepresentation:thumbRep];
 		} while(NO);
 		if(thumbnail) break;
 		NSString *const extension = [info objectForKey:PGExtensionKey];

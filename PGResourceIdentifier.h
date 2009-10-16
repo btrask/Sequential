@@ -83,7 +83,7 @@ typedef UInt8 PGLabelColor;
 
 - (void)setCustomDisplayName:(NSString *)aString; // A custom name, like a webpage title.
 - (void)updateNaturalDisplayName;
-- (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag;
+- (NSAttributedString *)attributedStringWithAncestory:(BOOL)flag;
 
 @end
 

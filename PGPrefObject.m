@@ -212,6 +212,13 @@ NSArray *PGScaleModes(void)
 	[self PG_postNotificationName:PGPrefObjectTimerIntervalDidChangeNotification];
 }
 
+#pragma mark -
+
+- (BOOL)isCurrentSortOrder:(PGSortOrder)order
+{
+	return (PGSortOrderMask & order) == (PGSortOrderMask & self.sortOrder);
+}
+
 #pragma mark -NSObject
 
 - (id)init

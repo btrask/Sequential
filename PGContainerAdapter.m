@@ -122,10 +122,9 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	}
 	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context];
 }
-- (void)noteChild:(PGNode *)child didChangeForSortOrder:(PGSortOrder)order
+- (void)noteChildValueForCurrentSortOrderDidChange:(PGNode *)child
 {
 	if([_unsortedChildren indexOfObjectIdenticalTo:child] == NSNotFound) return;
-	if((PGSortOrderMask & order) != (PGSortOrderMask & [[self document] sortOrder])) return;
 	[_sortedChildren release];
 	_sortedChildren = nil;
 	[[self document] noteSortedChildrenDidChange];

@@ -292,7 +292,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	name = [name PG_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
 	[self setNaturalDisplayName:name];
 }
-- (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag
+- (NSAttributedString *)attributedStringWithAncestory:(BOOL)flag
 {
 	NSMutableAttributedString *const result = [NSMutableAttributedString PG_attributedStringWithFileIcon:[self icon] name:[self displayName]];
 	if(!flag) return result;

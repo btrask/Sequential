@@ -81,16 +81,6 @@ static NSView *(*PGNSViewNextValidKeyView)(id, SEL);
 static NSView *(*PGNSViewPreviousValidKeyView)(id, SEL);
 static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
 
-OSType PGHFSTypeCodeForPseudoFileType(NSString *type)
-{
-	return type ? CFSwapInt32BigToHost(*(OSType *)[[type dataUsingEncoding:NSUTF8StringEncoding] bytes]) : '????';
-}
-NSString *PGPseudoFileTypeForHFSTypeCode(OSType type)
-{
-	OSType const swapped = CFSwapInt32HostToBig(type);
-	return [[[NSString alloc] initWithBytes:(const void *)&swapped length:4 encoding:NSUTF8StringEncoding] autorelease];
-}
-
 static PGDocumentController *PGSharedDocumentController = nil;
 
 @interface PGDocumentController(Private)
@@ -757,7 +747,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 				break;
 			}
 
-			attributedTitle = [identifier attributedStringWithWithAncestory:!uniqueName];
+			attributedTitle = [identifier attributedStringWithAncestory:!uniqueName];
 			action = @selector(openRecentDocument:);
 			representedObject = identifier;
 		} else {

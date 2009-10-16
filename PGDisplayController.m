@@ -601,19 +601,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
 	if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGGenericError) {
-		[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
 		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
 		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
 	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGPasswordError) {
-		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
 		[passwordField setStringValue:@""];
 		[clipView setDocumentView:passwordView];
 		[clipView setNextKeyView:passwordField];
 		[passwordField setNextKeyView:clipView];
 	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGEncodingError) {
-		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
@@ -927,7 +927,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSString *const title = [identifier displayName];
 	NSString *const titleDetails = count > 1 ? [NSString stringWithFormat:@" (%lu/%lu)", (unsigned long)_displayImageIndex + 1, (unsigned long)count] : @"";
 	[[self window] setTitle:title ? [title stringByAppendingString:titleDetails] : @""];
-	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
+	NSMutableAttributedString *const menuLabel = [[[identifier attributedStringWithAncestory:NO] mutableCopy] autorelease];
 	[[menuLabel mutableString] appendString:titleDetails];
 	[[[PGDocumentController sharedDocumentController] windowsMenuItemForDocument:[self activeDocument]] setAttributedTitle:menuLabel];
 }

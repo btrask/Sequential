@@ -28,12 +28,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGDebug.h"
 
-// Categories
-#import "PGFoundationAdditions.h"
-
-BOOL PGIsSnowLeopardOrLater(void)
+NSString *PGOSTypeToStringQuoted(OSType type, BOOL flag)
 {
-       return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5;
+	return flag ? NSFileTypeForHFSTypeCode(type) : [(NSString *)UTCreateStringForOSType(type) autorelease];
+}
+OSType PGOSTypeFromString(NSString *str)
+{
+	if(!str) return 0;
+	switch([str length]) {
+		case 4: return UTGetOSTypeFromString((CFStringRef)str);
+		case 6: return NSHFSTypeCodeFromFileType(str);
+	}
+	PGCAssertNotReached(@"Invalid OSType string.");
+	return 0;
 }
 
 @implementation NSAffineTransform(PGFoundationAdditions)

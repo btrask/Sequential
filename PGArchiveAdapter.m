@@ -96,10 +96,9 @@ static id PGArchiveAdapterList = nil;
 		BOOL const isEntrylessFolder = !PGEqualObjects(subpath, entryPath);
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
-		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_typeForEntry:i preferOSType:YES]]];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
-		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:isEntrylessFolder ? PGPseudoFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_OSTypeForEntry:i standardFormat:NO], PGOSTypeKey, nil];
+		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:isEntrylessFolder ? PGOSTypeToStringQuoted('fold', NO) : [_archive PG_OSTypeForEntry:i standardFormat:NO], PGOSTypeKey, nil];
 		if(isFile) [node startLoadWithInfo:info];
 		else {
 			[info setObject:[PGContainerAdapter class] forKey:PGAdapterClassKey];
@@ -108,6 +107,7 @@ static id PGArchiveAdapterList = nil;
 			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
 		}
+		[identifier setIcon:[[node resourceAdapter] fastThumbnail]];
 		if(node) [children addObject:node];
 	}
 	return children;
@@ -250,13 +250,13 @@ static id PGArchiveAdapterList = nil;
 - (NSString *)PG_OSTypeForEntry:(NSInteger)index standardFormat:(BOOL)flag
 {
 	OSType value;
-	if([self entryIsDirectory:index]) value = kGenericFolderIcon;
+	if([self entryIsDirectory:index]) value = 'fold';
 	else {
 		NSNumber *const typeCode = [[self attributesOfEntry:index] objectForKey:NSFileHFSTypeCode];
 		if(!typeCode) return nil;
 		value = [typeCode unsignedLongValue];
 	}
-	return flag ? NSFileTypeForHFSTypeCode(value) : PGPseudoFileTypeForHFSTypeCode(value);
+	return PGOSTypeToStringQuoted(value, flag);
 }
 - (NSString *)PG_typeForEntry:(NSInteger)index preferOSType:(BOOL)flag
 {

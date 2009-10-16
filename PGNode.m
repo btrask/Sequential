@@ -59,6 +59,7 @@ enum {
 - (NSDictionary *)_standardizedInfoDictionary:(NSDictionary *)info;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
+- (void)_setValue:(id)value forSortOrder:(PGSortOrder)order;
 
 @end
 
@@ -181,6 +182,10 @@ enum {
 - (NSNumber *)dataLength
 {
 	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInteger:0];
+}
+- (NSString *)kind
+{
+	return _kind ? [[_kind retain] autorelease] : @"";
 }
 
 #pragma mark -
@@ -305,6 +310,7 @@ enum {
 		case PGSortByDateModified: r = [[self dateModified] compare:[node dateModified]]; break;
 		case PGSortByDateCreated:  r = [[self dateCreated] compare:[node dateCreated]]; break;
 		case PGSortBySize:         r = [[self dataLength] compare:[node dataLength]]; break;
+		case PGSortByKind:         r = [[self kind] compare:[node kind]]; break;
 		case PGSortShuffle:        return random() & 1 ? NSOrderedAscending : NSOrderedDescending;
 	}
 	return (NSOrderedSame == r ? [[[self identifier] displayName] PG_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
@@ -349,7 +355,7 @@ enum {
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
-	[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByName];
+	if([[self document] isCurrentSortOrder:PGSortByName]) [[self parentAdapter] noteChildValueForCurrentSortOrderDidChange:self];
 	[[self document] noteNodeDisplayNameDidChange:self];
 }
 
@@ -393,13 +399,14 @@ enum {
 - (void)_updateMenuItem
 {
 	if(!_allowMenuItemUpdates) return;
-	NSMutableAttributedString *const label = [[[[self identifier] attributedStringWithWithAncestory:NO] mutableCopy] autorelease];
+	NSMutableAttributedString *const label = [[[[self identifier] attributedStringWithAncestory:NO] mutableCopy] autorelease];
 	NSString *info = nil;
 	NSDate *date = nil;
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = _dateModified; break;
 		case PGSortByDateCreated:  date = _dateCreated; break;
 		case PGSortBySize: info = [_dataLength PG_localizedStringAsBytes]; break;
+		case PGSortByKind: info = _kind; break;
 	}
 	if(date && !info) info = [date PG_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
@@ -407,39 +414,45 @@ enum {
 }
 - (void)_updateFileAttributes
 {
-	BOOL menuNeedsUpdate = NO;
 	NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-	PGResourceIdentifier *const identifier = [self identifier];
-	if([identifier isFileIdentifier]) [attributes addEntriesFromDictionary:[[NSFileManager defaultManager] attributesOfItemAtPath:[[identifier URL] path] error:NULL]];
+	NSURL *const URL = [[self identifier] URL];
+	if([URL isFileURL]) [attributes addEntriesFromDictionary:[[NSFileManager defaultManager] attributesOfItemAtPath:[URL path] error:NULL]];
 	[attributes addEntriesFromDictionary:[[self dataSource] fileAttributesForNode:self]];
-
-	NSDate *const dateModified = [attributes fileModificationDate];
-	if(!PGEqualObjects(_dateModified, dateModified)) {
-		[_dateModified release];
-		_dateModified = [dateModified retain];
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
-		menuNeedsUpdate = YES;
-	}
-	NSDate *const dateCreated = [attributes fileCreationDate];
-	if(!PGEqualObjects(_dateCreated, dateCreated)) {
-		[_dateCreated release];
-		_dateCreated = [dateCreated retain];
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
-		menuNeedsUpdate = YES;
-	}
-	NSNumber *dataLength = [attributes objectForKey:NSFileSize];
-	if(PGEqualObjects([attributes fileType], NSFileTypeDirectory)) dataLength = nil;
-	else if(!dataLength) {
+	if(PGEqualObjects([attributes fileType], NSFileTypeDirectory)) [attributes removeObjectForKey:NSFileSize];
+	else if(![attributes objectForKey:NSFileSize]) {
 		NSData *const data = [self data];
-		if(data) dataLength = [NSNumber numberWithUnsignedInteger:[data length]];
+		if(data) [attributes setObject:[NSNumber numberWithUnsignedInteger:[data length]] forKey:NSFileSize];
 	}
-	if(!PGEqualObjects(_dataLength, dataLength)) {
-		[_dataLength release];
-		_dataLength = [dataLength retain];
-		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
-		menuNeedsUpdate = YES;
+	[self _setValue:[attributes fileModificationDate] forSortOrder:PGSortByDateModified];
+	[self _setValue:[attributes fileCreationDate] forSortOrder:PGSortByDateCreated];
+	[self _setValue:[attributes objectForKey:NSFileSize] forSortOrder:PGSortBySize];
+
+	NSDictionary *const info = [self info];
+	NSString *kind = nil;
+	// Try every possible method to get a decent string. When a method succeeds, it overwrites previous attempts.
+	if(noErr == LSCopyKindStringForMIMEType((CFStringRef)[info objectForKey:PGMIMETypeKey], (CFStringRef *)&kind)) [kind autorelease]; // For some reason this produces extremely ugly strings, like "TextEdit.app Document".
+	if(noErr == LSCopyKindStringForTypeInfo(kLSUnknownType, kLSUnknownCreator, (CFStringRef)[info objectForKey:PGExtensionKey], (CFStringRef *)&kind)) [kind autorelease];
+	NSString *const workspaceKind = [[NSWorkspace sharedWorkspace] localizedDescriptionForType:[(NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (CFStringRef)[info objectForKey:PGMIMETypeKey], NULL) autorelease]]; // This produces ugly strings too ("Portable Network Graphics image"), but they still aren't nearly as bad.
+	if(workspaceKind) kind = workspaceKind;
+	if(noErr == LSCopyKindStringForTypeInfo(PGOSTypeFromString([info objectForKey:PGOSTypeKey]), kLSUnknownCreator, NULL, (CFStringRef *)&kind)) [kind autorelease];
+	if(noErr == LSCopyKindStringForURL((CFURLRef)URL, (CFStringRef *)&kind)) [kind autorelease];
+	[self _setValue:kind forSortOrder:PGSortByKind];
+}
+- (void)_setValue:(id)value forSortOrder:(PGSortOrder)order
+{
+	id *attributePtr = NULL;
+	switch(PGSortOrderMask & order) {
+		case PGSortByDateModified: attributePtr = &_dateModified; break;
+		case PGSortByDateCreated:  attributePtr = &_dateCreated; break;
+		case PGSortBySize:         attributePtr = &_dataLength; break;
+		case PGSortByKind:         attributePtr = &_kind; break;
 	}
-	if(menuNeedsUpdate) [self _updateMenuItem];
+	if(PGEqualObjects(value, *attributePtr)) return;
+	[*attributePtr release];
+	*attributePtr = [value retain];
+	if(![[self document] isCurrentSortOrder:order]) return;
+	[[self parentAdapter] noteChildValueForCurrentSortOrderDidChange:self];
+	[self _updateMenuItem];
 }
 
 #pragma mark -NSObject
@@ -457,6 +470,7 @@ enum {
 	[_dateModified release];
 	[_dateCreated release];
 	[_dataLength release];
+	[_kind release];
 	[super dealloc];
 }
 

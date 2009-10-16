@@ -38,7 +38,7 @@ extern NSString *const PGPrefObjectAnimateKey;
 
 enum {
 	PGNoPattern = 0,
-	PGCheckerboardPattern = 1
+	PGCheckerboardPattern = 1,
 };
 typedef NSInteger PGPatternType;
 
@@ -47,7 +47,7 @@ enum {
 	PGAutomaticScale = 1,
 	PGDeprecatedVerticalFitScale = 2, // Deprecated after 1.0.3.
 	PGViewFitScale = 3, // Fits the entire image inside the screen/window.
-	PGActualSizeWithDPI = 4
+	PGActualSizeWithDPI = 4,
 };
 typedef NSInteger PGImageScaleMode;
 extern NSArray *PGScaleModes(void);
@@ -55,7 +55,7 @@ extern NSArray *PGScaleModes(void);
 enum {
 	PGDownscale   = -1,
 	PGScaleFreely = 0,
-	PGUpscale     = 1
+	PGUpscale     = 1,
 };
 typedef NSInteger PGImageScaleConstraint;
 
@@ -66,6 +66,7 @@ enum {
 	PGSortByDateModified = 2,
 	PGSortByDateCreated  = 3,
 	PGSortBySize         = 4,
+	PGSortByKind         = 5,
 	PGSortShuffle        = 100,
 	PGSortInnateOrder    = 200,
 	PGSortOptionsMask    = 0x7FFF0000,
@@ -100,5 +101,7 @@ typedef NSInteger PGSortOrder;
 @property(assign) BOOL animatesImages;
 @property(assign) PGSortOrder sortOrder;
 @property(assign) NSTimeInterval timerInterval;
+
+- (BOOL)isCurrentSortOrder:(PGSortOrder)order; // Ignores sort options.
 
 @end

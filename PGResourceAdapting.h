@@ -40,7 +40,7 @@ extern NSString *const PGURLResponseKey;
 extern NSString *const PGAdapterClassKey;
 extern NSString *const PGFourCCDataKey;
 extern NSString *const PGMIMETypeKey;
-extern NSString *const PGOSTypeKey; // Uses the pseudo-OS-type that doesn't include single quotes around it.
+extern NSString *const PGOSTypeKey; // Unquoted string.
 extern NSString *const PGExtensionKey;
 extern NSString *const PGPasswordKey;
 extern NSString *const PGStringEncodingKey;
