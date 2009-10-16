@@ -29,6 +29,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 extern BOOL PGIsSnowLeopardOrLater(void);
 
+NS_INLINE BOOL PGEqualObjects(id<NSObject> a, id<NSObject> b)
+{
+	if(a == b) return YES;
+	if(!a || !b) return NO;
+	return [a isEqual:b];
+}
+
 @interface NSAffineTransform(PGFoundationAdditions)
 
 + (id)PG_transformWithRect:(inout NSRectPointer)rectPtr orientation:(PGOrientation)orientation;

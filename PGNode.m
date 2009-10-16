@@ -419,7 +419,7 @@ enum {
 			dateModified = [attributes fileModificationDate];
 		}
 	}
-	if(_dateModified != dateModified && (!_dateModified || !dateModified || ![_dateModified isEqualToDate:dateModified])) {
+	if(!PGEqualObjects(_dateModified, dateModified)) {
 		[_dateModified release];
 		_dateModified = [dateModified retain];
 		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateModified];
@@ -434,7 +434,7 @@ enum {
 			dateCreated = [attributes fileCreationDate];
 		}
 	}
-	if(_dateCreated != dateCreated && (!_dateCreated || !dateCreated || ![_dateCreated isEqualToDate:dateCreated])) {
+	if(!PGEqualObjects(_dateCreated, dateCreated)) {
 		[_dateCreated release];
 		_dateCreated = [dateCreated retain];
 		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortByDateCreated];
@@ -453,7 +453,7 @@ enum {
 			if(![NSFileTypeDirectory isEqualToString:[attributes fileType]]) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
 		}
 	} while(NO);
-	if(_dataLength != dataLength && (!_dataLength || !dataLength || ![_dataLength isEqualToNumber:dataLength])) {
+	if(!PGEqualObjects(_dataLength, dataLength)) {
 		[_dataLength release];
 		_dataLength = [dataLength retain];
 		[[self parentAdapter] noteChild:self didChangeForSortOrder:PGSortBySize];
