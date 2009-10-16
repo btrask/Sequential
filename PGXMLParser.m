@@ -270,7 +270,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	[self endedTagPath:_tagPath];
-	if([_initialTagPath isEqualToString:_tagPath]) {
+	if(PGEqualObjects(_initialTagPath, _tagPath)) {
 		[_parser setDelegate:_parent];
 		[_parent parser:parser didEndElement:elementName namespaceURI:namespaceURI qualifiedName:qName];
 	}

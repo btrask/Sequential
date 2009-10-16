@@ -193,8 +193,8 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	if([self identifier] == [obj identifier]) return YES;
 	if(![obj isKindOfClass:[PGResourceIdentifier class]] || [self index] != [(PGResourceIdentifier *)obj index]) return NO;
-	if([self superidentifier] != [obj superidentifier] && ![[self superidentifier] isEqual:[obj superidentifier]]) return NO;
-	return [self URL] == [obj URL] || [[self URL] isEqual:[obj URL]];
+	if(!PGEqualObjects([self superidentifier], [obj superidentifier])) return NO;
+	return PGEqualObjects([self URL], [obj URL]);
 }
 
 #pragma mark -
@@ -252,7 +252,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 }
 - (void)setNaturalDisplayName:(NSString *)aString
 {
-	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
+	if(PGEqualObjects(aString, _naturalDisplayName)) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
 	if(_postsNotifications && !_customDisplayName) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
@@ -272,8 +272,8 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 - (void)setCustomDisplayName:(NSString *)aString
 {
-	NSString *const string = [@"" isEqualToString:aString] ? nil : aString;
-	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
+	NSString *const string = [aString length] ? aString : nil;
+	if(PGEqualObjects(string, _customDisplayName)) return;
 	[_customDisplayName release];
 	_customDisplayName = [string copy];
 	if(_postsNotifications) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
@@ -286,7 +286,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 		if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&name) == noErr && name) [name autorelease];
 		else {
 			NSString *const path = [URL path];
-			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
+			name = PGEqualObjects(path, @"/") ? [URL absoluteString] : [path lastPathComponent];
 		}
 	}
 	name = [name PG_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
@@ -300,7 +300,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(!URL) return result;
 	NSString *const parent = [URL isFileURL] ? [[URL path] stringByDeletingLastPathComponent] : [URL absoluteString];
 	NSString *const parentName = [URL isFileURL] ? [parent lastPathComponent] : parent;
-	if(!parentName || [parentName isEqual:@""]) return result;
+	if(![parentName length]) return result;
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
 	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent PG_fileURL] PG_icon] : nil name:parentName]];
 	return result;

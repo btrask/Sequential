@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGResourceIdentifier.h"
 
+// Categories
+#import "PGFoundationAdditions.h"
+
 @implementation DOMHTMLDocument(PGWebKitAdditions)
 
 - (NSArray *)PG_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts
@@ -42,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			NSString *href = [a href];
 			NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
 			if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
-			if(!href || [@"" isEqualToString:href]) continue;
+			if(![href length]) continue;
 			NSURL *const URL = [NSURL URLWithString:href];
 			if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
 			PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
@@ -68,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
 			if([results containsObject:ident]) continue;
 			NSString *const title = [img title]; // Prefer the title to the alt attribute.
-			[ident setCustomDisplayName:title && ![@"" isEqualToString:title] ? title : [img alt]];
+			[ident setCustomDisplayName:[title length] ? title : [img alt]];
 			[results addObject:ident];
 		} while(NO);
 		[pool release];
@@ -82,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)PG_hasAncestorWithNodeName:(NSString *)string
 {
-	return [[self nodeName] isEqualToString:string] ? YES : [[self parentNode] PG_hasAncestorWithNodeName:string];
+	return PGEqualObjects([self nodeName], string) ? YES : [[self parentNode] PG_hasAncestorWithNodeName:string];
 }
 
 @end

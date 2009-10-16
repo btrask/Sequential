@@ -623,7 +623,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
 {
-	return ident && [[self identifier] isEqual:ident] ? [self node] : nil;
+	return PGEqualObjects(ident, [self identifier]) ? [self node] : nil;
 }
 - (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode
 {

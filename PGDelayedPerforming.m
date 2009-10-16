@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDelayedPerforming.h"
 
+// Categories
+#import "PGFoundationAdditions.h"
+
 static NSMutableDictionary *PGTimersByNonretainedObjectValue;
 
 @interface PGTimerContextObject : NSObject
@@ -113,7 +116,7 @@ static void PGTimerCallback(CFRunLoopTimerRef timer, PGTimerContextObject *conte
 - (BOOL)matchesSelector:(SEL)aSel object:(id)anArgument
 {
 	if(aSel != _selector) return NO;
-	if(anArgument != _argument && (PGCompareArgumentPointer & _options || ![anArgument isEqual:_argument])) return NO;
+	if(anArgument != _argument && (PGCompareArgumentPointer & _options || !PGEqualObjects(anArgument, _argument))) return NO;
 	return YES;
 }
 - (void)invoke

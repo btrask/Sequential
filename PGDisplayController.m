@@ -600,19 +600,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
-	if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGGenericError) {
+	if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGGenericError) {
 		[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
 		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
 		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
-	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
+	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGPasswordError) {
 		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[passwordField setStringValue:@""];
 		[clipView setDocumentView:passwordView];
 		[clipView setNextKeyView:passwordField];
 		[passwordField setNextKeyView:clipView];
-	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGEncodingError) {
+	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGEncodingError) {
 		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
@@ -950,7 +950,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
-	return (!returnType || [@"" isEqual:returnType]) && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
+	return ![returnType length] && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
 }
 
 #pragma mark -NSObject

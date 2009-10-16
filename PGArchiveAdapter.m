@@ -87,12 +87,13 @@ static id PGArchiveAdapterList = nil;
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
 		if(_encodingError) return nil;
-		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
+		if(!entryPath) continue;
+		if([path length] && ![entryPath hasPrefix:path]) continue;
 		[indexes removeIndex:i];
 		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
 		NSString *const subpath = [path stringByAppendingPathComponent:[[entryPath substringFromIndex:[path length]] PG_firstPathComponent]];
-		if([path isEqualToString:entryPath]) continue;
-		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
+		if(PGEqualObjects(path, entryPath)) continue;
+		BOOL const isEntrylessFolder = !PGEqualObjects(subpath, entryPath);
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
 		[identifier setIcon:[[NSWorkspace sharedWorkspace] iconForFileType:isEntrylessFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [_archive PG_typeForEntry:i preferOSType:YES]]];
@@ -241,7 +242,7 @@ static id PGArchiveAdapterList = nil;
 		if(![self entryIsDirectory:i]) entryName = [entryName stringByDeletingLastPathComponent];
 		else if([entryName hasSuffix:@"/"]) entryName = [entryName substringToIndex:[entryName length] - 1];
 		if(!root) root = entryName;
-		else while(![root isEqualToString:entryName]) {
+		else while(!PGEqualObjects(root, entryName)) {
 			if([root length] > [entryName length]) root = [root stringByDeletingLastPathComponent];
 			else entryName = [entryName stringByDeletingLastPathComponent];
 		}

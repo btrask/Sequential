@@ -79,7 +79,7 @@ enum {
 	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
 	NSURL *const URL = [ident URL];
 	if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
-	if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
+	if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
 
 	NSString *photo = nil;
 	NSString *user = nil;
@@ -210,17 +210,17 @@ enum {
 
 + (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	return [@"/rsp/photos" isEqualToString:p] || [@"/rsp/photoset" isEqualToString:p];
+	return PGEqualObjects(p, @"/rsp/photos") || PGEqualObjects(p, @"/rsp/photoset");
 }
 
 #pragma mark -PGXMLParser
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	if([@"/rsp/photoset" isEqualToString:p]) {
+	if(PGEqualObjects(p, @"/rsp/photoset")) {
 		[_title release];
 		_title = [[attrs objectForKey:@"id"] copy];
-	} else if([@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) [self useSubparser:[[[PGFlickrPhotoParser alloc] init] autorelease]];
+	} else if(PGEqualObjects(p, @"/rsp/photos/photo") || PGEqualObjects(p, @"/rsp/photoset/photo")) [self useSubparser:[[[PGFlickrPhotoParser alloc] init] autorelease]];
 }
 
 #pragma mark -PGXMLParser(PGXMLParserNodeCreation)
@@ -250,7 +250,7 @@ enum {
 
 + (BOOL)canParseTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	return [@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p] || [@"/rsp/err" isEqualToString:p];
+	return PGEqualObjects(p, @"/rsp/photo") || PGEqualObjects(p, @"/rsp/photos/photo") || PGEqualObjects(p, @"/rsp/photoset/photo") || PGEqualObjects(p, @"/rsp/err");
 }
 
 #pragma mark -PGFlickrPhotoParser
@@ -264,7 +264,7 @@ enum {
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	if([@"/rsp/photo" isEqualToString:p] || [@"/rsp/photos/photo" isEqualToString:p] || [@"/rsp/photoset/photo" isEqualToString:p]) {
+	if(PGEqualObjects(p, @"/rsp/photo") || PGEqualObjects(p, @"/rsp/photos/photo") || PGEqualObjects(p, @"/rsp/photoset/photo")) {
 		[_farm release];
 		_farm = [[attrs objectForKey:@"farm"] copy];
 		[_server release];
@@ -283,7 +283,7 @@ enum {
 		}
 		NSString *const title = [attrs objectForKey:@"title"];
 		if(title) [_title setString:title];
-	} else if([@"/rsp/err" isEqualToString:p]) {
+	} else if(PGEqualObjects(p, @"/rsp/err")) {
 		[_errorString release];
 		_errorString = [[attrs objectForKey:@"msg"] copy];
 		_errorCode = [[attrs objectForKey:@"code"] integerValue];
@@ -291,7 +291,7 @@ enum {
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
 {
-	return [@"/rsp/photo/title" isEqualToString:p] ? _title : [super contentStringForTagPath:p];
+	return PGEqualObjects(p, @"/rsp/photo/title") ? _title : [super contentStringForTagPath:p];
 }
 
 #pragma mark -PGXMLParser(PGXMLParserNodeCreation)

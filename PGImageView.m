@@ -277,7 +277,7 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if(_cacheLayer || !_rep || ([self canAnimateRep] && [self animates]) || ![self usesCaching] || [self inLiveResize] || _sizeTransitionTimer) return;
 	NSString *const runLoopMode = [[NSRunLoop currentRunLoop] currentMode];
-	if(!runLoopMode || [NSEventTrackingRunLoopMode isEqualToString:runLoopMode]) {
+	if(!runLoopMode || PGEqualObjects(runLoopMode, NSEventTrackingRunLoopMode)) {
 		if(!_awaitingUpdate) [self performSelector:@selector(_update) withObject:nil afterDelay:0.0f inModes:[NSArray arrayWithObject:NSDefaultRunLoopMode]];
 		_awaitingUpdate = YES;
 		return;

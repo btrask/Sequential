@@ -29,6 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
+// Categories
+#import "PGFoundationAdditions.h"
+
 NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 @interface PGContainerAdapter(Private)
@@ -92,7 +95,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 - (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent
 {
-	for(PGNode *const child in _unsortedChildren) if([anIdent isEqual:[child identifier]]) return child;
+	for(PGNode *const child in _unsortedChildren) if(PGEqualObjects(anIdent, [child identifier])) return child;
 	return nil;
 }
 - (NSUInteger)viewableIndexOfChild:(PGNode *)aNode

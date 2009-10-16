@@ -58,7 +58,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 	[[textView textStorage] removeLayoutManager:[textView layoutManager]];
 	NSDictionary *attrs = nil;
 	[[[NSTextStorage alloc] initWithURL:[path PG_fileURL] options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:NSUTF8StringEncoding], NSCharacterEncodingDocumentAttribute, nil] documentAttributes:&attrs error:NULL] addLayoutManager:[textView layoutManager]];
-	if([NSPlainTextDocumentType isEqualToString:[attrs objectForKey:NSDocumentTypeDocumentAttribute]]) {
+	if(PGEqualObjects([attrs objectForKey:NSDocumentTypeDocumentAttribute], NSPlainTextDocumentType)) {
 		NSFont *const font = [NSFont fontWithName:@"Monaco" size:10.0f]; // There's no way to ask for the system-wide fixed pitch font, so we use 10pt Monaco since it's the default for TextEdit.
 		if(font) [textView setFont:font];
 	}
@@ -105,7 +105,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)ident willBeInsertedIntoToolbar:(BOOL)flag
 {
-	NSParameterAssert([PGPaneItemKey isEqualToString:ident]);
+	NSParameterAssert(PGEqualObjects(ident, PGPaneItemKey));
 	NSToolbarItem *const item = [[[NSToolbarItem alloc] initWithItemIdentifier:ident] autorelease];
 	[item setView:paneControl];
 	[item setMinSize:[paneControl frame].size];

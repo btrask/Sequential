@@ -304,7 +304,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)setRecentDocumentIdentifiers:(NSArray *)anArray
 {
 	NSParameterAssert(anArray);
-	if(_recentDocumentIdentifiers && [anArray isEqual:_recentDocumentIdentifiers]) return;
+	if(PGEqualObjects(anArray, _recentDocumentIdentifiers)) return;
 	[_recentDocumentIdentifiers PG_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_recentDocumentIdentifiers PG_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
@@ -356,7 +356,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (BOOL)pathFinderRunning
 {
-	for(NSDictionary *const dict in [[NSWorkspace sharedWorkspace] launchedApplications]) if([PGPathFinderApplicationName isEqualToString:[dict objectForKey:@"NSApplicationName"]]) return YES;
+	for(NSDictionary *const dict in [[NSWorkspace sharedWorkspace] launchedApplications]) if(PGEqualObjects([dict objectForKey:@"NSApplicationName"], PGPathFinderApplicationName)) return YES;
 	return NO;
 }
 
@@ -387,7 +387,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident
 {
-	for(PGDocument *const doc in _documents) if([[doc originalIdentifier] isEqual:ident]) return doc;
+	for(PGDocument *const doc in _documents) if(PGEqualObjects([doc originalIdentifier], ident)) return doc;
 	return nil;
 }
 - (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document
@@ -752,7 +752,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			NSString *const name = [identifier displayName];
 
 			BOOL uniqueName = YES;
-			for(PGDisplayableIdentifier *const comparisonIdentifier in identifiers) if(comparisonIdentifier != identifier && [[comparisonIdentifier displayName] isEqual:name]) {
+			for(PGDisplayableIdentifier *const comparisonIdentifier in identifiers) if(comparisonIdentifier != identifier && PGEqualObjects([comparisonIdentifier displayName], name)) {
 				uniqueName = NO;
 				break;
 			}

@@ -450,7 +450,7 @@ enum {
 		if(path || [identifier isFileIdentifier]) {
 			if(!path) path = [[identifier URL] path];
 			if(!attributes) attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
-			if(![NSFileTypeDirectory isEqualToString:[attributes fileType]]) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
+			if(!PGEqualObjects([attributes fileType], NSFileTypeDirectory)) dataLength = [attributes objectForKey:NSFileSize]; // File size is meaningless for folders.
 		}
 	} while(NO);
 	if(!PGEqualObjects(_dataLength, dataLength)) {
@@ -503,7 +503,7 @@ enum {
 }
 - (BOOL)isEqual:(id)anObject
 {
-	return [anObject isMemberOfClass:[self class]] && [[self identifier] isEqual:[anObject identifier]];
+	return [anObject isMemberOfClass:[self class]] && PGEqualObjects([self identifier], [anObject identifier]);
 }
 
 #pragma mark -

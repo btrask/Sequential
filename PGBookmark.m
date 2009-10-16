@@ -116,7 +116,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 }
 - (BOOL)isEqual:(id)anObject
 {
-	return [anObject isMemberOfClass:[self class]] && [[self documentIdentifier] isEqual:[anObject documentIdentifier]] && [[self fileIdentifier] isEqual:[anObject fileIdentifier]];
+	return [anObject isMemberOfClass:[self class]] && PGEqualObjects([self documentIdentifier], [anObject documentIdentifier]) && PGEqualObjects([self fileIdentifier], [anObject fileIdentifier]);
 }
 
 #pragma mark NSObject

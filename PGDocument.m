@@ -229,7 +229,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	[self _setInitialIdentifier:[aBookmark fileIdentifier]];
 	PGNode *const initialNode = [self _initialNode];
-	if([[initialNode identifier] isEqual:[aBookmark fileIdentifier]]) {
+	if(PGEqualObjects([initialNode identifier], [aBookmark fileIdentifier])) {
 		_openedBookmark = YES;
 		[[self displayController] activateNode:initialNode];
 		[[PGBookmarkController sharedBookmarkController] removeBookmark:aBookmark];

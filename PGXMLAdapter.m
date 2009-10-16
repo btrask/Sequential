@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGXMLParser.h"
 
+// Categories
+#import "PGFoundationAdditions.h"
+
 @interface PGMediaRSSParser : PGXMLParser
 {
 	@private
@@ -60,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	do {
 		if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist) break;
 		NSURL *const URL = [[info objectForKey:PGIdentifierKey] URL];
-		if(![[URL host] isEqualToString:@"flickr.com"] && ![[URL host] hasSuffix:@".flickr.com"]) break;
+		if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) break;
 		if(![[URL path] hasPrefix:@"/photos"]) break;
 		[info setObject:[[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] PG_resourceIdentifier] forKey:PGIdentifierKey];
 		[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
@@ -74,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSUInteger i = 0;
 		for(; i < [elements length]; i++) {
 			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
-			if(![@"alternate" isEqualToString:[[link rel] lowercaseString]]) continue;
+			if(!PGEqualObjects([[link rel] lowercaseString], @"alternate")) continue;
 			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
 			NSURL *const linkURL = [NSURL URLWithString:[link href] relativeToURL:docURL];
 			if(!linkURL) continue;
@@ -127,10 +130,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
 {
-	if([@"/oembed/version" isEqualToString:p]) return _version;
-	if([@"/oembed/type" isEqualToString:p]) return _type;
-	if([@"/oembed/title" isEqualToString:p]) return _title;
-	if([@"/oembed/url" isEqualToString:p]) return _URLString;
+	if(PGEqualObjects(p, @"/oembed/version")) return _version;
+	if(PGEqualObjects(p, @"/oembed/type")) return _type;
+	if(PGEqualObjects(p, @"/oembed/title")) return _title;
+	if(PGEqualObjects(p, @"/oembed/url")) return _URLString;
 	return [super contentStringForTagPath:p];
 }
 
@@ -142,11 +145,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (NSString *)title
 {
-	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _title : nil;
+	return PGEqualObjects(_version, @"1.0") && PGEqualObjects(_type, @"photo") ? _title : nil;
 }
 - (NSString *)URLString
 {
-	return [@"1.0" isEqualToString:_version] && [@"photo" isEqualToString:_type] ? _URLString : nil;
+	return PGEqualObjects(_version, @"1.0") && PGEqualObjects(_type, @"photo") ? _URLString : nil;
 }
 
 #pragma mark -NSObject
@@ -200,11 +203,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	if([@"/rss/channel/item" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemParser alloc] init] autorelease]];
+	if(PGEqualObjects(p, @"/rss/channel/item")) [self useSubparser:[[[PGMediaRSSItemParser alloc] init] autorelease]];
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
 {
-	return [@"/rss/channel/title" isEqualToString:p] ? _title : nil;
+	return PGEqualObjects(p, @"/rss/channel/title") ? _title : nil;
 }
 
 #pragma mark -PGXMLParser(PGXMLParserNodeCreation)
@@ -237,11 +240,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)beganTagPath:(NSString *)p attributes:(NSDictionary *)attrs
 {
-	if([@"/rss/channel/item/media:content" isEqualToString:p] || [@"rss/channel/item/media:group/media:content" isEqualToString:p]) [self useSubparser:[[[PGMediaRSSItemContentParser alloc] init] autorelease]];
+	if(PGEqualObjects(p, @"/rss/channel/item/media:content") || PGEqualObjects(p, @"rss/channel/item/media:group/media:content")) [self useSubparser:[[[PGMediaRSSItemContentParser alloc] init] autorelease]];
 }
 - (NSMutableString *)contentStringForTagPath:(NSString *)p
 {
-	if([@"/rss/channel/item/title" isEqualToString:p]) return _title;
+	if(PGEqualObjects(p, @"/rss/channel/item/title")) return _title;
 	return nil;
 }
 

@@ -108,10 +108,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 @synthesize backgroundColor = _backgroundColor;
 - (void)setBackgroundColor:(NSColor *)aColor
 {
-	if(aColor == _backgroundColor || (aColor && _backgroundColor && [aColor isEqual:_backgroundColor])) return;
+	if(PGEqualObjects(aColor, _backgroundColor)) return;
 	[_backgroundColor release];
 	_backgroundColor = [aColor copy];
-	_backgroundIsComplex = !_backgroundColor || [NSPatternColorSpace isEqualToString:[_backgroundColor colorSpaceName]];
+	_backgroundIsComplex = !_backgroundColor || PGEqualObjects([_backgroundColor colorSpaceName], NSPatternColorSpace);
 	if([[self documentView] isOpaque]) {
 		NSUInteger i;
 		NSRect rects[4];

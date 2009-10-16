@@ -131,7 +131,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 }
 - (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident
 {
-	for(PGBookmark *const bookmark in _bookmarks) if([ident isEqual:[bookmark documentIdentifier]]) return bookmark;
+	for(PGBookmark *const bookmark in _bookmarks) if(PGEqualObjects([bookmark documentIdentifier], ident)) return bookmark;
 	return nil;
 }
 
@@ -158,7 +158,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	}
 	NSMutableAttributedString *const title = [[[NSMutableAttributedString alloc] init] autorelease];
 	[title appendAttributedString:[[aBookmark documentIdentifier] attributedStringWithWithAncestory:NO]];
-	if(![[aBookmark documentIdentifier] isEqual:[aBookmark fileIdentifier]]) {
+	if(!PGEqualObjects([aBookmark documentIdentifier], [aBookmark fileIdentifier])) {
 		[[title mutableString] appendFormat:@" %C ", 0x25B8];
 		[title appendAttributedString:[[aBookmark fileIdentifier] attributedStringWithWithAncestory:NO]];
 	}

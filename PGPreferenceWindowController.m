@@ -97,11 +97,11 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 
 - (NSString *)_titleForPane:(NSString *)identifier
 {
-	if([PGGeneralPaneIdentifier isEqualToString:identifier]) {
+	if(PGEqualObjects(identifier, PGGeneralPaneIdentifier)) {
 		return NSLocalizedString(@"General", @"Title of general pref pane.");
-	} else if([PGNavigationPaneIdentifier isEqualToString:identifier]) {
+	} else if(PGEqualObjects(identifier, PGNavigationPaneIdentifier)) {
 		return NSLocalizedString(@"Navigation", @"Title of navigation pref pane.");
-	} else if([PGUpdatePaneIdentifier isEqualToString:identifier]) {
+	} else if(PGEqualObjects(identifier, PGUpdatePaneIdentifier)) {
 		return NSLocalizedString(@"Update", @"Title of update pref pane.");
 	}
 	return @"";
@@ -109,9 +109,9 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 - (void)_setCurrentPane:(NSString *)identifier
 {
 	NSView *newView = nil;
-	if([PGGeneralPaneIdentifier isEqualToString:identifier]) newView = generalView;
-	else if([PGNavigationPaneIdentifier isEqualToString:identifier]) newView = navigationView;
-	else if([PGUpdatePaneIdentifier isEqualToString:identifier]) newView = updateView;
+	if(PGEqualObjects(identifier, PGGeneralPaneIdentifier)) newView = generalView;
+	else if(PGEqualObjects(identifier, PGNavigationPaneIdentifier)) newView = navigationView;
+	else if(PGEqualObjects(identifier, PGUpdatePaneIdentifier)) newView = updateView;
 	NSAssert(newView, @"Invalid identifier.");
 	NSWindow *const w = [self window];
 	[w setTitle:NSLocalizedString(@"Preferences", nil)];
@@ -203,7 +203,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
 	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
+	if(PGEqualObjects(keyPath, PGMouseClickActionKey)) [self _updateSecondaryMouseActionLabel];
 	else [self PG_postNotificationName:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 }
 
@@ -243,11 +243,11 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 	[item setTarget:self];
 	[item setAction:@selector(changePane:)];
 	[item setLabel:[self _titleForPane:ident]];
-	if([PGGeneralPaneIdentifier isEqualToString:ident]) {
+	if(PGEqualObjects(ident, PGGeneralPaneIdentifier)) {
 		[item setImage:[NSImage imageNamed:@"Pref-General"]];
-	} else if([PGNavigationPaneIdentifier isEqualToString:ident]) {
+	} else if(PGEqualObjects(ident, PGNavigationPaneIdentifier)) {
 		[item setImage:[NSImage imageNamed:@"Pref-Navigation"]];
-	} else if([PGUpdatePaneIdentifier isEqualToString:ident]) {
+	} else if(PGEqualObjects(ident, PGUpdatePaneIdentifier)) {
 		[item setImage:[NSImage imageNamed:@"Pref-Update"]];
 	}
 	return item;

@@ -265,7 +265,7 @@ BOOL PGIsSnowLeopardOrLater(void)
 
 - (NSString *)PG_firstPathComponent
 {
-	for(NSString *const component in [self pathComponents]) if(![component isEqualToString:@"/"]) return component;
+	for(NSString *const component in [self pathComponents]) if(!PGEqualObjects(component, @"/")) return component;
 	return @"";
 }
 - (NSURL *)PG_fileURL
@@ -286,7 +286,7 @@ BOOL PGIsSnowLeopardOrLater(void)
 	NSArray *const components = [self componentsSeparatedByString:@" "];
 	NSMutableArray *const terms = [NSMutableArray arrayWithCapacity:[components count]];
 	for(NSString *const component in components) {
-		if([component isEqualToString:@""]) continue;
+		if(![component length]) continue;
 		NSScanner *const scanner = [NSScanner localizedScannerWithString:component];
 		NSInteger index;
 		if([scanner scanInteger:&index] && [scanner isAtEnd] && index != NSIntegerMax && index != NSIntegerMin) [terms addObject:[NSNumber numberWithInteger:index]];
@@ -348,10 +348,10 @@ BOOL PGIsSnowLeopardOrLater(void)
 
 	NSString *host = @"";
 	if(![scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@":/"] intoString:&host]) {
-		if(![@"file" isEqualToString:scheme] || [scanner isAtEnd]) return nil;
-	} else if([@"~" isEqualToString:host]) {
+		if(!PGEqualObjects(scheme, @"file") || [scanner isAtEnd]) return nil;
+	} else if(PGEqualObjects(host, @"~")) {
 		host = NSHomeDirectory();
-	} else if(![@"localhost" isEqual:host]) {
+	} else if(!PGEqualObjects(host, @"localhost")) {
 		NSCharacterSet *const subdomainDelimitingCharacters = [NSCharacterSet characterSetWithCharactersInString:@".-"];
 		NSScanner *const hostScanner = [NSScanner scannerWithString:host];
 		do {
@@ -365,7 +365,7 @@ BOOL PGIsSnowLeopardOrLater(void)
 	[URL appendString:host];
 
 	if([scanner scanString:@":" intoString:NULL]) {
-		if([@"file" isEqualToString:scheme]) return nil;
+		if(PGEqualObjects(scheme, @"file")) return nil;
 		NSInteger port;
 		if(![scanner scanInteger:&port]) return nil;
 		[URL appendFormat:@":%ld", (long)port];
