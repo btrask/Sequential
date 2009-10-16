@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGFloatingPanelController(Private)
 
@@ -153,7 +153,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_displayController release];
 	[super dealloc];
 }

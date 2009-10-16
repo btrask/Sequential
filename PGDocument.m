@@ -43,8 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGDocumentWillRemoveNodesNotification          = @"PGDocumentWillRemoveNodes";
 NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSortedNodesDidChange";
@@ -81,14 +80,14 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		if([_originalIdentifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
-			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] AE_fileURL] PG_displayableIdentifier];
+			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] PG_fileURL] PG_displayableIdentifier];
 			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier dataSource:nil];
 			[_node startLoadWithInfo:nil];
 			[self _setInitialIdentifier:ident];
 		}
-		[_originalIdentifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		[_originalIdentifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
 		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
-		[_subscription AE_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		[_subscription PG_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
 	}
 	return self;
@@ -152,7 +151,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	if(anOrientation == _baseOrientation) return;
 	_baseOrientation = anOrientation;
-	[self AE_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
+	[self PG_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
 }
 - (BOOL)isProcessingNodes
 {
@@ -248,7 +247,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		_storedNode = [newStoredNode retain];
 		_storedOffset = PGRectEdgeMaskToSizeWithMagnitude(PGReadingDirectionAndLocationToRectEdgeMask([self readingDirection], PGHomeLocation), CGFLOAT_MAX);
 	}
-	[self AE_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
+	[self PG_postNotificationName:PGDocumentWillRemoveNodesNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, anArray, PGDocumentRemovedChildrenKey, nil]];
 }
 - (void)noteSortedChildrenDidChange
 {
@@ -261,21 +260,21 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
 	[[self node] addMenuItemsToMenu:_pageMenu];
 	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
-	[self AE_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
+	[self PG_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
 {
-	if(_node) [self AE_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	if(_node) [self PG_postNotificationName:PGDocumentNodeIsViewableDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeThumbnailDidChange:(PGNode *)node recursively:(BOOL)flag
 {
-	if(node) [self AE_postNotificationName:PGDocumentNodeThumbnailDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, [NSNumber numberWithBool:flag], PGDocumentUpdateRecursivelyKey, nil]];
+	if(node) [self PG_postNotificationName:PGDocumentNodeThumbnailDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:node, PGDocumentNodeKey, [NSNumber numberWithBool:flag], PGDocumentUpdateRecursivelyKey, nil]];
 }
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node
 {
 	if(!_node) return;
 	if([self node] == node) [[self displayController] synchronizeWindowTitleWithDocumentName];
-	[self AE_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
+	[self PG_postNotificationName:PGDocumentNodeDisplayNameDidChangeNotification userInfo:[NSDictionary dictionaryWithObject:node forKey:PGDocumentNodeKey]];
 }
 - (void)noteNodeDidCache:(PGNode *)node
 {
@@ -299,7 +298,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	NSParameterAssert(aNotif);
 	NSUInteger const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntegerValue];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
-	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] AE_fileURL] PG_resourceIdentifier];
+	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] PG_fileURL] PG_resourceIdentifier];
 	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 
@@ -382,7 +381,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_node cancelLoad];
 	[_node detachFromTree];
 	[_originalIdentifier release];

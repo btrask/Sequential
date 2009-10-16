@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGRoundedBackgroundView.h"
 
 // Categories
-#import "NSBezierPathAdditions.h"
+#import "PGAppKitAdditions.h"
 
 @implementation PGRoundedBackgroundView
 
@@ -38,7 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawRect:(NSRect)aRect
 {
 	[[NSColor windowBackgroundColor] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect([self bounds], 1.0f, 1.0f) cornerRadius:20.0f] fill];
+	[[NSBezierPath PG_bezierPathWithRoundRect:NSInsetRect([self bounds], 1.0f, 1.0f) cornerRadius:20.0f] fill];
 }
 
 #pragma mark -NSResponder

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 
 // Categories
-#import "DOMNodeAdditions.h"
+#import "PGWebKitAdditions.h"
 
 NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
@@ -81,8 +81,8 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 {
 	DOMHTMLDocument *const doc = [[self info] objectForKey:PGDOMDocumentKey];
 	if(!doc) return [self load];
-	NSArray *identifiers = [doc AE_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
-	if(![identifiers count]) identifiers = [doc AE_imageSrcIdentifiers];
+	NSArray *identifiers = [doc PG_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
+	if(![identifiers count]) identifiers = [doc PG_imageSrcIdentifiers];
 	NSMutableArray *const pages = [NSMutableArray array];
 	for(PGDisplayableIdentifier *const ident in identifiers) {
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident dataSource:nil] autorelease];

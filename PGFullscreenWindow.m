@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFullscreenWindow.h"
 
 // Categories
-#import "NSWindowAdditions.h"
+#import "PGAppKitAdditions.h"
 
 @implementation PGFullscreenWindow
 

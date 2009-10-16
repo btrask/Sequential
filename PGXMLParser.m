@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGXMLParser(Private)
 
@@ -169,7 +169,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:[URL PG_resourceIdentifier], PGIdentifierKey, nil] : nil;
 	}
 	NSMutableArray *const dicts = [NSMutableArray array];
-	for(PGXMLParser *const parser in _subparsers) [dicts addObjectsFromArray:[[parser info] AE_asArray]];
+	for(PGXMLParser *const parser in _subparsers) [dicts addObjectsFromArray:[[parser info] PG_asArray]];
 	return dicts;
 }
 - (NSString *)URLString

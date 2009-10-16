@@ -28,10 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 
 // Categories
-#import "NSColorAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSScreenAdditions.h"
-#import "NSUserDefaultsAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification = @"PGPreferenceWindowControllerBackgroundPatternColorDidChange";
 NSString *const PGPreferenceWindowControllerDisplayScreenDidChangeNotification          = @"PGPreferenceWindowControllerDisplayScreenDidChange";
@@ -80,8 +78,8 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 
 - (NSColor *)backgroundPatternColor
 {
-	NSColor *const color = [[NSUserDefaults standardUserDefaults] AE_decodedObjectForKey:@"PGBackgroundColor"];
-	return [[[NSUserDefaults standardUserDefaults] objectForKey:@"PGBackgroundPattern"] unsignedIntegerValue] == PGCheckerboardPattern ? [color AE_checkerboardPatternColor] : color;
+	NSColor *const color = [[NSUserDefaults standardUserDefaults] PG_decodedObjectForKey:@"PGBackgroundColor"];
+	return [[[NSUserDefaults standardUserDefaults] objectForKey:@"PGBackgroundPattern"] unsignedIntegerValue] == PGCheckerboardPattern ? [color PG_checkerboardPatternColor] : color;
 }
 - (NSScreen *)displayScreen
 {
@@ -92,7 +90,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 	[_displayScreen autorelease];
 	_displayScreen = [aScreen retain];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:[[NSScreen screens] indexOfObjectIdenticalTo:aScreen]] forKey:PGDisplayScreenIndexKey];
-	[self AE_postNotificationName:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
+	[self PG_postNotificationName:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
 }
 
 #pragma mark -PGPreferenceWindowController(Private)
@@ -182,9 +180,9 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 
 		NSArray *const screens = [NSScreen screens];
 		NSUInteger const screenIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:PGDisplayScreenIndexKey] unsignedIntegerValue];
-		[self setDisplayScreen:screenIndex >= [screens count] ? [NSScreen AE_mainScreen] : [screens objectAtIndex:screenIndex]];
+		[self setDisplayScreen:screenIndex >= [screens count] ? [NSScreen PG_mainScreen] : [screens objectAtIndex:screenIndex]];
 
-		[NSApp AE_addObserver:self selector:@selector(applicationDidChangeScreenParameters:) name:NSApplicationDidChangeScreenParametersNotification];
+		[NSApp PG_addObserver:self selector:@selector(applicationDidChangeScreenParameters:) name:NSApplicationDidChangeScreenParametersNotification];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundColorKey options:kNilOptions context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGBackgroundPatternKey options:kNilOptions context:self];
 		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGMouseClickActionKey options:kNilOptions context:self];
@@ -193,7 +191,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundColorKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGBackgroundPatternKey];
 	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGMouseClickActionKey];
@@ -206,7 +204,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 {
 	if(context != self) return [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 	if([keyPath isEqualToString:PGMouseClickActionKey]) [self _updateSecondaryMouseActionLabel];
-	else [self AE_postNotificationName:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
+	else [self PG_postNotificationName:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 }
 
 #pragma mark -<NSApplicationDelegate>

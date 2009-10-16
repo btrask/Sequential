@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 
 // Categories
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGFolderAdapter
 
@@ -63,7 +63,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		static NSArray *ignoredPaths = nil;
 		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];
 		if([ignoredPaths containsObject:pagePath]) continue;
-		NSURL *const pageURL = [pagePath AE_fileURL];
+		NSURL *const pageURL = [pagePath PG_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
 		PGDisplayableIdentifier *const pageIdent = [pageURL PG_displayableIdentifier];
 		PGNode *node = [self childForIdentifier:pageIdent];

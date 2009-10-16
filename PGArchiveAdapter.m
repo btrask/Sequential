@@ -36,8 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCancelableProxy.h"
 
 // Categories
-#import "NSMutableDictionaryAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 static id PGArchiveAdapterList = nil;
@@ -91,7 +90,7 @@ static id PGArchiveAdapterList = nil;
 		if(!entryPath || (![entryPath hasPrefix:path] && ![path isEqualToString:@""])) continue;
 		[indexes removeIndex:i];
 		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
-		NSString *const subpath = [path stringByAppendingPathComponent:[[entryPath substringFromIndex:[path length]] AE_firstPathComponent]];
+		NSString *const subpath = [path stringByAppendingPathComponent:[[entryPath substringFromIndex:[path length]] PG_firstPathComponent]];
 		if([path isEqualToString:entryPath]) continue;
 		BOOL const isEntrylessFolder = ![subpath isEqualToString:entryPath];
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
@@ -197,8 +196,8 @@ static id PGArchiveAdapterList = nil;
 	NSUInteger const i = [[sender identifier] index];
 	if(NSNotFound == i) return;
 	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
-	if(![info objectForKey:PGOSTypeKey]) [info AE_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
-	if(![info objectForKey:PGExtensionKey]) [info AE_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
+	if(![info objectForKey:PGOSTypeKey]) [info PG_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
+	if(![info objectForKey:PGExtensionKey]) [info PG_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
 }
 - (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
 {

@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGActivityPanelController(Private)
 

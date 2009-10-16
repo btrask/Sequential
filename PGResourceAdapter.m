@@ -35,11 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSAffineTransformAdditions.h"
-#import "NSDateAdditions.h"
-#import "NSImageRepAdditions.h"
-#import "NSMenuItemAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGSubstitutedClassKey = @"PGSubstitutedClass";
 
@@ -151,7 +148,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 + (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict
 {
 	NSImageRep *rep = [dict objectForKey:PGImageRepKey];
-	if(!rep) rep = [NSImageRep AE_bestImageRepWithData:[dict objectForKey:PGDataKey]];
+	if(!rep) rep = [NSImageRep PG_bestImageRepWithData:[dict objectForKey:PGDataKey]];
 	if(!rep) return nil;
 	PGOrientation const orientation = [[dict objectForKey:PGOrientationKey] unsignedIntegerValue];
 	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
@@ -162,7 +159,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 	[NSGraphicsContext setCurrentContext:ctx];
 	[ctx setImageInterpolation:NSImageInterpolationHigh];
 	NSRect rect = NSMakeRect(0.0f, 0.0f, s.width, s.height);
-	if(PGUpright != orientation) [[NSAffineTransform AE_transformWithRect:&rect orientation:orientation] concat];
+	if(PGUpright != orientation) [[NSAffineTransform PG_transformWithRect:&rect orientation:orientation] concat];
 	[rep drawInRect:rect];
 	[NSGraphicsContext setCurrentContext:nil];
 	return thumbRep;
@@ -316,7 +313,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 - (void)setRealThumbnail:(NSImage *)anImage validAsOf:(NSDate *)date
 {
 	if(anImage == _realThumbnail) return;
-	if(date && _lastThumbnailInvalidation && [_lastThumbnailInvalidation AE_isAfter:date]) {
+	if(date && _lastThumbnailInvalidation && [_lastThumbnailInvalidation PG_isAfter:date]) {
 		(void)[self thumbnail];
 		return;
 	}
@@ -619,7 +616,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
-	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] AE_matchesSearchTerms:terms] ? [self node] : nil;
+	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] PG_matchesSearchTerms:terms] ? [self node] : nil;
 }
 
 #pragma mark -
@@ -642,7 +639,7 @@ static NSMutableArray  *PGInfoDictionaries                = nil;
 
 - (void)addMenuItemsToMenu:(NSMenu *)aMenu
 {
-	[[[self node] menuItem] AE_removeFromMenu];
+	[[[self node] menuItem] PG_removeFromMenu];
 	[aMenu addItem:[[self node] menuItem]];
 }
 

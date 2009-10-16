@@ -43,8 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSWindowAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThumbnailControllerContentInsetDidChange";
 
@@ -76,19 +76,19 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	if(aController == _displayController) return;
 	[[_window parentWindow] removeChildWindow:_window];
-	[_displayController AE_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[_displayController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
-	[[_displayController clipView] AE_removeObserver:self name:PGClipViewBoundsDidChangeNotification];
-	[[_displayController window] AE_removeObserver:self name:NSWindowDidResizeNotification];
-	[[_displayController windowForSheet] AE_removeObserver:self name:NSWindowWillBeginSheetNotification];
-	[[_displayController windowForSheet] AE_removeObserver:self name:NSWindowDidEndSheetNotification];
+	[_displayController PG_removeObserver:self name:PGDisplayControllerActiveNodeDidChangeNotification];
+	[_displayController PG_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
+	[[_displayController clipView] PG_removeObserver:self name:PGClipViewBoundsDidChangeNotification];
+	[[_displayController window] PG_removeObserver:self name:NSWindowDidResizeNotification];
+	[[_displayController windowForSheet] PG_removeObserver:self name:NSWindowWillBeginSheetNotification];
+	[[_displayController windowForSheet] PG_removeObserver:self name:NSWindowDidEndSheetNotification];
 	_displayController = aController;
-	[_displayController AE_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
-	[_displayController AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
-	[[_displayController clipView] AE_addObserver:self selector:@selector(clipViewBoundsDidChange:) name:PGClipViewBoundsDidChangeNotification];
-	[[_displayController window] AE_addObserver:self selector:@selector(parentWindowDidResize:) name:NSWindowDidResizeNotification];
-	[[_displayController windowForSheet] AE_addObserver:self selector:@selector(parentWindowWillBeginSheet:) name:NSWindowWillBeginSheetNotification];
-	[[_displayController windowForSheet] AE_addObserver:self selector:@selector(parentWindowDidEndSheet:) name:NSWindowDidEndSheetNotification];
+	[_displayController PG_addObserver:self selector:@selector(displayControllerActiveNodeDidChange:) name:PGDisplayControllerActiveNodeDidChangeNotification];
+	[_displayController PG_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
+	[[_displayController clipView] PG_addObserver:self selector:@selector(clipViewBoundsDidChange:) name:PGClipViewBoundsDidChangeNotification];
+	[[_displayController window] PG_addObserver:self selector:@selector(parentWindowDidResize:) name:NSWindowDidResizeNotification];
+	[[_displayController windowForSheet] PG_addObserver:self selector:@selector(parentWindowWillBeginSheet:) name:NSWindowWillBeginSheetNotification];
+	[[_displayController windowForSheet] PG_addObserver:self selector:@selector(parentWindowDidEndSheet:) name:NSWindowDidEndSheetNotification];
 	[_window setIgnoresMouseEvents:!![[_displayController windowForSheet] attachedSheet]];
 	[self setDocument:[_displayController activeDocument]];
 	[self display];
@@ -97,15 +97,15 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)setDocument:(PGDocument *)aDoc
 {
 	if(aDoc == _document) return;
-	[_document AE_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
-	[_document AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
-	[_document AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
-	[_document AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
+	[_document PG_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
+	[_document PG_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+	[_document PG_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
+	[_document PG_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 	_document = aDoc;
-	[_document AE_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
-	[_document AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
-	[_document AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
-	[_document AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
+	[_document PG_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
+	[_document PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
+	[_document PG_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
+	[_document PG_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
 	[self _updateWindowFrame];
 	[self displayControllerActiveNodeDidChange:nil];
 	[self documentBaseOrientationDidChange:nil];
@@ -188,11 +188,11 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	NSWindow *const p = [_displayController window];
 	if(!p) return;
-	NSRect const r = [p AE_contentRect];
-	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window AE_userSpaceScaleFactor], NSHeight(r));
+	NSRect const r = [p PG_contentRect];
+	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window PG_userSpaceScaleFactor], NSHeight(r));
 	if(NSEqualRects(newFrame, [_window frame])) return;
 	[_window setFrame:newFrame display:YES];
-	[self AE_postNotificationName:PGThumbnailControllerContentInsetDidChangeNotification];
+	[self PG_postNotificationName:PGThumbnailControllerContentInsetDidChangeNotification];
 }
 
 #pragma mark -NSObject
@@ -216,7 +216,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_window setDelegate:nil];
 	[_window release];
 	[_browser release];
@@ -263,7 +263,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	id const item = [sender representedObject];
 	if(item) return [item isContainer] ? [item sortedChildren] : nil;
 	PGNode *const root = [[self document] node];
-	if([root isViewable]) return [root AE_asArray];
+	if([root isViewable]) return [root PG_asArray];
 	return [root isContainer] ? [(PGContainerAdapter *)root sortedChildren] : nil;
 }
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item

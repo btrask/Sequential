@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <sys/resource.h>
 #import <objc/Protocol.h>
 #import "Sparkle/Sparkle.h"
+#import <tgmath.h>
 
 // Models
 #import "PGDocument.h"
@@ -53,13 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGLegacy.h"
 
 // Categories
-#import "NSArrayAdditions.h"
-#import "NSColorAdditions.h"
-#import "NSMenuItemAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
-#import "NSUserDefaultsAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
@@ -284,19 +280,19 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (BOOL)performZoomIn
 {
-	return [zoomIn AE_performAction];
+	return [zoomIn PG_performAction];
 }
 - (BOOL)performZoomOut
 {
-	return [zoomOut AE_performAction];
+	return [zoomOut PG_performAction];
 }
 - (BOOL)performToggleFullscreen
 {
-	return [toggleFullscreen AE_performAction];
+	return [toggleFullscreen PG_performAction];
 }
 - (BOOL)performToggleInfo
 {
-	return [toggleInfo AE_performAction];
+	return [toggleInfo PG_performAction];
 }
 
 #pragma mark -
@@ -309,12 +305,12 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	NSParameterAssert(anArray);
 	if(_recentDocumentIdentifiers && [anArray isEqual:_recentDocumentIdentifiers]) return;
-	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_recentDocumentIdentifiers AE_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	[_recentDocumentIdentifiers PG_removeObjectObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers PG_removeObjectObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_recentDocumentIdentifiers release];
 	_recentDocumentIdentifiers = [[anArray subarrayWithRange:NSMakeRange(0, MIN([anArray count], [self maximumRecentDocumentCount]))] copy];
-	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_recentDocumentIdentifiers AE_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	[_recentDocumentIdentifiers PG_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_recentDocumentIdentifiers PG_addObjectObserver:self selector:@selector(recentDocumentIdentifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[self recentDocumentIdentifierDidChange:nil];
 }
 - (NSUInteger)maximumRecentDocumentCount
@@ -352,10 +348,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 @synthesize currentDocument = _currentDocument;
 - (void)setCurrentDocument:(PGDocument *)document
 {
-	[[self currentPrefObject] AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
+	[[self currentPrefObject] PG_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	_currentDocument = document;
 	[self _setPageMenu:_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu]];
-	[[self currentPrefObject] AE_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
+	[[self currentPrefObject] PG_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
 	[self readingDirectionDidChange:nil];
 }
 - (BOOL)pathFinderRunning
@@ -386,7 +382,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_documents removeObject:document];
 	NSUInteger const i = [windowsMenu indexOfItemWithRepresentedObject:document];
 	if(NSNotFound != i) [windowsMenu removeItemAtIndex:i];
-	if(![_documents count]) [windowsMenuSeparator AE_removeFromMenu];
+	if(![_documents count]) [windowsMenuSeparator PG_removeFromMenu];
 	[self _setFullscreen:[_documents count] > 0];
 }
 - (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident
@@ -594,7 +590,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)dealloc
 {
 	if(PGSharedDocumentController == self) [[NSAppleEventManager sharedAppleEventManager] removeEventHandlerForEventClass:kInternetEventClass andEventID:kAEGetURL];
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[defaultPageMenu release];
 	[windowsMenuSeparator release];
 	[_updateTimer invalidate];
@@ -675,7 +671,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[defaultPageMenu retain];
 	[windowsMenuSeparator retain];
-	[windowsMenuSeparator AE_removeFromMenu];
+	[windowsMenuSeparator PG_removeFromMenu];
 
 	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
 	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
@@ -722,11 +718,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (BOOL)application:(NSApplication *)sender openFile:(NSString *)filename
 {
-	return !![self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
+	return !![self openDocumentWithContentsOfURL:[filename PG_fileURL] display:YES];
 }
 - (void)application:(NSApplication *)sender openFiles:(NSArray *)filenames
 {
-	for(NSString *const filename in filenames) [self openDocumentWithContentsOfURL:[filename AE_fileURL] display:YES];
+	for(NSString *const filename in filenames) [self openDocumentWithContentsOfURL:[filename PG_fileURL] display:YES];
 	[sender replyToOpenOrPrint:NSApplicationDelegateReplySuccess];
 }
 
@@ -735,7 +731,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
 {
 	if(menu == recentMenu) {
-		[_recentMenuSeparatorItem AE_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
+		[_recentMenuSeparatorItem PG_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
 		NSMutableArray *const identifiers = [NSMutableArray array];
 		for(PGDisplayableIdentifier *const identifier in [self recentDocumentIdentifiers]) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
 		[self setRecentDocumentIdentifiers:identifiers];
@@ -804,10 +800,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	if([PGApplication class] != self) return;
 
-	PGNSWindowValidateMenuItem = [NSWindow AE_useImplementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
-	PGNSViewNextValidKeyView = [NSView AE_useImplementationFromClass:[PGView class] forSelector:@selector(nextValidKeyView)];
-	PGNSViewPreviousValidKeyView = [NSView AE_useImplementationFromClass:[PGView class] forSelector:@selector(previousValidKeyView)];
-	PGNSMenuPerformKeyEquivalent = [NSMenu AE_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
+	PGNSWindowValidateMenuItem = [NSWindow PG_useImplementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
+	PGNSViewNextValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(nextValidKeyView)];
+	PGNSViewPreviousValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(previousValidKeyView)];
+	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
 
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
@@ -860,7 +856,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if(PGKeyUnknown == keyCode || [anEvent keyCode] != keyCode) continue; // Some non-English keyboard layouts switch to English when the Command key is held, but that doesn't help our shortcuts that don't use Command, so we have to check by key code.
 		NSUInteger const modifiersMask = NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask;
 		if(([anEvent modifierFlags] & modifiersMask) != ([item keyEquivalentModifierMask] & modifiersMask)) continue;
-		return [item AE_performAction];
+		return [item PG_performAction];
 	}
 	for(i = 0; i < count; i++) if([[[self itemAtIndex:i] submenu] performKeyEquivalent:anEvent]) return YES;
 	return [NSApp mainMenu] == self ? PGNSMenuPerformKeyEquivalent(self, _cmd, anEvent) : NO;

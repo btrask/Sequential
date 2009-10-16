@@ -33,11 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmark.h"
 
 // Categories
-#import "NSDateAdditions.h"
-#import "NSMutableDictionaryAdditions.h"
-#import "NSNumberAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
@@ -104,8 +100,8 @@ enum {
 	[_menuItem setAction:@selector(jumpToPage:)];
 	_allowMenuItemUpdates = YES;
 	[self _updateMenuItem];
-	[_identifier AE_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_identifier AE_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	[_identifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier PG_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	return self;
 }
 
@@ -272,14 +268,14 @@ enum {
 	NSParameterAssert((PGNodeLoadingOrReading & _status) == PGNodeReading);
 	_status &= ~PGNodeReading;
 	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	[dict AE_setObject:aRep forKey:PGImageRepKey];
+	[dict PG_setObject:aRep forKey:PGImageRepKey];
 	if(error) [dict setObject:error forKey:PGErrorKey];
 	else {
-		[dict AE_setObject:_error forKey:PGErrorKey];
+		[dict PG_setObject:_error forKey:PGErrorKey];
 		[_error release];
 		_error = nil;
 	}
-	[self AE_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
+	[self PG_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
 }
 
 #pragma mark -
@@ -311,7 +307,7 @@ enum {
 		case PGSortBySize:         r = [[self dataLength] compare:[node dataLength]]; break;
 		case PGSortShuffle:        return random() & 1 ? NSOrderedAscending : NSOrderedDescending;
 	}
-	return (NSOrderedSame == r ? [[[self identifier] displayName] AE_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
+	return (NSOrderedSame == r ? [[[self identifier] displayName] PG_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
 }
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types
 {
@@ -370,7 +366,7 @@ enum {
 - (NSArray *)_standardizedInfo:(id)info
 {
 	NSMutableArray *const results = [NSMutableArray array];
-	for(NSDictionary *const dict in [info AE_asArray]) [results addObject:[self _standardizedInfoDictionary:dict]];
+	for(NSDictionary *const dict in [info PG_asArray]) [results addObject:[self _standardizedInfoDictionary:dict]];
 	if(![results count]) [results addObject:[self _standardizedInfoDictionary:nil]];
 	return results;
 }
@@ -381,14 +377,14 @@ enum {
 	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
 	if(![mutableInfo objectForKey:PGIdentifierKey]) {
 		NSURL *const responseURL = [response URL];
-		[mutableInfo AE_setObject:responseURL ? [responseURL PG_resourceIdentifier] : [self identifier] forKey:PGIdentifierKey];
+		[mutableInfo PG_setObject:responseURL ? [responseURL PG_resourceIdentifier] : [self identifier] forKey:PGIdentifierKey];
 	}
-	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo AE_setObject:[response MIMEType] forKey:PGMIMETypeKey];
-	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo AE_setObject:[[[[mutableInfo objectForKey:PGIdentifierKey] URL] path] pathExtension] forKey:PGExtensionKey];
+	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo PG_setObject:[response MIMEType] forKey:PGMIMETypeKey];
+	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo PG_setObject:[[[[mutableInfo objectForKey:PGIdentifierKey] URL] path] pathExtension] forKey:PGExtensionKey];
 	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		NSData *const data = [self dataWithInfo:mutableInfo fast:YES];
-		if(data && [data length] >= 4) [mutableInfo AE_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
+		if(data && [data length] >= 4) [mutableInfo PG_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
 		[pool release]; // Dispose of the data ASAP.
 	}
 	[mutableInfo setObject:[NSNumber numberWithInteger:[self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist] forKey:PGDataExistenceKey];
@@ -403,9 +399,9 @@ enum {
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = _dateModified; break;
 		case PGSortByDateCreated:  date = _dateCreated; break;
-		case PGSortBySize: info = [_dataLength AE_localizedStringAsBytes]; break;
+		case PGSortBySize: info = [_dataLength PG_localizedStringAsBytes]; break;
 	}
-	if(date && !info) info = [date AE_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
+	if(date && !info) info = [date PG_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
 	[_menuItem setAttributedTitle:label];
 }
@@ -470,9 +466,9 @@ enum {
 
 - (void)dealloc
 {
-	// Using our generic -AE_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
-	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
-	[_identifier AE_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	// Using our generic -PG_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
+	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
+	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
 	[_identifier release];
 	[_menuItem release];

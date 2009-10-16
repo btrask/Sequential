@@ -23,10 +23,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGZooming.h"
+#import <tgmath.h>
 
 // Categories
-#import "NSWindowAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
 
 @implementation NSWindow(PGZooming)
 
@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSRect f = [self contentRectForFrameRect:[self frame]];
 	NSSize s = [[self contentView] PG_zoomedFrameSize];
-	s.width /= [self AE_userSpaceScaleFactor];
-	s.height /= [self AE_userSpaceScaleFactor];
+	s.width /= [self PG_userSpaceScaleFactor];
+	s.height /= [self PG_userSpaceScaleFactor];
 	f.origin.y += NSHeight(f) - s.height;
 	f.size = s;
 	return [self PG_constrainedFrameRect:[self frameRectForContentRect:f]];

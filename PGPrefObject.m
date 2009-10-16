@@ -23,10 +23,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGPrefObject.h"
+#import <tgmath.h>
 
 // Categories
-#import "NSObjectAdditions.h"
-#include <tgmath.h>
+#import "PGFoundationAdditions.h"
 
 NSString *const PGPrefObjectShowsInfoDidChangeNotification = @"PGPrefObjectShowsInfoDidChange";
 NSString *const PGPrefObjectShowsThumbnailsDidChangeNotification = @"PGPrefObjectShowsThumbnailsDidChange";
@@ -96,7 +96,7 @@ NSArray *PGScaleModes(void)
 	if(!flag == !_showsInfo) return;
 	_showsInfo = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsInfoKey];
-	[self AE_postNotificationName:PGPrefObjectShowsInfoDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectShowsInfoDidChangeNotification];
 }
 - (BOOL)showsThumbnails
 {
@@ -107,7 +107,7 @@ NSArray *PGScaleModes(void)
 	if(!flag == !_showsThumbnails) return;
 	_showsThumbnails = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGShowsThumbnailsKey];
-	[self AE_postNotificationName:PGPrefObjectShowsThumbnailsDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectShowsThumbnailsDidChangeNotification];
 }
 
 #pragma mark -
@@ -121,7 +121,7 @@ NSArray *PGScaleModes(void)
 	if(aDirection == _readingDirection) return;
 	_readingDirection = aDirection;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:aDirection == PGReadingDirectionRightToLeft] forKey:PGReadingDirectionRightToLeftKey];
-	[self AE_postNotificationName:PGPrefObjectReadingDirectionDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectReadingDirectionDidChangeNotification];
 }
 
 #pragma mark -
@@ -136,7 +136,7 @@ NSArray *PGScaleModes(void)
 	_imageScaleFactor = 1;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:aMode] forKey:PGImageScaleModeKey];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:1] forKey:PGImageScaleFactorKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
+	[self PG_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
 }
 
 - (CGFloat)imageScaleFactor
@@ -155,7 +155,7 @@ NSArray *PGScaleModes(void)
 	_imageScaleMode = PGConstantFactorScale;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:newFactor] forKey:PGImageScaleFactorKey];
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:PGConstantFactorScale] forKey:PGImageScaleModeKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:flag], PGPrefObjectAnimateKey, nil]];
+	[self PG_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:flag], PGPrefObjectAnimateKey, nil]];
 }
 
 - (PGImageScaleConstraint)imageScaleConstraint
@@ -167,7 +167,7 @@ NSArray *PGScaleModes(void)
 	if(constraint == _imageScaleConstraint) return;
 	_imageScaleConstraint = constraint;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:constraint] forKey:PGImageScaleConstraintKey];
-	[self AE_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
+	[self PG_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
 }
 
 #pragma mark -
@@ -181,7 +181,7 @@ NSArray *PGScaleModes(void)
 	if(!flag == !_animatesImages) return;
 	_animatesImages = flag;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:flag] forKey:PGAnimatesImagesKey];
-	[self AE_postNotificationName:PGPrefObjectAnimatesImagesDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectAnimatesImagesDidChangeNotification];
 }
 
 #pragma mark -
@@ -195,7 +195,7 @@ NSArray *PGScaleModes(void)
 	if(anOrder == _sortOrder) return;
 	_sortOrder = anOrder;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:anOrder] forKey:PGSortOrderKey];
-	[self AE_postNotificationName:PGPrefObjectSortOrderDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectSortOrderDidChangeNotification];
 }
 
 #pragma mark -
@@ -209,7 +209,7 @@ NSArray *PGScaleModes(void)
 	if(interval == _timerInterval) return;
 	_timerInterval = interval;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithDouble:interval] forKey:PGTimerIntervalKey];
-	[self AE_postNotificationName:PGPrefObjectTimerIntervalDidChangeNotification];
+	[self PG_postNotificationName:PGPrefObjectTimerIntervalDidChangeNotification];
 }
 
 #pragma mark -NSObject

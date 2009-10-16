@@ -22,14 +22,14 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "DOMNodeAdditions.h"
+#import "PGWebKitAdditions.h"
 
 // Models
 #import "PGResourceIdentifier.h"
 
-@implementation DOMHTMLDocument(AEAdditions)
+@implementation DOMHTMLDocument(PGWebKitAdditions)
 
-- (NSArray *)AE_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts
+- (NSArray *)PG_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	DOMHTMLCollection *const links = [self links];
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	return results;
 }
-- (NSArray *)AE_imageSrcIdentifiers
+- (NSArray *)PG_imageSrcIdentifiers
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	DOMHTMLCollection *const images = [self images];
@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		do {
 			DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
-			if([img AE_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+			if([img PG_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
 			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
 			if([results containsObject:ident]) continue;
 			NSString *const title = [img title]; // Prefer the title to the alt attribute.
@@ -78,11 +78,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
-@implementation DOMNode(AEAdditions)
+@implementation DOMNode(PGWebKitAdditions)
 
-- (BOOL)AE_hasAncestorWithNodeName:(NSString *)string
+- (BOOL)PG_hasAncestorWithNodeName:(NSString *)string
 {
-	return [[self nodeName] isEqualToString:string] ? YES : [[self parentNode] AE_hasAncestorWithNodeName:string];
+	return [[self nodeName] isEqualToString:string] ? YES : [[self parentNode] PG_hasAncestorWithNodeName:string];
 }
 
 @end

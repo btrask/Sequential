@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmark.h"
 
 // Categories
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGDynamicURL
 
@@ -86,7 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self init] release];
 	PGDisplayableIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
 	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
-	PGDisplayableIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] AE_fileURL] PG_displayableIdentifier];
+	PGDisplayableIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] PG_fileURL] PG_displayableIdentifier];
 	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
 }
 

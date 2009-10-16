@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSColorAdditions.h"
+#import "PGAppKitAdditions.h"
 
 @implementation PGTimerButton
 
@@ -77,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)drawWithFrame:(NSRect)b inView:(NSView *)v
 {
-	[[NSColor AE_bezelForegroundColor] set];
+	[[NSColor PG_bezelForegroundColor] set];
 	[[NSBezierPath bezierPathWithOvalInRect:NSInsetRect(b, 0.5f, 0.5f)] stroke];
 	[self drawInteriorWithFrame:b inView:v];
 }
@@ -108,7 +108,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[shadow setShadowBlurRadius:2.0f];
 		[shadow setShadowColor:[NSColor colorWithDeviceWhite:0.0f alpha:e ? 1.0f : 0.33f]];
 		[shadow set];
-		[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(20.0f, 20.0f), b)];
+		[NSBezierPath PG_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(20.0f, 20.0f), b)];
 		[shadow setShadowColor:nil];
 		[shadow set];
 	}

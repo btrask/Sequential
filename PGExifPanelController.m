@@ -33,8 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGExifPanelController
 
@@ -43,8 +42,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (IBAction)changeSearch:(id)sender
 {
 	NSMutableArray *const e = [NSMutableArray array];
-	NSArray *const terms = [[searchField stringValue] AE_searchTerms];
-	for(PGExifEntry *const entry in _allEntries) if([[entry label] AE_matchesSearchTerms:terms] || [[entry value] AE_matchesSearchTerms:terms]) [e addObject:entry];
+	NSArray *const terms = [[searchField stringValue] PG_searchTerms];
+	for(PGExifEntry *const entry in _allEntries) if([[entry label] PG_matchesSearchTerms:terms] || [[entry value] PG_matchesSearchTerms:terms]) [e addObject:entry];
 	[_matchingEntries release];
 	_matchingEntries = [e retain];
 	[entriesTable reloadData];
@@ -82,8 +81,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	PGDisplayController *const oldController = [self displayController];
 	if(![super setDisplayController:controller]) return NO;
-	[oldController AE_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
-	[[self displayController] AE_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
+	[oldController PG_removeObserver:self name:PGDisplayControllerActiveNodeWasReadNotification];
+	[[self displayController] PG_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
 	[self displayControllerActiveNodeWasRead:nil];
 	return YES;
 }

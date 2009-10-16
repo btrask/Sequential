@@ -23,15 +23,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGInfoView.h"
+#import <tgmath.h>
 
 // Views
 #import "PGBezelPanel.h"
 
 // Categories
-#import "NSBezierPathAdditions.h"
-#import "NSColorAdditions.h"
-#import "NSObjectAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 #define PGGraphicalIndicatorStyle YES
 #define PGMarginSize              4.0f // Outside the window.
@@ -72,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_stringValue release];
 	_stringValue = [string copy];
 	[self setNeedsDisplay:YES];
-	[self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	[self PG_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 }
 @synthesize index = _index;
 - (void)setIndex:(NSUInteger)anInt
@@ -87,7 +86,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(anInt == _count) return;
 	BOOL const showedIndicator = [self displaysProgressIndicator];
 	_count = anInt;
-	if(!showedIndicator != ![self displaysProgressIndicator]) [self AE_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
+	if(!showedIndicator != ![self displaysProgressIndicator]) [self PG_postNotificationName:PGBezelPanelFrameShouldChangeNotification];
 	else [self setNeedsDisplay:YES];
 }
 - (BOOL)displaysProgressIndicator
@@ -123,12 +122,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)drawRect:(NSRect)aRect
 {
 	NSRect const b = [self bounds];
-	NSBezierPath *const bezel = [NSBezierPath AE_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
-	[[NSColor AE_bezelBackgroundColor] set];
+	NSBezierPath *const bezel = [NSBezierPath PG_bezierPathWithRoundRect:b cornerRadius:PGCornerRadius];
+	[[NSColor PG_bezelBackgroundColor] set];
 	[bezel fill];
 	if(self.displaysProgressIndicator) {
-		[[NSColor AE_bezelForegroundColor] set];
-		[[NSBezierPath AE_bezierPathWithRoundRect:NSMakeRect((self.originCorner == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
+		[[NSColor PG_bezelForegroundColor] set];
+		[[NSBezierPath PG_bezierPathWithRoundRect:NSMakeRect((self.originCorner == PGMinXMinYCorner ? 0.5f + PGPaddingSize : NSWidth(b) - PGIndicatorWidth - PGPaddingSize + 0.5f), 0.5f + PGPaddingSize, PGIndicatorWidth - 1.0f, PGIndicatorHeight) cornerRadius:PGIndicatorRadius] stroke];
 
 		NSUInteger const maxValue = [self count] - 1;
 		NSBezierPath *const indicator = [NSBezierPath bezierPath];

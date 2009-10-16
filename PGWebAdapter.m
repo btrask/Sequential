@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGWebAdapter
 
@@ -87,7 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
-	if(sender == _mainLoad) [[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
+	if(sender == _mainLoad) [[self node] PG_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
 - (void)loadDidReceiveResponse:(PGURLLoad *)sender
 {

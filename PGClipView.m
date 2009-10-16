@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <IOKit/hidsystem/IOHIDLib.h>
 #import <IOKit/hidsystem/event_status_driver.h>
 #import <HMDTAppKit/HMAppKitEx.h>
+#import <tgmath.h>
 
 // Other
 #import "PGDelayedPerforming.h"
@@ -34,9 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGZooming.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSWindowAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidChange";
 
@@ -81,13 +81,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)setDocumentView:(NSView *)aView
 {
 	if(aView == documentView) return;
-	[documentView AE_removeObserver:self name:NSViewFrameDidChangeNotification];
+	[documentView PG_removeObserver:self name:NSViewFrameDidChangeNotification];
 	[documentView removeFromSuperview];
 	[documentView release];
 	documentView = [aView retain];
 	if(!documentView) return;
 	[self addSubview:documentView];
-	[documentView AE_addObserver:self selector:@selector(viewFrameDidChange:) name:NSViewFrameDidChangeNotification];
+	[documentView PG_addObserver:self selector:@selector(viewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 	[self viewFrameDidChange:nil];
 	[documentView setPostsFrameChangedNotifications:YES];
 }
@@ -99,7 +99,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_boundsInset = inset;
 	[self scrollTo:p animation:PGAllowAnimation];
 	[[self window] invalidateCursorRectsForView:self];
-	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	[self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 - (NSRect)insetBounds
 {
@@ -346,7 +346,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		if(PGMouseHiddenDraggingStyle) {
 			CGAssociateMouseAndMouseCursorPosition(true);
 			NXEventHandle const handle = NXOpenEventStatus();
-			NSPoint const screenPoint = PGPointInRect([[self window] convertBaseToScreen:finalPoint], [[self window] AE_contentRect]);
+			NSPoint const screenPoint = PGPointInRect([[self window] convertBaseToScreen:finalPoint], [[self window] PG_contentRect]);
 			IOHIDSetMouseLocation((io_connect_t)handle, round(screenPoint.x), round(CGDisplayPixelsHigh(kCGDirectMainDisplay) - screenPoint.y)); // Use this function instead of CGDisplayMoveCursorToPoint() because it doesn't make the mouse lag briefly after being moved.
 			NXCloseEventStatus(handle);
 			[NSCursor unhide];
@@ -430,7 +430,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSSize const offset = [self pinLocationOffset];
 	_documentFrame = [documentView frame];
 	[self scrollPinLocationToOffset:offset animation:PGNoAnimation];
-	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	[self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
 	NSParameterAssert(_documentViewIsResizing);
 	_documentViewIsResizing--;
 }
@@ -447,7 +447,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[self setBoundsOrigin:NSMakePoint(round(_immediatePosition.x), round(_immediatePosition.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	self.scrolling = NO;
-	[self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	[self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
 	return YES;
 }
 - (BOOL)_scrollTo:(NSPoint)aPoint
@@ -539,7 +539,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	CGFloat const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self AE_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 
 #pragma mark -NSView(PGClipViewAdditions)
@@ -757,7 +757,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[self stopAnimatedScrolling];
 	[documentView release];
 	[_backgroundColor release];

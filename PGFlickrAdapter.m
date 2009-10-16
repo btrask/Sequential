@@ -31,9 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGXMLParser.h"
 
 // Categories
-#import "NSMutableDictionaryAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSScannerAdditions.h"
+#import "PGFoundationAdditions.h"
 
 static NSString *const PGFlickrAPIKey = @"efba0200d782ae552a34fc78d18c02bc"; // Registered to me for use in Sequential. Do no evil.
 
@@ -89,7 +87,7 @@ enum {
 	NSString *tag = nil;
 	NSString *set = nil;
 	NSScanner *const scanner = [NSScanner scannerWithString:[URL path]];
-	if([scanner AE_scanFromString:@"/photos/" toString:@"/" intoString:&user]) {
+	if([scanner PG_scanFromString:@"/photos/" toString:@"/" intoString:&user]) {
 		if([[NSArray arrayWithObjects:@"tags", @"sets", nil] containsObject:user]) user = nil;
 		else {
 			[scanner scanString:@"/" intoString:NULL];
@@ -97,16 +95,16 @@ enum {
 			if([[NSArray arrayWithObjects:@"tags", @"sets", @"groups", @"archives", @"favorites", nil] containsObject:photo]) photo = nil;
 		}
 	}
-	[scanner AE_scanFromString:@"/groups/" toString:@"/" intoString:&group];
-	[scanner AE_scanFromString:@"/tags/" toString:@"/" intoString:&tag];
-	[scanner AE_scanFromString:@"/sets/" toString:@"/" intoString:&set];
+	[scanner PG_scanFromString:@"/groups/" toString:@"/" intoString:&group];
+	[scanner PG_scanFromString:@"/tags/" toString:@"/" intoString:&tag];
+	[scanner PG_scanFromString:@"/sets/" toString:@"/" intoString:&set];
 	if(!photo && !user && !group && !tag && !set) return PGNotAMatch;
 
-	[info AE_setObject:photo forKey:PGFlickrPhotoNameKey];
-	[info AE_setObject:user forKey:PGFlickrUserNameKey];
-	[info AE_setObject:group forKey:PGFlickrGroupNameKey];
-	[info AE_setObject:tag forKey:PGFlickrTagNameKey];
-	[info AE_setObject:set forKey:PGFlickrSetNameKey];
+	[info PG_setObject:photo forKey:PGFlickrPhotoNameKey];
+	[info PG_setObject:user forKey:PGFlickrUserNameKey];
+	[info PG_setObject:group forKey:PGFlickrGroupNameKey];
+	[info PG_setObject:tag forKey:PGFlickrTagNameKey];
+	[info PG_setObject:set forKey:PGFlickrSetNameKey];
 	return PGMatchByIntrinsicAttribute + 700;
 }
 
@@ -162,7 +160,7 @@ enum {
 
 - (void)loadLoadingDidProgress:(PGURLLoad *)sender
 {
-	[[self node] AE_postNotificationName:PGNodeLoadingDidProgressNotification];
+	[[self node] PG_postNotificationName:PGNodeLoadingDidProgressNotification];
 }
 - (void)loadDidReceiveResponse:(PGURLLoad *)sender
 {

@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGColorWell.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGColorWell
 
@@ -48,9 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)viewWillMoveToWindow:(NSWindow *)aWindow
 {
-	[[self window] AE_removeObserver:self name:NSWindowWillCloseNotification];
+	[[self window] PG_removeObserver:self name:NSWindowWillCloseNotification];
 	[super viewWillMoveToWindow:aWindow];
-	[aWindow AE_addObserver:self selector:@selector(PG_windowWillClose:) name:NSWindowWillCloseNotification];
+	[aWindow PG_addObserver:self selector:@selector(PG_windowWillClose:) name:NSWindowWillCloseNotification];
 }
 - (void)viewWillMoveToSuperview:(NSView *)newSuperview
 {
@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[super dealloc];
 }
 

@@ -23,6 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGThumbnailView.h"
+#import <tgmath.h>
 
 // Views
 #import "PGClipView.h"
@@ -31,10 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSAffineTransformAdditions.h"
-#import "NSBezierPathAdditions.h"
-#import "NSObjectAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 #define PGBackgroundHoleSize 6.0f
 #define PGBackgroundHoleSpacing 3.0f
@@ -208,11 +207,11 @@ static void PGDrawGradient(void)
 	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
 	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
 	[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:leftHoleRect cornerRadius:2.0f] fill];
-	[[NSBezierPath AE_bezierPathWithRoundRect:rightHoleRect cornerRadius:2.0f] fill];
+	[[NSBezierPath PG_bezierPathWithRoundRect:leftHoleRect cornerRadius:2.0f] fill];
+	[[NSBezierPath PG_bezierPathWithRoundRect:rightHoleRect cornerRadius:2.0f] fill];
 	[[NSColor clearColor] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] AE_fillUsingOperation:NSCompositeCopy];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] AE_fillUsingOperation:NSCompositeCopy];
+	[[NSBezierPath PG_bezierPathWithRoundRect:NSOffsetRect(leftHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] PG_fillUsingOperation:NSCompositeCopy];
+	[[NSBezierPath PG_bezierPathWithRoundRect:NSOffsetRect(rightHoleRect, 0.0f, 1.0f) cornerRadius:2.0f] PG_fillUsingOperation:NSCompositeCopy];
 
 	CGContextEndTransparencyLayer(imageContext);
 	[background unlockFocus];
@@ -287,7 +286,7 @@ static void PGDrawGradient(void)
 		}
 		NSImage *const thumb = [[self dataSource] thumbnailView:self thumbnailForItem:item];
 		if(!thumb) {
-			[NSBezierPath AE_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20.0f, 20.0f) startAtPetal:-1];
+			[NSBezierPath PG_drawSpinnerInRect:NSInsetRect([self frameOfItemAtIndex:i withMargin:NO], 20.0f, 20.0f) startAtPetal:-1];
 			continue;
 		}
 		NSSize originalSize = [thumb size];
@@ -303,7 +302,7 @@ static void PGDrawGradient(void)
 			[nilShadow set];
 		}
 		NSRect transformedThumbnailRect = thumbnailRect;
-		NSAffineTransform *const transform = [NSAffineTransform AE_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
+		NSAffineTransform *const transform = [NSAffineTransform PG_transformWithRect:&transformedThumbnailRect orientation:[[self dataSource] thumbnailView:self shouldRotateThumbnailForItem:item] ? PGAddOrientation(_thumbnailOrientation, PGFlippedVert) : PGFlippedVert]; // Also flip it vertically because our view is flipped and -drawInRect:… ignores that.
 		[transform concat];
 		[thumb drawInRect:transformedThumbnailRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.33f];
 		[transform invert];
@@ -356,7 +355,7 @@ static void PGDrawGradient(void)
 			[textContainer setContainerSize:labelSize]; // We center the text in the text container, so the final size has to be the right width.
 			NSRect const labelRect = NSIntegralRect(NSMakeRect(NSMidX(frame) - labelSize.width / 2.0f, NSMidY(frame) - labelSize.height / 2.0f, labelSize.width, labelSize.height));
 			[[(labelColor ? labelColor : [NSColor blackColor]) colorWithAlphaComponent:0.5f] set];
-			[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(labelRect, -4.0f, -2.0f) cornerRadius:6.0f] fill];
+			[[NSBezierPath PG_bezierPathWithRoundRect:NSInsetRect(labelRect, -4.0f, -2.0f) cornerRadius:6.0f] fill];
 			[layoutManager drawGlyphsForGlyphRange:glyphRange atPoint:labelRect.origin];
 			[shadow set];
 		} else if(labelColor) {
@@ -415,7 +414,7 @@ static void PGDrawGradient(void)
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[representedObject release];
 	[_items release];
 	[_selection release];

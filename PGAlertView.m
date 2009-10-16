@@ -32,9 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSBezierPathAdditions.h"
-#import "NSColorAdditions.h"
-#import "NSObjectAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 #define PGAlertViewSize 100.0f
 #define PGMarginSize 4.0f
@@ -147,8 +146,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)viewWillMoveToWindow:(NSWindow *)aWindow
 {
-	[[self window] AE_removeObserver:self name:NSWindowWillCloseNotification];
-	if(aWindow) [aWindow AE_addObserver:self selector:@selector(windowWillClose:) name:NSWindowWillCloseNotification];
+	[[self window] PG_removeObserver:self name:NSWindowWillCloseNotification];
+	if(aWindow) [aWindow PG_addObserver:self selector:@selector(windowWillClose:) name:NSWindowWillCloseNotification];
 	else [self windowWillClose:nil];
 }
 
@@ -170,7 +169,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)dealloc
 {
 	[self PG_cancelPreviousPerformRequests];
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_graphicStack release];
 	[_currentGraphic release];
 	[_frameTimer invalidate];
@@ -235,7 +234,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSInteger count, i;
 	NSRect const *rects;
 	[anAlertView getRectsBeingDrawn:&rects count:&count];
-	[[NSColor AE_bezelBackgroundColor] set];
+	[[NSColor PG_bezelBackgroundColor] set];
 	CGFloat const f = PGAlertViewSize / 300.0f;
 	for(i = count; i--;) {
 		NSRectFill(NSIntersectionRect(rects[i], PGIntegralRect(NSMakeRect(  0.0f * f, 50.0f * f,  50.0f * f, 200.0f * f))));
@@ -259,7 +258,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		if(!PGIntersectsRectList(corner, rects, count)) continue;
 		[[NSColor clearColor] set];
 		NSRectFill(corners[i]);
-		[[NSColor AE_bezelBackgroundColor] set];
+		[[NSColor PG_bezelBackgroundColor] set];
 		NSBezierPath *const path = [NSBezierPath bezierPath];
 		[path moveToPoint:centers[i]];
 		[path appendBezierPathWithArcWithCenter:centers[i] radius:50.0f * f startAngle:90.0f * i endAngle:90.0f * (i + 1)];
@@ -309,7 +308,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	CGFloat const f = PGAlertViewSize / 300.0f;
 	CGFloat const small = 5.0f * f;
 	CGFloat const large = 10.0f * f;
-	[[NSColor AE_bezelForegroundColor] set];
+	[[NSColor PG_bezelForegroundColor] set];
 
 	NSBezierPath *const arrow = [NSBezierPath bezierPath];
 	[arrow appendBezierPathWithArcWithCenter:NSMakePoint(180.0f * f, 150.0f * f) radius:large startAngle:315.0f endAngle:45.0f];
@@ -364,7 +363,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 
-	[[NSColor AE_bezelForegroundColor] set];
+	[[NSColor PG_bezelForegroundColor] set];
 
 	NSBezierPath *const s = [NSBezierPath bezierPath];
 	CGFloat const f = PGAlertViewSize / 300.0f;
@@ -440,10 +439,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSPoint const center = NSMakePoint(150.0f * f, 150.0f * f);
 		[progressPath appendBezierPathWithArcWithCenter:center radius:110.0f * f startAngle:90.0f endAngle:90.0f - _progress * 360.0f clockwise:YES];
 		[progressPath appendBezierPathWithArcWithCenter:center radius:55.0f * f startAngle:90.0f - _progress * 360.0f endAngle:90.0f clockwise:NO];
-		[[NSColor AE_bezelForegroundColor] set];
+		[[NSColor PG_bezelForegroundColor] set];
 		[progressPath fill];
 	} else {
-		[NSBezierPath AE_drawSpinnerInRect:NSMakeRect(40.0f * f, 40.0f * f, 220.0f * f, 220.0f * f) startAtPetal:[anAlertView frameCount]];
+		[NSBezierPath PG_drawSpinnerInRect:NSMakeRect(40.0f * f, 40.0f * f, 220.0f * f, 220.0f * f) startAtPetal:[anAlertView frameCount]];
 	}
 }
 
@@ -502,8 +501,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super drawInView:anAlertView];
 	NSRect const b = [anAlertView bounds];
-	[[NSColor AE_bezelForegroundColor] set];
-	[NSBezierPath AE_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(PGAlertViewSize / 2.0f, PGAlertViewSize / 2.0f), b)];
+	[[NSColor PG_bezelForegroundColor] set];
+	[NSBezierPath PG_drawIcon:_iconType inRect:PGCenteredSizeInRect(NSMakeSize(PGAlertViewSize / 2.0f, PGAlertViewSize / 2.0f), b)];
 }
 
 #pragma mark -<NSObject>

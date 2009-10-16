@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGExifEntry.h"
 
 // Categories
-#import "NSImageRepAdditions.h"
+#import "PGAppKitAdditions.h"
 
 @interface PGGenericImageAdapter(Private)
 
@@ -53,7 +53,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		data = [[self node] dataWithInfo:info fast:NO];
 	}
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
-	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:[NSImageRep AE_bestImageRepWithData:data] waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:[NSImageRep PG_bestImageRepWithData:data] waitUntilDone:NO];
 	[pool release];
 }
 - (void)_readExifWithData:(NSData *)data

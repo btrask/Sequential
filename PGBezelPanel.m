@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSWindowAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGBezelPanelFrameShouldChangeNotification = @"PGBezelPanelFrameShouldChange";
 NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameDidChange";
@@ -129,8 +129,8 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 - (void)_updateFrameWithWindow:(NSWindow *)aWindow display:(BOOL)flag
 {
-	CGFloat const s = [self AE_userSpaceScaleFactor];
-	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow AE_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
+	CGFloat const s = [self PG_userSpaceScaleFactor];
+	NSRect const f = [[self contentView] bezelPanel:self frameForContentRect:PGInsetRect([aWindow PG_contentRect], PGScaleInset(_frameInset, 1.0f / s)) scale:s];
 	if(NSEqualRects([self frame], f)) return;
 	if(flag) NSDisableScreenUpdates();
 	[self setFrame:f display:NO];
@@ -138,7 +138,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 		[[self content] display]; // Do this instead of sending -setFrame:display:YES to force redisplay no matter what.
 		NSEnableScreenUpdates();
 	}
-	[self AE_postNotificationName:PGBezelPanelFrameDidChangeNotification];
+	[self PG_postNotificationName:PGBezelPanelFrameDidChangeNotification];
 }
 
 #pragma mark NSStandardKeyBindingMethods Protocol
@@ -178,15 +178,15 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 }
 - (void)setContentView:(NSView *)aView
 {
-	[[self contentView] AE_removeObserver:self name:PGBezelPanelFrameShouldChangeNotification];
+	[[self contentView] PG_removeObserver:self name:PGBezelPanelFrameShouldChangeNotification];
 	[super setContentView:aView];
-	[[self contentView] AE_addObserver:self selector:@selector(frameShouldChange:) name:PGBezelPanelFrameShouldChangeNotification];
+	[[self contentView] PG_addObserver:self selector:@selector(frameShouldChange:) name:PGBezelPanelFrameShouldChangeNotification];
 }
 - (void)setParentWindow:(NSWindow *)aWindow
 {
-	[[self parentWindow] AE_removeObserver:self name:NSWindowDidResizeNotification];
+	[[self parentWindow] PG_removeObserver:self name:NSWindowDidResizeNotification];
 	[super setParentWindow:aWindow];
-	[[self parentWindow] AE_addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification];
+	[[self parentWindow] PG_addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification];
 }
 
 #pragma mark -
@@ -209,7 +209,7 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[super dealloc];
 }
 

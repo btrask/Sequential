@@ -24,6 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 #import <unistd.h>
+#import <tgmath.h>
 
 // Models
 #import "PGDocument.h"
@@ -51,17 +52,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGEncodingAlert.h"
 
 // Other
+#import "PGDebug.h"
 #import "PGDelayedPerforming.h"
 #import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
 
 // Categories
-#import "NSArrayAdditions.h"
-#import "NSControlAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSScreenAdditions.h"
-#import "NSStringAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 NSString *const PGDisplayControllerActiveNodeWasReadNotification = @"PGDisplayControllerActiveNodeWasRead";
@@ -103,7 +101,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 + (NSArray *)pasteboardTypes
 {
-	return [NSArray AE_arrayWithContentsOfArrays:[PGNode pasteboardTypes], [PGImageView pasteboardTypes], nil];
+	return [NSArray PG_arrayWithContentsOfArrays:[PGNode pasteboardTypes], [PGImageView pasteboardTypes], nil];
 }
 
 #pragma mark +NSObject
@@ -140,7 +138,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)setAsDesktopPicture:(id)sender
 {
 	PGResourceIdentifier *const ident = [[self activeNode] identifier];
-	if(![ident isFileIdentifier] || ![[NSScreen AE_mainScreen] AE_setDesktopImageURL:[ident URLByFollowingAliases:YES]]) NSBeep();
+	if(![ident isFileIdentifier] || ![[NSScreen PG_mainScreen] PG_setDesktopImageURL:[ident URLByFollowingAliases:YES]]) NSBeep();
 }
 - (IBAction)setCopyAsDesktopPicture:(id)sender
 {
@@ -184,7 +182,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		case NSFindPanelActionNext:
 		case NSFindPanelActionPrevious:
 		{
-			NSArray *const terms = [[searchField stringValue] AE_searchTerms];
+			NSArray *const terms = [[searchField stringValue] PG_searchTerms];
 			if(terms && [terms count] && ![self tryToSetActiveNode:[[self activeNode] sortedViewableNodeNext:[sender tag] == NSFindPanelActionNext matchSearchTerms:terms] forward:YES]) NSBeep();
 			break;
 		}
@@ -295,8 +293,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)decrypt:(id)sender
 {
 	PGNode *const activeNode = [self activeNode];
-	[activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
-	[activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
+	[activeNode PG_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
+	[activeNode PG_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[[activeNode info] setObject:[passwordField stringValue] forKey:PGPasswordKey];
 	[activeNode becomeViewed];
 }
@@ -384,7 +382,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_nextTimerFireDate = nil;
 		_timer = nil;
 	}
-	[self AE_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
+	[self PG_postNotificationName:PGDisplayControllerTimerDidChangeNotification];
 }
 
 #pragma mark -
@@ -396,18 +394,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		if(_reading) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
 		[_activeDocument storeNode:[self activeNode] imageView:_imageView offset:[clipView pinLocationOffset] query:[searchField stringValue]];
 		[self _setImageView:nil];
-		[_activeDocument AE_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
-		[_activeDocument AE_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGDocumentWillRemoveNodesNotification];
+		[_activeDocument PG_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
 
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
-		[_activeDocument AE_removeObserver:self name:PGPrefObjectTimerIntervalDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectImageScaleDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectAnimatesImagesDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectTimerIntervalDidChangeNotification];
 	}
 	if(flag && !document && _activeDocument) {
 		_activeDocument = nil;
@@ -417,18 +415,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	_activeDocument = document;
 	if([[self window] isMainWindow]) [[PGDocumentController sharedDocumentController] setCurrentDocument:_activeDocument];
-	[_activeDocument AE_addObserver:self selector:@selector(documentWillRemoveNodes:) name:PGDocumentWillRemoveNodesNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentWillRemoveNodes:) name:PGDocumentWillRemoveNodesNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
 
-	[_activeDocument AE_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
-	[_activeDocument AE_addObserver:self selector:@selector(documentTimerIntervalDidChange:) name:PGPrefObjectTimerIntervalDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentReadingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentImageScaleDidChange:) name:PGPrefObjectImageScaleDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentAnimatesImagesDidChange:) name:PGPrefObjectAnimatesImagesDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentTimerIntervalDidChange:) name:PGPrefObjectTimerIntervalDidChangeNotification];
 	[self setTimerRunning:NO];
 	if(_activeDocument) {
 		NSDisableScreenUpdates();
@@ -603,19 +601,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
 	if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGGenericError) {
-		[errorLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[errorMessage setStringValue:[error localizedDescription]];
 		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
 		[reloadButton setEnabled:YES];
 		[clipView setDocumentView:errorView];
 	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGPasswordError) {
-		[passwordLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[passwordField setStringValue:@""];
 		[clipView setDocumentView:passwordView];
 		[clipView setNextKeyView:passwordField];
 		[passwordField setNextKeyView:clipView];
 	} else if([PGNodeErrorDomain isEqualToString:[error domain]] && [error code] == PGEncodingError) {
-		[encodingLabel AE_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
+		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithWithAncestory:NO]];
 		[clipView setDocumentView:encodingView];
 		[[self window] makeFirstResponder:clipView];
 	} else {
@@ -693,9 +691,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_thumbnailController setDisplayController:self];
 		[self thumbnailControllerContentInsetDidChange:nil];
 		NSEnableScreenUpdates();
-		[_thumbnailController AE_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
+		[_thumbnailController PG_addObserver:self selector:@selector(thumbnailControllerContentInsetDidChange:) name:PGThumbnailControllerContentInsetDidChangeNotification];
 	} else {
-		[_thumbnailController AE_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
+		[_thumbnailController PG_removeObserver:self name:PGThumbnailControllerContentInsetDidChangeNotification];
 		[_thumbnailController fadeOut];
 		[_thumbnailController release];
 		_thumbnailController = nil;
@@ -779,13 +777,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (BOOL)_setActiveNode:(PGNode *)aNode
 {
 	if(aNode == _activeNode) return NO;
-	[_activeNode AE_removeObserver:self name:PGNodeLoadingDidProgressNotification];
-	[_activeNode AE_removeObserver:self name:PGNodeReadyForViewingNotification];
+	[_activeNode PG_removeObserver:self name:PGNodeLoadingDidProgressNotification];
+	[_activeNode PG_removeObserver:self name:PGNodeReadyForViewingNotification];
 	[_activeNode release];
 	_activeNode = [aNode retain];
 	[self _updateNodeIndex];
 	[self _updateInfoPanelText];
-	[self AE_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
+	[self PG_postNotificationName:PGDisplayControllerActiveNodeDidChangeNotification];
 	return YES;
 }
 - (void)_readActiveNode
@@ -794,8 +792,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
 	_reading = YES;
 	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:-0.5f options:kNilOptions];
-	[_activeNode AE_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
-	[_activeNode AE_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
+	[_activeNode PG_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
+	[_activeNode PG_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
 	[self setTimerRunning:self.timerRunning];
 }
@@ -806,7 +804,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[[_graphicPanel content] popGraphicsOfType:PGSingleImageGraphic]; // Hide most alerts.
 	[_loadingGraphic release];
 	_loadingGraphic = nil;
-	[self AE_postNotificationName:PGDisplayControllerActiveNodeWasReadNotification];
+	[self PG_postNotificationName:PGDisplayControllerActiveNodeWasReadNotification];
 }
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation
 {
@@ -866,9 +864,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)_setCopyAsDesktopPicturePanelDidEnd:(NSSavePanel *)savePanel returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo
 {
 	if(NSFileHandlingPanelOKButton != returnCode) return;
-	NSURL *const URL = [[savePanel filename] AE_fileURL];
+	NSURL *const URL = [[savePanel filename] PG_fileURL];
 	[[[self activeNode] data] writeToURL:URL atomically:NO];
-	if(![[NSScreen AE_mainScreen] AE_setDesktopImageURL:URL]) NSBeep();
+	if(![[NSScreen PG_mainScreen] PG_setDesktopImageURL:URL]) NSBeep();
 }
 - (void)_offerToOpenBookmarkAlertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode bookmark:(PGBookmark *)bookmark
 {
@@ -900,7 +898,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
 	[clipView setCursor:cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5.0f, 0.0f)] autorelease] : [NSCursor pointingHandCursor]];
 	[clipView setPostsFrameChangedNotifications:YES];
-	[clipView AE_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
+	[clipView PG_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];
 
 	_findPanel = [[PGBezelPanel alloc] initWithContentView:findView];
 	[_findPanel setInitialFirstResponder:searchField];
@@ -966,14 +964,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		_infoPanel = [[PGInfoView PG_bezelPanel] retain];
 		[self _updateInfoPanelText];
 
-		[[PGPreferenceWindowController sharedPrefController] AE_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
+		[[PGPreferenceWindowController sharedPrefController] PG_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
 	}
 	return self;
 }
 - (void)dealloc
 {
 	[self PG_cancelPreviousPerformRequests];
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[self _setImageView:nil];
 	[passwordView release];
 	[encodingView release];

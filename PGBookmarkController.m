@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSMenuItemAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 static NSString *const PGPausedDocumentsKey            = @"PGPausedDocuments3";
 static NSString *const PGPausedDocumentsDeprecated2Key = @"PGPausedDocuments2"; // Deprecated after 1.3.2.
@@ -119,14 +119,14 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (void)addMenuItemForBookmark:(PGBookmark *)aBookmark
 {
 	NSParameterAssert(aBookmark);
-	[emptyMenuItem AE_removeFromMenu];
+	[emptyMenuItem PG_removeFromMenu];
 	if([bookmarkMenu numberOfItems]) [[bookmarkMenu itemAtIndex:0] setKeyEquivalent:@""];
 	NSMenuItem *const item = [[[NSMenuItem alloc] init] autorelease];
 	[item setTarget:self];
 	[item setAction:@selector(open:)];
 	[item setRepresentedObject:aBookmark];
 	[bookmarkMenu insertItem:item atIndex:0];
-	[aBookmark AE_addObserver:self selector:@selector(bookmarkDidUpdate:) name:PGBookmarkDidUpdateNotification];
+	[aBookmark PG_addObserver:self selector:@selector(bookmarkDidUpdate:) name:PGBookmarkDidUpdateNotification];
 	[self _updateMenuItemForBookmark:aBookmark];
 }
 - (PGBookmark *)bookmarkForIdentifier:(PGResourceIdentifier *)ident
@@ -166,7 +166,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 }
 - (void)_removeBookmarkAtIndex:(NSUInteger)index
 {
-	[[_bookmarks objectAtIndex:index] AE_removeObserver:self name:PGBookmarkDidUpdateNotification];
+	[[_bookmarks objectAtIndex:index] PG_removeObserver:self name:PGBookmarkDidUpdateNotification];
 	[_bookmarks removeObjectAtIndex:index];
 	[bookmarkMenu removeItemAtIndex:[bookmarkMenu numberOfItems] - index - 1];
 	if(![_bookmarks count]) [bookmarkMenu addItem:emptyMenuItem];
@@ -203,7 +203,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[emptyMenuItem release];
 	[_bookmarks release];
 	[super dealloc];

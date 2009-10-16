@@ -22,38 +22,10 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "NSColorAdditions.h"
-
-@implementation NSColor(AEAdditions)
-
-#pragma mark +NSColor(AEAdditions)
-
-+ (NSColor *)AE_bezelBackgroundColor
-{
-	return [NSColor colorWithDeviceWhite:48.0f / 255.0f alpha:0.75f];
-}
-+ (NSColor *)AE_bezelForegroundColor
-{
-	return [NSColor colorWithDeviceWhite:0.95f alpha:0.9f];
-}
-
-#pragma mark -NSColor(AEAdditions)
-
-- (NSColor *)AE_checkerboardPatternColor
-{
-	return [self AE_patternColorWithImage:[NSImage imageNamed:@"Checkerboard"] fraction:0.05f];
-}
-- (NSColor *)AE_patternColorWithImage:(NSImage *)image fraction:(CGFloat)fraction
-{
-	NSSize const s = [image size];
-	NSRect const r = (NSRect){NSZeroPoint, s};
-	NSImage *const pattern = [[[NSImage alloc] initWithSize:s] autorelease];
-	[pattern lockFocus];
-	[self set];
-	NSRectFill(r);
-	[image drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceAtop fraction:fraction];
-	[pattern unlockFocus];
-	return [NSColor colorWithPatternImage:pattern];
-}
-
-@end
+#if defined(NS_BLOCK_ASSERTIONS)
+	#define PGAssertNotReached(desc)
+	#define PGCAssertNotReached(desc)
+#else
+	#define PGAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInMethod:_cmd object:self file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+	#define PGCAssertNotReached(desc) [[NSAssertionHandler currentHandler] handleFailureInFunction:[NSString stringWithUTF8String:__PRETTY_FUNCTION__] file:[NSString stringWithUTF8String:__FILE__] lineNumber:__LINE__ description:(desc)]
+#endif

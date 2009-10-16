@@ -36,9 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDelayedPerforming.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSScreenAdditions.h"
-#import "NSStringAdditions.h"
+#import "PGAppKitAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGFullscreenController(Private)
 
@@ -72,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSScreen *const screen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 	[(PGFullscreenWindow *)[self window] moveToScreen:screen];
 	if(![[self window] isKeyWindow]) return;
-	if([NSScreen AE_mainScreen] == screen) [self _hideMenuBar];
+	if([NSScreen PG_mainScreen] == screen) [self _hideMenuBar];
 	else SetSystemUIMode(kUIModeNormal, kNilOptions);
 }
 
@@ -129,14 +128,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)init
 {
 	if((self = [super init])) {
-		[[PGPreferenceWindowController sharedPrefController] AE_addObserver:self selector:@selector(displayScreenDidChange:) name:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
+		[[PGPreferenceWindowController sharedPrefController] PG_addObserver:self selector:@selector(displayScreenDidChange:) name:PGPreferenceWindowControllerDisplayScreenDidChangeNotification];
 	}
 	return self;
 }
 - (void)dealloc
 {
 	[self PG_cancelPreviousPerformRequests];
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
 	[_shieldWindows release];
 	[super dealloc];
@@ -159,7 +158,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL const dim = [[NSUserDefaults standardUserDefaults] boolForKey:PGDimOtherScreensKey]; // We shouldn't need to observe this value because our fullscreen window isn't going to be key while the user is adjusting the setting in the prefs window.
 	NSScreen *const displayScreen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 
-	if(dim || [NSScreen AE_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if(dim || [NSScreen PG_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions]; // Prevents the menu bar from messing up when the application unhides on Leopard.
 
 	if(!dim) return;
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
@@ -178,7 +177,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
-	if([[NSApp keyWindow] delegate] == self || [[PGPreferenceWindowController sharedPrefController] displayScreen] != [NSScreen AE_mainScreen]) return;
+	if([[NSApp keyWindow] delegate] == self || [[PGPreferenceWindowController sharedPrefController] displayScreen] != [NSScreen PG_mainScreen]) return;
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
 	SetSystemUIMode(kUIModeNormal, kNilOptions);
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
@@ -205,7 +204,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSPasteboard *const pboard = [info draggingPasteboard];
 	NSArray *const types = [pboard types];
-	if([types containsObject:NSFilenamesPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[[[pboard propertyListForType:NSFilenamesPboardType] lastObject] AE_fileURL] display:YES];
+	if([types containsObject:NSFilenamesPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[[[pboard propertyListForType:NSFilenamesPboardType] lastObject] PG_fileURL] display:YES];
 	else if([types containsObject:NSURLPboardType]) return !![[PGDocumentController sharedDocumentController] openDocumentWithContentsOfURL:[NSURL URLFromPasteboard:pboard] display:YES];
 	return NO;
 }

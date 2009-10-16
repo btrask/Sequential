@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCancelableProxy.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventDidOccur";
 
@@ -155,7 +155,7 @@ static id  PGActiveSubscriptions = nil;
 	NSString *const path = [self path];
 	if(path) [dict setObject:path forKey:PGSubscriptionPathKey];
 	if(flagsNum) [dict setObject:flagsNum forKey:PGSubscriptionRootFlagsKey];
-	[[self rootSubscription] AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
+	[[self rootSubscription] PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
 #pragma mark NSCopying Protocol
@@ -200,7 +200,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 {
 	if((self = [super init])) {
 		_rootSubscription = [[PGSubscription subscriptionWithPath:path] retain];
-		[_rootSubscription AE_addObserver:self selector:@selector(rootSubscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		[_rootSubscription PG_addObserver:self selector:@selector(rootSubscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self subscribeWithPath:path];
 	}
 	return self;
@@ -224,7 +224,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 }
 - (void)noteFileEventsDidOccurAtPaths:(NSArray *)paths
 {
-	for(NSString *const path in paths) [self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path, PGSubscriptionPathKey, nil]];
+	for(NSString *const path in paths) [self PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:path, PGSubscriptionPathKey, nil]];
 }
 - (void)rootSubscriptionEventDidOccur:(NSNotification *)aNotif
 {
@@ -232,7 +232,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 	NSUInteger const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntegerValue];
 	if(!(flags & (NOTE_RENAME | NOTE_REVOKE | NOTE_DELETE))) return;
 	[self subscribeWithPath:[[aNotif userInfo] objectForKey:PGSubscriptionPathKey]];
-	[self AE_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];
+	[self PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];
 }
 
 #pragma mark PGSubscription
@@ -246,7 +246,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[self unsubscribe];
 	[_rootSubscription release];
 	[super dealloc];

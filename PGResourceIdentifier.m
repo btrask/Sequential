@@ -31,10 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAttachments.h"
 
 // Categories
-#import "NSCharacterSetAdditions.h"
-#import "NSObjectAdditions.h"
-#import "NSStringAdditions.h"
-#import "NSURLAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGDisplayableIdentifierIconDidChangeNotification = @"PGDisplayableIdentifierIconDidChange";
 NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDisplayableIdentifierDisplayNameDidChange";
@@ -234,14 +231,14 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 }
 - (NSImage *)icon
 {
-	return _icon ? [[_icon retain] autorelease] : [[self URL] AE_icon];
+	return _icon ? [[_icon retain] autorelease] : [[self URL] PG_icon];
 }
 - (void)setIcon:(NSImage *)icon
 {
 	if(icon == _icon) return;
 	[_icon release];
 	_icon = [icon retain];
-	if(_postsNotifications) [self AE_postNotificationName:PGDisplayableIdentifierIconDidChangeNotification];
+	if(_postsNotifications) [self PG_postNotificationName:PGDisplayableIdentifierIconDidChangeNotification];
 }
 - (NSString *)displayName
 {
@@ -258,7 +255,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(!aString || aString == _naturalDisplayName || [aString isEqualToString:_naturalDisplayName]) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
-	if(_postsNotifications && !_customDisplayName) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	if(_postsNotifications && !_customDisplayName) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 - (PGLabelColor)labelColor
 {
@@ -279,7 +276,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	if(string == _customDisplayName || [string isEqualToString:_customDisplayName]) return;
 	[_customDisplayName release];
 	_customDisplayName = [string copy];
-	if(_postsNotifications) [self AE_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	if(_postsNotifications) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 - (void)updateNaturalDisplayName
 {
@@ -292,7 +289,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 			name = [@"/" isEqualToString:path] ? [URL absoluteString] : [path lastPathComponent];
 		}
 	}
-	name = [name AE_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet AE_newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
+	name = [name PG_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
 	[self setNaturalDisplayName:name];
 }
 - (NSAttributedString *)attributedStringWithWithAncestory:(BOOL)flag
@@ -305,7 +302,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	NSString *const parentName = [URL isFileURL] ? [parent lastPathComponent] : parent;
 	if(!parentName || [parentName isEqual:@""]) return result;
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
-	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent AE_fileURL] AE_icon] : nil name:parentName]];
+	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent PG_fileURL] PG_icon] : nil name:parentName]];
 	return result;
 }
 
@@ -396,10 +393,10 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 
 #pragma mark -NSObject(AEAdditions)
 
-- (void)AE_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
+- (void)PG_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
 {
 	_postsNotifications = YES;
-	[super AE_addObserver:observer selector:aSelector name:aName];
+	[super PG_addObserver:observer selector:aSelector name:aName];
 }
 
 #pragma mark -<NSCoding>

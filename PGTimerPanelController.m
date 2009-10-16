@@ -39,8 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 // Categories
-#import "NSObjectAdditions.h"
-#import "NSNumberAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGTimerPanelController(Private)
 
@@ -131,9 +130,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	PGDisplayController *const oldController = [self displayController];
 	if(![super setDisplayController:controller]) return NO;
-	[oldController AE_removeObserver:self name:PGDisplayControllerTimerDidChangeNotification];
+	[oldController PG_removeObserver:self name:PGDisplayControllerTimerDidChangeNotification];
 	PGDisplayController *const newController = [self displayController];
-	[newController AE_addObserver:self selector:@selector(displayControllerTimerDidChange:) name:PGDisplayControllerTimerDidChangeNotification];
+	[newController PG_addObserver:self selector:@selector(displayControllerTimerDidChange:) name:PGDisplayControllerTimerDidChangeNotification];
 	[self _update];
 	return YES;
 }
@@ -154,7 +153,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_updateTimer invalidate];
 	[_updateTimer release];
 	[super dealloc];

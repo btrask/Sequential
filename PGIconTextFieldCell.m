@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGIconTextFieldCell.h"
 
 // Categories
-#import "NSAffineTransformAdditions.h"
+#import "PGFoundationAdditions.h"
 
 #define PGIconSize 16.0f
 #define PGIconSpacingLeft 5.0f
@@ -54,7 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	NSRect r = NSMakeRect(NSMinX(aRect) + PGIconSpacingLeft, NSMinY(aRect), PGIconSize, PGIconSize);
-	[[NSAffineTransform AE_counterflipWithRect:&r] concat];
+	[[NSAffineTransform PG_counterflipWithRect:&r] concat];
 	[[self icon] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:[self isEnabled] ? 1.0f : 0.66f];
 	[NSGraphicsContext restoreGraphicsState];
 }

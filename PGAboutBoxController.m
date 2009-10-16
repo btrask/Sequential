@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGZooming.h"
 
 // Categories
-#import "NSStringAdditions.h"
+#import "PGFoundationAdditions.h"
 
 static NSString *const PGPaneItemKey = @"PGPaneItem";
 
@@ -57,7 +57,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 	[textView setSelectedRange:NSMakeRange(0, 0)];
 	[[textView textStorage] removeLayoutManager:[textView layoutManager]];
 	NSDictionary *attrs = nil;
-	[[[NSTextStorage alloc] initWithURL:[path AE_fileURL] options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:NSUTF8StringEncoding], NSCharacterEncodingDocumentAttribute, nil] documentAttributes:&attrs error:NULL] addLayoutManager:[textView layoutManager]];
+	[[[NSTextStorage alloc] initWithURL:[path PG_fileURL] options:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:NSUTF8StringEncoding], NSCharacterEncodingDocumentAttribute, nil] documentAttributes:&attrs error:NULL] addLayoutManager:[textView layoutManager]];
 	if([NSPlainTextDocumentType isEqualToString:[attrs objectForKey:NSDocumentTypeDocumentAttribute]]) {
 		NSFont *const font = [NSFont fontWithName:@"Monaco" size:10.0f]; // There's no way to ask for the system-wide fixed pitch font, so we use 10pt Monaco since it's the default for TextEdit.
 		if(font) [textView setFont:font];

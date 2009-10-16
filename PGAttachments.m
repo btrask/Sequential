@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAttachments.h"
 
 // Categories
-#import "NSAffineTransformAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @interface PGFileIconAttachmentCell : NSTextAttachmentCell
 @end
@@ -70,7 +70,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[NSGraphicsContext saveGraphicsState];
 	NSRect r = aRect;
-	[[NSAffineTransform AE_counterflipWithRect:&r] concat];
+	[[NSAffineTransform PG_counterflipWithRect:&r] concat];
 	[[NSImage imageNamed:[self imageNameHighlighted:highlighted]] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:enabled ? 1.0f : 0.5f];
 	[NSGraphicsContext restoreGraphicsState];
 }
@@ -134,7 +134,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[NSGraphicsContext saveGraphicsState];
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	NSRect r = aRect;
-	[[NSAffineTransform AE_counterflipWithRect:&r] concat];
+	[[NSAffineTransform PG_counterflipWithRect:&r] concat];
 	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
 	[NSGraphicsContext restoreGraphicsState];
 }

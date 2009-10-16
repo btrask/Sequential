@@ -23,10 +23,10 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGProgressIndicatorCell.h"
+#import <tgmath.h>
 
 // Categories
-#import "NSBezierPathAdditions.h"
-#include <tgmath.h>
+#import "PGAppKitAdditions.h"
 
 @implementation PGProgressIndicatorCell
 
@@ -41,13 +41,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([self hidden]) return;
 
 	[[NSColor colorWithDeviceWhite:0.9f alpha:0.8f] set];
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5f, 0.5f) cornerRadius:(NSHeight(aRect) - 1.0f) / 2.0f] stroke];
+	[[NSBezierPath PG_bezierPathWithRoundRect:NSInsetRect(aRect, 0.5f, 0.5f) cornerRadius:(NSHeight(aRect) - 1.0f) / 2.0f] stroke];
 
 	NSRect r = aRect;
 	r.size.width = (CGFloat)ceil(NSWidth(aRect) * [[self objectValue] doubleValue]);
 	[NSGraphicsContext saveGraphicsState];
 	NSRectClip(r);
-	[[NSBezierPath AE_bezierPathWithRoundRect:NSInsetRect(aRect, 2.0f, 2.0f) cornerRadius:(NSHeight(aRect) - 4.0f) / 2.0f] addClip];
+	[[NSBezierPath PG_bezierPathWithRoundRect:NSInsetRect(aRect, 2.0f, 2.0f) cornerRadius:(NSHeight(aRect) - 4.0f) / 2.0f] addClip];
 	
 	r.size.height = ceil(NSHeight(r) / 2.0f);
 	[[NSColor colorWithDeviceWhite:0.95f alpha:0.8f] set];

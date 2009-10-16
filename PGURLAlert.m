@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGZooming.h"
 
 // Categories
-#import "NSURLAdditions.h"
+#import "PGFoundationAdditions.h"
 
 @implementation PGURLAlert
 
@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL const canceled = [NSApp runModalForWindow:[self window]] == NSAlertSecondButtonReturn;
 	[[self window] close];
 	if(canceled) return nil;
-	return [NSURL AE_URLWithString:[URLField stringValue]];
+	return [NSURL PG_URLWithString:[URLField stringValue]];
 }
 
 #pragma mark -NSWindowController
@@ -72,7 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
-	[OKButton setEnabled:[NSURL AE_URLWithString:[URLField stringValue]] != nil];
+	[OKButton setEnabled:[NSURL PG_URLWithString:[URLField stringValue]] != nil];
 }
 
 #pragma mark -<NSWindowDelegate>

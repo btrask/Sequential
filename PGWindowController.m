@@ -35,12 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDocumentController.h"
 
-// Categories
-#import "NSScreenAdditions.h"
-#import "NSWindowAdditions.h"
-
 // Other
 #import "PGZooming.h"
+
+// Categories
+#import "PGAppKitAdditions.h"
 
 static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
@@ -57,11 +56,11 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 - (BOOL)setActiveDocument:(PGDocument *)document closeIfAppropriate:(BOOL)flag
 {
-	[[self activeDocument] storeWindowFrame:[[self window] AE_contentRect]];
+	[[self activeDocument] storeWindowFrame:[[self window] PG_contentRect]];
 	if([super setActiveDocument:document closeIfAppropriate:flag]) return YES;
 	NSRect frame;
 	if([[self activeDocument] getStoredWindowFrame:&frame]) {
-		[[self window] AE_setContentRect:frame];
+		[[self window] PG_setContentRect:frame];
 		_shouldZoomOnNextImageLoad = NO;
 	}
 	return NO;

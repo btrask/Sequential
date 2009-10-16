@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGSubscription.h"
 
 // Categories
-#import "NSObjectAdditions.h"
+#import "PGFoundationAdditions.h"
 
 NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
@@ -47,15 +47,15 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 {
 	if((self = [super init])) {
 		_documentIdentifier = [docIdent retain];
-		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-		[_documentIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+		[_documentIdentifier PG_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		[_documentIdentifier PG_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 		_documentSubscription = [[_documentIdentifier subscriptionWithDescendents:NO] retain];
-		[_documentSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		[_documentSubscription PG_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		_fileIdentifier = [fileIdent retain];
-		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-		[_fileIdentifier AE_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+		[_fileIdentifier PG_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		[_fileIdentifier PG_addObserver:self selector:@selector(identifierDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 		_fileSubscription = [[_fileIdentifier subscriptionWithDescendents:NO] retain];
-		[_fileSubscription AE_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
+		[_fileSubscription PG_addObserver:self selector:@selector(eventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		if(aString) {
 			[_fileIdentifier setNaturalDisplayName:aString];
 			[_fileIdentifier updateNaturalDisplayName];
@@ -88,11 +88,11 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 	NSParameterAssert(aNotif);
 	if([aNotif object] == _documentSubscription) [_documentIdentifier updateNaturalDisplayName];
 	else if([aNotif object] == _fileSubscription) [_fileIdentifier updateNaturalDisplayName];
-	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
+	[self PG_postNotificationName:PGBookmarkDidUpdateNotification];
 }
 - (void)identifierDidChange:(NSNotification *)aNotif
 {
-	[self AE_postNotificationName:PGBookmarkDidUpdateNotification];
+	[self PG_postNotificationName:PGBookmarkDidUpdateNotification];
 }
 
 #pragma mark NSCoding Protocol
@@ -123,7 +123,7 @@ NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";
 
 - (void)dealloc
 {
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[_documentIdentifier release];
 	[_documentSubscription release];
 	[_fileIdentifier release];

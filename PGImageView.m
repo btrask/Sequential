@@ -23,18 +23,18 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGImageView.h"
+#import <tgmath.h>
 
 // Views
 @class PGClipView;
 
 // Other
+#import "PGDebug.h"
 #import "PGGeometry.h"
 #import "PGDelayedPerforming.h"
 
 // Categories
-#import "NSAffineTransformAdditions.h"
-#import "NSObjectAdditions.h"
-#include <tgmath.h>
+#import "PGFoundationAdditions.h"
 
 #define PGAnimateSizeChanges true
 #define PGDebugDrawingModes false
@@ -315,7 +315,7 @@ static NSSize PGRoundedCornerSizes[4];
 	NSRect r = aRect;
 	NSAffineTransform *transform = nil;
 	if(PGUpright != _orientation) {
-		transform = [NSAffineTransform AE_transformWithRect:&r orientation:_orientation];
+		transform = [NSAffineTransform PG_transformWithRect:&r orientation:_orientation];
 		[transform concat];
 	}
 	NSCompositingOperation const op = !_isPDF && (compositeCopy || [_rep isOpaque]) ? NSCompositeCopy : NSCompositeSourceOver;
@@ -408,8 +408,8 @@ static NSSize PGRoundedCornerSizes[4];
 		_usesCaching = YES;
 		_antialiasWhenUpscaling = YES;
 		_usesRoundedCorners = YES;
-		[NSApp AE_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
-		[NSApp AE_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
+		[NSApp PG_addObserver:self selector:@selector(appDidHide:) name:NSApplicationDidHideNotification];
+		[NSApp PG_addObserver:self selector:@selector(appDidUnhide:) name:NSApplicationDidUnhideNotification];
 	}
 	return self;
 }
@@ -493,7 +493,7 @@ static NSSize PGRoundedCornerSizes[4];
 - (void)dealloc
 {
 	[self PG_cancelPreviousPerformRequests];
-	[self AE_removeObserver];
+	[self PG_removeObserver];
 	[self stopAnimatedSizeTransition];
 	[self unbind:@"animates"];
 	[self unbind:@"antialiasWhenUpscaling"];

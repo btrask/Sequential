@@ -22,7 +22,7 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 enum {
 	AENoIcon = 0,
@@ -32,12 +32,57 @@ enum {
 };
 typedef NSUInteger AEIconType;
 
-@interface NSBezierPath(AEAdditions)
+@interface NSBezierPath(PGAppKitAdditions)
 
-+ (NSBezierPath *)AE_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(CGFloat)radius;
-+ (void)AE_drawIcon:(AEIconType)type inRect:(NSRect)r;
-+ (void)AE_drawSpinnerInRect:(NSRect)aRect startAtPetal:(NSInteger)petal;
++ (NSBezierPath *)PG_bezierPathWithRoundRect:(NSRect)aRect cornerRadius:(CGFloat)radius;
++ (void)PG_drawIcon:(AEIconType)type inRect:(NSRect)r;
++ (void)PG_drawSpinnerInRect:(NSRect)aRect startAtPetal:(NSInteger)petal;
 
-- (void)AE_fillUsingOperation:(NSCompositingOperation)op;
+- (void)PG_fillUsingOperation:(NSCompositingOperation)op;
+
+@end
+
+@interface NSColor(PGAppKitAdditions)
+
++ (NSColor *)PG_bezelBackgroundColor;
++ (NSColor *)PG_bezelForegroundColor;
+- (NSColor *)PG_checkerboardPatternColor;
+- (NSColor *)PG_patternColorWithImage:(NSImage *)image fraction:(CGFloat)fraction;
+
+@end
+
+@interface NSControl(PGAppKitAdditions)
+
+- (void)PG_setAttributedStringValue:(NSAttributedString *)str; // Keeps existing attributes.
+
+@end
+
+@interface NSImageRep(PGAppKitAdditions)
+
++ (id)PG_bestImageRepWithData:(NSData *)data;
+
+@end
+
+@interface NSMenuItem(PGAppKitAdditions)
+
+- (void)PG_addAfterItem:(NSMenuItem *)anItem;
+- (void)PG_removeFromMenu;
+- (BOOL)PG_performAction; // Uses undocumented calls to highlight the item appropriately. Returns whether the item was enabled (and the action was performed).
+
+@end
+
+@interface NSScreen(PGAppKitAdditions)
+
++ (NSScreen *)PG_mainScreen; // Returns the real main screen.
+- (BOOL)PG_setDesktopImageURL:(NSURL *)URL;
+
+@end
+
+@interface NSWindow(PGAppKitAdditions)
+
+- (BOOL)PG_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.
+- (CGFloat)PG_userSpaceScaleFactor; // Returns 1.0 if not supported.
+- (NSRect)PG_contentRect;
+- (void)PG_setContentRect:(NSRect)aRect;
 
 @end
