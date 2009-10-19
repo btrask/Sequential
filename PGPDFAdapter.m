@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other
 #import "PGGeometry.h"
 
-static NSString *const PGIndexKey = @"PGIndex";
-
 @interface PGPDFAdapter(Private)
 
 @property(readonly) NSPDFImageRep *_rep;
@@ -113,44 +111,7 @@ static NSString *const PGIndexKey = @"PGIndex";
 
 @implementation PGPDFPageAdapter
 
-#pragma mark PGResourceAdapter
-
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict
-{
-	NSPDFImageRep *const rep = [dict objectForKey:PGImageRepKey];
-	if(!rep) return nil;
-	NSBitmapImageRep *thumbRep = nil;
-	@synchronized(rep) {
-		[rep setCurrentPage:[[dict objectForKey:PGIndexKey] integerValue]];
-		NSSize const originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-		NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(size / originalSize.width, size / originalSize.height)));
-		thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
-		[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithAttributes:[NSDictionary dictionaryWithObject:thumbRep forKey:NSGraphicsContextDestinationAttributeName]]];
-		[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
-		[[NSColor whiteColor] set];
-		NSRectFill(NSMakeRect(0.0f, 0.0f, s.width, s.height));
-		[rep drawInRect:NSMakeRect(0.0f, 0.0f, s.width, s.height)];
-		[NSGraphicsContext setCurrentContext:nil];
-	}
-	return thumbRep;
-}
-
-#pragma mark PGResourceAdapting Protocol
-
-- (BOOL)isResolutionIndependent
-{
-	return YES;
-}
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
-{
-	if(![[self node] isViewable] || [self node] == descendent) return nil;
-	NSInteger const index = [[self identifier] index];
-	if(NSNotFound == index) return nil;
-	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
-	return [self node];
-}
-
-#pragma mark PGResourceAdapter
+#pragma mark -PGResourceAdapter
 
 - (BOOL)adapterIsViewable
 {
@@ -169,12 +130,32 @@ static NSString *const PGIndexKey = @"PGIndex";
 {
 	return YES;
 }
-- (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info
+- (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withInfo:(NSDictionary *)info
 {
+	NSPDFImageRep *rep = nil;
 	@synchronized(self) {
-		return [NSDictionary dictionaryWithObjectsAndKeys:[(PGPDFAdapter *)[self parentAdapter] _threaded_rep], PGImageRepKey, [NSNumber numberWithInteger:[[self identifier] index]], PGIndexKey, nil];
+		rep = [(PGPDFAdapter *)[self parentAdapter] _threaded_rep];
+	}
+	if(rep) @synchronized(rep) {
+		[rep setCurrentPage:[[self identifier] index]];
+		return [self thumbnailWithImageRep:rep orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] size:size opque:YES];
 	}
 	return nil;
+}
+
+#pragma mark -<PGResourceAdapting>
+
+- (BOOL)isResolutionIndependent
+{
+	return YES;
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
+{
+	if(![[self node] isViewable] || [self node] == descendent) return nil;
+	NSInteger const index = [[self identifier] index];
+	if(NSNotFound == index) return nil;
+	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
+	return [self node];
 }
 
 @end

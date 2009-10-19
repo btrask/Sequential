@@ -50,13 +50,12 @@ typedef NSUInteger PGMatchPriority;
 @interface PGResourceAdapter : NSObject <PGResourceAdapting>
 {
 	@private
-	PGMatchPriority      _priority;
-	PGNode              *_node;
+	PGMatchPriority _priority;
+	PGNode *_node;
 	NSMutableDictionary *_info;
-	NSImage             *_fastThumbnail;
-	NSImage             *_realThumbnail;
-	NSDate              *_lastThumbnailInvalidation;
-	NSMutableArray      *_subloads;
+	NSImage *_realThumbnail;
+	NSOperation *_thumbnailGenerationOperation;
+	NSMutableArray *_subloads;
 }
 
 + (NSDictionary *)typesDictionary; // For all resource adapters.
@@ -65,9 +64,6 @@ typedef NSUInteger PGMatchPriority;
 + (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfoDicts:(NSArray *)dicts;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
-
-+ (NSImage *)threaded_thumbnailOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict;
-+ (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withCreationDictionary:(NSDictionary *)dict;
 
 - (PGNode *)node;
 - (void)setNode:(PGNode *)aNode;
@@ -84,10 +80,11 @@ typedef NSUInteger PGMatchPriority;
 - (NSImage *)thumbnail;
 - (NSImage *)fastThumbnail;
 - (NSImage *)realThumbnail;
-- (void)setRealThumbnail:(NSImage *)anImage validAsOf:(NSDate *)date;
+- (void)setRealThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateRealThumbnail;
-- (NSDictionary *)threaded_thumbnailCreationDictionaryWithInfo:(NSDictionary *)info;
-- (void)cancelThumbnailGeneration;
+- (NSImage *)threaded_thumbnailOfSize:(CGFloat)size withInfo:(NSDictionary *)info;
+- (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withInfo:(NSDictionary *)info;
+- (NSImageRep *)thumbnailWithImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(CGFloat)size opque:(BOOL)flag;
 - (void)invalidateThumbnail;
 
 - (void)noteResourceDidChange;
