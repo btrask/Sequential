@@ -65,17 +65,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)setSelection:(NSSet *)aSet
 {
-	[self setSelection:aSet reload:YES];
-}
-
-#pragma mark -
-
-- (void)setSelection:(NSSet *)aSet reload:(BOOL)flag
-{
 	++_updateCount;
 	NSUInteger const initialNumberOfColumns = [self numberOfColumns];
 	if(!initialNumberOfColumns) [self _addColumnWithItem:nil];
-	else if(flag) [[self viewAtIndex:0] reloadData];
+	else [[self viewAtIndex:0] reloadData];
 
 	NSMutableArray *const path = [NSMutableArray array];
 	id obj = [aSet anyObject];
@@ -89,10 +82,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[view setSelection:[NSSet setWithObject:item]];
 		if(i + 1 < [self numberOfColumns]) {
 			PGThumbnailView *const nextView = [self viewAtIndex:i + 1];
-			if([nextView representedObject] != item || flag) {
-				[nextView setRepresentedObject:item];
-				[nextView reloadData];
-			}
+			[nextView setRepresentedObject:item];
+			[nextView reloadData];
 		} else [self _addColumnWithItem:item];
 	}
 
@@ -104,6 +95,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:initialNumberOfColumns];
 	if([self numberOfColumns] > initialNumberOfColumns) [self scrollToLastColumnAnimate:YES];
 }
+
+#pragma mark -
+
 - (void)redisplayItem:(id)item recursively:(BOOL)flag
 {
 	if(flag) return [self setNeedsDisplay:YES];

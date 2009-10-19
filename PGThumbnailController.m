@@ -140,7 +140,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)displayControllerActiveNodeDidChange:(NSNotification *)aNotif
 {
 	PGNode *const node = [[self displayController] activeNode];
-	[_browser setSelection:node ? [NSSet setWithObject:node] : nil reload:YES];
+	[_browser setSelection:node ? [NSSet setWithObject:node] : nil];
 }
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
@@ -175,7 +175,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif
 {
-	[_browser setSelection:[_browser selection] reload:YES];
+	[_browser setSelection:[_browser selection]];
 }
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif
 {
