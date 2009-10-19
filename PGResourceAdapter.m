@@ -294,6 +294,7 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 		NSRectFill(rect);
 	}
 	[rep drawInRect:rect];
+	[context flushGraphics];
 	return thumbRep;
 }
 - (void)invalidateThumbnail

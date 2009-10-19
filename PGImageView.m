@@ -282,14 +282,16 @@ static NSSize PGRoundedCornerSizes[4];
 		_awaitingUpdate = YES;
 		return;
 	}
-	CGContextRef const context = [[[self window] graphicsContext] graphicsPort];
-	NSParameterAssert(context);
-	CGLayerRef const layer = CGLayerCreateWithContext(context, NSSizeToCGSize(_immediateSize), NULL);
-	NSGraphicsContext *const oldGraphicsContext = [NSGraphicsContext currentContext];
-	[NSGraphicsContext setCurrentContext:[NSGraphicsContext graphicsContextWithGraphicsPort:CGLayerGetContext(layer) flipped:[self isFlipped]]];
+	CGContextRef const windowContext = [[[self window] graphicsContext] graphicsPort];
+	NSParameterAssert(windowContext);
+	CGLayerRef const layer = CGLayerCreateWithContext(windowContext, NSSizeToCGSize(_immediateSize), NULL);
+	NSGraphicsContext *const oldContext = [NSGraphicsContext currentContext];
+	NSGraphicsContext *const layerContext = [NSGraphicsContext graphicsContextWithGraphicsPort:CGLayerGetContext(layer) flipped:[self isFlipped]];
+	[NSGraphicsContext setCurrentContext:layerContext];
 	NSRect const b = (NSRect){NSZeroPoint, _immediateSize};
 	[self _drawImageWithFrame:b compositeCopy:YES rects:NULL count:0];
-	[NSGraphicsContext setCurrentContext:oldGraphicsContext];
+	[layerContext flushGraphics];
+	[NSGraphicsContext setCurrentContext:oldContext];
 	_cacheLayer = layer;
 }
 - (void)_drawImageWithFrame:(NSRect)aRect compositeCopy:(BOOL)compositeCopy rects:(NSRect const *)rects count:(NSUInteger)count
