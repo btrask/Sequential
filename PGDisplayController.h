@@ -98,6 +98,8 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)performFindPanelAction:(id)sender;
 - (IBAction)hideFindPanel:(id)sender;
 
+- (IBAction)toggleAnimation:(id)sender;
+
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
 

@@ -38,6 +38,10 @@
 "Show Thumbnails" = "Show Thumbnails";
 "Hide Thumbnails" = "Hide Thumbnails";
 
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "Turn Animation On";
+"Turn Animation Off" = "Turn Animation Off";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Fit to Screen";
 "Fit to Window" = "Fit to Window";
@@ -63,10 +67,10 @@
 "This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don’t resume from this page, the bookmark will be kept and you will start from the first page as usual.";
 
 /* Don't resume from bookmark button. */
-"Don't Resume" = "Don't Resume";
+"Don't Resume" = "Don’t Resume";
 
 /* Do resume from bookmark button. */
 "Resume" = "Resume";

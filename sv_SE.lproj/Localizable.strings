@@ -38,6 +38,10 @@
 "Show Thumbnails" = "Visa miniatyrer";
 "Hide Thumbnails" = "Göm miniatyrer";
 
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "Turn Animation On";
+"Turn Animation Off" = "Turn Animation Off";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Anpassa till skärm";
 "Fit to Window" = "Anpassa till fönster";

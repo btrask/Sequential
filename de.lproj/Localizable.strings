@@ -38,6 +38,10 @@
 "Show Thumbnails" = "Miniaturen einblenden";
 "Hide Thumbnails" = "Miniaturen ausblenden";
 
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "Turn Animation On";
+"Turn Animation Off" = "Turn Animation Off";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "An Bildschirm anpassen";
 "Fit to Window" = "An Fenster anpassen";

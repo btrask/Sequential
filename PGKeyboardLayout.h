@@ -34,6 +34,7 @@ enum {
 	PGKeyJ = 38,
 	PGKeyK = 40,
 	PGKeyL = 37,
+	PGKeyM = 46,
 	PGKeyN = 45,
 	PGKeyQ = 12,
 	PGKeyR = 15,
@@ -83,7 +84,7 @@ enum {
 	PGKeyPadPlus = 69,
 	PGKeyPadMinus = 78,
 
-	PGKeyUnknown = USHRT_MAX
+	PGKeyUnknown = USHRT_MAX,
 };
 
 extern unsigned short PGKeyCodeFromUnichar(unichar);

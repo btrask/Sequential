@@ -38,6 +38,10 @@
 "Show Thumbnails" = "Показать эскизы фотографий";
 "Hide Thumbnails" = "Спрятать эскизы фотографий";
 
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "Turn Animation On";
+"Turn Animation Off" = "Turn Animation Off";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "Масштаб под размер экрана";
 "Fit to Window" = "Масштаб под размер окна";

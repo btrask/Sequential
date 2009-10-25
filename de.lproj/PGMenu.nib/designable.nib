@@ -11,8 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="1244"/>
-			<integer value="1087"/>
+			<integer value="891"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -681,6 +680,24 @@
 									<reference key="NSOnImage" ref="362813364"/>
 									<reference key="NSMixedImage" ref="323527360"/>
 								</object>
+								<object class="NSMenuItem" id="74571734">
+									<reference key="NSMenu" ref="1030933657"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="362813364"/>
+									<reference key="NSMixedImage" ref="323527360"/>
+								</object>
+								<object class="NSMenuItem" id="133496601">
+									<reference key="NSMenu" ref="1030933657"/>
+									<string key="NSTitle">Turn Animation On</string>
+									<string key="NSKeyEquiv">m</string>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="362813364"/>
+									<reference key="NSMixedImage" ref="323527360"/>
+								</object>
 							</array>
 						</object>
 					</object>
@@ -1297,7 +1314,7 @@
 				<string key="NSClassName">SUUpdater</string>
 			</object>
 			<object class="NSCustomView" id="640235494">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSButton" id="264224871">
@@ -1375,7 +1392,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{140, 25}</string>
-				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -2309,6 +2325,14 @@
 					</object>
 					<int key="connectionID">1261</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleAnimation:</string>
+						<reference key="source" ref="477082805"/>
+						<reference key="destination" ref="133496601"/>
+					</object>
+					<int key="connectionID">1264</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2926,6 +2950,8 @@
 							<reference ref="1032690116"/>
 							<reference ref="600942956"/>
 							<reference ref="887729473"/>
+							<reference ref="74571734"/>
+							<reference ref="133496601"/>
 						</array>
 						<reference key="parent" ref="670140953"/>
 					</object>
@@ -3302,6 +3328,16 @@
 						<reference key="object" ref="553818620"/>
 						<reference key="parent" ref="220572284"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1262</int>
+						<reference key="object" ref="74571734"/>
+						<reference key="parent" ref="1030933657"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1263</int>
+						<reference key="object" ref="133496601"/>
+						<reference key="parent" ref="1030933657"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -3394,6 +3430,8 @@
 				<string key="1251.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1260.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1260.ImportedFromIB2"/>
+				<string key="1262.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="1263.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="130.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="130.ImportedFromIB2"/>
 				<string key="131.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3551,7 +3589,7 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
-				<string key="891.IBEditorWindowLastContentRect">{{463, 770}, {336, 183}}</string>
+				<string key="891.IBEditorWindowLastContentRect">{{603, 477}, {338, 213}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3605,7 +3643,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">1261</int>
+			<int key="maxID">1264</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3893,6 +3931,7 @@
 						<string key="setCopyAsDesktopPicture:">id</string>
 						<string key="skipBeforeFolder:">id</string>
 						<string key="skipPastFolder:">id</string>
+						<string key="toggleAnimation:">id</string>
 						<string key="zoomIn:">id</string>
 						<string key="zoomOut:">id</string>
 					</dictionary>

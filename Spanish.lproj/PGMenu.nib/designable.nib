@@ -11,8 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="1087"/>
-			<integer value="1241"/>
+			<integer value="891"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -681,6 +680,24 @@
 									<reference key="NSOnImage" ref="649326220"/>
 									<reference key="NSMixedImage" ref="660995249"/>
 								</object>
+								<object class="NSMenuItem" id="351220534">
+									<reference key="NSMenu" ref="180469397"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="649326220"/>
+									<reference key="NSMixedImage" ref="660995249"/>
+								</object>
+								<object class="NSMenuItem" id="1013242022">
+									<reference key="NSMenu" ref="180469397"/>
+									<string key="NSTitle">Turn Animation On</string>
+									<string key="NSKeyEquiv">m</string>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="649326220"/>
+									<reference key="NSMixedImage" ref="660995249"/>
+								</object>
 							</array>
 						</object>
 					</object>
@@ -1305,6 +1322,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{20, 11}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="99343180"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="856443262">
 							<int key="NSCellFlags">67239424</int>
@@ -1333,6 +1351,7 @@
 						<int key="NSvFlags">265</int>
 						<string key="NSFrame">{{106, 11}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="99343180"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="582411346">
 							<int key="NSCellFlags">67239424</int>
@@ -1357,6 +1376,7 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{42, 0}, {56, 26}}</string>
 						<reference key="NSSuperview" ref="99343180"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="189740854">
 							<int key="NSCellFlags">-2079981824</int>
@@ -1376,6 +1396,7 @@
 				</array>
 				<string key="NSFrameSize">{140, 25}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -2309,6 +2330,14 @@
 					</object>
 					<int key="connectionID">1256</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">toggleAnimation:</string>
+						<reference key="source" ref="966903588"/>
+						<reference key="destination" ref="1013242022"/>
+					</object>
+					<int key="connectionID">1259</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -2926,6 +2955,8 @@
 							<reference ref="145802475"/>
 							<reference ref="952596413"/>
 							<reference ref="325601431"/>
+							<reference ref="351220534"/>
+							<reference ref="1013242022"/>
 						</array>
 						<reference key="parent" ref="294748688"/>
 					</object>
@@ -3302,6 +3333,16 @@
 						<reference key="object" ref="839293540"/>
 						<reference key="parent" ref="1041719883"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1257</int>
+						<reference key="object" ref="351220534"/>
+						<reference key="parent" ref="180469397"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">1258</int>
+						<reference key="object" ref="1013242022"/>
+						<reference key="parent" ref="180469397"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -3394,6 +3435,8 @@
 				<string key="1247.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1255.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1255.ImportedFromIB2"/>
+				<string key="1257.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="1258.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="130.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="130.ImportedFromIB2"/>
 				<string key="131.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3551,6 +3594,7 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
+				<string key="891.IBEditorWindowLastContentRect">{{793, 349}, {248, 213}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3604,7 +3648,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">1256</int>
+			<int key="maxID">1259</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3892,6 +3936,7 @@
 						<string key="setCopyAsDesktopPicture:">id</string>
 						<string key="skipBeforeFolder:">id</string>
 						<string key="skipPastFolder:">id</string>
+						<string key="toggleAnimation:">id</string>
 						<string key="zoomIn:">id</string>
 						<string key="zoomOut:">id</string>
 					</dictionary>

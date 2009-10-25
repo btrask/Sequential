@@ -38,6 +38,10 @@
 "Show Thumbnails" = "顯示縮覽圖";
 "Hide Thumbnails" = "隱藏縮覽圖";
 
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "Turn Animation On";
+"Turn Animation Off" = "Turn Animation Off";
+
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Screen" = "符合螢幕大小";
 "Fit to Window" = "符合視窗大小";

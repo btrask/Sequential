@@ -198,6 +198,16 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (IBAction)toggleAnimation:(id)sender
+{
+	NSParameterAssert([_imageView canAnimateRep]);
+	BOOL const nowPlaying = ![[self activeDocument] animatesImages];
+	[[_graphicPanel content] pushGraphic:[PGBezierPathIconGraphic graphicWithIconType:nowPlaying ? AEPlayIcon : AEPauseIcon] window:[self window]];
+	[[self activeDocument] setAnimatesImages:nowPlaying];
+}
+
+#pragma mark -
+
 - (IBAction)zoomIn:(id)sender
 {
 	[self zoomBy:2.0f animate:YES];
@@ -994,6 +1004,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	(void)[[PGDocumentController sharedDocumentController] validateMenuItem:anItem];
 	SEL const action = [anItem action];
+	if(@selector(toggleAnimation:) == action) {
+		[anItem setTitle:[[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
+		return [_imageView canAnimateRep];
+	}
 	if(@selector(jumpToPage:) == action) {
 		PGNode *const node = [[anItem representedObject] nonretainedObjectValue];
 		NSCellStateValue state = NSOffState;
@@ -1042,6 +1056,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	}
 	if([[self activeDocument] baseOrientation] == PGUpright) {
 		if(@selector(revertOrientation:) == action) return NO;
+	}
+	if(![_imageView canAnimateRep]) {
+		if(@selector(toggleAnimation:) == action) return NO;
 	}
 	PGDocument *const doc = [self activeDocument];
 	if([doc imageScaleMode] == PGConstantFactorScale) {
@@ -1180,16 +1197,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	unsigned short const keyCode = [anEvent keyCode];
 	if(!modifiers) switch(keyCode) {
 		case PGKeyEscape: return [[PGDocumentController sharedDocumentController] performEscapeKeyAction];
-	}
-	if(!modifiers || NSShiftKeyMask == modifiers) switch(keyCode) {
-		case PGKeySpace:
-		{
-			if(![_imageView canAnimateRep]) return NO;
-			BOOL const nowPlaying = ![[self activeDocument] animatesImages];
-			[[_graphicPanel content] pushGraphic:[PGBezierPathIconGraphic graphicWithIconType:nowPlaying ? AEPlayIcon : AEPauseIcon] window:[self window]];
-			[[self activeDocument] setAnimatesImages:nowPlaying];
-			return YES;
-		}
 	}
 	if(!modifiers || !(~(NSCommandKeyMask | NSShiftKeyMask) & modifiers)) switch(keyCode) {
 		case PGKeyPadPlus:

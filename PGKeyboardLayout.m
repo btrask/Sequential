@@ -38,6 +38,8 @@ unsigned short PGKeyCodeFromUnichar(unichar c)
 		case 'j': return PGKeyJ;
 		case 'k': return PGKeyK;
 		case 'l': return PGKeyL;
+		case 'm': return PGKeyM;
+		case 'n': return PGKeyN;
 		case 'q': return PGKeyQ;
 		case 'r': return PGKeyR;
 		case 's': return PGKeyS;
