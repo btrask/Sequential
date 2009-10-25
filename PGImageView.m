@@ -158,7 +158,8 @@ static NSSize PGRoundedCornerSizes[4];
 {
 	if(flag == _animates) return;
 	_animates = flag;
-	if(!flag && [self antialiasWhenUpscaling]) [self setNeedsDisplay:YES];
+	if(flag) [self _invalidateCache];
+	else if([self antialiasWhenUpscaling]) [self setNeedsDisplay:YES];
 	[self _runAnimationTimer];
 }
 - (BOOL)isPaused
