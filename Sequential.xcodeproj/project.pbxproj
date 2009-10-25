@@ -67,7 +67,6 @@
 		0E1D3A4C0A7FA7B500C542A6 /* PGClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */; };
 		0E1D3EC90A8091FE00C542A6 /* PGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */; };
 		0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */; };
-		0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */; };
 		0E246B4310887CF200C30936 /* PGFoundationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4210887CF200C30936 /* PGFoundationAdditions.m */; };
 		0E246B4610887DC600C30936 /* PGAppKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4510887DC600C30936 /* PGAppKitAdditions.m */; };
 		0E246B4910887E1900C30936 /* PGWebKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4810887E1900C30936 /* PGWebKitAdditions.m */; };
@@ -382,8 +381,6 @@
 		0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDocumentController.m; sourceTree = "<group>"; };
 		0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCFMutableArray.h; sourceTree = "<group>"; };
 		0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCFMutableArray.m; sourceTree = "<group>"; };
-		0E2237A60EC2096D002F09C8 /* PGDisplayControlling.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDisplayControlling.h; sourceTree = "<group>"; };
-		0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDisplayControlling.m; sourceTree = "<group>"; };
 		0E246B4110887CF200C30936 /* PGFoundationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFoundationAdditions.h; sourceTree = "<group>"; };
 		0E246B4210887CF200C30936 /* PGFoundationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFoundationAdditions.m; sourceTree = "<group>"; };
 		0E246B4410887DC600C30936 /* PGAppKitAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAppKitAdditions.h; sourceTree = "<group>"; };
@@ -701,8 +698,6 @@
 		0E1D37360A7E1A5800C542A6 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				0E2237A60EC2096D002F09C8 /* PGDisplayControlling.h */,
-				0E2237A70EC2096E002F09C8 /* PGDisplayControlling.m */,
 				0E1D3EC70A8091FD00C542A6 /* PGDocumentController.h */,
 				0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */,
 				0E8A1C0410157A5200C23B34 /* PGAboutBoxController.h */,
@@ -1369,7 +1364,6 @@
 				0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */,
 				0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */,
 				0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */,
-				0E2237A80EC2096E002F09C8 /* PGDisplayControlling.m in Sources */,
 				0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */,
 				0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */,
 				0E2500C20FA4755A002CCCBA /* PGDelayedPerforming.m in Sources */,

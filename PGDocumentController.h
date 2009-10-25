@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGBookmark;
 
 // Controllers
-#import "PGDisplayControlling.h"
 @class PGDisplayController;
 @class PGFullscreenController;
 @class PGExifPanelController;
@@ -58,7 +57,7 @@ enum {
 #define PGScaleMax 16.0f
 #define PGScaleMin (1.0f / 16.0f)
 
-@interface PGDocumentController : NSResponder <NSApplicationDelegate, NSMenuDelegate, PGDisplayControlling>
+@interface PGDocumentController : NSResponder <NSApplicationDelegate, NSMenuDelegate>
 {
 	@private
 	IBOutlet NSMenu *recentMenu;

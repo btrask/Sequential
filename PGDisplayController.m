@@ -198,6 +198,18 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (IBAction)toggleFullscreen:(id)sender
+{
+	[[PGDocumentController sharedDocumentController] setFullscreen:![PGDocumentController sharedDocumentController].fullscreen];
+}
+- (IBAction)toggleInfo:(id)sender
+{
+	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
+}
+- (IBAction)toggleThumbnails:(id)sender
+{
+	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
+}
 - (IBAction)toggleAnimation:(id)sender
 {
 	NSParameterAssert([_imageView canAnimateRep]);
@@ -1002,8 +1014,11 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
-	(void)[[PGDocumentController sharedDocumentController] validateMenuItem:anItem];
 	SEL const action = [anItem action];
+	if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([[PGDocumentController sharedDocumentController] pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+	if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString(([[PGDocumentController sharedDocumentController] isFullscreen] ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
+	if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
+	if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
 	if(@selector(toggleAnimation:) == action) {
 		[anItem setTitle:[[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
 		return [_imageView canAnimateRep];
@@ -1257,21 +1272,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
 	}
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
-}
-
-#pragma mark -<PGDisplayControlling>
-
-- (IBAction)toggleFullscreen:(id)sender
-{
-	[[PGDocumentController sharedDocumentController] setFullscreen:![PGDocumentController sharedDocumentController].fullscreen];
-}
-- (IBAction)toggleInfo:(id)sender
-{
-	[[self activeDocument] setShowsInfo:![[self activeDocument] showsInfo]];
-}
-- (IBAction)toggleThumbnails:(id)sender
-{
-	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
 
 #pragma mark -<PGDocumentWindowDelegate>

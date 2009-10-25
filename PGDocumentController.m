@@ -605,14 +605,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	SEL const action = [anItem action];
 	NSInteger const tag = [anItem tag];
 
-	if(protocol_getMethodDescription(@protocol(PGDisplayControlling), action, YES, YES).name) {
-		if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
-		if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
-		if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
-		if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self currentPrefObject] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
-		return NO;
-	}
-
 	if(@selector(installUpdate:) == action) {
 		[anItem setTitle:[[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states.")];
 	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
@@ -765,13 +757,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[item setRepresentedObject:representedObject];
 	return YES;
 }
-
-#pragma mark -<PGDisplayControlling>
-
-- (IBAction)reveal:(id)sender {}
-- (IBAction)toggleFullscreen:(id)sender {}
-- (IBAction)toggleInfo:(id)sender {}
-- (IBAction)toggleThumbnails:(id)sender {}
 
 @end
 

@@ -11,7 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="891"/>
+			<integer value="338"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -313,7 +313,7 @@
 								</object>
 								<object class="NSMenuItem" id="157427532">
 									<reference key="NSMenu" ref="523135223"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Показать в Finder</string>
 									<string key="NSKeyEquiv">r</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -529,7 +529,7 @@
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="333971816">
 									<reference key="NSMenu" ref="708982342"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Войти в полноэкранный режим</string>
 									<string key="NSKeyEquiv">f</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -538,7 +538,7 @@
 								</object>
 								<object class="NSMenuItem" id="139254677">
 									<reference key="NSMenu" ref="708982342"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Показать инф. панель</string>
 									<string key="NSKeyEquiv">i</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="770086926"/>
@@ -546,7 +546,7 @@
 								</object>
 								<object class="NSMenuItem" id="460831058">
 									<reference key="NSMenu" ref="708982342"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Показать эскизы фотографий</string>
 									<string key="NSKeyEquiv">t</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="770086926"/>
@@ -1314,7 +1314,7 @@
 				<string key="NSClassName">SUUpdater</string>
 			</object>
 			<object class="NSCustomView" id="1063111763">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSButton" id="468464276">
@@ -1322,7 +1322,6 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{20, 11}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="1063111763"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="1031983489">
 							<int key="NSCellFlags">67239424</int>
@@ -1351,7 +1350,6 @@
 						<int key="NSvFlags">265</int>
 						<string key="NSFrame">{{106, 11}, {14, 14}}</string>
 						<reference key="NSSuperview" ref="1063111763"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="775919844">
 							<int key="NSCellFlags">67239424</int>
@@ -1376,7 +1374,6 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{42, 0}, {56, 26}}</string>
 						<reference key="NSSuperview" ref="1063111763"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="564547830">
 							<int key="NSCellFlags">-2079981824</int>
@@ -1395,8 +1392,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{140, 25}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -3485,6 +3480,7 @@
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="337.ImportedFromIB2"/>
+				<string key="338.IBEditorWindowLastContentRect">{{581, 371}, {427, 283}}</string>
 				<string key="338.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="338.ImportedFromIB2"/>
 				<string key="340.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3594,7 +3590,7 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
-				<string key="891.IBEditorWindowLastContentRect">{{702, 441}, {248, 213}}</string>
+				<string key="891.IBEditorWindowLastContentRect">{{702, 441}, {297, 213}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3937,6 +3933,9 @@
 						<string key="skipBeforeFolder:">id</string>
 						<string key="skipPastFolder:">id</string>
 						<string key="toggleAnimation:">id</string>
+						<string key="toggleFullscreen:">id</string>
+						<string key="toggleInfo:">id</string>
+						<string key="toggleThumbnails:">id</string>
 						<string key="zoomIn:">id</string>
 						<string key="zoomOut:">id</string>
 					</dictionary>
@@ -3967,10 +3966,7 @@
 						<string key="revealInBrowser:">id</string>
 						<string key="revealInFinder:">id</string>
 						<string key="revealInPathFinder:">id</string>
-						<string key="toggleFullscreen:">id</string>
-						<string key="toggleInfo:">id</string>
 						<string key="toggleOnScreenDisplay:">id</string>
-						<string key="toggleThumbnails:">id</string>
 					</dictionary>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">imageView</string>

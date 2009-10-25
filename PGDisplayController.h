@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGFindlessTextView;
 
 // Controllers
-#import "PGDisplayControlling.h"
 @class PGThumbnailController;
 #import "PGEncodingAlert.h"
 
@@ -49,7 +48,7 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerActiveNodeWasReadNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
-@interface PGDisplayController : NSWindowController <NSWindowDelegate, PGClipViewDelegate, PGDisplayControlling, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
+@interface PGDisplayController : NSWindowController <NSWindowDelegate, PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 {
 	@private
 	IBOutlet PGClipView *clipView;
@@ -98,6 +97,9 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)performFindPanelAction:(id)sender;
 - (IBAction)hideFindPanel:(id)sender;
 
+- (IBAction)toggleFullscreen:(id)sender;
+- (IBAction)toggleInfo:(id)sender;
+- (IBAction)toggleThumbnails:(id)sender;
 - (IBAction)toggleAnimation:(id)sender;
 
 - (IBAction)zoomIn:(id)sender;

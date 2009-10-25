@@ -11,7 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="891"/>
+			<integer value="338"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -313,7 +313,7 @@
 								</object>
 								<object class="NSMenuItem" id="549325898">
 									<reference key="NSMenu" ref="1001563722"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Reveal in Finder</string>
 									<string key="NSKeyEquiv">r</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -529,7 +529,7 @@
 							<array class="NSMutableArray" key="NSMenuItems">
 								<object class="NSMenuItem" id="110387313">
 									<reference key="NSMenu" ref="509181458"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Enter Full Screen</string>
 									<string key="NSKeyEquiv">f</string>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -538,7 +538,7 @@
 								</object>
 								<object class="NSMenuItem" id="136848917">
 									<reference key="NSMenu" ref="509181458"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Show Info</string>
 									<string key="NSKeyEquiv">i</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="421653445"/>
@@ -546,7 +546,7 @@
 								</object>
 								<object class="NSMenuItem" id="683038605">
 									<reference key="NSMenu" ref="509181458"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Show Thumbnails</string>
 									<string key="NSKeyEquiv">t</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="421653445"/>
@@ -3517,7 +3517,7 @@
 				<boolean value="YES" key="552.ImportedFromIB2"/>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="56.ImportedFromIB2"/>
-				<string key="57.IBEditorWindowLastContentRect">{{67, 891}, {260, 223}}</string>
+				<string key="57.IBEditorWindowLastContentRect">{{66, 582}, {260, 223}}</string>
 				<string key="57.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="57.ImportedFromIB2"/>
 				<string key="573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3591,7 +3591,7 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
-				<string key="891.IBEditorWindowLastContentRect">{{246, 592}, {248, 213}}</string>
+				<string key="891.IBEditorWindowLastContentRect">{{246, 592}, {242, 213}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3904,6 +3904,9 @@
 						<string key="skipBeforeFolder:">id</string>
 						<string key="skipPastFolder:">id</string>
 						<string key="toggleAnimation:">id</string>
+						<string key="toggleFullscreen:">id</string>
+						<string key="toggleInfo:">id</string>
+						<string key="toggleThumbnails:">id</string>
 						<string key="zoomIn:">id</string>
 						<string key="zoomOut:">id</string>
 					</dictionary>
@@ -3934,10 +3937,7 @@
 						<string key="revealInBrowser:">id</string>
 						<string key="revealInFinder:">id</string>
 						<string key="revealInPathFinder:">id</string>
-						<string key="toggleFullscreen:">id</string>
-						<string key="toggleInfo:">id</string>
 						<string key="toggleOnScreenDisplay:">id</string>
-						<string key="toggleThumbnails:">id</string>
 					</dictionary>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">imageView</string>
