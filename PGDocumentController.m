@@ -511,7 +511,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[windowsMenuSeparator release];
 	[_updateTimer invalidate];
 	[_updateTimer release];
-	[_recentMenuSeparatorItem release];
 	[_recentDocumentIdentifiers release];
 	[_documents release];
 	[_fullscreenController release];
@@ -606,52 +605,28 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -<NSMenuDelegate>
 
-- (NSInteger)numberOfItemsInMenu:(NSMenu *)menu
+- (void)menuNeedsUpdate:(NSMenu *)menu
 {
-	if(menu == recentMenu) {
-		[_recentMenuSeparatorItem PG_removeFromMenu]; // The separator gets moved around as we rebuild the menu.
-		NSMutableArray *const identifiers = [NSMutableArray array];
-		for(PGDisplayableIdentifier *const identifier in [self recentDocumentIdentifiers]) if([identifier URL]) [identifiers addObject:identifier]; // Make sure the URLs are valid.
-		[self setRecentDocumentIdentifiers:identifiers];
-		return [identifiers count] + 1;
-	}
-	return -1;
-}
-- (BOOL)menu:(NSMenu *)menu updateItem:(NSMenuItem *)item atIndex:(NSInteger)anInt shouldCancel:(BOOL)shouldCancel
-{
-	NSString *title = @"";
-	NSAttributedString *attributedTitle = nil;
-	SEL action = NULL;
-	id representedObject = nil;
-	if(menu == recentMenu) {
-		NSArray *const identifiers = [self recentDocumentIdentifiers];
-		if((NSUInteger)anInt < [identifiers count]) {
-			PGDisplayableIdentifier *const identifier = [identifiers objectAtIndex:anInt];
-			NSString *const name = [identifier displayName];
-
-			BOOL uniqueName = YES;
-			for(PGDisplayableIdentifier *const comparisonIdentifier in identifiers) if(comparisonIdentifier != identifier && PGEqualObjects([comparisonIdentifier displayName], name)) {
-				uniqueName = NO;
-				break;
-			}
-
-			attributedTitle = [identifier attributedStringWithAncestory:!uniqueName];
-			action = @selector(openRecentDocument:);
-			representedObject = identifier;
-		} else {
-			title = NSLocalizedString(@"Clear Menu", @"Clear the Open Recent menu. Should be the same as the standard text.");
-			if(anInt) {
-				if(!_recentMenuSeparatorItem) _recentMenuSeparatorItem = [[NSMenuItem separatorItem] retain];
-				[menu insertItem:_recentMenuSeparatorItem atIndex:anInt];
-				action = @selector(clearRecentDocuments:);
-			}
+	[menu removeAllItems];
+	BOOL addedAnyItems = NO;
+	NSArray *const identifiers = [self recentDocumentIdentifiers];
+	for(PGDisplayableIdentifier *const identifier in identifiers) {
+		if(![identifier URL]) continue; // Make sure the URLs are valid.
+		BOOL uniqueName = YES;
+		NSString *const name = [identifier displayName];
+		for(PGDisplayableIdentifier *const comparisonIdentifier in identifiers) {
+			if(comparisonIdentifier == identifier || !PGEqualObjects([comparisonIdentifier displayName], name)) continue;
+			uniqueName = NO;
+			break;
 		}
+		NSMenuItem *const item = [[[NSMenuItem alloc] initWithTitle:@"" action:@selector(openRecentDocument:) keyEquivalent:@""] autorelease];
+		[item setAttributedTitle:[identifier attributedStringWithAncestory:!uniqueName]];
+		[item setRepresentedObject:identifier];
+		[menu addItem:item];
+		addedAnyItems = YES;
 	}
-	[item setTitle:title];
-	[item setAttributedTitle:attributedTitle];
-	[item setAction:action];
-	[item setRepresentedObject:representedObject];
-	return YES;
+	if(addedAnyItems) [menu addItem:[NSMenuItem separatorItem]];
+	[menu addItem:[[[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"Clear Menu", @"Clear the Open Recent menu. Should be the same as the standard text.") action:@selector(clearRecentDocuments:) keyEquivalent:@""] autorelease]];
 }
 
 @end

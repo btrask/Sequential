@@ -60,7 +60,6 @@ enum {
 {
 	@private
 	IBOutlet NSMenu *recentMenu;
-	NSMenuItem *_recentMenuSeparatorItem;
 
 	IBOutlet NSMenuItem *rotate90CC;
 	IBOutlet NSMenuItem *rotate270CC;
