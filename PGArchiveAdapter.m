@@ -132,14 +132,11 @@ static id PGArchiveAdapterList = nil;
 		XADError error = XADNoError;
 		PGResourceIdentifier *const ident = [[self info] objectForKey:PGIdentifierKey];
 		id const dataSource = [[self node] dataSource];
-		if([dataSource respondsToSelector:@selector(archive)]) {
-			_archive = [[XADArchive alloc] initWithArchive:[dataSource archive] entry:[ident index] error:&error];
-		} else if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
+		if([dataSource respondsToSelector:@selector(archive)]) _archive = [[XADArchive alloc] initWithArchive:[dataSource archive] entry:[ident index] delegate:self error:&error];
+		else if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *const data = [self data];
-			if(!data) return [[self node] loadFinished];
-			_archive = [[XADArchive alloc] initWithData:data error:&error];
-			[_archive setDelegate:self];
+			if(data) _archive = [[XADArchive alloc] initWithData:data delegate:self error:&error];
 		}
 		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFinished];
 	}
