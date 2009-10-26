@@ -538,7 +538,7 @@ XADUNARCHIVE(Shrink)
 XADRECOGDATA(SPack)
 {
   xadUINT32 i;
-  static const xadUINT8 *c = "PACKFI";
+  static const xadUINT8 *c = (xadUINT8 *)"PACKFI";
 
   for(i = 0; i < 6 && c[i] == data[i]; ++i)
     ;
@@ -630,7 +630,7 @@ XADGETINFO(SPack)
               {
                 io->xio_InSize = EndGetM32(buf+8);
                 io->xio_OutBufferSize = io->xio_OutSize = b2s;
-                io->xio_OutBuffer = buf2;
+                io->xio_OutBuffer = (xadUINT8 *)buf2;
 
                 if(!(err = DeShrink(io, 7)) && EndGetM16(buf+12) != xadCalcCRC16(XADM XADCRC16_ID1, 0, b2s, (xadUINT8 *)buf2))
                   err = XADERR_CHECKSUM;

@@ -22,7 +22,7 @@
 	return NO;
 }
 
--(void)parse
+-(void)parseWithSeparateMacForks
 {
 	CSHandle *fh=[self handle];
 

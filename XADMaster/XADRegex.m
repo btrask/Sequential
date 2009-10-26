@@ -4,77 +4,6 @@ static NSString *nullstring=nil;
 
 @implementation XADRegex
 
--(id)initWithPattern:(NSString *)pattern options:(int)options
-{
-	if(self=[super init])
-	{
-		int err=regcomp(&preg,[pattern UTF8String],options|REG_EXTENDED);
-		if(err)
-		{
-			char errbuf[256];
-			regerror(err,&preg,errbuf,sizeof(errbuf));
-			[NSException raise:@"XADRegexException"
-			format:@"Could not compile regex \"%@\": %s",pattern,errbuf];
-		}
-	}
-	return self;
-}
-
--(void)dealloc
-{
-	regfree(&preg);
-	[super dealloc];
-}
-
--(BOOL)matchesString:(NSString *)string
-{
-	if(regexec(&preg,[string UTF8String],0,NULL,0)==0) return YES;
-	return NO;
-}
-
--(NSString *)matchedSubstringOfString:(NSString *)string
-{
-	const char *cstr=[string UTF8String];
-	regmatch_t match;
-	if(regexec(&preg,cstr,1,&match,0)==0)
-	{
-		return [[[NSString alloc] initWithBytes:cstr+match.rm_so
-		length:match.rm_eo-match.rm_so encoding:NSUTF8StringEncoding] autorelease];
-	}
-
-	return nil;
-}
-
--(NSArray *)capturedSubstringsOfString:(NSString *)string
-{
-	const char *cstr=[string UTF8String];
-	int num=preg.re_nsub+1;
-	regmatch_t *matches=calloc(sizeof(regmatch_t),num);
-
-	if(regexec(&preg,cstr,num,matches,0)==0)
-	{
-		NSMutableArray *array=[NSMutableArray arrayWithCapacity:num];
-
-		int i;
-		for(i=0;i<num;i++)
-		{
-			NSString *str;
-
-			if(matches[i].rm_so==-1&&matches[i].rm_eo==-1) str=nullstring;
-			else str=[[[NSString alloc] initWithBytes:cstr+matches[i].rm_so
-			length:matches[i].rm_eo-matches[i].rm_so encoding:NSUTF8StringEncoding] autorelease];
-
-			[array addObject:str];
-		}
-
-		free(matches);
-
-		return [NSArray arrayWithArray:array];
-	}
-
-	return nil;
-}
-
 +(XADRegex *)regexWithPattern:(NSString *)pattern options:(int)options
 { return [[[XADRegex alloc] initWithPattern:pattern options:options] autorelease]; }
 
@@ -85,39 +14,190 @@ static NSString *nullstring=nil;
 
 +(void)initialize
 {
-	if(!nullstring) nullstring=[[NSString alloc] initWithString:@""];
+	if(!nullstring) nullstring=[NSMutableString stringWithString:@""];
 }
+
+-(id)initWithPattern:(NSString *)pattern options:(int)options
+{
+	if(self=[super init])
+	{
+		patternstring=[patternstring retain];
+		currdata=nil;
+		matches=NULL;
+
+		int err=regcomp(&preg,[pattern UTF8String],options|REG_EXTENDED);
+		if(err)
+		{
+			[self autorelease];
+			char errbuf[256];
+			regerror(err,&preg,errbuf,sizeof(errbuf));
+			[NSException raise:@"XADRegexException" format:@"Could not compile regex \"%@\": %s",pattern,errbuf];
+		}
+
+		matches=calloc(sizeof(regmatch_t),preg.re_nsub+1);
+		if(!matches)
+		{
+			[self autorelease];
+			[NSException raise:NSMallocException format:@"Out of memory when creating regex \"%@\"",pattern];
+		}
+	}
+	return self;
+}
+
+-(void)dealloc
+{
+	[patternstring release];
+	regfree(&preg);
+	[currdata release];
+	[super dealloc];
+}
+
+-(void)beginMatchingString:(NSString *)string { [self beginMatchingData:[string dataUsingEncoding:NSUTF8StringEncoding]]; }
+
+-(void)beginMatchingData:(NSData *)data { [self beginMatchingData:data range:NSMakeRange(0,[data length])]; }
+
+-(void)beginMatchingData:(NSData *)data range:(NSRange)range
+{
+	matchrange=range;
+	if(data==currdata) return;
+	[currdata release];
+	currdata=[data retain];
+}
+
+-(void)finishMatching { [currdata release]; currdata=nil; }
+
+-(BOOL)matchNext
+{
+	matches[0].rm_so=matchrange.location;
+	matches[0].rm_eo=matchrange.location+matchrange.length;
+	if(regexec(&preg,[currdata bytes],preg.re_nsub+1,matches,REG_STARTEND)==0)
+	{
+		matchrange.length-=matches[0].rm_eo-matchrange.location;
+		matchrange.location=matches[0].rm_eo;
+		return YES;
+	}
+	[self finishMatching];
+	return NO;
+}
+
+-(NSString *)stringForMatch:(int)n
+{
+	if(n>preg.re_nsub||n<0) [NSException raise:NSRangeException format:@"Index %d out of range for regex \"%@\"",n,self];
+ 	if(matches[n].rm_so==-1&&matches[n].rm_eo==-1) return nil;
+	return [[[NSString alloc] initWithBytes:[currdata bytes]+matches[n].rm_so
+	length:matches[n].rm_eo-matches[n].rm_so encoding:NSUTF8StringEncoding] autorelease];
+}
+
+-(NSArray *)allMatches
+{
+	NSMutableArray *array=[NSMutableArray arrayWithCapacity:preg.re_nsub+1];
+	for(int i=0;i<=preg.re_nsub;i++)
+	{
+		NSString *str=[self stringForMatch:i];
+		[array addObject:str?str:nullstring];
+	}
+	return [NSArray arrayWithArray:array];
+}
+
+
+
+-(BOOL)matchesString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	BOOL res=[self matchNext];
+	[self finishMatching];
+	return res;
+}
+
+-(NSString *)matchedSubstringOfString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	NSString *res=nil;
+	if([self matchNext]) res=[self stringForMatch:0];
+	[self finishMatching];
+	return res;
+}
+
+-(NSArray *)capturedSubstringsOfString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	NSArray *res=nil;
+	if([self matchNext]) res=[self allMatches];
+	[self finishMatching];
+	return res;
+}
+
+-(NSArray *)allMatchedSubstringsOfString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	NSMutableArray *array=[NSMutableArray array];
+	while([self matchNext]) [array addObject:[self stringForMatch:0]];
+	[self finishMatching];
+	return [NSArray arrayWithArray:array];
+}
+
+-(NSArray *)allCapturedSubstringsOfString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	NSMutableArray *array=[NSMutableArray array];
+	while([self matchNext]) [array addObject:[self allMatches]];
+	[self finishMatching];
+	return [NSArray arrayWithArray:array];
+}
+
+-(NSArray *)componentsOfSeparatedString:(NSString *)string
+{
+	[self beginMatchingString:string];
+	NSMutableArray *array=[NSMutableArray array];
+
+	regoff_t prevstart=0;
+	const char *bytes=[currdata bytes];
+	while([self matchNext])
+	{
+		[array addObject:[[[NSString alloc] initWithBytes:bytes+prevstart length:matches[0].rm_so-prevstart
+		encoding:NSUTF8StringEncoding] autorelease]];
+		prevstart=matches[0].rm_eo;
+	}
+	[array addObject:[[[NSString alloc] initWithBytes:bytes+prevstart length:[currdata length]-prevstart
+	encoding:NSUTF8StringEncoding] autorelease]];
+
+	[self finishMatching];
+	return [NSArray arrayWithArray:array];
+}
+
+-(NSString *)pattern { return patternstring; }
+
+-(NSString *)description { return patternstring; }
 
 @end
 
+
+
 @implementation NSString (XADRegex)
 
+-(BOOL)matchedByPattern:(NSString *)pattern { return [self matchedByPattern:pattern options:0]; }
 -(BOOL)matchedByPattern:(NSString *)pattern options:(int)options
-{
-	XADRegex *re=[XADRegex regexWithPattern:pattern options:options|REG_NOSUB];
-	return [re matchesString:self];
-}
+{ return [[XADRegex regexWithPattern:pattern options:options] matchesString:self]; }
 
--(BOOL)matchedByPattern:(NSString *)pattern
-{ return [self matchedByPattern:pattern options:0]; }
-
+-(NSString *)substringMatchedByPattern:(NSString *)pattern { return [self substringMatchedByPattern:pattern options:0]; }
 -(NSString *)substringMatchedByPattern:(NSString *)pattern options:(int)options
-{
-	XADRegex *re=[XADRegex regexWithPattern:pattern options:options];
-	return [re matchedSubstringOfString:self];
-}
+{ return [[XADRegex regexWithPattern:pattern options:options] matchedSubstringOfString:self]; }
 
--(NSString *)substringMatchedByPattern:(NSString *)pattern
-{ return [self substringMatchedByPattern:pattern options:0]; }
-
+-(NSArray *)substringsCapturedByPattern:(NSString *)pattern { return [self substringsCapturedByPattern:pattern options:0]; }
 -(NSArray *)substringsCapturedByPattern:(NSString *)pattern options:(int)options
-{
-	XADRegex *re=[XADRegex regexWithPattern:pattern options:options];
-	return [re capturedSubstringsOfString:self];
-}
+{ return [[XADRegex regexWithPattern:pattern options:options] capturedSubstringsOfString:self]; }
 
--(NSArray *)substringsCapturedByPattern:(NSString *)pattern
-{ return [self substringsCapturedByPattern:pattern options:0]; }
+-(NSArray *)allSubstringsMatchedByPattern:(NSString *)pattern { return [self allSubstringsMatchedByPattern:pattern options:0]; }
+-(NSArray *)allSubstringsMatchedByPattern:(NSString *)pattern options:(int)options
+{ return [[XADRegex regexWithPattern:pattern options:options] allMatchedSubstringsOfString:self]; }
+
+-(NSArray *)allSubstringsCapturedByPattern:(NSString *)pattern { return [self allSubstringsCapturedByPattern:pattern options:0]; }
+-(NSArray *)allSubstringsCapturedByPattern:(NSString *)pattern options:(int)options
+{ return [[XADRegex regexWithPattern:pattern options:options] allCapturedSubstringsOfString:self]; }
+
+-(NSArray *)componentsSeparatedByPattern:(NSString *)pattern { return [self componentsSeparatedByPattern:pattern options:0]; }
+-(NSArray *)componentsSeparatedByPattern:(NSString *)pattern options:(int)options
+{ return [[XADRegex regexWithPattern:pattern options:options] componentsOfSeparatedString:self]; }
 
 -(NSString *)escapedPattern
 {

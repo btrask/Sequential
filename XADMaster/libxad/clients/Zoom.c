@@ -742,10 +742,10 @@ XADGETINFO(Zoom)
                 ti->xti_Size = 80+21;
                 xadConvertDates(XADM XAD_DATEDATESTAMP, &zn.DateStamp,
                 XAD_GETDATEXADDATE, &xd, TAG_DONE);
-                sprintf(buf, "%02ld.%02ld.%04ld %02ld:%02ld:%02ld\n\n",
-                (long)xd.xd_Day, (long)xd.xd_Month,
-                (long)xd.xd_Year, (long)xd.xd_Hour,
-                (long)xd.xd_Minute, (long)xd.xd_Second);
+                sprintf(buf, "%02d.%02d.%04d %02d:%02d:%02d\n\n",
+                (xadUINT32)xd.xd_Day, (xadUINT32)xd.xd_Month,
+                (xadUINT32)xd.xd_Year, (xadUINT32)xd.xd_Hour,
+                (xadUINT32)xd.xd_Minute, (xadUINT32)xd.xd_Second);
 
                 xadCopyMem(XADM (xadPTR) &zn.Note, buf+21, 80);
               }

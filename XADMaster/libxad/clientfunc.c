@@ -328,8 +328,8 @@ FUNCxadHookTagAccess /* xadUINT32 command, xadSignSize data, xadPTR buffer,
     {
     case XAD_USESKIPINFO: skip = (xadUINT32) tags->ti_Data; break;
     case XAD_SECTORLABELS: tis[0].ti_Data = tags->ti_Data; break;
-    case XAD_GETCRC32: crc32 = (xadUINT32 *) tags->ti_Data; break;
-    case XAD_GETCRC16: crc16 = (xadUINT16 *) tags->ti_Data; break;
+    case XAD_GETCRC32: crc32 = (xadUINT32 *)(uintptr_t) tags->ti_Data; break;
+    case XAD_GETCRC16: crc16 = (xadUINT16 *)(uintptr_t) tags->ti_Data; break;
     case XAD_CRC32ID: crc32ID = (xadUINT32) tags->ti_Data; break;
     case XAD_CRC16ID: crc16ID = (xadUINT16)  tags->ti_Data; break;
     }

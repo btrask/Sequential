@@ -5,7 +5,7 @@
     amiga filesytem client
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -266,7 +266,7 @@ static xadINT32 parsedir(struct DiskParseData *parse)
             fh->afs_Name[0] + curnamesize+1+1+j,fh->afs_Comment[0] ? XAD_OBJCOMMENTSIZE :
             TAG_DONE, fh->afs_Comment[0]+1, TAG_DONE)))
             {
-              fi->xfi_PrivateInfo = (xadPTR) j; /* store block number */
+              fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) j; /* store block number */
               str = fi->xfi_FileName;
               if(curnamesize)
               {
@@ -332,7 +332,7 @@ static xadINT32 parsedir(struct DiskParseData *parse)
             fh->afs_Name[0] + curnamesize+1+1, fh->afs_Comment[0] ? XAD_OBJCOMMENTSIZE :
             TAG_DONE, fh->afs_Comment[0]+1, TAG_DONE)))
             {
-              fi->xfi_PrivateInfo = (xadPTR) j; /* store block number */
+              fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) j; /* store block number */
               str = fi->xfi_FileName;
               if(curnamesize)
               {
@@ -437,7 +437,7 @@ XADGETINFO(FSAmiga)
                 pd.DirList = fi->xfi_Next;
                 xadCopyMem(XADM fi->xfi_PrivateInfo, b1, ii->xii_SectorSize);
                 xadFreeObjectA(XADM fi->xfi_PrivateInfo, 0); /* free stored block */
-                fi->xfi_PrivateInfo = (xadPTR) EndGetM32(pd.fh1->afs_HeaderKey); /* set blocknum */
+                fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) EndGetM32(pd.fh1->afs_HeaderKey); /* set blocknum */
                 if(!(err = xadAddFileEntry(XADM fi, ai, XAD_INSERTDIRSFIRST, XADTRUE, TAG_DONE)))
                   err = parsedir(&pd);
               }
@@ -451,7 +451,7 @@ XADGETINFO(FSAmiga)
 
                 for(ofi = ai->xai_FileInfo; ofi; ofi=ofi->xfi_Next)
                 {
-                  if((xadUINT32) ofi->xfi_PrivateInfo == EndGetM32(pd.fh1->afs_LinkOriginal))
+                  if((xadUINT32)(uintptr_t) ofi->xfi_PrivateInfo == EndGetM32(pd.fh1->afs_LinkOriginal))
                     break;
                 }
                 if(ofi)
@@ -536,7 +536,7 @@ XADUNARCHIVE(FSAmiga)
 
   if((buf = (xadSTRPTR) xadAllocVec(XADM blksize*11, XADMEMF_PUBLIC)))
   {
-    if(!(err = getdiskblock(xadMasterBase, ai, (xadUINT32) ai->xai_CurFile->xfi_PrivateInfo, buf, 1)))
+    if(!(err = getdiskblock(xadMasterBase, ai, (xadUINT32)(uintptr_t) ai->xai_CurFile->xfi_PrivateInfo, buf, 1)))
     {
       struct FileExtensionBlock *fe;
       xadUINT8 *data;

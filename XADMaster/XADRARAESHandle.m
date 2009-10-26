@@ -5,38 +5,10 @@
 
 @implementation XADRARAESHandle
 
--(id)initWithHandle:(CSHandle *)handle password:(NSString *)password
-salt:(NSData *)salt brokenHash:(BOOL)brokenhash
++(NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt brokenHash:(BOOL)brokenhash
 {
-	if(self=[super initWithName:[handle name]])
-	{
-		parent=[handle retain];
-		startoffs=[handle offsetInFile];
-		[self calculateKeyForPassword:password salt:salt brokenHash:brokenhash];
-	}
-	return self;
-}
+	uint8_t keybuf[2*16];
 
--(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSString *)password
-salt:(NSData *)salt brokenHash:(BOOL)brokenhash
-{
-	if(self=[super initWithName:[handle name] length:length])
-	{
-		parent=[handle retain];
-		startoffs=[handle offsetInFile];
-		[self calculateKeyForPassword:password salt:salt brokenHash:brokenhash];
-	}
-	return self;
-}
-
--(void)dealloc
-{
-	[parent release];
-	[super dealloc];
-}
-
--(void)calculateKeyForPassword:(NSString *)password salt:(NSData *)salt brokenHash:(BOOL)brokenhash
-{
 	int length=[password length];
 	if(length>126) length=126;
 
@@ -71,14 +43,14 @@ salt:(NSData *)salt brokenHash:(BOOL)brokenhash
 			SHA_CTX tmpsha=sha;
 			uint8_t digest[20];
 			SHA1_Final(digest,&tmpsha);
-			iv[i/0x4000]=digest[19];
+			keybuf[i/0x4000]=digest[19];
 		}
 	}
 
-	uint8_t digest[20],keybuf[16];
+	uint8_t digest[20];
 	SHA1_Final(digest,&sha);
 
-	for(int i=0;i<16;i++) keybuf[i]=digest[i^3];
+	for(int i=0;i<16;i++) keybuf[i+16]=digest[i^3];
 
 /*NSLog(@"%@",salt);
 NSLog(@"%02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x",
@@ -86,29 +58,67 @@ keybuf[0],keybuf[1],keybuf[2],keybuf[3],keybuf[4],keybuf[5],keybuf[6],keybuf[7],
 keybuf[8],keybuf[9],keybuf[10],keybuf[11],keybuf[12],keybuf[13],keybuf[14],keybuf[15]
 );*/
 
-	AES_set_decrypt_key(keybuf,128,&key);
+	return [NSData dataWithBytes:keybuf length:sizeof(keybuf)];
+}
+
+-(id)initWithHandle:(CSHandle *)handle key:(NSData *)keydata
+{
+	if(self=[super initWithName:[handle name]])
+	{
+		parent=[handle retain];
+		startoffs=[handle offsetInFile];
+
+		const uint8_t *keybuf=[keydata bytes];
+		memcpy(iv,&keybuf[0],16);
+		AES_set_decrypt_key(&keybuf[16],128,&key);
+	}
+	return self;
+}
+
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length key:(NSData *)keydata
+{
+	if(self=[super initWithName:[handle name] length:length])
+	{
+		parent=[handle retain];
+		startoffs=[handle offsetInFile];
+
+		const uint8_t *keybuf=[keydata bytes];
+		memcpy(iv,&keybuf[0],16);
+		AES_set_decrypt_key(&keybuf[16],128,&key);
+	}
+	return self;
+}
+
+-(void)dealloc
+{
+	[parent release];
+	[super dealloc];
 }
 
 -(void)resetBlockStream
 {
 	[parent seekToFileOffset:startoffs];
 	memcpy(xorblock,iv,16);
-	[self setBlockPointer:outblock];
+	[self setBlockPointer:buffer];
 }
 
 -(int)produceBlockAtOffset:(off_t)pos
 {
-	uint8_t inblock[16];
+	uint8_t tmpblock[16];
 
-	int actual=[parent readAtMost:16 toBuffer:inblock];
-	if(actual!=16) return -1;
+	int actual=[parent readAtMost:sizeof(buffer) toBuffer:buffer];
+	if(actual==0) return -1;
 
-	AES_decrypt(inblock,outblock,&key);
+	for(int i=0;i<sizeof(buffer);i+=16)
+	{
+		AES_decrypt(buffer+i,tmpblock,&key);
 
-	for(int i=0;i<16;i++) outblock[i]^=xorblock[i];
-	memcpy(xorblock,inblock,16);
+		for(int i=0;i<16;i++) tmpblock[i]^=xorblock[i];
+		memcpy(xorblock,buffer+i,16);
+		memcpy(buffer+i,tmpblock,16);
+	}
 
-	return 16;
+	return actual;
 }
 
 @end

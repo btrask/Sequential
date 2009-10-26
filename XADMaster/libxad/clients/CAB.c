@@ -5,7 +5,7 @@
     Microsoft Cabinet archiver
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
     Copyright (C) 2000-2002 Stuart Caie <kyzer@4u.net>
 
     Quantum algorithm is based on the work of  Matthew T. Russotto
@@ -35,7 +35,7 @@
  * Phil Katz. LZX was created by Johnathan Forbes and Tomi Poutanen.
  * Quantum was created by David Stafford.
  *
- * The MSZIP part of this client was written for me by Dirk Stöcker, who
+ * The MSZIP part of this client was written for me by Dirk StË†cker, who
  * based it on code from InfoZip's free UnZip utility. Dirk also provided
  * extensive testing materials, feedback and moral support (oh - and he
  * created the XAD system :). I took the fast Huffman table builder from
@@ -366,7 +366,7 @@ struct CABstate {
 /*--------------------------------------------------------------------------*/
 /* MSZIP decompressor */
 
-/* This part was written by Dirk Stöcker, based on the InfoZip deflate code */
+/* This part was written by Dirk StË†cker, based on the InfoZip deflate code */
 
 /* Tables for deflate from PKZIP's appnote.txt. */
 static const xadUINT8 CABZipborder[] = /* Order of the bit length code lengths */
@@ -2132,7 +2132,7 @@ XADGETINFO(CAB) {
         READ(namep, 1);
       } while (*namep++);
 
-      D(("CAB: file size=%ld offset=%ld index=0x%lx name=«%s»\n",
+      D(("CAB: file size=%ld offset=%ld index=0x%lx name=Â´%sÂª\n",
         GETLONG(cffile_UncompressedSize), GETLONG(cffile_FolderOffset),
         GETWORD(cffile_FolderIndex), namebuf
       ))
@@ -2148,17 +2148,17 @@ XADGETINFO(CAB) {
       /* convert filename */
       nametags[0].ti_Data = (GETWORD(cffile_Attribs) & cffileUTFNAME)
                           ? CHARSET_UNICODE_UTF8 : CHARSET_WINDOWS;
-      nametags[1].ti_Data = (xadUINT32) (namep - namebuf);
-      nametags[2].ti_Data = (xadUINT32) namebuf;
+      nametags[1].ti_Data = (xadSize) (namep - namebuf);
+      nametags[2].ti_Data = (xadSize)(uintptr_t) namebuf;
       fi->xfi_FileName = xadConvertNameA(XADM CHARSET_HOST, nametags);
       if (!fi->xfi_FileName) ERROR(NOMEMORY);
 
       prottags[0].ti_Data = GETWORD(cffile_Attribs);
-      prottags[1].ti_Data = (xadUINT32) &fi->xfi_Protection;
+      prottags[1].ti_Data = (xadSize)(uintptr_t) &fi->xfi_Protection;
       xadConvertProtectionA(XADM prottags);
 
       datetags[0].ti_Data = (GETWORD(cffile_Date)<<16)|GETWORD(cffile_Time);
-      datetags[1].ti_Data = (xadUINT32) &fi->xfi_Date;
+      datetags[1].ti_Data = (xadSize)(uintptr_t) &fi->xfi_Date;
       xadConvertDatesA(XADM datetags);
 
       /* which folder is this file in? */

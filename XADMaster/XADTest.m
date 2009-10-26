@@ -53,7 +53,7 @@ int main(int argc,char **argv)
 
 	if(argc<2)
 	{
-		struct xadMasterBase *xmb=xadOpenLibrary(11);
+/*		struct xadMasterBase *xmb=xadOpenLibrary(11);
 		struct xadClient *client=xadGetClientInfo(xmb);
 
 		while(client)
@@ -62,7 +62,7 @@ int main(int argc,char **argv)
 			client=client->xc_Next;
 		}
 
-		return 0;
+		return 0;*/
 	}
 
 	NSString *filename,*destination;
@@ -70,7 +70,9 @@ int main(int argc,char **argv)
 	if(argc>=3) destination=[NSString stringWithUTF8String:argv[2]];
 	else destination=@"";
 
-	XADArchive *archive=[XADArchive recursiveArchiveForFile:filename];
+XADError error;
+	XADArchive *archive=archive = [[XADArchive alloc] initWithFile:filename error:&error];
+	//XADArchive *archive=[XADArchive recursiveArchiveForFile:filename];
 
 	[archive setDelegate:[[TestDelegate alloc] init]];
 

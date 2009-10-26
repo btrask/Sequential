@@ -89,7 +89,7 @@ static void ScanElementData(CSHandle *fh,StuffItXElement *element)
 }
 
 
-
+#import "XAD7ZipBranchHandles.h"
 static CSHandle *HandleForElement(CSHandle *fh,StuffItXElement *element,BOOL wantchecksum)
 {
 	[fh seekToFileOffset:element->dataoffset];
@@ -153,11 +153,47 @@ static CSHandle *HandleForElement(CSHandle *fh,StuffItXElement *element,BOOL wan
 		break;
 
 		default:
+			NSLog(@"File uses SITX compression method %d\n",element->alglist[0]);
 			return nil;
 	}
 
-	if(element->alglist[2]==0)
-	handle=[[[XADStuffItXEnglishHandle alloc] initWithHandle:handle length:element->attribs[4]] autorelease];
+	switch(element->alglist[2])
+	{
+		case -1: break; // no filtering
+
+		case 0: // English
+			handle=[[[XADStuffItXEnglishHandle alloc] initWithHandle:handle length:element->attribs[4]] autorelease];
+		break;
+
+/*		case 1: // biff
+		break;
+
+		case 2: // x86
+		break;
+
+		case 3: // peff
+		break;
+
+		case 4: // m68k
+		break;
+
+		case 5: // sparc
+		break;
+
+		case 6: // tiff
+		break;
+
+		case 7: // wav
+		break;
+
+		case 8: // wrt
+		break;
+*/
+
+		default:
+			NSLog(@"File uses SITX preprocessing method %d\n",element->alglist[2]);
+			return nil;
+	}
 
 	if(wantchecksum&&element->alglist[1]==0)
 	handle=[XADCRCHandle IEEECRC32HandleWithHandle:handle
@@ -255,6 +291,7 @@ static void DumpElement(StuffItXElement *element)
 						{
 							[entry setObject:[NSNumber numberWithLongLong:0] forKey:XADFileSizeKey];
 							[entry setObject:[NSNumber numberWithLongLong:0] forKey:XADCompressedSizeKey];
+							[entry setObject:[NSNumber numberWithBool:YES] forKey:@"StuffItXEmpty"];
 							[self addEntryWithDictionary:entry];
 						}
 					}
@@ -526,6 +563,7 @@ static void DumpElement(StuffItXElement *element)
 
 -(CSHandle *)handleForEntryWithDictionary:(NSDictionary *)dict wantChecksum:(BOOL)checksum
 {
+	if([dict objectForKey:@"StuffItXEmpty"]) return [self zeroLengthHandleWithChecksum:checksum];
 	return [self subHandleFromSolidStreamForEntryWithDictionary:dict];
 }
 

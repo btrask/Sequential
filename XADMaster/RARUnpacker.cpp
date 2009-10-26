@@ -3,7 +3,6 @@
 #include "unrar/rar.hpp"
 #include <stdint.h>
 
-
 extern "C" {
 
 RARUnpacker *AllocRARUnpacker(RARReadFunc readfunc,void *readparam1,void *readparam2)

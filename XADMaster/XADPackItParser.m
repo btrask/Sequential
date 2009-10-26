@@ -2,7 +2,6 @@
 #import "XADStuffItHuffmanHandle.h"
 #import "XADCRCHandle.h"
 #import "NSDateXAD.h"
-#import "Paths.h"
 
 @implementation XADPackItParser
 

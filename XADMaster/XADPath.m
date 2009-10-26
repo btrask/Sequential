@@ -298,7 +298,7 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 
 -(BOOL)isEqual:(id)other { return [other isKindOfClass:[XADPath class]]&&[components isEqual:((XADPath *)other)->components]; }
 
--(unsigned)hash
+-(NSUInteger)hash
 {
 	int count=[components count];
 	if(!count) return 0;

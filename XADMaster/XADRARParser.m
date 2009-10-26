@@ -111,6 +111,21 @@ static int TestSignature(const uint8_t *ptr)
 
 
 
+-(id)initWithHandle:(CSHandle *)handle name:(NSString *)name
+{
+	if(self=[super initWithHandle:handle name:name])
+	{
+		keys=nil;
+	}
+	return self;
+}
+
+-(void)dealloc
+{
+	[keys release];
+	[super dealloc];
+}
+
 -(void)parse
 {
 	CSHandle *handle=[self handle];
@@ -357,6 +372,7 @@ static int TestSignature(const uint8_t *ptr)
 
 		if(block.type==0x72) // file marker header
 		{
+			[self skipBlock:block];
 		}
 		else if(block.type==0x73) // archive header
 		{
@@ -377,6 +393,8 @@ static int TestSignature(const uint8_t *ptr)
 				RARBlock commentblock=[self readBlockHeaderLevel1];
 				[self readCommentBlock:commentblock];
 			}
+
+			[self skipBlock:block];
 		}
 		//else if(block.type==0x7a) // newsub header
 		//{
@@ -384,13 +402,17 @@ static int TestSignature(const uint8_t *ptr)
 		else if(block.type==0x7b) // end header
 		{
 			archiveflags=0;
+
+			[self skipBlock:block];
+
+			CSHandle *handle=[self handle];
+			if([handle respondsToSelector:@selector(currentHandle)]) handle=[(id)handle currentHandle];
+			if([handle offsetInFile]!=0) [handle seekToEndOfFile];
 		}
 		else
 		{
 			return block;
 		}
-
-		[self skipBlock:block];
 	}
 }
 
@@ -406,8 +428,7 @@ static int TestSignature(const uint8_t *ptr)
 	if(archiveflags&MHD_PASSWORD)
 	{
 		NSData *salt=[fh readDataOfLength:8];
-		fh=[[[XADRARAESHandle alloc] initWithHandle:fh
-		password:[self password] salt:salt brokenHash:encryptversion<36] autorelease];
+		fh=[[[XADRARAESHandle alloc] initWithHandle:fh key:[self keyForSalt:salt]] autorelease];
 	}
 
 	block.fh=fh;
@@ -480,11 +501,22 @@ encrypted:(BOOL)encrypted cryptoVersion:(int)version salt:(NSData *)salt
 		}
 		else
 		{
-			return [[[XADRARAESHandle alloc] initWithHandle:fh
-			password:[self password] salt:salt brokenHash:encryptversion<36] autorelease];
+			return [[[XADRARAESHandle alloc] initWithHandle:fh key:[self keyForSalt:salt]] autorelease];
 		}
 	}
 	else return fh;
+}
+
+-(NSData *)keyForSalt:(NSData *)salt
+{
+	if(!keys) keys=[NSMutableDictionary new];
+
+	NSData *key=[keys objectForKey:salt];
+	if(key) return key;
+
+	key=[XADRARAESHandle keyForPassword:[self password] salt:salt brokenHash:encryptversion<36];
+	[keys setObject:key forKey:salt];
+	return key;
 }
 
 
@@ -577,11 +609,16 @@ encrypted:(BOOL)encrypted cryptoVersion:(int)version salt:(NSData *)salt
 	CSHandle *handle;
 	if([[dict objectForKey:@"RARCompressionMethod"] intValue]==0x30)
 	{
-		handle=[self dataHandleFromSkipOffset:[[dict objectForKey:XADSkipOffsetKey] longLongValue]
-		length:[[dict objectForKey:XADSkipLengthKey] longLongValue]
-		encrypted:[[dict objectForKey:XADIsEncryptedKey] boolValue]
-		cryptoVersion:[[dict objectForKey:@"RARCompressionVersion"] intValue]
-		salt:[dict objectForKey:@"RARSalt"]];
+		off_t skipoffs=[[dict objectForKey:XADSkipOffsetKey] longLongValue];
+		off_t skiplength=[[dict objectForKey:XADSkipLengthKey] longLongValue];
+		off_t filesize=[[dict objectForKey:XADFileSizeKey] longLongValue];
+		BOOL encrypted=[[dict objectForKey:XADIsEncryptedKey] boolValue];
+		int cryptver=[[dict objectForKey:@"RARCompressionVersion"] intValue];
+
+		handle=[self dataHandleFromSkipOffset:skipoffs length:skiplength
+		encrypted:encrypted cryptoVersion:cryptver salt:[dict objectForKey:@"RARSalt"]];
+
+		if(skiplength!=filesize) handle=[handle nonCopiedSubHandleOfLength:filesize];
 	}
 	else
 	{
@@ -607,6 +644,9 @@ encrypted:(BOOL)encrypted cryptoVersion:(int)version salt:(NSData *)salt
 }
 
 @end
+
+
+
 
 
 @implementation XADEmbeddedRARParser

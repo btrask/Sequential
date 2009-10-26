@@ -54,6 +54,7 @@
 {
 	NSString *readString = [[NSString alloc] initWithUTF8String:buffer];
 	NSScanner* scanner = [NSScanner scannerWithString:readString];
+	[readString release];
 	double returnValue;
 	if([scanner scanDouble:&returnValue] == YES) {
 		return( returnValue );
@@ -65,6 +66,7 @@
 {
 	NSString *readString = [[NSString alloc] initWithUTF8String:buffer];
 	NSScanner* scanner = [NSScanner scannerWithString:readString];
+	[readString release];
 	int64_t returnValue;
 	if([scanner scanLongLong:&returnValue] == YES) {
 		return( returnValue );
@@ -76,6 +78,7 @@
 {
 	NSString *readString = [[NSString alloc] initWithData:[buffer subdataWithRange:range] encoding:NSASCIIStringEncoding];
 	NSScanner* scanner = [NSScanner scannerWithString:readString];
+	[readString release];
 	int64_t returnValue;
 	if([scanner scanLongLong:&returnValue] == YES) {
 		return( returnValue );
@@ -418,7 +421,7 @@
 	[handle seekToFileOffset:offset];
 }
 
--(void)parse
+-(void)parseWithSeparateMacForks
 {
 	// Reset global current header for posix.2001;
 	currentGlobalHeader = [NSData data];

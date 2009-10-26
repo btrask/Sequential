@@ -111,6 +111,7 @@
 		streampos=0;
 		endofstream=NO;
 		//nextstreambyte=-1;
+		if(input) CSInputRestart(input);
 		[self resetStream];
 	}
 

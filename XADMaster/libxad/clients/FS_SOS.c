@@ -89,7 +89,7 @@ XADGETINFO(SOS)
        return err;
 
     /* break if this is the "loader" file entry */
-    if(!strncmp("loader", file.name, 24))
+    if(!strncmp("loader", (const char *)file.name, 24))
       break;
   } while(++n < 35); /* block 2-29 and some security */
   if(n == 35)

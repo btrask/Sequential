@@ -129,7 +129,7 @@ FUNCxadConvertProtection /* xadTAGPTR tags */
       if(!(dosprot & MP_ARCHIVE))       prot |= AMIG_ARCHIVE;
 
       break;
-    case XAD_PROTFILEINFO: fi = (struct xadFileInfo *) ti->ti_Data;
+    case XAD_PROTFILEINFO: fi = (struct xadFileInfo *)(uintptr_t) ti->ti_Data;
       prot = fi->xfi_Protection;
       if(fi->xfi_Flags & XADFIF_DOSPROTECTION)
       {
@@ -180,28 +180,28 @@ FUNCxadConvertProtection /* xadTAGPTR tags */
       if(!ti->ti_Data) res = XADERR_BADPARAMS;
       else
       {
-        *((xadUINT32 *) ti->ti_Data) = prot; ++numres;
+        *((xadUINT32 *)(uintptr_t) ti->ti_Data) = prot; ++numres;
       }
       break;
     case XAD_GETPROTUNIX:
       if(!ti->ti_Data) res = XADERR_BADPARAMS;
       else
       {
-        *((xadUINT32 *) ti->ti_Data) = unxprot; ++numres;
+        *((xadUINT32 *)(uintptr_t) ti->ti_Data) = unxprot; ++numres;
       }
       break;
     case XAD_GETPROTMSDOS:
       if(!ti->ti_Data) res = XADERR_BADPARAMS;
       else
       {
-        *((xadUINT32 *) ti->ti_Data) = dosprot; ++numres;
+        *((xadUINT32 *)(uintptr_t) ti->ti_Data) = dosprot; ++numres;
       }
       break;
     case XAD_GETPROTFILEINFO:
       if(!ti->ti_Data) res = XADERR_BADPARAMS;
       else
       {
-        fi = (struct xadFileInfo *) ti->ti_Data; ++numres;
+        fi = (struct xadFileInfo *)(uintptr_t) ti->ti_Data; ++numres;
         fi->xfi_Flags |= flags;
         fi->xfi_Protection = prot;
         fi->xfi_UnixProtect = unxprot;

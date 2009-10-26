@@ -5,7 +5,7 @@
     file extraction from disk images
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -41,7 +41,7 @@ FUNCxadGetDiskInfo /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     switch(ti->ti_Tag)
     {
     case XAD_STARTCLIENT: ai->xaip_ArchiveInfo.xai_Client
-    = (struct xadClient *) ti->ti_Data; break;
+    = (struct xadClient *)(uintptr_t) ti->ti_Data; break;
     case XAD_NOEXTERN: noext = ti->ti_Data; break;
     case XAD_NOEMPTYERROR:
       if(ti->ti_Data)
@@ -68,7 +68,7 @@ FUNCxadGetDiskInfo /* struct xadArchiveInfoP *ai, xadTAGPTR tags */
     {
       struct xadClient *xc;
       ai->xaip_InHookParam.xhp_Command = XADHC_IMAGEINFO;
-      ai->xaip_InHookParam.xhp_CommandData = (xadINT32) ii;
+      ai->xaip_InHookParam.xhp_CommandData = (xadSignSize)(uintptr_t)ii;
       if(CallHookPkt(ai->xaip_InHook, ai, &ai->xaip_InHookParam))
       {
 #ifdef DEBUG

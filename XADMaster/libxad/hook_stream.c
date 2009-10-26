@@ -99,7 +99,7 @@ FUNCHOOK(InHookStream)
       {
         switch(ti2->ti_Tag)
         {
-          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data; break;
+          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *)(uintptr_t) ti2->ti_Data; break;
           case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data = ti2->ti_Data; break;
           case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data = ti2->ti_Data; break;
           case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data = ti2->ti_Data; break;
@@ -193,7 +193,7 @@ FUNCHOOK(OutHookStream)
       {
         switch(ti2->ti_Tag)
         {
-          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *) ti2->ti_Data; break;
+          case XAD_ARCHIVEINFO: sp->ai = (struct xadArchiveInfo *)(uintptr_t) ti2->ti_Data; break;
           case XAD_USESKIPINFO: sp->ti[0].ti_Tag = ti2->ti_Tag; sp->ti[0].ti_Data = ti2->ti_Data; break;
           case XAD_GETCRC32: sp->ti[1].ti_Tag = ti2->ti_Tag; sp->ti[1].ti_Data = ti2->ti_Data; break;
           case XAD_GETCRC16: sp->ti[2].ti_Tag = ti2->ti_Tag; sp->ti[2].ti_Data = ti2->ti_Data; break;

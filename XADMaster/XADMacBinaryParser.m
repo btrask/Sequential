@@ -12,7 +12,7 @@
 	return [XADMacArchiveParser macBinaryVersionForHeader:data]>0;
 }
 
--(void)parse
+-(void)parseWithSeparateMacForks
 {
 	[self setIsMacArchive:YES];
 

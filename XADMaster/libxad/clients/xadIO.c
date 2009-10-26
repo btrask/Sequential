@@ -165,12 +165,12 @@ struct xadArchiveInfo *ai, struct xadMasterBase *xadMasterBase)
     io->xio_xadMasterBase = xadMasterBase;
     if(flags & XADIOF_ALLOCINBUFFER)
     {
-      io->xio_InBuffer = b; b += XIDBUFSIZE;
+      io->xio_InBuffer = (xadUINT8 *)b; b += XIDBUFSIZE;
       io->xio_InBufferSize = io->xio_InBufferPos = XIDBUFSIZE;
     }
     if(flags & XADIOF_ALLOCOUTBUFFER)
     {
-      io->xio_OutBuffer = b;
+      io->xio_OutBuffer = (xadUINT8 *)b;
       io->xio_OutBufferSize = XIDBUFSIZE;
     }
   }

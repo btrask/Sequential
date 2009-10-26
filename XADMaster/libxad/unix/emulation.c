@@ -2,7 +2,7 @@
     Amiga API Emulation for Unix-like systems.
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 
 #include "emulation.h"
 #include <stddef.h>
+#include <stdint.h>
 
 xadUINT32 CallHookPkt(struct Hook *hook, xadPTR object, xadPTR paramPacket)
 {
@@ -47,7 +48,7 @@ xadTAGPTR NextTagItem(xadTAGPTR *tp )
     }
     else if (tag == TAG_MORE)
     {
-        if ((*tp = (xadTAGPTR)(*tp)->ti_Data) == NULL)
+        if ((*tp = (xadTAGPTR)(uintptr_t)(*tp)->ti_Data) == NULL)
           return NULL;
 
         continue;

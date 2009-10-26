@@ -5,7 +5,7 @@
     date and time conversion stuff
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -246,11 +246,11 @@ FUNCxadConvertDates /* xadTAGPTR tags */
     case XAD_DATEMAC: ++mac; timeval = ti->ti_Data; break;
     case XAD_DATEUNIX: ++unx; timeval = ti->ti_Data; break;
     case XAD_DATEAMIGA: ++am; timeval = ti->ti_Data; break;
-    case XAD_DATEDATESTAMP: ++dats; datsp = (struct MyDateStamp *)
+    case XAD_DATEDATESTAMP: ++dats; datsp = (struct MyDateStamp *)(uintptr_t)
       ti->ti_Data; break;
-    case XAD_DATEXADDATE: ++xad; xadp = (struct xadDate *) ti->ti_Data;
+    case XAD_DATEXADDATE: ++xad; xadp = (struct xadDate *)(uintptr_t) ti->ti_Data;
       break;
-    case XAD_DATECLOCKDATA: ++cd; cdp = (struct MyClockData *) ti->ti_Data;
+    case XAD_DATECLOCKDATA: ++cd; cdp = (struct MyClockData *)(uintptr_t) ti->ti_Data;
       break;
     case XAD_DATECURRENTTIME:
 #ifdef AMIGA
@@ -281,8 +281,8 @@ FUNCxadConvertDates /* xadTAGPTR tags */
       break;
     case XAD_DATEMSDOS: ++msdos; timeval = ti->ti_Data; break;
     case XAD_DATECPM2: ++cpm2; timeval = ti->ti_Data; break;
-    case XAD_DATECPM: ++cpm; cpmdate = (xadUINT8 *) ti->ti_Data; break;
-    case XAD_DATEISO9660: ++iso; isodate = (xadUINT8 *) ti->ti_Data; break;
+    case XAD_DATECPM: ++cpm; cpmdate = (xadUINT8 *)(uintptr_t) ti->ti_Data; break;
+    case XAD_DATEISO9660: ++iso; isodate = (xadUINT8 *)(uintptr_t) ti->ti_Data; break;
     case XAD_MAKELOCALDATE: ++gmt; if(ti->ti_Data) gmttst = 1; break;
     case XAD_MAKEGMTDATE: ++gmt; if(ti->ti_Data) gmttst = 2; break;
     }
@@ -432,13 +432,13 @@ FUNCxadConvertDates /* xadTAGPTR tags */
     switch(ti->ti_Tag)
     {
     case XAD_GETDATEUNIX:
-      *((xadUINT32 *)ti->ti_Data) = xadtosec(&xadi, 1970);
+      *((xadUINT32 *)(uintptr_t)ti->ti_Data) = xadtosec(&xadi, 1970);
       break;
     case XAD_GETDATEAMIGA:
-      *((xadUINT32 *)ti->ti_Data) = xadtosec(&xadi, 1978);
+      *((xadUINT32 *)(uintptr_t)ti->ti_Data) = xadtosec(&xadi, 1978);
       break;
     case XAD_GETDATEMAC:
-      *((xadUINT32 *)ti->ti_Data) = xadtosec(&xadi, 1904);
+      *((xadUINT32 *)(uintptr_t)ti->ti_Data) = xadtosec(&xadi, 1904);
       break;
 #ifdef AMIGA
     case XAD_GETDATEDATESTAMP:
@@ -452,7 +452,7 @@ FUNCxadConvertDates /* xadTAGPTR tags */
       break;
 #endif
     case XAD_GETDATEXADDATE:
-      xadCopyMem(XADM &xadi, (xadPTR) ti->ti_Data, sizeof(struct xadDate));
+      xadCopyMem(XADM &xadi, (xadPTR)(uintptr_t) ti->ti_Data, sizeof(struct xadDate));
       break;
 #ifdef AMIGA
     case XAD_GETDATECLOCKDATA:
@@ -477,11 +477,11 @@ FUNCxadConvertDates /* xadTAGPTR tags */
         if(xd.xd_Second&1) /* correct uneven seconds */
           addoffset(&xd, 1);
         if(xd.xd_Year > 1980+127) /* 31.12.2107 23:59:59 */
-          *((xadUINT32 *)ti->ti_Data) = (xadUINT32) (((((((((127<<4)+12)<<5)+31)<<5)+23)<<6)+59)<<5)+(59/2);
+          *((xadUINT32 *)(uintptr_t)ti->ti_Data) = (xadUINT32) (((((((((127<<4)+12)<<5)+31)<<5)+23)<<6)+59)<<5)+(59/2);
         else if(xd.xd_Year < 1980) /* 1.1.1980 00:00:00 */
-          *((xadUINT32 *)ti->ti_Data) = (((((((((0<<4)+1)<<5)+1)<<5)+0)<<6)+0)<<5)+0;
+          *((xadUINT32 *)(uintptr_t)ti->ti_Data) = (((((((((0<<4)+1)<<5)+1)<<5)+0)<<6)+0)<<5)+0;
         else
-          *((xadUINT32 *)ti->ti_Data) = ((((((((((xd.xd_Year-1980)<<4)+xd.xd_Month)<<5)+
+          *((xadUINT32 *)(uintptr_t)ti->ti_Data) = ((((((((((xd.xd_Year-1980)<<4)+xd.xd_Month)<<5)+
           xd.xd_Day)<<5)+xd.xd_Hour)<<6)+xd.xd_Minute)<<5)+(xd.xd_Second/2);
       }
       break;
@@ -493,19 +493,19 @@ FUNCxadConvertDates /* xadTAGPTR tags */
         if(xd.xd_Second&1) /* correct uneven seconds */
           addoffset(&xd, 1);
         if(xd.xd_Year < 1978) /* 1.1.1978 00:00:00 */
-          *((xadUINT32 *)ti->ti_Data) = (((((1<<5)+0)<<6)+0)<<5)+0;
+          *((xadUINT32 *)(uintptr_t)ti->ti_Data) = (((((1<<5)+0)<<6)+0)<<5)+0;
         else
         {
           timeval = xadtodays(&xd, 1978)+1;
           if(timeval > 0xFFFF)
-            *((xadUINT32 *)ti->ti_Data) = (xadUINT32) (((((0xFFFF<<5)+23)<<6)+59)<<5)+(59/2);
+            *((xadUINT32 *)(uintptr_t)ti->ti_Data) = (xadUINT32) (((((0xFFFF<<5)+23)<<6)+59)<<5)+(59/2);
           else
-            *((xadUINT32 *)ti->ti_Data) = (((((timeval<<5)+xd.xd_Hour)<<6)+xd.xd_Minute)<<5)+(xd.xd_Second/2);
+            *((xadUINT32 *)(uintptr_t)ti->ti_Data) = (((((timeval<<5)+xd.xd_Hour)<<6)+xd.xd_Minute)<<5)+(xd.xd_Second/2);
         }
       }
       break;
     case XAD_GETDATECPM:
-      cpmdate = (xadUINT8 *) ti->ti_Data;
+      cpmdate = (xadUINT8 *)(uintptr_t) ti->ti_Data;
       if(xadi.xd_Year < 1978) /* 1.1.1978 00:00:00 */
       {
         *(cpmdate++) = 0;
@@ -536,7 +536,7 @@ FUNCxadConvertDates /* xadTAGPTR tags */
       }
       break;
     case XAD_GETDATEISO9660:
-      isodate = (xadUINT8 *) ti->ti_Data;
+      isodate = (xadUINT8 *)(uintptr_t) ti->ti_Data;
       isodate[6] = 0;
       if(xadi.xd_Year < 1900)
       {

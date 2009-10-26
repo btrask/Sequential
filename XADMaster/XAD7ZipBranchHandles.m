@@ -1,6 +1,9 @@
 #import "XAD7ZipBranchHandles.h"
 
+#if !__LP64__
 #define _LZMA_UINT32_IS_ULONG
+#endif
+
 #import "lzma/Bra.h"
 
 @implementation XAD7ZipBranchHandle

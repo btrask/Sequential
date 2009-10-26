@@ -14,12 +14,18 @@
 
 	if(length<13) return NO;
 
+	// Reject invalid settings bytes
 	if(bytes[0]>=9*5*5) return NO;
 
+	// Accept only power-of-two or three-times-power-of-two dictionary sizes
 	uint32_t dictsize=CSUInt32LE(&bytes[1]);
 	uint32_t div3=dictsize*0xaaaaaaab; // Multiplicative inverse of three
 	if((dictsize&dictsize-1)!=0 && (div3&div3-1)!=0) return NO;
 
+	// Reject all-0 size fields.
+	if(CSUInt64LE(&bytes[5])==0) return NO;
+
+	// Reject huge sizes
 	if(!(bytes[11]==0x00&&bytes[12]==0x00)&&!(bytes[11]==0xff&&bytes[12]==0xff)) return NO;
 
 	return YES;

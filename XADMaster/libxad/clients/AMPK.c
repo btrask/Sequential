@@ -5,7 +5,7 @@
     AmiPack file archiver
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -74,7 +74,7 @@ static xadUINT8 xadIOPutFuncRLE90(struct xadInOut *io, xadUINT8 data)
 {
   xadUINT32 a, num;
 
-  a = (xadUINT32) io->xio_PutFuncPrivate;
+  a = (xadUINT32)(uintptr_t) io->xio_PutFuncPrivate;
 
   if(a & 0x100) /* was RLE mode */
   {
@@ -84,7 +84,7 @@ static xadUINT8 xadIOPutFuncRLE90(struct xadInOut *io, xadUINT8 data)
   else if(data == 0x90) { num = 0; a |= 0x100; }
   else { num = 1; a = data; }
 
-  io->xio_PutFuncPrivate = (xadPTR) a;
+  io->xio_PutFuncPrivate = (xadPTR)(uintptr_t) a;
 
   while(num-- && !io->xio_Error)
   {
@@ -106,7 +106,7 @@ static xadUINT8 xadIOPutFuncRLE90(struct xadInOut *io, xadUINT8 data)
   return data;
 }
 
-#define xadIOPutFuncRLECBMSet(io,c,old) (io->xio_PutFuncPrivate = ((xadPTR) \
+#define xadIOPutFuncRLECBMSet(io,c,old) (io->xio_PutFuncPrivate = ((xadPTR)(uintptr_t) \
   (((old) ? 0x80000000 : 0)|((c)<<8))))
 /* xxyyzz --> zz (yy times) */
 /* xx00zz --> zz (255/256 times) */
@@ -116,7 +116,7 @@ static xadUINT8 xadIOPutFuncRLECBM(struct xadInOut *io, xadUINT8 data)
 {
   xadUINT32 a, num;
 
-  a = (xadUINT32) io->xio_PutFuncPrivate;
+  a = (xadUINT32)(uintptr_t) io->xio_PutFuncPrivate;
   /* upper 16 bits == flags
        mid  8 bits == rle char
      lower  8 bits == count
@@ -136,7 +136,7 @@ static xadUINT8 xadIOPutFuncRLECBM(struct xadInOut *io, xadUINT8 data)
   else
     num = 1;
 
-  io->xio_PutFuncPrivate = (xadPTR) a;
+  io->xio_PutFuncPrivate = (xadPTR)(uintptr_t) a;
 
   while(num-- && !io->xio_Error)
   {
@@ -162,13 +162,13 @@ static void xadIOChecksum(struct xadInOut *io, xadUINT32 size)
 {
   xadUINT32 s, i;
 
-  s = (xadUINT32) io->xio_OutFuncPrivate;
+  s = (xadUINT32)(uintptr_t) io->xio_OutFuncPrivate;
 
   for(i = 0; i < size; i++)
     s += io->xio_OutBuffer[i];
   /* byte sum */
 
-  io->xio_OutFuncPrivate  = (xadPTR) s;
+  io->xio_OutFuncPrivate  = (xadPTR)(uintptr_t) s;
 }
 
 /* AMPK1 ******************************************************************************************/
@@ -1455,7 +1455,7 @@ XADGETINFO(AMPK)
                 if(!fl.CommentSize || !(err = xadHookAccess(XADM XADAC_READ, fl.CommentSize, fi->xfi_Comment, ai)))
                 {
                   fi->xfi_DataPos = ai->xai_InPos;
-                  fi->xfi_PrivateInfo = (xadPTR) (xadUINT32) fl.CrunchType;
+                  fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) fl.CrunchType;
                   fi->xfi_EntryInfo = ampktype[fl.CrunchType];
                   for(i = 0; i < dirnamesize + et.NameSize; ++i)
                     fi->xfi_FileName[i] = dirname[i];
@@ -1506,7 +1506,7 @@ XADUNARCHIVE(AMPK)
     {
       io->xio_InSize = fi->xfi_CrunchSize;
       io->xio_OutSize = fi->xfi_Size;
-      switch((xadUINT32)fi->xfi_PrivateInfo)
+      switch((xadUINT32)(uintptr_t)fi->xfi_PrivateInfo)
       {
       case 1: io->xio_Flags |= XADIOF_NOINENDERR; err = DecrAMPK1(io); break;
       case 2: err = DecrAMPK2(io); break;
@@ -1709,13 +1709,13 @@ static void AmPlusUnpCalcChecksum(struct xadInOut *io, xadUINT32 size)
 {
   xadUINT32 s, i;
 
-  s = (xadUINT32) io->xio_OutFuncPrivate;
+  s = (xadUINT32)(uintptr_t) io->xio_OutFuncPrivate;
 
   for(i = 0; i < size; i++)
     s += io->xio_OutBuffer[i] << ((3 - (i&3)) << 3);
   /* longword sum, with remainder added at highest position */
 
-  io->xio_OutFuncPrivate  = (xadPTR) s;
+  io->xio_OutFuncPrivate  = (xadPTR)(uintptr_t) s;
 }
 
 XADUNARCHIVE(AmPlusUnpack)
@@ -1789,7 +1789,7 @@ XADUNARCHIVE(AmPlusUnpack)
       err = xadIOWriteBuf(io);
 
     if(!err && (up->Mode == AMPLUSPACKMODE_INT)
-    && (xadUINT32) io->xio_OutFuncPrivate != up->CRC)
+    && (xadUINT32)(uintptr_t) io->xio_OutFuncPrivate != up->CRC)
       err = XADERR_CHECKSUM;
 
     xadFreeObjectA(XADM io, 0);
@@ -1904,8 +1904,8 @@ XADUNARCHIVE(CompDisk)
             {
               io->xio_InSize = io->xio_InBufferSize = j;
               io->xio_OutSize = io->xio_OutBufferSize = 512*22;
-              io->xio_InBuffer = buf2;
-              io->xio_OutBuffer = buf;
+              io->xio_InBuffer = (xadUINT8 *)buf2;
+              io->xio_OutBuffer = (xadUINT8 *)buf;
 
               if(!(err = xadIO_Compress(io, 12|UCOMPBLOCK_MASK)) && io->xio_OutSize)
                 err = XADERR_DECRUNCH;
@@ -2001,7 +2001,7 @@ XADGETINFO(LHWARP)
     {
       cr = EndGetM32(lhw.crtextsize);
       ucr = EndGetM32(lhw.textsize);
-      if((xdi->xdi_PrivateInfo = (xadPTR) (xadUINT32) lhw.revision1))
+      if((xdi->xdi_PrivateInfo = (xadPTR)(uintptr_t) lhw.revision1))
         xdi->xdi_Flags |= XADDIF_SECTORLABELS;
       xdi->xdi_EntryNumber = 1;
       xdi->xdi_Cylinders = 80;
@@ -2029,7 +2029,7 @@ XADGETINFO(LHWARP)
             {
               io->xio_InSize = cr;
               io->xio_OutSize = io->xio_OutBufferSize = ucr;
-              io->xio_OutBuffer = ti->xti_Text;
+              io->xio_OutBuffer = (xadUINT8 *)ti->xti_Text;
 
               if(!DecrAMPK3(io,0))
                 ok = 1;
@@ -2144,7 +2144,7 @@ XADUNARCHIVE(LHWARP)
           {
             io->xio_InSize = j;
             io->xio_OutSize = io->xio_OutBufferSize = l;
-            io->xio_OutBuffer = data;
+            io->xio_OutBuffer = (xadUINT8 *)data;
 
             switch(lhw.method)
             {
@@ -2353,7 +2353,7 @@ static void ARCDecrypt(struct xadInOut *io, xadUINT32 size)
   xadSTRPTR p, a;
 
   p = (xadSTRPTR) io->xio_InFuncPrivate;
-  a = io->xio_InBuffer;
+  a = (xadSTRPTR) io->xio_InBuffer;
   while(size--)
   {
     if(!p || !*p) /* !p for start and !*p for end of PWD */
@@ -2759,13 +2759,13 @@ static void xadIOArcCRC(struct xadInOut *io, xadUINT32 size)
   xadUINT8 s2;
   xadUINT32 i;
 
-  s = (xadUINT16) (xadUINT32) io->xio_OutFuncPrivate;
-  s2 = (xadUINT8) (((xadUINT32)io->xio_OutFuncPrivate) >> 16);
+  s = (xadUINT16) (xadUINT32)(uintptr_t) io->xio_OutFuncPrivate;
+  s2 = (xadUINT8) (((xadUINT32)(uintptr_t) io->xio_OutFuncPrivate) >> 16);
 
   for(i = 0; i < size; i++)
     s += io->xio_OutBuffer[i] ^ (++s2);
 
-  io->xio_OutFuncPrivate  = (xadPTR) ((xadUINT32)s + (((xadUINT32)s2)<<16));
+  io->xio_OutFuncPrivate  = (xadPTR)(uintptr_t) ((xadUINT32)s + (((xadUINT32)s2)<<16));
 }
 
 XADUNARCHIVE(ArcCBM)
@@ -2811,7 +2811,7 @@ XADUNARCHIVE(ArcCBM)
     if(!err)
       err = xadIOWriteBuf(io);
 
-    if(!err && ((xadUINT16)((xadUINT32)io->xio_OutFuncPrivate)) != ACBPI(fi)->CRC)
+    if(!err && ((xadUINT16)((uintptr_t)io->xio_OutFuncPrivate)) != ACBPI(fi)->CRC)
     {
       err = XADERR_CHECKSUM;
     }
@@ -2962,8 +2962,8 @@ XADUNARCHIVE(Warp)
           {
             if(dat[19])
               io->xio_PutFunc = xadIOPutFuncRLE90;
-            io->xio_InBuffer = inbuf;
-            io->xio_OutBuffer = outbuf;
+            io->xio_InBuffer = (xadUINT8 *)inbuf;
+            io->xio_OutBuffer = (xadUINT8 *)outbuf;
             io->xio_OutSize = io->xio_OutBufferSize = (512+16)*11;
             io->xio_InSize = io->xio_InBufferSize = io->xio_InBufferPos = EndGetM32(dat+22);
 
@@ -3055,7 +3055,7 @@ XADGETINFO(SQ)
         XAD_OBJNAMESIZE, nl-4, TAG_DONE)))
         {
           xadCopyMem(XADM buf+4, fi->xfi_FileName, nl-4);
-          fi->xfi_PrivateInfo = (xadPTR) EndGetI16(buf+2);
+          fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) EndGetI16(buf+2);
           fi->xfi_Flags = XADFIF_SEEKDATAPOS;
           if(buf[nl] || buf[nl+1]) /* empty file ??? */
             fi->xfi_Flags |= XADFIF_NOUNCRUNCHSIZE;
@@ -3116,7 +3116,7 @@ XADUNARCHIVE(SQ)
     if(!(err = ARCunsqueeze(io)))
       err = xadIOWriteBuf(io);
 
-    if(!err && (xadUINT16) ((xadUINT32) io->xio_OutFuncPrivate) != (xadUINT16) ((xadUINT32) fi->xfi_PrivateInfo))
+    if(!err && (xadUINT16) ((uintptr_t) io->xio_OutFuncPrivate) != (xadUINT16) ((uintptr_t) fi->xfi_PrivateInfo))
       err = XADERR_CHECKSUM;
 
     xadFreeObjectA(XADM io, 0);
@@ -3213,7 +3213,7 @@ XADGETINFO(Crunch)
         ++i;
         fi->xfi_DataPos = i;
         fi->xfi_CrunchSize = ai->xai_InSize-2-fi->xfi_DataPos;
-        fi->xfi_PrivateInfo = (xadPTR) (xadUINT32) data[1];
+        fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) data[1];
 
         if((data[i+1] & 0xF0) == 0x10)
         {
@@ -3253,7 +3253,7 @@ XADUNARCHIVE(Crunch)
       io->xio_InSize = ai->xai_CurFile->xfi_CrunchSize;
       io->xio_OutFunc = xadIOChecksum;
 /*    io->xio_OutSize = 0; */
-      if((xadUINT32) ai->xai_CurFile->xfi_PrivateInfo == 0xFD)
+      if((xadUINT32)(uintptr_t) ai->xai_CurFile->xfi_PrivateInfo == 0xFD)
         err = DecrAMPK3(io, ((data[1] & 0xF0) == 0x10) ? 1 : 2);
       else
       {
@@ -3269,7 +3269,7 @@ XADUNARCHIVE(Crunch)
       {
         chksum =  xadIOGetChar(io);
         chksum += xadIOGetChar(io)<<8;
-        if((((xadUINT32)io->xio_OutFuncPrivate)&0xFFFF) != chksum)
+        if((((xadUINT32)(uintptr_t)io->xio_OutFuncPrivate)&0xFFFF) != chksum)
           err = XADERR_CHECKSUM;
       }
       xadFreeObjectA(XADM io, 0);

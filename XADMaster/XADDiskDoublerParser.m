@@ -346,6 +346,10 @@
 	off_t size=[[dict objectForKey:XADFileSizeKey] longLongValue];
 
 	int method=[[dict objectForKey:@"DiskDoublerMethod"] intValue];
+	int info1=[[dict objectForKey:@"DiskDoublerInfo1"] intValue];
+	int info2=[[dict objectForKey:@"DiskDoublerInfo2"] intValue];
+	int correctchecksum=[[dict objectForKey:@"DiskDoublerCRC"] intValue];
+
 	switch(method&0x7f)
 	{
 		case 0: // No compression
@@ -353,9 +357,6 @@
 
 		case 1: // Compress
 		{
-			int info1=[[dict objectForKey:@"DiskDoublerInfo1"] intValue];
-			int info2=[[dict objectForKey:@"DiskDoublerInfo2"] intValue];
-
 			int xor=0;
 			if(info1>=0x2a&&(info2&0x80)==0) xor=0x5a;
 
@@ -370,21 +371,27 @@
 			if(checksum)
 			{
 				handle=[[[XADChecksumHandle alloc] initWithHandle:handle length:size
-				correctChecksum:[[dict objectForKey:@"DiskDoublerCRC"] intValue]-m1-m2-flags
+				correctChecksum:correctchecksum-m1-m2-flags
 				mask:0xffff] autorelease];
 			}
 		}
 		break;
 
-		case 4: // Untested!
+		case 2: // Untested!
+		{
+			int xor=0;
+			if(info1>=0x2a&&(info2&0x80)==0) xor=0x5a;
+
 			handle=[[[XADStuffItHuffmanHandle alloc] initWithHandle:handle length:size] autorelease];
+			if(xor) handle=[[[XADXORHandle alloc] initWithHandle:handle
+			password:[NSData dataWithBytes:"Z" length:1]] autorelease];
 
 			if(checksum)
 			{
-				handle=[XADCRCHandle IBMCRC16HandleWithHandle:handle length:size
-				correctCRC:[[dict objectForKey:@"DiskDoublerCRC"] intValue]
-				conditioned:NO];
+				handle=[[[XADChecksumHandle alloc] initWithHandle:handle length:size
+				correctChecksum:correctchecksum mask:0xffff] autorelease];
 			}
+		}
 		break;
 
 		case 8:
@@ -398,8 +405,7 @@
 			if(checksum)
 			{
 				handle=[XADCRCHandle IBMCRC16HandleWithHandle:handle length:size
-				correctCRC:[[dict objectForKey:@"DiskDoublerCRC"] intValue]
-				conditioned:NO];
+				correctCRC:correctchecksum conditioned:NO];
 			}
 		}
 		break;

@@ -5,7 +5,7 @@
     DMS and related disk/file archiver clients
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -1207,7 +1207,7 @@ struct xadArchiveInfo *ai, xadINT32 *more, xadINT32 crypted, xadINT32 *ret)
                 tracksize = upsize;
                 /* store first track to extract */
 /* FIXME - make real pointer! */
-                di->xdi_PrivateInfo = (xadPTR) (ai->xai_InPos-sizeof(struct DMSTrack));
+                di->xdi_PrivateInfo = (xadPTR)(uintptr_t) (ai->xai_InPos-sizeof(struct DMSTrack));
                 if(!tr)
                 {
                   zerosize = upsize;
@@ -1522,7 +1522,7 @@ XADUNARCHIVE(DMS)
 
         if(!(err = DecrunchDMS(&t, ai, xadMasterBase, &res, d)))
         { /* xdi_PrivateInfo contains start pos of useful data */
-          if(ai->xai_InPos > (xadUINT32) di->xdi_PrivateInfo) /* skip unusable parts */
+          if(ai->xai_InPos > (xadUINT32)(uintptr_t) di->xdi_PrivateInfo) /* skip unusable parts */
           {
             if(i == EndGetM16(t.TrackNumber))
             {

@@ -12,7 +12,6 @@
 #import <sys/time.h>
 
 
-
 NSString *XADResourceDataKey=@"XADResourceData";
 NSString *XADFinderFlags=@"XADFinderFlags";
 
@@ -251,7 +250,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	NSNumber *resnum=[dict objectForKey:XADIsResourceForkKey];
 	BOOL isres=resnum&&[resnum boolValue];
 
-	XADString *name=[dict objectForKey:XADFileNameKey];
+	XADPath *name=[dict objectForKey:XADFileNameKey];
 
 	NSNumber *index=[namedict objectForKey:name];
 	if(index) // Try to update an existing entry
@@ -286,8 +285,17 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 				{
 					if(immediatesubarchives&&[self entryIsArchive:n])
 					{
-						if(![self extractArchiveEntry:n to:immediatedestination])
-						immediatefailed=YES;
+						// Try to extract as archive, if the format is unknown, extract as regular file
+						BOOL res;
+						@try { res=[self extractArchiveEntry:n to:immediatedestination]; }
+						@catch(id e) { res=NO; }
+
+						if(!res&&lasterror==XADDataFormatError)
+						{
+							if(![self extractEntry:n to:immediatedestination
+							deferDirectories:YES resourceFork:NO]) immediatefailed=YES;
+						}
+						else immediatefailed=YES;
 					}
 					else
 					{
@@ -321,13 +329,22 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 		int n=[dataentries count]-1;
 		if(immediatesubarchives&&[self entryIsArchive:n])
 		{
-			if(![self extractArchiveEntry:n to:immediatedestination])
-			immediatefailed=YES;
+			// Try to extract as archive, if the format is unknown, extract as regular file
+			BOOL res;
+			@try { res=[self extractArchiveEntry:n to:immediatedestination]; }
+			@catch(id e) { res=NO; }
+
+			if(!res&&lasterror==XADDataFormatError)
+			{
+				if(![self extractEntry:n to:immediatedestination
+				deferDirectories:YES resourceFork:YES]) immediatefailed=YES;
+			}
+			else immediatefailed=YES;
 		}
 		else
 		{
 			if(![self extractEntry:n to:immediatedestination
-			deferDirectories:YES resourceFork:NO]) immediatefailed=YES;
+			deferDirectories:YES resourceFork:YES]) immediatefailed=YES;
 		}
 	}
 }
@@ -627,7 +644,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 			{
 				@try
 				{
-					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:NO];
+					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:YES];
 					if(!handle) [XADException raiseDecrunchException];
 					NSData *forkdata=[handle remainingFileContents];
 					if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];
@@ -660,7 +677,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(!dict) return [CSMemoryHandle memoryHandleForReadingData:[NSData data]]; // Special case for files with only a resource fork
 
 	@try
-	{ return [parser handleForEntryWithDictionary:dict wantChecksum:NO]; }
+	{ return [parser handleForEntryWithDictionary:dict wantChecksum:YES]; }
 	@catch(id e)
 	{
 		lasterror=[self _parseException:e];
@@ -682,7 +699,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(isdir&&[isdir boolValue]) return nil;
 
 	@try
-	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:NO]; }
+	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:YES]; }
 	@catch(id e)
 	{
 		lasterror=[self _parseException:e];
@@ -698,7 +715,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 
 	@try
 	{
-		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:NO];
+		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 		if(!handle) [XADException raiseDecrunchException];
 		NSData *data=[handle remainingFileContents];
 		if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];
@@ -761,18 +778,27 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	extractsize=0;
 	totalsize=0;
 
-	for(int i=[entryset firstIndex];i!=NSNotFound;i=[entryset indexGreaterThanIndex:i])
+	for(NSUInteger i=[entryset firstIndex];i!=NSNotFound;i=[entryset indexGreaterThanIndex:i])
 	totalsize+=[self representativeSizeOfEntry:i];
 
 	int numentries=[entryset count];
 	[delegate archive:self extractionProgressFiles:0 of:numentries];
 	[delegate archive:self extractionProgressBytes:0 of:totalsize];
 
-	for(int i=[entryset firstIndex];i!=NSNotFound;i=[entryset indexGreaterThanIndex:i])
+	for(NSUInteger i=[entryset firstIndex];i!=NSNotFound;i=[entryset indexGreaterThanIndex:i])
 	{
 		BOOL res;
 
-		if(sub&&[self entryIsArchive:i]) res=[self extractArchiveEntry:i to:destination];
+		if(sub&&[self entryIsArchive:i])
+		{
+			@try { res=[self extractArchiveEntry:i to:destination]; }
+			@catch(id e) { res=NO; }
+
+			if(!res&&lasterror==XADDataFormatError) // Retry as regular file if the archive format was not known
+			{
+				res=[self extractEntry:i to:destination deferDirectories:YES];
+			}
+		}
 		else res=[self extractEntry:i to:destination deferDirectories:YES];
 
 		if(!res)
@@ -828,7 +854,6 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(![name length]) return YES; // Silently ignore unnamed files (or more likely, directories).
 
 	NSString *destfile=[destination stringByAppendingPathComponent:name];
-
 	while(![self _extractEntry:n as:destfile]
 	||![self _changeAllAttributesForEntry:n atPath:destfile deferDirectories:defer resourceFork:resfork])
 	{
@@ -874,7 +899,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 		[subarchive release];
 
 		if(res) return YES;
-		else if(err==XADBreakError) return NO;
+		else if(err==XADBreakError||err==XADDataFormatError) return NO;
 		else if(delegate)
 		{
 			XADAction action=[delegate archive:self extractionOfEntryDidFail:n error:err];
@@ -954,6 +979,8 @@ static double XADGetTime()
 {
 	NSAutoreleasePool *pool=[NSAutoreleasePool new];
 
+/*	int fh=open([destfile fileSystemRepresentation],O_WRONLY,0666);
+	if(fh==-1) fh=open([destfile fileSystemRepresentation],O_WRONLY|O_CREAT|O_TRUNC,0666);*/
 	int fh=open([destfile fileSystemRepresentation],O_WRONLY|O_CREAT|O_TRUNC,0666);
 	if(fh==-1)
 	{
@@ -1132,7 +1159,7 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 		return YES;
 	}
 
-	if(resfork)
+	if(resfork && ![self entryIsLink:n])
 	{
 		CSHandle *rsrchandle=[self resourceHandleForEntry:n];
 		if(rsrchandle) @try
@@ -1141,7 +1168,14 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 			if([rsrchandle hasChecksum]&&![rsrchandle isChecksumCorrect]) [XADException raiseChecksumException];
 
 			// TODO: use xattrs?
-			if(![data writeToFile:[path stringByAppendingString:@"/..namedfork/rsrc"] atomically:NO]) return NO;
+			if(![data writeToFile:[path stringByAppendingString:@"/..namedfork/rsrc"] atomically:NO])
+			{
+				// Change permissions and try again
+				const char *cpath=[path fileSystemRepresentation];
+				int oldperms=chmod(cpath,0700);
+				if(![data writeToFile:[path stringByAppendingString:@"/..namedfork/rsrc"] atomically:NO]) return NO;
+				chmod(cpath,oldperms);
+			}
 		}
 		@catch(id e)
 		{

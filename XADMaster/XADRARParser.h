@@ -14,6 +14,7 @@ typedef struct RARBlock
 	int archiveflags,encryptversion;
 
 	NSMutableDictionary *lastcompressed;
+	NSMutableDictionary *keys;
 }
 
 +(int)requiredHeaderSize;
@@ -31,6 +32,7 @@ typedef struct RARBlock
 -(void)skipBlock:(RARBlock)block;
 -(CSHandle *)dataHandleFromSkipOffset:(off_t)offs length:(off_t)length
 encrypted:(BOOL)encrypted cryptoVersion:(int)version salt:(NSData *)salt;
+-(NSData *)keyForSalt:(NSData *)salt;
 
 -(void)readCommentBlock:(RARBlock)block;
 -(XADPath *)parseNameData:(NSData *)data flags:(int)flags;

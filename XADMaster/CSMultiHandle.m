@@ -62,6 +62,8 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 
 -(NSArray *)handles { return handles; }
 
+-(CSHandle *)currentHandle { return [handles objectAtIndex:currhandle]; }
+
 -(off_t)fileSize
 {
 	off_t size=0;

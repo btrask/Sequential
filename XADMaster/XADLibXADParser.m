@@ -29,7 +29,7 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 {
 	if(!xmb) return NO;
 
-		// Kludge to recognize ADF disk images, since the filesystem parsers don't provide recognition functions
+	// Kludge to recognize ADF disk images, since the filesystem parsers don't provide recognition functions
 	NSString *ext=[[name pathExtension] lowercaseString];
 	if([ext isEqual:@"adf"]) return YES;
 
@@ -42,7 +42,7 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 	inhook.h_Data=(void *)&indata;
 
 	if(xadRecogFile(xmb,[data length],[data bytes],
-		XAD_INHOOK,(xadSize)(uintptr_t)&inhook,
+		XAD_INHOOK,&inhook,
 	TAG_DONE)) return YES;
 
 	return NO;
@@ -91,8 +91,8 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 	numdisksadded=0;
 
 	struct TagItem tags[]={
-		XAD_INHOOK,(xadSize)(uintptr_t)&inhook,
-		XAD_PROGRESSHOOK,(xadSize)(uintptr_t)&progresshook,
+		XAD_INHOOK,(uintptr_t)&inhook,
+		XAD_PROGRESSHOOK,(uintptr_t)&progresshook,
 	TAG_DONE};
 
 	int err=xadGetInfoA(xmb,archive,tags);
@@ -275,8 +275,8 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 
 		err=xadFileUnArc(xmb,archive,
 			XAD_ENTRYNUMBER,info->xfi_EntryNumber,
-			XAD_OUTHOOK,(xadSize)(uintptr_t)&outhook,
-			XAD_INHOOK,(xadSize)(uintptr_t)&inhook,
+			XAD_OUTHOOK,&outhook,
+			XAD_INHOOK,&inhook,
 			pass?XAD_PASSWORD:TAG_IGNORE,pass,
 		TAG_DONE);
 	}
@@ -292,8 +292,8 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 
 		err=xadDiskUnArc(xmb,archive,
 			XAD_ENTRYNUMBER,info->xdi_EntryNumber,
-			XAD_OUTHOOK,(xadSize)(uintptr_t)&outhook,
-			XAD_INHOOK,(xadSize)(uintptr_t)&inhook,
+			XAD_OUTHOOK,&outhook,
+			XAD_INHOOK,&inhook,
 		TAG_DONE);
 	}
 

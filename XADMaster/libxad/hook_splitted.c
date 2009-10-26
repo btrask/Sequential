@@ -5,7 +5,7 @@
     splitted input file IO hook
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -198,7 +198,7 @@ FUNCHOOK(InHookSplitted)
           switch(sf->xsf_Type)
           {
           case XAD_INFILENAME:
-            sd[i].xsd_InFileName = (xadSTRPTR) sf->xsf_Data;
+            sd[i].xsd_InFileName = (xadSTRPTR)(uintptr_t) sf->xsf_Data;
             sd[i].xsd_Hook = &ai->xaip_MasterBase->xmb_InHookFH;
             if(!sf->xsf_Data) return XADERR_BADPARAMS;
             break;
@@ -208,25 +208,25 @@ FUNCHOOK(InHookSplitted)
             if(!sf->xsf_Data) return XADERR_BADPARAMS;
             break;
           case XAD_INMEMORY:
-            sd[i].xsd_InMemory = (xadPTR) sf->xsf_Data;
+            sd[i].xsd_InMemory = (xadPTR)(uintptr_t) sf->xsf_Data;
             sd[i].xsd_Hook = &ai->xaip_MasterBase->xmb_InHookMem;
             if(!sf->xsf_Size || !sf->xsf_Data) return XADERR_BADPARAMS;
             break;
           case XAD_INHOOK:
-            sd[i].xsd_Hook = (struct Hook *) sf->xsf_Data;
+            sd[i].xsd_Hook = (struct Hook *)(uintptr_t) sf->xsf_Data;
             break;
           case XAD_INSPLITTED:
-            sd[i].xsd_InSplitted = (struct xadSplitFile *) sf->xsf_Data;
+            sd[i].xsd_InSplitted = (struct xadSplitFile *)(uintptr_t) sf->xsf_Data;
             sd[i].xsd_Hook = &ai->xaip_MasterBase->xmb_InHookSplitted;
             if(!sf->xsf_Data) return XADERR_BADPARAMS;
             break;
           case XAD_INDISKARCHIVE:
-            sd[i].xsd_InDiskArc = (xadTAGPTR) sf->xsf_Data;
+            sd[i].xsd_InDiskArc = (xadTAGPTR)(uintptr_t) sf->xsf_Data;
             sd[i].xsd_Hook = &ai->xaip_MasterBase->xmb_InHookDiskArc;
             if(!sf->xsf_Data) return XADERR_BADPARAMS;
             break;
           case XAD_INXADSTREAM:
-            sd[i].xsd_InArcInfo = (xadTAGPTR) sf->xsf_Data;
+            sd[i].xsd_InArcInfo = (xadTAGPTR)(uintptr_t) sf->xsf_Data;
             sd[i].xsd_Hook = &ai->xaip_MasterBase->xmb_InHookStream;
             if(!sf->xsf_Data) return XADERR_BADPARAMS;
             break;

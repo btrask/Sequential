@@ -14,14 +14,14 @@
 
 static uint64_t ReadNumber(CSHandle *handle)
 {
-	int first=[handle readUInt8];
+	uint64_t first=[handle readUInt8];
 	uint64_t val=0;
-
 	for(int i=0;i<8;i++)
 	{
 		if((first&(0x80>>i))==0) return val|((first&((0x80>>i)-1))<<i*8);
 		val|=(uint64_t)[handle readUInt8]<<i*8;
 	}
+
 	return val;
 }
 
@@ -205,7 +205,7 @@ static void FindAttribute(CSHandle *handle,int attribute)
 		if(winattrs&0x8000)
 		{
 			int perms=winattrs>>16;
-			[file setObject:[NSNumber numberWithInt:winattrs] forKey:XADPosixPermissionsKey];
+			[file setObject:[NSNumber numberWithInt:perms] forKey:XADPosixPermissionsKey];
 			if((perms&0xf000)==0xa000) [file setObject:[NSNumber numberWithBool:YES] forKey:XADIsLinkKey];
 		}
 
@@ -311,7 +311,7 @@ static void FindAttribute(CSHandle *handle,int attribute)
 	int external=[handle readUInt8];
 	if(external!=0) [XADException raiseNotSupportedException]; // TODO: figure out what to do
 
-	for(int i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
+	for(NSInteger i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
 	{
 		uint32_t low=[handle readUInt32LE];
 		uint32_t high=[handle readUInt32LE];
@@ -322,7 +322,7 @@ static void FindAttribute(CSHandle *handle,int attribute)
 -(void)parseCRCsForHandle:(CSHandle *)handle array:(NSMutableArray *)array
 {
 	NSIndexSet *indexes=[self parseDefintionVectorForHandle:handle numberOfElements:[array count]];
-	for(int i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
+	for(NSInteger i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
 	SetNumberEntryInArray(array,i,[handle readUInt32LE],@"CRC");
 }
 
@@ -354,7 +354,7 @@ static void FindAttribute(CSHandle *handle,int attribute)
 	int external=[handle readUInt8];
 	if(external!=0) [XADException raiseNotSupportedException]; // TODO: figure out what to do
 
-	for(int i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
+	for(NSInteger i=[indexes firstIndex];i!=NSNotFound;i=[indexes indexGreaterThanIndex:i])
 	SetNumberEntryInArray(array,i,[handle readUInt32LE],XADWindowsFileAttributesKey);
 }
 
@@ -679,8 +679,7 @@ packedStreams:(NSArray *)packedstreams packedStreamIndex:(int *)packedstreaminde
 -(CSHandle *)handleForEntryWithDictionary:(NSDictionary *)dict wantChecksum:(BOOL)checksum
 {
 	NSNumber *isempty=[dict objectForKey:@"7zIsEmptyFile"];
-	if(isempty&&[isempty boolValue]) return [XADCRCHandle IEEECRC32HandleWithHandle:
-	[[self handle] nonCopiedSubHandleOfLength:0] length:0 correctCRC:0 conditioned:NO];
+	if(isempty&&[isempty boolValue]) return [self zeroLengthHandleWithChecksum:checksum];
 
 	CSHandle *handle=[self subHandleFromSolidStreamForEntryWithDictionary:dict];
 

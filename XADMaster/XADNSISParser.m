@@ -379,7 +379,7 @@ static BOOL LooksLikeZlib(uint8_t *sig)
 
 
 
-static int CompareEntryDataOffsets(id first,id second,void *context)
+static NSInteger CompareEntryDataOffsets(id first,id second,void *context)
 {
 	return [[first objectForKey:@"NSISDataOffset"] compare:[second objectForKey:@"NSISDataOffset"]];
 }

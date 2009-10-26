@@ -7,16 +7,14 @@
 	off_t startoffs;
 
 	AES_KEY key;
-	uint8_t iv[16],xorblock[16],outblock[16];
+	uint8_t iv[16],xorblock[16],buffer[65536];
 }
 
--(id)initWithHandle:(CSHandle *)handle password:(NSString *)password
-salt:(NSData *)salt brokenHash:(BOOL)brokenhash;
--(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSString *)password
-salt:(NSData *)salt  brokenHash:(BOOL)brokenhash;
--(void)dealloc;
++(NSData *)keyForPassword:(NSString *)password salt:(NSData *)salt brokenHash:(BOOL)brokenhash;
 
--(void)calculateKeyForPassword:(NSString *)password salt:(NSData *)salt brokenHash:(BOOL)brokenhash;
+-(id)initWithHandle:(CSHandle *)handle key:(NSData *)keydata;
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length key:(NSData *)keydata;
+-(void)dealloc;
 
 -(void)resetBlockStream;
 -(int)produceBlockAtOffset:(off_t)pos;

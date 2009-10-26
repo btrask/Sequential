@@ -53,7 +53,6 @@ NSString *CSByteStreamEOFReachedException=@"CSByteStreamEOFReachedException";
 
 -(void)resetStream
 {
-	CSInputRestart(input);
 	[self resetByteStream];
 }
 

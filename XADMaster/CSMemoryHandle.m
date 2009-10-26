@@ -28,7 +28,7 @@
 
 -(id)initWithData:(NSData *)data
 {
-	if(self=[super initWithName:[NSString stringWithFormat:@"%@ at 0x%x",[data class],(int)data]])
+	if(self=[super initWithName:[NSString stringWithFormat:@"%@ at %p",[data class],data]])
 	{
 		memorypos=0;
 		backingdata=[data retain];

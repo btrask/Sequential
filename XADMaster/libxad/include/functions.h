@@ -55,8 +55,8 @@
   va_start(ap, tag); \
   convtags[0].ti_Tag = tag; \
   while (tag != TAG_DONE) { \
-    convtags[x++].ti_Data = \
-      ( (tag & TAG_PTR)  ? (xadSize)va_arg(ap, void *)  : \
+    convtags[x++].ti_Data =  \
+      ( (tag & TAG_PTR)  ? (xadSize)(uintptr_t)va_arg(ap, void *)  : \
 	((tag & TAG_SIZ) ? va_arg(ap, xadSize) : \
 	                   (xadSize)va_arg(ap, int))); \
     if (tag == TAG_MORE) break; \

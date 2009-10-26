@@ -84,8 +84,9 @@ NSString *EscapeString(NSString *str)
 	if(arch&&[arch boolValue])
 	{
 		[fh seekToFileOffset:0];
-
+NSLog(@"what");
 		XADArchiveParser *parser=[XADArchiveParser archiveParserForHandle:fh name:name];
+NSLog(@"what2 %@",parser);
 		[parser setDelegate:[[[ArchiveTester alloc] initWithIndentLevel:indent+2] autorelease]];
 		[parser parse];
 	}

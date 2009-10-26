@@ -159,7 +159,7 @@ FUNCHOOK(InHookDiskArc)
     {
       struct xadImageInfo *ii;
 
-      ii = (struct xadImageInfo *) param->xhp_CommandData;
+      ii = (struct xadImageInfo *)(uintptr_t) param->xhp_CommandData;
       ii->xii_SectorSize = dap->di->xdi_SectorSize;
       ii->xii_TotalSectors = dap->di->xdi_TotalSectors;
       if(dap->di->xdi_Flags & (XADDIF_NOCYLINDERS|XADDIF_NOCYLSECTORS))

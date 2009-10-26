@@ -68,6 +68,10 @@
 	CFStringEncoding cfenc=CFStringConvertIANACharSetNameToEncoding((CFStringRef)mimecharset);
 	if(cfenc==kCFStringEncodingInvalidId) return 0;
 
+	// UniversalDetector detects CP949 but returns "EUC-KR" because CP949 lacks an IANA name.
+	// Kludge to make strings decode properly anyway.
+	if(cfenc==kCFStringEncodingEUC_KR) cfenc=kCFStringEncodingDOSKorean;
+
 	return CFStringConvertEncodingToNSStringEncoding(cfenc);
 }
 

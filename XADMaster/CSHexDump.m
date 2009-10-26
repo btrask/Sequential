@@ -20,7 +20,6 @@
 			else [str appendFormat:@"%02x",bytes[i*cols+j]];
 			if(j%4==3&&j!=cols-1) [str appendString:@" "];
 		}
-
 		[str appendString:@"   "];
 
 		for(int j=0;j<cols;j++)
@@ -31,7 +30,7 @@
 			{
 				int c=bytes[i*cols+j];
 				if(c<0x20||(c>=0x80&&c<0xa0)) c='.';
-				[str appendFormat:@"%c",c];
+				[str appendFormat:@"%C",c];
 			}
 		}
 

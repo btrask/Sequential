@@ -5,7 +5,7 @@
     filename conversion
 
     XAD library system for archive handling
-    Copyright (C) 1998 and later by Dirk Stöcker <soft@dstoecker.de>
+    Copyright (C) 1998 and later by Dirk StË†cker <soft@dstoecker.de>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -469,7 +469,7 @@ static xadERROR makenormalstring(struct MyString *str, xadUINT32 charset)
 {
   xadINT32 i;
   xadERROR err = 0;
-  xadUINT16 a;
+  //xadUINT16 a;
 
   for(i = 0; i < str->ucsize && str->bufsize; ++i)
     str->string[str->size++] = str->ucstring[i];
@@ -530,12 +530,12 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
     switch(ti->ti_Tag)
     {
     case XAD_CHARACTERSET: cset = ti->ti_Data; break;
-    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data; break;
+    case XAD_ERRORCODE: errcode = (xadERROR *)(uintptr_t) ti->ti_Data; break;
     case XAD_STRINGSIZE: if(!(strs = ti->ti_Data)) strs = 0xFFFFFFFF; break;
     case XAD_XADSTRING:
       if(ti->ti_Data)
       {
-        obj = ((struct xadObject *)ti->ti_Data)-1;
+        obj = ((struct xadObject *)(uintptr_t)ti->ti_Data)-1;
         se = ((struct xadStringEnd *)(((xadSTRPTR)obj)+obj->xo_Size))-1;
         len += (se->xse_UnicodeSize ? se->xse_UnicodeSize
         : se->xse_StringSize)-1+1;
@@ -545,7 +545,7 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
     case XAD_PSTRING:
       if(ti->ti_Data)
       {
-        len += 1 + ((xadSTRPTR) ti->ti_Data)[0];
+        len += 1 + ((xadSTRPTR)(uintptr_t) ti->ti_Data)[0];
       }
       strs = 0xFFFFFFFF;
       break;
@@ -553,7 +553,7 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
       if(ti->ti_Data)
       {
         ++len;
-        if((i = getlen((xadUINT8 *)ti->ti_Data, cset, strs)) < 0)
+        if((i = getlen((xadUINT8 *)(uintptr_t)ti->ti_Data, cset, strs)) < 0)
           err = -i;
         else
           len += i;
@@ -591,13 +591,13 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
       case XAD_ADDPATHSEPERATOR:
         mystr->addpathsep = ti->ti_Data ? XADTRUE : XADFALSE; break;
       case XAD_PATHSEPERATOR:
-        mystr->pathsep = ti->ti_Data ? (const xadUINT16 *) ti->ti_Data
+        mystr->pathsep = ti->ti_Data ? (const xadUINT16 *)(uintptr_t) ti->ti_Data
         : psep+2; break;
       case XAD_CHARACTERSET: cset = ti->ti_Data; break;
       case XAD_XADSTRING:
         if(ti->ti_Data)
         {
-          obj = ((struct xadObject *)ti->ti_Data)-1;
+          obj = ((struct xadObject *)(uintptr_t)ti->ti_Data)-1;
           se = ((struct xadStringEnd *)(((xadSTRPTR)obj)+obj->xo_Size))-1;
           if(se->xse_UnicodeSize)
             err = makestring(mystr, CHARSET_UNICODE_UCS2_HOST,
@@ -605,7 +605,7 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
             -se->xse_UnicodeSize), strs < se->xse_UnicodeSize-1 ? strs :
             se->xse_UnicodeSize-1);
           else
-            err = makestring(mystr, se->xse_Charset, (xadSTRPTR) ti->ti_Data,
+            err = makestring(mystr, se->xse_Charset, (xadSTRPTR)(uintptr_t) ti->ti_Data,
             strs < se->xse_StringSize-1 ? strs : se->xse_StringSize-1);
         }
         strs = 0xFFFFFFFF;
@@ -613,7 +613,7 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
       case XAD_PSTRING:
         if(ti->ti_Data)
         {
-          str = (xadSTRPTR) ti->ti_Data;
+          str = (xadSTRPTR)(uintptr_t) ti->ti_Data;
           err = makestring(mystr, cset, str+1, strs < str[0] ? strs : str[0]);
         }
         strs = 0xFFFFFFFF;
@@ -621,7 +621,7 @@ FUNCxadConvertName /* xadUINT32 charset, xadTAGPTR tags */
       case XAD_CSTRING:
         if(ti->ti_Data)
         {
-          str = (xadSTRPTR) ti->ti_Data;
+          str = (xadSTRPTR)(uintptr_t) ti->ti_Data;
           if((i = getlen((xadUINT8 *)str, cset, strs)) < 0)
             err = -i;
           else
@@ -733,7 +733,7 @@ FUNCxadGetFilename /* xadUINT32 buffersize, xadSTRPTR buffer,
       ? XADTRUE : XADFALSE; break;
     case XAD_MASKCHARACTERS:
       {
-        const xadSTRING *mm = (xadSTRPTR) ti->ti_Data;
+        const xadSTRING *mm = (xadSTRPTR)(uintptr_t) ti->ti_Data;
         for(i = 0; i < 256/8; ++i)
           mask[i] = 0;
         while(mm && *mm)
@@ -744,7 +744,7 @@ FUNCxadGetFilename /* xadUINT32 buffersize, xadSTRPTR buffer,
       }
       break;
     case XAD_MASKINGCHAR: maskchar = ti->ti_Data; break;
-    case XAD_REQUIREDBUFFERSIZE: reqbufsize = (xadUINT32 *) ti->ti_Data; break;
+    case XAD_REQUIREDBUFFERSIZE: reqbufsize = (xadUINT32 *)(uintptr_t) ti->ti_Data; break;
     }
   }
   if(nopath)
@@ -822,8 +822,8 @@ FUNCxadGetDefaultName /* xadTAGPTR tags */
   {
     switch(ti->ti_Tag)
     {
-    case XAD_ARCHIVEINFO: ai = (struct xadArchiveInfo *) ti->ti_Data; break;
-    case XAD_ERRORCODE: errcode = (xadERROR *) ti->ti_Data; break;
+    case XAD_ARCHIVEINFO: ai = (struct xadArchiveInfo *)(uintptr_t) ti->ti_Data; break;
+    case XAD_ERRORCODE: errcode = (xadERROR *)(uintptr_t) ti->ti_Data; break;
     }
   }
 
@@ -844,7 +844,7 @@ FUNCxadGetDefaultName /* xadTAGPTR tags */
     {
       if(ti->ti_Tag == XAD_EXTENSION)
       {
-        ext = (xadSTRPTR) ti->ti_Data;
+        ext = (xadSTRPTR)(uintptr_t) ti->ti_Data;
         for(extsize = 0; ext[extsize] && ext[extsize] != ';'; ++extsize)
           ;
         if(extsize < namesize && !strnicmp(ai->xai_InName+namesize-extsize,
