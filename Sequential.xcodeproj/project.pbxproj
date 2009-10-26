@@ -794,6 +794,9 @@
 		0EEE57B10DB55837006E5B9C /* External */ = {
 			isa = PBXGroup;
 			children = (
+				0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */,
+				0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */,
+				0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */,
 				0EEE58010DB55B52006E5B9C /* exiftags */,
 			);
 			name = External;
@@ -865,9 +868,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Pornograph */ = {
 			isa = PBXGroup;
 			children = (
-				0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */,
-				0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */,
-				0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */,
 				2A37F4ABFDCFA73011CA2CEA /* Models */,
 				0E1D37350A7E1A5200C542A6 /* Views */,
 				0E1D37360A7E1A5800C542A6 /* Controllers */,
