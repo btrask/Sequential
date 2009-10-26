@@ -43,8 +43,8 @@
 "Turn Animation Off" = "Turn Animation Off";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
-"Fit to Screen" = "Fit to Screen";
 "Fit to Window" = "Fit to Window";
+"Fit to Screen" = "Fit to Screen";
 
 /* The title of the bookmarks menu. Two states. */
 "Resume" = "Resume";

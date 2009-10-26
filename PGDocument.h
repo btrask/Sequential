@@ -83,7 +83,6 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 @property(readonly) PGDisplayableIdentifier *rootIdentifier;
 @property(readonly) PGNode *node;
 @property(retain) PGDisplayController *displayController;
-@property(readonly) BOOL displayControllerIsModal;
 @property(readonly, getter = isOnline) BOOL online;
 @property(readonly) NSMenu *pageMenu;
 @property PGOrientation baseOrientation;

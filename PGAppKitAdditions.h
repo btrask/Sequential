@@ -78,6 +78,12 @@ typedef NSUInteger AEIconType;
 
 @end
 
+@interface NSView(PGAppKitAdditions)
+
+- (void)PG_setEnabled:(BOOL)enabled recursive:(BOOL)recursive;
+
+@end
+
 @interface NSWindow(PGAppKitAdditions)
 
 - (BOOL)PG_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.

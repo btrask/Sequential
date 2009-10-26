@@ -43,8 +43,8 @@
 "Turn Animation Off" = "Turn Animation Off";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
-"Fit to Screen" = "符合螢幕大小";
 "Fit to Window" = "符合視窗大小";
+"Fit to Screen" = "符合螢幕大小";
 
 /* The title of the bookmarks menu. Two states. */
 "Resume" = "繼續播放";

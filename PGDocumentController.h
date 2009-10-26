@@ -24,7 +24,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Models
-#import "PGPrefObject.h"
 @class PGDocument;
 @class PGResourceIdentifier;
 @class PGBookmark;
@@ -80,10 +79,6 @@ enum {
 
 	IBOutlet NSMenuItem *pageMenuItem;
 	IBOutlet NSMenu *defaultPageMenu;
-	IBOutlet NSMenuItem *firstPage;
-	IBOutlet NSMenuItem *previousPage;
-	IBOutlet NSMenuItem *nextPage;
-	IBOutlet NSMenuItem *lastPage;
 
 	IBOutlet NSMenu *windowsMenu;
 	IBOutlet NSMenuItem *windowsMenuSeparator;
@@ -119,17 +114,6 @@ enum {
 - (IBAction)clearRecentDocuments:(id)sender;
 - (IBAction)closeAll:(id)sender;
 
-- (IBAction)changeImageScaleMode:(id)sender; // PGImageScaleMode from [sender tag].
-- (IBAction)changeImageScaleConstraint:(id)sender; // PGImageScaleConstraint from [sender tag].
-- (IBAction)changeImageScaleFactor:(id)sender; // Scale from [sender doubleValue].
-- (IBAction)minImageScaleFactor:(id)sender;
-- (IBAction)maxImageScaleFactor:(id)sender;
-
-- (IBAction)changeSortOrder:(id)sender; // PGSortOrder from [sender tag].
-- (IBAction)changeSortDirection:(id)sender; // PGSortDescendingMask from [sender tag].
-- (IBAction)changeSortRepeat:(id)sender; // PGSortOrder from [sender tag].
-- (IBAction)changeReadingDirection:(id)sender; // PGReadingDirection from [sender tag].
-
 - (IBAction)toggleExif:(id)sender;
 - (IBAction)toggleTimer:(id)sender;
 - (IBAction)toggleActivity:(id)sender;
@@ -151,8 +135,9 @@ enum {
 @property(assign, getter = isFullscreen) BOOL fullscreen;
 @property(readonly) BOOL canToggleFullscreen;
 @property(readonly) NSArray *documents;
+@property(readonly) NSMenu *scaleMenu;
+@property(readonly) NSSlider *scaleSlider;
 @property(readonly) NSMenu *defaultPageMenu;
-@property(readonly) PGPrefObject *currentPrefObject;
 @property(assign) PGDocument *currentDocument;
 @property(readonly) BOOL pathFinderRunning;
 
@@ -170,6 +155,5 @@ enum {
 - (void)handleAppleEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent;
 
 - (void)recentDocumentIdentifierDidChange:(NSNotification *)aNotif;
-- (void)readingDirectionDidChange:(NSNotification *)aNotif;
 
 @end

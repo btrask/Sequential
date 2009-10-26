@@ -210,6 +210,10 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[[self activeDocument] setShowsThumbnails:![[self activeDocument] showsThumbnails]];
 }
+- (IBAction)changeReadingDirection:(id)sender
+{
+	[[self activeDocument] setReadingDirection:[sender tag]];
+}
 - (IBAction)toggleAnimation:(id)sender
 {
 	NSParameterAssert([_imageView canAnimateRep]);
@@ -220,6 +224,14 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -
 
+- (IBAction)changeImageScaleMode:(id)sender
+{
+	[[self activeDocument] setImageScaleMode:[sender tag]];
+}
+- (IBAction)changeImageScaleConstraint:(id)sender
+{
+	[[self activeDocument] setImageScaleConstraint:[sender tag]];
+}
 - (IBAction)zoomIn:(id)sender
 {
 	[self zoomBy:2.0f animate:YES];
@@ -227,6 +239,36 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)zoomOut:(id)sender
 {
 	[self zoomBy:0.5f animate:YES];
+}
+- (IBAction)changeImageScaleFactor:(id)sender
+{
+	[[self activeDocument] setImageScaleFactor:pow(2.0f, (CGFloat)[sender doubleValue]) animate:NO];
+	[[[PGDocumentController sharedDocumentController] scaleMenu] update];
+}
+- (IBAction)minImageScaleFactor:(id)sender
+{
+	[[self activeDocument] setImageScaleFactor:PGScaleMin];
+	[[[PGDocumentController sharedDocumentController] scaleMenu] update];
+}
+- (IBAction)maxImageScaleFactor:(id)sender
+{
+	[[self activeDocument] setImageScaleFactor:PGScaleMax];
+	[[[PGDocumentController sharedDocumentController] scaleMenu] update];
+}
+
+#pragma mark -
+
+- (IBAction)changeSortOrder:(id)sender
+{
+	[[self activeDocument] setSortOrder:([sender tag] & PGSortOrderMask) | ([[self activeDocument] sortOrder] & PGSortOptionsMask)];
+}
+- (IBAction)changeSortDirection:(id)sender
+{
+	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortDescendingMask) | [sender tag]];
+}
+- (IBAction)changeSortRepeat:(id)sender
+{
+	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortRepeatMask) | [sender tag]];
 }
 
 #pragma mark -
@@ -1012,10 +1054,28 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -NSObject(NSMenuValidation)
 
+#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); (fabs(__a - __b) < 0.001f ? NSOnState : (fabs(round(__a) - round(__b)) < 0.1f ? NSMixedState : NSOffState)); })
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
 	SEL const action = [anItem action];
-	if(@selector(reveal:) == action) [anItem setTitle:NSLocalizedString(([[PGDocumentController sharedDocumentController] pathFinderRunning] ? @"Reveal in Path Finder" : @"Reveal in Finder"), @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+	NSInteger const tag = [anItem tag];
+
+	// File:
+	if(@selector(reveal:) == action) {
+		if([[self activeDocument] isOnline]) [anItem setTitle:NSLocalizedString(@"Reveal in Browser", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+		else if([[PGDocumentController sharedDocumentController] pathFinderRunning]) [anItem setTitle:NSLocalizedString(@"Reveal in Path Finder", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+		else [anItem setTitle:NSLocalizedString(@"Reveal in Finder", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+	}
+
+	// Edit:
+	if(@selector(performFindPanelAction:) == action) switch([anItem tag]) {
+		case NSFindPanelActionShowFindPanel:
+		case NSFindPanelActionNext:
+		case NSFindPanelActionPrevious: break;
+		default: return NO;
+	}
+
+	// View:
 	if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString(([[PGDocumentController sharedDocumentController] isFullscreen] ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 	if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 	if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
@@ -1023,6 +1083,31 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[anItem setTitle:[[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
 		return [_imageView canAnimateRep];
 	}
+	if(@selector(changeReadingDirection:) == action) [anItem setState:[[self activeDocument] readingDirection] == tag];
+
+	// Scale:
+	if(@selector(changeImageScaleMode:) == action) {
+		if(PGViewFitScale == tag) {
+			if([[PGDocumentController sharedDocumentController] isFullscreen]) [anItem setTitle:NSLocalizedString(@"Fit to Screen", @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
+			else [anItem setTitle:NSLocalizedString(@"Fit to Window", @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
+		} else if(PGConstantFactorScale == tag) [anItem setState:[[self activeDocument] imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([[self activeDocument] imageScaleFactor])) : NSOffState];
+		else [anItem setState:[[self activeDocument] imageScaleMode] == tag];
+	}
+	if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[[self activeDocument] imageScaleConstraint] == tag];
+	if(@selector(changeImageScaleFactor:) == action) [[[PGDocumentController sharedDocumentController] scaleSlider] setDoubleValue:log2([[self activeDocument] imageScaleFactor])];
+
+	// Sort:
+	if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [[self activeDocument] sortOrder]) == tag];
+	if(@selector(changeSortDirection:) == action) {
+		[anItem setState:tag == (PGSortDescendingMask & [[self activeDocument] sortOrder])];
+		if(([[self activeDocument] sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
+	}
+	if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [[self activeDocument] sortOrder]) == tag];
+
+	// Page:
+	if(@selector(nextPage:) == action || @selector(lastPage:) == action) [anItem setKeyEquivalent:[[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? @"]" : @"["];
+	if(@selector(previousPage:) == action || @selector(firstPage:) == action) [anItem setKeyEquivalent:[[self activeDocument] readingDirection] == PGReadingDirectionLeftToRight ? @"[" : @"]"];
+	if(@selector(nextPage:) == action || @selector(previousPage:) == action) [anItem setKeyEquivalentModifierMask:kNilOptions];
 	if(@selector(jumpToPage:) == action) {
 		PGNode *const node = [[anItem representedObject] nonretainedObjectValue];
 		NSCellStateValue state = NSOffState;
@@ -1031,7 +1116,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[anItem setState:state];
 		return [node isViewable] || [anItem submenu];
 	}
-	if(@selector(reveal:) == action && [[self activeDocument] isOnline]) [anItem setTitle:NSLocalizedString(@"Reveal in Browser", @"Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item.")];
+
 	if(![[self activeNode] isViewable]) {
 		if(@selector(reveal:) == action) return NO;
 		if(@selector(setAsDesktopPicture:) == action) return NO;
@@ -1053,12 +1138,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGResourceIdentifier *const selectedNodeIdent = [[self selectedNode] identifier];
 	if(![selectedNodeIdent isFileIdentifier] || ![selectedNodeIdent URL]) {
 		if(@selector(moveToTrash:) == action) return NO;
-	}
-	if(@selector(performFindPanelAction:) == action) switch([anItem tag]) {
-		case NSFindPanelActionShowFindPanel:
-		case NSFindPanelActionNext:
-		case NSFindPanelActionPrevious: break;
-		default: return NO;
 	}
 	if(![[PGDocumentController sharedDocumentController] canToggleFullscreen]) {
 		if(@selector(toggleFullscreen:) == action) return NO;

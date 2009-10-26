@@ -131,10 +131,6 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[_displayController setActiveDocument:self closeIfAppropriate:NO];
 	[_displayController synchronizeWindowTitleWithDocumentName];
 }
-- (BOOL)displayControllerIsModal
-{
-	return [[self displayController] activeDocument] == self && [[[self displayController] window] attachedSheet];
-}
 - (BOOL)isOnline
 {
 	return ![[self rootIdentifier] isFileIdentifier];

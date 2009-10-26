@@ -102,8 +102,17 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)toggleThumbnails:(id)sender;
 - (IBAction)toggleAnimation:(id)sender;
 
+- (IBAction)changeImageScaleMode:(id)sender;
+- (IBAction)changeImageScaleConstraint:(id)sender;
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
+- (IBAction)changeImageScaleFactor:(id)sender;
+- (IBAction)minImageScaleFactor:(id)sender;
+- (IBAction)maxImageScaleFactor:(id)sender;
+
+- (IBAction)changeSortOrder:(id)sender;
+- (IBAction)changeSortDirection:(id)sender;
+- (IBAction)changeSortRepeat:(id)sender;
 
 - (IBAction)previousPage:(id)sender;
 - (IBAction)nextPage:(id)sender;

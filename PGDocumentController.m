@@ -76,17 +76,11 @@ static NSString *const PGNextUpdateCheckDateKey = @"PGNextUpdateCheckDate";
 
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 
-static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
-static NSView *(*PGNSViewNextValidKeyView)(id, SEL);
-static NSView *(*PGNSViewPreviousValidKeyView)(id, SEL);
-static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
-
 static PGDocumentController *PGSharedDocumentController = nil;
 
 @interface PGDocumentController(Private)
 
 - (void)_setFullscreen:(BOOL)flag;
-- (void)_setPageMenu:(NSMenu *)aMenu;
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
 - (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date;
 - (void)_checkForUpdates;
@@ -174,51 +168,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	[[_fullscreenController window] close];
 	for(PGDocument *const doc in [self documents]) [[[doc displayController] window] performClose:self];
-}
-
-#pragma mark -
-
-- (IBAction)changeImageScaleMode:(id)sender
-{
-	[[self currentPrefObject] setImageScaleMode:[sender tag]];
-}
-- (IBAction)changeImageScaleConstraint:(id)sender
-{
-	[[self currentPrefObject] setImageScaleConstraint:[sender tag]];
-}
-- (IBAction)changeImageScaleFactor:(id)sender
-{
-	[[self currentPrefObject] setImageScaleFactor:pow(2.0f, (CGFloat)[sender doubleValue]) animate:NO];
-	[[scaleSliderItem menu] update];
-}
-- (IBAction)minImageScaleFactor:(id)sender
-{
-	[[self currentPrefObject] setImageScaleFactor:PGScaleMin];
-	[[scaleSliderItem menu] update];
-}
-- (IBAction)maxImageScaleFactor:(id)sender
-{
-	[[self currentPrefObject] setImageScaleFactor:PGScaleMax];
-	[[scaleSliderItem menu] update];
-}
-
-#pragma mark -
-
-- (IBAction)changeSortOrder:(id)sender
-{
-	[[self currentPrefObject] setSortOrder:([sender tag] & PGSortOrderMask) | ([[self currentPrefObject] sortOrder] & PGSortOptionsMask)];
-}
-- (IBAction)changeSortDirection:(id)sender
-{
-	[[self currentPrefObject] setSortOrder:([[self currentPrefObject] sortOrder] & ~PGSortDescendingMask) | [sender tag]];
-}
-- (IBAction)changeSortRepeat:(id)sender
-{
-	[[self currentPrefObject] setSortOrder:([[self currentPrefObject] sortOrder] & ~PGSortRepeatMask) | [sender tag]];
-}
-- (IBAction)changeReadingDirection:(id)sender
-{
-	[[self currentPrefObject] setReadingDirection:[sender tag]];
 }
 
 #pragma mark -
@@ -330,19 +279,21 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	return YES;
 }
 @synthesize documents = _documents;
-@synthesize defaultPageMenu;
-- (PGPrefObject *)currentPrefObject
+- (NSMenu *)scaleMenu
 {
-	return _currentDocument ? _currentDocument : [PGPrefObject globalPrefObject];
+	return [scaleSliderItem menu];
 }
+- (NSSlider *)scaleSlider
+{
+	return scaleSlider;
+}
+@synthesize defaultPageMenu;
 @synthesize currentDocument = _currentDocument;
 - (void)setCurrentDocument:(PGDocument *)document
 {
-	[[self currentPrefObject] PG_removeObserver:self name:PGPrefObjectReadingDirectionDidChangeNotification];
 	_currentDocument = document;
-	[self _setPageMenu:_currentDocument ? [_currentDocument pageMenu] : [self defaultPageMenu]];
-	[[self currentPrefObject] PG_addObserver:self selector:@selector(readingDirectionDidChange:) name:PGPrefObjectReadingDirectionDidChangeNotification];
-	[self readingDirectionDidChange:nil];
+	NSMenu *const menu = [_currentDocument pageMenu];
+	[pageMenuItem setSubmenu:menu ? menu : [self defaultPageMenu]];
 }
 - (BOOL)pathFinderRunning
 {
@@ -440,19 +391,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:_recentDocumentIdentifiers] forKey:PGRecentItemsKey];
 }
 
-- (void)readingDirectionDidChange:(NSNotification *)aNotif
-{
-	NSString *prev, *next;
-	if([[self currentPrefObject] readingDirection] == PGReadingDirectionLeftToRight) prev = @"[", next = @"]";
-	else prev = @"]", next = @"[";
-	[previousPage setKeyEquivalent:prev];
-	[nextPage setKeyEquivalent:next];
-	[firstPage setKeyEquivalent:prev];
-	[lastPage setKeyEquivalent:next];
-	[previousPage setKeyEquivalentModifierMask:0];
-	[nextPage setKeyEquivalentModifierMask:0];
-}
-
 #pragma mark -PGDocumentController(Private)
 
 - (void)_setFullscreen:(BOOL)flag
@@ -489,18 +427,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[_fullscreenController showWindow:self];
 	}
 	NSEnableScreenUpdates();
-}
-- (void)_setPageMenu:(NSMenu *)aMenu
-{
-	NSMenu *const oldMenu = [pageMenuItem submenu];
-	NSMenu *const newMenu = aMenu ? aMenu : defaultPageMenu;
-	firstPage = [newMenu itemAtIndex:[oldMenu indexOfItem:firstPage]]; // Since we change the whole menu, make sure to get the current menu's items.
-	previousPage = [newMenu itemAtIndex:[oldMenu indexOfItem:previousPage]];
-	nextPage = [newMenu itemAtIndex:[oldMenu indexOfItem:nextPage]];
-	lastPage = [newMenu itemAtIndex:[oldMenu indexOfItem:lastPage]];
-	[pageMenuItem setSubmenu:newMenu];
-
-	[self readingDirectionDidChange:nil];
 }
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display
 {
@@ -598,51 +524,22 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -NSObject(NSMenuValidation)
 
-#define PGFuzzyEqualityToCellState(a, b) ({ double __a = (double)(a); double __b = (double)(b); (fabs(__a - __b) < 0.001f ? NSOnState : (fabs(round(__a) - round(__b)) < 0.1f ? NSMixedState : NSOffState)); })
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
-	id const pref = [self currentPrefObject];
 	SEL const action = [anItem action];
-	NSInteger const tag = [anItem tag];
 
+	// Sequential:
 	if(@selector(installUpdate:) == action) {
 		[anItem setTitle:[[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states.")];
-	} else if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
-	else if(@selector(changeReadingDirection:) == action) [anItem setState:[pref readingDirection] == tag];
-	else if(@selector(changeImageScaleMode:) == action) {
-		if(PGViewFitScale == tag) [anItem setTitle:NSLocalizedString((_fullscreen ? @"Fit to Screen" : @"Fit to Window"), @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		if(PGConstantFactorScale == tag) [anItem setState:[pref imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([pref imageScaleFactor])) : NSOffState];
-		else [anItem setState:[pref imageScaleMode] == tag];
-	} else if(@selector(changeImageScaleFactor:) == action) {
-		[scaleSlider setEnabled:YES];
-		[minScale setEnabled:YES];
-		[maxScale setEnabled:YES];
-		[scaleSlider setDoubleValue:log2([pref imageScaleFactor])];
-	} else if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[pref imageScaleConstraint] == tag];
-	else if(@selector(changeSortOrder:) == action) [anItem setState:(PGSortOrderMask & [pref sortOrder]) == tag];
-	else if(@selector(changeSortDirection:) == action) {
-		[anItem setState:tag == (PGSortDescendingMask & [pref sortOrder])];
-		if(([pref sortOrder] & PGSortOrderMask) == PGSortShuffle) return NO;
-	} else if(@selector(changeSortRepeat:) == action) [anItem setState:(PGSortRepeatMask & [pref sortOrder]) == tag];
-	else if(@selector(activateDocument:) == action) [anItem setState:[anItem representedObject] == [self currentDocument]];
+	}
+	if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
+
+	// Window:
+	if(@selector(activateDocument:) == action) [anItem setState:[anItem representedObject] == [self currentDocument]];
 
 	if([[self documents] count] <= 1) {
 		if(@selector(selectPreviousDocument:) == action) return NO;
 		if(@selector(selectNextDocument:) == action) return NO;
-	}
-	if(![self currentDocument] || [[self currentDocument] displayControllerIsModal]) {
-		if(@selector(changeReadingDirection:) == action) return NO;
-		if(@selector(changeImageScaleMode:) == action) return NO;
-		if(@selector(changeImageScaleFactor:) == action) {
-			[scaleSlider setEnabled:NO];
-			[minScale setEnabled:NO];
-			[maxScale setEnabled:NO];
-			return NO;
-		}
-		if(@selector(changeImageScaleConstraint:) == action) return NO;
-		if(@selector(changeSortOrder:) == action) return NO;
-		if(@selector(changeSortDirection:) == action) return NO;
-		if(@selector(changeSortRepeat:) == action) return NO;
 	}
 	return [super validateMenuItem:anItem];
 }
@@ -678,7 +575,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	[self _setFullscreen:_fullscreen];
 	[self setCurrentDocument:nil];
-	[self readingDirectionDidChange:nil];
 }
 
 #pragma mark -NSObject(SUUpdaterDelegateInformalProtocol)
@@ -768,6 +664,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 @end
 @interface PGMenu : NSMenu
 @end
+@interface PGMenuItem : NSMenuItem
+@end
+
+static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
+static NSView *(*PGNSViewNextValidKeyView)(id, SEL);
+static NSView *(*PGNSViewPreviousValidKeyView)(id, SEL);
+static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
+
+static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 
 @implementation PGApplication
 
@@ -779,6 +684,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	PGNSViewNextValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(nextValidKeyView)];
 	PGNSViewPreviousValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(previousValidKeyView)];
 	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
+	PGNSMenuItemSetEnabled = [NSMenuItem PG_useImplementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
 
 	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
@@ -835,6 +741,16 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	}
 	for(i = 0; i < count; i++) if([[[self itemAtIndex:i] submenu] performKeyEquivalent:anEvent]) return YES;
 	return [NSApp mainMenu] == self ? PGNSMenuPerformKeyEquivalent(self, _cmd, anEvent) : NO;
+}
+
+@end
+
+@implementation PGMenuItem
+
+- (void)setEnabled:(BOOL)flag
+{
+	PGNSMenuItemSetEnabled(self, _cmd, flag);
+	[[self view] PG_setEnabled:flag recursive:YES];
 }
 
 @end

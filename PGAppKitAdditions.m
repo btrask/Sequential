@@ -244,6 +244,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@implementation NSView(PGAppKitAdditions)
+
+- (void)PG_setEnabled:(BOOL)enabled recursive:(BOOL)recursive
+{
+	if([self respondsToSelector:@selector(setEnabled:)]) [(NSControl *)self setEnabled:enabled];
+	if(recursive) for(NSView *const subview in [self subviews]) [subview PG_setEnabled:enabled recursive:YES];
+}
+
+@end
+
 @implementation NSWindow(PGAppKitAdditions)
 
 - (BOOL)PG_isVisible

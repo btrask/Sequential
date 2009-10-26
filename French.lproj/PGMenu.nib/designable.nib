@@ -11,7 +11,8 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="338"/>
+			<integer value="756"/>
+			<integer value="1240"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -755,7 +756,7 @@
 								</object>
 								<object class="NSMenuItem" id="981712103">
 									<reference key="NSMenu" ref="287763997"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Ajuster à la fenêtre</string>
 									<string key="NSKeyEquiv">s</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="676493246"/>
@@ -1314,7 +1315,7 @@
 				<string key="NSClassName">SUUpdater</string>
 			</object>
 			<object class="NSCustomView" id="387774365">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSButton" id="116247512">
@@ -1372,8 +1373,9 @@
 					<object class="NSSlider" id="763042376">
 						<reference key="NSNextResponder" ref="387774365"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{42, 0}, {56, 26}}</string>
+						<string key="NSFrame">{{42, 1}, {56, 25}}</string>
 						<reference key="NSSuperview" ref="387774365"/>
+						<int key="NSTag">1</int>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSliderCell" key="NSCell" id="638632050">
 							<int key="NSCellFlags">-2079981824</int>
@@ -1382,7 +1384,7 @@
 							<reference key="NSControlView" ref="763042376"/>
 							<double key="NSMaxValue">100</double>
 							<double key="NSMinValue">0.0</double>
-							<double key="NSValue">50</double>
+							<double key="NSValue">0.0</double>
 							<double key="NSAltIncValue">0.0</double>
 							<int key="NSNumberOfTickMarks">1</int>
 							<int key="NSTickMarkPosition">0</int>
@@ -1392,6 +1394,7 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{140, 25}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -1574,38 +1577,6 @@
 					<int key="connectionID">579</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">firstPage</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="707439894"/>
-					</object>
-					<int key="connectionID">619</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">lastPage</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="1054799997"/>
-					</object>
-					<int key="connectionID">620</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">nextPage</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="943200008"/>
-					</object>
-					<int key="connectionID">621</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">previousPage</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="776847675"/>
-					</object>
-					<int key="connectionID">622</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">nextPage:</string>
 						<reference key="source" ref="41632474"/>
@@ -1726,22 +1697,6 @@
 					<int key="connectionID">906</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeReadingDirection:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="915046698"/>
-					</object>
-					<int key="connectionID">911</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeReadingDirection:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="313211327"/>
-					</object>
-					<int key="connectionID">912</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">windowsMenu</string>
 						<reference key="source" ref="636320928"/>
@@ -1804,78 +1759,6 @@
 						<reference key="destination" ref="629694903"/>
 					</object>
 					<int key="connectionID">1034</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortDirection:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="691271091"/>
-					</object>
-					<int key="connectionID">1099</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortDirection:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="37465732"/>
-					</object>
-					<int key="connectionID">1100</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="1028778915"/>
-					</object>
-					<int key="connectionID">1101</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="1033762397"/>
-					</object>
-					<int key="connectionID">1102</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="585966999"/>
-					</object>
-					<int key="connectionID">1103</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="641881103"/>
-					</object>
-					<int key="connectionID">1104</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="720325491"/>
-					</object>
-					<int key="connectionID">1105</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortRepeat:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="187940196"/>
-					</object>
-					<int key="connectionID">1106</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortRepeat:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="570890579"/>
-					</object>
-					<int key="connectionID">1107</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
@@ -2151,62 +2034,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="981109871"/>
-					</object>
-					<int key="connectionID">1213</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="473928913"/>
-					</object>
-					<int key="connectionID">1214</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="110860554"/>
-					</object>
-					<int key="connectionID">1215</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleMode:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="627691540"/>
-					</object>
-					<int key="connectionID">1216</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleMode:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="661866111"/>
-					</object>
-					<int key="connectionID">1217</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleMode:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="681750134"/>
-					</object>
-					<int key="connectionID">1218</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleMode:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="981712103"/>
-					</object>
-					<int key="connectionID">1219</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">setAsDesktopPicture:</string>
 						<reference key="source" ref="41632474"/>
 						<reference key="destination" ref="830861482"/>
@@ -2246,38 +2073,6 @@
 					<int key="connectionID">1236</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleFactor:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="303092091"/>
-					</object>
-					<int key="connectionID">1239</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">maxImageScaleFactor:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="653914450"/>
-					</object>
-					<int key="connectionID">1247</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">minImageScaleFactor:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="116247512"/>
-					</object>
-					<int key="connectionID">1248</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleFactor:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="763042376"/>
-					</object>
-					<int key="connectionID">1249</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">minScale</string>
 						<reference key="source" ref="636320928"/>
@@ -2311,19 +2106,195 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">changeSortOrder:</string>
-						<reference key="source" ref="636320928"/>
-						<reference key="destination" ref="607806940"/>
-					</object>
-					<int key="connectionID">1255</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">toggleAnimation:</string>
 						<reference key="source" ref="41632474"/>
 						<reference key="destination" ref="696743756"/>
 					</object>
 					<int key="connectionID">1258</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleConstraint:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="981109871"/>
+					</object>
+					<int key="connectionID">1259</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleConstraint:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="473928913"/>
+					</object>
+					<int key="connectionID">1260</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleConstraint:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="110860554"/>
+					</object>
+					<int key="connectionID">1261</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleFactor:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="303092091"/>
+					</object>
+					<int key="connectionID">1262</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleFactor:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="763042376"/>
+					</object>
+					<int key="connectionID">1263</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleMode:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="627691540"/>
+					</object>
+					<int key="connectionID">1264</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleMode:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="661866111"/>
+					</object>
+					<int key="connectionID">1265</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleMode:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="681750134"/>
+					</object>
+					<int key="connectionID">1266</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeImageScaleMode:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="981712103"/>
+					</object>
+					<int key="connectionID">1267</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeReadingDirection:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="915046698"/>
+					</object>
+					<int key="connectionID">1268</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeReadingDirection:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="313211327"/>
+					</object>
+					<int key="connectionID">1269</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortDirection:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="691271091"/>
+					</object>
+					<int key="connectionID">1270</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortDirection:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="37465732"/>
+					</object>
+					<int key="connectionID">1271</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="1028778915"/>
+					</object>
+					<int key="connectionID">1272</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="1033762397"/>
+					</object>
+					<int key="connectionID">1273</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="585966999"/>
+					</object>
+					<int key="connectionID">1274</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="641881103"/>
+					</object>
+					<int key="connectionID">1275</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="607806940"/>
+					</object>
+					<int key="connectionID">1276</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortOrder:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="720325491"/>
+					</object>
+					<int key="connectionID">1277</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortRepeat:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="187940196"/>
+					</object>
+					<int key="connectionID">1278</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">changeSortRepeat:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="570890579"/>
+					</object>
+					<int key="connectionID">1279</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">maxImageScaleFactor:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="653914450"/>
+					</object>
+					<int key="connectionID">1280</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">minImageScaleFactor:</string>
+						<reference key="source" ref="41632474"/>
+						<reference key="destination" ref="116247512"/>
+					</object>
+					<int key="connectionID">1281</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -3337,7 +3308,7 @@
 				<boolean value="YES" key="-3.ImportedFromIB2"/>
 				<string key="1086.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1086.ImportedFromIB2"/>
-				<string key="1087.IBEditorWindowLastContentRect">{{658, 638}, {243, 223}}</string>
+				<string key="1087.IBEditorWindowLastContentRect">{{435, 782}, {243, 223}}</string>
 				<string key="1087.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1087.ImportedFromIB2"/>
 				<string key="1088.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3467,12 +3438,12 @@
 				<string key="267.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="267.ImportedFromIB2"/>
 				<boolean value="YES" key="277.ImportedFromIB2"/>
-				<string key="29.IBEditorWindowLastContentRect">{{286, 861}, {589, 20}}</string>
+				<string key="29.IBEditorWindowLastContentRect">{{63, 1005}, {589, 20}}</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="337.ImportedFromIB2"/>
-				<string key="338.IBEditorWindowLastContentRect">{{392, 578}, {419, 283}}</string>
+				<string key="338.IBEditorWindowLastContentRect">{{231, 688}, {419, 283}}</string>
 				<string key="338.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="338.ImportedFromIB2"/>
 				<string key="340.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3543,7 +3514,7 @@
 				<boolean value="YES" key="694.ImportedFromIB2"/>
 				<string key="755.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="755.ImportedFromIB2"/>
-				<string key="756.IBEditorWindowLastContentRect">{{603, 668}, {246, 193}}</string>
+				<string key="756.IBEditorWindowLastContentRect">{{380, 812}, {244, 193}}</string>
 				<string key="756.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="756.ImportedFromIB2"/>
 				<string key="758.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3570,6 +3541,7 @@
 				<boolean value="YES" key="837.ImportedFromIB2"/>
 				<string key="858.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="858.ImportedFromIB2"/>
+				<string key="859.IBEditorWindowLastContentRect">{{626, 852}, {145, 63}}</string>
 				<string key="859.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="859.ImportedFromIB2"/>
 				<string key="860.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3582,7 +3554,7 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
-				<string key="891.IBEditorWindowLastContentRect">{{521, 648}, {276, 213}}</string>
+				<string key="891.IBEditorWindowLastContentRect">{{298, 792}, {276, 213}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3636,7 +3608,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">1258</int>
+			<int key="maxID">1281</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -3644,38 +3616,8 @@
 					<string key="className">FirstResponder</string>
 					<string key="superclassName">NSObject</string>
 					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="PG_grow:">id</string>
-						<string key="changeOrientation:">id</string>
-						<string key="changeTimerInterval:">id</string>
-						<string key="firstOfFolder:">id</string>
-						<string key="firstOfNextFolder:">id</string>
-						<string key="firstOfPreviousFolder:">id</string>
-						<string key="firstPage:">id</string>
-						<string key="lastOfFolder:">id</string>
-						<string key="lastPage:">id</string>
-						<string key="moveToTrash:">id</string>
-						<string key="nextPage:">id</string>
-						<string key="nextTab:">id</string>
-						<string key="openURL:">id</string>
-						<string key="pauseAndCloseDocument:">id</string>
-						<string key="pauseDocument:">id</string>
-						<string key="previousPage:">id</string>
-						<string key="previousTab:">id</string>
+						<string key="changeReadingDirection:">id</string>
 						<string key="reveal:">id</string>
-						<string key="revertOrientation:">id</string>
-						<string key="saveImagesTo:">id</string>
-						<string key="setAsDesktopPicture:">id</string>
-						<string key="setCopyAsDesktopPicture:">id</string>
-						<string key="skipBeforeFolder:">id</string>
-						<string key="skipPastFolder:">id</string>
-						<string key="toggleFullscreen:">id</string>
-						<string key="toggleInfo:">id</string>
-						<string key="toggleThumbnails:">id</string>
-						<string key="toggleTracksImageScalingMode:">id</string>
-						<string key="toggleTracksReadingDirection:">id</string>
-						<string key="toggleTracksSortDescriptor:">id</string>
-						<string key="zoomIn:">id</string>
-						<string key="zoomOut:">id</string>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3789,6 +3731,10 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSView</string>
+					<reference key="sourceIdentifier" ref="875603228"/>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSView</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">PGBezelPanel.h</string>
@@ -3899,7 +3845,13 @@
 					<string key="className">PGDisplayController</string>
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
+						<string key="changeImageScaleConstraint:">id</string>
+						<string key="changeImageScaleFactor:">id</string>
+						<string key="changeImageScaleMode:">id</string>
 						<string key="changeOrientation:">id</string>
+						<string key="changeSortDirection:">id</string>
+						<string key="changeSortOrder:">id</string>
+						<string key="changeSortRepeat:">id</string>
 						<string key="chooseEncoding:">id</string>
 						<string key="copy:">id</string>
 						<string key="decrypt:">id</string>
@@ -3911,6 +3863,8 @@
 						<string key="jumpToPage:">id</string>
 						<string key="lastOfFolder:">id</string>
 						<string key="lastPage:">id</string>
+						<string key="maxImageScaleFactor:">id</string>
+						<string key="minImageScaleFactor:">id</string>
 						<string key="moveToTrash:">id</string>
 						<string key="nextPage:">id</string>
 						<string key="pauseAndCloseDocument:">id</string>
@@ -3974,18 +3928,9 @@
 					<string key="superclassName">NSResponder</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="activateDocument:">id</string>
-						<string key="changeImageScaleConstraint:">id</string>
-						<string key="changeImageScaleFactor:">id</string>
-						<string key="changeImageScaleMode:">id</string>
-						<string key="changeReadingDirection:">id</string>
-						<string key="changeSortDirection:">id</string>
-						<string key="changeSortOrder:">id</string>
-						<string key="changeSortRepeat:">id</string>
 						<string key="clearRecentDocuments:">id</string>
 						<string key="closeAll:">id</string>
 						<string key="installUpdate:">id</string>
-						<string key="maxImageScaleFactor:">id</string>
-						<string key="minImageScaleFactor:">id</string>
 						<string key="open:">id</string>
 						<string key="openRecentDocument:">id</string>
 						<string key="openURL:">id</string>
@@ -4001,15 +3946,11 @@
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="defaultPageMenu">NSMenu</string>
-						<string key="firstPage">NSMenuItem</string>
-						<string key="lastPage">NSMenuItem</string>
 						<string key="maxScale">NSButton</string>
 						<string key="minScale">NSButton</string>
 						<string key="mirrorHorz">NSMenuItem</string>
 						<string key="mirrorVert">NSMenuItem</string>
-						<string key="nextPage">NSMenuItem</string>
 						<string key="pageMenuItem">NSMenuItem</string>
-						<string key="previousPage">NSMenuItem</string>
 						<string key="recentMenu">NSMenu</string>
 						<string key="rotate180">NSMenuItem</string>
 						<string key="rotate270CC">NSMenuItem</string>
