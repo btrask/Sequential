@@ -78,12 +78,12 @@ typedef UInt8 PGLabelColor;
 @property(assign) BOOL postsNotifications;
 @property(retain) NSImage *icon;
 @property(readonly) NSString *displayName;
+@property(copy) NSString *customDisplayName;
 @property(copy) NSString *naturalDisplayName; // The name from the filesystem or raw address of the URL.
 @property(readonly) PGLabelColor labelColor;
 
-- (void)setCustomDisplayName:(NSString *)aString; // A custom name, like a webpage title.
-- (void)updateNaturalDisplayName;
 - (NSAttributedString *)attributedStringWithAncestory:(BOOL)flag;
+- (void)noteNaturalDisplayNameDidChange;
 
 @end
 

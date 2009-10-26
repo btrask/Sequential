@@ -73,7 +73,6 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	if((self = [self init])) {
 		_originalIdentifier = [ident retain];
-		[_originalIdentifier updateNaturalDisplayName]; // It may be old.
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident dataSource:nil];
 		[_node startLoadWithInfo:nil];
 		PGDisplayableIdentifier *rootIdentifier = ident;

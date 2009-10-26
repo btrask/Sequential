@@ -244,18 +244,38 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 {
 	return _customDisplayName ? [[_customDisplayName retain] autorelease] : [self naturalDisplayName];
 }
+- (NSString *)customDisplayName
+{
+	return [[_customDisplayName retain] autorelease];
+}
+- (void)setCustomDisplayName:(NSString *)aString
+{
+	NSString *const string = [aString length] ? aString : nil;
+	if(PGEqualObjects(string, _customDisplayName)) return;
+	[_customDisplayName release];
+	_customDisplayName = [string copy];
+	if(_postsNotifications) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+}
 - (NSString *)naturalDisplayName
 {
-	if(!_naturalDisplayName) [self updateNaturalDisplayName];
 	if(_naturalDisplayName) return [[_naturalDisplayName retain] autorelease];
-	return @"";
+	NSString *name = @"";
+	NSURL *const URL = [self URL];
+	if(URL) {
+		if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&name) == noErr && name) [name autorelease];
+		else {
+			NSString *const path = [URL path];
+			name = PGEqualObjects(path, @"/") ? [URL absoluteString] : [path lastPathComponent];
+		}
+	}
+	return [name PG_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet newlineCharacterSet] withString:@""];
 }
 - (void)setNaturalDisplayName:(NSString *)aString
 {
 	if(PGEqualObjects(aString, _naturalDisplayName)) return;
 	[_naturalDisplayName release];
 	_naturalDisplayName = [aString copy];
-	if(_postsNotifications && !_customDisplayName) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
+	[self noteNaturalDisplayNameDidChange];
 }
 - (PGLabelColor)labelColor
 {
@@ -265,33 +285,11 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	UInt16 finderFlags;
 	if(catalogInfo.nodeFlags & kFSNodeIsDirectoryMask) finderFlags = ((FolderInfo *)&catalogInfo.finderInfo)->finderFlags;
 	else finderFlags = ((FileInfo *)&catalogInfo.finderInfo)->finderFlags;
-	return (finderFlags & 0x0E) >> 1;
+	return (finderFlags >> 1) & 0x07;
 }
 
 #pragma mark -
 
-- (void)setCustomDisplayName:(NSString *)aString
-{
-	NSString *const string = [aString length] ? aString : nil;
-	if(PGEqualObjects(string, _customDisplayName)) return;
-	[_customDisplayName release];
-	_customDisplayName = [string copy];
-	if(_postsNotifications) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
-}
-- (void)updateNaturalDisplayName
-{
-	NSString *name = nil;
-	NSURL *const URL = [self URL];
-	if(URL) {
-		if(LSCopyDisplayNameForURL((CFURLRef)URL, (CFStringRef *)&name) == noErr && name) [name autorelease];
-		else {
-			NSString *const path = [URL path];
-			name = PGEqualObjects(path, @"/") ? [URL absoluteString] : [path lastPathComponent];
-		}
-	}
-	name = [name PG_stringByReplacingOccurrencesOfCharactersInSet:[NSCharacterSet newlineCharacterSet] withString:@""]; // Filenames can actually contain certain types of newlines sometimes.
-	[self setNaturalDisplayName:name];
-}
 - (NSAttributedString *)attributedStringWithAncestory:(BOOL)flag
 {
 	NSMutableAttributedString *const result = [NSMutableAttributedString PG_attributedStringWithFileIcon:[self icon] name:[self displayName]];
@@ -304,6 +302,10 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", 0x2014]];
 	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent PG_fileURL] PG_icon] : nil name:parentName]];
 	return result;
+}
+- (void)noteNaturalDisplayNameDidChange
+{
+	if(_postsNotifications && !_customDisplayName) [self PG_postNotificationName:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 }
 
 #pragma mark -PGDisplayableIdentifier(Private)
