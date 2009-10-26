@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGPrefObject.h"
 #import <tgmath.h>
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 NSString *const PGPrefObjectShowsInfoDidChangeNotification = @"PGPrefObjectShowsInfoDidChange";

@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAppKitAdditions.h"
 #import <Carbon/Carbon.h>
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation NSBezierPath(PGAppKitAdditions)

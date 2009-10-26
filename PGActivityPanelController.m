@@ -30,12 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGProgressIndicatorCell.h"
 
-// Other
+// Other Sources
 #import "PGDelayedPerforming.h"
-#import "PGGeometry.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 @interface PGActivityPanelController(Private)
 

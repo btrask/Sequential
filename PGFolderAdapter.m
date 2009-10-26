@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation PGFolderAdapter

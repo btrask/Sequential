@@ -32,10 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDocumentController.h"
 
-// Other
+// Other Sources
 #import "PGCancelableProxy.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
 
 static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";

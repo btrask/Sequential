@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGResourceIdentifier.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation DOMHTMLDocument(PGWebKitAdditions)

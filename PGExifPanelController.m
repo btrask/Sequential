@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 #import "PGDisplayController.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation PGExifPanelController

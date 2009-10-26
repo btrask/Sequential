@@ -27,10 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <unistd.h>
 #import <fcntl.h>
 
-// Other
+// Other Sources
 #import "PGCancelableProxy.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
 
 NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventDidOccur";

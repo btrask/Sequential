@@ -39,12 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDisplayController.h"
 
-// Other
-#import "PGGeometry.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThumbnailControllerContentInsetDidChange";
 

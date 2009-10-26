@@ -27,13 +27,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGBezelPanel.h"
 
-// Other
-#import "PGDelayedPerforming.h"
-#import "PGGeometry.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
+#import "PGDelayedPerforming.h"
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 #define PGAlertViewSize 100.0f
 #define PGMarginSize 4.0f

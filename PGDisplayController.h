@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGThumbnailController;
 #import "PGEncodingAlert.h"
 
-// Other
+// Other Sources
 #import "PGGeometryTypes.h"
 
 extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;

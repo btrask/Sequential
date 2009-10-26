@@ -30,13 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 
-// Other
-#import "PGCFMutableArray.h"
-#import "PGGeometry.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
+#import "PGCFMutableArray.h"
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 NSString *const PGSubstitutedClassKey = @"PGSubstitutedClass";
 

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
 
-// Other
+// Other Sources
 #import "PGGeometry.h"
 
 @interface PGPDFAdapter(Private)

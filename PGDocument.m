@@ -39,11 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmarkController.h"
 #import "PGDisplayController.h"
 
-// Other
-#import "PGGeometry.h"
-
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 NSString *const PGDocumentWillRemoveNodesNotification          = @"PGDocumentWillRemoveNodes";
 NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSortedNodesDidChange";

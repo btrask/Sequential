@@ -32,11 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 #import "PGPreferenceWindowController.h"
 
-// Other
-#import "PGDelayedPerforming.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
+#import "PGDelayedPerforming.h"
 #import "PGFoundationAdditions.h"
 
 @interface PGFullscreenController(Private)

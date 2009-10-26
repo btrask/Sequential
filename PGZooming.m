@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGZooming.h"
 #import <tgmath.h>
 
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
 
 @implementation NSWindow(PGZooming)

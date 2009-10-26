@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDisplayController.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @interface PGFloatingPanelController(Private)

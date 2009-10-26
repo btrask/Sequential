@@ -746,19 +746,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0E47C0A70B93AE3A0060E8A8 /* Categories */ = {
-			isa = PBXGroup;
-			children = (
-				0E246B4410887DC600C30936 /* PGAppKitAdditions.h */,
-				0E246B4510887DC600C30936 /* PGAppKitAdditions.m */,
-				0E246B4110887CF200C30936 /* PGFoundationAdditions.h */,
-				0E246B4210887CF200C30936 /* PGFoundationAdditions.m */,
-				0E246B4710887E1900C30936 /* PGWebKitAdditions.h */,
-				0E246B4810887E1900C30936 /* PGWebKitAdditions.m */,
-			);
-			name = Categories;
-			sourceTree = "<group>";
-		};
 		0E82627E0CA96CD10041FA9D /* Document Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -802,35 +789,6 @@
 				0EBAD5980F569E2B0014BA11 /* Sparkle Unit Tests.octest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		0EC11DED0CA028E1003E492C /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				0E4793910DF15FD90083B7CA /* PGAttachments.h */,
-				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
-				0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */,
-				0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */,
-				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
-				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
-				0E246BBB108880F800C30936 /* PGDebug.h */,
-				0E246BBC108880F800C30936 /* PGDebug.m */,
-				0E2500C00FA4755A002CCCBA /* PGDelayedPerforming.h */,
-				0E2500C10FA4755A002CCCBA /* PGDelayedPerforming.m */,
-				0E92E1340E2CA88400276801 /* PGGeometry.h */,
-				0E92E1350E2CA88400276801 /* PGGeometry.m */,
-				0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */,
-				0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */,
-				0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */,
-				0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */,
-				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
-				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
-				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
-				0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */,
-				0EC11DEE0CA02B7B003E492C /* PGZooming.h */,
-				0EC11DEF0CA02B7B003E492C /* PGZooming.m */,
-			);
-			name = Other;
 			sourceTree = "<group>";
 		};
 		0EEE57B10DB55837006E5B9C /* External */ = {
@@ -913,8 +871,6 @@
 				2A37F4ABFDCFA73011CA2CEA /* Models */,
 				0E1D37350A7E1A5200C542A6 /* Views */,
 				0E1D37360A7E1A5800C542A6 /* Controllers */,
-				0EC11DED0CA028E1003E492C /* Other */,
-				0E47C0A70B93AE3A0060E8A8 /* Categories */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
 				0EEE57B10DB55837006E5B9C /* External */,
 				2A37F4B8FDCFA73011CA2CEA /* Resources */,
@@ -980,6 +936,34 @@
 			children = (
 				2A37F4B0FDCFA73011CA2CEA /* main.m */,
 				0E47C3BF0B963DD30060E8A8 /* Sequential_Prefix.pch */,
+				0E246B4410887DC600C30936 /* PGAppKitAdditions.h */,
+				0E246B4510887DC600C30936 /* PGAppKitAdditions.m */,
+				0E4793910DF15FD90083B7CA /* PGAttachments.h */,
+				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
+				0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */,
+				0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */,
+				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
+				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
+				0E246BBB108880F800C30936 /* PGDebug.h */,
+				0E246BBC108880F800C30936 /* PGDebug.m */,
+				0E2500C00FA4755A002CCCBA /* PGDelayedPerforming.h */,
+				0E2500C10FA4755A002CCCBA /* PGDelayedPerforming.m */,
+				0E246B4110887CF200C30936 /* PGFoundationAdditions.h */,
+				0E246B4210887CF200C30936 /* PGFoundationAdditions.m */,
+				0E92E1340E2CA88400276801 /* PGGeometry.h */,
+				0E92E1350E2CA88400276801 /* PGGeometry.m */,
+				0E1616920EB3C71C00589D4B /* PGGeometryTypes.h */,
+				0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */,
+				0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */,
+				0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */,
+				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
+				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
+				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
+				0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */,
+				0E246B4710887E1900C30936 /* PGWebKitAdditions.h */,
+				0E246B4810887E1900C30936 /* PGWebKitAdditions.m */,
+				0EC11DEE0CA02B7B003E492C /* PGZooming.h */,
+				0EC11DEF0CA02B7B003E492C /* PGZooming.m */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";

@@ -28,12 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGClipView.h"
 
-// Other
-#import "PGGeometry.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 #define PGBackgroundHoleSize 6.0f
 #define PGBackgroundHoleSpacing 3.0f

@@ -28,15 +28,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <HMDTAppKit/HMAppKitEx.h>
 #import <tgmath.h>
 
-// Other
+// Other Sources
+#import "PGAppKitAdditions.h"
 #import "PGDelayedPerforming.h"
+#import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
 #import "PGZooming.h"
-
-// Categories
-#import "PGAppKitAdditions.h"
-#import "PGFoundationAdditions.h"
 
 NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidChange";
 

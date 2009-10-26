@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";

@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGLoading.h"
 @class PGBookmark;
 
-// Other
+// Other Sources
 #import "PGGeometryTypes.h"
 
 extern NSString *const PGIdentifierKey;

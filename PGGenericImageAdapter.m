@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGExifEntry.h"
 
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
 
 @interface PGGenericImageAdapter(Private)

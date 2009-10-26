@@ -35,11 +35,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDocumentController.h"
 
-// Other
-#import "PGZooming.h"
-
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
+#import "PGZooming.h"
 
 static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 

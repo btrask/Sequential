@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 @class PGDisplayController;
 
-// Other
+// Other Sources
 #import "PGGeometryTypes.h"
 
 extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;

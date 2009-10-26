@@ -28,13 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 @class PGClipView;
 
-// Other
+// Other Sources
 #import "PGDebug.h"
-#import "PGGeometry.h"
 #import "PGDelayedPerforming.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 #define PGAnimateSizeChanges true
 #define PGDebugDrawingModes false

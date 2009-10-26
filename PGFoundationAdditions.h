@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Foundation/Foundation.h>
 
-// Other
+// Other Sources
 #import "PGGeometryTypes.h"
 
 NS_INLINE BOOL PGEqualObjects(id<NSObject> a, id<NSObject> b)

@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGIconTextFieldCell.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 #define PGIconSize 16.0f

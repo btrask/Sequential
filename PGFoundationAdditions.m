@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFoundationAdditions.h"
 #import <objc/runtime.h>
 
-// Other
+// Other Sources
 #import "PGDebug.h"
 
 NSString *PGOSTypeToStringQuoted(OSType type, BOOL flag)

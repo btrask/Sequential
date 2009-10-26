@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGSubscription.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 NSString *const PGBookmarkDidUpdateNotification = @"PGBookmarkDidUpdate";

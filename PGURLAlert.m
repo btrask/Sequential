@@ -24,11 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGURLAlert.h"
 
-// Other
-#import "PGZooming.h"
-
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
+#import "PGZooming.h"
 
 @implementation PGURLAlert
 

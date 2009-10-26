@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCancelableProxy.h"
 
-// Other
+// Other Sources
 #import "PGCFMutableArray.h"
 
 @implementation PGCancelableProxy

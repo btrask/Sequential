@@ -47,15 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGActivityPanelController.h"
 #import "PGURLAlert.h"
 
-// Other
+// Other Sources
+#import "PGAppKitAdditions.h"
 #import "PGAttachments.h"
 #import "PGDelayedPerforming.h"
+#import "PGFoundationAdditions.h"
 #import "PGKeyboardLayout.h"
 #import "PGLegacy.h"
-
-// Categories
-#import "PGAppKitAdditions.h"
-#import "PGFoundationAdditions.h"
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGBackgroundColorKey = @"PGBackgroundColor";

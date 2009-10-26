@@ -51,15 +51,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGImageSaveAlert.h"
 #import "PGEncodingAlert.h"
 
-// Other
+// Other Sources
+#import "PGAppKitAdditions.h"
 #import "PGDebug.h"
 #import "PGDelayedPerforming.h"
+#import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
 #import "PGKeyboardLayout.h"
-
-// Categories
-#import "PGAppKitAdditions.h"
-#import "PGFoundationAdditions.h"
 
 NSString *const PGDisplayControllerActiveNodeDidChangeNotification = @"PGDisplayControllerActiveNodeDidChange";
 NSString *const PGDisplayControllerActiveNodeWasReadNotification = @"PGDisplayControllerActiveNodeWasRead";

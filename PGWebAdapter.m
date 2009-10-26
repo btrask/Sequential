@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDocumentController.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation PGWebAdapter

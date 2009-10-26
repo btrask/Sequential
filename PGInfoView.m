@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Views
 #import "PGBezelPanel.h"
 
-// Categories
+// Other Sources
 #import "PGAppKitAdditions.h"
 #import "PGFoundationAdditions.h"
 

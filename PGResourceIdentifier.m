@@ -27,10 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGSubscription.h"
 
-// Other
+// Other Sources
 #import "PGAttachments.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
 
 NSString *const PGDisplayableIdentifierIconDidChangeNotification = @"PGDisplayableIdentifierIconDidChange";

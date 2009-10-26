@@ -34,12 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 #import "PGDisplayController.h"
 
-// Other
+// Other Sources
 #import "PGDelayedPerforming.h"
-#import "PGGeometry.h"
-
-// Categories
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 @interface PGTimerPanelController(Private)
 

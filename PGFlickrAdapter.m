@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGURLLoad.h"
 #import "PGXMLParser.h"
 
-// Categories
+// Other Sources
 #import "PGFoundationAdditions.h"
 
 static NSString *const PGFlickrAPIKey = @"efba0200d782ae552a34fc78d18c02bc"; // Registered to me for use in Sequential. Do no evil.
