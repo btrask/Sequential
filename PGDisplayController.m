@@ -1080,8 +1080,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 	if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
 	if(@selector(toggleAnimation:) == action) {
-		[anItem setTitle:[[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
-		return [_imageView canAnimateRep];
+		BOOL const canAnimate = [_imageView canAnimateRep];
+		[anItem setTitle:canAnimate && [[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
+		if(!canAnimate) return NO;
 	}
 	if(@selector(changeReadingDirection:) == action) [anItem setState:[[self activeDocument] readingDirection] == tag];
 
