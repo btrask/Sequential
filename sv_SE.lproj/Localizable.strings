@@ -63,6 +63,15 @@
 "GB" = "GB";
 "TB" = "TB";
 
+/* Title of general pref pane. */
+"General" = "General";
+
+/* Title of navigation pref pane. */
+"Navigation" = "Navigation";
+
+/* Title of update pref pane. */
+"Update" = "Update";
+
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
 "This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
 
