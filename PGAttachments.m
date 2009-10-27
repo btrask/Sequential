@@ -61,7 +61,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
 	NSRect r = aRect;
 	[[NSAffineTransform PG_counterflipWithRect:&r] concat];
-	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
+	r.origin.x = round(NSMinX(r));
+	[[self image] drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
 	[NSGraphicsContext restoreGraphicsState];
 }
 - (NSSize)cellSize
