@@ -61,11 +61,7 @@ enum {
 	@private
 	IBOutlet NSMenu *recentMenu;
 
-	IBOutlet NSMenuItem *rotate90CC;
-	IBOutlet NSMenuItem *rotate270CC;
-	IBOutlet NSMenuItem *rotate180;
-	IBOutlet NSMenuItem *mirrorHorz;
-	IBOutlet NSMenuItem *mirrorVert;
+	IBOutlet NSMenu *orientationMenu;
 
 	IBOutlet NSMenuItem *toggleFullscreen;
 	IBOutlet NSMenuItem *toggleInfo;

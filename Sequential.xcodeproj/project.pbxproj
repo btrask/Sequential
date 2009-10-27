@@ -67,6 +67,7 @@
 		0E1D3A4C0A7FA7B500C542A6 /* PGClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */; };
 		0E1D3EC90A8091FE00C542A6 /* PGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */; };
 		0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */; };
+		0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20FDB910967449007EE24A /* PGOrientationMenuItemCell.m */; };
 		0E246B4310887CF200C30936 /* PGFoundationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4210887CF200C30936 /* PGFoundationAdditions.m */; };
 		0E246B4610887DC600C30936 /* PGAppKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4510887DC600C30936 /* PGAppKitAdditions.m */; };
 		0E246B4910887E1900C30936 /* PGWebKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4810887E1900C30936 /* PGWebKitAdditions.m */; };
@@ -195,35 +196,35 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8DC2EF5B0486A6940098B216 /* XADMaster.framework */;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
 			remoteInfo = XADMaster;
 		};
 		0E20FCDC109652CF007EE24A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1B5A7BA30A24F9B400B189EB /* XADTest */;
+			remoteGlobalIDString = 1B5A7BA30A24F9B400B189EB;
 			remoteInfo = XADTest;
 		};
 		0E20FCDE109652CF007EE24A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1BBAB68B0EC274A3007FE6A2 /* XADTest2 */;
+			remoteGlobalIDString = 1BBAB68B0EC274A3007FE6A2;
 			remoteInfo = XADTest2;
 		};
 		0E20FCE0109652CF007EE24A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1BC8931A0ED6F283006B47FE /* XADTest3 */;
+			remoteGlobalIDString = 1BC8931A0ED6F283006B47FE;
 			remoteInfo = XADTest3;
 		};
 		0E20FCE2109652CF007EE24A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 1B3A68A2101BA12C00AE25A8 /* XADTest4 */;
+			remoteGlobalIDString = 1B3A68A2101BA12C00AE25A8;
 			remoteInfo = XADTest4;
 		};
 		0E3DA4500DB0B6A800BE502B /* PBXContainerItemProxy */ = {
@@ -375,6 +376,8 @@
 		0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCFMutableArray.h; sourceTree = "<group>"; };
 		0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCFMutableArray.m; sourceTree = "<group>"; };
 		0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = XADMaster.xcodeproj; path = XADMaster/XADMaster.xcodeproj; sourceTree = "<group>"; };
+		0E20FDB810967449007EE24A /* PGOrientationMenuItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGOrientationMenuItemCell.h; sourceTree = "<group>"; };
+		0E20FDB910967449007EE24A /* PGOrientationMenuItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGOrientationMenuItemCell.m; sourceTree = "<group>"; };
 		0E246B4110887CF200C30936 /* PGFoundationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFoundationAdditions.h; sourceTree = "<group>"; };
 		0E246B4210887CF200C30936 /* PGFoundationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFoundationAdditions.m; sourceTree = "<group>"; };
 		0E246B4410887DC600C30936 /* PGAppKitAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAppKitAdditions.h; sourceTree = "<group>"; };
@@ -684,6 +687,8 @@
 				0E255BA60E3A9D2E00EDF04C /* PGTimerButton.m */,
 				0EF9B2530FA348F700B7E16A /* PGIconTextFieldCell.h */,
 				0EF9B2540FA348F700B7E16A /* PGIconTextFieldCell.m */,
+				0E20FDB810967449007EE24A /* PGOrientationMenuItemCell.h */,
+				0E20FDB910967449007EE24A /* PGOrientationMenuItemCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -1348,6 +1353,7 @@
 				0E246B4610887DC600C30936 /* PGAppKitAdditions.m in Sources */,
 				0E246B4910887E1900C30936 /* PGWebKitAdditions.m in Sources */,
 				0E246BBD108880F800C30936 /* PGDebug.m in Sources */,
+				0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

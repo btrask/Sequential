@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
 
+// Views
+#import "PGOrientationMenuItemCell.h"
+
 // Controllers
 #import "PGAboutBoxController.h"
 #import "PGPreferenceWindowController.h"
@@ -49,7 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other Sources
 #import "PGAppKitAdditions.h"
-#import "PGAttachments.h"
 #import "PGDelayedPerforming.h"
 #import "PGFoundationAdditions.h"
 #import "PGKeyboardLayout.h"
@@ -549,12 +551,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[windowsMenuSeparator retain];
 	[windowsMenuSeparator PG_removeFromMenu];
 
-	[rotate90CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate90CC rotation:90] autorelease] label:[rotate90CC title]]];
-	[rotate270CC setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate270CC rotation:-90] autorelease] label:[rotate270CC title]]];
-	[rotate180 setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGRotationMenuIconCell alloc] initWithMenuItem:rotate180 rotation:180] autorelease] label:[rotate180 title]]];
-
-	[mirrorHorz setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorHorz rotation:0] autorelease] label:[mirrorHorz title]]];
-	[mirrorVert setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[PGMirrorMenuIconCell alloc] initWithMenuItem:mirrorVert rotation:90] autorelease] label:[mirrorVert title]]];
+	for(NSMenuItem *const item in [orientationMenu itemArray]) [PGOrientationMenuIconCell addOrientationMenuIconCellToMenuItem:item];
 
 	[zoomIn setKeyEquivalent:@"+"];
 	[zoomIn setKeyEquivalentModifierMask:0];

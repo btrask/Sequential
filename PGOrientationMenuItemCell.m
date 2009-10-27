@@ -22,64 +22,53 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGAttachments.h"
+#import "PGOrientationMenuItemCell.h"
 
 // Other Sources
 #import "PGFoundationAdditions.h"
 
-@implementation NSAttributedString(PGAdditions)
+@implementation PGOrientationMenuIconCell
 
-#pragma mark -NSAttributedString(PGAdditions)
+#pragma mark +PGOrientationMenuIconCell
 
-+ (NSMutableAttributedString *)PG_attributedStringWithAttachmentCell:(NSTextAttachmentCell *)cell label:(NSString *)label
++ (void)addOrientationMenuIconCellToMenuItem:(NSMenuItem *)anItem
 {
-	NSMutableAttributedString *const result = [[[NSMutableAttributedString alloc] init] autorelease];
-	if(cell) {
-		NSTextAttachment *const attachment = [[[NSTextAttachment alloc] init] autorelease];
-		[attachment setAttachmentCell:cell];
-		[result appendAttributedString:[NSAttributedString attributedStringWithAttachment:attachment]];
-		if(label) [[result mutableString] appendString:@" "];
+	if(![anItem isSeparatorItem]) [anItem setAttributedTitle:[NSAttributedString PG_attributedStringWithAttachmentCell:[[[self alloc] initWithMenuItem:anItem] autorelease] label:[anItem title]]];
+}
+
+#pragma mark -PGOrientationMenuIconCell
+
+- (id)initWithMenuItem:(NSMenuItem *)anItem
+{
+	if((self = [super init])) {
+		_item = anItem;
 	}
-	if(label) [[result mutableString] appendString:label];
-	[result addAttribute:NSFontAttributeName value:[NSFont menuFontOfSize:14.0f] range:NSMakeRange(0, [result length])]; // Use 14 instead of 0 (default) for the font size because the default seems to be 13, which is wrong.
-	return result;
+	return self;
 }
-+ (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage name:(NSString *)fileName
+- (NSImage *)iconForOrientation:(inout PGOrientation *)orientation highlighted:(BOOL)flag
 {
-	return [self PG_attributedStringWithAttachmentCell:[[[PGIconAttachmentCell alloc] initImageCell:anImage] autorelease] label:fileName];
+	switch(*orientation) {
+		case PGFlippedHorz:
+			*orientation = PGUpright;
+			return [NSImage imageNamed:flag ? @"Mirror-White" : @"Mirror-Black"];
+		case PGFlippedVert:
+			*orientation = PGRotated90CC;
+			return [NSImage imageNamed:flag ? @"Mirror-White" : @"Mirror-Black"];
+		default: return [NSImage imageNamed:flag ? @"Silhouette-White" : @"Silhouette-Black"];
+	}
 }
-
-@end
-
-@implementation PGIconAttachmentCell
 
 #pragma mark -NSTextAttachmentCell
 
 - (void)drawWithFrame:(NSRect)aRect inView:(NSView *)aView
 {
 	[NSGraphicsContext saveGraphicsState];
-	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+	PGOrientation orientation = [_item tag];
+	NSImage *const icon = [self iconForOrientation:&orientation highlighted:[_item isHighlighted]];
 	NSRect r = aRect;
-	[[NSAffineTransform PG_counterflipWithRect:&r] concat];
-	[[self image] drawInRect:aRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
+	[[NSAffineTransform PG_transformWithRect:&r orientation:PGAddOrientation(orientation, [[NSGraphicsContext currentContext] isFlipped] ? PGFlippedVert : PGUpright)] concat];
+	[icon drawInRect:r fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:!_item || [_item isEnabled] ? 1.0f : 0.5f];
 	[NSGraphicsContext restoreGraphicsState];
-}
-- (NSSize)cellSize
-{
-	return NSMakeSize(16.0f, 16.0f);
-}
-- (NSPoint)cellBaselineOffset
-{
-	return NSMakePoint(0.0f, -3.0f);
-}
-
-#pragma mark -NSCell
-
-- (id)initImageCell:(NSImage *)anImage
-{
-	if(anImage) return [super initImageCell:anImage];
-	[self release];
-	return nil;
 }
 
 @end

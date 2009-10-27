@@ -23,14 +23,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
-#import "PGGeometryTypes.h"
+#import "PGAttachments.h"
 
-@interface NSAttributedString(PGAdditions)
+@interface PGOrientationMenuIconCell : PGIconAttachmentCell
+{
+	@private
+	NSMenuItem *_item;
+}
 
-+ (NSMutableAttributedString *)PG_attributedStringWithAttachmentCell:(NSTextAttachmentCell *)cell label:(NSString *)label;
-+ (NSMutableAttributedString *)PG_attributedStringWithFileIcon:(NSImage *)anImage name:(NSString *)fileName;
++ (void)addOrientationMenuIconCellToMenuItem:(NSMenuItem *)anItem;
 
-@end
+- (id)initWithMenuItem:(NSMenuItem *)anItem;
+- (NSImage *)iconForOrientation:(inout PGOrientation *)orientation highlighted:(BOOL)flag;
 
-@interface PGIconAttachmentCell : NSTextAttachmentCell
 @end
