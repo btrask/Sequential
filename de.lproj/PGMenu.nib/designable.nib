@@ -12,7 +12,7 @@
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="1244"/>
-			<integer value="756"/>
+			<integer value="894"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3459,10 +3459,10 @@
 				<object class="IBPartialClassDescription">
 					<string key="className">FirstResponder</string>
 					<string key="superclassName">NSObject</string>
-					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="changeReadingDirection:">id</string>
-						<string key="reveal:">id</string>
-					</dictionary>
+					<object class="NSMutableDictionary" key="actions">
+						<string key="NS.key.0">reveal:</string>
+						<string key="NS.object.0">id</string>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
@@ -3689,10 +3689,10 @@
 					<string key="className">PGDisplayController</string>
 					<string key="superclassName">NSWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="changeImageScaleConstraint:">id</string>
 						<string key="changeImageScaleFactor:">id</string>
 						<string key="changeImageScaleMode:">id</string>
 						<string key="changeOrientation:">id</string>
+						<string key="changeReadingDirection:">id</string>
 						<string key="changeSortDirection:">id</string>
 						<string key="changeSortOrder:">id</string>
 						<string key="changeSortRepeat:">id</string>

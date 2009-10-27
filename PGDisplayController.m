@@ -158,14 +158,6 @@ typedef NSUInteger PGZoomDirection;
 {
 	if(![self writeSelectionToPasteboard:[NSPasteboard generalPasteboard] types:[[self class] pasteboardTypes]]) NSBeep();
 }
-- (IBAction)changeOrientation:(id)sender
-{
-	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], [sender tag])];
-}
-- (IBAction)revertOrientation:(id)sender
-{
-	[[self activeDocument] setBaseOrientation:PGUpright];
-}
 - (IBAction)performFindPanelAction:(id)sender
 {
 	switch([sender tag]) {
@@ -207,6 +199,26 @@ typedef NSUInteger PGZoomDirection;
 {
 	[[self activeDocument] setReadingDirection:[sender tag]];
 }
+- (IBAction)changeSortOrder:(id)sender
+{
+	[[self activeDocument] setSortOrder:([sender tag] & PGSortOrderMask) | ([[self activeDocument] sortOrder] & PGSortOptionsMask)];
+}
+- (IBAction)changeSortDirection:(id)sender
+{
+	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortDescendingMask) | [sender tag]];
+}
+- (IBAction)changeSortRepeat:(id)sender
+{
+	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortRepeatMask) | [sender tag]];
+}
+- (IBAction)revertOrientation:(id)sender
+{
+	[[self activeDocument] setBaseOrientation:PGUpright];
+}
+- (IBAction)changeOrientation:(id)sender
+{
+	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], [sender tag])];
+}
 - (IBAction)toggleAnimation:(id)sender
 {
 	NSParameterAssert([_imageView canAnimateRep]);
@@ -243,21 +255,6 @@ typedef NSUInteger PGZoomDirection;
 {
 	[[self activeDocument] setImageScaleFactor:PGScaleMax];
 	[[[PGDocumentController sharedDocumentController] scaleMenu] update];
-}
-
-#pragma mark -
-
-- (IBAction)changeSortOrder:(id)sender
-{
-	[[self activeDocument] setSortOrder:([sender tag] & PGSortOrderMask) | ([[self activeDocument] sortOrder] & PGSortOptionsMask)];
-}
-- (IBAction)changeSortDirection:(id)sender
-{
-	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortDescendingMask) | [sender tag]];
-}
-- (IBAction)changeSortRepeat:(id)sender
-{
-	[[self activeDocument] setSortOrder:([[self activeDocument] sortOrder] & ~PGSortRepeatMask) | [sender tag]];
 }
 
 #pragma mark -
@@ -1067,12 +1064,13 @@ typedef NSUInteger PGZoomDirection;
 	if(@selector(toggleFullscreen:) == action) [anItem setTitle:NSLocalizedString(([[PGDocumentController sharedDocumentController] isFullscreen] ? @"Exit Full Screen" : @"Enter Full Screen"), @"Enter/exit full screen. Two states of the same item.")];
 	if(@selector(toggleInfo:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsInfo] ? @"Hide Info" : @"Show Info"), @"Lets the user toggle the on-screen display. Two states of the same item.")];
 	if(@selector(toggleThumbnails:) == action) [anItem setTitle:NSLocalizedString(([[self activeDocument] showsThumbnails] ? @"Hide Thumbnails" : @"Show Thumbnails"), @"Lets the user toggle whether thumbnails are shown. Two states of the same item.")];
+	if(@selector(changeReadingDirection:) == action) [anItem setState:[[self activeDocument] readingDirection] == tag];
+	if(@selector(revertOrientation:) == action) [anItem setState:[[self activeDocument] baseOrientation] == PGUpright];
 	if(@selector(toggleAnimation:) == action) {
 		BOOL const canAnimate = [_imageView canAnimateRep];
 		[anItem setTitle:canAnimate && [[self activeDocument] animatesImages] ? NSLocalizedString(@"Turn Animation Off", @"Title of menu item for toggling animation. Two states.") : NSLocalizedString(@"Turn Animation On", @"Title of menu item for toggling animation. Two states.")];
 		if(!canAnimate) return NO;
 	}
-	if(@selector(changeReadingDirection:) == action) [anItem setState:[[self activeDocument] readingDirection] == tag];
 
 	// Scale:
 	if(@selector(changeImageScaleMode:) == action) {
@@ -1135,9 +1133,6 @@ typedef NSUInteger PGZoomDirection;
 	}
 	if(![PGThumbnailController canShowThumbnailsForDocument:[self activeDocument]]) {
 		if(@selector(toggleThumbnails:) == action) return NO;
-	}
-	if([[self activeDocument] baseOrientation] == PGUpright) {
-		if(@selector(revertOrientation:) == action) return NO;
 	}
 	if(![_imageView canAnimateRep]) {
 		if(@selector(toggleAnimation:) == action) return NO;

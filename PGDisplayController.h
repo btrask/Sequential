@@ -92,14 +92,18 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)moveToTrash:(id)sender;
 
 - (IBAction)copy:(id)sender;
-- (IBAction)changeOrientation:(id)sender; // Gets the orientation from [sender tag].
-- (IBAction)revertOrientation:(id)sender;
 - (IBAction)performFindPanelAction:(id)sender;
 - (IBAction)hideFindPanel:(id)sender;
 
 - (IBAction)toggleFullscreen:(id)sender;
 - (IBAction)toggleInfo:(id)sender;
 - (IBAction)toggleThumbnails:(id)sender;
+- (IBAction)changeReadingDirection:(id)sender;
+- (IBAction)changeSortOrder:(id)sender;
+- (IBAction)changeSortDirection:(id)sender;
+- (IBAction)changeSortRepeat:(id)sender;
+- (IBAction)revertOrientation:(id)sender;
+- (IBAction)changeOrientation:(id)sender;
 - (IBAction)toggleAnimation:(id)sender;
 
 - (IBAction)changeImageScaleMode:(id)sender;
@@ -108,10 +112,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)changeImageScaleFactor:(id)sender;
 - (IBAction)minImageScaleFactor:(id)sender;
 - (IBAction)maxImageScaleFactor:(id)sender;
-
-- (IBAction)changeSortOrder:(id)sender;
-- (IBAction)changeSortDirection:(id)sender;
-- (IBAction)changeSortRepeat:(id)sender;
 
 - (IBAction)previousPage:(id)sender;
 - (IBAction)nextPage:(id)sender;
