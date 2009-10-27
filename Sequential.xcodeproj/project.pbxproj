@@ -494,6 +494,17 @@
 		0E9B60DC0E5C0EFF002D19FD /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = zh_TW; path = zh_TW.lproj/PGEncoding.nib; sourceTree = "<group>"; };
 		0EA496310C6C7C9A00095184 /* PGBookmarkController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBookmarkController.h; sourceTree = "<group>"; };
 		0EA496320C6C7C9A00095184 /* PGBookmarkController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBookmarkController.m; sourceTree = "<group>"; };
+		0EA5404C10976CF800A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0EA5404D10976D0A00A2094D /* pt_BR */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = pt_BR; path = pt_BR.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0EA5404E10976D1500A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGMenu.nib; sourceTree = "<group>"; };
+		0EA5405210976DE300A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGDocument.nib; sourceTree = "<group>"; };
+		0EA5405310976DF000A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGExif.nib; sourceTree = "<group>"; };
+		0EA5405510976E2500A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGTimer.nib; sourceTree = "<group>"; };
+		0EA5405610976E2E00A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGActivity.nib; sourceTree = "<group>"; };
+		0EA540581097717F00A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGURL.nib; sourceTree = "<group>"; };
+		0EA540591097718C00A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGImageSave.nib; sourceTree = "<group>"; };
+		0EA5405A1097719600A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = pt_BR; path = pt_BR.lproj/PGEncoding.nib; sourceTree = "<group>"; };
+		0EA5405C1097725E00A2094D /* pt_BR */ = {isa = PBXFileReference; lastKnownFileType = folder; name = pt_BR; path = pt_BR.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0EA540FD0DB717C300F60F0E /* PGExifEntry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGExifEntry.h; sourceTree = "<group>"; };
 		0EA540FE0DB717C300F60F0E /* PGExifEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGExifEntry.m; sourceTree = "<group>"; };
 		0EA542610DB72C0A00F60F0E /* French */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = French; path = French.lproj/PGExif.nib; sourceTree = "<group>"; };
@@ -1070,6 +1081,7 @@
 				de,
 				Russian,
 				sv_SE,
+				pt_BR,
 			);
 			mainGroup = 2A37F4AAFDCFA73011CA2CEA /* Pornograph */;
 			projectDirPath = "";
@@ -1386,6 +1398,7 @@
 				0EC999EB0D9762A60093187C /* French */,
 				0EA62C200CCE0AFB0047E83E /* it_IT */,
 				0E1211780D31A5A40055F587 /* Polish */,
+				0EA5404C10976CF800A2094D /* pt_BR */,
 				0E9851F80EDA196B002E5B4F /* Russian */,
 				0E5DD3520CAF91310085241E /* Spanish */,
 				0E04504E0F06884D00441263 /* sv_SE */,
@@ -1402,6 +1415,7 @@
 				0EC999F30D9762DB0093187C /* French */,
 				0EA62C260CCE0B9C0047E83E /* it_IT */,
 				0E1211800D31A5E70055F587 /* Polish */,
+				0EA5405A1097719600A2094D /* pt_BR */,
 				0E9852030EDA19CE002E5B4F /* Russian */,
 				0E5DD3580CAF91840085241E /* Spanish */,
 				0E0450590F0688B900441263 /* sv_SE */,
@@ -1418,6 +1432,7 @@
 				0E255F080E3C07D100EDF04C /* French */,
 				0E255F090E3C07D400EDF04C /* it_IT */,
 				0E255F0A0E3C07D700EDF04C /* Polish */,
+				0EA5405510976E2500A2094D /* pt_BR */,
 				0E9851FF0EDA19AD002E5B4F /* Russian */,
 				0E255F0B0E3C07DA00EDF04C /* Spanish */,
 				0E0450550F06888F00441263 /* sv_SE */,
@@ -1434,6 +1449,7 @@
 				0EC1C5330E366FB700E911E7 /* French */,
 				0EC1C5340E366FBA00E911E7 /* it_IT */,
 				0EC1C5350E366FBD00E911E7 /* Polish */,
+				0EA5405610976E2E00A2094D /* pt_BR */,
 				0E9852000EDA19B5002E5B4F /* Russian */,
 				0EC1C5360E366FBF00E911E7 /* Spanish */,
 				0E0450560F0688A300441263 /* sv_SE */,
@@ -1450,6 +1466,7 @@
 				0EC999F00D9762CE0093187C /* French */,
 				0E81357A0D01998F001A5B60 /* it_IT */,
 				0E12117D0D31A5D10055F587 /* Polish */,
+				0EA540581097717F00A2094D /* pt_BR */,
 				0E9852010EDA19BE002E5B4F /* Russian */,
 				0E8135790D019987001A5B60 /* Spanish */,
 				0E0450570F0688AA00441263 /* sv_SE */,
@@ -1482,6 +1499,7 @@
 				0EC999ED0D9762B40093187C /* French */,
 				0EA62C220CCE0B1A0047E83E /* it_IT */,
 				0E12117A0D31A5B90055F587 /* Polish */,
+				0EA5404D10976D0A00A2094D /* pt_BR */,
 				0E9851FA0EDA1981002E5B4F /* Russian */,
 				0E5DD3540CAF915A0085241E /* Spanish */,
 				0E0450500F06886100441263 /* sv_SE */,
@@ -1498,6 +1516,7 @@
 				0EC999F10D9762D20093187C /* French */,
 				0E81357C0D019999001A5B60 /* it_IT */,
 				0E12117E0D31A5D70055F587 /* Polish */,
+				0EA540591097718C00A2094D /* pt_BR */,
 				0E9852020EDA19C6002E5B4F /* Russian */,
 				0E81357B0D019996001A5B60 /* Spanish */,
 				0E0450580F0688B200441263 /* sv_SE */,
@@ -1514,6 +1533,7 @@
 				0EE98F8E0DEEB14C0004F628 /* French */,
 				0EE98F8F0DEEB1510004F628 /* it_IT */,
 				0EE98F900DEEB1540004F628 /* Polish */,
+				0EA5405210976DE300A2094D /* pt_BR */,
 				0E9851FD0EDA199B002E5B4F /* Russian */,
 				0EE98F910DEEB1570004F628 /* Spanish */,
 				0E0450530F06888000441263 /* sv_SE */,
@@ -1530,6 +1550,7 @@
 				0EC1C5380E366FD600E911E7 /* French */,
 				0EC1C5440E366FD900E911E7 /* it_IT */,
 				0EC1C5500E366FDC00E911E7 /* Polish */,
+				0EA5405C1097725E00A2094D /* pt_BR */,
 				0E9852040EDA19D5002E5B4F /* Russian */,
 				0E04505A0F0688C700441263 /* sv_SE */,
 				0EC1C55C0E366FDE00E911E7 /* Spanish */,
@@ -1545,6 +1566,7 @@
 				0EA542610DB72C0A00F60F0E /* French */,
 				0EA542620DB72C0F00F60F0E /* it_IT */,
 				0EA542650DB72C2D00F60F0E /* Polish */,
+				0EA5405310976DF000A2094D /* pt_BR */,
 				0E9851FE0EDA19A5002E5B4F /* Russian */,
 				0EA542660DB72C3100F60F0E /* Spanish */,
 				0E0450540F06888700441263 /* sv_SE */,
@@ -1561,6 +1583,7 @@
 				0EC999EE0D9762B80093187C /* French */,
 				0EA62C230CCE0B7C0047E83E /* it_IT */,
 				0E12117B0D31A5C00055F587 /* Polish */,
+				0EA5404E10976D1500A2094D /* pt_BR */,
 				0E9851FB0EDA198A002E5B4F /* Russian */,
 				0E5DD3550CAF91640085241E /* Spanish */,
 				0E0450510F06886F00441263 /* sv_SE */,
