@@ -44,7 +44,6 @@ static NSString *const PGShowsThumbnailsKey = @"PGShowsThumbnails";
 static NSString *const PGReadingDirectionRightToLeftKey = @"PGReadingDirectionRightToLeft";
 static NSString *const PGImageScaleModeKey = @"PGImageScaleMode";
 static NSString *const PGImageScaleFactorKey = @"PGImageScaleFactor";
-static NSString *const PGImageScaleConstraintKey = @"PGImageScaleConstraint";
 static NSString *const PGAnimatesImagesKey = @"PGAnimatesImages";
 static NSString *const PGSortOrderKey = @"PGSortOrder2";
 static NSString *const PGTimerIntervalKey = @"PGTimerInterval";
@@ -78,7 +77,6 @@ NSArray *PGScaleModes(void)
 		[NSNumber numberWithBool:NO], PGReadingDirectionRightToLeftKey,
 		[NSNumber numberWithInteger:PGConstantFactorScale], PGImageScaleModeKey,
 		[NSNumber numberWithDouble:1.0f], PGImageScaleFactorKey,
-		[NSNumber numberWithInteger:PGScaleFreely], PGImageScaleConstraintKey,
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
 		[NSNumber numberWithInteger:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
 		[NSNumber numberWithDouble:30.0f], PGTimerIntervalKey,
@@ -158,18 +156,6 @@ NSArray *PGScaleModes(void)
 	[self PG_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:flag], PGPrefObjectAnimateKey, nil]];
 }
 
-- (PGImageScaleConstraint)imageScaleConstraint
-{
-	return _imageScaleConstraint;
-}
-- (void)setImageScaleConstraint:(PGImageScaleConstraint)constraint
-{
-	if(constraint == _imageScaleConstraint) return;
-	_imageScaleConstraint = constraint;
-	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:constraint] forKey:PGImageScaleConstraintKey];
-	[self PG_postNotificationName:PGPrefObjectImageScaleDidChangeNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], PGPrefObjectAnimateKey, nil]];
-}
-
 #pragma mark -
 
 - (BOOL)animatesImages
@@ -232,8 +218,6 @@ NSArray *PGScaleModes(void)
 		if(_imageScaleMode < 0 || _imageScaleMode > 4) _imageScaleMode = PGConstantFactorScale;
 		if(PGDeprecatedVerticalFitScale == _imageScaleMode) _imageScaleMode = PGAutomaticScale;
 		_imageScaleFactor = (CGFloat)[[d objectForKey:PGImageScaleFactorKey] doubleValue];
-		_imageScaleConstraint = [[d objectForKey:PGImageScaleConstraintKey] integerValue];
-		if(_imageScaleConstraint < PGDownscale || _imageScaleConstraint > PGUpscale) _imageScaleConstraint = PGDownscale;
 		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
 		_sortOrder = [[d objectForKey:PGSortOrderKey] integerValue];
 		_timerInterval = [[d objectForKey:PGTimerIntervalKey] doubleValue];

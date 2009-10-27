@@ -72,11 +72,6 @@ enum {
 };
 typedef NSUInteger PGZoomDirection;
 
-static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
-{
-	return NSMakeSize(MIN(MAX(min.width, size.width), max.width), MIN(MAX(min.height, size.height), max.height));
-}
-
 @interface PGDisplayController(Private)
 
 - (void)_setImageView:(PGImageView *)aView;
@@ -225,10 +220,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)changeImageScaleMode:(id)sender
 {
 	[[self activeDocument] setImageScaleMode:[sender tag]];
-}
-- (IBAction)changeImageScaleConstraint:(id)sender
-{
-	[[self activeDocument] setImageScaleConstraint:[sender tag]];
 }
 - (IBAction)zoomIn:(id)sender
 {
@@ -886,10 +877,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		newSize.width *= factor;
 		newSize.height *= factor;
 	} else if(PGActualSizeWithDPI != scaleMode) {
-		PGImageScaleConstraint const constraint = [[self activeDocument] imageScaleConstraint];
 		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
-		NSSize const minSize = constraint != PGUpscale || resIndependent ? NSZeroSize : newSize;
-		NSSize const maxSize = constraint != PGDownscale || resIndependent ? NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) : newSize;
+		NSSize const minSize = resIndependent ? NSZeroSize : newSize;
+		NSSize const maxSize = resIndependent ? NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) : newSize;
 		NSRect const bounds = [clipView insetBounds];
 		CGFloat scaleX = NSWidth(bounds) / round(newSize.width);
 		CGFloat scaleY = NSHeight(bounds) / round(newSize.height);
@@ -898,7 +888,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floor(newSize.height * scaleX / scrollMax.height + 0.3f) * scrollMax.height) / newSize.height));
 			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floor(newSize.width * scaleY / scrollMax.width + 0.3f) * scrollMax.width) / newSize.width));
 		} else if(PGViewFitScale == scaleMode) scaleX = scaleY = MIN(scaleX, scaleY);
-		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
+		newSize = PGScaleSizeByXY(newSize, scaleX, scaleY);
 	}
 	return PGIntegralSize(newSize);
 }
@@ -1092,7 +1082,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		} else if(PGConstantFactorScale == tag) [anItem setState:[[self activeDocument] imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([[self activeDocument] imageScaleFactor])) : NSOffState];
 		else [anItem setState:[[self activeDocument] imageScaleMode] == tag];
 	}
-	if(@selector(changeImageScaleConstraint:) == action) [anItem setState:[[self activeDocument] imageScaleConstraint] == tag];
 	if(@selector(changeImageScaleFactor:) == action) [[[PGDocumentController sharedDocumentController] scaleSlider] setDoubleValue:log2([[self activeDocument] imageScaleFactor])];
 
 	// Sort:

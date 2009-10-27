@@ -53,13 +53,6 @@ typedef NSInteger PGImageScaleMode;
 extern NSArray *PGScaleModes(void);
 
 enum {
-	PGDownscale   = -1,
-	PGScaleFreely = 0,
-	PGUpscale     = 1,
-};
-typedef NSInteger PGImageScaleConstraint;
-
-enum {
 	PGUnsorted           = 0,
 	PGSortOrderMask      = 0x0000FFFF,
 	PGSortByName         = 1,
@@ -83,7 +76,6 @@ typedef NSInteger PGSortOrder;
 	PGReadingDirection _readingDirection;
 	PGImageScaleMode _imageScaleMode;
 	CGFloat _imageScaleFactor;
-	PGImageScaleConstraint _imageScaleConstraint;
 	BOOL _animatesImages;
 	PGSortOrder _sortOrder;
 	NSTimeInterval _timerInterval;
@@ -97,7 +89,6 @@ typedef NSInteger PGSortOrder;
 @property(assign) PGImageScaleMode imageScaleMode;
 @property(assign) CGFloat imageScaleFactor;
 - (void)setImageScaleFactor:(CGFloat)factor animate:(BOOL)flag;
-@property(assign) PGImageScaleConstraint imageScaleConstraint;
 @property(assign) BOOL animatesImages;
 @property(assign) PGSortOrder sortOrder;
 @property(assign) NSTimeInterval timerInterval;

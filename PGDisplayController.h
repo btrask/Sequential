@@ -103,7 +103,6 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 - (IBAction)toggleAnimation:(id)sender;
 
 - (IBAction)changeImageScaleMode:(id)sender;
-- (IBAction)changeImageScaleConstraint:(id)sender;
 - (IBAction)zoomIn:(id)sender;
 - (IBAction)zoomOut:(id)sender;
 - (IBAction)changeImageScaleFactor:(id)sender;

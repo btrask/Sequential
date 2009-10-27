@@ -11,8 +11,8 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="894"/>
 			<integer value="1244"/>
+			<integer value="756"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -877,17 +877,6 @@
 									<reference key="NSMixedImage" ref="323527360"/>
 									<int key="NSTag">4</int>
 								</object>
-								<object class="NSMenuItem" id="563272104">
-									<reference key="NSMenu" ref="257867438"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="362813364"/>
-									<reference key="NSMixedImage" ref="323527360"/>
-								</object>
 								<object class="NSMenuItem" id="822093321">
 									<reference key="NSMenu" ref="257867438"/>
 									<string key="NSTitle">Automatisch anpassen</string>
@@ -906,51 +895,26 @@
 									<reference key="NSMixedImage" ref="323527360"/>
 									<int key="NSTag">3</int>
 								</object>
-								<object class="NSMenuItem" id="794050943">
+								<object class="NSMenuItem" id="203979945">
 									<reference key="NSMenu" ref="257867438"/>
-									<string key="NSTitle">Größe anpassen</string>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="362813364"/>
 									<reference key="NSMixedImage" ref="323527360"/>
-									<string key="NSAction">submenuAction:</string>
-									<object class="NSMenu" key="NSSubmenu" id="832517181">
-										<string key="NSTitle">Größe anpassen</string>
-										<array class="NSMutableArray" key="NSMenuItems">
-											<object class="NSMenuItem" id="332849622">
-												<reference key="NSMenu" ref="832517181"/>
-												<string key="NSTitle">Vergrößern</string>
-												<string key="NSKeyEquiv"/>
-												<int key="NSKeyEquivModMask">1048576</int>
-												<int key="NSMnemonicLoc">2147483647</int>
-												<reference key="NSOnImage" ref="362813364"/>
-												<reference key="NSMixedImage" ref="323527360"/>
-												<int key="NSTag">1</int>
-											</object>
-											<object class="NSMenuItem" id="83939013">
-												<reference key="NSMenu" ref="832517181"/>
-												<string key="NSTitle">Frei skalieren</string>
-												<string key="NSKeyEquiv"/>
-												<int key="NSKeyEquivModMask">1048576</int>
-												<int key="NSMnemonicLoc">2147483647</int>
-												<reference key="NSOnImage" ref="362813364"/>
-												<reference key="NSMixedImage" ref="323527360"/>
-											</object>
-											<object class="NSMenuItem" id="254257793">
-												<reference key="NSMenu" ref="832517181"/>
-												<string key="NSTitle">Verkleinern</string>
-												<string key="NSKeyEquiv"/>
-												<int key="NSKeyEquivModMask">1048576</int>
-												<int key="NSMnemonicLoc">2147483647</int>
-												<reference key="NSOnImage" ref="362813364"/>
-												<reference key="NSMixedImage" ref="323527360"/>
-												<int key="NSTag">-1</int>
-											</object>
-										</array>
-									</object>
 								</object>
-								<object class="NSMenuItem" id="203979945">
+								<object class="NSMenuItem" id="26483148">
+									<reference key="NSMenu" ref="257867438"/>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="362813364"/>
+									<reference key="NSMixedImage" ref="323527360"/>
+								</object>
+								<object class="NSMenuItem" id="823139985">
 									<reference key="NSMenu" ref="257867438"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
@@ -972,25 +936,6 @@
 								<object class="NSMenuItem" id="630904369">
 									<reference key="NSMenu" ref="257867438"/>
 									<string key="NSTitle">Verkleinern</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="362813364"/>
-									<reference key="NSMixedImage" ref="323527360"/>
-								</object>
-								<object class="NSMenuItem" id="823139985">
-									<reference key="NSMenu" ref="257867438"/>
-									<bool key="NSIsDisabled">YES</bool>
-									<bool key="NSIsSeparator">YES</bool>
-									<string key="NSTitle"/>
-									<string key="NSKeyEquiv"/>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="362813364"/>
-									<reference key="NSMixedImage" ref="323527360"/>
-								</object>
-								<object class="NSMenuItem" id="26483148">
-									<reference key="NSMenu" ref="257867438"/>
-									<string key="NSTitle"/>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="362813364"/>
@@ -2063,30 +2008,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="477082805"/>
-						<reference key="destination" ref="332849622"/>
-					</object>
-					<int key="connectionID">1265</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="477082805"/>
-						<reference key="destination" ref="83939013"/>
-					</object>
-					<int key="connectionID">1266</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleConstraint:</string>
-						<reference key="source" ref="477082805"/>
-						<reference key="destination" ref="254257793"/>
-					</object>
-					<int key="connectionID">1267</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
 						<string key="label">changeImageScaleFactor:</string>
 						<reference key="source" ref="477082805"/>
 						<reference key="destination" ref="169507688"/>
@@ -2783,13 +2704,11 @@
 							<reference ref="822093321"/>
 							<reference ref="34753555"/>
 							<reference ref="203979945"/>
-							<reference ref="823139985"/>
 							<reference ref="247672418"/>
 							<reference ref="630904369"/>
-							<reference ref="563272104"/>
-							<reference ref="794050943"/>
 							<reference ref="785069333"/>
 							<reference ref="26483148"/>
+							<reference ref="823139985"/>
 						</array>
 						<reference key="parent" ref="36841800"/>
 					</object>
@@ -2827,44 +2746,6 @@
 						<int key="objectID">836</int>
 						<reference key="object" ref="630904369"/>
 						<reference key="parent" ref="257867438"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">837</int>
-						<reference key="object" ref="563272104"/>
-						<reference key="parent" ref="257867438"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">858</int>
-						<reference key="object" ref="794050943"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="832517181"/>
-						</array>
-						<reference key="parent" ref="257867438"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">859</int>
-						<reference key="object" ref="832517181"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="83939013"/>
-							<reference ref="254257793"/>
-							<reference ref="332849622"/>
-						</array>
-						<reference key="parent" ref="794050943"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">860</int>
-						<reference key="object" ref="83939013"/>
-						<reference key="parent" ref="832517181"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">861</int>
-						<reference key="object" ref="254257793"/>
-						<reference key="parent" ref="832517181"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">862</int>
-						<reference key="object" ref="332849622"/>
-						<reference key="parent" ref="832517181"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">1189</int>
@@ -3497,7 +3378,7 @@
 				<boolean value="YES" key="694.ImportedFromIB2"/>
 				<string key="755.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="755.ImportedFromIB2"/>
-				<string key="756.IBEditorWindowLastContentRect">{{435, 792}, {230, 193}}</string>
+				<string key="756.IBEditorWindowLastContentRect">{{435, 822}, {230, 163}}</string>
 				<string key="756.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="756.ImportedFromIB2"/>
 				<string key="758.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3520,19 +3401,6 @@
 				<boolean value="YES" key="835.ImportedFromIB2"/>
 				<string key="836.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="836.ImportedFromIB2"/>
-				<string key="837.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="837.ImportedFromIB2"/>
-				<string key="858.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="858.ImportedFromIB2"/>
-				<string key="859.IBEditorWindowLastContentRect">{{681, 832}, {157, 63}}</string>
-				<string key="859.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="859.ImportedFromIB2"/>
-				<string key="860.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="860.ImportedFromIB2"/>
-				<string key="861.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="861.ImportedFromIB2"/>
-				<string key="862.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="862.ImportedFromIB2"/>
 				<string key="874.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

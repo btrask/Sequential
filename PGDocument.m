@@ -336,11 +336,6 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[super setImageScaleFactor:factor animate:flag];
 	[[PGPrefObject globalPrefObject] setImageScaleFactor:factor animate:flag];
 }
-- (void)setImageScaleConstraint:(PGImageScaleConstraint)constraint
-{
-	[super setImageScaleConstraint:constraint];
-	[[PGPrefObject globalPrefObject] setImageScaleConstraint:constraint];
-}
 - (void)setAnimatesImages:(BOOL)flag
 {
 	[super setAnimatesImages:flag];
