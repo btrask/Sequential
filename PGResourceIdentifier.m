@@ -189,8 +189,9 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 }
 - (BOOL)isEqual:(id)obj
 {
-	if([self identifier] == [obj identifier]) return YES;
-	if(![obj isKindOfClass:[PGResourceIdentifier class]] || [self index] != [(PGResourceIdentifier *)obj index]) return NO;
+	if(![obj isKindOfClass:[PGResourceIdentifier class]]) return NO;
+	if([self identifier] == [(PGResourceIdentifier *)obj identifier]) return YES;
+	if([self index] != [(PGResourceIdentifier *)obj index]) return NO;
 	if(!PGEqualObjects([self superidentifier], [obj superidentifier])) return NO;
 	return PGEqualObjects([self URL], [obj URL]);
 }

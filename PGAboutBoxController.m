@@ -69,7 +69,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 	[paneControl retain];
 	[paneControl removeFromSuperview];
 	if([paneControl respondsToSelector:@selector(setSegmentStyle:)]) [paneControl setSegmentStyle:NSSegmentStyleTexturedRounded];
-	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGAboutBoxControllerToolbar"] autorelease];
+	NSToolbar *const toolbar = [[(NSToolbar *)[NSToolbar alloc] initWithIdentifier:@"PGAboutBoxControllerToolbar"] autorelease];
 	[toolbar setDisplayMode:NSToolbarDisplayModeIconOnly];
 	[toolbar setSizeMode:NSToolbarSizeModeRegular];
 	[toolbar setAllowsUserCustomization:NO];

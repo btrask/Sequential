@@ -11,7 +11,7 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="894"/>
+			<integer value="574"/>
 			<integer value="1240"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
@@ -279,7 +279,7 @@
 								</object>
 								<object class="NSMenuItem" id="629694903">
 									<reference key="NSMenu" ref="247621394"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Reprendre</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -287,7 +287,7 @@
 									<reference key="NSMixedImage" ref="935440048"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="425889408">
-										<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+										<string key="NSTitle">Reprendre</string>
 										<array class="NSMutableArray" key="NSMenuItems">
 											<object class="NSMenuItem" id="1002753299">
 												<reference key="NSMenu" ref="425889408"/>
@@ -3300,7 +3300,7 @@
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="337.ImportedFromIB2"/>
-				<string key="338.IBEditorWindowLastContentRect">{{231, 688}, {419, 283}}</string>
+				<string key="338.IBEditorWindowLastContentRect">{{169, 722}, {419, 283}}</string>
 				<string key="338.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="338.ImportedFromIB2"/>
 				<string key="340.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3341,6 +3341,7 @@
 				<boolean value="YES" key="57.ImportedFromIB2"/>
 				<string key="573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="573.ImportedFromIB2"/>
+				<string key="574.IBEditorWindowLastContentRect">{{588, 842}, {127, 23}}</string>
 				<string key="574.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="574.ImportedFromIB2"/>
 				<string key="575.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

@@ -163,14 +163,14 @@ OSType PGOSTypeFromString(NSString *str)
 }
 - (void)PG_postNotificationName:(NSString *)aName userInfo:(NSDictionary *)aDict
 {
-	[[NSNotificationCenter defaultCenter] postNotificationName:aName object:self userInfo:aDict];
+	[(NSNotificationCenter *)[NSNotificationCenter defaultCenter] postNotificationName:aName object:self userInfo:aDict];
 }
 
 #pragma mark -
 
 - (void)PG_addObserver:(id)observer selector:(SEL)aSelector name:(NSString *)aName
 {
-	[[NSNotificationCenter defaultCenter] addObserver:observer selector:aSelector name:aName object:self];
+	[(NSNotificationCenter *)[NSNotificationCenter defaultCenter] addObserver:observer selector:aSelector name:aName object:self];
 }
 - (void)PG_removeObserver
 {
@@ -178,7 +178,7 @@ OSType PGOSTypeFromString(NSString *str)
 }
 - (void)PG_removeObserver:(id)observer name:(NSString *)aName
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:observer name:aName object:self];
+	[(NSNotificationCenter *)[NSNotificationCenter defaultCenter] removeObserver:observer name:aName object:self];
 }
 
 #pragma mark -

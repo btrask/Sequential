@@ -158,7 +158,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)openRecentDocument:(id)sender
 {
-	[self openDocumentWithContentsOfIdentifier:[sender representedObject] display:YES];
+	[self openDocumentWithContentsOfIdentifier:[(NSMenuItem *)sender representedObject] display:YES];
 }
 - (IBAction)clearRecentDocuments:(id)sender
 {
@@ -196,7 +196,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (IBAction)activateDocument:(id)sender
 {
-	PGDocument *const doc = [sender representedObject];
+	PGDocument *const doc = [(NSMenuItem *)sender representedObject];
 	[[doc displayController] activateDocument:doc];
 }
 
@@ -355,7 +355,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 {
 	if(!ident) return nil;
 	PGDocument *const doc = [self documentForIdentifier:ident];
-	return [self _openNew:!doc document:doc ? doc : [[[PGDocument alloc] initWithIdentifier:[ident displayableIdentifier]] autorelease] display:flag];
+	return [self _openNew:!doc document:doc ? doc : [[(PGDocument *)[PGDocument alloc] initWithIdentifier:[ident displayableIdentifier]] autorelease] display:flag];
 }
 - (id)openDocumentWithContentsOfURL:(NSURL *)URL display:(BOOL)flag
 {

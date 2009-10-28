@@ -192,6 +192,13 @@
 			remoteGlobalIDString = 8D15AC270486D014006FF6A4;
 			remoteInfo = Sequential;
 		};
+		0E0A4C661098E00200EF6072 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = XADMaster;
+		};
 		0E20FCDA109652CF007EE24A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
@@ -748,7 +755,7 @@
 				0E20FCDD109652CF007EE24A /* XADTest */,
 				0E20FCDF109652CF007EE24A /* XADTest2 */,
 				0E20FCE1109652CF007EE24A /* XADTest3 */,
-				0E20FCE3109652CF007EE24A /* XADTest4 */,
+				0E20FCE3109652CF007EE24A /* XADTest3 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1053,6 +1060,7 @@
 			dependencies = (
 				0E3DA4D60DB0BAD300BE502B /* PBXTargetDependency */,
 				0EBAD5CE0F56A0860014BA11 /* PBXTargetDependency */,
+				0E0A4C671098E00200EF6072 /* PBXTargetDependency */,
 			);
 			name = Sequential;
 			productInstallPath = "$(HOME)/Applications";
@@ -1136,10 +1144,10 @@
 			remoteRef = 0E20FCE0109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		0E20FCE3109652CF007EE24A /* XADTest4 */ = {
+		0E20FCE3109652CF007EE24A /* XADTest3 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = XADTest4;
+			path = XADTest3;
 			remoteRef = 0E20FCE2109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1376,6 +1384,11 @@
 			isa = PBXTargetDependency;
 			target = 8D15AC270486D014006FF6A4 /* Sequential */;
 			targetProxy = 0E04EFA50F5592CE002FD4F2 /* PBXContainerItemProxy */;
+		};
+		0E0A4C671098E00200EF6072 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = XADMaster;
+			targetProxy = 0E0A4C661098E00200EF6072 /* PBXContainerItemProxy */;
 		};
 		0E3DA4D60DB0BAD300BE502B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1656,7 +1669,7 @@
 		C05733CC08A9546B00998B17 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1665,7 +1678,6 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sequential_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1690,14 +1702,13 @@
 		C05733CD08A9546B00998B17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sequential_Prefix.pch;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

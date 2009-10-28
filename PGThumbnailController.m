@@ -247,7 +247,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	NSSet *const selection = [sender selection];
 	id const item = [selection anyObject];
-	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [item parentNode]) viewableAncestor] forward:YES];
+	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [(PGNode *)item parentNode]) viewableAncestor] forward:YES];
 }
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount
 {
@@ -270,7 +270,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item
 {
-	return [item hasRealThumbnail] ? nil : [[item identifier] displayName];
+	return [item hasRealThumbnail] ? nil : [[(PGNode *)item identifier] displayName];
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 {
@@ -278,7 +278,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item
 {
-	switch([[item identifier] labelColor]) {
+	switch([[(PGNode *)item identifier] labelColor]) {
 		case PGLabelRed: return [NSColor redColor];
 		case PGLabelOrange: return [NSColor orangeColor];
 		case PGLabelYellow: return [NSColor yellowColor];

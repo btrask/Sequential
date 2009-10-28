@@ -202,7 +202,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
 	NSParameterAssert(tableColumn == nameColumn);
-	if(object && [object length]) [_saveNamesByNodePointer setObject:object forKey:[NSValue valueWithNonretainedObject:item]];
+	if([(NSString *)object length]) [_saveNamesByNodePointer setObject:object forKey:[NSValue valueWithNonretainedObject:item]];
 }
 
 #pragma mark -<NSOutlineViewDelegate>
@@ -210,7 +210,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	if(tableColumn == nameColumn) {
-		[cell setIcon:[[item identifier] icon]];
+		[cell setIcon:[[(PGNode *)item identifier] icon]];
 		[cell setEnabled:[item canSaveData]];
 	}
 }

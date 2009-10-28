@@ -314,7 +314,7 @@ typedef NSUInteger PGZoomDirection;
 
 - (IBAction)jumpToPage:(id)sender
 {
-	PGNode *node = [[sender representedObject] nonretainedObjectValue];
+	PGNode *node = [[(NSMenuItem *)sender representedObject] nonretainedObjectValue];
 	if(![node isViewable]) node = [node sortedViewableNodeFirst:YES];
 	if([self activeNode] == node || !node) return;
 	[self setActiveNode:node forward:YES];
@@ -874,9 +874,6 @@ typedef NSUInteger PGZoomDirection;
 		newSize.width *= factor;
 		newSize.height *= factor;
 	} else if(PGActualSizeWithDPI != scaleMode) {
-		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
-		NSSize const minSize = resIndependent ? NSZeroSize : newSize;
-		NSSize const maxSize = resIndependent ? NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) : newSize;
 		NSRect const bounds = [clipView insetBounds];
 		CGFloat scaleX = NSWidth(bounds) / round(newSize.width);
 		CGFloat scaleY = NSHeight(bounds) / round(newSize.height);
@@ -896,7 +893,7 @@ typedef NSUInteger PGZoomDirection;
 - (void)_updateNodeIndex
 {
 	_displayImageIndex = [[self activeNode] viewableNodeIndex];
-	[[_infoPanel content] setIndex:_displayImageIndex];
+	[(PGInfoView *)[_infoPanel content] setIndex:_displayImageIndex];
 	[self synchronizeWindowTitleWithDocumentName];
 }
 - (void)_updateInfoPanelText

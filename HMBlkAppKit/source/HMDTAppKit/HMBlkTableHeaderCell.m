@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
     return [NSColor whiteColor];
 }
 
-- (void)_drawThemeContents:(struct _NSRect)rect highlighted:(BOOL)highlighted inView:(id)view
+- (void)_drawThemeContents:(NSRect)rect highlighted:(BOOL)highlighted inView:(id)view
 {
     [[[NSColor blackColor] colorWithAlphaComponent:0.7f] set];
     NSRectFill(rect);

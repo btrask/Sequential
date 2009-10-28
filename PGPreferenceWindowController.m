@@ -66,7 +66,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 
 - (IBAction)changeDisplayScreen:(id)sender
 {
-	[self setDisplayScreen:[sender representedObject]];
+	[self setDisplayScreen:[(NSMenuItem *)sender representedObject]];
 }
 - (IBAction)showPrefsHelp:(id)sender
 {
@@ -161,7 +161,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 	[super windowDidLoad];
 	NSWindow *const w = [self window];
 
-	NSToolbar *const toolbar = [[[NSToolbar alloc] initWithIdentifier:@"PGPreferenceWindowControllerToolbar"] autorelease];
+	NSToolbar *const toolbar = [[(NSToolbar *)[NSToolbar alloc] initWithIdentifier:@"PGPreferenceWindowControllerToolbar"] autorelease];
 	[toolbar setDelegate:self];
 	[w setToolbar:toolbar];
 

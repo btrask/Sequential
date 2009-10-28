@@ -114,7 +114,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSRect const vb = [_view bounds];
 	NSUInteger i = 0;
 	NSUInteger const count = [_clipViews count];
-	for(; i < count; i++) [[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth, NSHeight(vb))];
+	for(; i < count; i++) [(NSView *)[_clipViews objectAtIndex:i] setFrame:NSMakeRect(NSMinX(vb) + _columnWidth * i, NSMinY(vb), _columnWidth, NSHeight(vb))];
 	[self setNeedsDisplay:YES];
 }
 

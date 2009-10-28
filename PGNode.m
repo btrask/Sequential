@@ -237,7 +237,7 @@ enum {
 - (void)continueLoadWithInfo:(id)info
 {
 	NSParameterAssert(PGNodeLoading & _status);
-	NSParameterAssert(info && [info count]); // Otherwise nothing has changed.
+	NSParameterAssert([(NSArray *)info count]); // Otherwise nothing has changed.
 	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]];
 	if(![newAdapters count]) return [_adapter fallbackLoad];
 	[_adapters addObjectsFromArray:newAdapters];
@@ -497,7 +497,7 @@ enum {
 }
 - (BOOL)isEqual:(id)anObject
 {
-	return [anObject isMemberOfClass:[self class]] && PGEqualObjects([self identifier], [anObject identifier]);
+	return [anObject isMemberOfClass:[self class]] && PGEqualObjects([self identifier], [(PGNode *)anObject identifier]);
 }
 
 #pragma mark -

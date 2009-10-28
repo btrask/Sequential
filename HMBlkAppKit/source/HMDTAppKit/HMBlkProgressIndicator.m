@@ -24,13 +24,8 @@ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABI
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGE.
 */
-
 #import "HMBlkPanel.h"
 #import "HMBlkProgressIndicator.h"
-
-struct NSProgressIndicator_t {
-    @defs(NSProgressIndicator)
-};
 
 @implementation HMBlkProgressIndicator
 
@@ -85,7 +80,7 @@ struct NSProgressIndicator_t {
         
         NSPoint point;
         point.y = 1;
-        point.x = -32 + ((struct NSProgressIndicator_t*)self)->_animationIndex;
+        point.x = -32 + 0;//((struct NSProgressIndicator_t*)self)->_animationIndex;
         while (point.x < bounds.size.width) {
             [image drawAtPoint:point fromRect:srcRect 
                     operation:NSCompositeSourceOver fraction:1.0f];

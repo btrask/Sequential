@@ -229,7 +229,7 @@ static void PGDrawGradient(void)
 {
 	if((self = [super initWithFrame:aRect])) {
 		_selection = (NSMutableSet *)CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(systemColorsDidChange:) name:NSSystemColorsDidChangeNotification object:nil];
+		[(NSNotificationCenter *)[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(systemColorsDidChange:) name:NSSystemColorsDidChangeNotification object:nil];
 	}
 	return self;
 }

@@ -11,8 +11,8 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="894"/>
 			<integer value="1241"/>
+			<integer value="574"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -279,7 +279,7 @@
 								</object>
 								<object class="NSMenuItem" id="492933687">
 									<reference key="NSMenu" ref="992896788"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+									<string key="NSTitle">Continuar</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -287,7 +287,7 @@
 									<reference key="NSMixedImage" ref="660995249"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="725861482">
-										<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
+										<string key="NSTitle">Continuar</string>
 										<array class="NSMutableArray" key="NSMenuItems">
 											<object class="NSMenuItem" id="495049731">
 												<reference key="NSMenu" ref="725861482"/>
@@ -3348,6 +3348,7 @@
 				<boolean value="YES" key="57.ImportedFromIB2"/>
 				<string key="573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="573.ImportedFromIB2"/>
+				<string key="574.IBEditorWindowLastContentRect">{{560, 774}, {155, 23}}</string>
 				<string key="574.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="574.ImportedFromIB2"/>
 				<string key="575.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

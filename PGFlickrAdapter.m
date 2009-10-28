@@ -185,8 +185,8 @@ enum {
 		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
 		[[self node] loadFinished];
 	} else {
-		id const info = [parser info];
-		if(info && [info count]) [[self node] continueLoadWithInfo:info];
+		NSArray *const info = [parser info];
+		if([info count]) [[self node] continueLoadWithInfo:info];
 		else [[self node] setError:nil];
 	}
 }

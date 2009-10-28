@@ -42,11 +42,13 @@ static NSString *const PGPausedDocumentsDeprecatedKey  = @"PGPausedDocuments"; /
 
 static PGBookmarkController *sharedBookmarkController = nil;
 
+#if !__LP64__
 static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void *inUserData)
 {
 	[(PGBookmarkController *)inUserData setDeletesBookmarks:!!(GetCurrentEventKeyModifiers() & optionKey)];
 	return noErr;
 }
+#endif
 
 @interface PGBookmarkController(Private)
 
@@ -69,7 +71,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 
 - (IBAction)open:(id)sender
 {
-	PGBookmark *const bookmark = [sender representedObject];
+	PGBookmark *const bookmark = [(NSMenuItem *)sender representedObject];
 	if(!_deletesBookmarks && [bookmark isValid]) {
 		[[PGDocumentController sharedDocumentController] openDocumentWithBookmark:bookmark display:YES];
 		return;
@@ -96,7 +98,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (void)setDeletesBookmarks:(BOOL)flag
 {
 	_deletesBookmarks = flag;
-	[bookmarkItem setTitle:NSLocalizedString(flag ? @"Delete" : @"Resume", @"The title of the bookmarks menu. Two states.")];
+	[bookmarkItem setTitle:flag ? NSLocalizedString(@"Delete", @"The title of the bookmarks menu. Two states.") : NSLocalizedString(@"Resume", @"The title of the bookmarks menu. Two states.")];
 }
 
 #pragma mark -
@@ -183,8 +185,10 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	if((self = [super init])) {
 		if(!sharedBookmarkController) {
 			sharedBookmarkController = [self retain];
+#if !__LP64__
 			EventTypeSpec const list[] = {{kEventClassKeyboard, kEventRawKeyModifiersChanged}, {kEventClassMenu, kEventMenuOpening}};
 			InstallEventHandler(GetUserFocusEventTarget(), PGBookmarkControllerFlagsChanged, 2, list, self, NULL);
+#endif
 		}
 		NSUserDefaults *const defaults = [NSUserDefaults standardUserDefaults];
 		NSData *bookmarksData = [defaults objectForKey:PGPausedDocumentsKey];

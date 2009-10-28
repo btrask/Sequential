@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(p) return p;
 	do {
 		if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist) break;
-		NSURL *const URL = [[info objectForKey:PGIdentifierKey] URL];
+		NSURL *const URL = [(PGResourceIdentifier *)[info objectForKey:PGIdentifierKey] URL];
 		if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) break;
 		if(![[URL path] hasPrefix:@"/photos"]) break;
 		[info setObject:[[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] PG_resourceIdentifier] forKey:PGIdentifierKey];
@@ -96,7 +96,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSData *const data = [self data];
 	if(!data) return [[self node] loadFinished];
 	_triedLoading = YES;
-	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
+	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[(PGResourceIdentifier *)[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
 	NSString *const title = [p title];
 	if(title) [[self identifier] setCustomDisplayName:title];
 	if(![p createsMultipleNodes]) {
@@ -261,7 +261,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSURL *)URL
 {
 	NSArray *const subparsers = [self subparsers];
-	return [subparsers count] ? [[subparsers objectAtIndex:0] URL] : nil;
+	return [subparsers count] ? [(PGXMLParser *)[subparsers objectAtIndex:0] URL] : nil;
 }
 
 #pragma mark -NSObject
