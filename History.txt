@@ -1,5 +1,6 @@
-2.1 (Current)
+2.1 (November 4th, 2009)
 - Mac OS 10.6 Snow Leopard support added. 10.4 support dropped.
+- 64-bit support.
 - Dramatically improved support for all archive file formats.
 - Improved image saving.
 - Smaller and less obtrusive alerts.
@@ -8,7 +9,7 @@
 - Option to dim secondary monitors in full screen mode.
 - Option to scroll to different locations when going backwards between images.
 - Holding the Control key will preserve the scroll location when changing between images to make comparison easier.
-- Other minor improvements.
+- Many other improvements.
 
 2.0.3 (February 23rd, 2009)
 - The visible portion of the current image is now highlighted in the thumbnail sidebar.
