@@ -764,6 +764,7 @@ typedef NSUInteger PGZoomDirection;
 	[_infoPanel setFrameInset:inset];
 	[[_infoPanel content] setOriginCorner:corner];
 	[_infoPanel updateFrameDisplay:YES];
+	[[[self activeDocument] pageMenu] update];
 }
 - (void)documentImageScaleDidChange:(NSNotification *)aNotif
 {
