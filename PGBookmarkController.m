@@ -72,7 +72,8 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (IBAction)open:(id)sender
 {
 	PGBookmark *const bookmark = [(NSMenuItem *)sender representedObject];
-	if(!_deletesBookmarks && [bookmark isValid]) {
+	BOOL const delete = _deletesBookmarks || NSAlternateKeyMask & [[NSApp currentEvent] modifierFlags];
+	if(!delete && [bookmark isValid]) {
 		[[PGDocumentController sharedDocumentController] openDocumentWithBookmark:bookmark display:YES];
 		return;
 	}
