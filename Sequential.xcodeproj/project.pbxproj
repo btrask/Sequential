@@ -391,6 +391,23 @@
 		0E3378E8100C82B700373E83 /* History.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = History.txt; sourceTree = "<group>"; };
 		0E3378F9100C83C400373E83 /* License.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = License.txt; sourceTree = "<group>"; };
 		0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HMBlkAppKit.xcodeproj; path = HMBlkAppKit/HMBlkAppKit.xcodeproj; sourceTree = "<group>"; };
+		0E3F5C0410A29D5F006145C1 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it_IT; path = it_IT.lproj/PGAbout.xib; sourceTree = "<group>"; };
+		0E3F5C0510A29D66006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGAbout.xib; sourceTree = "<group>"; };
+		0E3F5C0610A29D6A006145C1 /* Russian */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Russian; path = Russian.lproj/PGAbout.xib; sourceTree = "<group>"; };
+		0E3F5C0810A29D80006145C1 /* it_IT */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = it_IT; path = it_IT.lproj/PGPreference.xib; sourceTree = "<group>"; };
+		0E3F5C0910A29D83006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGPreference.xib; sourceTree = "<group>"; };
+		0E3F5C0A10A29D85006145C1 /* Russian */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Russian; path = Russian.lproj/PGPreference.xib; sourceTree = "<group>"; };
+		0E3F5C0B10A29DA9006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		0E3F5C0C10A29DB9006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
+		0E3F5C0D10A29DC4006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGMenu.xib; sourceTree = "<group>"; };
+		0E3F5C0E10A29DD1006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGDocument.xib; sourceTree = "<group>"; };
+		0E3F5C0F10A29DDA006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGExif.xib; sourceTree = "<group>"; };
+		0E3F5C1010A29DE4006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGTimer.xib; sourceTree = "<group>"; };
+		0E3F5C1110A29DEE006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGActivity.xib; sourceTree = "<group>"; };
+		0E3F5C1210A29DF7006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGURL.xib; sourceTree = "<group>"; };
+		0E3F5C1310A29E00006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGImageSave.xib; sourceTree = "<group>"; };
+		0E3F5C1410A29E08006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Japanese; path = Japanese.lproj/PGEncoding.xib; sourceTree = "<group>"; };
+		0E3F5C1510A29E11006145C1 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Japanese; path = Japanese.lproj/SequentialHelp; sourceTree = "<group>"; };
 		0E4793910DF15FD90083B7CA /* PGAttachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAttachments.h; sourceTree = "<group>"; };
 		0E4793920DF15FD90083B7CA /* PGAttachments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGAttachments.m; sourceTree = "<group>"; };
 		0E4794280DF182C40083B7CA /* Silhouette-Black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Silhouette-Black.png"; sourceTree = "<group>"; };
@@ -1410,6 +1427,7 @@
 				0EE935670E6455B9002A8F6E /* de */,
 				0EC999EB0D9762A60093187C /* French */,
 				0EA62C200CCE0AFB0047E83E /* it_IT */,
+				0E3F5C0B10A29DA9006145C1 /* Japanese */,
 				0E1211780D31A5A40055F587 /* Polish */,
 				0EA5404C10976CF800A2094D /* pt_BR */,
 				0E9851F80EDA196B002E5B4F /* Russian */,
@@ -1427,6 +1445,7 @@
 				0EA540AA10977EFE00A2094D /* de */,
 				0EA540AC10977F0D00A2094D /* French */,
 				0EA540AE10977F1800A2094D /* it_IT */,
+				0E3F5C0D10A29DC4006145C1 /* Japanese */,
 				0EA540B010977F2400A2094D /* Polish */,
 				0EA540B210977F3000A2094D /* pt_BR */,
 				0EA540B410977F3B00A2094D /* Russian */,
@@ -1441,6 +1460,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				0EA540BD1097804F00A2094D /* English */,
+				0E3F5C0410A29D5F006145C1 /* it_IT */,
+				0E3F5C0510A29D66006145C1 /* Japanese */,
+				0E3F5C0610A29D6A006145C1 /* Russian */,
 			);
 			name = PGAbout.xib;
 			sourceTree = "<group>";
@@ -1449,6 +1471,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				0EA540C11097806E00A2094D /* English */,
+				0E3F5C0810A29D80006145C1 /* it_IT */,
+				0E3F5C0910A29D83006145C1 /* Japanese */,
+				0E3F5C0A10A29D85006145C1 /* Russian */,
 			);
 			name = PGPreference.xib;
 			sourceTree = "<group>";
@@ -1460,6 +1485,7 @@
 				0EA540C81097814B00A2094D /* de */,
 				0EA540CA1097815500A2094D /* French */,
 				0EA540CC1097816000A2094D /* it_IT */,
+				0E3F5C0E10A29DD1006145C1 /* Japanese */,
 				0EA540CE1097816B00A2094D /* Polish */,
 				0EA540D01097817500A2094D /* pt_BR */,
 				0EA540D21097817F00A2094D /* Russian */,
@@ -1477,6 +1503,7 @@
 				0EA540DF109781D100A2094D /* de */,
 				0EA540E1109781DB00A2094D /* French */,
 				0EA540E3109781E500A2094D /* it_IT */,
+				0E3F5C0F10A29DDA006145C1 /* Japanese */,
 				0EA540E5109781F000A2094D /* Polish */,
 				0EA540E7109781FA00A2094D /* pt_BR */,
 				0EA540E91097820400A2094D /* Russian */,
@@ -1494,6 +1521,7 @@
 				0EA540F51097824400A2094D /* de */,
 				0EA540F71097825B00A2094D /* French */,
 				0EA540F91097826400A2094D /* it_IT */,
+				0E3F5C1010A29DE4006145C1 /* Japanese */,
 				0EA540FB1097826E00A2094D /* Polish */,
 				0EA540FD1097827800A2094D /* pt_BR */,
 				0EA540FF1097828100A2094D /* Russian */,
@@ -1511,6 +1539,7 @@
 				0EA5410B109782D300A2094D /* de */,
 				0EA5410D1097845400A2094D /* French */,
 				0EA5410F1097845D00A2094D /* it_IT */,
+				0E3F5C1110A29DEE006145C1 /* Japanese */,
 				0EA541111097846700A2094D /* Polish */,
 				0EA541131097847100A2094D /* pt_BR */,
 				0EA541151097847A00A2094D /* Russian */,
@@ -1528,6 +1557,7 @@
 				0EA54121109784C400A2094D /* de */,
 				0EA54123109784CD00A2094D /* French */,
 				0EA54125109784D700A2094D /* it_IT */,
+				0E3F5C1210A29DF7006145C1 /* Japanese */,
 				0EA54127109784E100A2094D /* Polish */,
 				0EA54129109784EA00A2094D /* pt_BR */,
 				0EA5412B109784F300A2094D /* Russian */,
@@ -1545,6 +1575,7 @@
 				0EA541381097854800A2094D /* de */,
 				0EA5413A1097855300A2094D /* French */,
 				0EA5413C1097855C00A2094D /* it_IT */,
+				0E3F5C1310A29E00006145C1 /* Japanese */,
 				0EA5413E1097856600A2094D /* Polish */,
 				0EA541401097857000A2094D /* pt_BR */,
 				0EA541421097857A00A2094D /* Russian */,
@@ -1562,6 +1593,7 @@
 				0EA5414E109785B400A2094D /* de */,
 				0EA54150109785BF00A2094D /* French */,
 				0EA54152109785C800A2094D /* it_IT */,
+				0E3F5C1410A29E08006145C1 /* Japanese */,
 				0EA54154109785D900A2094D /* Polish */,
 				0EA54156109785E300A2094D /* pt_BR */,
 				0EA54158109785EB00A2094D /* Russian */,
@@ -1579,6 +1611,7 @@
 				0EE9356B0E6455D6002A8F6E /* de */,
 				0EC999ED0D9762B40093187C /* French */,
 				0EA62C220CCE0B1A0047E83E /* it_IT */,
+				0E3F5C0C10A29DB9006145C1 /* Japanese */,
 				0E12117A0D31A5B90055F587 /* Polish */,
 				0EA5404D10976D0A00A2094D /* pt_BR */,
 				0E9851FA0EDA1981002E5B4F /* Russian */,
@@ -1596,6 +1629,7 @@
 				0E7A18280E66CE8B00BCA2AF /* de */,
 				0EC1C5380E366FD600E911E7 /* French */,
 				0EC1C5440E366FD900E911E7 /* it_IT */,
+				0E3F5C1510A29E11006145C1 /* Japanese */,
 				0EC1C5500E366FDC00E911E7 /* Polish */,
 				0EA5405C1097725E00A2094D /* pt_BR */,
 				0E9852040EDA19D5002E5B4F /* Russian */,

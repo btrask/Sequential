@@ -1,0 +1,136 @@
+/* The primary screen. */
+"Main Screen" = "メインスクリーン";
+
+/* Non-primary screens. %lu is replaced with the screen number. */
+"Screen %lu" = "スクリーン %lu";
+
+/* Clear the Open Recent menu. Should be the same as the standard text. */
+"Clear Menu" = "メニューを消去";
+
+/* Label for when no image is being displayed in the window. */
+"No image" = "画像なし";
+
+/* Update menu item title. One of two states. */
+"Check for Updates..." = "更新を確認する...";
+"Install Update..." = "更新をインストールする...";
+
+/* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
+"Reveal in Finder" = "Finder に表示";
+"Reveal in Path Finder" = "Path Finder に表示";
+"Reveal in Browser" = "ブラウザに表示";
+
+/* Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item. */
+"Switch to Finder" = "Finder を開く";
+"Switch to Path Finder" = "Path Finder を開く";
+
+/* Title of save dialog when setting a copy as the desktop picture. */
+"Save Copy as Desktop Picture" = "コピーをデスクトップピクチャにする";
+
+/* Enter/exit full screen. Two states of the same item. */
+"Enter Full Screen" = "フルスクリーンにする";
+"Exit Full Screen" = "フルスクリーンを解除する";
+
+/* Lets the user toggle the on-screen display. Two states of the same item. */
+"Show Info" = "情報を映る";
+"Hide Info" = "情報を隠す";
+
+/* Lets the user toggle whether thumbnails are shown. Two states of the same item. */
+"Show Thumbnails" = "サムネイルを映る";
+"Hide Thumbnails" = "サムネイルを隠す";
+
+/* Title of menu item for toggling animation. Two states. */
+"Turn Animation On" = "アニメーションを始める";
+"Turn Animation Off" = "アニメーションを止める";
+
+/* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
+"Fit to Window" = "ウインドウに合わせる";
+"Fit to Screen" = "画面に合わせる";
+
+/* The title of the bookmarks menu. Two states. */
+"Resume" = "続く";
+"Delete" = "消す";
+
+/* Bookmark menu item used when the file named %@ cannot be found. */
+"Missing File %@" = "“%@” がありません";
+
+/* Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds.*/
+"%@ seconds" = "%@ 秒";
+
+/* Units (bytes, kilobytes, etc). */
+"B" = "B";
+"KB" = "KB";
+"MB" = "MB";
+"GB" = "GB";
+"TB" = "TB";
+
+/* Title of general pref pane. */
+"General" = "全般";
+
+/* Title of navigation pref pane. */
+"Navigation" = "移動";
+
+/* Title of update pref pane. */
+"Update" = "更新";
+
+/* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
+"This document has a bookmark for the page %@." = "このドキュメントには “%@” ページのブックマークがあります。";
+
+/* Offer to resume from bookmark alert informative text. */
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "このページから続かないとブックマークはそのままにされて、最初のページから始める事になります。";
+
+/* Don't resume from bookmark button. */
+"Don't Resume" = "続かない";
+
+/* Do resume from bookmark button. */
+"Resume" = "続く";
+
+/* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
+"The error %ld %@ was generated while loading the URL %@." = "エラー “%ld %@” は発生しました、URL “%@.” を読み込み中に。";
+
+/* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
+"The URL %@ could not be loaded." = "URL “%@” は失敗しました。";
+
+/* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+"%@ already exists in %@. Do you want to replace it?" = "“%@” はすでに “%@” に存在します。置き換えますか？";
+
+/* Replace multiple files alert. %lu is replaced with a number greater than 1, %@ is replaced with the destination name. */
+"%lu pages already exist in %@. Do you want to replace them?" = "%lu ページはすでに “%@” に存在します。置き換えますか？";
+
+/* Informative text for replacement alerts. */
+"Replacing a file overwrites its current contents." = "ファイルを置き換えたら今の内容が消されてしまいます。";
+
+/* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
+"The image %@ could not be saved to %@." = "画像 “%@” は “%@” に保存が出来ませんでした。";
+
+/* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
+"%lu images could not be saved to %@." = "%lu の画像が “%@” に保存が出来ませんでした。";
+
+/* Informative text for save failure alerts. */
+"Make sure the volume is writable and has enough free space." = "ボリュームに書けるか、充分の空き領域があるかどうか確かめてください。";
+
+/* Appears in the image save alert beside each filename that conflicts with an existing file in the destination folder. */
+"File already exists." = "ファイルはすでに存在します。";
+
+/* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
+"The file referenced by the bookmark %@ could not be found." = "ブックマークと関係しているファイル “%@” が見つかりません。";
+
+/* Bookmarked file could not be found error informative text. */
+"It may have been moved or deleted." = "ファイルは動かされた、または消された。";
+
+/* Informative string for secondary mouse button action. */
+"Secondary click goes to the previous page." = "副ボタンは先のページへ戻ります。";
+"Secondary click goes right." = "副ボタンは右に行きます。";
+"Secondary click goes left." = "副ボタンは左に行きます。";
+
+/* Flickr generic error message. %@ is replaced with the message as returned by Flickr. */
+"Flickr returned the error %@." = "Flickr はエラー “%@” を発しました。";
+
+/* Flickr user not found error message. %@ is replaced with the user name/NSID. */
+"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr のユーザー “%@.” が見つかりません。このユーザーは存在していない可能性があり、または Flickr のプライバシー設定により検索は禁止されています。";
+
+/* Dialog button labels. */
+"OK" = "OK";
+"Cancel" = "キャンセル";
+"Delete Bookmark" = "ブックマークを消す";
+"Replace" = "置き換え";
+"Choose" = "選択";

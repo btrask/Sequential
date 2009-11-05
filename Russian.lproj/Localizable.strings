@@ -1,4 +1,4 @@
-﻿/* The primary screen. */
+/* The primary screen. */
 "Main Screen" = "Основное окно";
 
 /* Non-primary screens. %lu is replaced with the screen number. */
@@ -11,8 +11,8 @@
 "No image" = "Нет изображения";
 
 /* Update menu item title. One of two states. */
-"Check for Updates..." = "Check for Updates…";
-"Install Update..." = "Install Update…";
+"Check for Updates..." = "Проверить обновления…";
+"Install Update..." = "Установить обновление…";
 
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
 "Reveal in Finder" = "Показать в Finder";
@@ -39,8 +39,8 @@
 "Hide Thumbnails" = "Спрятать эскизы фотографий";
 
 /* Title of menu item for toggling animation. Two states. */
-"Turn Animation On" = "Turn Animation On";
-"Turn Animation Off" = "Turn Animation Off";
+"Turn Animation On" = "Включить анимацию";
+"Turn Animation Off" = "Выключить анимацию";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Window" = "Масштаб под размер окна";
@@ -64,25 +64,25 @@
 "TB" = "TB";
 
 /* Title of general pref pane. */
-"General" = "General";
+"General" = "Основное";
 
 /* Title of navigation pref pane. */
-"Navigation" = "Navigation";
+"Navigation" = "Просмотр";
 
 /* Title of update pref pane. */
-"Update" = "Update";
+"Update" = "Обновления";
 
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
-"This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
+"This document has a bookmark for the page %@." = "Обнаружена закладка на стр. “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "Если вы не желаете продолжить чтение от закладки, она сохранится, а вы начнете читать с первой страницы как обычно.";
 
 /* Don't resume from bookmark button. */
-"Don't Resume" = "Don't Resume";
+"Don't Resume" = "Не продолжать";
 
 /* Do resume from bookmark button. */
-"Resume" = "Resume";
+"Resume" = "Продолжить";
 
 /* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %ld %@ was generated while loading the URL %@." = "Произошла ошибка “%ld %@” при загрузке URL “%@.”";
@@ -100,10 +100,10 @@
 "Replacing a file overwrites its current contents." = "Файл будет записан поверх существующего.";
 
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
+"The image %@ could not be saved to %@." = "Изображение %@ не удалось сохранить в %@.";
 
 /* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
-"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
+"%lu images could not be saved to %@." = "%lu изображений не удалось сохранить в “%@.”";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Проверьте, что на диски достаточно места и защита от записи снята.";
@@ -118,7 +118,7 @@
 "It may have been moved or deleted." = "Вероятно, вы его переместили или удалили.";
 
 /* Informative string for secondary mouse button action. */
-"Secondary click goes to the previous page." = "Правый щелчок мыши ведет на предыдущую страицу.";
+"Secondary click goes to the previous page." = "Правый щелчок мыши ведет на предыдущую страницу.";
 "Secondary click goes right." = "Правый щелчок мыши ведет вправо.";
 "Secondary click goes left." = "Правый щелчок мыши ведет влево.";
 

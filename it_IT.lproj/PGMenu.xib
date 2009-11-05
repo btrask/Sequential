@@ -11,8 +11,8 @@
 			<string key="NS.object.0">732</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="574"/>
 			<integer value="1241"/>
+			<integer value="574"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -651,7 +651,7 @@
 											</object>
 											<object class="NSMenuItem" id="144780110">
 												<reference key="NSMenu" ref="812617748"/>
-												<string key="NSTitle">by Kind</string>
+												<string key="NSTitle">Per tipo</string>
 												<string key="NSKeyEquiv">5</string>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -734,7 +734,7 @@
 								</object>
 								<object class="NSMenuItem" id="224224279">
 									<reference key="NSMenu" ref="1005487767"/>
-									<string key="NSTitle">Reorient</string>
+									<string key="NSTitle">Riorienta</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
@@ -742,11 +742,11 @@
 									<reference key="NSMixedImage" ref="463441706"/>
 									<string key="NSAction">submenuAction:</string>
 									<object class="NSMenu" key="NSSubmenu" id="357496977">
-										<string key="NSTitle">Reorient</string>
+										<string key="NSTitle">Riorienta</string>
 										<array class="NSMutableArray" key="NSMenuItems">
 											<object class="NSMenuItem" id="353783202">
 												<reference key="NSMenu" ref="357496977"/>
-												<string key="NSTitle">Upright</string>
+												<string key="NSTitle">Normale</string>
 												<string key="NSKeyEquiv">o</string>
 												<int key="NSMnemonicLoc">2147483647</int>
 												<reference key="NSOnImage" ref="251177767"/>
@@ -803,7 +803,7 @@
 											</object>
 											<object class="NSMenuItem" id="681919205">
 												<reference key="NSMenu" ref="357496977"/>
-												<string key="NSTitle">Mirror Horizontally</string>
+												<string key="NSTitle">Speculare orizzontalmente</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -813,7 +813,7 @@
 											</object>
 											<object class="NSMenuItem" id="91833421">
 												<reference key="NSMenu" ref="357496977"/>
-												<string key="NSTitle">Mirror Vertically</string>
+												<string key="NSTitle">Speculare verticalmente</string>
 												<string key="NSKeyEquiv"/>
 												<int key="NSKeyEquivModMask">1048576</int>
 												<int key="NSMnemonicLoc">2147483647</int>
@@ -836,7 +836,7 @@
 								</object>
 								<object class="NSMenuItem" id="276512756">
 									<reference key="NSMenu" ref="1005487767"/>
-									<string key="NSTitle">Turn Animation On</string>
+									<string key="NSTitle">Attiva animazioni</string>
 									<string key="NSKeyEquiv">m</string>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="251177767"/>
@@ -3232,7 +3232,7 @@
 				<boolean value="YES" key="1291.ImportedFromIB2"/>
 				<string key="1293.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1293.ImportedFromIB2"/>
-				<string key="1294.IBEditorWindowLastContentRect">{{644, 654}, {217, 223}}</string>
+				<string key="1294.IBEditorWindowLastContentRect">{{538, 457}, {217, 223}}</string>
 				<string key="1294.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1294.ImportedFromIB2"/>
 				<string key="1295.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3279,6 +3279,7 @@
 				<boolean value="YES" key="202.ImportedFromIB2"/>
 				<string key="212.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="212.ImportedFromIB2"/>
+				<string key="213.IBEditorWindowLastContentRect">{{206, 617}, {191, 183}}</string>
 				<string key="213.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="213.ImportedFromIB2"/>
 				<string key="214.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3299,15 +3300,16 @@
 				<boolean value="YES" key="239.ImportedFromIB2"/>
 				<string key="266.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="266.ImportedFromIB2"/>
+				<string key="267.IBEditorWindowLastContentRect">{{427, 587}, {281, 213}}</string>
 				<string key="267.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="267.ImportedFromIB2"/>
 				<boolean value="YES" key="277.ImportedFromIB2"/>
-				<string key="29.IBEditorWindowLastContentRect">{{132, 997}, {603, 20}}</string>
+				<string key="29.IBEditorWindowLastContentRect">{{35, 800}, {603, 20}}</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="337.ImportedFromIB2"/>
-				<string key="338.IBEditorWindowLastContentRect">{{238, 714}, {443, 283}}</string>
+				<string key="338.IBEditorWindowLastContentRect">{{141, 517}, {443, 283}}</string>
 				<string key="338.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="338.ImportedFromIB2"/>
 				<string key="340.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3328,6 +3330,7 @@
 				<boolean value="YES" key="393.ImportedFromIB2"/>
 				<string key="397.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="397.ImportedFromIB2"/>
+				<string key="398.IBEditorWindowLastContentRect">{{562, 757}, {241, 43}}</string>
 				<string key="398.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="398.ImportedFromIB2"/>
 				<string key="399.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3343,12 +3346,12 @@
 				<boolean value="YES" key="552.ImportedFromIB2"/>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="56.ImportedFromIB2"/>
-				<string key="57.IBEditorWindowLastContentRect">{{361, 569}, {272, 223}}</string>
+				<string key="57.IBEditorWindowLastContentRect">{{47, 577}, {272, 223}}</string>
 				<string key="57.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="57.ImportedFromIB2"/>
 				<string key="573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="573.ImportedFromIB2"/>
-				<string key="574.IBEditorWindowLastContentRect">{{681, 834}, {174, 23}}</string>
+				<string key="574.IBEditorWindowLastContentRect">{{584, 637}, {174, 23}}</string>
 				<string key="574.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="574.ImportedFromIB2"/>
 				<string key="575.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3369,6 +3372,7 @@
 				<boolean value="YES" key="606.ImportedFromIB2"/>
 				<string key="690.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="690.ImportedFromIB2"/>
+				<string key="691.IBEditorWindowLastContentRect">{{397, 577}, {207, 63}}</string>
 				<string key="691.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="691.ImportedFromIB2"/>
 				<string key="692.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3379,7 +3383,7 @@
 				<boolean value="YES" key="694.ImportedFromIB2"/>
 				<string key="755.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="755.ImportedFromIB2"/>
-				<string key="756.IBEditorWindowLastContentRect">{{480, 834}, {290, 163}}</string>
+				<string key="756.IBEditorWindowLastContentRect">{{374, 637}, {290, 163}}</string>
 				<string key="756.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="756.ImportedFromIB2"/>
 				<string key="758.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3406,14 +3410,14 @@
 				<boolean value="YES" key="874.ImportedFromIB2"/>
 				<string key="890.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="890.ImportedFromIB2"/>
-				<string key="891.IBEditorWindowLastContentRect">{{428, 804}, {216, 193}}</string>
+				<string key="891.IBEditorWindowLastContentRect">{{322, 607}, {216, 193}}</string>
 				<string key="891.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="891.ImportedFromIB2"/>
 				<string key="892.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="892.ImportedFromIB2"/>
 				<string key="893.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="893.ImportedFromIB2"/>
-				<string key="894.IBEditorWindowLastContentRect">{{644, 714}, {205, 143}}</string>
+				<string key="894.IBEditorWindowLastContentRect">{{538, 517}, {257, 143}}</string>
 				<string key="894.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="894.ImportedFromIB2"/>
 				<string key="895.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3430,6 +3434,7 @@
 				<boolean value="YES" key="909.ImportedFromIB2"/>
 				<string key="915.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="915.ImportedFromIB2"/>
+				<string key="916.IBEditorWindowLastContentRect">{{490, 577}, {318, 223}}</string>
 				<string key="916.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="916.ImportedFromIB2"/>
 				<string key="917.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
