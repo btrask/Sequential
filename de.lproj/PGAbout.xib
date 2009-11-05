@@ -4,13 +4,15 @@
 		<int key="IBDocument.SystemTarget">1050</int>
 		<string key="IBDocument.SystemVersion">10B504</string>
 		<string key="IBDocument.InterfaceBuilderVersion">740</string>
-		<string key="IBDocument.AppKitVersion">1038.22</string>
-		<string key="IBDocument.HIToolboxVersion">457.00</string>
+		<string key="IBDocument.AppKitVersion">1038.2</string>
+		<string key="IBDocument.HIToolboxVersion">437.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			<string key="NS.object.0">740</string>
 		</object>
-		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs"/>
+		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+			<integer value="9"/>
+		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
@@ -162,13 +164,13 @@
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
 			</object>
 			<object class="NSCustomView" id="890833366">
-				<nil key="NSNextResponder"/>
+				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSSegmentedControl" id="899772693">
 						<reference key="NSNextResponder" ref="890833366"/>
 						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{18, 17}, {205, 24}}</string>
+						<string key="NSFrame">{{18, 17}, {310, 24}}</string>
 						<reference key="NSSuperview" ref="890833366"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSegmentedCell" key="NSCell" id="204230443">
@@ -199,7 +201,8 @@
 						</object>
 					</object>
 				</array>
-				<string key="NSFrameSize">{241, 60}</string>
+				<string key="NSFrameSize">{346, 60}</string>
+				<reference key="NSSuperview"/>
 				<string key="NSClassName">NSView</string>
 			</object>
 		</array>
@@ -361,7 +364,7 @@
 				<boolean value="YES" key="28.IBShouldRemoveOnLegacySave"/>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="29.IBShouldRemoveOnLegacySave"/>
-				<string key="9.IBEditorWindowLastContentRect">{{318, 786}, {241, 60}}</string>
+				<string key="9.IBEditorWindowLastContentRect">{{318, 786}, {346, 60}}</string>
 				<string key="9.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="9.ImportedFromIB2"/>
 			</dictionary>
