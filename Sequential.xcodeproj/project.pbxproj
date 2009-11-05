@@ -601,6 +601,8 @@
 		0EDB9A780EA1899300B7342A /* PGThumbnailBrowser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGThumbnailBrowser.m; sourceTree = "<group>"; };
 		0EDB9BFD0EA1E27D00B7342A /* PGThumbnailView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGThumbnailView.h; sourceTree = "<group>"; };
 		0EDB9BFE0EA1E27D00B7342A /* PGThumbnailView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGThumbnailView.m; sourceTree = "<group>"; };
+		0EDE7AE510A2D830001464F3 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/PGAbout.xib; sourceTree = "<group>"; };
+		0EDE7AE610A2D83E001464F3 /* de */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = de; path = de.lproj/PGPreference.xib; sourceTree = "<group>"; };
 		0EE059AF0CF29F380080061B /* PGImageSaveAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGImageSaveAlert.h; sourceTree = "<group>"; };
 		0EE059B00CF29F380080061B /* PGImageSaveAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGImageSaveAlert.m; sourceTree = "<group>"; };
 		0EE5F8D90DBA6786005A5F0B /* XADMaster.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XADMaster.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1294,7 +1296,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nDOWNLOAD_BASE_URL=\"http://www.sequentialx.com\"\nRELEASENOTES_URL=\"http://www.sequentialx.com/release-notes.html#version-$VERSION\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME$VERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sequential Appcast Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nzip -qr \"$ARCHIVE_FILENAME\" \"$PROJECT_NAME.app\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $VERSION</title>\n\t\t\t<sparkle:releaseNotesLink>$RELEASENOTES_URL</sparkle:releaseNotesLink>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF\n";
+			shellScript = "set -o errexit\n\n[ $BUILD_STYLE = Release ] || { echo Distribution target requires \"'Release'\" build style; false; }\n\nVERSION=$(defaults read \"$BUILT_PRODUCTS_DIR/$PROJECT_NAME.app/Contents/Info\" CFBundleVersion)\nDOWNLOAD_BASE_URL=\"http://www.sequentialx.com\"\n\nARCHIVE_FILENAME=\"$PROJECT_NAME$VERSION.zip\"\nDOWNLOAD_URL=\"$DOWNLOAD_BASE_URL/$ARCHIVE_FILENAME\"\nKEYCHAIN_PRIVKEY_NAME=\"Sequential Appcast Private Key\"\n\nWD=$PWD\ncd \"$BUILT_PRODUCTS_DIR\"\nrm -f \"$PROJECT_NAME\"*.zip\nzip -qr \"$ARCHIVE_FILENAME\" \"$PROJECT_NAME.app\"\n\nSIZE=$(stat -f %z \"$ARCHIVE_FILENAME\")\nPUBDATE=$(date +\"%a, %d %b %G %T %z\")\nSIGNATURE=$(\n\topenssl dgst -sha1 -binary < \"$ARCHIVE_FILENAME\" \\\n\t| openssl dgst -dss1 -sign <(security find-generic-password -g -s \"$KEYCHAIN_PRIVKEY_NAME\" 2>&1 1>/dev/null | perl -pe '($_) = /\"(.+)\"/; s/\\\\012/\\n/g') \\\n\t| openssl enc -base64\n)\n\n[ $SIGNATURE ] || { echo Unable to load signing private key with name \"'$KEYCHAIN_PRIVKEY_NAME'\" from keychain; false; }\n\ncat <<EOF\n\t\t<item>\n\t\t\t<title>Version $VERSION</title>\n\t\t\t<pubDate>$PUBDATE</pubDate>\n\t\t\t<enclosure\n\t\t\t\turl=\"$DOWNLOAD_URL\"\n\t\t\t\tsparkle:version=\"$VERSION\"\n\t\t\t\ttype=\"application/octet-stream\"\n\t\t\t\tlength=\"$SIZE\"\n\t\t\t\tsparkle:dsaSignature=\"$SIGNATURE\"\n\t\t\t/>\n\t\t</item>\nEOF\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1460,6 +1462,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				0EA540BD1097804F00A2094D /* English */,
+				0EDE7AE510A2D830001464F3 /* de */,
 				0E3F5C0410A29D5F006145C1 /* it_IT */,
 				0E3F5C0510A29D66006145C1 /* Japanese */,
 				0E3F5C0610A29D6A006145C1 /* Russian */,
@@ -1471,6 +1474,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				0EA540C11097806E00A2094D /* English */,
+				0EDE7AE610A2D83E001464F3 /* de */,
 				0E3F5C0810A29D80006145C1 /* it_IT */,
 				0E3F5C0910A29D83006145C1 /* Japanese */,
 				0E3F5C0A10A29D85006145C1 /* Russian */,

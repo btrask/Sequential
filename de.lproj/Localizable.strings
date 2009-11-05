@@ -11,8 +11,8 @@
 "No image" = "Kein Bild";
 
 /* Update menu item title. One of two states. */
-"Check for Updates..." = "Check for Updates…";
-"Install Update..." = "Install Update…";
+"Check for Updates..." = "Nach Aktualisierungen suchen ...";
+"Install Update..." = "Update installieren ...";
 
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
 "Reveal in Finder" = "Im Finder anzeigen";
@@ -39,15 +39,15 @@
 "Hide Thumbnails" = "Miniaturen ausblenden";
 
 /* Title of menu item for toggling animation. Two states. */
-"Turn Animation On" = "Turn Animation On";
-"Turn Animation Off" = "Turn Animation Off";
+"Turn Animation On" = "Animationen einschalten";
+"Turn Animation Off" = "Animationen ausschalten";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Window" = "An Fenster anpassen";
 "Fit to Screen" = "An Bildschirm anpassen";
 
 /* The title of the bookmarks menu. Two states. */
-"Resume" = "Fortsetzen";
+"Resume" = "Resume";
 "Delete" = "Löschen";
 
 /* Bookmark menu item used when the file named %@ cannot be found. */
@@ -64,25 +64,25 @@
 "TB" = "TB";
 
 /* Title of general pref pane. */
-"General" = "General";
+"General" = "Allgemein";
 
 /* Title of navigation pref pane. */
 "Navigation" = "Navigation";
 
 /* Title of update pref pane. */
-"Update" = "Update";
+"Update" = "Softwareaktualisierung";
 
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
-"This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
+"This document has a bookmark for the page %@." = "Dieses Dokument enthält ein Lesezeichen für die Seite “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "Wenn Sie von dieser Seite nicht fortsetzen, wird das Lesezeichen erhalten und Sie starten wie üblich von der ersten Seite.";
 
 /* Don't resume from bookmark button. */
-"Don't Resume" = "Don't Resume";
+"Don't Resume" = "Nicht fortsetzen";
 
 /* Do resume from bookmark button. */
-"Resume" = "Resume";
+"Resume" = "Fortsetzen";
 
 /* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %ld %@ was generated while loading the URL %@." = "Der Fehler “%ld %@” wurde bei Laden der URL “%@” generiert.";
@@ -100,10 +100,10 @@
 "Replacing a file overwrites its current contents." = "Ersetzen einer Datei führt zum Überschreiben des Inhalts.";
 
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
+"The image %@ could not be saved to %@." = "Das Bild “%@” konnte nicht in “%@ gesichert werden.”";
 
 /* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
-"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
+"%lu images could not be saved to %@." = "%lu Bilder konnten nicht in “%@ gesichert werden.”";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Stellen Sie sicher, dass das Volume groß genug ist und über ausrechend freien Speicherplatz verfügt.";
