@@ -540,6 +540,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		if(@selector(selectPreviousDocument:) == action) return NO;
 		if(@selector(selectNextDocument:) == action) return NO;
 	}
+	if(![[self recentDocumentIdentifiers] count]) {
+		if(@selector(clearRecentDocuments:) == action) return NO;
+	}
 	return [super validateMenuItem:anItem];
 }
 
