@@ -605,7 +605,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-	[menu removeAllItems];
+	[menu PG_removeAllItems];
 	BOOL addedAnyItems = NO;
 	NSArray *const identifiers = [self recentDocumentIdentifiers];
 	for(PGDisplayableIdentifier *const identifier in identifiers) {

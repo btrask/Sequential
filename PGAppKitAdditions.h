@@ -63,6 +63,12 @@ typedef NSUInteger AEIconType;
 
 @end
 
+@interface NSMenu(PGAppKitAdditions)
+
+- (void)PG_removeAllItems; // Available on 10.5.
+
+@end
+
 @interface NSMenuItem(PGAppKitAdditions)
 
 - (void)PG_addAfterItem:(NSMenuItem *)anItem;

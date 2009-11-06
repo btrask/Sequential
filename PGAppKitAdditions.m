@@ -167,6 +167,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@implementation NSMenu(PGAppKitAdditions)
+
+- (void)PG_removeAllItems
+{
+	if(PGIsSnowLeopardOrLater()) [self removeAllItems];
+	else while([self numberOfItems]) [self removeItemAtIndex:0];
+}
+
+@end
+
 @interface NSMenu(AEUndocumented)
 - (id)_menuImpl;
 @end
