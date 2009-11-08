@@ -1,3 +1,7 @@
+2.1.1 (November 6th, 2009)
+- Fixes a bug that prevented launch on 10.5.
+- Other minor fixes and improvements.
+
 2.1 (November 4th, 2009)
 - Mac OS 10.6 Snow Leopard support added. 10.4 support dropped.
 - 64-bit support.
