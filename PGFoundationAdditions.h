@@ -33,6 +33,9 @@ NS_INLINE BOOL PGEqualObjects(id<NSObject> a, id<NSObject> b)
 	if(!a || !b) return NO;
 	return [a isEqual:b];
 }
+#ifndef NSAppKitVersionNumber10_5
+#define NSAppKitVersionNumber10_5 949
+#endif
 NS_INLINE BOOL PGIsSnowLeopardOrLater(void)
 {
        return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_5;
@@ -89,6 +92,13 @@ extern OSType PGOSTypeFromString(NSString *);
 - (NSArray *)PG_asArray;
 
 + (void *)PG_useImplementationFromClass:(Class)class forSelector:(SEL)aSel;
+
+@end
+
+@interface NSProcessInfo(PGFoundationAdditions)
+
+- (void)PG_enableSuddenTermination;
+- (void)PG_disableSuddenTermination;
 
 @end
 

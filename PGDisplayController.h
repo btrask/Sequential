@@ -48,7 +48,11 @@ extern NSString *const PGDisplayControllerActiveNodeDidChangeNotification;
 extern NSString *const PGDisplayControllerActiveNodeWasReadNotification;
 extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 
-@interface PGDisplayController : NSWindowController <NSWindowDelegate, PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
+@interface PGDisplayController : NSWindowController <
+#ifdef MAC_OS_X_VERSION_10_6
+NSWindowDelegate,
+#endif
+PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 {
 	@private
 	IBOutlet PGClipView *clipView;

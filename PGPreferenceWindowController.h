@@ -26,7 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 extern NSString *const PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification;
 extern NSString *const PGPreferenceWindowControllerDisplayScreenDidChangeNotification;
 
-@interface PGPreferenceWindowController : NSWindowController <NSApplicationDelegate, NSToolbarDelegate>
+@interface PGPreferenceWindowController : NSWindowController
+#ifdef MAC_OS_X_VERSION_10_6
+<NSApplicationDelegate, NSToolbarDelegate>
+#endif
 {
 	@private
 	IBOutlet NSView *generalView;

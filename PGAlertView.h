@@ -34,7 +34,10 @@ enum {
 };
 typedef NSUInteger PGAlertGraphicType;
 
-@interface PGAlertView : NSView <NSWindowDelegate>
+@interface PGAlertView : NSView
+#ifdef MAC_OS_X_VERSION_10_6
+<NSWindowDelegate>
+#endif
 {
 	@private
 	NSMutableArray *_graphicStack;

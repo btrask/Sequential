@@ -26,7 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGNode;
 @class PGContainerAdapter;
 
-@interface PGXMLParser : NSObject <NSXMLParserDelegate>
+@interface PGXMLParser : NSObject
+#ifdef MAC_OS_X_VERSION_10_6
+<NSXMLParserDelegate>
+#endif
 {
 	@private
 	NSXMLParser    *_parser;

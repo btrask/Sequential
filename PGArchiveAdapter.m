@@ -81,7 +81,7 @@ static id PGArchiveAdapterList = nil;
 	NSParameterAssert(parent);
 	NSParameterAssert(_archive);
 	NSMutableArray *const children = [NSMutableArray array];
-	NSInteger i = [indexes firstIndex];
+	NSUInteger i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
 		if(_encodingError) return nil;

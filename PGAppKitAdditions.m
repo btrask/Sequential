@@ -167,6 +167,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@interface NSMenu(PGSnowLeopardOrLater)
+- (void)removeAllItems;
+@end
+
 @implementation NSMenu(PGAppKitAdditions)
 
 - (void)PG_removeAllItems
@@ -212,6 +216,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return YES;
 }
 
+@end
+
+@interface NSWorkspace(PGSnowLeopardOrLater)
+- (BOOL)setDesktopImageURL:(NSURL *)URL forScreen:(NSScreen *)screen options:(NSUInteger)options error:(out NSError **)outError;
+- (NSUInteger)desktopImageOptionsForScreen:(NSScreen *)screen;
 @end
 
 @implementation NSScreen(PGAppKitAdditions)

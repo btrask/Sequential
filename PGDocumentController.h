@@ -56,7 +56,10 @@ enum {
 #define PGScaleMax 16.0f
 #define PGScaleMin (1.0f / 16.0f)
 
-@interface PGDocumentController : NSResponder <NSApplicationDelegate, NSMenuDelegate>
+@interface PGDocumentController : NSResponder
+#ifdef MAC_OS_X_VERSION_10_6
+<NSApplicationDelegate, NSMenuDelegate>
+#endif
 {
 	@private
 	IBOutlet NSMenu *recentMenu;

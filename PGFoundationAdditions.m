@@ -217,6 +217,24 @@ OSType PGOSTypeFromString(NSString *str)
 
 @end
 
+@interface NSProcessInfo(PGSnowLeopardOrLater)
+- (void)enableSuddenTermination;
+- (void)disableSuddenTermination;
+@end
+
+@implementation NSProcessInfo(PGFoundationAdditions)
+
+- (void)PG_enableSuddenTermination
+{
+	if([self respondsToSelector:@selector(enableSuddenTermination)]) [self enableSuddenTermination];
+}
+- (void)PG_disableSuddenTermination
+{
+	if([self respondsToSelector:@selector(disableSuddenTermination)]) [self disableSuddenTermination];
+}
+
+@end
+
 @implementation NSScanner(PGFoundationAdditions)
 
 - (BOOL)PG_scanFromString:(NSString *)start toString:(NSString *)end intoString:(out NSString **)outString

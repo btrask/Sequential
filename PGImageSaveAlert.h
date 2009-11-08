@@ -25,7 +25,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGNode;
 
-@interface PGImageSaveAlert : NSWindowController <NSOpenSavePanelDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate>
+@interface PGImageSaveAlert : NSWindowController
+#ifdef MAC_OS_X_VERSION_10_6
+<NSOpenSavePanelDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate>
+#endif
 {
 	@private
 	IBOutlet NSView *accessoryView;

@@ -37,7 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 extern NSString *const PGThumbnailControllerContentInsetDidChangeNotification;
 
-@interface PGThumbnailController : NSObject <NSWindowDelegate, PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource>
+@interface PGThumbnailController : NSObject <
+#ifdef MAC_OS_X_VERSION_10_6
+NSWindowDelegate,
+#endif
+PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource>
 {
 	@private
 	PGFadeOutPanel *_window;

@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_rootNode = [root retain];
 	_initialSelection = [aSet copy];
 	_saveNamesByNodePointer = [[NSMutableDictionary alloc] init];
-	[[NSProcessInfo processInfo] disableSuddenTermination];
+	[[NSProcessInfo processInfo] PG_disableSuddenTermination];
 	return self;
 }
 - (void)beginSheetForWindow:(NSWindow *)window
@@ -94,7 +94,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)dealloc
 {
-	[[NSProcessInfo processInfo] enableSuddenTermination];
+	[[NSProcessInfo processInfo] PG_enableSuddenTermination];
 	[nodesOutline setDataSource:nil];
 	[nodesOutline setDelegate:nil];
 	[_rootNode release];

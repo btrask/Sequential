@@ -25,7 +25,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGClipView.h"
 #import <IOKit/hidsystem/IOHIDLib.h>
 #import <IOKit/hidsystem/event_status_driver.h>
-#import <HMDTAppKit/HMAppKitEx.h>
 #import <tgmath.h>
 
 // Other Sources
