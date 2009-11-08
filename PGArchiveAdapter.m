@@ -164,7 +164,7 @@ static id PGArchiveAdapterList = nil;
 	_needsPassword = YES;
 	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
 }
-- (NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(CGFloat)confidence
+-(NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
 {
 	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
