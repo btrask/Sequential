@@ -774,7 +774,7 @@
 				0E20FCDD109652CF007EE24A /* XADTest */,
 				0E20FCDF109652CF007EE24A /* XADTest2 */,
 				0E20FCE1109652CF007EE24A /* XADTest3 */,
-				0E20FCE3109652CF007EE24A /* XADTest4 */,
+				0E20FCE3109652CF007EE24A /* XADTest3 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1163,10 +1163,10 @@
 			remoteRef = 0E20FCE0109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		0E20FCE3109652CF007EE24A /* XADTest4 */ = {
+		0E20FCE3109652CF007EE24A /* XADTest3 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = XADTest4;
+			path = XADTest3;
 			remoteRef = 0E20FCE2109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1746,7 +1746,7 @@
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sequential_Prefix.pch;
-				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_MISSING_NEWLINE = YES;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
