@@ -105,13 +105,9 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 
 #pragma mark -<NSWindowDelegate>
 
-- (void)windowDidResize:(NSNotification *)notification
+- (void)windowDidResize:(NSNotification *)aNotif
 {
-	if(_shouldSaveFrame) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
-}
-- (void)windowDidMove:(NSNotification *)notification
-{
-	[self windowDidResize:nil];
+	if(_shouldSaveFrame && [self window] == [aNotif object]) [[NSUserDefaults standardUserDefaults] setObject:[[self window] stringWithSavedFrame] forKey:PGMainWindowFrameKey];
 }
 
 #pragma mark -
