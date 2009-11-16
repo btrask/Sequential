@@ -78,7 +78,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:PGAnimationFramerate / 2.0f options:PGRetainTarget] retain];
 	[self _update];
 }
-- (void)windowDidClose
+- (void)windowWillClose
 {
 	[_updateTimer invalidate];
 	[_updateTimer release];
@@ -98,7 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)dealloc
 {
-	[self windowDidClose];
+	[self windowWillClose];
 	[super dealloc];
 }
 

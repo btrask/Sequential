@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[self windowWillShow];
 		[super showWindow:self];
 	} else {
+		[self windowWillClose];
 		[[self window] performClose:self];
-		[self windowDidClose];
 	}
 }
 - (PGDisplayController *)displayController
@@ -77,7 +77,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return name ? [NSString stringWithFormat:@"%@PanelFrame", name] : nil;
 }
 - (void)windowWillShow {}
-- (void)windowDidClose {}
+- (void)windowWillClose {}
 - (BOOL)setDisplayController:(PGDisplayController *)controller
 {
 	if(controller == _displayController) return NO;
@@ -172,6 +172,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)windowWillClose:(NSNotification *)aNotif
 {
 	_shown = NO;
+	[self windowWillClose];
 }
 
 @end

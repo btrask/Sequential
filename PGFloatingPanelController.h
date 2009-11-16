@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(readonly) NSString *nibName;
 @property(readonly) NSString *windowFrameAutosaveName;
 - (void)windowWillShow;
-- (void)windowDidClose;
+- (void)windowWillClose;
 - (BOOL)setDisplayController:(PGDisplayController *)controller;
 
 - (void)windowDidBecomeMain:(NSNotification *)aNotif;
