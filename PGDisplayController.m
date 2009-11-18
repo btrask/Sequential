@@ -607,6 +607,7 @@ typedef NSUInteger PGZoomDirection;
 	PGZoomDirection dir = PGZoomNone;
 	BOOL stop = NO;
 	do {
+		if([latestEvent type] != NSPeriodic && [latestEvent isARepeat]) continue;
 		NSEventType const type = [latestEvent type];
 		if(NSKeyDown == type || NSKeyUp == type) {
 			PGZoomDirection newDir = PGZoomNone;
