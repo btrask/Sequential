@@ -182,7 +182,7 @@ static NSSize PGRoundedCornerSizes[4];
 	[self setNeedsDisplay:YES];
 	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
 	_orientation = orientation;
-	[_image setSize:NSMakeSize([_rep pixelsWide], [_rep pixelsHigh])];
+	[_image setSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])];
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
 		[_rep release];
