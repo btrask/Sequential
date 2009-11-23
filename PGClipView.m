@@ -44,6 +44,7 @@ NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidCha
 #define PGGameStyleArrowScrolling true
 #define PGBorderPadding (PGGameStyleArrowScrolling ? 10.0f : 23.0f)
 #define PGLineScrollDistance (PGBorderPadding * 4.0f)
+#define PGPageScrollMargin (PGLineScrollDistance * 4.0f)
 #define PGMouseWheelScrollFactor 10.0f
 #define PGMouseWheelZoomFactor 20.0f
 
@@ -283,7 +284,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	switch(scrollType) {
 		case PGScrollByLine: return NSMakeSize(PGLineScrollDistance, PGLineScrollDistance);
-		case PGScrollByPage: return NSMakeSize(NSWidth([self insetBounds]) - PGLineScrollDistance, NSHeight([self insetBounds]) - PGLineScrollDistance);
+		case PGScrollByPage: return NSMakeSize(NSWidth([self insetBounds]) - PGPageScrollMargin, NSHeight([self insetBounds]) - PGPageScrollMargin);
 		default: return NSZeroSize;
 	}
 }
