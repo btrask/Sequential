@@ -426,31 +426,30 @@ static NSSize PGRoundedCornerSizes[4];
 - (void)drawRect:(NSRect)aRect
 {
 	if(!_rep) return;
-	NSRect b = (NSRect){NSZeroPoint, _immediateSize};
-	b.origin.x = round(NSMidX([self bounds]) - NSWidth(b) / 2);
-	b.origin.y = round(NSMidY([self bounds]) - NSHeight(b) / 2);
+	NSRect const b = [self bounds];
+	NSRect const imageRect = NSMakeRect(round(NSMidX(b) - _immediateSize.width / 2.0f), round(NSMidY(b) - _immediateSize.height / 2.0f), _immediateSize.width, _immediateSize.height);
 	CGFloat const deg = [self rotationInDegrees];
 	if(deg) {
 		[NSGraphicsContext saveGraphicsState];
 		[[self _transformWithRotationInDegrees:deg] concat];
 	}
 	[self _cache];
-	if(_cacheLayer) CGContextDrawLayerAtPoint([[NSGraphicsContext currentContext] graphicsPort], NSPointToCGPoint(b.origin), _cacheLayer);
+	if(_cacheLayer) CGContextDrawLayerAtPoint([[NSGraphicsContext currentContext] graphicsPort], NSPointToCGPoint(imageRect.origin), _cacheLayer);
 	else {
 		NSInteger count = 0;
 		NSRect const *rects = NULL;
 		if(!deg) [self getRectsBeingDrawn:&rects count:&count];
-		[self _drawImageWithFrame:b compositeCopy:NO rects:rects count:count];
+		[self _drawImageWithFrame:imageRect compositeCopy:NO rects:rects count:count];
 	}
 #if PGDebugDrawingModes
 	[(_cacheLayer ? [NSColor redColor] : [NSColor blueColor]) set];
-	NSFrameRect(b); // Outer frame: Cached
+	NSFrameRect(imageRect); // Outer frame: Cached
 	[([self isOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
-	NSFrameRect(NSInsetRect(b, 2, 2)); // Middle frame 1: View opaque
+	NSFrameRect(NSInsetRect(imageRect, 2.0f, 2.0f)); // Middle frame 1: View opaque
 	[([self _imageIsOpaque] ? [NSColor redColor] : [NSColor blueColor]) set];
-	NSFrameRect(NSInsetRect(b, 4, 4)); // Middle frame 2: Image opaque
+	NSFrameRect(NSInsetRect(imageRect, 4.0f, 4.0f)); // Middle frame 2: Image opaque
 	[(deg ? [NSColor blueColor] : [NSColor redColor]) set];
-	NSFrameRect(NSInsetRect(b, 6, 6)); // Inner frame: Rotated
+	NSFrameRect(NSInsetRect(imageRect, 6.0f, 6.0f)); // Inner frame: Rotated
 #endif
 	if(deg) [NSGraphicsContext restoreGraphicsState];
 }
