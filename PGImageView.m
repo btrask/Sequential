@@ -182,13 +182,13 @@ static NSSize PGRoundedCornerSizes[4];
 	[self setNeedsDisplay:YES];
 	if(orientation == _orientation && rep == _rep && !_sizeTransitionTimer && NSEqualSizes(size, _immediateSize)) return;
 	_orientation = orientation;
+	[_image setSize:NSMakeSize([_rep pixelsWide], [_rep pixelsHigh])];
 	if(rep != _rep) {
 		[_image removeRepresentation:_rep];
 		[_rep release];
 		_rep = nil;
 		[self setSize:size allowAnimation:NO];
 		_rep = [rep retain];
-		[_image setSize:NSMakeSize([_rep pixelsWide], [_rep pixelsHigh])];
 		[_image addRepresentation:_rep];
 
 		_isPDF = [_rep isKindOfClass:[NSPDFImageRep class]];
