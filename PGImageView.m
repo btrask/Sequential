@@ -253,7 +253,7 @@ static NSSize PGRoundedCornerSizes[4];
 
 - (BOOL)_imageIsOpaque
 {
-	return (_isPDF && _cacheLayer) || [_rep isOpaque];
+	return _isPDF || [_rep isOpaque];
 }
 - (void)_runAnimationTimer
 {
