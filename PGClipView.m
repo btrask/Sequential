@@ -38,7 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidChange";
 
 #define PGMouseHiddenDraggingStyle true
-#define PGAnimateScrolling true
 #define PGClickSlopDistance 3.0f
 #define PGPageTurnMovementDelay 0.5f
 #define PGGameStyleArrowScrolling true
@@ -146,6 +145,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	_pinLocation = PGNonContradictoryRectEdges(mask);
 }
+@synthesize allowsAnimation = _allowsAnimation;
 
 #pragma mark -
 
@@ -178,7 +178,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (BOOL)scrollTo:(NSPoint)aPoint animation:(PGAnimationType)type
 {
-	if(!PGAnimateScrolling || PGPreferAnimation != type) {
+	if(PGPreferAnimation != type || ![self allowsAnimation]) {
 		if(PGNoAnimation == type) [self stopAnimatedScrolling];
 		if(!_scrollTimer) return [self _scrollTo:aPoint];
 	}
@@ -480,6 +480,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		[self setShowsBorder:YES];
 		[self setCursor:[NSCursor arrowCursor]];
 		_backgroundIsComplex = YES;
+		_allowsAnimation = YES;
 	}
 	return self;
 }

@@ -61,13 +61,15 @@ typedef NSUInteger PGScrollToRectType;
 	BOOL _showsBorder;
 	NSCursor *_cursor;
 	NSPoint _position;
-	NSPoint _targetPosition;
-	NSTimer *_scrollTimer;
-	NSTimeInterval _lastScrollTime;
 	PGRectEdgeMask _pinLocation;
 	NSUInteger _documentViewIsResizing;
 	BOOL _firstMouse;
 	NSUInteger _scrollCount;
+
+	BOOL _allowsAnimation;
+	NSPoint _targetPosition;
+	NSTimer *_scrollTimer;
+	NSTimeInterval _lastScrollTime;
 }
 
 @property(assign) NSResponder<PGClipViewDelegate> *delegate;
@@ -80,6 +82,7 @@ typedef NSUInteger PGScrollToRectType;
 @property(retain) NSCursor *cursor;
 @property(assign, getter = isScrolling) BOOL scrolling;
 @property(assign) PGRectEdgeMask pinLocation;
+@property(assign) BOOL allowsAnimation;
 
 @property(readonly) NSPoint position;
 @property(readonly) NSPoint center;
