@@ -1076,7 +1076,8 @@ typedef NSUInteger PGZoomDirection;
 		if(PGViewFitScale == tag) {
 			if([[PGDocumentController sharedDocumentController] isFullscreen]) [anItem setTitle:NSLocalizedString(@"Fit to Screen", @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
 			else [anItem setTitle:NSLocalizedString(@"Fit to Window", @"Scale image down so the entire thing fits menu item. Two labels, depending on mode.")];
-		} else if(PGConstantFactorScale == tag) [anItem setState:[[self activeDocument] imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([[self activeDocument] imageScaleFactor])) : NSOffState];
+		}
+		if(PGConstantFactorScale == tag) [anItem setState:[[self activeDocument] imageScaleMode] == tag ? PGFuzzyEqualityToCellState(0.0f, log2([[self activeDocument] imageScaleFactor])) : NSOffState];
 		else [anItem setState:[[self activeDocument] imageScaleMode] == tag];
 	}
 	if(@selector(changeImageScaleFactor:) == action) [[[PGDocumentController sharedDocumentController] scaleSlider] setDoubleValue:log2([[self activeDocument] imageScaleFactor])];
