@@ -151,7 +151,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (NSPoint)position
 {
-	return _scrollTimer ? _position : _immediatePosition;
+	return _scrollTimer ? _targetPosition : _position;
 }
 - (NSPoint)center
 {
@@ -184,7 +184,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	}
 	NSPoint const newTargetPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
 	if(NSEqualPoints(newTargetPosition, [self position])) return NO;
-	_position = newTargetPosition;
+	_targetPosition = newTargetPosition;
 	if(!_scrollTimer) {
 		self.scrolling = YES;
 		_scrollTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
@@ -293,10 +293,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(PGNoEdges == mask) return NO;
 	NSRect const l = [self scrollableRectWithBorder:YES];
 	NSRect const s = NSInsetRect([self scrollableRectWithBorder:NO], -1, -1);
-	if(mask & PGMinXEdgeMask && _immediatePosition.x > MAX(NSMinX(l), NSMinX(s))) return NO;
-	if(mask & PGMinYEdgeMask && _immediatePosition.y > MAX(NSMinY(l), NSMinY(s))) return NO;
-	if(mask & PGMaxXEdgeMask && _immediatePosition.x < MIN(NSMaxX(l), NSMaxX(s))) return NO;
-	if(mask & PGMaxYEdgeMask && _immediatePosition.y < MIN(NSMaxY(l), NSMaxY(s))) return NO; // Don't use NSIntersectionRect() because it returns NSZeroRect if the width or height is zero.
+	if(mask & PGMinXEdgeMask && _position.x > MAX(NSMinX(l), NSMinX(s))) return NO;
+	if(mask & PGMinYEdgeMask && _position.y > MAX(NSMinY(l), NSMinY(s))) return NO;
+	if(mask & PGMaxXEdgeMask && _position.x < MIN(NSMaxX(l), NSMaxX(s))) return NO;
+	if(mask & PGMaxYEdgeMask && _position.y < MIN(NSMaxY(l), NSMaxY(s))) return NO; // Don't use NSIntersectionRect() because it returns NSZeroRect if the width or height is zero.
 	return YES;
 }
 
@@ -439,10 +439,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSPoint const newPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
 	if(scroll) [[self PG_enclosingClipView] scrollBy:NSMakeSize(aPoint.x - newPosition.x, aPoint.y - newPosition.y) animation:PGAllowAnimation];
-	if(NSEqualPoints(newPosition, _immediatePosition)) return NO;
+	if(NSEqualPoints(newPosition, _position)) return NO;
 	self.scrolling = YES;
-	_immediatePosition = newPosition;
-	[self setBoundsOrigin:NSMakePoint(round(_immediatePosition.x), round(_immediatePosition.y))];
+	_position = newPosition;
+	[self setBoundsOrigin:NSMakePoint(round(_position.x), round(_position.y))];
 	if(redisplay) [self setNeedsDisplay:YES];
 	self.scrolling = NO;
 	[self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
@@ -454,10 +454,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)_scrollOneFrame
 {
-	NSSize const r = NSMakeSize(_position.x - _immediatePosition.x, _position.y - _immediatePosition.y);
+	NSSize const r = NSMakeSize(_targetPosition.x - _position.x, _targetPosition.y - _position.y);
 	CGFloat const dist = hypotf(r.width, r.height);
 	CGFloat const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
-	if(![self _scrollTo:dist < 1.0f ? _position : PGOffsetPointByXY(_immediatePosition, r.width * factor, r.height * factor)]) [self stopAnimatedScrolling];
+	if(![self _scrollTo:dist < 1.0f ? _targetPosition : PGOffsetPointByXY(_position, r.width * factor, r.height * factor)]) [self stopAnimatedScrolling];
 }
 
 - (void)_beginPreliminaryDrag:(NSValue *)val
@@ -537,7 +537,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	CGFloat const heightDiff = NSHeight([self frame]) - newSize.height;
 	[super setFrameSize:newSize];
-	if(![self _setPosition:PGOffsetPointByXY(_immediatePosition, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
+	if(![self _setPosition:PGOffsetPointByXY(_position, 0.0f, heightDiff) scrollEnclosingClipViews:NO markForRedisplay:YES]) [self PG_postNotificationName:PGClipViewBoundsDidChangeNotification];
 }
 
 #pragma mark -NSView(PGClipViewAdditions)
