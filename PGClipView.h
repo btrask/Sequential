@@ -67,9 +67,11 @@ typedef NSUInteger PGScrollToRectType;
 	NSUInteger _scrollCount;
 
 	BOOL _allowsAnimation;
+	NSPoint _startPosition;
 	NSPoint _targetPosition;
-	NSTimer *_scrollTimer;
-	NSTimeInterval _lastScrollTime;
+	CGFloat _animationProgress;
+	NSTimer *_animationTimer;
+	NSTimeInterval _lastAnimationTime;
 }
 
 @property(assign) NSResponder<PGClipViewDelegate> *delegate;

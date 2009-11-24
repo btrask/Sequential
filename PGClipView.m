@@ -46,6 +46,7 @@ NSString *const PGClipViewBoundsDidChangeNotification = @"PGClipViewBoundsDidCha
 #define PGPageScrollMargin (PGLineScrollDistance * 4.0f)
 #define PGMouseWheelScrollFactor 10.0f
 #define PGMouseWheelZoomFactor 20.0f
+#define PGAnimationDuration ((NSTimeInterval)0.2f)
 
 enum {
 	PGNotDragging,
@@ -151,7 +152,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (NSPoint)position
 {
-	return _scrollTimer ? _targetPosition : _position;
+	return _animationTimer ? _targetPosition : _position;
 }
 - (NSPoint)center
 {
@@ -180,14 +181,16 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	if(PGPreferAnimation != type || ![self allowsAnimation]) {
 		if(PGNoAnimation == type) [self stopAnimatedScrolling];
-		if(!_scrollTimer) return [self _scrollTo:aPoint];
+		if(!_animationTimer) return [self _scrollTo:aPoint];
 	}
 	NSPoint const newTargetPosition = PGPointInRect(aPoint, [self scrollableRectWithBorder:YES]);
 	if(NSEqualPoints(newTargetPosition, [self position])) return NO;
+	_startPosition = _position;
 	_targetPosition = newTargetPosition;
-	if(!_scrollTimer) {
+	_animationProgress = 0.0f;
+	if(!_animationTimer) {
 		self.scrolling = YES;
-		_scrollTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
+		_animationTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
 	}
 	return YES;
 }
@@ -226,11 +229,12 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 - (void)stopAnimatedScrolling
 {
-	if(!_scrollTimer) return;
-	[_scrollTimer invalidate];
-	[_scrollTimer release];
-	_scrollTimer = nil;
-	_lastScrollTime = 0.0f;
+	if(!_animationTimer) return;
+	[_animationTimer invalidate];
+	[_animationTimer release];
+	_animationTimer = nil;
+	_animationProgress = 0.0f;
+	_lastAnimationTime = 0.0f;
 	self.scrolling = NO;
 }
 
@@ -362,17 +366,17 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	[NSEvent startPeriodicEventsAfterDelay:0.0f withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGRectEdgeMask pressedDirections = PGNoEdges;
-	NSTimeInterval pageTurnTime = 0.0f, lastScrollTime = 0.0f;
+	NSTimeInterval pageTurnTime = 0.0f, lastAnimationTime = 0.0f;
 	do {
 		NSEventType const type = [latestEvent type];
 		if(NSPeriodic == type) {
 			NSTimeInterval const currentTime = PGUptime();
 			if(currentTime > pageTurnTime + PGPageTurnMovementDelay) {
 				NSSize const d = [self distanceInDirection:PGNonContradictoryRectEdges(pressedDirections) forScrollType:PGScrollByLine];
-				CGFloat const timeAdjustment = (CGFloat)(lastScrollTime ? PGAnimationFramerate / (currentTime - lastScrollTime) : 1.0f);
+				CGFloat const timeAdjustment = (CGFloat)(lastAnimationTime ? PGAnimationFramerate / (currentTime - lastAnimationTime) : 1.0f);
 				[self scrollBy:NSMakeSize(d.width / timeAdjustment, d.height / timeAdjustment) animation:PGNoAnimation];
 			}
-			lastScrollTime = currentTime;
+			lastAnimationTime = currentTime;
 			continue;
 		}
 		if([latestEvent isARepeat]) continue;
@@ -454,10 +458,12 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (void)_scrollOneFrame
 {
-	NSSize const r = NSMakeSize(_targetPosition.x - _position.x, _targetPosition.y - _position.y);
-	CGFloat const dist = hypotf(r.width, r.height);
-	CGFloat const factor = MIN(1.0f, MAX(0.25f, 10.0f / dist) * PGLagCounteractionSpeedup(&_lastScrollTime, PGAnimationFramerate));
-	if(![self _scrollTo:dist < 1.0f ? _targetPosition : PGOffsetPointByXY(_position, r.width * factor, r.height * factor)]) [self stopAnimatedScrolling];
+	if(_animationProgress >= 1.0f) return [self stopAnimatedScrolling];
+	_animationProgress += (PGAnimationFramerate / PGAnimationDuration) * PGLagCounteractionSpeedup(&_lastAnimationTime, PGAnimationFramerate);
+	if(_animationProgress > 1.0f) _animationProgress = 1.0f;
+	NSSize const r = NSMakeSize(_targetPosition.x - _startPosition.x, _targetPosition.y - _startPosition.y);
+	CGFloat const f = 0.5f * sin(M_PI * (_animationProgress - 0.5f)) + 0.5f;
+	(void)[self _scrollTo:PGOffsetPointByXY(_startPosition, r.width * f, r.height * f)];
 }
 
 - (void)_beginPreliminaryDrag:(NSValue *)val
