@@ -207,6 +207,7 @@ static id PGArchiveAdapterList = nil;
 		BOOL const neededPassword = _needsPassword;
 		_needsPassword = NO;
 		_currentSubnode = sender;
+		[_archive clearLastError];
 		data = [_archive contentsOfEntry:i];
 		if(!_needsPassword && [_archive lastError] == XADPasswordError) [self archiveNeedsPassword:_archive];
 		_currentSubnode = nil;
