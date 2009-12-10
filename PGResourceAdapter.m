@@ -238,10 +238,11 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (void)setRealThumbnail:(NSImage *)anImage
 {
-	if(anImage == _realThumbnail) return;
-	[_realThumbnail release];
-	_realThumbnail = [anImage retain];
-	[[self document] noteNodeThumbnailDidChange:[self node] recursively:NO];
+	if(anImage != _realThumbnail) {
+		[_realThumbnail release];
+		_realThumbnail = [anImage retain];
+		[[self document] noteNodeThumbnailDidChange:[self node] recursively:NO];
+	}
 	[_thumbnailGenerationOperation cancel];
 	[_thumbnailGenerationOperation release];
 	_thumbnailGenerationOperation = nil;
@@ -598,7 +599,7 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	if([self isCancelled]) return;
 	NSImage *const thumbnail = [[_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info] retain];
-	if(!thumbnail || [self isCancelled]) return;
+	if([self isCancelled]) return;
 	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:thumbnail waitUntilDone:NO];
 }
 
