@@ -58,6 +58,7 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 	PGNode *_node;
 	PGSubscription *_subscription;
 	NSMutableArray *_cachedNodes;
+	NSOperationQueue *_operationQueue;
 
 	PGNode *_storedNode;
 	PGImageView *_storedImageView;
@@ -103,6 +104,7 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 - (void)noteNodeThumbnailDidChange:(PGNode *)node recursively:(BOOL)flag;
 - (void)noteNodeDisplayNameDidChange:(PGNode *)node;
 - (void)noteNodeDidCache:(PGNode *)node;
+- (void)addOperation:(NSOperation *)operation;
 
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)subscriptionEventDidOccur:(NSNotification *)aNotif;

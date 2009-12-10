@@ -48,18 +48,14 @@ NSString *const PGDateKey        = @"PGDate";
 
 #define PGThumbnailSize 128
 
-static NSOperationQueue *PGThumbnailGenerationQueue;
-
 @interface PGThumbnailGenerationOperation : NSOperation
 {
 	@private
 	PGResourceAdapter *_adapter;
 	NSDictionary *_info;
-	NSImage *_thumbnail;
 }
 
 - (id)initWithResourceAdapter:(PGResourceAdapter *)adapter info:(NSDictionary *)info;
-- (void)mainThread_finish;
 
 @end
 
@@ -138,14 +134,6 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 	return [PGResourceAdapter class] != self;
 }
 
-#pragma mark +NSObject
-
-+ (void)initialize
-{
-	if([PGResourceAdapter class] != self) return;
-	PGThumbnailGenerationQueue = [[NSOperationQueue alloc] init];
-}
-
 #pragma mark -PGResourceAdapter
 
 - (PGNode *)node
@@ -210,7 +198,7 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 		[info setObject:[NSNumber numberWithUnsignedInteger:[self orientationWithBase:NO]] forKey:PGOrientationKey];
 		[info setObject:[NSDate date] forKey:PGDateKey];
 		_thumbnailGenerationOperation = [[PGThumbnailGenerationOperation alloc] initWithResourceAdapter:self info:info];
-		[PGThumbnailGenerationQueue addOperation:_thumbnailGenerationOperation];
+		[[self document] addOperation:_thumbnailGenerationOperation];
 	}
 	return [self fastThumbnail];
 }
@@ -254,6 +242,9 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 	[_realThumbnail release];
 	_realThumbnail = [anImage retain];
 	[[self document] noteNodeThumbnailDidChange:[self node] recursively:NO];
+	[_thumbnailGenerationOperation cancel];
+	[_thumbnailGenerationOperation release];
+	_thumbnailGenerationOperation = nil;
 }
 - (BOOL)canGenerateRealThumbnail
 {
@@ -340,7 +331,6 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 }
 - (void)dealloc
 {
-	[_thumbnailGenerationOperation cancel];
 	[_info release];
 	[_realThumbnail release];
 	[_thumbnailGenerationOperation release];
@@ -601,33 +591,23 @@ static NSOperationQueue *PGThumbnailGenerationQueue;
 	}
 	return self;
 }
-- (void)mainThread_finish
-{
-	if(![self isCancelled]) [_adapter setRealThumbnail:_thumbnail];
-	
-}
 
 #pragma mark -NSOperation
 
 - (void)main
 {
-	do {
-		if([self isCancelled]) break;
-		_thumbnail = [[_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info] retain];
-		if(!_thumbnail || [self isCancelled]) break;
-		[self performSelectorOnMainThread:@selector(mainThread_finish) withObject:nil waitUntilDone:YES];
-	} while(NO);
-	[_adapter release];
-	_adapter = nil;
+	if([self isCancelled]) return;
+	NSImage *const thumbnail = [[_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info] retain];
+	if(!thumbnail || [self isCancelled]) return;
+	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:thumbnail waitUntilDone:NO];
 }
 
 #pragma mark -NSObject
 
 - (void)dealloc
 {
-	NSAssert(!_adapter, @"The adapter must be released by -main.");
+	[_adapter release];
 	[_info release];
-	[_thumbnail release];
 	[super dealloc];
 }
 

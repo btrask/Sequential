@@ -279,6 +279,10 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		[_cachedNodes removeLastObject];
 	}
 }
+- (void)addOperation:(NSOperation *)operation
+{
+	[_operationQueue addOperation:operation];
+}
 
 #pragma mark -
 
@@ -364,6 +368,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		_pageMenu = [[[PGDocumentController sharedDocumentController] defaultPageMenu] copy];
 		[_pageMenu addItem:[NSMenuItem separatorItem]];
 		_cachedNodes = [[NSMutableArray alloc] init];
+		_operationQueue = [[NSOperationQueue alloc] init];
 	}
 	return self;
 }
@@ -372,10 +377,13 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[self PG_removeObserver];
 	[_node cancelLoad];
 	[_node detachFromTree];
+	[_operationQueue cancelAllOperations];
+
 	[_originalIdentifier release];
 	[_node release];
 	[_subscription release];
 	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
+	[_operationQueue release];
 	[_storedNode release];
 	[_storedImageView release];
 	[_storedQuery release];
