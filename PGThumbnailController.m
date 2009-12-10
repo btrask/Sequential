@@ -125,6 +125,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	if(_selfRetained) [self autorelease];
 	_selfRetained = NO;
 	[[[self displayController] window] addChildWindow:_window ordered:NSWindowAbove];
+	[self _updateWindowFrame];
 }
 - (void)fadeOut
 {
