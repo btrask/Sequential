@@ -208,6 +208,7 @@ static id PGArchiveAdapterList = nil;
 		_needsPassword = NO;
 		_currentSubnode = sender;
 		data = [_archive contentsOfEntry:i];
+		if(!_needsPassword && [_archive lastError] == XADPasswordError) [self archiveNeedsPassword:_archive];
 		_currentSubnode = nil;
 		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
 	}
