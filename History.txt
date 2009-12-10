@@ -1,3 +1,10 @@
+2.1.2 (Current)
+- Fixes a crash with Exif image data on 10.5.
+- Fixes a bug that prevented retrying incorrect archive passwords.
+- Fixes a bug where the thumbnail bad could appear detached from the document window.
+- Fixes a bug with PDF pages of varying sizes.
+- Other minor improvements.
+
 2.1.1 (November 6th, 2009)
 - Fixes a bug that prevented launch on 10.5.
 - Other minor fixes and improvements.
