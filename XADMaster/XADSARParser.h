@@ -1,6 +1,6 @@
 #import "XADArchiveParser.h"
 
-@interface XADLZMAParser:XADArchiveParser
+@interface XADSARParser:XADArchiveParser
 {
 }
 
@@ -12,4 +12,3 @@
 -(NSString *)formatName;
 
 @end
-

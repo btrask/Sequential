@@ -89,24 +89,27 @@ static int TestSignature(const uint8_t *ptr)
 	return NO;
 }
 
-+(XADRegex *)volumeRegexForFilename:(NSString *)filename
++(NSArray *)volumesForFilename:(NSString *)filename
 {
 	NSArray *matches;
 
 	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.part[0-9]+\\.rar$" options:REG_ICASE])
-	return [XADRegex regexWithPattern:[NSString stringWithFormat:
-	@"^%@\\.part[0-9]+\\.rar$",[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE];
+	{
+		return [self scanForVolumesWithFilename:filename
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.part[0-9]+\\.rar$",
+			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		firstFileExtension:@"rar"];
+	}
 
 	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.(rar|r[0-9]{2}|s[0-9]{2})$" options:REG_ICASE])
-	return [XADRegex regexWithPattern:[NSString stringWithFormat:
-	@"^%@\\.(rar|r[0-9]{2}|s[0-9]{2})$",[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE];
+	{
+		return [self scanForVolumesWithFilename:filename
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(rar|r[0-9]{2}|s[0-9]{2})$",
+			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		firstFileExtension:@"rar"];
+	}
 
 	return nil;
-}
-
-+(BOOL)isFirstVolume:(NSString *)filename
-{
-	return [filename rangeOfString:@".rar" options:NSAnchoredSearch|NSCaseInsensitiveSearch|NSBackwardsSearch].location!=NSNotFound;
 }
 
 

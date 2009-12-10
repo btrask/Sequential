@@ -54,6 +54,14 @@
 
 
 
+-(NSData *)data { return backingdata; }
+
+-(NSMutableData *)mutableData
+{
+	if(![backingdata isKindOfClass:[NSMutableData class]]) [self _raiseNotSupported:_cmd];
+	return (NSMutableData *)backingdata;
+}
+
 
 
 -(off_t)fileSize { return [backingdata length]; }
@@ -127,16 +135,5 @@
 -(NSData *)copyDataOfLength:(int)length { return [[self readDataOfLength:length] retain]; }
 
 -(NSData *)copyDataOfLengthAtMost:(int)length { return [[self readDataOfLengthAtMost:length] retain]; }
-
-
-
-
--(NSData *)data { return backingdata; }
-
--(NSMutableData *)mutableData
-{
-	if(![backingdata isKindOfClass:[NSMutableData class]]) [self _raiseNotSupported:_cmd];
-	return (NSMutableData *)backingdata;
-}
 
 @end

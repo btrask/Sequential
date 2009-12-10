@@ -6,8 +6,7 @@
 
 +(int)requiredHeaderSize;
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name;
-+(XADRegex *)volumeRegexForFilename:(NSString *)filename;
-+(BOOL)isFirstVolume:(NSString *)filename;
++(NSArray *)volumesForFilename:(NSString *)filename;
 
 -(void)parseWithSeparateMacForks;
 -(BOOL)findEndOfCentralDirectory:(off_t *)offsptr zip64Locator:(off_t *)locatorptr;

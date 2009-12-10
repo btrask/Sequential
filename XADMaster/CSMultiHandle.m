@@ -4,7 +4,7 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 
 @implementation CSMultiHandle
 
-+(CSHandle *)multiHandleWithHandleArray:(NSArray *)handlearray
++(CSMultiHandle *)multiHandleWithHandleArray:(NSArray *)handlearray
 {
 	if(!handlearray) return nil;
 	int count=[handlearray count];
@@ -13,7 +13,7 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 	else return [[[self alloc] initWithHandles:handlearray] autorelease];
 }
 
-+(CSHandle *)multiHandleWithHandles:(CSHandle *)firsthandle,...
++(CSMultiHandle *)multiHandleWithHandles:(CSHandle *)firsthandle,...
 {
 	if(!firsthandle) return nil;
 

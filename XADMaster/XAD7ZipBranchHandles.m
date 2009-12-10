@@ -8,12 +8,31 @@
 
 @implementation XAD7ZipBranchHandle
 
+-(id)initWithHandle:(CSHandle *)handle
+{
+	return [self initWithHandle:handle length:CSHandleMaxLength propertyData:nil];
+}
+
+-(id)initWithHandle:(CSHandle *)handle propertyData:(NSData *)propertydata
+{
+	return [self initWithHandle:handle length:CSHandleMaxLength propertyData:propertydata];
+}
+
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
+{
+	return [self initWithHandle:handle length:length propertyData:nil];
+}
+
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length propertyData:(NSData *)propertydata
 {
 	if(self=[super initWithName:[handle name] length:length])
 	{
 		parent=[handle retain];
 		startoffs=[handle offsetInFile];
+
+		if(propertydata&&[propertydata length]>=4) baseoffset=CSUInt32LE([propertydata bytes]);
+		else baseoffset=0;
+
 		[self setBlockPointer:inbuffer];
 	}
 	return self;
@@ -38,16 +57,13 @@
 	int bytesread=[parent readAtMost:sizeof(inbuffer)-leftoverlength toBuffer:inbuffer+leftoverlength];
 	if(bytesread==0)
 	{
-		if(leftoverlength)
-		{
-			int len=leftoverlength;
-			leftoverlength=0;
-			return len;
-		}
-		else [parent _raiseEOF];
+		[self endBlockStream];
+
+		if(leftoverlength) return leftoverlength;
+		else return 0;
 	}
 
-	int processed=[self decodeBlock:inbuffer length:bytesread+leftoverlength offset:pos];
+	int processed=[self decodeBlock:inbuffer length:bytesread+leftoverlength offset:pos+baseoffset];
 	leftoverstart=processed;
 	leftoverlength=bytesread+leftoverlength-processed;
 

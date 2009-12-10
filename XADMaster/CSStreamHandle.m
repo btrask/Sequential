@@ -95,16 +95,7 @@
 
 -(void)seekToFileOffset:(off_t)offs
 {
-	if(needsreset) { [self resetStream]; needsreset=NO; }
-
-	if(offs==streampos) return;
-	if(offs>streamlength) [self _raiseEOF];
-	if(nextstreambyte>=0)
-	{
-		nextstreambyte=-1;
-		streampos+=1;
-		if(offs==streampos) return;
-	}
+	if(![self _prepareStreamSeekTo:offs]) return;
 
 	if(offs<streampos)
 	{
@@ -137,6 +128,7 @@
 		streampos++;
 		nextstreambyte=-1;
 		offs=1;
+		if(num==1) return 1;
 	}
 
 	int actual=[self streamAtMost:num-offs toBuffer:((uint8_t *)buffer)+offs];
@@ -148,13 +140,38 @@
 	return actual+offs;
 }
 
+
+
+-(void)resetStream {}
+
+-(int)streamAtMost:(int)num toBuffer:(void *)buffer { return 0; }
+
+
+
+
 -(void)endStream
 {
 	endofstream=YES;
 }
 
--(void)resetStream {}
+-(BOOL)_prepareStreamSeekTo:(off_t)offs
+{
+	if(needsreset) { [self resetStream]; needsreset=NO; }
 
--(int)streamAtMost:(int)num toBuffer:(void *)buffer { return 0; }
+	if(offs==streampos) return NO;
+	if(endofstream&&offs>streampos) [self _raiseEOF];
+	if(offs>streamlength) [self _raiseEOF];
+	if(nextstreambyte>=0)
+	{
+		nextstreambyte=-1;
+		streampos+=1;
+		if(offs==streampos) return NO;
+	}
+
+	return YES;
+}
+
+-(void)setStreamLength:(off_t)length { streamlength=length; }
+
 
 @end

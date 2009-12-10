@@ -276,7 +276,6 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 		err=xadFileUnArc(xmb,archive,
 			XAD_ENTRYNUMBER,info->xfi_EntryNumber,
 			XAD_OUTHOOK,&outhook,
-			XAD_INHOOK,&inhook,
 			pass?XAD_PASSWORD:TAG_IGNORE,pass,
 		TAG_DONE);
 	}
@@ -293,7 +292,6 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 		err=xadDiskUnArc(xmb,archive,
 			XAD_ENTRYNUMBER,info->xdi_EntryNumber,
 			XAD_OUTHOOK,&outhook,
-			XAD_INHOOK,&inhook,
 		TAG_DONE);
 	}
 

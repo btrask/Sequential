@@ -44,6 +44,7 @@
 // Recognize files by name or magic. (tar v7 files have no magic.)
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
 {
+	if([data length]<512) return NO;
 	return(
 		[name matchedByPattern:@"^(.*)\\.tar$" options:REG_ICASE] ||
 		([XADTarParser getTarType:data] != TAR_FORMAT_V7)

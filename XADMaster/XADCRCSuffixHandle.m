@@ -65,15 +65,17 @@ CRCSize:(int)crcbytes bigEndianCRC:(BOOL)bigendian CRCTable:(const uint32_t *)cr
 	if(crcparent)
 	{
 		@try {
+NSLog(@"? %x",crc^initcrc);
 			if(bigend&&crcsize==2) compcrc=[crcparent readUInt16BE];
 			else if(bigend&&crcsize==4) compcrc=[crcparent readUInt32BE];
 			else if(!bigend&&crcsize==2) compcrc=[crcparent readUInt16LE];
 			else if(!bigend&&crcsize==4) compcrc=[crcparent readUInt32LE];
-		} @catch(id e) { compcrc=(crc+1)^initcrc; } // make sure check fails if reading failed
+NSLog(@"??? %x",compcrc);
+		} @catch(id e) { compcrc=(crc+1)^initcrc; NSLog(@"what");} // make sure check fails if reading failed
 		[crcparent release];
 		crcparent=nil;
 	}
-
+NSLog(@"%x %x",crc^initcrc,compcrc);
 	return (crc^initcrc)==compcrc;
 }
 

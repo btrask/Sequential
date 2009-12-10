@@ -268,12 +268,18 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	uint32_t rsrcsize=CSUInt32BE(bytes+87);
 	int extsize=CSUInt16BE(bytes+120);
 
+	XADPath *filename=[dict objectForKey:XADFileNameKey];
+	XADPath *parent=[filename pathByDeletingLastPathComponent];
+	if(!parent) parent=[self XADPath];
+	XADString *namepart=[self XADStringWithBytes:bytes+2 length:bytes[1]];
+	XADPath *newpath=[parent pathByAppendingPathComponent:namepart];
+
 	NSMutableDictionary *template=[NSMutableDictionary dictionaryWithDictionary:dict];
 	[template setObject:dict forKey:@"MacOriginalDictionary"];
-	[template setObject:[self XADPathWithBytes:bytes+2 length:bytes[1] separators:XADNoPathSeparator] forKey:XADFileNameKey];
+	[template setObject:newpath forKey:XADFileNameKey];
 	[template setObject:[NSNumber numberWithUnsignedInt:CSUInt32BE(bytes+65)] forKey:XADFileTypeKey];
 	[template setObject:[NSNumber numberWithUnsignedInt:CSUInt32BE(bytes+69)] forKey:XADFileCreatorKey];
-	[template setObject:[NSNumber numberWithInt:bytes[73]+(bytes[101]<<8)] forKey:XADFinderFlagsKey];
+	[template setObject:[NSNumber numberWithInt:bytes[101]+(bytes[73]<<8)] forKey:XADFinderFlagsKey];
 	[template setObject:[NSNumber numberWithUnsignedInt:CSUInt32BE(bytes+65)] forKey:XADFileTypeKey];
 	[template setObject:[NSDate XADDateWithTimeIntervalSince1904:CSUInt32BE(bytes+91)] forKey:XADCreationDateKey];
 	[template setObject:[NSDate XADDateWithTimeIntervalSince1904:CSUInt32BE(bytes+95)] forKey:XADLastModificationDateKey];

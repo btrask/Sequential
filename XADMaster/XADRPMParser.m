@@ -134,6 +134,7 @@ static uint64_t ParseInt(const uint8_t *buffer,int size,int type,int offset)
 					if(len==4&&memcmp(storage+offset,"gzip",4)==0) compressionext="gz";
 					else if(len==5&&memcmp(storage+offset,"bzip2",5)==0) compressionext="bz2";
 					else if(len==4&&memcmp(storage+offset,"lzma",4)==0) compressionext="lzma";
+					else if(len==2&&memcmp(storage+offset,"xz",2)==0) compressionext="xz";
 					else compressionext=NULL;
 				}
 				break;

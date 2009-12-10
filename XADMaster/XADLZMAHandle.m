@@ -20,13 +20,14 @@ static ISzAlloc allocator={Alloc,Free};
 		startoffs=[parent offsetInFile];
 
 		LzmaDec_Construct(&lzma);
-		if(LzmaDec_Allocate(&lzma,[propertydata bytes],[propertydata length],&allocator)!=SZ_OK)
+		if(LzmaDec_Allocate(&lzma,[propertydata bytes],[propertydata length],&allocator)==SZ_OK)
 		{
-			[self release];
-			[XADException raiseDecrunchException];
+			return self;
 		}
 	}
-	return self;
+
+	[self release];
+	return nil;
 }
 
 -(void)dealloc

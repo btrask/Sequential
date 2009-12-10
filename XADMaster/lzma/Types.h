@@ -1,5 +1,5 @@
 /* Types.h -- Basic types
-2008-11-23 : Igor Pavlov : Public domain */
+2009-08-14 : Igor Pavlov : Public domain */
 
 #ifndef __7Z_TYPES_H
 #define __7Z_TYPES_H
@@ -9,6 +9,18 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+
+#ifndef EXTERN_C_BEGIN
+#ifdef __cplusplus
+#define EXTERN_C_BEGIN extern "C" {
+#define EXTERN_C_END }
+#else
+#define EXTERN_C_BEGIN
+#define EXTERN_C_END
+#endif
+#endif
+
+EXTERN_C_BEGIN
 
 #define SZ_OK 0
 
@@ -204,5 +216,7 @@ typedef struct
 
 #define IAlloc_Alloc(p, size) (p)->Alloc((p), size)
 #define IAlloc_Free(p, a) (p)->Free((p), a)
+
+EXTERN_C_END
 
 #endif

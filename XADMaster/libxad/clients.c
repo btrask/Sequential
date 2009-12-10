@@ -62,7 +62,6 @@ void DebugClient(const struct xadArchiveInfo *ai, const xadSTRING *, ...);      
 #include "clients/IFF-CDAF.c"
 #include "clients/LhA.c"
 #include "clients/LhF.c"
-#include "clients/LZX.c"
 //#include "clients/MDC.c" // uses XPK only, not supported
 #include "clients/MXM-SimpleArc.c"
 //#include "clients/PackDev.c" // uses XPK only, not supported

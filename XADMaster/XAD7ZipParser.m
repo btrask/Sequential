@@ -1,5 +1,7 @@
 #import "XAD7ZipParser.h"
 #import "XADLZMAHandle.h"
+#import "XADLZMA2Handle.h"
+#import "XAD7ZipFilterHandles.h"
 #import "XAD7ZipBranchHandles.h"
 #import "XAD7ZipBCJ2Handle.h"
 #import "XADDeflateHandle.h"
@@ -72,12 +74,18 @@ static void FindAttribute(CSHandle *handle,int attribute)
 	&&bytes[4]==0x27&&bytes[5]==0x1c&&bytes[6]==0;
 }
 
-+(XADRegex *)volumeRegexForFilename:(NSString *)filename
+
++(NSArray *)volumesForFilename:(NSString *)filename
 {
 	NSArray *matches;
+
 	if(matches=[filename substringsCapturedByPattern:@"^(.*\\.7z)\\.([0-9]+)$" options:REG_ICASE])
-	return [XADRegex regexWithPattern:[NSString stringWithFormat:
-	@"^%@\\.([0-9]+)$",[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE];
+	{
+		return [self scanForVolumesWithFilename:filename
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.([0-9]+)$",
+			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		firstFileExtension:nil];
+	}
 
 	return nil;
 }
@@ -719,11 +727,12 @@ packedStreams:(NSArray *)packedstreams packedStreamIndex:(int *)packedstreaminde
 	switch([self IDForCoder:coder])
 	{
 		case 0x00000000: return inhandle;
+		case 0x00000021: return [[[XADLZMA2Handle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		//case 0x02030200: return @"Swap2";
 		//case 0x02030400: return @"Swap4";
-		//case 0x02040000: return @"Delta";
+		case 0x02040000: return [[[XAD7ZipDeltaHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x03010100: return [[[XADLZMAHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
-		case 0x03030103: return [[[XAD7ZipBCJHandle alloc] initWithHandle:inhandle length:size] autorelease];
+		case 0x03030103: return [[[XAD7ZipBCJHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x0303011b:
 		{
 			CSHandle *inhandle1=[self inHandleForFolder:folder coder:coder index:1];
@@ -733,18 +742,19 @@ packedStreams:(NSArray *)packedstreams packedStreamIndex:(int *)packedstreaminde
 			return [[[XAD7ZipBCJ2Handle alloc] initWithHandle:inhandle callHandle:inhandle1
 			jumpHandle:inhandle2 rangeHandle:inhandle3 length:size] autorelease];
 		}
-		case 0x03030205: return [[[XAD7ZipPPCHandle alloc] initWithHandle:inhandle length:size] autorelease];
-		//case 0x03030301: return [[[XAD7ZipAlphaHandle alloc] initWithHandle:inhandle length:size] autorelease];
-		case 0x03030401: return [[[XAD7ZipIA64Handle alloc] initWithHandle:inhandle length:size] autorelease];
-		case 0x03030501: return [[[XAD7ZipARMHandle alloc] initWithHandle:inhandle length:size] autorelease];
-		//case 0x03030605: return [[[XAD7ZipM68kHandle alloc] initWithHandle:inhandle length:size] autorelease];
-		case 0x03030701: return [[[XAD7ZipThumbHandle alloc] initWithHandle:inhandle length:size] autorelease];
-		case 0x03030805: return [[[XAD7ZipSPARCHandle alloc] initWithHandle:inhandle length:size] autorelease];
+		case 0x03030205: return [[[XAD7ZipPPCHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		//case 0x03030301: return [[[XAD7ZipAlphaHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		case 0x03030401: return [[[XAD7ZipIA64Handle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		case 0x03030501: return [[[XAD7ZipARMHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		//case 0x03030605: return [[[XAD7ZipM68kHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		case 0x03030701: return [[[XAD7ZipThumbHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		case 0x03030805: return [[[XAD7ZipSPARCHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x03040100:
 		{
 			if([props length]<5) return nil;
-			int maxorder=((uint8_t *)[props bytes])[0];
-			int suballocsize=CSUInt32LE((uint8_t *)[props bytes]+1);
+			const uint8_t *bytes=[props bytes];
+			int maxorder=bytes[0];
+			int suballocsize=CSUInt32LE(&bytes[1]);
 			return [[[XAD7ZipPPMdHandle alloc] initWithHandle:inhandle length:size
 			maxOrder:maxorder subAllocSize:suballocsize] autorelease];
 		}

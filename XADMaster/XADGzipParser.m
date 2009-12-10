@@ -1,6 +1,7 @@
 #import "XADGzipParser.h"
 #import "CSZlibHandle.h"
-#import "XADCRCSuffixHandle.h"
+#import "CRC.h"
+#import "Progress.h"
 
 
 
@@ -62,68 +63,44 @@
 		}
     }
 
-	off_t datapos=[handle offsetInFile];
+	NSString *name=[self name];
+	NSString *extension=[[name pathExtension] lowercaseString];
+	NSString *contentname;
+	if([extension isEqual:@"tgz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"tar"];
+	else if([extension isEqual:@"adz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"adf"];
+	else if([extension isEqual:@"cpgz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"cpio"];
+	else contentname=[name stringByDeletingPathExtension];
 
-	[handle seekToEndOfFile];
-	[handle skipBytes:-4];
-	off_t size=[handle readUInt32LE];
-	off_t compsize=[handle offsetInFile]-datapos-8;
-
+	// TODO: set no filename flag
 	NSMutableDictionary *dict=[NSMutableDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithLongLong:compsize],XADCompressedSizeKey,
-		[NSNumber numberWithLongLong:datapos],XADDataOffsetKey,
+		[self XADPathWithUnseparatedString:contentname],XADFileNameKey,
 		[NSDate dateWithTimeIntervalSince1970:time],XADLastModificationDateKey,
 		[self XADStringWithString:@"Deflate"],XADCompressionNameKey,
 		[NSNumber numberWithUnsignedInt:extraflags],@"GzipExtraFlags",
 		[NSNumber numberWithUnsignedInt:os],@"GzipOS",
 	nil];
 
-	[dict setObject:[NSNumber numberWithLongLong:size] forKey:XADFileSizeKey];
+	if([contentname matchedByPattern:@"\\.(tar|cpio)" options:REG_ICASE])
+	[dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsArchiveKey];
+
+	off_t filesize=[handle fileSize];
+	if(filesize!=CSHandleMaxLength)
+	[dict setObject:[NSNumber numberWithLongLong:filesize] forKey:XADCompressedSizeKey];
 
 	if(filename)
-	{
-		[dict setObject:[self XADPathWithData:filename separators:XADUnixPathSeparator] forKey:XADFileNameKey];
+	[dict setObject:[self XADStringWithData:filename] forKey:@"GzipFilename"];
 
-		NSString *stringname=[[NSString alloc] initWithData:filename encoding:NSISOLatin1StringEncoding];
-		if([stringname matchedByPattern:@"\\.(tar|cpio)" options:REG_ICASE])
-		[dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsArchiveKey];
-		[stringname release];
-	}
-	else
-	{
-		NSString *name=[self name];
-		NSString *extension=[[name pathExtension] lowercaseString];
-		NSString *contentname;
-		if([extension isEqual:@"tgz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"tar"];
-		else if([extension isEqual:@"adz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"adf"];
-		else if([extension isEqual:@"cpgz"]) contentname=[[name stringByDeletingPathExtension] stringByAppendingPathExtension:@"cpio"];
-		else contentname=[name stringByDeletingPathExtension];
-
-		// TODO: set no filename flag
-		[dict setObject:[self XADPathWithUnseparatedString:contentname] forKey:XADFileNameKey];
-
-		if([contentname matchedByPattern:@"\\.(tar|cpio)" options:REG_ICASE])
-		[dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsArchiveKey];
-	}
-
-	if(comment) [dict setObject:[self XADStringWithData:comment] forKey:XADCommentKey];
+	if(comment)
+	[dict setObject:[self XADStringWithData:comment] forKey:XADCommentKey];
 
 	[self addEntryWithDictionary:dict];
 }
 
 -(CSHandle *)handleForEntryWithDictionary:(NSDictionary *)dictionary wantChecksum:(BOOL)checksum
 {
-	CSHandle *handle=[self handleAtDataOffsetForDictionary:dictionary];
-	CSZlibHandle *zh=[CSZlibHandle deflateHandleWithHandle:handle];
-
-	// TODO: somehow make checksumming work even though there are a million broken gzip files out there
-	if(checksum)
-	{
-		[zh setSeekBackAtEOF:YES]; // enable seeking back after zlib reads too much data at the end
-		return [XADCRCSuffixHandle IEEECRC32SuffixHandleWithHandle:zh
-		CRCHandle:handle bigEndianCRC:NO conditioned:YES];
-	}
-	else return zh;
+	CSHandle *handle=[self handle];
+	[handle seekToFileOffset:0];
+	return [[[XADGzipHandle alloc] initWithHandle:handle] autorelease];
 }
 
 -(NSString *)formatName { return @"Gzip"; }
@@ -177,4 +154,146 @@
 @end
 
 
+
+#define HeaderState 0
+#define DataState 1
+#define FooterState 2
+#define EndState 10
+
+@implementation XADGzipHandle
+
+-(id)initWithHandle:(CSHandle *)handle
+{
+	if(self=[super initWithName:[handle name]])
+	{
+		parent=[handle retain];
+		startoffs=[parent offsetInFile];
+		currhandle=nil;
+	}
+	return self;
+}
+
+-(void)dealloc
+{
+	[parent release];
+	[currhandle release];
+	[super dealloc];
+}
+
+-(void)resetStream
+{
+	[parent seekToFileOffset:startoffs];
+	state=HeaderState;
+	checksumscorrect=YES;
+}
+
+-(int)streamAtMost:(int)num toBuffer:(void *)buffer
+{
+	int bytesread=0;
+	uint8_t *bytebuf=buffer;
+
+	while(bytesread<num && state!=EndState) switch(state)
+	{
+		case HeaderState:
+		{
+			uint16_t headid=[parent readUInt16BE];
+			uint8_t method=[parent readUInt8];
+			uint8_t flags=[parent readUInt8];
+			/*uint32_t time=[parent readUInt32LE];
+			uint8_t extraflags=[parent readUInt8];
+			uint8_t os=[parent readUInt8];*/
+			[parent skipBytes:6];
+
+			if(method!=8) [XADException raiseIllegalDataException];
+
+			if(headid!=0x1fa1)
+			{
+				if(flags&0x04) // FEXTRA: extra fields
+				{
+					uint16_t len=[parent readUInt16LE];
+					[parent skipBytes:len];
+				}
+				if(flags&0x08) // FNAME: filename
+				{
+					while([parent readUInt8]);
+				}
+				if(flags&0x10) // FCOMMENT: comment
+				{
+					while([parent readUInt8]);
+				}
+				if(flags&0x02) // FHCRC: header crc
+				{
+					[parent skipBytes:2];
+				}
+			}
+
+			CSZlibHandle *zh=[CSZlibHandle deflateHandleWithHandle:parent];
+			[zh setSeekBackAtEOF:YES];
+
+			[currhandle release];
+			currhandle=[zh retain];
+
+			crc=0xffffffff;
+
+			state=DataState;
+		}
+		break;
+
+		case DataState:
+		{
+			int actual=[currhandle readAtMost:num-bytesread toBuffer:&bytebuf[bytesread]];
+			crc=XADCalculateCRC(crc,&bytebuf[bytesread],actual,XADCRCTable_edb88320);
+
+			bytesread+=actual;
+
+			if([currhandle atEndOfFile]) state=FooterState;
+		}
+		break;
+
+		case FooterState:
+		{
+			@try
+			{
+				uint32_t correctcrc=[parent readUInt32LE];
+				/*uint32_t len=[parent readUInt32LE];*/
+				[parent skipBytes:4];
+				if((crc^0xffffffff)!=correctcrc) checksumscorrect=NO;
+			}
+			@catch(id e)
+			{
+				checksumscorrect=NO;
+				state=EndState;
+				break;
+			}
+
+			if([parent atEndOfFile]) state=EndState;
+			else state=HeaderState;
+		}
+		break;
+	}
+
+	if(state==EndState)
+	{
+		[self endStream];
+		[currhandle release];
+		currhandle=nil;
+	}
+
+	return bytesread;
+}
+
+-(BOOL)hasChecksum
+{
+	return YES;
+}
+
+-(BOOL)isChecksumCorrect
+{
+	if(currhandle) return NO;
+	return checksumscorrect;
+}
+
+-(double)estimatedProgress { return [parent estimatedProgress]; } // TODO: better estimation using buffer?
+
+@end
 

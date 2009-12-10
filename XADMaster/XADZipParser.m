@@ -32,24 +32,28 @@
 	return NO;
 }
 
-+(XADRegex *)volumeRegexForFilename:(NSString *)filename
++(NSArray *)volumesForFilename:(NSString *)filename
 {
 	NSArray *matches;
 
 	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.(zip|z[0-9]{2})$" options:REG_ICASE])
-	return [XADRegex regexWithPattern:[NSString stringWithFormat:
-	@"^%@\\.(zip|z[0-9]{2})$",[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE];
+	{
+		return [self scanForVolumesWithFilename:filename
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(zip|z[0-9]{2})$",
+			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		firstFileExtension:@"zip"];
+	}
 
 	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.[0-9]{3}$" options:REG_ICASE])
-	return [XADRegex regexWithPattern:[NSString stringWithFormat:
-	@"^%@\\.[0-9]{3}$",[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE];
+	{
+NSLog(@"what");
+		return [self scanForVolumesWithFilename:filename
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.[0-9]{3}$",
+			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		firstFileExtension:nil];
+	}
 
 	return nil;
-}
-
-+(BOOL)isFirstVolume:(NSString *)filename
-{
-	return [filename rangeOfString:@".zip" options:NSAnchoredSearch|NSCaseInsensitiveSearch|NSBackwardsSearch].location!=NSNotFound;
 }
 
 -(void)parseWithSeparateMacForks

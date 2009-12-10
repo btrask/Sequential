@@ -14,7 +14,7 @@ static NSString *nullstring=nil;
 
 +(void)initialize
 {
-	if(!nullstring) nullstring=[NSMutableString stringWithString:@""];
+	if(!nullstring) nullstring=[[NSMutableString alloc] initWithString:@""];
 }
 
 -(id)initWithPattern:(NSString *)pattern options:(int)options

@@ -3,7 +3,7 @@
 #import "CSBzip2Handle.h"
 #import "XADLZMAHandle.h"
 #import "XADDigestHandle.h"
-#import "XADLZMAParser.h"
+#import "XADXZHandle.h"
 #import "XADRegex.h"
 
 #define GroundState 0
@@ -431,17 +431,16 @@ length:(NSNumber *)length size:(NSNumber *)size checksum:(NSData *)checksum chec
 		if(!encodingstyle||[encodingstyle length]==0); // no encoding style, copy
 		else if([encodingstyle isEqual:@"application/x-gzip"]) handle=[CSZlibHandle zlibHandleWithHandle:handle length:sizeval];
 		else if([encodingstyle isEqual:@"application/x-bzip2"]) handle=[CSBzip2Handle bzip2HandleWithHandle:handle length:sizeval];
+		else if([encodingstyle isEqual:@"application/x-xz"]) handle=[[[XADXZHandle alloc] initWithHandle:handle length:sizeval] autorelease];
 		else if([encodingstyle isEqual:@"application/x-lzma"])
 		{
 			int first=[handle readUInt8];
 			if(first==0xff)
 			{
-				[handle seekToFileOffset:0];
-				XADLZMAParser *parser=[[[XADLZMAParser alloc] initWithHandle:handle name:nil] autorelease];
-				lzmahandle=nil;
-				[parser parse];
-				if(!lzmahandle) return nil;
-				handle=lzmahandle;
+				/*[handle seekToFileOffset:0];
+				return [[[XADXZHandle alloc] initWithHandle:handle length:sizeval ...] autorelease];
+				*/
+				return nil;
 			}
 			else
 			{
@@ -463,11 +462,6 @@ length:(NSNumber *)length size:(NSNumber *)size checksum:(NSData *)checksum chec
 	}
 
 	return handle;
-}
-
--(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
-{
-	lzmahandle=[parser handleForEntryWithDictionary:dict wantChecksum:NO];
 }
 
 

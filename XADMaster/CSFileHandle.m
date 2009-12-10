@@ -86,6 +86,9 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 
 
 
+-(FILE *)filePointer { return fh; }
+
+
 
 
 -(off_t)fileSize
@@ -166,7 +169,5 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 		pos=ftello(fh);
 	}
 }
-
--(FILE *)filePointer { return fh; }
 
 @end

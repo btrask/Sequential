@@ -94,9 +94,6 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 {
 	if(self=[self init])
 	{
-//NSLog(@"--------");
-//for(int i=0;i<numsymbols;i++) NSLog(@"%d",lengths[i]);
-
 		@try
 		{
 			int code=0,symbolsleft=numsymbols;

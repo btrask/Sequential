@@ -243,7 +243,7 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 						uint32_t start=[fh readUInt32LE];
 						uint32_t end=[fh readUInt32LE];
 
-						[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+						[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 							path,XADFileNameKey,
 							[NSNumber numberWithUnsignedLong:end-start],XADFileSizeKey,
 							[NSNumber numberWithUnsignedLong:end-start],XADCompressedSizeKey,

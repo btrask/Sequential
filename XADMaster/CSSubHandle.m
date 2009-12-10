@@ -64,15 +64,15 @@
 
 -(void)seekToEndOfFile
 {
-	@try
+//	@try
 	{
 		[parent seekToFileOffset:end];
 	}
-	@catch(NSException *e)
+/*	@catch(NSException *e)
 	{
 		if([[e name] isEqual:@"CSEndOfFileException"]) [parent seekToEndOfFile];
-		else @throw e;
-	}
+		else @throw;
+	}*/
 }
 
 -(int)readAtMost:(int)num toBuffer:(void *)buffer

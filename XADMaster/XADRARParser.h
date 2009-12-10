@@ -19,8 +19,7 @@ typedef struct RARBlock
 
 +(int)requiredHeaderSize;
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name;
-+(XADRegex *)volumeRegexForFilename:(NSString *)filename;
-+(BOOL)isFirstVolume:(NSString *)filename;
++(NSArray *)volumesForFilename:(NSString *)filename;
 
 -(void)parse;
 -(RARBlock)readFileHeaderWithBlock:(RARBlock)block;

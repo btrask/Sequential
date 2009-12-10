@@ -4,7 +4,8 @@
 
 +(NSDate *)XADDateWithTimeIntervalSince1904:(NSTimeInterval)interval
 {
-	return [NSDate dateWithTimeIntervalSince1970:interval-2082938400];
+	return [NSDate dateWithTimeIntervalSince1970:interval-2082844800
+	-[[NSTimeZone defaultTimeZone] secondsFromGMT]];
 }
 
 +(NSDate *)XADDateWithTimeIntervalSince1601:(NSTimeInterval)interval
@@ -12,7 +13,12 @@
 	return [NSDate dateWithTimeIntervalSince1970:interval-11644473600];
 }
 
-+(NSDate *)XADDateWithMSDOSDateTime:(unsigned long)msdos
++(NSDate *)XADDateWithMSDOSDate:(uint16_t)date time:(uint16_t)time
+{
+	return [self XADDateWithMSDOSDateTime:((uint32_t)date<<16)|(uint32_t)time];
+}
+
++(NSDate *)XADDateWithMSDOSDateTime:(uint32_t)msdos
 {
 	int second=(msdos&31)*2;
 	int minute=(msdos>>5)&63;
@@ -30,3 +36,4 @@
 }
 
 @end
+

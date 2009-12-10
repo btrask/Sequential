@@ -18,10 +18,57 @@ CSInputBuffer *CSInputBufferAlloc(CSHandle *parent,int size)
 	return buf;
 }
 
+CSInputBuffer *CSInputBufferAllocWithBuffer(uint8_t *buffer,int length,off_t startoffs)
+{
+	CSInputBuffer *buf=malloc(sizeof(CSInputBuffer));
+	if(!buf) return NULL;
+
+	buf->parent=NULL;
+	buf->startoffs=-startoffs;
+	buf->eof=YES;
+
+	buf->buffer=buffer;
+	buf->bufsize=length;
+	buf->bufbytes=length;
+	buf->currbyte=0;
+	buf->currbit=0;
+
+	return buf;
+}
+
+CSInputBuffer *CSInputBufferAllocEmpty()
+{
+	CSInputBuffer *buf=malloc(sizeof(CSInputBuffer));
+	if(!buf) return NULL;
+
+	buf->parent=NULL;
+	buf->startoffs=0;
+	buf->eof=YES;
+
+	buf->buffer=NULL;
+	buf->bufsize=0;
+	buf->bufbytes=0;
+	buf->currbyte=0;
+	buf->currbit=0;
+
+	return buf;
+}
+
 void CSInputBufferFree(CSInputBuffer *buf)
 {
 	if(buf) [buf->parent release];
 	free(buf);
+}
+
+void CSInputSetMemoryBuffer(CSInputBuffer *buf,uint8_t *buffer,int length,off_t startoffs)
+{
+	buf->eof=YES;
+	buf->startoffs=-startoffs;
+	buf->buffer=buffer;
+	buf->bufsize=length;
+	buf->bufbytes=length;
+	buf->currbyte=0;
+	buf->currbit=0;
 }
 
 void CSInputRestart(CSInputBuffer *buf)
@@ -65,7 +112,8 @@ off_t CSInputBufferOffset(CSInputBuffer *buf)
 
 off_t CSInputFileOffset(CSInputBuffer *buf)
 {
-	return [buf->parent offsetInFile]-buf->bufbytes+buf->currbyte;
+	if(buf->parent) return [buf->parent offsetInFile]-buf->bufbytes+buf->currbyte;
+	else return buf->currbyte;
 }
 
 
@@ -81,9 +129,10 @@ void _CSInputFillBuffer(CSInputBuffer *buf)
 		left=0;
 	}
 
-	buf->bufbytes=left+[buf->parent readAtMost:buf->bufsize-left toBuffer:buf->buffer+left];
-	if(buf->bufbytes==left) buf->eof=YES;
+	int actual=[buf->parent readAtMost:buf->bufsize-left toBuffer:buf->buffer+left];
+	if(actual==0) buf->eof=YES;
 
+	buf->bufbytes=left+actual;
 	buf->currbyte=0;
 }
 
@@ -101,6 +150,12 @@ void CSInputSkipToByteBoundary(CSInputBuffer *buf)
 {
 	if(buf->currbit!=0) CSInputSkipBytes(buf,1);
 	buf->currbit=0;
+}
+
+void CSInputSkipTo16BitBoundary(CSInputBuffer *buf)
+{
+	CSInputSkipToByteBoundary(buf);
+	if(CSInputBufferOffset(buf)&1) CSInputSkipBytes(buf,1);
 }
 
 

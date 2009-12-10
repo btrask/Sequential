@@ -10,8 +10,6 @@
 	NSMutableDictionary *currfile,*currext;
 	NSMutableArray *files,*filestack;
 	NSMutableString *currstring;
-
-	CSHandle *lzmahandle;
 }
 
 +(int)requiredHeaderSize;
@@ -38,7 +36,6 @@ destinationDictionary:(NSMutableDictionary *)dest;
 -(CSHandle *)handleForEntryWithDictionary:(NSDictionary *)dict wantChecksum:(BOOL)checksum;
 -(CSHandle *)handleForEncodingStyle:(NSString *)encodingstyle offset:(NSNumber *)offset
 length:(NSNumber *)length size:(NSNumber *)size checksum:(NSData *)checksum checksumStyle:(NSString *)checksumstyle;
--(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict;
 
 -(NSString *)formatName;
 

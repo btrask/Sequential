@@ -191,8 +191,10 @@ CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 		int actual=readatmost_ptr(self,@selector(readAtMost:toBuffer:),1,b);
 
 		if(actual==0)
-		if([data length]==0) [self _raiseEOF];
-		else break;
+		{
+			if([data length]==0) [self _raiseEOF];
+			else break;
+		}
 
 		if(b[0]=='\n') break;
 

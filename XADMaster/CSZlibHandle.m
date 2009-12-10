@@ -41,6 +41,8 @@ NSString *CSZlibException=@"CSZlibException";
 		inited=YES;
 		seekback=NO;
 
+		memset(&zs,0,sizeof(zs));
+
 		if(header) inflateInit(&zs);
 		else inflateInit2(&zs,-MAX_WBITS);
 	}
