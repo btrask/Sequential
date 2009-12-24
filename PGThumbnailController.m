@@ -200,14 +200,8 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	if((self = [super init])) {
 		_window = [[PGThumbnailBrowser PG_bezelPanel] retain];
-//		_window = [[PGBezelPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
 		[_window setReleasedWhenClosed:NO];
-//		[_window setOpaque:NO];
-//		[_window useOptimizedDrawing:YES];
 		[_window setDelegate:self];
-//		[_window setHasShadow:NO];
-//		[_window setHidesOnDeactivate:NO];
-//		[_window setContentView:_browser];
 		[_window setAcceptsEvents:YES];
 		[_window setCanBecomeKey:YES];
 		_browser = [_window content];
