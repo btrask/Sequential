@@ -43,8 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGInnerTotalWidth (PGThumbnailSize + PGThumbnailMarginWidth * 2.0f)
 #define PGOuterTotalWidth (PGInnerTotalWidth + 2.0f)
 
-static NSString *const PGThumbnailGlossStyleEnabledKey = @"PGThumbnailGlossStyleEnabled";
-static BOOL PGThumbnailGlossStyleEnabled = NO;
 static NSColor *PGBackgroundColor = nil;
 static NSColor *PGHighlightedBackgroundColor = nil;
 
@@ -57,13 +55,8 @@ static NSColor *PGHighlightedBackgroundColor = nil;
 
 static void PGGradientCallback(void *info, CGFloat const *inData, CGFloat *outData)
 {
-	if(PGThumbnailGlossStyleEnabled) {
-		outData[0] = 1.0f;
-		outData[1] = inData[0] < 0.5f ? 0.1f * inData[0] + 0.15f : -0.3f * inData[0] + 0.45f;
-	} else {
-		outData[0] = (0.25f - pow(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
-		outData[1] = 0.95f;
-	}
+	outData[0] = (0.25f - pow(inData[0] - 0.5f, 2.0f)) / 2.0f + 0.1f;
+	outData[1] = 0.95f;
 }
 static void PGDrawGradient(void)
 {
@@ -82,14 +75,6 @@ static void PGDrawGradient(void)
 }
 
 @implementation PGThumbnailView
-
-#pragma mark +NSObject
-
-+ (void)initialize
-{
-	[[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:NO] forKey:PGThumbnailGlossStyleEnabledKey]];
-	PGThumbnailGlossStyleEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:PGThumbnailGlossStyleEnabledKey];
-}
 
 #pragma mark -PGThumbnailView
 
@@ -191,15 +176,11 @@ static void PGDrawGradient(void)
 	CGContextRef const imageContext = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextBeginTransparencyLayerWithRect(imageContext, CGRectMake(0, 0, PGOuterTotalWidth, PGBackgroundHeight), NULL);
 	NSRect const r = NSMakeRect(0.0f, 0.0f, PGInnerTotalWidth, PGBackgroundHeight);
-	if(PGThumbnailGlossStyleEnabled) {
-		[[NSColor blackColor] set];
-		NSRectFill(r);
-	} else PGDrawGradient();
+	PGDrawGradient();
 	if(highlight) {
 		[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.5f] set];
 		NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	}
-	if(PGThumbnailGlossStyleEnabled) PGDrawGradient();
 
 	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
 	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
