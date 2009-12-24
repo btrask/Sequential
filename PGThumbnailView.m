@@ -174,7 +174,7 @@ static void PGDrawGradient(void)
 	[self setNeedsDisplay:YES];
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGThumbnailView(Private)
 
 - (void)_validateSelection
 {
@@ -216,14 +216,7 @@ static void PGDrawGradient(void)
 	return [NSColor colorWithPatternImage:background];
 }
 
-#pragma mark PGClipViewAdditions Protocol
-
-- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
-{
-	return NO;
-}
-
-#pragma mark NSView
+#pragma mark -NSView
 
 - (id)initWithFrame:(NSRect)aRect
 {
@@ -380,10 +373,22 @@ static void PGDrawGradient(void)
 	[self sizeToFit];
 }
 
-#pragma mark NSResponder
+#pragma mark -NSView(PGClipViewAdditions)
 
+- (BOOL)PG_acceptsClicksInClipView:(PGClipView *)sender
+{
+	return NO;
+}
+
+#pragma mark -NSResponder
+
+- (BOOL)acceptsFirstResponder
+{
+	return YES;
+}
 - (void)mouseDown:(NSEvent *)anEvent
 {
+	[[self window] makeFirstResponder:self];
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	NSUInteger const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
@@ -408,7 +413,7 @@ static void PGDrawGradient(void)
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {

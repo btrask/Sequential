@@ -23,7 +23,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGThumbnailController.h"
-#import "HMBlkAppKit/source/HMDTAppKit/PGFadeOutPanel.h"
 
 // Models
 #import "PGDocument.h"
@@ -33,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Views
 #import "PGClipView.h"
+#import "PGBezelPanel.h"
 #import "PGThumbnailBrowser.h"
 #import "PGThumbnailView.h"
 
@@ -202,7 +202,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 		_browser = [[PGThumbnailBrowser alloc] initWithFrame:NSZeroRect];
 		[_browser setDelegate:self];
 		[_browser setDataSource:self];
-		_window = [[PGFadeOutPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+		_window = [[PGBezelPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
 		[_window setReleasedWhenClosed:NO];
 		[_window setOpaque:NO];
 		[_window useOptimizedDrawing:YES];
@@ -210,6 +210,8 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 		[_window setHasShadow:NO];
 		[_window setHidesOnDeactivate:NO];
 		[_window setContentView:_browser];
+		[_window setAcceptsEvents:YES];
+		[_window setCanBecomeKey:YES];
 	}
 	return self;
 }

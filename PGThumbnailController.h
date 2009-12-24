@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGDocument;
 
 // Views
-@class PGFadeOutPanel;
+@class PGBezelPanel;
 #import "PGThumbnailBrowser.h"
 
 // Controllers
@@ -44,7 +44,7 @@ NSWindowDelegate,
 PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSource>
 {
 	@private
-	PGFadeOutPanel *_window;
+	PGBezelPanel *_window;
 	PGThumbnailBrowser *_browser;
 	PGDisplayController *_displayController;
 	PGDocument *_document;

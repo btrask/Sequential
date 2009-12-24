@@ -700,7 +700,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)performKeyEquivalent:(NSEvent *)anEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
-	return [super performKeyEquivalent:anEvent] || [[self delegate] performKeyEquivalent:anEvent];
+	return [super performKeyEquivalent:anEvent];
 }
 
 #if !PGGameStyleArrowScrolling
