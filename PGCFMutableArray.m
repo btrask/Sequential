@@ -24,25 +24,56 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCFMutableArray.h"
 
-static CFIndex PGUnsignedToCFIndex(NSUInteger i)
+@interface PGCFMutableArray : NSMutableArray
+{
+	@private
+	CFMutableArrayRef _array;
+}
+@end
+
+@implementation NSMutableArray(PGExtendedMutableArray)
+
+- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
+{
+	[self release];
+	return [[PGCFMutableArray alloc] initWithCallbacks:callbacks];
+}
+
+@end
+
+static CFIndex PGNSUIntegerToCFIndex(NSUInteger i)
 {
 	return NSNotFound == i ? kCFNotFound : (CFIndex)i;
 }
-static NSUInteger PGCFIndexToUnsigned(CFIndex i)
+static NSUInteger PGCFIndexToNSUInteger(CFIndex i)
 {
 	return kCFNotFound == i ? NSNotFound : (NSUInteger)i;
 }
 
 @implementation PGCFMutableArray
 
-#pragma mark -NSMutableArray(PGExtendedMutableArray)
+#pragma mark -NSMutableArray
 
-- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
+- (void)addObject:(id)anObject
 {
-	if((self = [super init])) {
-		_array = CFArrayCreateMutable(kCFAllocatorDefault, 0, callbacks);
-	}
-	return self;
+	CFArrayAppendValue(_array, anObject);
+}
+- (void)insertObject:(id)anObject atIndex:(NSUInteger)index
+{
+	CFArrayInsertValueAtIndex(_array, PGNSUIntegerToCFIndex(index), anObject);
+}
+- (void)removeLastObject
+{
+	NSUInteger const count = [self count];
+	if(count) CFArrayRemoveValueAtIndex(_array, PGNSUIntegerToCFIndex(count - 1));
+}
+- (void)removeObjectAtIndex:(NSUInteger)index
+{
+	CFArrayRemoveValueAtIndex(_array, PGNSUIntegerToCFIndex(index));
+}
+- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject
+{
+	CFArraySetValueAtIndex(_array, PGNSUIntegerToCFIndex(index), anObject);
 }
 
 #pragma mark -NSMutableArray(NSExtendedMutableArray)
@@ -57,8 +88,8 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 }
 - (void)removeObject:(id)anObject inRange:(NSRange)range
 {
-	CFIndex const start = PGUnsignedToCFIndex(range.location);
-	CFIndex i = PGUnsignedToCFIndex(NSMaxRange(range));
+	CFIndex const start = PGNSUIntegerToCFIndex(range.location);
+	CFIndex i = PGNSUIntegerToCFIndex(NSMaxRange(range));
 	while(kCFNotFound != (i = CFArrayGetLastIndexOfValue(_array, CFRangeMake(start, i - start), anObject))) CFArrayRemoveValueAtIndex(_array, i);
 }
 - (void)removeObject:(id)anObject
@@ -72,6 +103,27 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 - (void)removeObjectIdenticalTo:(id)anObject
 {
 	return [self removeObjectIdenticalTo:anObject inRange:NSMakeRange(0, [self count])];
+}
+
+#pragma mark -NSMutableArray(PGExtendedMutableArray)
+
+- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
+{
+	if((self = [super init])) {
+		_array = CFArrayCreateMutable(kCFAllocatorDefault, 0, callbacks);
+	}
+	return self;
+}
+
+#pragma mark -NSArray
+
+- (NSUInteger)count
+{
+	return PGCFIndexToNSUInteger(CFArrayGetCount(_array));
+}
+- (id)objectAtIndex:(NSUInteger)index
+{
+	return (id)CFArrayGetValueAtIndex(_array, PGNSUIntegerToCFIndex(index));
 }
 
 #pragma mark -NSArray(NSExtendedArray)
@@ -90,46 +142,11 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 }
 - (NSUInteger)indexOfObject:(id)anObject inRange:(NSRange)range
 {
-	return PGCFIndexToUnsigned(CFArrayGetFirstIndexOfValue(_array, CFRangeMake(PGUnsignedToCFIndex(range.location), PGUnsignedToCFIndex(range.length)), anObject));
+	return PGCFIndexToNSUInteger(CFArrayGetFirstIndexOfValue(_array, CFRangeMake(PGNSUIntegerToCFIndex(range.location), PGNSUIntegerToCFIndex(range.length)), anObject));
 }
 - (NSUInteger)indexOfObjectIdenticalTo:(id)anObject inRange:(NSRange)range
 {
 	return [self indexOfObject:anObject inRange:range];
-}
-
-#pragma mark -NSMutableArray
-
-- (void)addObject:(id)anObject
-{
-	CFArrayAppendValue(_array, anObject);
-}
-- (void)insertObject:(id)anObject atIndex:(NSUInteger)index
-{
-	CFArrayInsertValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
-}
-- (void)removeLastObject
-{
-	NSUInteger const count = [self count];
-	if(count) CFArrayRemoveValueAtIndex(_array, PGUnsignedToCFIndex(count - 1));
-}
-- (void)removeObjectAtIndex:(NSUInteger)index
-{
-	CFArrayRemoveValueAtIndex(_array, PGUnsignedToCFIndex(index));
-}
-- (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject
-{
-	CFArraySetValueAtIndex(_array, PGUnsignedToCFIndex(index), anObject);
-}
-
-#pragma mark -NSArray
-
-- (NSUInteger)count
-{
-	return PGCFIndexToUnsigned(CFArrayGetCount(_array));
-}
-- (id)objectAtIndex:(NSUInteger)index
-{
-	return (id)CFArrayGetValueAtIndex(_array, PGUnsignedToCFIndex(index));
 }
 
 #pragma mark -NSObject
@@ -142,16 +159,6 @@ static NSUInteger PGCFIndexToUnsigned(CFIndex i)
 {
 	if(_array) CFRelease(_array);
 	[super dealloc];
-}
-
-@end
-
-@implementation NSMutableArray(PGExtendedMutableArray)
-
-- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks
-{
-	[[self init] release];
-	return [[PGCFMutableArray alloc] initWithCallbacks:callbacks];
 }
 
 @end

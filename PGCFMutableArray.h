@@ -22,16 +22,8 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-@interface PGCFMutableArray : NSMutableArray // Toll-free bridging a CFArray to NSArray causes the callbacks to occasionally be ignored.
-{
-	@private
-	CFMutableArrayRef _array;
-}
-
-@end
-
 @interface NSMutableArray(PGExtendedMutableArray)
 
-- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks;
+- (id)initWithCallbacks:(CFArrayCallBacks const *)callbacks; // Toll-free bridging a CFArray to NSArray causes the callbacks to occasionally be ignored.
 
 @end
