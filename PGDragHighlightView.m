@@ -53,21 +53,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_highlightPath stroke];
 }
 
-#pragma mark -NSView(PGBezelPanelView)
-
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
-{
-	[_highlightPath release];
-	_highlightPath = nil;
-	return aRect;
-}
-
 #pragma mark -NSObject
 
 - (void)dealloc
 {
 	[_highlightPath release];
 	[super dealloc];
+}
+
+#pragma mark -<PGBezelPanelContentView>
+
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
+{
+	[_highlightPath release];
+	_highlightPath = nil;
+	return aRect;
 }
 
 @end

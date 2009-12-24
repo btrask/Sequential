@@ -95,25 +95,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 @synthesize originCorner = _originCorner;
 
-#pragma mark PGBezelPanelContentView Protocol
-
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
-{
-	NSSize const messageSize = [self.attributedStringValue size];
-	CGFloat const scaledMarginSize = PGMarginSize * scaleFactor;
-	NSRect frame = NSIntersectionRect(
-		NSMakeRect(
-			NSMinX(aRect) + scaledMarginSize,
-			NSMinY(aRect) + scaledMarginSize,
-			ceilf((messageSize.width + PGTextTotalHorzPadding + (self.displaysProgressIndicator ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
-			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, (self.displaysProgressIndicator ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
-		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
-	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
-	if(self.originCorner == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
-	return frame;
-}
-
-#pragma mark NSView
+#pragma mark -NSView
 
 - (BOOL)isFlipped
 {
@@ -145,12 +127,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self.attributedStringValue drawInRect:NSMakeRect(NSMinX(b) + PGPaddingSize + PGTextHorzPadding + textOffset, NSMinY(b) + PGTextBottomPadding, NSWidth(b) - PGTotalPaddingSize - PGTextTotalHorzPadding - indicatorWidth, NSHeight(b) - PGTextTotalVertPadding)];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
 	[_stringValue release];
 	[super dealloc];
+}
+
+#pragma mark -<PGBezelPanelContentView>
+
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
+{
+	NSSize const messageSize = [self.attributedStringValue size];
+	CGFloat const scaledMarginSize = PGMarginSize * scaleFactor;
+	NSRect frame = NSIntersectionRect(
+		NSMakeRect(
+			NSMinX(aRect) + scaledMarginSize,
+			NSMinY(aRect) + scaledMarginSize,
+			ceilf((messageSize.width + PGTextTotalHorzPadding + (self.displaysProgressIndicator ? PGIndicatorWidth : 0.0f) + PGTotalPaddingSize) * scaleFactor),
+			ceilf(MAX(messageSize.height + PGTextTotalVertPadding, (self.displaysProgressIndicator ? PGIndicatorHeight + PGPaddingSize : 0.0f)) * scaleFactor)),
+		NSInsetRect(aRect, scaledMarginSize, scaledMarginSize));
+	frame.size.width = MAX(NSWidth(frame), NSHeight(frame)); // Don't allow the panel to be narrower than it is tall.
+	if(self.originCorner == PGMaxXMinYCorner) frame.origin.x = NSMaxX(aRect) - scaledMarginSize - NSWidth(frame);
+	return frame;
 }
 
 @end

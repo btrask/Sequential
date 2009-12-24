@@ -199,19 +199,20 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (id)init
 {
 	if((self = [super init])) {
-		_browser = [[PGThumbnailBrowser alloc] initWithFrame:NSZeroRect];
-		[_browser setDelegate:self];
-		[_browser setDataSource:self];
-		_window = [[PGBezelPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+		_window = [[PGThumbnailBrowser PG_bezelPanel] retain];
+//		_window = [[PGBezelPanel alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
 		[_window setReleasedWhenClosed:NO];
-		[_window setOpaque:NO];
-		[_window useOptimizedDrawing:YES];
+//		[_window setOpaque:NO];
+//		[_window useOptimizedDrawing:YES];
 		[_window setDelegate:self];
-		[_window setHasShadow:NO];
-		[_window setHidesOnDeactivate:NO];
-		[_window setContentView:_browser];
+//		[_window setHasShadow:NO];
+//		[_window setHidesOnDeactivate:NO];
+//		[_window setContentView:_browser];
 		[_window setAcceptsEvents:YES];
 		[_window setCanBecomeKey:YES];
+		_browser = [_window content];
+		[_browser setDelegate:self];
+		[_browser setDataSource:self];
 	}
 	return self;
 }
@@ -220,7 +221,6 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	[self PG_removeObserver];
 	[_window setDelegate:nil];
 	[_window release];
-	[_browser release];
 	[super dealloc];
 }
 

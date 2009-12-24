@@ -309,6 +309,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent
 {
 	NSParameterAssert(firstEvent);
+	if(![[self window] makeFirstResponder:[self documentView]]) [[self window] makeFirstResponder:self];
 	self.scrolling = YES;
 	[self stopAnimatedScrolling];
 	BOOL handled = NO;

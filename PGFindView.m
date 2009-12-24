@@ -29,13 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGFindView
 
-#pragma mark -NSView(PGBezelPanelContentView)
-
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)s
-{
-	return (NSRect){aRect.origin, {NSWidth([self frame]) * s, NSHeight([self frame]) * s}};
-}
-
 #pragma mark -NSResponder
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
@@ -46,6 +39,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[[self window] makeKeyAndOrderFront:self];
 	[[self window] makeFirstResponder:[[self window] initialFirstResponder]]; // Fitt's law.
+}
+
+#pragma mark -<PGBezelPanelContentView>
+
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)s
+{
+	return (NSRect){aRect.origin, {NSWidth([self frame]) * s, NSHeight([self frame]) * s}};
 }
 
 @end

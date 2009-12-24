@@ -116,7 +116,6 @@ static void PGDrawGradient(void)
 	for(id const addedItem in addedItems) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
 	[_selection setSet:items];
 	[self _validateSelection];
-	[self scrollToFirstSelectedItem];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
@@ -382,13 +381,61 @@ static void PGDrawGradient(void)
 
 #pragma mark -NSResponder
 
+- (IBAction)moveUp:(id)sender
+{
+	NSUInteger i = 1;
+	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
+		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i - 1]]];
+		break;
+	}
+}
+- (IBAction)moveDown:(id)sender
+{
+	NSUInteger const count = [_items count];
+	if(!count) return;
+	NSUInteger i = count - 1;
+	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
+		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i + 1]]];
+		break;
+	}
+}
+- (IBAction)moveUpAndModifySelection:(id)sender
+{
+	NSUInteger i = 1;
+	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
+		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
+		[selection addObject:[_items objectAtIndex:i - 1]];
+		[self setSelection:selection];
+		[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i - 1 withMargin:YES] type:PGScrollLeastToRect];
+		break;
+	}
+}
+- (IBAction)moveDownAndModifySelection:(id)sender
+{
+	NSUInteger const count = [_items count];
+	if(!count) return;
+	NSUInteger i = count - 1;
+	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
+		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
+		[selection addObject:[_items objectAtIndex:i + 1]];
+		[self setSelection:selection];
+		[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i + 1 withMargin:YES] type:PGScrollLeastToRect];
+		break;
+	}
+}
+- (IBAction)selectAll:(id)sender
+{
+	[self setSelection:[NSSet setWithArray:_items]];
+}
+
+#pragma mark -
+
 - (BOOL)acceptsFirstResponder
 {
 	return YES;
 }
 - (void)mouseDown:(NSEvent *)anEvent
 {
-	[[self window] makeFirstResponder:self];
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
 	NSUInteger const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
@@ -411,6 +458,10 @@ static void PGDrawGradient(void)
 	[self setNeedsDisplayInRect:itemFrame];
 	[self PG_scrollRectToVisible:itemFrame type:PGScrollLeastToRect];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
+- (void)keyDown:(NSEvent *)anEvent
+{
+	[self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
 }
 
 #pragma mark -NSObject

@@ -149,19 +149,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	else [self windowWillClose:nil];
 }
 
-#pragma mark -NSView(PGBezelPanelContentView)
-
-- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
-{
-	CGFloat const scaledPanelSize = scaleFactor * PGAlertViewSize;
-	return PGIntegralRect(NSMakeRect(
-		NSMinX(aRect) + PGMarginSize,
-		NSMaxY(aRect) - scaledPanelSize - PGMarginSize,
-		scaledPanelSize,
-		scaledPanelSize
-	));
-}
-
 #pragma mark -NSObject
 
 - (void)dealloc
@@ -181,6 +168,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_frameTimer invalidate];
 	_frameTimer = nil;
 	[_graphicStack removeAllObjects];
+}
+
+#pragma mark -<PGBezelPanelContentView>
+
+- (NSRect)bezelPanel:(PGBezelPanel *)sender frameForContentRect:(NSRect)aRect scale:(CGFloat)scaleFactor
+{
+	CGFloat const scaledPanelSize = scaleFactor * PGAlertViewSize;
+	return PGIntegralRect(NSMakeRect(
+		NSMinX(aRect) + PGMarginSize,
+		NSMaxY(aRect) - scaledPanelSize - PGMarginSize,
+		scaledPanelSize,
+		scaledPanelSize
+	));
 }
 
 @end
