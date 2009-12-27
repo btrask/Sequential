@@ -106,6 +106,7 @@ static void PGDrawGradient(void)
 	for(id const addedItem in addedItems) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
 	[_selection setSet:items];
 	[self _validateSelection];
+	[self scrollToFirstSelectedItem];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
 }
 
@@ -407,7 +408,6 @@ static void PGDrawGradient(void)
 		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
 		[selection addObject:[_items objectAtIndex:i - 1]];
 		[self setSelection:selection];
-		[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i - 1 withMargin:YES] type:PGScrollLeastToRect];
 		break;
 	}
 }
@@ -420,7 +420,6 @@ static void PGDrawGradient(void)
 		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
 		[selection addObject:[_items objectAtIndex:i + 1]];
 		[self setSelection:selection];
-		[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i + 1 withMargin:YES] type:PGScrollLeastToRect];
 		break;
 	}
 }
