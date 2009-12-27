@@ -43,13 +43,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGInnerTotalWidth (PGThumbnailSize + PGThumbnailMarginWidth * 2.0f)
 #define PGOuterTotalWidth (PGInnerTotalWidth + 2.0f)
 
-static NSColor *PGBackgroundColor = nil;
-static NSColor *PGHighlightedBackgroundColor = nil;
+typedef enum {
+	PGBackgroundDeselected,
+	PGBackgroundSelectedActive,
+	PGBackgroundSelectedInactive,
+	PGBackgroundCount,
+} PGBackgroundType;
+static NSColor *PGBackgroundColors[PGBackgroundCount];
 
 @interface PGThumbnailView(Private)
 
 - (void)_validateSelection;
-- (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight;
+- (NSColor *)_backgroundColorWithType:(PGBackgroundType)type;
 
 @end
 
@@ -151,10 +156,17 @@ static void PGDrawGradient(void)
 
 #pragma mark -
 
+- (void)windowDidChangeKey:(NSNotification *)aNotif
+{
+	[self setNeedsDisplay:YES];
+}
 - (void)systemColorsDidChange:(NSNotification *)aNotif
 {
-	[PGHighlightedBackgroundColor release];
-	PGHighlightedBackgroundColor = nil;
+	NSUInteger i = PGBackgroundCount;
+	while(i--) {
+		[PGBackgroundColors[i] release];
+		PGBackgroundColors[i] = nil;
+	}
 	[self setNeedsDisplay:YES];
 }
 
@@ -164,8 +176,9 @@ static void PGDrawGradient(void)
 {
 	for(id const selectedItem in [[_selection copy] autorelease]) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
 }
-- (NSColor *)_backgroundColorWithHighlight:(BOOL)highlight
+- (NSColor *)_backgroundColorWithType:(PGBackgroundType)type
 {
+	if(PGBackgroundColors[type]) return PGBackgroundColors[type];
 	NSImage *const background = [[[NSImage alloc] initWithSize:NSMakeSize(PGOuterTotalWidth, PGBackgroundHeight)] autorelease];
 	[background lockFocus];
 
@@ -177,8 +190,8 @@ static void PGDrawGradient(void)
 	CGContextBeginTransparencyLayerWithRect(imageContext, CGRectMake(0, 0, PGOuterTotalWidth, PGBackgroundHeight), NULL);
 	NSRect const r = NSMakeRect(0.0f, 0.0f, PGInnerTotalWidth, PGBackgroundHeight);
 	PGDrawGradient();
-	if(highlight) {
-		[[[NSColor alternateSelectedControlColor] colorWithAlphaComponent:0.5f] set];
+	if(PGBackgroundDeselected != type) {
+		[[PGBackgroundSelectedActive == type ? [NSColor alternateSelectedControlColor] : [NSColor secondarySelectedControlColor] colorWithAlphaComponent:0.5f] set];
 		NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	}
 
@@ -193,7 +206,9 @@ static void PGDrawGradient(void)
 
 	CGContextEndTransparencyLayer(imageContext);
 	[background unlockFocus];
-	return [NSColor colorWithPatternImage:background];
+	NSColor *const color = [NSColor colorWithPatternImage:background];
+	PGBackgroundColors[type] = [color retain];
+	return color;
 }
 
 #pragma mark -NSView
@@ -232,8 +247,7 @@ static void PGDrawGradient(void)
 	NSRect const *rects = NULL;
 	[self getRectsBeingDrawn:&rects count:&count];
 
-	if(!PGBackgroundColor) PGBackgroundColor = [[self _backgroundColorWithHighlight:NO] retain];
-	[PGBackgroundColor set];
+	[[self _backgroundColorWithType:PGBackgroundDeselected] set];
 	NSRectFillList(rects, count);
 
 	NSShadow *const nilShadow = [[[NSShadow alloc] init] autorelease];
@@ -250,8 +264,7 @@ static void PGDrawGradient(void)
 		id const item = [_items objectAtIndex:i];
 		if([_selection containsObject:item]) {
 			[nilShadow set];
-			if(!PGHighlightedBackgroundColor) PGHighlightedBackgroundColor = [[self _backgroundColorWithHighlight:YES] retain];
-			[PGHighlightedBackgroundColor set];
+			[[self _backgroundColorWithType:[self PG_isActive] ? PGBackgroundSelectedActive : PGBackgroundSelectedInactive] set];
 			NSRectFill(frameWithMargin);
 			[shadow set];
 		}
@@ -351,6 +364,13 @@ static void PGDrawGradient(void)
 - (void)setFrameSize:(NSSize)oldSize
 {
 	[self sizeToFit];
+}
+- (void)viewWillMoveToWindow:(NSWindow *)aWindow
+{
+	[[self window] PG_removeObserver:self name:NSWindowDidBecomeKeyNotification];
+	[[self window] PG_removeObserver:self name:NSWindowDidResignKeyNotification];
+	[aWindow PG_addObserver:self selector:@selector(windowDidChangeKey:) name:NSWindowDidBecomeKeyNotification];
+	[aWindow PG_addObserver:self selector:@selector(windowDidChangeKey:) name:NSWindowDidResignKeyNotification];
 }
 
 #pragma mark -NSView(PGClipViewAdditions)

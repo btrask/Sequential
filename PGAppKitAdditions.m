@@ -270,6 +270,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([self respondsToSelector:@selector(setEnabled:)]) [(NSControl *)self setEnabled:enabled];
 	if(recursive) for(NSView *const subview in [self subviews]) [subview PG_setEnabled:enabled recursive:YES];
 }
+- (BOOL)PG_isActive
+{
+	NSWindow *const w = [self window];
+	return [w isKeyWindow] && [w firstResponder] == self;
+}
 
 @end
 

@@ -54,6 +54,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)sizeToFit;
 - (void)scrollToFirstSelectedItem;
 
+- (void)windowDidChangeKey:(NSNotification *)aNotif;
 - (void)systemColorsDidChange:(NSNotification *)aNotif;
 
 @end

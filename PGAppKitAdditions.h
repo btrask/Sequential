@@ -87,6 +87,7 @@ typedef NSUInteger AEIconType;
 @interface NSView(PGAppKitAdditions)
 
 - (void)PG_setEnabled:(BOOL)enabled recursive:(BOOL)recursive;
+- (BOOL)PG_isActive;
 
 @end
 
