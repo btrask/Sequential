@@ -435,6 +435,19 @@ static void PGDrawGradient(void)
 {
 	return YES;
 }
+- (BOOL)becomeFirstResponder
+{
+	[self setNeedsDisplay:YES];
+	return [super becomeFirstResponder];
+}
+- (BOOL)resignFirstResponder
+{
+	[self setNeedsDisplay:YES];
+	return [super resignFirstResponder];
+}
+
+#pragma mark -
+
 - (void)mouseDown:(NSEvent *)anEvent
 {
 	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
