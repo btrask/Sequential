@@ -200,6 +200,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	if((self = [super init])) {
 		_window = [[PGThumbnailBrowser PG_bezelPanel] retain];
+		[_window setAutorecalculatesKeyViewLoop:YES];
 		[_window setReleasedWhenClosed:NO];
 		[_window setDelegate:self];
 		[_window setAcceptsEvents:YES];
