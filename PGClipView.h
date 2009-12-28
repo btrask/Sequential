@@ -62,6 +62,7 @@ typedef NSUInteger PGScrollToRectType;
 	NSCursor *_cursor;
 	NSPoint _position;
 	PGRectEdgeMask _pinLocation;
+	BOOL _acceptsFirstResponder;
 	NSUInteger _documentViewIsResizing;
 	BOOL _firstMouse;
 	NSUInteger _scrollCount;
@@ -85,6 +86,7 @@ typedef NSUInteger PGScrollToRectType;
 @property(assign, getter = isScrolling) BOOL scrolling;
 @property(assign) PGRectEdgeMask pinLocation;
 @property(assign) BOOL allowsAnimation;
+@property(assign) BOOL acceptsFirstResponder;
 
 @property(readonly) NSPoint position;
 @property(readonly) NSPoint center;
@@ -140,5 +142,7 @@ typedef NSUInteger PGScrollToRectType;
 - (BOOL)PG_scalesContentWithFrameSizeInClipView:(PGClipView *)sender;
 - (void)PG_viewWillScrollInClipView:(PGClipView *)clipView;
 - (void)PG_viewDidScrollInClipView:(PGClipView *)clipView;
+
+- (NSView *)PG_deepestViewAtPoint:(NSPoint)aPoint;
 
 @end

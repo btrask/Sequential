@@ -449,7 +449,7 @@ static void PGDrawGradient(void)
 
 - (void)mouseDown:(NSEvent *)anEvent
 {
-	NSPoint const p = [self convertPoint:[anEvent locationInWindow] fromView:nil];
+	NSPoint const p = [anEvent PG_locationInView:self];
 	NSUInteger const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
 	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];

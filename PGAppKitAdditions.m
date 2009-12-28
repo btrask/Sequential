@@ -141,6 +141,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@implementation NSEvent(PGAppKitAdditions)
+
+- (NSPoint)PG_locationInView:(NSView *)view
+{
+	NSParameterAssert([view window] == [self window]);
+	NSPoint const p = [self locationInWindow];
+	return view ? [view convertPoint:p fromView:nil] : p;
+}
+
+@end
+
 @implementation NSImageRep(PGAppKitAdditions)
 
 + (id)PG_bestImageRepWithData:(NSData *)data

@@ -944,6 +944,7 @@ typedef NSUInteger PGZoomDirection;
 	[[self window] setMinSize:PGWindowMinSize];
 
 	NSImage *const cursorImage = [NSImage imageNamed:@"Cursor-Hand-Pointing"];
+	[clipView setAcceptsFirstResponder:YES];
 	[clipView setCursor:cursorImage ? [[[NSCursor alloc] initWithImage:cursorImage hotSpot:NSMakePoint(5.0f, 0.0f)] autorelease] : [NSCursor pointingHandCursor]];
 	[clipView setPostsFrameChangedNotifications:YES];
 	[clipView PG_addObserver:self selector:@selector(clipViewFrameDidChange:) name:NSViewFrameDidChangeNotification];

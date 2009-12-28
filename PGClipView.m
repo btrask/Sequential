@@ -147,6 +147,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_pinLocation = PGNonContradictoryRectEdges(mask);
 }
 @synthesize allowsAnimation = _allowsAnimation;
+@synthesize acceptsFirstResponder = _acceptsFirstResponder;
 
 #pragma mark -
 
@@ -309,7 +310,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (BOOL)handleMouseDown:(NSEvent *)firstEvent
 {
 	NSParameterAssert(firstEvent);
-	if(![[self window] makeFirstResponder:[self documentView]]) [[self window] makeFirstResponder:self];
+	NSView *const clickedView = [self PG_deepestViewAtPoint:[firstEvent PG_locationInView:[self superview]]];
+	if(!([clickedView acceptsFirstResponder] && [[self window] makeFirstResponder:clickedView]) && [self acceptsFirstResponder]) [[self window] makeFirstResponder:self];
 	self.scrolling = YES;
 	[self stopAnimatedScrolling];
 	BOOL handled = NO;
@@ -329,7 +331,8 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSPoint const dragPoint = PGOffsetPointByXY(originalPoint, [self position].x, [self position].y);
 	NSEvent *latestEvent;
 	while([(latestEvent = [[self window] nextEventMatchingMask:dragMask | NSEventMaskFromType(stopType) untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]) type] != stopType) {
-		if(PGPreliminaryDragging == dragMode || (PGNotDragging == dragMode && hypotf(originalPoint.x - [latestEvent locationInWindow].x, originalPoint.y - [latestEvent locationInWindow].y) >= PGClickSlopDistance)) {
+		NSPoint const latestPoint = [latestEvent locationInWindow];
+		if(PGPreliminaryDragging == dragMode || (PGNotDragging == dragMode && hypotf(originalPoint.x - latestPoint.x, originalPoint.y - latestPoint.y) >= PGClickSlopDistance)) {
 			dragMode = PGDragging;
 			if(PGMouseHiddenDraggingStyle) {
 				[NSCursor hide];
@@ -338,7 +341,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 			[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag:) object:dragModeValue];
 		}
 		if(PGMouseHiddenDraggingStyle) [self scrollBy:NSMakeSize(-[latestEvent deltaX], [latestEvent deltaY]) animation:PGNoAnimation];
-		else [self scrollTo:PGOffsetPointByXY(dragPoint, -[latestEvent locationInWindow].x, -[latestEvent locationInWindow].y) animation:PGNoAnimation];
+		else [self scrollTo:PGOffsetPointByXY(dragPoint, -latestPoint.x, -latestPoint.y) animation:PGNoAnimation];
 		finalPoint = PGPointInRect(PGOffsetPointByXY(finalPoint, [latestEvent deltaX], -[latestEvent deltaY]), availableDragRect);
 	}
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_beginPreliminaryDrag:) object:dragModeValue];
@@ -595,6 +598,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if(clipView == self || !_scrollCount) [super PG_viewDidScrollInClipView:clipView];
 }
 
+#pragma mark -
+
+- (NSView *)PG_deepestViewAtPoint:(NSPoint)aPoint
+{
+	return [super hitTest:aPoint];
+}
+
 #pragma mark -NSView(PGZooming)
 
 - (NSSize)PG_zoomedBoundsSize
@@ -654,10 +664,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark -
 
-- (BOOL)acceptsFirstResponder
-{
-	return YES;
-}
 - (void)keyDown:(NSEvent *)anEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
@@ -832,6 +838,11 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 - (void)PG_viewDidScrollInClipView:(PGClipView *)clipView
 {
 	if(clipView) [[self subviews] makeObjectsPerformSelector:_cmd withObject:clipView];
+}
+
+- (NSView *)PG_deepestViewAtPoint:(NSPoint)aPoint
+{
+	return [self hitTest:aPoint];
 }
 
 @end

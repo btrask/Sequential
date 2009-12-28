@@ -57,6 +57,12 @@ typedef NSUInteger AEIconType;
 
 @end
 
+@interface NSEvent(PGAppKitAdditions)
+
+- (NSPoint)PG_locationInView:(NSView *)view;
+
+@end
+
 @interface NSImageRep(PGAppKitAdditions)
 
 + (id)PG_bestImageRepWithData:(NSData *)data;

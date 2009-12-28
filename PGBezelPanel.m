@@ -58,7 +58,6 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 		[self setBackgroundColor:[NSColor clearColor]];
 		[self useOptimizedDrawing:YES];
 		[self setHidesOnDeactivate:NO];
-		[self setBecomesKeyOnlyIfNeeded:YES];
 		[self setContentView:aView];
 	}
 	return self;
