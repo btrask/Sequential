@@ -168,5 +168,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[_views objectAtIndex:i] mouseDown:anEvent];
 	return YES;
 }
+- (PGRectEdgeMask)clipView:(PGClipView *)sender directionFor:(PGPageLocation)pageLocation
+{
+	return PGReadingDirectionAndLocationToRectEdgeMask(pageLocation, PGReadingDirectionLeftToRight);
+}
 
 @end
