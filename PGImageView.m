@@ -205,7 +205,7 @@ static NSSize PGRoundedCornerSizes[4];
 	}
 	if(NSEqualSizes(size, [self size])) return;
 	_size = size;
-	if(!_sizeTransitionTimer) _sizeTransitionTimer = [[self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
+	if(!_sizeTransitionTimer) _sizeTransitionTimer = [[self PG_performSelector:@selector(_sizeTransitionOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:PGRepeatOnInterval] retain];
 }
 - (void)stopAnimatedSizeTransition
 {
@@ -258,7 +258,7 @@ static NSSize PGRoundedCornerSizes[4];
 - (void)_runAnimationTimer
 {
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_animate) object:nil];
-	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:-[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] doubleValue] options:kNilOptions];
+	if([self canAnimateRep] && _animates && !_pauseCount) [self PG_performSelector:@selector(_animate) withObject:nil fireDate:nil interval:[[(NSBitmapImageRep *)_rep valueForProperty:NSImageCurrentFrameDuration] doubleValue] options:kNilOptions];
 }
 - (void)_animate
 {

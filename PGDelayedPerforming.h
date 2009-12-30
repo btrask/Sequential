@@ -24,7 +24,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 enum {
 	PGRetainTarget = 1 << 0,
-	PGCompareArgumentPointer = 1 << 1
+	PGCompareArgumentPointer = 1 << 1,
+	PGRepeatOnInterval = 1 << 2,
 };
 typedef NSUInteger PGDelayedPerformingOptions;
 

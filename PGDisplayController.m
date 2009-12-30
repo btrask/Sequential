@@ -843,7 +843,7 @@ typedef NSUInteger PGZoomDirection;
 	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(showLoadingIndicator) object:nil];
 	if(!_activeNode) return [self nodeReadyForViewing:nil];
 	_reading = YES;
-	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:-0.5f options:kNilOptions];
+	[self PG_performSelector:@selector(showLoadingIndicator) withObject:nil fireDate:nil interval:0.5f options:kNilOptions];
 	[_activeNode PG_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode PG_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];

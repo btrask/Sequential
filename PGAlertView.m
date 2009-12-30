@@ -71,7 +71,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[self _updateCurrentGraphic];
 	}
 	NSTimeInterval const fadeOutDelay = [_currentGraphic fadeOutDelay];
-	if(fadeOutDelay >= 0.01f) [self PG_performSelector:@selector(popGraphicIdenticalTo:) withObject:_currentGraphic fireDate:nil interval:-fadeOutDelay options:PGCompareArgumentPointer];
+	if(fadeOutDelay >= 0.01f) [self PG_performSelector:@selector(popGraphicIdenticalTo:) withObject:_currentGraphic fireDate:nil interval:fadeOutDelay options:PGCompareArgumentPointer];
 	if(window && [[self window] respondsToSelector:@selector(displayOverWindow:)]) [(PGBezelPanel *)[self window] displayOverWindow:window];
 }
 - (void)popGraphic:(PGAlertGraphic *)aGraphic
@@ -119,7 +119,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_frameTimer invalidate];
 	_frameCount = 0;
 	NSTimeInterval const frameDelay = _currentGraphic.frameDelay;
-	_frameTimer = _currentGraphic.frameCount > 1 ? [self PG_performSelector:@selector(animateOneFrame:) withObject:self fireDate:nil interval:frameDelay options:PGRetainTarget] : nil;
+	_frameTimer = _currentGraphic.frameCount > 1 ? [self PG_performSelector:@selector(animateOneFrame:) withObject:self fireDate:nil interval:frameDelay options:PGRetainTarget | PGRepeatOnInterval] : nil;
 	[self setNeedsDisplay:YES];
 }
 

@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_updateTimer release];
 		_updateTimer = nil;
 	} else if(!_updateTimer) {
-		_updateTimer = [[self PG_performSelector:@selector(_updateOnTimer:) withObject:[NSNumber numberWithBool:NO] fireDate:nil interval:PGAnimationFramerate options:0] retain];
+		_updateTimer = [[self PG_performSelector:@selector(_updateOnTimer:) withObject:[NSNumber numberWithBool:NO] fireDate:nil interval:PGAnimationFramerate options:PGRepeatOnInterval] retain];
 	}
 	[timerButton setEnabled:!!d];
 	[timerButton setIconType:run ? AEStopIcon : AEPlayIcon];

@@ -191,7 +191,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	_animationProgress = 0.0f;
 	if(!_animationTimer) {
 		self.scrolling = YES;
-		_animationTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:kNilOptions] retain];
+		_animationTimer = [[self PG_performSelector:@selector(_scrollOneFrame) withObject:nil fireDate:nil interval:PGAnimationFramerate options:PGRepeatOnInterval] retain];
 	}
 	return YES;
 }
@@ -326,9 +326,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSValue *const dragModeValue = [NSValue valueWithPointer:&dragMode];
 	[self PG_performSelector:@selector(_beginPreliminaryDrag:) withObject:dragModeValue fireDate:nil interval:
 #if __LP64__
-		-[NSEvent doubleClickInterval]
+		[NSEvent doubleClickInterval]
 #else
-		GetDblTime() / -60.0f
+		GetDblTime() / 60.0f
 #endif
 		options:kNilOptions mode:NSEventTrackingRunLoopMode];
 	NSPoint const originalPoint = [firstEvent locationInWindow]; // Don't convert the point to our view coordinates, since we change them when scrolling.
@@ -640,7 +640,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	if([anEvent modifierFlags] & NSCommandKeyMask) {
 		[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_delayedEndGesture) object:nil];
 		[[self delegate] clipView:self magnifyBy:y * PGMouseWheelZoomFactor];
-		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil fireDate:nil interval:-1.0f options:kNilOptions]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
+		[self PG_performSelector:@selector(_delayedEndGesture) withObject:nil fireDate:nil interval:1.0f options:kNilOptions]; // We don't actually know when the zooming will stop, since there's no such thing as a "scroll wheel up" event.
 	} else [self scrollBy:NSMakeSize(x * PGMouseWheelScrollFactor, y * PGMouseWheelScrollFactor) animation:PGNoAnimation];
 }
 

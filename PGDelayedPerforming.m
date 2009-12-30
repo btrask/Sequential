@@ -58,14 +58,16 @@ static void PGTimerCallback(CFRunLoopTimerRef timer, PGTimerContextObject *conte
 }
 - (NSTimer *)PG_performSelector:(SEL)aSel withObject:(id)anArgument fireDate:(NSDate *)date interval:(NSTimeInterval)interval options:(PGDelayedPerformingOptions)opts mode:(NSString *)mode
 {
+	NSParameterAssert(interval >= 0.0f);
 	CFRunLoopTimerContext context = {
 		0,
 		[[[PGTimerContextObject alloc] initWithTarget:self selector:aSel object:anArgument options:opts] autorelease],
 		CFRetain,
 		CFRelease,
-		CFCopyDescription
+		CFCopyDescription,
 	};
-	NSTimer *const timer = [(NSTimer *)CFRunLoopTimerCreate(kCFAllocatorDefault, CFDateGetAbsoluteTime((CFDateRef)(date ? date : [NSDate dateWithTimeIntervalSinceNow:fabs(interval)])), (CFTimeInterval)interval, kNilOptions, 0, (CFRunLoopTimerCallBack)PGTimerCallback, &context) autorelease];
+	CFTimeInterval const repeatInterval = PGRepeatOnInterval & opts ? interval : 0.0f;
+	NSTimer *const timer = [(NSTimer *)CFRunLoopTimerCreate(kCFAllocatorDefault, CFDateGetAbsoluteTime((CFDateRef)(date ? date : [NSDate dateWithTimeIntervalSinceNow:interval])), repeatInterval, kNilOptions, 0, (CFRunLoopTimerCallBack)PGTimerCallback, &context) autorelease];
 	[[NSRunLoop currentRunLoop] addTimer:timer forMode:mode];
 	if(!PGTimersByNonretainedObjectValue) PGTimersByNonretainedObjectValue = (NSMutableDictionary *)CFDictionaryCreateMutable(kCFAllocatorDefault, 0, NULL, &kCFTypeDictionaryValueCallBacks);
 	[NSMutableDictionary dictionary];
