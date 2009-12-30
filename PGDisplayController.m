@@ -661,8 +661,6 @@ typedef NSUInteger PGZoomDirection;
 		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
 		[passwordField setStringValue:@""];
 		[clipView setDocumentView:passwordView];
-		[clipView setNextKeyView:passwordField];
-		[passwordField setNextKeyView:clipView];
 	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGEncodingError) {
 		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
 		[clipView setDocumentView:encodingView];
@@ -1335,24 +1333,6 @@ typedef NSUInteger PGZoomDirection;
 		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
 	}
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
-}
-
-#pragma mark -<PGDocumentWindowDelegate>
-
-- (void)selectNextOutOfWindowKeyView:(NSWindow *)window
-{
-	NSParameterAssert(window == [self window]);
-	if(![self findPanelShown]) return;
-	[_findPanel makeKeyWindow];
-	[_findPanel makeFirstResponder:[_findPanel initialFirstResponder]];
-}
-- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window
-{
-	NSParameterAssert(window == [self window]);
-	if(![self findPanelShown]) return;
-	[_findPanel makeKeyWindow];
-	NSView *const previousKeyView = [[_findPanel initialFirstResponder] previousValidKeyView];
-	[_findPanel makeFirstResponder:previousKeyView ? previousKeyView : [_findPanel initialFirstResponder]];
 }
 
 #pragma mark -<PGEncodingAlertDelegate>

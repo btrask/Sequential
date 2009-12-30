@@ -641,8 +641,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 @end
 
 static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
-static NSView *(*PGNSViewNextValidKeyView)(id, SEL);
-static NSView *(*PGNSViewPreviousValidKeyView)(id, SEL);
 static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
 
 static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
@@ -654,8 +652,6 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 	if([PGApplication class] != self) return;
 
 	PGNSWindowValidateMenuItem = [NSWindow PG_useImplementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
-	PGNSViewNextValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(nextValidKeyView)];
-	PGNSViewPreviousValidKeyView = [NSView PG_useImplementationFromClass:[PGView class] forSelector:@selector(previousValidKeyView)];
 	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
 	PGNSMenuItemSetEnabled = [NSMenuItem PG_useImplementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
 
@@ -675,22 +671,6 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 {
 	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask); // Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
 	return PGNSWindowValidateMenuItem(self, _cmd, anItem);
-}
-
-@end
-
-@implementation PGView
-
-// Help tab between windows.
-- (NSView *)nextValidKeyView
-{
-	NSView *const view = PGNSViewNextValidKeyView(self, _cmd);
-	return view ? view : self;
-}
-- (NSView *)previousValidKeyView
-{
-	NSView *const view = PGNSViewPreviousValidKeyView(self, _cmd);
-	return view ? view : self;
 }
 
 @end

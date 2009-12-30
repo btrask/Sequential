@@ -56,19 +56,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self draggingExited:nil];
 }
 
-#pragma mark NSKeyboardUI Protocol
-
-- (void)selectKeyViewFollowingView:(NSView *)aView
-{
-	[super selectKeyViewFollowingView:aView];
-	if([[self firstResponder] isKindOfClass:[NSView class]] && [(NSView *)[self firstResponder] isDescendantOf:[self initialFirstResponder]]) [(id<PGDocumentWindowDelegate>)[self delegate] selectNextOutOfWindowKeyView:self];
-}
-- (void)selectKeyViewPrecedingView:(NSView *)aView
-{
-	if([aView isDescendantOf:[self initialFirstResponder]]) [(id<PGDocumentWindowDelegate>)[self delegate] selectPreviousOutOfWindowKeyView:self];
-	[super selectKeyViewPrecedingView:aView];
-}
-
 #pragma mark NSWindow
 
 - (void)close
@@ -99,7 +86,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return NO;
 }
-- (void)selectNextOutOfWindowKeyView:(NSWindow *)window {}
-- (void)selectPreviousOutOfWindowKeyView:(NSWindow *)window {}
 
 @end

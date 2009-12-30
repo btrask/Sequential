@@ -187,22 +187,6 @@ NSString *const PGBezelPanelFrameDidChangeNotification    = @"PGBezelPanelFrameD
 	[[self parentWindow] PG_addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification];
 }
 
-#pragma mark -
-
-// Insert the parent window before the initial first responder in the key view loop.
-- (void)selectKeyViewFollowingView:(NSView *)aView
-{
-	if(![aView nextValidKeyView] || [aView nextValidKeyView] == [self initialFirstResponder]) {
-		if([self makeFirstResponder:nil]) [[self parentWindow] makeKeyWindow];
-	} else [super selectKeyViewFollowingView:aView];
-}
-- (void)selectKeyViewPrecedingView:(NSView *)aView
-{
-	if(!aView || aView == [self initialFirstResponder]) {
-		if([self makeFirstResponder:nil]) [[self parentWindow] makeKeyWindow];
-	} else [super selectKeyViewPrecedingView:aView];
-}
-
 #pragma mark NSObject
 
 - (void)dealloc

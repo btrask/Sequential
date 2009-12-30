@@ -2,17 +2,15 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10B504</string>
-		<string key="IBDocument.InterfaceBuilderVersion">732</string>
-		<string key="IBDocument.AppKitVersion">1038.2</string>
-		<string key="IBDocument.HIToolboxVersion">437.00</string>
+		<string key="IBDocument.SystemVersion">10C540</string>
+		<string key="IBDocument.InterfaceBuilderVersion">740</string>
+		<string key="IBDocument.AppKitVersion">1038.25</string>
+		<string key="IBDocument.HIToolboxVersion">458.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">732</string>
+			<string key="NS.object.0">740</string>
 		</object>
-		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="100"/>
-		</array>
+		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs"/>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
@@ -31,7 +29,7 @@
 				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{204, 551}, {321, 214}}</string>
-				<int key="NSWTFlags">1081606144</int>
+				<int key="NSWTFlags">1081608192</int>
 				<string key="NSWindowTitle"/>
 				<string key="NSWindowClass">PGDocumentWindow</string>
 				<string key="NSViewClass">View</string>
@@ -174,6 +172,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{254, 12}, {96, 32}}</string>
 						<reference key="NSSuperview" ref="526223446"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="405813134">
 							<int key="NSCellFlags">67239424</int>
@@ -198,6 +197,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{100, 18}, {152, 22}}</string>
 						<reference key="NSSuperview" ref="526223446"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSSecureTextFieldCell" key="NSCell" id="358999862">
 							<int key="NSCellFlags">341966400</int>
@@ -223,6 +223,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{97, 48}, {250, 17}}</string>
 						<reference key="NSSuperview" ref="526223446"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="215405599">
 							<int key="NSCellFlags">67239488</int>
@@ -247,6 +248,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{19, 22}, {73, 17}}</string>
 						<reference key="NSSuperview" ref="526223446"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="323794913">
 							<int key="NSCellFlags">67239488</int>
@@ -267,6 +269,7 @@
 						<int key="NSvFlags">268</int>
 						<string key="NSFrame">{{32, 48}, {60, 17}}</string>
 						<reference key="NSSuperview" ref="526223446"/>
+						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="885222308">
 							<int key="NSCellFlags">67239488</int>
@@ -281,6 +284,7 @@
 				</array>
 				<string key="NSFrameSize">{364, 85}</string>
 				<reference key="NSSuperview"/>
+				<reference key="NSWindow"/>
 				<string key="NSClassName">PGRoundedBackgroundView</string>
 			</object>
 			<object class="NSCustomView" id="1025111255">
@@ -328,7 +332,7 @@
 				<string key="NSClassName">PGRoundedBackgroundView</string>
 			</object>
 			<object class="NSCustomView" id="750337150">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
 				<array class="NSMutableArray" key="NSSubviews">
 					<object class="NSTextField" id="850224826">
@@ -336,7 +340,6 @@
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{17, 85}, {330, 17}}</string>
 						<reference key="NSSuperview" ref="750337150"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="168806977">
 							<int key="NSCellFlags">67239488</int>
@@ -353,7 +356,6 @@
 						<int key="NSvFlags">274</int>
 						<string key="NSFrame">{{17, 60}, {330, 17}}</string>
 						<reference key="NSSuperview" ref="750337150"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSTextFieldCell" key="NSCell" id="462658668">
 							<int key="NSCellFlags">69336577</int>
@@ -370,7 +372,6 @@
 						<int key="NSvFlags">293</int>
 						<string key="NSFrame">{{137, 12}, {92, 32}}</string>
 						<reference key="NSSuperview" ref="750337150"/>
-						<reference key="NSWindow"/>
 						<bool key="NSEnabled">YES</bool>
 						<object class="NSButtonCell" key="NSCell" id="277816118">
 							<int key="NSCellFlags">67239424</int>
@@ -388,8 +389,6 @@
 					</object>
 				</array>
 				<string key="NSFrameSize">{364, 122}</string>
-				<reference key="NSSuperview"/>
-				<reference key="NSWindow"/>
 				<string key="NSClassName">PGRoundedBackgroundView</string>
 			</object>
 		</array>
@@ -934,6 +933,10 @@
 						<string key="majorKey">IBUserSource</string>
 						<string key="minorKey"/>
 					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSMenu</string>
+					<reference key="sourceIdentifier" ref="1034286825"/>
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">NSObject</string>
@@ -1785,10 +1788,6 @@
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
 			<integer value="1050" key="NS.object.0"/>
-		</object>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<integer value="1060" key="NS.object.0"/>
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<string key="IBDocument.LastKnownRelativeProjectPath">../Sequential.xcodeproj</string>
