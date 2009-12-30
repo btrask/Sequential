@@ -474,7 +474,8 @@ static void PGDrawGradient(void)
 }
 - (void)keyDown:(NSEvent *)anEvent
 {
-	[self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
+	if([anEvent modifierFlags] & NSCommandKeyMask) return [super keyDown:anEvent];
+	if(![[NSApp mainMenu] performKeyEquivalent:anEvent]) [self interpretKeyEvents:[NSArray arrayWithObject:anEvent]];
 }
 
 #pragma mark -NSObject
