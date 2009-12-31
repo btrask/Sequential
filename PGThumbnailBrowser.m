@@ -141,6 +141,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:columns];
 }
 
+#pragma mark -NSResponder
+
+- (IBAction)moveLeft:(id)sender
+{
+	NSUInteger const i = [[self views] indexOfObjectIdenticalTo:[[self window] firstResponder]];
+	if(NSNotFound == i || !i) return;
+	[[[self views] objectAtIndex:i] setSelection:[NSSet set]];
+	[[self window] makeFirstResponder:[[self views] objectAtIndex:i - 1]];
+}
+- (IBAction)moveRight:(id)sender
+{
+	NSUInteger const i = [[self views] indexOfObjectIdenticalTo:[[self window] firstResponder]];
+	if(NSNotFound == i || i + 1 >= [self numberOfColumns]) return;
+	[[self window] makeFirstResponder:[[self views] objectAtIndex:i + 1]];
+}
+
 #pragma mark -<PGThumbnailViewDelegate>
 
 - (void)thumbnailViewSelectionDidChange:(PGThumbnailView *)sender

@@ -28,11 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGColumnView : NSView <PGClipViewDelegate>
 {
 	@private
-	PGClipView     *_clipView;
-	NSView         *_view;
+	PGClipView *_clipView;
+	NSView *_view;
 	NSMutableArray *_clipViews;
 	NSMutableArray *_views;
-	CGFloat           _columnWidth;
+	CGFloat _columnWidth;
 }
 
 @property(readonly) NSUInteger numberOfColumns;
