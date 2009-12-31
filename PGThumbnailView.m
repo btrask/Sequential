@@ -385,6 +385,7 @@ static void PGDrawGradient(void)
 
 - (IBAction)moveUp:(id)sender
 {
+	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items lastObject]]];
 	NSUInteger i = 1;
 	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
 		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i - 1]]];
@@ -395,6 +396,7 @@ static void PGDrawGradient(void)
 {
 	NSUInteger const count = [_items count];
 	if(!count) return;
+	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items objectAtIndex:0]]];
 	NSUInteger i = count - 1;
 	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
 		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i + 1]]];
@@ -403,6 +405,7 @@ static void PGDrawGradient(void)
 }
 - (IBAction)moveUpAndModifySelection:(id)sender
 {
+	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items lastObject]]];
 	NSUInteger i = 1;
 	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
 		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
@@ -415,6 +418,7 @@ static void PGDrawGradient(void)
 {
 	NSUInteger const count = [_items count];
 	if(!count) return;
+	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items objectAtIndex:0]]];
 	NSUInteger i = count - 1;
 	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
 		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
