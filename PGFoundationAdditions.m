@@ -399,32 +399,43 @@ OSType PGOSTypeFromString(NSString *str)
 	NSMutableString *const path = [NSMutableString string];
 	[scanner scanString:@"/" intoString:NULL];
 	[path appendString:@"/"];
-	NSCharacterSet *const hexCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"];
-	NSMutableData *const hexData = [NSMutableData data];
-	while(YES) {
-		NSString *pathPart;
-		if([scanner scanUpToString:@"%" intoString:&pathPart]) {
-			[hexData setLength:0];
-			[path appendString:pathPart];
+	if(PGEqualObjects(scheme, @"file")) {
+		while(![scanner isAtEnd]) {
+			NSString *pathSegment = nil;
+			if([scanner scanUpToString:@"/" intoString:&pathSegment]) [path appendString:pathSegment];
+			if([scanner scanString:@"/" intoString:NULL]) {
+				if(![pathSegment length]) return nil;
+				[path appendString:@"/"];
+			}
 		}
-		if(![scanner scanString:@"%" intoString:NULL]) break;
-		NSUInteger const percentLoc = [scanner scanLocation];
-		NSString *hex = nil;
-		if(![scanner scanCharactersFromSet:hexCharacterSet intoString:&hex] || [hex length] < 2) {
-			[hexData setLength:0];
-			[scanner setScanLocation:percentLoc];
-			[path appendString:@"%"];
-			continue;
-		}
-		[scanner setScanLocation:percentLoc + 2];
-		NSScanner *const hexScanner = [NSScanner scannerWithString:[hex substringToIndex:2]];
-		unsigned character;
-		if([hexScanner scanHexInt:&character]) {
-			[hexData appendBytes:&character length:1];
-			NSString *const hexEncodedString = [[[NSString alloc] initWithData:hexData encoding:NSUTF8StringEncoding] autorelease];
-			if(hexEncodedString) {
-				[path appendString:hexEncodedString];
+	} else {
+		NSCharacterSet *const hexCharacterSet = [NSCharacterSet characterSetWithCharactersInString:@"0123456789abcdefABCDEF"];
+		NSMutableData *const hexData = [NSMutableData data];
+		while(YES) {
+			NSString *pathPart;
+			if([scanner scanUpToString:@"%" intoString:&pathPart]) {
 				[hexData setLength:0];
+				[path appendString:pathPart];
+			}
+			if(![scanner scanString:@"%" intoString:NULL]) break;
+			NSUInteger const percentLoc = [scanner scanLocation];
+			NSString *hex = nil;
+			if(![scanner scanCharactersFromSet:hexCharacterSet intoString:&hex] || [hex length] < 2) {
+				[hexData setLength:0];
+				[scanner setScanLocation:percentLoc];
+				[path appendString:@"%"];
+				continue;
+			}
+			[scanner setScanLocation:percentLoc + 2];
+			NSScanner *const hexScanner = [NSScanner scannerWithString:[hex substringToIndex:2]];
+			unsigned character;
+			if([hexScanner scanHexInt:&character]) {
+				[hexData appendBytes:&character length:1];
+				NSString *const hexEncodedString = [[[NSString alloc] initWithData:hexData encoding:NSUTF8StringEncoding] autorelease];
+				if(hexEncodedString) {
+					[path appendString:hexEncodedString];
+					[hexData setLength:0];
+				}
 			}
 		}
 	}
