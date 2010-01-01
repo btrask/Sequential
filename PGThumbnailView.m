@@ -106,8 +106,56 @@ static void PGDrawGradient(void)
 	for(id const addedItem in addedItems) [self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:addedItem] withMargin:YES]];
 	[_selection setSet:items];
 	[self _validateSelection];
-	[self scrollToFirstSelectedItem];
+	[self scrollToSelectionAnchor];
 	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
+@synthesize selectionAnchor = _selectionAnchor;
+- (void)selectItem:(id)item byExtendingSelection:(BOOL)flag
+{
+	if(!item) return;
+	BOOL const can = [[self dataSource] thumbnailView:self canSelectItem:item];
+	if(!can) {
+		if(!flag) [self setSelection:[NSSet set]];
+		return;
+	}
+	if(!flag) {
+		[_selection removeAllObjects];
+		[self setNeedsDisplay:YES];
+	}
+	[_selection addObject:item];
+	_selectionAnchor = item;
+	NSRect const itemFrame = [self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:item] withMargin:YES];
+	if(flag) [self setNeedsDisplayInRect:itemFrame];
+	[self PG_scrollRectToVisible:itemFrame type:PGScrollLeastToRect];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
+- (void)deselectItem:(id)item
+{
+	if(!item || ![_selection containsObject:item]) return;
+	[_selection removeObject:item];
+	if(item == _selectionAnchor) [self _validateSelection];
+	[self setNeedsDisplayInRect:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:item] withMargin:YES]];
+	[[self delegate] thumbnailViewSelectionDidChange:self];
+}
+- (void)toggleSelectionOfItem:(id)item
+{
+	if([_selection containsObject:item]) [self deselectItem:item];
+	else [self selectItem:item byExtendingSelection:YES];
+}
+- (void)moveUp:(BOOL)up byExtendingSelection:(BOOL)ext
+{
+	NSUInteger const count = [_items count];
+	if(!count) return;
+	if(!_selectionAnchor) return [self selectItem:up ? [_items lastObject] : [_items objectAtIndex:0] byExtendingSelection:NO];
+	NSUInteger const i = [_items indexOfObjectIdenticalTo:_selectionAnchor];
+	NSParameterAssert(NSNotFound != i);
+	NSArray *const items = [_items subarrayWithRange:up ? NSMakeRange(0, i) : NSMakeRange(i + 1, count - i - 1)];
+	for(id const item in up ? (id<NSFastEnumeration>)[items reverseObjectEnumerator] : (id<NSFastEnumeration>)items) {
+		if(![[self dataSource] thumbnailView:self canSelectItem:item]) continue;
+		if([_selection containsObject:item]) [self deselectItem:_selectionAnchor];
+		[self selectItem:item byExtendingSelection:ext];
+		break;
+	}
 }
 
 #pragma mark -
@@ -131,7 +179,7 @@ static void PGDrawGradient(void)
 	_items = [[[self dataSource] itemsForThumbnailView:self] copy];
 	[self _validateSelection];
 	[self sizeToFit];
-	[self scrollToFirstSelectedItem];
+	[self scrollToSelectionAnchor];
 	[self setNeedsDisplay:YES];
 	if(hadSelection) [[self delegate] thumbnailViewSelectionDidChange:self];
 }
@@ -140,19 +188,10 @@ static void PGDrawGradient(void)
 	CGFloat const height = [self superview] ? NSHeight([[self superview] bounds]) : 0.0f;
 	[super setFrameSize:NSMakeSize(PGOuterTotalWidth, MAX(height, [_items count] * PGThumbnailTotalHeight))];
 }
-- (void)scrollToFirstSelectedItem
+- (void)scrollToSelectionAnchor
 {
-	NSUInteger const selCount = [_selection count];
-	if(1 == selCount) return [self PG_scrollRectToVisible:[self frameOfItemAtIndex:[_items indexOfObjectIdenticalTo:[_selection anyObject]] withMargin:YES] type:PGScrollCenterToRect];
-	else if(selCount) {
-		NSUInteger i = 0;
-		for(; i < [_items count]; i++) {
-			if(![_selection containsObject:[_items objectAtIndex:i]]) continue;
-			[self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
-			return;
-		}
-	}
-	[[self PG_enclosingClipView] scrollToEdge:PGMaxYEdgeMask animation:PGAllowAnimation];
+	NSUInteger const i = [_items indexOfObjectIdenticalTo:_selectionAnchor];
+	if(NSNotFound != i) [self PG_scrollRectToVisible:[self frameOfItemAtIndex:i withMargin:YES] type:PGScrollCenterToRect];
 }
 
 #pragma mark -
@@ -176,6 +215,12 @@ static void PGDrawGradient(void)
 - (void)_validateSelection
 {
 	for(id const selectedItem in [[_selection copy] autorelease]) if([_items indexOfObjectIdenticalTo:selectedItem] == NSNotFound) [_selection removeObject:selectedItem];
+	if([_selection containsObject:_selectionAnchor]) return;
+	_selectionAnchor = nil;
+	for(id const anchor in _items) if([_selection containsObject:anchor]) {
+		_selectionAnchor = anchor;
+		break;
+	}
 }
 - (NSColor *)_backgroundColorWithType:(PGBackgroundType)type
 {
@@ -385,47 +430,19 @@ static void PGDrawGradient(void)
 
 - (IBAction)moveUp:(id)sender
 {
-	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items lastObject]]];
-	NSUInteger i = 1;
-	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
-		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i - 1]]];
-		break;
-	}
+	[self moveUp:YES byExtendingSelection:NO];
 }
 - (IBAction)moveDown:(id)sender
 {
-	NSUInteger const count = [_items count];
-	if(!count) return;
-	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items objectAtIndex:0]]];
-	NSUInteger i = count - 1;
-	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
-		[self setSelection:[NSSet setWithObject:[_items objectAtIndex:i + 1]]];
-		break;
-	}
+	[self moveUp:NO byExtendingSelection:NO];
 }
 - (IBAction)moveUpAndModifySelection:(id)sender
 {
-	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items lastObject]]];
-	NSUInteger i = 1;
-	for(; i < [_items count]; i++) if([_selection containsObject:[_items objectAtIndex:i]]) {
-		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
-		[selection addObject:[_items objectAtIndex:i - 1]];
-		[self setSelection:selection];
-		break;
-	}
+	[self moveUp:YES byExtendingSelection:YES];
 }
 - (IBAction)moveDownAndModifySelection:(id)sender
 {
-	NSUInteger const count = [_items count];
-	if(!count) return;
-	if(![_selection count]) return [self setSelection:[NSSet setWithObject:[_items objectAtIndex:0]]];
-	NSUInteger i = count - 1;
-	while(i--) if([_selection containsObject:[_items objectAtIndex:i]]) {
-		NSMutableSet *const selection = [[[self selection] mutableCopy] autorelease];
-		[selection addObject:[_items objectAtIndex:i + 1]];
-		[self setSelection:selection];
-		break;
-	}
+	[self moveUp:NO byExtendingSelection:YES];
 }
 - (IBAction)selectAll:(id)sender
 {
@@ -456,25 +473,8 @@ static void PGDrawGradient(void)
 	NSPoint const p = [anEvent PG_locationInView:self];
 	NSUInteger const i = [self indexOfItemAtPoint:p];
 	id const item = [self mouse:p inRect:[self bounds]] && i < [_items count] ? [_items objectAtIndex:i] : nil;
-	BOOL const canSelect = !dataSource || [dataSource thumbnailView:self canSelectItem:item];
-	BOOL const modifyExistingSelection = !!([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask));
-	if([_selection containsObject:item]) {
-		if(!modifyExistingSelection) {
-			[_selection removeAllObjects];
-			[self setNeedsDisplay:YES];
-			if(canSelect && item) [_selection addObject:item];
-		} else if(item) [_selection removeObject:item];
-	} else {
-		if(!modifyExistingSelection) {
-			[_selection removeAllObjects];
-			[self setNeedsDisplay:YES];
-		}
-		if(canSelect && item) [_selection addObject:item];
-	}
-	NSRect const itemFrame = [self frameOfItemAtIndex:i withMargin:YES];
-	[self setNeedsDisplayInRect:itemFrame];
-	[self PG_scrollRectToVisible:itemFrame type:PGScrollLeastToRect];
-	[[self delegate] thumbnailViewSelectionDidChange:self];
+	if([anEvent modifierFlags] & (NSShiftKeyMask | NSCommandKeyMask)) [self toggleSelectionOfItem:item];
+	else [self selectItem:item byExtendingSelection:NO];
 }
 - (void)keyDown:(NSEvent *)anEvent
 {

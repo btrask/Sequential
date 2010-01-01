@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGOrientation _thumbnailOrientation;
 	NSArray *_items;
 	NSMutableSet *_selection;
+	id _selectionAnchor;
 }
 
 @property(assign) NSObject<PGThumbnailViewDataSource> *dataSource;
@@ -46,13 +47,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @property(readonly) NSArray *items;
 @property(copy) NSSet *selection;
+@property(readonly) id selectionAnchor;
+- (void)selectItem:(id)item byExtendingSelection:(BOOL)extend;
+- (void)deselectItem:(id)item;
+- (void)toggleSelectionOfItem:(id)item;
+- (void)moveUp:(BOOL)up byExtendingSelection:(BOOL)ext;
 
 - (NSUInteger)indexOfItemAtPoint:(NSPoint)p;
 - (NSRect)frameOfItemAtIndex:(NSUInteger)index withMargin:(BOOL)flag;
 
 - (void)reloadData;
 - (void)sizeToFit;
-- (void)scrollToFirstSelectedItem;
+- (void)scrollToSelectionAnchor;
 
 - (void)windowDidChangeKey:(NSNotification *)aNotif;
 - (void)systemColorsDidChange:(NSNotification *)aNotif;
