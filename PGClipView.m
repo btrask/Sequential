@@ -141,11 +141,6 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 		if(!--_scrollCount) [self PG_viewDidScrollInClipView:self];
 	}
 }
-@synthesize pinLocation = _pinLocation;
-- (void)setPinLocation:(PGRectEdgeMask)mask
-{
-	_pinLocation = PGNonContradictoryRectEdges(mask);
-}
 @synthesize allowsAnimation = _allowsAnimation;
 @synthesize acceptsFirstResponder = _acceptsFirstResponder;
 
@@ -170,7 +165,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	if(NSIsEmptyRect(_documentFrame)) return NSZeroSize;
 	NSRect const b = [self insetBounds];
-	PGRectEdgeMask const pin = [self pinLocation];
+	PGRectEdgeMask const pin = [[self delegate] clipView:self directionFor:PGHomeLocation];
 	NSSize const diff = PGPointDiff(PGPointOfPartOfRect(b, pin), PGPointOfPartOfRect(_documentFrame, pin));
 	if(![[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) return diff;
 	return NSMakeSize(diff.width * 2.0f / NSWidth(_documentFrame), diff.height * 2.0f / NSHeight(_documentFrame));
@@ -223,7 +218,7 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSSize o = aSize;
 	NSRect const b = [self insetBounds];
-	PGRectEdgeMask const pin = [self pinLocation];
+	PGRectEdgeMask const pin = [[self delegate] clipView:self directionFor:PGHomeLocation];
 	if([[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
 	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:type];
 }
@@ -571,8 +566,9 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 	NSRect const r = [self convertRect:aRect fromView:view];
 	NSRect const b = [self insetBounds];
 	NSSize o = NSZeroSize;
-	NSPoint const preferredVisiblePoint = PGPointOfPartOfRect(r, [self pinLocation]);
-	NSPoint const preferredTargetLocation = PGPointOfPartOfRect(b, [self pinLocation]);
+	PGRectEdgeMask const part = [[self delegate] clipView:self directionFor:PGHomeLocation];
+	NSPoint const preferredVisiblePoint = PGPointOfPartOfRect(r, part);
+	NSPoint const preferredTargetLocation = PGPointOfPartOfRect(b, part);
 	if(NSWidth(r) > NSWidth(b)) o.width = preferredVisiblePoint.x - preferredTargetLocation.x;
 	else if(NSMinX(r) < NSMinX(b)) switch(type) {
 		case PGScrollLeastToRect:  o.width = NSMinX(r) - NSMinX(b); break;

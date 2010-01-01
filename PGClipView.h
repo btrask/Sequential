@@ -61,7 +61,6 @@ typedef NSUInteger PGScrollToRectType;
 	BOOL _showsBorder;
 	NSCursor *_cursor;
 	NSPoint _position;
-	PGRectEdgeMask _pinLocation;
 	BOOL _acceptsFirstResponder;
 	NSUInteger _documentViewIsResizing;
 	BOOL _firstMouse;
@@ -84,7 +83,6 @@ typedef NSUInteger PGScrollToRectType;
 @property(assign) BOOL showsBorder;
 @property(retain) NSCursor *cursor;
 @property(assign, getter = isScrolling) BOOL scrolling;
-@property(assign) PGRectEdgeMask pinLocation;
 @property(assign) BOOL allowsAnimation;
 @property(assign) BOOL acceptsFirstResponder;
 

@@ -127,7 +127,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_clipView setBackgroundColor:nil];
 		[_clipView setShowsBorder:NO];
 		[_clipView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
-		[_clipView setPinLocation:PGMinXEdgeMask];
 		[self addSubview:_clipView];
 		_view = [[NSView alloc] initWithFrame:NSZeroRect];
 		[_clipView setDocumentView:_view];
