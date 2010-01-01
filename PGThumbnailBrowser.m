@@ -92,7 +92,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([lastView representedObject] == [path lastObject]) [lastView setSelection:aSet];
 
 	--_updateCount;
-	if(!_updateCount) [[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:initialNumberOfColumns];
+	if(!_updateCount) {
+		[[self window] makeFirstResponder:[[self views] lastObject]];
+		[[self delegate] thumbnailBrowser:self numberOfColumnsDidChangeFrom:initialNumberOfColumns];
+	}
 	if([self numberOfColumns] > initialNumberOfColumns) [self scrollToLastColumnAnimate:YES];
 }
 

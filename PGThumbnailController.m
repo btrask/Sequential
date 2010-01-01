@@ -115,7 +115,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (NSSet *)selectedNodes
 {
-	return _browser.selection;
+	return [_browser selection];
 }
 
 #pragma mark -

@@ -147,9 +147,12 @@ typedef NSUInteger PGZoomDirection;
 }
 - (IBAction)moveToTrash:(id)sender
 {
-	NSInteger tag;
-	NSString *const path = [[[[self selectedNode] identifier] URL] path];
-	if(![[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:&tag] || tag < 0) NSBeep();
+	BOOL movedAnything = NO;
+	for(PGNode *const node in [self selectedNodes]) {
+		NSString *const path = [[[node identifier] URL] path];
+		if([[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation source:[path stringByDeletingLastPathComponent] destination:@"" files:[NSArray arrayWithObject:[path lastPathComponent]] tag:NULL]) movedAnything = YES;
+	}
+	if(!movedAnything) NSBeep();
 }
 
 #pragma mark -
