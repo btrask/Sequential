@@ -100,6 +100,7 @@ typedef NSUInteger PGScrollToRectType;
 - (BOOL)scrollPinLocationToOffset:(NSSize)aSize animation:(PGAnimationType)type;
 - (void)stopAnimatedScrolling;
 
+- (NSRect)documentFrameWithBorder:(BOOL)flag;
 - (NSRect)scrollableRectWithBorder:(BOOL)flag;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType;
 - (NSSize)distanceInDirection:(PGRectEdgeMask)direction forScrollType:(PGScrollType)scrollType fromPosition:(NSPoint)position;

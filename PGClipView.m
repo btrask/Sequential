@@ -163,12 +163,13 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 }
 - (NSSize)pinLocationOffset
 {
-	if(NSIsEmptyRect(_documentFrame)) return NSZeroSize;
+	NSRect const r = [self documentFrameWithBorder:YES];
+	if(NSIsEmptyRect(r)) return NSZeroSize;
 	NSRect const b = [self insetBounds];
 	PGRectEdgeMask const pin = [[self delegate] clipView:self directionFor:PGHomeLocation];
-	NSSize const diff = PGPointDiff(PGPointOfPartOfRect(b, pin), PGPointOfPartOfRect(_documentFrame, pin));
+	NSSize const diff = PGPointDiff(PGPointOfPartOfRect(b, pin), PGPointOfPartOfRect(r, pin));
 	if(![[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) return diff;
-	return NSMakeSize(diff.width * 2.0f / NSWidth(_documentFrame), diff.height * 2.0f / NSHeight(_documentFrame));
+	return NSMakeSize(diff.width * 2.0f / NSWidth(r), diff.height * 2.0f / NSHeight(r));
 }
 
 #pragma mark -
@@ -218,9 +219,10 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
 	NSSize o = aSize;
 	NSRect const b = [self insetBounds];
+	NSRect const r = [self documentFrameWithBorder:YES];
 	PGRectEdgeMask const pin = [[self delegate] clipView:self directionFor:PGHomeLocation];
-	if([[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(_documentFrame) * 0.5f, o.height * NSHeight(_documentFrame) * 0.5f);
-	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(_documentFrame, pin), o), PGPointOfPartOfRect(b, pin)) animation:type];
+	if([[self documentView] PG_scalesContentWithFrameSizeInClipView:self]) o = NSMakeSize(o.width * NSWidth(r) * 0.5f, o.height * NSHeight(r) * 0.5f);
+	return [self scrollBy:PGPointDiff(PGOffsetPointBySize(PGPointOfPartOfRect(r, pin), o), PGPointOfPartOfRect(b, pin)) animation:type];
 }
 
 - (void)stopAnimatedScrolling
@@ -236,14 +238,18 @@ static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 
 #pragma mark -
 
+- (NSRect)documentFrameWithBorder:(BOOL)flag
+{
+	if(!flag || !_showsBorder) return _documentFrame;
+	NSSize const boundsSize = [self insetBounds].size;
+	return NSInsetRect(_documentFrame, NSWidth(_documentFrame) > boundsSize.width ? -PGBorderPadding : 0.0f, NSHeight(_documentFrame) > boundsSize.height ? -PGBorderPadding : 0.0f);
+}
 - (NSRect)scrollableRectWithBorder:(BOOL)flag
 {
 	NSSize const boundsSize = [self insetBounds].size;
-	NSSize margin = NSMakeSize((boundsSize.width - NSWidth(_documentFrame)) / 2.0f, (boundsSize.height - NSHeight(_documentFrame)) / 2.0f);
-	CGFloat const padding = _showsBorder && flag ? PGBorderPadding : 0.0f;
-	if(margin.width < 0.0f) margin.width = padding;
-	if(margin.height < 0.0f) margin.height = padding;
-	NSRect r = NSInsetRect(_documentFrame, -margin.width, -margin.height);
+	NSRect const documentFrame = [self documentFrameWithBorder:flag];
+	NSSize const margin = NSMakeSize(MAX(0.0f, boundsSize.width - NSWidth(documentFrame)), MAX(0.0f, boundsSize.height - NSHeight(documentFrame)));
+	NSRect r = NSInsetRect(documentFrame, margin.width / -2.0f, margin.height / -2.0f);
 	r.size.width -= boundsSize.width;
 	r.size.height -= boundsSize.height;
 	PGInset const inset = [self boundsInset];
