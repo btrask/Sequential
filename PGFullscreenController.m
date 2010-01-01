@@ -39,7 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGFullscreenController(Private)
 
+- (void)_setMenuBarHidden:(BOOL)hidden delayed:(BOOL)delayed; // Delaying prevents the menu bar from messing up when the application unhides on Leopard.
 - (void)_hideMenuBar;
+- (void)_showMenuBar;
 
 @end
 
@@ -59,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)prepareToExitFullscreen
 {
 	_isExitingFullscreen = YES;
-	SetSystemUIMode(kUIModeNormal, kNilOptions); // For some reason, this moves windows downward slightly (at least on 10.5.3), so make sure it happens before our new windows get put onscreen.
+	[self _setMenuBarHidden:NO delayed:NO]; // For some reason, this moves windows downward slightly (at least on 10.5.3), so make sure it happens before our new windows get put onscreen.
 }
 
 #pragma mark -
@@ -69,15 +71,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSScreen *const screen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 	[(PGFullscreenWindow *)[self window] moveToScreen:screen];
 	if(![[self window] isKeyWindow]) return;
-	if([NSScreen PG_mainScreen] == screen) [self _hideMenuBar];
-	else SetSystemUIMode(kUIModeNormal, kNilOptions);
+	[self _setMenuBarHidden:[NSScreen PG_mainScreen] == screen delayed:YES];
 }
 
 #pragma mark -PGFullscreenController(Private)
 
+- (void)_setMenuBarHidden:(BOOL)hidden delayed:(BOOL)delayed
+{
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
+	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_showMenuBar) object:nil];
+	if(delayed) [self PG_performSelector:hidden ? @selector(_hideMenuBar) : @selector(_showMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions];
+	else if(hidden) [self _hideMenuBar];
+	else [self _showMenuBar];
+}
 - (void)_hideMenuBar
 {
 	SetSystemUIMode(kUIModeAllSuppressed, kNilOptions);
+}
+- (void)_showMenuBar
+{
+	SetSystemUIMode(kUIModeNormal, kNilOptions);
 }
 
 #pragma mark -PGDisplayController
@@ -95,6 +108,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSWindow *)windowForSheet
 {
 	return nil;
+}
+
+#pragma mark -PGDisplayController(PGThumbnailControllerCallbacks)
+
+- (void)thumbnailPanelDidBecomeKey:(NSNotification *)aNotif
+{
+	[self windowDidBecomeKey:aNotif];
+}
+- (void)thumbnailPanelDidResignKey:(NSNotification *)aNotif
+{
+	[self windowDidResignKey:aNotif];
 }
 
 #pragma mark -NSWindowController
@@ -156,7 +180,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	BOOL const dim = [[NSUserDefaults standardUserDefaults] boolForKey:PGDimOtherScreensKey]; // We shouldn't need to observe this value because our fullscreen window isn't going to be key while the user is adjusting the setting in the prefs window.
 	NSScreen *const displayScreen = [[PGPreferenceWindowController sharedPrefController] displayScreen];
 
-	if(dim || [NSScreen PG_mainScreen] == displayScreen) [self PG_performSelector:@selector(_hideMenuBar) withObject:nil fireDate:nil interval:0.0f options:kNilOptions]; // Prevents the menu bar from messing up when the application unhides on Leopard.
+	if(dim || [NSScreen PG_mainScreen] == displayScreen) [self _setMenuBarHidden:YES delayed:YES];
 
 	if(!dim) return;
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
@@ -175,9 +199,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowDidResignKey:(NSNotification *)aNotif
 {
-	if([[NSApp keyWindow] delegate] == self || [[PGPreferenceWindowController sharedPrefController] displayScreen] != [NSScreen PG_mainScreen]) return;
-	[self PG_cancelPreviousPerformRequestsWithSelector:@selector(_hideMenuBar) object:nil];
-	SetSystemUIMode(kUIModeNormal, kNilOptions);
+	if([[PGPreferenceWindowController sharedPrefController] displayScreen] != [NSScreen PG_mainScreen]) return;
+	[self _setMenuBarHidden:NO delayed:YES];
 	[_shieldWindows makeObjectsPerformSelector:@selector(close)];
 	[_shieldWindows release];
 	_shieldWindows = nil;

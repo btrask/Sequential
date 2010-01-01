@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGThumbnailBrowser.h"
 
 // Controllers
-@class PGDisplayController;
+#import "PGDisplayController.h"
 
 // Other Sources
 #import "PGGeometryTypes.h"
@@ -73,5 +73,12 @@ PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSou
 - (void)documentBaseOrientationDidChange:(NSNotification *)aNotif;
 - (void)documentSortedNodesDidChange:(NSNotification *)aNotif;
 - (void)documentNodeIsViewableDidChange:(NSNotification *)aNotif;
+
+@end
+
+@interface PGDisplayController(PGThumbnailControllerCallbacks)
+
+- (void)thumbnailPanelDidBecomeKey:(NSNotification *)aNotif;
+- (void)thumbnailPanelDidResignKey:(NSNotification *)aNotif;
 
 @end

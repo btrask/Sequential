@@ -221,6 +221,14 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 #pragma mark -<NSWindowDelegate>
 
+- (void)windowDidBecomeKey:(NSNotification *)aNotif
+{
+	[[self displayController] thumbnailPanelDidBecomeKey:aNotif];
+}
+- (void)windowDidResignKey:(NSNotification *)aNotif
+{
+	[[self displayController] thumbnailPanelDidResignKey:aNotif];
+}
 - (void)windowWillClose:(NSNotification *)aNotif
 {
 	if(_selfRetained) [self autorelease];
@@ -305,5 +313,12 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 {
 	return [item hasRealThumbnail];
 }
+
+@end
+
+@implementation PGDisplayController(PGThumbnailControllerCallbacks)
+
+- (void)thumbnailPanelDidBecomeKey:(NSNotification *)aNotif {}
+- (void)thumbnailPanelDidResignKey:(NSNotification *)aNotif {}
 
 @end
