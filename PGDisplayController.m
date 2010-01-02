@@ -238,11 +238,11 @@ typedef NSUInteger PGZoomDirection;
 }
 - (IBAction)zoomIn:(id)sender
 {
-	[self zoomBy:2.0f animate:YES];
+	if(![self zoomKeyDown:[[self window] currentEvent]]) [self zoomBy:2.0f animate:YES];
 }
 - (IBAction)zoomOut:(id)sender
 {
-	[self zoomBy:0.5f animate:YES];
+	if(![self zoomKeyDown:[[self window] currentEvent]]) [self zoomBy:0.5f animate:YES];
 }
 - (IBAction)changeImageScaleFactor:(id)sender
 {
@@ -598,42 +598,45 @@ typedef NSUInteger PGZoomDirection;
 
 - (void)zoomBy:(CGFloat)factor animate:(BOOL)flag
 {
-	PGDocument *const doc = [self activeDocument];
-	[doc setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * factor, PGScaleMax)) animate:flag];
+	[[self activeDocument] setImageScaleFactor:MAX(PGScaleMin, MIN([_imageView averageScaleFactor] * factor, PGScaleMax)) animate:flag];
 }
-- (void)zoomKeyDown:(NSEvent *)firstEvent
+- (BOOL)zoomKeyDown:(NSEvent *)firstEvent
 {
 	[NSCursor setHiddenUntilMouseMoves:YES];
 	[_imageView setUsesCaching:NO];
 	[NSEvent startPeriodicEventsAfterDelay:0.0f withPeriod:PGAnimationFramerate];
 	NSEvent *latestEvent = firstEvent;
 	PGZoomDirection dir = PGZoomNone;
-	BOOL stop = NO;
+	BOOL stop = NO, didAnything = NO;
 	do {
-		if([latestEvent type] != NSPeriodic && [latestEvent isARepeat]) continue;
 		NSEventType const type = [latestEvent type];
 		if(NSKeyDown == type || NSKeyUp == type) {
 			PGZoomDirection newDir = PGZoomNone;
 			switch([latestEvent keyCode]) {
 				case PGKeyEquals:
-				case PGKeyPadPlus:  newDir = PGZoomIn ; break;
+				case PGKeyPadPlus:
+					newDir = PGZoomIn; break;
 				case PGKeyMinus:
-				case PGKeyPadMinus: newDir = PGZoomOut; break;
+				case PGKeyPadMinus:
+					newDir = PGZoomOut; break;
 			}
 			switch(type) {
 				case NSKeyDown: dir |= newDir;  break;
 				case NSKeyUp:   dir &= ~newDir; break;
 			}
-		}
-		switch(dir) {
-			case PGZoomNone: stop = YES; break;
-			case PGZoomIn:  [self zoomBy:1.1f animate:NO]; break;
-			case PGZoomOut: [self zoomBy:1.0f / 1.1f animate:NO]; break;
+		} else {
+			switch(dir) {
+				case PGZoomNone: stop = YES; break;
+				case PGZoomIn:  [self zoomBy:1.1f animate:NO]; break;
+				case PGZoomOut: [self zoomBy:1.0f / 1.1f animate:NO]; break;
+			}
+			if(!stop) didAnything = YES;
 		}
 	} while(!stop && (latestEvent = [[self window] nextEventMatchingMask:NSKeyDownMask | NSKeyUpMask | NSPeriodicMask untilDate:[NSDate distantFuture] inMode:NSEventTrackingRunLoopMode dequeue:YES]));
 	[NSEvent stopPeriodicEvents];
 	[[self window] discardEventsMatchingMask:NSAnyEventMask beforeEvent:latestEvent];
 	[_imageView setUsesCaching:YES];
+	return didAnything;
 }
 
 #pragma mark -

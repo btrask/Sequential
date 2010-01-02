@@ -170,7 +170,7 @@ PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 - (void)advanceOnTimer;
 
 - (void)zoomBy:(CGFloat)factor animate:(BOOL)flag;
-- (void)zoomKeyDown:(NSEvent *)firstEvent;
+- (BOOL)zoomKeyDown:(NSEvent *)firstEvent;
 
 - (void)clipViewFrameDidChange:(NSNotification *)aNotif;
 
