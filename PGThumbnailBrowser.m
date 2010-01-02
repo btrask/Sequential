@@ -157,7 +157,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSUInteger const i = [[self views] indexOfObjectIdenticalTo:[[self window] firstResponder]];
 	if(NSNotFound == i || i + 1 >= [self numberOfColumns]) return;
-	[[self window] makeFirstResponder:[[self views] objectAtIndex:i + 1]];
+	PGThumbnailView *const view = [[self views] objectAtIndex:i + 1];
+	[[self window] makeFirstResponder:view];
+	NSArray *const items = [view items];
+	if([items count] && ![[view selection] count]) [view selectItem:[items objectAtIndex:0] byExtendingSelection:NO];
 }
 
 #pragma mark -<PGThumbnailViewDelegate>
