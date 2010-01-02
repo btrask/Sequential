@@ -171,7 +171,7 @@ enum {
 		[[self node] loadFinished];
 	} else if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] > 300)) {
 		[_load cancelAndNotify:NO];
-		[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] forKey:NSLocalizedDescriptionKey]]];
+		[[self node] setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] userInfo:nil]];
 	}
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
@@ -180,7 +180,7 @@ enum {
 	PGXMLParser *const parser = [PGXMLParser parserWithData:[_load data] baseURL:[[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGFlickrPhotoListParser class], [PGFlickrPhotoParser class], nil]];
 	[[self identifier] setCustomDisplayName:[parser title]];
 	NSError *const error = [parser error];
-	if(error) [[self node] setError:[parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]], NSLocalizedDescriptionKey, nil]] : error];
+	if(error) [[self node] setError:[parser respondsToSelector:@selector(errorCode)] && [(PGFlickrPhotoParser *)parser errorCode] == PGFlickrUserNotFoundErr ? [NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings.", @"Flickr user not found error message. %@ is replaced with the user name/NSID."), [[self info] objectForKey:PGFlickrUserNameKey]] userInfo:nil] : error];
 	else if([parser createsMultipleNodes]) {
 		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
 		[[self node] loadFinished];
@@ -194,7 +194,7 @@ enum {
 {
 	if(sender != _load) return;
 	[_load cancelAndNotify:NO];
-	[[self node] setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[sender request] URL]] forKey:NSLocalizedDescriptionKey]]];
+	[[self node] setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[sender request] URL]] userInfo:nil]];
 }
 - (void)loadDidCancel:(PGURLLoad *)sender
 {

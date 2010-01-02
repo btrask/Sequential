@@ -117,6 +117,9 @@
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "加入書籤的檔案已被移除或刪除。";
 
+/* XADMaster error reporting. %@ is replaced with the XADMaster error. */
+"The error %@ occurred while parsing the archive." = "The error “%@” occurred while parsing the archive.";
+
 /* Informative string for secondary mouse button action. */
 "Secondary click goes to the previous page." = "輔助按鈕前往上一頁。";
 "Secondary click goes right." = "輔助按鈕向右移動。";

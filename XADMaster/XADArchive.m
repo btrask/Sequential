@@ -715,7 +715,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 
 	@try
 	{
-		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:NO];
+		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 		if(!handle) [XADException raiseDecrunchException];
 		NSData *data=[handle remainingFileContents];
 		if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];

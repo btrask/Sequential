@@ -41,6 +41,7 @@ static id PGArchiveAdapterList = nil;
 
 @interface PGArchiveAdapter(Private)
 
+- (void)_threaded_setError:(NSError *)error forNode:(PGNode *)node;
 - (void)_updateThumbnailsOfChildren;
 
 @end
@@ -113,6 +114,10 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark -PGArchiveAdapter(Private)
 
+- (void)_threaded_setError:(NSError *)error forNode:(PGNode *)node;
+{
+	[node performSelectorOnMainThread:@selector(setError:) withObject:error waitUntilDone:NO];
+}
 - (void)_updateThumbnailsOfChildren
 {
 	[[self document] noteNodeThumbnailDidChange:[self node] recursively:YES];
@@ -162,13 +167,13 @@ static id PGArchiveAdapterList = nil;
 - (void)archiveNeedsPassword:(XADArchive *)archive
 {
 	_needsPassword = YES;
-	[_currentSubnode performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] waitUntilDone:NO];
+	[self _threaded_setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGPasswordError userInfo:nil] forNode:_currentSubnode];
 }
 -(NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
 {
 	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
-		[[self node] performSelectorOnMainThread:@selector(setError:) withObject:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] waitUntilDone:YES];
+		[self _threaded_setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] forNode:[self node]];
 		[[self node] loadFinished];
 	}
 	return guess;
@@ -209,7 +214,15 @@ static id PGArchiveAdapterList = nil;
 		_currentSubnode = sender;
 		[_archive clearLastError];
 		data = [_archive contentsOfEntry:i];
-		if(!_needsPassword && [_archive lastError] == XADPasswordError) [self archiveNeedsPassword:_archive];
+		switch([_archive lastError]) {
+			case XADNoError: break;
+			case XADPasswordError: 
+				if(!_needsPassword) [self archiveNeedsPassword:_archive];
+				break;
+			default:
+				[self _threaded_setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error “%@” occurred while parsing the archive.", @"XADMaster error reporting. %@ is replaced with the XADMaster error."), [_archive describeLastError]] userInfo:nil] forNode:_currentSubnode];
+				break;
+		}
 		_currentSubnode = nil;
 		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
 	}

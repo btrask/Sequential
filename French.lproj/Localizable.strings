@@ -117,6 +117,9 @@
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Il a peut être été déplacé ou effacé.";
 
+/* XADMaster error reporting. %@ is replaced with the XADMaster error. */
+"The error %@ occurred while parsing the archive." = "The error “%@” occurred while parsing the archive.";
+
 /* Informative string for secondary mouse button action. */
 "Secondary click goes to the previous page." = "Le clic secondaire retourne sur la page précédente.";
 "Secondary click goes right." = "Le clic secondaire vas à droite.";

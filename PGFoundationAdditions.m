@@ -123,6 +123,17 @@ OSType PGOSTypeFromString(NSString *str)
 
 @end
 
+@implementation NSError(PGFoundationAdditions)
+
++ (id)PG_errorWithDomain:(NSString *)domain code:(NSInteger)code localizedDescription:(NSString *)desc userInfo:(NSDictionary *)dict
+{
+	NSMutableDictionary *const d = dict ? [[dict mutableCopy] autorelease] : [NSMutableDictionary dictionary];
+	[d PG_setObject:desc forKey:NSLocalizedDescriptionKey];
+	return [self errorWithDomain:domain code:code userInfo:d];
+}
+
+@end
+
 @implementation NSMutableDictionary(PGFoundationAdditions)
 
 - (void)PG_setObject:(id)obj forKey:(id)key

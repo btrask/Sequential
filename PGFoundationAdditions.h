@@ -68,6 +68,12 @@ extern OSType PGOSTypeFromString(NSString *);
 
 @end
 
+@interface NSError(PGFoundationAdditions)
+
++ (id)PG_errorWithDomain:(NSString *)domain code:(NSInteger)code localizedDescription:(NSString *)desc userInfo:(NSDictionary *)dict;
+
+@end
+
 @interface NSMutableDictionary(PGFoundationAdditions)
 
 - (void)PG_setObject:(id)obj forKey:(id)key;

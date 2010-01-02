@@ -657,21 +657,7 @@ typedef NSUInteger PGZoomDirection;
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
-	if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGGenericError) {
-		[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
-		[errorMessage setStringValue:[error localizedDescription]];
-		[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
-		[reloadButton setEnabled:YES];
-		[clipView setDocumentView:errorView];
-	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGPasswordError) {
-		[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
-		[passwordField setStringValue:@""];
-		[clipView setDocumentView:passwordView];
-	} else if(PGEqualObjects([error domain], PGNodeErrorDomain) && [error code] == PGEncodingError) {
-		[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
-		[clipView setDocumentView:encodingView];
-		[[self window] makeFirstResponder:clipView];
-	} else {
+	if(!error) {
 		NSPoint const relativeCenter = [clipView relativeCenter];
 		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
 		PGOrientation const orientation = [[self activeNode] orientationWithBase:YES];
@@ -680,6 +666,24 @@ typedef NSUInteger PGZoomDirection;
 		if(PGPreserveLocation == _initialLocation) [clipView scrollRelativeCenterTo:relativeCenter animation:PGNoAnimation];
 		else [clipView scrollToLocation:_initialLocation animation:PGNoAnimation];
 		[[self window] makeFirstResponder:clipView];
+	} else if(PGEqualObjects([error domain], PGNodeErrorDomain)) switch([error code]) {
+		case PGGenericError:
+			[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[errorMessage setStringValue:[error localizedDescription]];
+			[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
+			[reloadButton setEnabled:YES];
+			[clipView setDocumentView:errorView];
+			break;
+		case PGPasswordError:
+			[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[passwordField setStringValue:@""];
+			[clipView setDocumentView:passwordView];
+			break;
+		case PGEncodingError:
+			[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[clipView setDocumentView:encodingView];
+			[[self window] makeFirstResponder:clipView];
+			break;
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	[self _readFinished];

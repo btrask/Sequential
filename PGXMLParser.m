@@ -159,7 +159,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSError *)error
 {
 	NSString *const errorString = [self errorString];
-	return errorString ? [NSError errorWithDomain:PGNodeErrorDomain code:PGGenericError userInfo:[NSDictionary dictionaryWithObject:errorString forKey:NSLocalizedDescriptionKey]] : nil;
+	return errorString ? [NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:errorString userInfo:nil] : nil;
 }
 - (id)info
 {
