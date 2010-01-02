@@ -642,7 +642,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
 static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
-
 static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 
 @implementation PGApplication
@@ -655,8 +654,8 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
 	PGNSMenuItemSetEnabled = [NSMenuItem PG_useImplementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
 
-	struct rlimit l = {RLIM_INFINITY, RLIM_INFINITY};
-	(void)setrlimit(RLIMIT_NOFILE, &l); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
+	struct rlimit const lim = {RLIM_INFINITY, RLIM_INFINITY};
+	(void)setrlimit(RLIMIT_NOFILE, &lim); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
 }
 - (void)sendEvent:(NSEvent *)anEvent
 {
