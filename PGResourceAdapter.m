@@ -598,7 +598,7 @@ NSString *const PGDateKey        = @"PGDate";
 - (void)main
 {
 	if([self isCancelled]) return;
-	NSImage *const thumbnail = [[_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info] retain];
+	NSImage *const thumbnail = [_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info];
 	if([self isCancelled]) return;
 	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:thumbnail waitUntilDone:NO];
 }

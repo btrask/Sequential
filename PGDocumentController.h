@@ -62,8 +62,6 @@ enum {
 #endif
 {
 	@private
-	IBOutlet NSMenu *recentMenu;
-
 	IBOutlet NSMenu *orientationMenu;
 
 	IBOutlet NSMenuItem *toggleFullscreen;
@@ -72,8 +70,6 @@ enum {
 	IBOutlet NSMenuItem *zoomOut;
 	IBOutlet NSMenuItem *scaleSliderItem;
 	IBOutlet NSSlider *scaleSlider;
-	IBOutlet NSButton *minScale;
-	IBOutlet NSButton *maxScale;
 
 	IBOutlet NSMenuItem *pageMenuItem;
 	IBOutlet NSMenu *defaultPageMenu;

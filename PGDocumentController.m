@@ -93,7 +93,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 + (PGDocumentController *)sharedDocumentController
 {
-	return PGSharedDocumentController ? PGSharedDocumentController : [[self alloc] init];
+	return PGSharedDocumentController ? PGSharedDocumentController : [[[self alloc] init] autorelease];
 }
 
 #pragma mark +NSObject

@@ -447,7 +447,7 @@ enum {
 		case PGSortBySize:         attributePtr = &_dataLength; break;
 		case PGSortByKind:         attributePtr = &_kind; break;
 	}
-	if(PGEqualObjects(value, *attributePtr)) return;
+	if(!attributePtr || PGEqualObjects(value, *attributePtr)) return;
 	[*attributePtr release];
 	*attributePtr = [value retain];
 	if(![[self document] isCurrentSortOrder:order]) return;
