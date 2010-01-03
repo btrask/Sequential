@@ -57,6 +57,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGKeyboardLayout.h"
 #import "PGLegacy.h"
 #import "PGLocalizing.h"
+#import "PGZooming.h"
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
@@ -81,6 +82,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 @interface PGDocumentController(Private)
 
+- (void)_awakeAfterLocalizing;
 - (void)_setFullscreen:(BOOL)flag;
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
 - (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date;
@@ -394,6 +396,10 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -PGDocumentController(Private)
 
+- (void)_awakeAfterLocalizing
+{
+	for(NSMenuItem *const item in [orientationMenu itemArray]) [PGOrientationMenuIconCell addOrientationMenuIconCellToMenuItem:item];
+}
 - (void)_setFullscreen:(BOOL)flag
 {
 	if(flag == _inFullscreen) return;
@@ -443,7 +449,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
 	[_updateTimer invalidate];
 	[_updateTimer release];
-	_updateTimer = [[self PG_performSelector:@selector(_checkForUpdates:) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget] retain];
+	_updateTimer = [[self PG_performSelector:@selector(_checkForUpdates) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget] retain];
 }
 - (void)_checkForUpdates
 {
@@ -554,9 +560,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[defaultPageMenu retain];
 	[windowsMenuSeparator retain];
 	[windowsMenuSeparator PG_removeFromMenu];
-
-	for(NSMenuItem *const item in [orientationMenu itemArray]) [PGOrientationMenuIconCell addOrientationMenuIconCellToMenuItem:item];
-
 	[zoomIn setKeyEquivalent:@"+"];
 	[zoomIn setKeyEquivalentModifierMask:0];
 	[zoomOut setKeyEquivalent:@"-"];
@@ -573,6 +576,8 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 	[self _setFullscreen:_fullscreen];
 	[self setCurrentDocument:nil];
+
+	[self performSelector:@selector(_awakeAfterLocalizing) withObject:nil afterDelay:0.0f inModes:[NSArray arrayWithObject:(NSString *)kCFRunLoopCommonModes]];
 }
 
 #pragma mark -NSObject(SUUpdaterDelegateInformalProtocol)

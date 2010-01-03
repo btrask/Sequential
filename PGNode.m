@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
 
+// Controllers
+#import "PGDisplayController.h"
+
 // Other Sources
 #import "PGFoundationAdditions.h"
 
