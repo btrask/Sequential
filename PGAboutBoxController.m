@@ -66,6 +66,7 @@ static PGAboutBoxController *PGSharedAboutBoxController;
 
 - (void)windowDidLoad
 {
+	[paneControl sizeToFit];
 	[paneControl retain];
 	[paneControl removeFromSuperview];
 	if([paneControl respondsToSelector:@selector(setSegmentStyle:)]) [paneControl setSegmentStyle:NSSegmentStyleTexturedRounded];
