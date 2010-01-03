@@ -11,10 +11,10 @@
 			<string key="NS.object.0">740</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="1"/>
-			<integer value="570"/>
-			<integer value="374"/>
 			<integer value="563"/>
+			<integer value="570"/>
+			<integer value="1"/>
+			<integer value="374"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -31,7 +31,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSWindowTemplate" id="169720882">
-				<int key="NSWindowStyleMask">4103</int>
+				<int key="NSWindowStyleMask">4099</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 446}, {540, 100}}</string>
 				<int key="NSWTFlags">536873984</int>
