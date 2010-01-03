@@ -117,7 +117,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 	else if(PGEqualObjects(identifier, PGUpdatePaneIdentifier)) newView = updateView;
 	NSAssert(newView, @"Invalid identifier.");
 	NSWindow *const w = [self window];
-	[w setTitle:NSLocalizedString(@"Preferences", nil)];
+	[w setTitle:[self _titleForPane:identifier]];
 	[[w toolbar] setSelectedItemIdentifier:identifier];
 	NSView *const container = [w contentView];
 	NSView *const oldView = [[container subviews] lastObject];
