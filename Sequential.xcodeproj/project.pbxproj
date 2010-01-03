@@ -127,6 +127,7 @@
 		0EA89C9E0BD540E60077BEEE /* PGImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EA89C9D0BD540E60077BEEE /* PGImageView.m */; };
 		0EB167E00A82AD89001999E7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0EB167DF0A82AD89001999E7 /* Localizable.strings */; };
 		0EBED53B102FE2070013748A /* Checkerboard.png in Resources */ = {isa = PBXBuildFile; fileRef = 0EBED53A102FE2070013748A /* Checkerboard.png */; };
+		0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC0F5F910F0C758000C8B8B /* PGLocalizing.m */; };
 		0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DEF0CA02B7B003E492C /* PGZooming.m */; };
 		0EC33E3F0E29B0A700450CF8 /* PGProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */; };
 		0ECD9FFE0CB3961B0059C754 /* PGFindView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECD9FFD0CB3961B0059C754 /* PGFindView.m */; };
@@ -568,6 +569,8 @@
 		0EB167CA0A82ACC0001999E7 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Sparkle.xcodeproj; path = Sparkle/Sparkle.xcodeproj; sourceTree = "<group>"; };
 		0EBED53A102FE2070013748A /* Checkerboard.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Checkerboard.png; sourceTree = "<group>"; };
+		0EC0F5F810F0C758000C8B8B /* PGLocalizing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLocalizing.h; sourceTree = "<group>"; };
+		0EC0F5F910F0C758000C8B8B /* PGLocalizing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLocalizing.m; sourceTree = "<group>"; };
 		0EC11DEE0CA02B7B003E492C /* PGZooming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGZooming.h; sourceTree = "<group>"; };
 		0EC11DEF0CA02B7B003E492C /* PGZooming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGZooming.m; sourceTree = "<group>"; };
 		0EC1C5380E366FD600E911E7 /* French */ = {isa = PBXFileReference; lastKnownFileType = folder; name = French; path = French.lproj/SequentialHelp; sourceTree = "<group>"; };
@@ -1000,6 +1003,8 @@
 				0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */,
 				0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */,
 				0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */,
+				0EC0F5F810F0C758000C8B8B /* PGLocalizing.h */,
+				0EC0F5F910F0C758000C8B8B /* PGLocalizing.m */,
 				0E5EC0490CEB850300E7FF9A /* PGMainThreadProxy.h */,
 				0E5EC04A0CEB850300E7FF9A /* PGMainThreadProxy.m */,
 				0E246B4710887E1900C30936 /* PGWebKitAdditions.h */,
@@ -1393,6 +1398,7 @@
 				0E246B4910887E1900C30936 /* PGWebKitAdditions.m in Sources */,
 				0E246BBD108880F800C30936 /* PGDebug.m in Sources */,
 				0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */,
+				0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -97,7 +97,7 @@ extern OSType PGOSTypeFromString(NSString *);
 
 - (NSArray *)PG_asArray;
 
-+ (void *)PG_useImplementationFromClass:(Class)class forSelector:(SEL)aSel;
++ (void *)PG_useInstance:(BOOL)instance implementationFromClass:(Class)class forSelector:(SEL)aSel;
 
 @end
 

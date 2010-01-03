@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFoundationAdditions.h"
 #import "PGKeyboardLayout.h"
 #import "PGLegacy.h"
+#import "PGLocalizing.h"
 
 NSString *const PGAntialiasWhenUpscalingKey = @"PGAntialiasWhenUpscaling";
 NSString *const PGBackgroundColorKey = @"PGBackgroundColor";
@@ -650,12 +651,14 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 {
 	if([PGApplication class] != self) return;
 
-	PGNSWindowValidateMenuItem = [NSWindow PG_useImplementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
-	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useImplementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
-	PGNSMenuItemSetEnabled = [NSMenuItem PG_useImplementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
+	PGNSWindowValidateMenuItem = [NSWindow PG_useInstance:YES implementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
+	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useInstance:YES implementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
+	PGNSMenuItemSetEnabled = [NSMenuItem PG_useInstance:YES implementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
 
 	struct rlimit const lim = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &lim); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
+
+	[NSBundle PG_prepareToAutoLocalize];
 }
 - (void)sendEvent:(NSEvent *)anEvent
 {

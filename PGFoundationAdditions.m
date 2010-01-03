@@ -201,9 +201,10 @@ OSType PGOSTypeFromString(NSString *str)
 
 #pragma mark -
 
-+ (void *)PG_useImplementationFromClass:(Class)class forSelector:(SEL)aSel
++ (void *)PG_useInstance:(BOOL)instance implementationFromClass:(Class)class forSelector:(SEL)aSel
 {
-	Method const newMethod = class_getInstanceMethod(class, aSel);
+	if(!instance) self = objc_getMetaClass(class_getName(self));
+	Method const newMethod = instance ? class_getInstanceMethod(class, aSel) : class_getClassMethod(class, aSel);
 	if(!newMethod) return NULL;
 	IMP const originalImplementation = class_getMethodImplementation(self, aSel); // Make sure the IMP we return is gotten using the normal method lookup mechanism.
 	(void)class_replaceMethod(self, aSel, method_getImplementation(newMethod), method_getTypeEncoding(newMethod)); // If this specific class doesn't provide its own implementation of aSel--even if a superclass does--class_replaceMethod() adds the method without replacing anything and returns NULL. This behavior is good because it prevents our change from spreading to a superclass, but it means the return value is worthless.
