@@ -74,6 +74,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@implementation NSMatrix(PGLocalizing)
+
+- (void)PG_localizeFromTable:(NSString *)tableName
+{
+	[super PG_localizeFromTable:tableName];
+	[[self cells] PG_localizeFromTable:tableName];
+}
+
+@end
+
 @implementation NSButtonCell(PGLocalizing)
 
 - (void)PG_localizeFromTable:(NSString *)tableName
@@ -91,6 +101,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[super PG_localizeFromTable:tableName];
 	[self setStringValue:NSLocalizedStringFromTable([self stringValue], tableName, nil)];
+}
+
+@end
+
+@implementation NSSegmentedCell(PGLocalizing)
+
+- (void)PG_localizeFromTable:(NSString *)tableName
+{
+	[super PG_localizeFromTable:tableName];
+	NSInteger i = 0;
+	for(; i < [self segmentCount]; i++) [self setLabel:NSLocalizedStringFromTable([self labelForSegment:i], tableName, nil) forSegment:i];
 }
 
 @end
