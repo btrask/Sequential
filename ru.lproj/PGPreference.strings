@@ -23,3 +23,6 @@
 "Check automatically" = "Проверять автоматически";
 "Software update:" = "Обновления:";
 "When an update is available, you can install it by choosing Install Update… from the Sequential menu." = "Автоматическая проверка на наличие обновлений каждую неделю. Если есть доступные обновления, вы можете установить их через Sequential > Установить обновление…. ";
+"Upscale only" = "Upscale only";
+"Scale freely" = "Scale freely";
+"Downscale only" = "Downscale only";

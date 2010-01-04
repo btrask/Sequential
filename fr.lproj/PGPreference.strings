@@ -23,3 +23,6 @@
 "Check automatically" = "Vérifier automatiquement";
 "Software update:" = "Mises à jour du logiciel:";
 "When an update is available, you can install it by choosing Install Update… from the Sequential menu." = "Lorsqu'une mise à jour est disponible, vous pouvez l'installer en choisissant Installer la mise à jour… depuis le menu de Sequential.";
+"Upscale only" = "Upscale only";
+"Scale freely" = "Scale freely";
+"Downscale only" = "Downscale only";

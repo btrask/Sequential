@@ -105,6 +105,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@implementation NSPopUpButtonCell(PGLocalizing)
+
+- (void)PG_localizeFromTable:(NSString *)tableName
+{
+	// Don't call super because NSPopUpButtonCell doesn't behave like a NSButtonCell.
+	[[self menu] PG_localizeFromTable:tableName];
+}
+
+@end
+
 @implementation NSSegmentedCell(PGLocalizing)
 
 - (void)PG_localizeFromTable:(NSString *)tableName

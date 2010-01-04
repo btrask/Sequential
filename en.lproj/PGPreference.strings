@@ -23,3 +23,6 @@
 "Check automatically" = "Check automatically";
 "Software update:" = "Software update:";
 "When an update is available, you can install it by choosing Install Update… from the Sequential menu." = "When an update is available, you can install it by choosing Install Update… from the Sequential menu.";
+"Upscale only" = "Upscale only";
+"Scale freely" = "Scale freely";
+"Downscale only" = "Downscale only";
