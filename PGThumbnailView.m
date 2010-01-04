@@ -33,11 +33,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
 
-#define PGBackgroundHoleSize 6.0f
-#define PGBackgroundHoleSpacing 3.0f
-#define PGBackgroundHeight (PGBackgroundHoleSize + PGBackgroundHoleSpacing)
+#define PGBackgroundHoleWidth 7.0f
+#define PGBackgroundHoleHeight 5.0f
+#define PGBackgroundHoleSpacingWidth 3.0f
+#define PGBackgroundHoleSpacingHeight 8.0f
+#define PGBackgroundHeight (PGBackgroundHoleHeight + PGBackgroundHoleSpacingHeight)
 #define PGThumbnailSize 128.0f
-#define PGThumbnailMarginWidth (PGBackgroundHoleSize + PGBackgroundHoleSpacing * 2.0f)
+#define PGThumbnailMarginWidth (PGBackgroundHoleWidth + PGBackgroundHoleSpacingWidth * 2.0f)
 #define PGThumbnailMarginHeight 2.0f
 #define PGThumbnailTotalHeight (PGThumbnailSize + PGThumbnailMarginHeight * 2.0f)
 #define PGInnerTotalWidth (PGThumbnailSize + PGThumbnailMarginWidth * 2.0f)
@@ -241,8 +243,8 @@ static void PGDrawGradient(void)
 		NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	}
 
-	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
-	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacing, 0.0f, PGBackgroundHoleSize, PGBackgroundHoleSize);
+	NSRect const leftHoleRect = NSMakeRect(PGBackgroundHoleSpacingWidth, 0.0f, PGBackgroundHoleWidth, PGBackgroundHoleHeight);
+	NSRect const rightHoleRect = NSMakeRect(PGInnerTotalWidth - PGThumbnailMarginWidth + PGBackgroundHoleSpacingWidth, 0.0f, PGBackgroundHoleWidth, PGBackgroundHoleHeight);
 	[[NSColor colorWithDeviceWhite:1.0f alpha:0.2f] set];
 	[[NSBezierPath PG_bezierPathWithRoundRect:leftHoleRect cornerRadius:2.0f] fill];
 	[[NSBezierPath PG_bezierPathWithRoundRect:rightHoleRect cornerRadius:2.0f] fill];
@@ -287,7 +289,7 @@ static void PGDrawGradient(void)
 	CGContextRef const context = [[NSGraphicsContext currentContext] graphicsPort];
 
 	NSRect const patternRect = [self convertRect:[self bounds] toView:nil];
-	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), NSMaxY(patternRect) - PGBackgroundHoleSize / 2.0f));
+	CGContextSetPatternPhase(context, CGSizeMake(NSMinX(patternRect), floor(NSMaxY(patternRect) - PGBackgroundHoleHeight / 2.0f)));
 
 	NSInteger count = 0;
 	NSRect const *rects = NULL;
