@@ -72,6 +72,11 @@ enum {
 };
 typedef NSUInteger PGZoomDirection;
 
+static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
+{
+	return NSMakeSize(MIN(MAX(min.width, size.width), max.width), MIN(MAX(min.height, size.height), max.height));
+}
+
 @interface PGDisplayController(Private)
 
 - (void)_setImageView:(PGImageView *)aView;
@@ -884,6 +889,10 @@ typedef NSUInteger PGZoomDirection;
 		newSize.width *= factor;
 		newSize.height *= factor;
 	} else if(PGActualSizeWithDPI != scaleMode) {
+		PGImageScaleConstraint const constraint = [[[NSUserDefaults standardUserDefaults] objectForKey:PGImageScaleConstraintKey] unsignedIntegerValue];
+		BOOL const resIndependent = [[self activeNode] isResolutionIndependent];
+		NSSize const minSize = constraint != PGUpscaleOnly || resIndependent ? NSZeroSize : newSize;
+		NSSize const maxSize = constraint != PGDownscaleOnly || resIndependent ? NSMakeSize(CGFLOAT_MAX, CGFLOAT_MAX) : newSize;
 		NSRect const bounds = [clipView insetBounds];
 		CGFloat scaleX = NSWidth(bounds) / round(newSize.width);
 		CGFloat scaleY = NSHeight(bounds) / round(newSize.height);
@@ -892,7 +901,7 @@ typedef NSUInteger PGZoomDirection;
 			if(scaleX > scaleY) scaleX = scaleY = MAX(scaleY, MIN(scaleX, (floor(newSize.height * scaleX / scrollMax.height + 0.3f) * scrollMax.height) / newSize.height));
 			else if(scaleX < scaleY) scaleX = scaleY = MAX(scaleX, MIN(scaleY, (floor(newSize.width * scaleY / scrollMax.width + 0.3f) * scrollMax.width) / newSize.width));
 		} else if(PGViewFitScale == scaleMode) scaleX = scaleY = MIN(scaleX, scaleY);
-		newSize = PGScaleSizeByXY(newSize, scaleX, scaleY);
+		newSize = PGConstrainSize(minSize, PGScaleSizeByXY(newSize, scaleX, scaleY), maxSize);
 	}
 	return PGIntegralSize(newSize);
 }
@@ -1022,11 +1031,13 @@ typedef NSUInteger PGZoomDirection;
 		[self _updateInfoPanelText];
 
 		[[PGPreferenceWindowController sharedPrefController] PG_addObserver:self selector:@selector(prefControllerBackgroundPatternColorDidChange:) name:PGPreferenceWindowControllerBackgroundPatternColorDidChangeNotification];
+		[[NSUserDefaults standardUserDefaults] addObserver:self forKeyPath:PGImageScaleConstraintKey options:kNilOptions context:NULL];
 	}
 	return self;
 }
 - (void)dealloc
 {
+	[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:PGImageScaleConstraintKey];
 	[self PG_cancelPreviousPerformRequests];
 	[self PG_removeObserver];
 	[self _setImageView:nil];
@@ -1043,6 +1054,14 @@ typedef NSUInteger PGZoomDirection;
 	[_timer invalidate];
 	[_timer release];
 	[super dealloc];
+}
+
+#pragma mark -NSObject(NSKeyValueObserving)
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	if(PGEqualObjects(keyPath, PGImageScaleConstraintKey)) [self _updateImageViewSizeAllowAnimation:YES];
+	else [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 #pragma mark -NSObject(NSMenuValidation)

@@ -42,6 +42,7 @@ extern NSString *const PGMouseClickActionKey;
 extern NSString *const PGEscapeKeyMappingKey;
 extern NSString *const PGDimOtherScreensKey;
 extern NSString *const PGBackwardsInitialLocationKey;
+extern NSString *const PGImageScaleConstraintKey;
 
 enum {
 	PGNextPreviousAction = 0,
@@ -52,6 +53,12 @@ enum {
 	PGFullscreenMapping = 0,
 	PGQuitMapping       = 1
 };
+enum {
+	PGScaleFreely = 0,
+	PGDownscaleOnly = 1,
+	PGUpscaleOnly = 2,
+};
+typedef NSUInteger PGImageScaleConstraint;
 
 #define PGScaleMax 16.0f
 #define PGScaleMin (1.0f / 16.0f)

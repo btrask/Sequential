@@ -66,6 +66,7 @@ NSString *const PGMouseClickActionKey = @"PGMouseClickAction";
 NSString *const PGEscapeKeyMappingKey = @"PGEscapeKeyMapping";
 NSString *const PGDimOtherScreensKey = @"PGDimOtherScreens";
 NSString *const PGBackwardsInitialLocationKey = @"PGBackwardsInitialLocation";
+NSString *const PGImageScaleConstraintKey = @"PGImageScaleConstraint";
 
 static NSString *const PGRecentItemsKey = @"PGRecentItems2";
 static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprecated after 1.3.2
@@ -116,6 +117,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSNumber numberWithInteger:PGFullscreenMapping], PGEscapeKeyMappingKey,
 		no, PGDimOtherScreensKey,
 		[NSNumber numberWithInteger:PGEndLocation], PGBackwardsInitialLocationKey,
+		[NSNumber numberWithUnsignedInteger:PGScaleFreely], PGImageScaleConstraintKey,
 		yes, PGCheckForUpdatesKey,
 		no, PGUpdateAvailableKey,
 		nil]];
