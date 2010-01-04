@@ -11,11 +11,11 @@
 "No image" = "Aucune image";
 
 /* Update menu item title. One of two states. */
-"Check for Updates..." = "Check for Updates…";
-"Install Update..." = "Install Update…";
+"Check for Updates..." = "Vérifier les mises à jour…";
+"Install Update..." = "Installer la mise à jour…";
 
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
-"Reveal in Finder" = "Afficher dans Finder";
+"Reveal in Finder" = "Afficher dans le Finder";
 "Reveal in Path Finder" = "Afficher dans Path Finder";
 "Reveal in Browser" = "Afficher dans le navigateur";
 
@@ -35,12 +35,12 @@
 "Hide Info" = "Masquer les infos";
 
 /* Lets the user toggle whether thumbnails are shown. Two states of the same item. */
-"Show Thumbnails" = "Afficher Thumbnails";
-"Hide Thumbnails" = "Masquer Thumbnails";
+"Show Thumbnails" = "Afficher les miniatures";
+"Hide Thumbnails" = "Masquer les miniatures";
 
 /* Title of menu item for toggling animation. Two states. */
-"Turn Animation On" = "Turn Animation On";
-"Turn Animation Off" = "Turn Animation Off";
+"Turn Animation On" = "Activer les animations";
+"Turn Animation Off" = "Désactiver les animations";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Window" = "Ajuster à la fenêtre";
@@ -64,16 +64,16 @@
 "TB" = "TB";
 
 /* Title of general pref pane. */
-"General" = "General";
+"General" = "Général";
 
 /* Title of navigation pref pane. */
 "Navigation" = "Navigation";
 
 /* Title of update pref pane. */
-"Update" = "Update";
+"Update" = "Mise à jour";
 
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
-"This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
+"This document has a bookmark for the page %@." = "Ce document est un signet pour la page “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
 "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
@@ -100,10 +100,10 @@
 "Replacing a file overwrites its current contents." = "Remplacer un fichier vas en effacer son contenu actuel.";
 
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
+"The image %@ could not be saved to %@." = "L'image %@ ne peut pas être enregistrée dans %@.";
 
 /* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
-"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
+"%lu images could not be saved to %@." = "Les images %lu ne peuvent pas être enregistrés dans “%@.”";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Vérifiez que le volume est accessible en écriture et qu'il dispose d'assez d'espace libre.";
@@ -117,16 +117,13 @@
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Il a peut être été déplacé ou effacé.";
 
-/* XADMaster error reporting. %@ is replaced with the XADMaster error. */
-"The error %@ occurred while parsing the archive." = "The error “%@” occurred while parsing the archive.";
-
 /* Informative string for secondary mouse button action. */
 "Secondary click goes to the previous page." = "Le clic secondaire retourne sur la page précédente.";
 "Secondary click goes right." = "Le clic secondaire vas à droite.";
 "Secondary click goes left." = "Le clic secondaire vas à gauche.";
 
 /* Flickr error message. %@ is replaced with the message as returned by Flickr. */
-"Flickr returned the error %@." = "Flickr à renvoyer l'erreur “%@.”";
+"Flickr returned the error %@." = "Flickr à renvoyé l'erreur “%@.”";
 
 /* Flickr user not found error message. %@ is replaced with the user name/NSID. */
 "Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr trouve pas l'utilisateur “%@.” Cet utilisateur n'existe peut être pas ou a peut être désactivé la recherche dans ces réglages.";
