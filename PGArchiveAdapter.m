@@ -116,7 +116,7 @@ static id PGArchiveAdapterList = nil;
 
 - (void)_threaded_setError:(NSError *)error forNode:(PGNode *)node;
 {
-	[node performSelectorOnMainThread:@selector(setError:) withObject:error waitUntilDone:NO];
+	[node performSelectorOnMainThread:@selector(setError:) withObject:error waitUntilDone:YES];
 }
 - (void)_updateThumbnailsOfChildren
 {
@@ -215,7 +215,9 @@ static id PGArchiveAdapterList = nil;
 		[_archive clearLastError];
 		data = [_archive contentsOfEntry:i];
 		switch([_archive lastError]) {
-			case XADNoError: break;
+			case XADNoError:
+			case XADEncodingError:
+				break;
 			case XADPasswordError: 
 				if(!_needsPassword) [self archiveNeedsPassword:_archive];
 				break;
