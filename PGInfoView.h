@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(copy) NSString *stringValue;
 @property(assign) NSUInteger index;
 @property(assign) NSUInteger count;
-@property(readonly) BOOL displaysProgressIndicator;
+@property(readonly) BOOL showsProgressBar;
 @property(assign) PGRectCorner originCorner;
 
 @end
