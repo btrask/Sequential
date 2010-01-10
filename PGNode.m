@@ -48,6 +48,8 @@ NSString *const PGNodeErrorDomain        = @"PGNodeError";
 NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
 NSString *const PGDefaultEncodingKey     = @"PGDefaultEncoding";
 
+#define PGMaxDepth 5
+
 enum {
 	PGNodeNothing = 0,
 	PGNodeLoading = 1 << 0,
@@ -219,7 +221,7 @@ enum {
 {
 	if([aClass alwaysLoads]) return YES;
 	switch([self ancestorLoadPolicy]) {
-		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntegerValue];
+		case PGLoadToMaxDepth: return [self depth] <= PGMaxDepth;
 		case PGLoadAll: return YES;
 		default: return NO;
 	}

@@ -7,9 +7,6 @@
 "The end of the image" = "画像の最後の分";
 "The beginning of the image" = "画像の最初の分";
 "The top edge of the end side" = "最後の側の上の分";
-"Maximum depth:" = "フォルダに入る程度:";
-"1" = "1";
-"5" = "5";
 "Primary mouse clicks move to:" = "マウスボタンのクリックは…";
 "When going backward, start at:" = "逆に進んだら始めは：";
 "Hold Control to preserve the current position." = "Control を押さえたらそのままの動きにされる。";

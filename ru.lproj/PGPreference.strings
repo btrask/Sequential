@@ -7,9 +7,6 @@
 "The end of the image" = "Конца изображения";
 "The beginning of the image" = "Начала изображения";
 "The top edge of the end side" = "Верхнего края конца изображения";
-"Maximum depth:" = "Глубина поиска:";
-"1" = "1";
-"5" = "5";
 "Primary mouse clicks move to:" = "Левый щелчок переходит на:";
 "When going backward, start at:" = "При переходе назад, начинать от:";
 "Hold Control to preserve the current position." = "Держите Control чтобы сохранить текущее положение.";
