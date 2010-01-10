@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #define PGGraphicalProgressBarStyle true
 #define PGMarginSize 4.0f // Outside the window.
-#define PGPaddingSize 3.0f // Inside the window.
+#define PGPaddingSize 2.0f // Inside the window.
 #define PGTotalPaddingSize (PGPaddingSize * 2.0f)
 #define PGTextBottomPadding (PGPaddingSize - 1.0f)
 #define PGTextTotalVertPadding (PGPaddingSize + PGTextBottomPadding)
@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #define PGProgressBarRadius (PGProgressBarHeight / 2.0f)
 #define PGProgressBarWidth 100.0f
 #define PGProgressKnobSize (PGProgressBarHeight - 2.0f)
-#define PGCornerRadius (PGPaddingSize + PGProgressBarRadius)
+#define PGCornerRadius (PGProgressBarBorder + PGProgressBarRadius)
 
 @implementation PGInfoView
 
