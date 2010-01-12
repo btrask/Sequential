@@ -146,6 +146,8 @@ NSString *const PGDateKey        = @"PGDate";
 		if(aNode == _node) return;
 		_node = aNode;
 	}
+	PGNode *const parent = [self parentNode];
+	[_activity setParentActivity:parent ? [parent activity] : [[self document] activity]];
 	[self noteIsViewableDidChange];
 }
 
@@ -326,16 +328,18 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	if((self = [super init])) {
 		_info = [[NSMutableDictionary alloc] init];
-		_subloads = [[NSMutableArray alloc] initWithCallbacks:NULL];
+		_activity = [[PGActivity alloc] initWithOwner:self];
 	}
 	return self;
 }
 - (void)dealloc
 {
+	[_activity setParentActivity:nil];
+
 	[_info release];
 	[_realThumbnail release];
 	[_thumbnailGenerationOperation release];
-	[_subloads release];
+	[_activity release];
 	[super dealloc];
 }
 
@@ -346,41 +350,15 @@ NSString *const PGDateKey        = @"PGDate";
 	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
 }
 
-#pragma mark -<PGLoading>
+#pragma mark -<PGActivityOwner>
 
-- (NSString *)loadDescription
+- (PGActivity *)activity
+{
+	return [[_activity retain] autorelease];
+}
+- (NSString *)descriptionForActivity:(PGActivity *)activity
 {
 	return [[self identifier] displayName];
-}
-- (CGFloat)loadProgress
-{
-	return 0.0f;
-}
-- (id<PGLoading>)parentLoad
-{
-	return [self parentAdapter] ? [self parentAdapter] : [PGLoadManager sharedLoadManager];
-}
-- (NSArray *)subloads
-{
-	return [[_subloads retain] autorelease];
-}
-- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag
-{
-	if(!flag) [_subloads removeObjectIdenticalTo:obj];
-	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
-	[[self parentLoad] setSubload:[self node] isLoading:[_subloads count] != 0];
-}
-- (void)prioritizeSubload:(id<PGLoading>)obj
-{
-	NSUInteger const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
-	if(NSNotFound == i) return;
-	[_subloads removeObjectAtIndex:i];
-	[_subloads insertObject:obj atIndex:0];
-	[[self parentLoad] prioritizeSubload:[self node]];
-}
-- (void)cancelLoad
-{
-	[_subloads makeObjectsPerformSelector:@selector(cancelLoad)];
 }
 
 #pragma mark -<PGResourceAdapting>

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGContainerAdapter;
 @class PGResourceIdentifier;
 @class PGDisplayableIdentifier;
-#import "PGLoading.h"
+#import "PGActivity.h"
 @class PGBookmark;
 
 // Other Sources
@@ -59,7 +59,7 @@ enum {
 };
 typedef NSInteger PGLoadPolicy;
 
-@protocol PGResourceAdapting <PGLoading>
+@protocol PGResourceAdapting <PGActivityOwner>
 
 @required
 @property(readonly) PGNode *parentNode;

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 static NSString *PGUserAgent = nil;
 static NSUInteger PGSimultaneousConnections = 0;
 
-@interface NSObject(PGURLLoadStarting)
+@interface PGActivity(PGURLLoadStarting)
 
 - (BOOL)PG_startNextURLLoad;
 
@@ -40,13 +40,14 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 @interface PGURLLoad(Private)
 
+- (BOOL)_start;
 - (void)_stop;
 
 @end
 
 @implementation PGURLLoad
 
-#pragma mark Class Methods
+#pragma mark +PGURLLoad
 
 + (NSString *)userAgent
 {
@@ -59,18 +60,18 @@ static NSUInteger PGSimultaneousConnections = 0;
 	PGUserAgent = [aString copy];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGURLLoad
 
-- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(NSObject<PGURLLoadDelegate> *)anObject
+- (id)initWithRequest:(NSURLRequest *)aRequest parent:(id<PGActivityOwner>)parent delegate:(NSObject<PGURLLoadDelegate> *)delegate
 {
 	if((self = [super init])) {
-		_parentLoad = parent;
-		_delegate = anObject;
+		_delegate = delegate;
 		_loaded = NO;
 		_request = [aRequest copy];
 		_data = [[NSMutableData alloc] init];
-		[[self parentLoad] setSubload:self isLoading:YES];
-		[[PGLoadManager sharedLoadManager] PG_startNextURLLoad];
+		_activity = [[PGActivity alloc] initWithOwner:self];
+		[_activity setParentActivity:[parent activity]];
+		[[PGActivity applicationActivity] PG_startNextURLLoad];
 	}
 	return self;
 }
@@ -109,24 +110,10 @@ static NSUInteger PGSimultaneousConnections = 0;
 	return _loaded;
 }
 
-#pragma mark Private Protocol
+#pragma mark -PGURLLoad(Private)
 
-- (void)_stop
+- (BOOL)_start
 {
-	if(!_connection) return;
-	[_connection cancel];
-	[_connection release];
-	_connection = nil;
-	PGSimultaneousConnections--;
-	[[self parentLoad] setSubload:self isLoading:NO];
-	[[PGLoadManager sharedLoadManager] PG_startNextURLLoad];
-}
-
-#pragma mark PGURLLoadStarting Protocol
-
-- (BOOL)PG_startNextURLLoad
-{
-	if([super PG_startNextURLLoad]) return YES;
 	if(_connection || [self loaded]) return NO;
 	NSMutableURLRequest *const request = [[_request mutableCopy] autorelease];
 	if([[self class] userAgent]) [request setValue:[[self class] userAgent] forHTTPHeaderField:@"User-Agent"];
@@ -136,37 +123,29 @@ static NSUInteger PGSimultaneousConnections = 0;
 	PGSimultaneousConnections++;
 	return YES;
 }
-
-#pragma mark PGLoading Protocol
-
-- (NSString *)loadDescription
+- (void)_stop
 {
-	return [[_request URL] absoluteString];
-}
-- (CGFloat)loadProgress
-{
-	if([self loaded]) return 1.0f;
-	if(!_response) return 0.0f;
-	long long const expectedLength = [_response expectedContentLength];
-	if(-1 == expectedLength) return 0.0f;
-	return (CGFloat)[_data length] / (CGFloat)expectedLength;
-}
-- (id<PGLoading>)parentLoad
-{
-	return _parentLoad;
-}
-- (NSArray *)subloads
-{
-	return nil;
-}
-- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag {}
-- (void)prioritizeSubload:(id<PGLoading>)obj {}
-- (void)cancelLoad
-{
-	[self cancelAndNotify:YES];
+	if(!_connection) return;
+	[_connection cancel];
+	[_connection release];
+	_connection = nil;
+	PGSimultaneousConnections--;
+	[[self activity] setParentActivity:nil];
+	[[PGActivity applicationActivity] PG_startNextURLLoad];
 }
 
-#pragma mark NSURLConnectionDelegate Protocol
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[self _stop];
+	[_request release];
+	[_response release];
+	[_data release];
+	[super dealloc];
+}
+
+#pragma mark -NSObject(NSURLConnectionDelegate)
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
 {
@@ -197,15 +176,25 @@ static NSUInteger PGSimultaneousConnections = 0;
 	[[self delegate] loadDidSucceed:self];
 }
 
-#pragma mark NSObject
+#pragma mark -<PGActivityOwner>
 
-- (void)dealloc
+@synthesize activity = _activity;
+- (NSString *)descriptionForActivity:(PGActivity *)activity
 {
-	[self _stop];
-	[_request release];
-	[_response release];
-	[_data release];
-	[super dealloc];
+	return [[_request URL] absoluteString];
+}
+- (BOOL)activityShouldCancel:(PGActivity *)activity
+{
+	[self cancelAndNotify:YES];
+	return YES;
+}
+- (CGFloat)progressForActivity:(PGActivity *)activity
+{
+	if([self loaded]) return 1.0f;
+	if(!_response) return 0.0f;
+	long long const expectedLength = [_response expectedContentLength];
+	if(-1 == expectedLength) return 0.0f;
+	return (CGFloat)[_data length] / (CGFloat)expectedLength;
 }
 
 @end
@@ -220,15 +209,15 @@ static NSUInteger PGSimultaneousConnections = 0;
 
 @end
 
-@interface NSObject(PGLoadingCategoryHack) <PGLoading>
-@end
-
-@implementation NSObject(PGURLLoadStarting)
+@implementation PGActivity(PGURLLoadStarting)
 
 - (BOOL)PG_startNextURLLoad
 {
 	if(PGSimultaneousConnections >= PGMaxSimultaneousConnections) return YES;
-	for(NSObject<PGLoading> *const subload in [self subloads]) if([subload PG_startNextURLLoad]) return YES;
+	for(PGActivity *const activity in [self childActivities]) {
+		if([[activity owner] isKindOfClass:[PGURLLoad class]] && [(PGURLLoad *)[activity owner] _start]) return YES;
+		if([activity PG_startNextURLLoad]) return YES;
+	}
 	return NO;
 }
 

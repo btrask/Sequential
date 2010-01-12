@@ -55,7 +55,7 @@ typedef NSUInteger PGMatchPriority;
 	NSMutableDictionary *_info;
 	NSImage *_realThumbnail;
 	NSOperation *_thumbnailGenerationOperation;
-	NSMutableArray *_subloads;
+	PGActivity *_activity;
 }
 
 + (NSDictionary *)typesDictionary; // For all resource adapters.

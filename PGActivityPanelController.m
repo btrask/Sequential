@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGActivityPanelController.h"
 
 // Models
-#import "PGLoading.h"
+#import "PGActivity.h"
 
 // Views
 #import "PGProgressIndicatorCell.h"
@@ -49,7 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSIndexSet *const indexes = [activityOutline selectedRowIndexes];
 	NSUInteger i = [indexes firstIndex];
-	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [[activityOutline itemAtRow:i] cancelLoad];
+	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) [[activityOutline itemAtRow:i] cancel:sender];
 }
 
 #pragma mark -PGActivityPanelController(Private)
@@ -106,15 +106,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-	return item ? [[item subloads] count] > 0 : YES;
+	return item ? [[item childActivities] count] > 0 : YES;
 }
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] count];
+	return [[(item ? item : [PGActivity applicationActivity]) childActivities] count];
 }
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-	return [[(item ? item : [PGLoadManager sharedLoadManager]) subloads] objectAtIndex:index];
+	return [[(item ? item : [PGActivity applicationActivity]) childActivities] objectAtIndex:index];
 }
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
@@ -126,9 +126,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[style setLineBreakMode:NSLineBreakByTruncatingMiddle];
 			attrs = [[NSDictionary alloc] initWithObjectsAndKeys:style, NSParagraphStyleAttributeName, nil];
 		}
-		return [[[NSAttributedString alloc] initWithString:[item loadDescription] attributes:attrs] autorelease];
+		return [[[NSAttributedString alloc] initWithString:[item activityDescription] attributes:attrs] autorelease];
 	} else if(tableColumn == progressColumn) {
-		return [NSNumber numberWithDouble:[item loadProgress]];
+		return [NSNumber numberWithDouble:[item progress]];
 	}
 	return nil;
 }
@@ -137,7 +137,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
-	if(tableColumn == progressColumn) [cell setHidden:![item loadProgress] || [[item subloads] count]];
+	if(tableColumn == progressColumn) [cell setHidden:![item progress] || [[item childActivities] count]];
 }
 
 @end

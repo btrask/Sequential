@@ -54,10 +54,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URL];
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
-	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parentLoad:self delegate:self];
+	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parent:self delegate:self];
 	[_mainLoad cancelAndNotify:NO];
 	[_mainLoad release];
-	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0f] parentLoad:self delegate:self];
+	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:15.0f] parent:self delegate:self];
 }
 - (void)fallbackLoad
 {
@@ -74,13 +74,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	[super dealloc];
-}
-
-#pragma mark -<PGLoading>
-
-- (CGFloat)loadProgress
-{
-	return [_mainLoad loadProgress];
 }
 
 #pragma mark -<PGURLLoadDelegate>

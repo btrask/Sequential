@@ -1,4 +1,4 @@
-/* Copyright © 2007-2009, The Sequential Project
+/* Copyright © 2010, The Sequential Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -22,64 +22,38 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGLoading.h"
+@protocol PGActivityOwner;
 
-@implementation PGLoadManager
-
-#pragma mark +PGLoadManager
-
-+ (id)sharedLoadManager
+@interface PGActivity : NSObject
 {
-	static PGLoadManager *m = nil;
-	if(!m) m = [[self alloc] init];
-	return m;
+	@private
+	NSObject<PGActivityOwner> *_owner;
+	PGActivity *_parentActivity;
+	NSMutableArray *_childActivities;
 }
 
-#pragma mark -NSObject
++ (id)applicationActivity;
 
-- (id)init
-{
-	if((self = [super init])) {
-		_subloads = (NSMutableArray *)CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
-	}
-	return self;
-}
-- (void)dealloc
-{
-	[_subloads release];
-	[super dealloc];
-}
+- (id)initWithOwner:(NSObject<PGActivityOwner> *)owner;
+@property(readonly) NSObject<PGActivityOwner> *owner;
+@property(assign) PGActivity *parentActivity;
+@property(readonly) NSString *activityDescription;
+@property(readonly) CGFloat progress;
+@property(readonly) NSArray *childActivities;
 
-#pragma mark -<PGLoading>
+- (IBAction)cancel:(id)sender;
+- (IBAction)prioritize:(id)sender;
 
-- (NSString *)loadDescription
-{
-	return nil;
-}
-- (CGFloat)loadProgress
-{
-	return 0.0f;
-}
-- (id<PGLoading>)parentLoad
-{
-	return nil;
-}
-- (NSArray *)subloads
-{
-	return [[_subloads retain] autorelease];
-}
-- (void)setSubload:(id<PGLoading>)obj isLoading:(BOOL)flag
-{
-	if(!flag) [_subloads removeObjectIdenticalTo:obj];
-	else if([_subloads indexOfObjectIdenticalTo:obj] == NSNotFound) [_subloads addObject:obj];
-}
-- (void)prioritizeSubload:(id<PGLoading>)obj
-{
-	NSUInteger const i = [_subloads indexOfObjectIdenticalTo:[[obj retain] autorelease]];
-	if(NSNotFound == i) return;
-	[_subloads removeObjectAtIndex:i];
-	[_subloads insertObject:obj atIndex:0];
-}
-- (void)cancelLoad {}
+@end
+
+@protocol PGActivityOwner <NSObject>
+
+@required
+@property(readonly) PGActivity *activity;
+- (NSString *)descriptionForActivity:(PGActivity *)activity;
+
+@optional
+- (BOOL)activityShouldCancel:(PGActivity *)activity;
+- (CGFloat)progressForActivity:(PGActivity *)activity;
 
 @end

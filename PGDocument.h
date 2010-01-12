@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGResourceIdentifier;
 @class PGDisplayableIdentifier;
 @class PGSubscription;
+#import "PGActivity.h"
 @class PGBookmark;
 
 // Views
@@ -51,7 +52,7 @@ extern NSString *const PGDocumentNodeKey;
 extern NSString *const PGDocumentRemovedChildrenKey;
 extern NSString *const PGDocumentUpdateRecursivelyKey;
 
-@interface PGDocument : PGPrefObject
+@interface PGDocument : PGPrefObject <PGActivityOwner>
 {
 	@private
 	PGDisplayableIdentifier *_originalIdentifier;
@@ -71,6 +72,7 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 	PGDisplayController *_displayController;
 	NSMenu *_pageMenu;
 	PGOrientation _baseOrientation;
+	PGActivity *_activity;
 
 	NSUInteger _processingNodeCount;
 	BOOL _sortedChildrenChanged;

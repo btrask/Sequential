@@ -22,6 +22,7 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0E01794010FBEDBB0017FA5A /* PGActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E01793F10FBEDBB0017FA5A /* PGActivity.m */; };
 		0E04E98E0C23BA7100078EC2 /* PGBezelPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */; };
 		0E04EBD00C253BB100078EC2 /* PGAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCD0C253BB000078EC2 /* PGAlertView.m */; };
 		0E04EBD10C253BB100078EC2 /* PGInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E04EBCF0C253BB000078EC2 /* PGInfoView.m */; };
@@ -168,7 +169,6 @@
 		0EE647720DC8FA3A00A90F86 /* PGContainerAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE647710DC8FA3A00A90F86 /* PGContainerAdapter.m */; };
 		0EE7617B0DDB7BDE00ED8ABB /* PGResourceIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */; };
 		0EE7617E0DDB7C4900ED8ABB /* PGLegacy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */; };
-		0EE968130E95A2C500CE2891 /* PGLoading.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE968120E95A2C500CE2891 /* PGLoading.m */; };
 		0EEE58220DB55B61006E5B9C /* asahi.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58060DB55B61006E5B9C /* asahi.c */; };
 		0EEE58230DB55B61006E5B9C /* canon.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58070DB55B61006E5B9C /* canon.c */; };
 		0EEE58240DB55B61006E5B9C /* casio.c in Sources */ = {isa = PBXBuildFile; fileRef = 0EEE58080DB55B61006E5B9C /* casio.c */; };
@@ -320,6 +320,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E01793E10FBEDBB0017FA5A /* PGActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGActivity.h; sourceTree = "<group>"; };
+		0E01793F10FBEDBB0017FA5A /* PGActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGActivity.m; sourceTree = "<group>"; };
 		0E04E98C0C23BA7100078EC2 /* PGBezelPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGBezelPanel.h; sourceTree = "<group>"; };
 		0E04E98D0C23BA7100078EC2 /* PGBezelPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGBezelPanel.m; sourceTree = "<group>"; };
 		0E04EBCC0C253BB000078EC2 /* PGAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAlertView.h; sourceTree = "<group>"; };
@@ -651,8 +653,6 @@
 		0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGResourceIdentifier.m; sourceTree = "<group>"; };
 		0EE7617C0DDB7C4900ED8ABB /* PGLegacy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLegacy.h; sourceTree = "<group>"; };
 		0EE7617D0DDB7C4900ED8ABB /* PGLegacy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLegacy.m; sourceTree = "<group>"; };
-		0EE968110E95A2C500CE2891 /* PGLoading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGLoading.h; sourceTree = "<group>"; };
-		0EE968120E95A2C500CE2891 /* PGLoading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGLoading.m; sourceTree = "<group>"; };
 		0EEE58060DB55B61006E5B9C /* asahi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = asahi.c; path = exiftags/asahi.c; sourceTree = "<group>"; };
 		0EEE58070DB55B61006E5B9C /* canon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = canon.c; path = exiftags/canon.c; sourceTree = "<group>"; };
 		0EEE58080DB55B61006E5B9C /* casio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = casio.c; path = exiftags/casio.c; sourceTree = "<group>"; };
@@ -984,8 +984,8 @@
 				0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */,
 				0ECF36E60C7DC4FC0009EB00 /* PGSubscription.h */,
 				0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */,
-				0EE968110E95A2C500CE2891 /* PGLoading.h */,
-				0EE968120E95A2C500CE2891 /* PGLoading.m */,
+				0E01793E10FBEDBB0017FA5A /* PGActivity.h */,
+				0E01793F10FBEDBB0017FA5A /* PGActivity.m */,
 				0ED4A8DC0DD00E18007C5A77 /* PGURLLoad.h */,
 				0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */,
 				0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */,
@@ -1432,7 +1432,6 @@
 				0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */,
 				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
 				0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */,
-				0EE968130E95A2C500CE2891 /* PGLoading.m in Sources */,
 				0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */,
 				0EDB9A790EA1899300B7342A /* PGThumbnailBrowser.m in Sources */,
 				0EDB9BFF0EA1E27D00B7342A /* PGThumbnailView.m in Sources */,
@@ -1449,6 +1448,7 @@
 				0E246BBD108880F800C30936 /* PGDebug.m in Sources */,
 				0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */,
 				0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */,
+				0E01794010FBEDBB0017FA5A /* PGActivity.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

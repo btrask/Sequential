@@ -23,26 +23,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
-#import "PGLoading.h"
+#import "PGActivity.h"
 
 @protocol PGURLLoadDelegate;
 
-@interface PGURLLoad : NSObject <PGLoading>
+@interface PGURLLoad : NSObject <PGActivityOwner>
 {
 	@private
-	id<PGLoading> _parentLoad;
 	NSObject<PGURLLoadDelegate> * _delegate;
 	BOOL _loaded;
 	NSURLConnection *_connection;
 	NSURLRequest *_request;
 	NSURLResponse *_response;
 	NSMutableData *_data;
+	PGActivity *_activity;
 }
 
 + (NSString *)userAgent;
 + (void)setUserAgent:(NSString *)aString;
 
-- (id)initWithRequest:(NSURLRequest *)aRequest parentLoad:(id<PGLoading>)parent delegate:(NSObject<PGURLLoadDelegate> *)anObject;
+- (id)initWithRequest:(NSURLRequest *)aRequest parent:(id<PGActivityOwner>)parent delegate:(NSObject<PGURLLoadDelegate> *)delegate;
 
 @property(readonly) NSObject<PGURLLoadDelegate> *delegate;
 @property(readonly) NSURLRequest *request;

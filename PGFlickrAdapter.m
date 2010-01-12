@@ -133,7 +133,7 @@ enum {
 			if(tag) [URLString appendFormat:@"&tags=%@", tag];
 		}
 	}
-	_load = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:URLString]] parentLoad:self delegate:self];
+	_load = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:URLString]] parent:self delegate:self];
 }
 - (BOOL)shouldFallbackOnError
 {
@@ -147,13 +147,6 @@ enum {
 	[_load cancelAndNotify:NO];
 	[_load release];
 	[super dealloc];
-}
-
-#pragma mark -<PGLoading>
-
-- (CGFloat)loadProgress
-{
-	return [_load loadProgress];
 }
 
 #pragma mark -<PGURLLoadDelegate>

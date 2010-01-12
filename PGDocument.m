@@ -369,20 +369,23 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		[_pageMenu addItem:[NSMenuItem separatorItem]];
 		_cachedNodes = [[NSMutableArray alloc] init];
 		_operationQueue = [[NSOperationQueue alloc] init];
+		_activity = [[PGActivity alloc] initWithOwner:self];
+		[_activity setParentActivity:[PGActivity applicationActivity]];
 	}
 	return self;
 }
 - (void)dealloc
 {
 	[self PG_removeObserver];
-	[_node cancelLoad];
+	[[_node activity] cancel:self];
 	[_node detachFromTree];
 	[_operationQueue cancelAllOperations];
+	[_activity setParentActivity:nil];
 
 	[_originalIdentifier release];
 	[_node release];
 	[_subscription release];
-	[_cachedNodes release]; // Don't worry about sending -clearCache to each node because the ones that don't get deallocated with us are in active use by somebody else.
+	[_cachedNodes release];
 	[_operationQueue release];
 	[_storedNode release];
 	[_storedImageView release];
@@ -390,7 +393,19 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[_initialIdentifier release];
 	[_displayController release];
 	[_pageMenu release];
+	[_activity release];
 	[super dealloc];
+}
+
+#pragma mark -<PGActivityOwner>
+
+- (PGActivity *)activity
+{
+	return [[_activity retain] autorelease];
+}
+- (NSString *)descriptionForActivity:(PGActivity *)activity
+{
+	return [[[self node] identifier] displayName];
 }
 
 @end

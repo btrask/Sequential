@@ -264,7 +264,7 @@ enum {
 
 - (void)becomeViewed
 {
-	[[self parentLoad] prioritizeSubload:self];
+	[[self activity] prioritize:self];
 	if(PGNodeReading & _status) return;
 	_status |= PGNodeReading;
 	[self readIfNecessary];

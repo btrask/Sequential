@@ -579,7 +579,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if(_loadingGraphic) return;
 	_loadingGraphic = [[PGLoadingGraphic loadingGraphic] retain];
-	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
+	[_loadingGraphic setProgress:[[[self activeNode] activity] progress]];
 	[[_graphicPanel content] pushGraphic:_loadingGraphic window:[self window]];
 }
 - (void)offerToOpenBookmark:(PGBookmark *)bookmark
@@ -656,7 +656,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)nodeLoadingDidProgress:(NSNotification *)aNotif
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
-	[_loadingGraphic setProgress:[[self activeNode] loadProgress]];
+	[_loadingGraphic setProgress:[[[self activeNode] activity] progress]];
 }
 - (void)nodeReadyForViewing:(NSNotification *)aNotif
 {
