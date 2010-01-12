@@ -147,6 +147,7 @@ static PGActivity *PGApplicationActivity;
 }
 - (void)dealloc
 {
+	[[[_childActivities copy] autorelease] makeObjectsPerformSelector:@selector(setParentActivity:) withObject:nil];
 	[_childActivities release];
 	[super dealloc];
 }
