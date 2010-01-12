@@ -59,7 +59,13 @@ static PGActivity *PGApplicationActivity;
 	}
 	return self;
 }
-@synthesize owner = _owner;
+- (NSObject<PGActivityOwner> *)owner
+{
+	@synchronized(self) {
+		return _owner;
+	}
+	return nil;
+}
 - (PGActivity *)parentActivity
 {
 	@synchronized(self) {
@@ -83,14 +89,26 @@ static PGActivity *PGApplicationActivity;
 - (CGFloat)progress
 {
 	NSObject<PGActivityOwner> *const owner = [self owner];
-	return owner ? [owner progressForActivity:self] : 0.0f;
+	return owner ? [owner progressForActivity:self] : -1.0f;
 }
-- (NSArray *)childActivities
+- (BOOL)isActive
 {
+	if([self progress] >= 0.0f) return YES;
 	@synchronized(self) {
-		return [[_childActivities copy] autorelease];
+		for(PGActivity *const child in _childActivities) if([child isActive]) return YES;
 	}
-	return nil;
+	return NO;
+}
+- (NSArray *)childActivities:(BOOL)activeOnly
+{
+	NSMutableArray *activeChildren = nil;
+	@synchronized(self) {
+		if(activeOnly) {
+			activeChildren = [NSMutableArray arrayWithCapacity:[_childActivities count]];
+			for(PGActivity *const child in _childActivities) if([child isActive]) [activeChildren addObject:child];
+		} else activeChildren = [[_childActivities copy] autorelease];
+	}
+	return activeChildren;
 }
 
 #pragma mark -
@@ -106,6 +124,13 @@ static PGActivity *PGApplicationActivity;
 {
 	@synchronized(self) {
 		[_parentActivity _prioritizeChildActivity:self];
+	}
+}
+- (void)invalidate
+{
+	@synchronized(self) {
+		_owner = nil;
+		[self setParentActivity:nil];
 	}
 }
 
@@ -162,7 +187,7 @@ static PGActivity *PGApplicationActivity;
 }
 - (CGFloat)progressForActivity:(PGActivity *)activity
 {
-	return 0.0f;
+	return -1.0f;
 }
 
 @end

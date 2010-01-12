@@ -39,10 +39,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(assign) PGActivity *parentActivity;
 @property(readonly) NSString *activityDescription;
 @property(readonly) CGFloat progress;
-@property(readonly) NSArray *childActivities;
+@property(readonly) BOOL isActive;
+- (NSArray *)childActivities:(BOOL)activeOnly;
 
 - (IBAction)cancel:(id)sender;
 - (IBAction)prioritize:(id)sender;
+- (void)invalidate;
 
 @end
 

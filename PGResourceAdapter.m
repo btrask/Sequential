@@ -334,7 +334,7 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (void)dealloc
 {
-	[_activity setParentActivity:nil];
+	[_activity invalidate];
 
 	[_info release];
 	[_realThumbnail release];

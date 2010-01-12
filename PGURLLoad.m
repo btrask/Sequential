@@ -130,7 +130,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 	[_connection release];
 	_connection = nil;
 	PGSimultaneousConnections--;
-	[[self activity] setParentActivity:nil];
+	[_activity invalidate];
 	[[PGActivity applicationActivity] PG_startNextURLLoad];
 }
 
@@ -193,7 +193,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 	if([self loaded]) return 1.0f;
 	if(!_response) return 0.0f;
 	long long const expectedLength = [_response expectedContentLength];
-	if(-1 == expectedLength) return 0.0f;
+	if(NSURLResponseUnknownLength == expectedLength) return 0.0f;
 	return (CGFloat)[_data length] / (CGFloat)expectedLength;
 }
 
@@ -214,7 +214,7 @@ static NSUInteger PGSimultaneousConnections = 0;
 - (BOOL)PG_startNextURLLoad
 {
 	if(PGSimultaneousConnections >= PGMaxSimultaneousConnections) return YES;
-	for(PGActivity *const activity in [self childActivities]) {
+	for(PGActivity *const activity in [self childActivities:NO]) {
 		if([[activity owner] isKindOfClass:[PGURLLoad class]] && [(PGURLLoad *)[activity owner] _start]) return YES;
 		if([activity PG_startNextURLLoad]) return YES;
 	}

@@ -106,15 +106,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-	return item ? [[item childActivities] count] > 0 : YES;
+	return item ? [[item childActivities:YES] count] > 0 : YES;
 }
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-	return [[(item ? item : [PGActivity applicationActivity]) childActivities] count];
+	return [[(item ? item : [PGActivity applicationActivity]) childActivities:YES] count];
 }
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-	return [[(item ? item : [PGActivity applicationActivity]) childActivities] objectAtIndex:index];
+	return [[(item ? item : [PGActivity applicationActivity]) childActivities:YES] objectAtIndex:index];
 }
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
@@ -137,7 +137,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
-	if(tableColumn == progressColumn) [cell setHidden:![item progress] || [[item childActivities] count]];
+	if(tableColumn == progressColumn) [cell setHidden:![item progress] || [[item childActivities:YES] count]];
 }
 
 @end

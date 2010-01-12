@@ -380,7 +380,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[[_node activity] cancel:self];
 	[_node detachFromTree];
 	[_operationQueue cancelAllOperations];
-	[_activity setParentActivity:nil];
+	[_activity invalidate];
 
 	[_originalIdentifier release];
 	[_node release];
