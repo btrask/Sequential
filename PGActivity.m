@@ -115,10 +115,11 @@ static PGActivity *PGApplicationActivity;
 
 - (IBAction)cancel:(id)sender
 {
-	if([[self owner] activityShouldCancel:self]) @synchronized(self) {
+	@synchronized(self) {
 		[self setParentActivity:nil];
 		[_childActivities makeObjectsPerformSelector:@selector(cancel:) withObject:sender];
 	}
+	[[self owner] cancelActivity:self];
 }
 - (IBAction)prioritize:(id)sender
 {
@@ -181,13 +182,10 @@ static PGActivity *PGApplicationActivity;
 
 @implementation NSObject(PGActivityOwner)
 
-- (BOOL)activityShouldCancel:(PGActivity *)activity
-{
-	return NO;
-}
 - (CGFloat)progressForActivity:(PGActivity *)activity
 {
 	return -1.0f;
 }
+- (void)cancelActivity:(PGActivity *)activity {}
 
 @end

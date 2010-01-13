@@ -183,11 +183,6 @@ static NSUInteger PGSimultaneousConnections = 0;
 {
 	return [[_request URL] absoluteString];
 }
-- (BOOL)activityShouldCancel:(PGActivity *)activity
-{
-	[self cancelAndNotify:YES];
-	return YES;
-}
 - (CGFloat)progressForActivity:(PGActivity *)activity
 {
 	if([self loaded]) return 1.0f;
@@ -195,6 +190,10 @@ static NSUInteger PGSimultaneousConnections = 0;
 	long long const expectedLength = [_response expectedContentLength];
 	if(NSURLResponseUnknownLength == expectedLength) return 0.0f;
 	return (CGFloat)[_data length] / (CGFloat)expectedLength;
+}
+- (void)cancelActivity:(PGActivity *)activity
+{
+	[self cancelAndNotify:YES];
 }
 
 @end

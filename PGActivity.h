@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSString *)descriptionForActivity:(PGActivity *)activity;
 
 @optional
-- (BOOL)activityShouldCancel:(PGActivity *)activity;
 - (CGFloat)progressForActivity:(PGActivity *)activity;
+- (void)cancelActivity:(PGActivity *)activity;
 
 @end
