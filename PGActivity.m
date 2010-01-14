@@ -117,7 +117,7 @@ static PGActivity *PGApplicationActivity;
 {
 	@synchronized(self) {
 		[self setParentActivity:nil];
-		[_childActivities makeObjectsPerformSelector:@selector(cancel:) withObject:sender];
+		[[[_childActivities copy] autorelease] makeObjectsPerformSelector:@selector(cancel:) withObject:sender];
 	}
 	[[self owner] cancelActivity:self];
 }
