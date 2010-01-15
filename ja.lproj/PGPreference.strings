@@ -20,6 +20,6 @@
 "Check automatically" = "自動に確認する";
 "Software update:" = "ソフトウェア更新:";
 "When an update is available, you can install it by choosing Install Update… from the Sequential menu." = "更新がありましたら Sequential メニュー > 更新をインストールする… を選択してインストールが出来ます。";
-"Upscale only" = "Upscale only";
-"Scale freely" = "Scale freely";
-"Downscale only" = "Downscale only";
+"Upscale only" = "大きくする以外にしない";
+"Scale freely" = "自由に大きさを合わせる";
+"Downscale only" = "小さくする以外にしない";
