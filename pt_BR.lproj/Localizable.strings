@@ -11,8 +11,8 @@
 "No image" = "Sem imagem";
 
 /* Update menu item title. One of two states. */
-"Check for Updates..." = "Check for Updates…";
-"Install Update..." = "Install Update…";
+"Check for Updates..." = "Verificar Atualizações…";
+"Install Update..." = "Instalar Atualização…";
 
 /* Reveal in Finder, Path Finder (www.cocoatech.com) or web browser. Three states of the same item. */
 "Reveal in Finder" = "Mostrar no Finder";
@@ -39,8 +39,8 @@
 "Hide Thumbnails" = "Esconder Thumbnails";
 
 /* Title of menu item for toggling animation. Two states. */
-"Turn Animation On" = "Turn Animation On";
-"Turn Animation Off" = "Turn Animation Off";
+"Turn Animation On" = "Ligar Animação";
+"Turn Animation Off" = "Desligar Animação";
 
 /* Scale image down so the entire thing fits menu item. Two labels, depending on mode. */
 "Fit to Window" = "Ajustar a Janela";
@@ -51,7 +51,7 @@
 "Delete" = "Deletar";
 
 /* Bookmark menu item used when the file named %@ cannot be found. */
-"Missing File %@" = "Arquivo “%@” não encontrado";
+"Missing File %@" = "Arquivo %@ não encontrado";
 
 /* Display string for timer intervals. %@ is replaced with the remaining seconds and tenths of seconds.*/
 "%@ seconds" = "%@ segundos";
@@ -64,46 +64,46 @@
 "TB" = "TB";
 
 /* Title of general pref pane. */
-"General" = "General";
+"General" = "Geral";
 
 /* Title of navigation pref pane. */
-"Navigation" = "Navigation";
+"Navigation" = "Navegação";
 
 /* Title of update pref pane. */
-"Update" = "Update";
+"Update" = "Atualização";
 
 /* Offer to resume from bookmark alert message text. %@ is replaced with the page name. */
-"This document has a bookmark for the page %@." = "This document has a bookmark for the page “%@.”";
+"This document has a bookmark for the page %@." = "Este documento tem a página %@ marcada como favorita.";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual.";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "Se você não continuar a partir desta página, a marcação como favorito será mantida e você terá de começar a partir da primeira página como de costume.";
 
 /* Don't resume from bookmark button. */
-"Don't Resume" = "Don't Resume";
+"Don't Resume" = "Não Continuar";
 
 /* Do resume from bookmark button. */
-"Resume" = "Resume";
+"Resume" = "Continuar";
 
 /* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
-"The error %ld %@ was generated while loading the URL %@." = "O erro “%ld %@” foi gerado ao carregar a URL “%@.”";
+"The error %ld %@ was generated while loading the URL %@." = "O erro “%ld %@” foi gerado ao carregar a URL %@.";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
-"The URL %@ could not be loaded." = "A URL “%@” não pode ser carregada.";
+"The URL %@ could not be loaded." = "A URL %@ não pode ser carregada.";
 
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"%@ already exists in %@. Do you want to replace it?" = "“%@” já existe em “%@.” Deseja substituir?";
+"%@ already exists in %@. Do you want to replace it?" = "%@ já existe em %@. Deseja substituir?";
 
 /* Replace multiple files alert. %lu is replaced with a number greater than 1, %@ is replaced with the destination name. */
-"%lu pages already exist in %@. Do you want to replace them?" = "%lu páginas já existem em “%@.” Deseja substituir?";
+"%lu pages already exist in %@. Do you want to replace them?" = "%lu páginas já existem em %@. Deseja substituir?";
 
 /* Informative text for replacement alerts. */
 "Replacing a file overwrites its current contents." = "Substituir um arquivo sobrescreve seu conteúdo atual.";
 
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The image %@ could not be saved to %@." = "The image %@ could not be saved to %@.";
+"The image %@ could not be saved to %@." = "A imagem %@ não pode ser salva em %@.";
 
 /* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
-"%lu images could not be saved to %@." = "%lu images could not be saved to “%@.”";
+"%lu images could not be saved to %@." = "%lu imagens não puderam ser salvas em %@.";
 
 /* Informative text for save failure alerts. */
 "Make sure the volume is writable and has enough free space." = "Certifique-se que o dispositivo tenha permissão de escrita e espaço livre suficiente.";
@@ -112,28 +112,28 @@
 "File already exists." = "Arquivo já existe.";
 
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
-"The file referenced by the bookmark %@ could not be found." = "O arquivo referenciado pelo bookmark “%@” não foi encontrado.";
+"The file referenced by the bookmark %@ could not be found." = "O arquivo referenciado como favorito %@ não foi encontrado.";
 
 /* Bookmarked file could not be found error informative text. */
 "It may have been moved or deleted." = "Pode ter sido movido ou deletado.";
 
 /* XADMaster error reporting. %@ is replaced with the XADMaster error. */
-"The error %@ occurred while parsing the archive." = "The error “%@” occurred while parsing the archive.";
+"The error %@ occurred while parsing the archive." = "Ocorreu o erro %@ durante a análise do arquivo.";
 
 /* Informative string for secondary mouse button action. */
-"Secondary click goes to the previous page." = "Click secundário leva a página anterior.";
-"Secondary click goes right." = "Click secundário leva a direita.";
-"Secondary click goes left." = "Click secundário leva esquerda.";
+"Secondary click goes to the previous page." = "Clique secundário do mouse leva a página anterior.";
+"Secondary click goes right." = "Clique secundário do mouse leva a direita.";
+"Secondary click goes left." = "Clique secundário do mouse leva a esquerda.";
 
 /* Flickr generic error message. %@ is replaced with the message as returned by Flickr. */
-"Flickr returned the error %@." = "Flickr retornou o erro “%@.”";
+"Flickr returned the error %@." = "Flickr retornou o erro %@.";
 
 /* Flickr user not found error message. %@ is replaced with the user name/NSID. */
-"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr não encontrou o usuário “%@.” Esse usuário pode não existir ou ter desabilitado as pesquisas nas preferências de privacidade do Flickr.";
+"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr não encontrou o usuário %@. Esse usuário pode não existir ou ter desabilitado as pesquisas nas preferências de privacidade do Flickr.";
 
 /* Dialog button labels. */
 "OK" = "OK";
 "Cancel" = "Cancelar";
-"Delete Bookmark" = "Deletar Bookmark";
+"Delete Bookmark" = "Deletar Favorito";
 "Replace" = "Substituir";
 "Choose" = "Escolher";
