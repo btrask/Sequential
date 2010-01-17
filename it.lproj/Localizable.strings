@@ -47,7 +47,7 @@
 "Fit to Screen" = "Adatta allo schermo";
 
 /* The title of the bookmarks menu. Two states. */
-"Resume" = "Riprendi";
+"Resume" = "Usa segnalibro";
 "Delete" = "Cancella";
 
 /* Bookmark menu item used when the file named %@ cannot be found. */
@@ -76,13 +76,13 @@
 "This document has a bookmark for the page %@." = "Questo documento ha un segnalibro per la pagina “%@.”";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "Se non riparti da questa pagina, il segnalibro verrà mantenuto e inizierai dalla prima pagina come di solito.";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "Se non riprendi da questa pagina, il segnalibro verrà mantenuto e inizierai dalla prima pagina come di solito.";
 
 /* Don't resume from bookmark button. */
 "Don't Resume" = "Non usare segnalibro";
 
 /* Do resume from bookmark button. */
-"Resume" = "Usa segnalibro";
+"Resume" = "Riprendi da";
 
 /* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
 "The error %ld %@ was generated while loading the URL %@." = "L'errore “%ld %@” è stato generato caricando l'URL “%@.”";
@@ -118,7 +118,7 @@
 "It may have been moved or deleted." = "Potrebbe essere stato spostato o cancellato.";
 
 /* XADMaster error reporting. %@ is replaced with the XADMaster error. */
-"The error %@ occurred while parsing the archive." = "The error “%@” occurred while parsing the archive.";
+"The error %@ occurred while parsing the archive." = "Errore “%@” durante la lettura dell'archivio.";
 
 /* Informative string for secondary mouse button action. */
 "Secondary click goes to the previous page." = "Il clic secondario va alla pagina precedente.";

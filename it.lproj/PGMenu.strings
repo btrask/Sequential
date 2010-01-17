@@ -1,4 +1,4 @@
-"Sequential" = "Sequential";
+﻿"Sequential" = "Sequential";
 "About Sequential" = "Informazioni su Sequential";
 "Services" = "Servizi";
 "Hide Sequential" = "Nascondi Sequential";
@@ -22,7 +22,7 @@
 "Help" = "Aiuto";
 "Sequential Help" = "Aiuto di Sequential";
 "Save Images To…" = "Registra immagini in…";
-"Resume" = "Riprendi";
+"Resume" = "Riprendi da";
 "No Items" = "Nessun oggetto";
 "Pause" = "Pausa";
 "Last" = "Ultima";
