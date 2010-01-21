@@ -1,4 +1,4 @@
-"Sequential" = "Sequential";
+﻿"Sequential" = "Sequential";
 "About Sequential" = "À propos de Sequential";
 "Services" = "Services";
 "Hide Sequential" = "Masquer Sequential";
@@ -78,7 +78,7 @@
 "Mirror Vertically" = "Miroir Vertical";
 "Upright" = "Originale";
 "Sort" = "Tri";
-"by Kind" = "by Kind";
+"by Kind" = "par Type";
 "Descending" = "Décroissant";
 "Ascending" = "Croissant";
 "by Size" = "par Taille";
