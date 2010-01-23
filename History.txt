@@ -1,4 +1,4 @@
-2.1.2 (Current)
+2.1.2 (January 22nd, 2010)
 - The thumbnail sidebar now accepts keyboard focus.
 - Brings back image scaling constraints.
 - Zooming in and out on an image preserves the location of the top corner instead of the center.
@@ -62,9 +62,9 @@
 - German localization by Christoph Schmitz.
 - Updated French localization by Thomas Audibert.
 - Animates changes to the current image scale.
-- Adds a "grow window" command.
+- Adds a “grow window” command.
 - Fixes a bug that could cause some URLs to never finish loading.
-- Fixes a bug that prevented the "round image corners" option from staying off.
+- Fixes a bug that prevented the “round image corners” option from staying off.
 - Fixes a bug where correct date or size information wouldn't show up in the Page menu.
 - Better performance when deleting files or noticing folders update.
 - Other minor improvements.
@@ -95,7 +95,7 @@
 - Simpler keyboard shortcuts for moving between pages.
 - Holding two adjacent arrow keys scrolls diagonally.
 - URLs with hyphens in the domain name are now allowed.
-- Smooth scrolling is now more "crisp."
+- Smooth scrolling is now more “crisp.”
 - Images are no longer smoothed when scaled up.
 - The Mighty Mouse's scroll ball should now be completely supported.
 - Fixes a bug which caused the current file not to be selected in the open panel.

@@ -1,4 +1,4 @@
-/* The primary screen. */
+﻿/* The primary screen. */
 "Main Screen" = "メインスクリーン";
 
 /* Non-primary screens. %lu is replaced with the screen number. */
