@@ -885,5 +885,7 @@
 	<string>http://www.sequentialx.com/sequential.xml</string>
 	<key>SUShowReleaseNotes</key>
 	<false/>
+	<key>SUPublicDSAKeyFile</key>
+	<string>dsa_pub.pem</string>
 </dict>
 </plist>
