@@ -31,11 +31,11 @@
 "Exit Full Screen" = "フルスクリーンを解除する";
 
 /* Lets the user toggle the on-screen display. Two states of the same item. */
-"Show Info" = "情報を映る";
+"Show Info" = "情報を表示する";
 "Hide Info" = "情報を隠す";
 
 /* Lets the user toggle whether thumbnails are shown. Two states of the same item. */
-"Show Thumbnails" = "サムネイルを映る";
+"Show Thumbnails" = "サムネイルを表示する";
 "Hide Thumbnails" = "サムネイルを隠す";
 
 /* Title of menu item for toggling animation. Two states. */
@@ -47,8 +47,8 @@
 "Fit to Screen" = "画面に合わせる";
 
 /* The title of the bookmarks menu. Two states. */
-"Resume" = "続く";
-"Delete" = "消す";
+"Resume" = "再開";
+"Delete" = "削除";
 
 /* Bookmark menu item used when the file named %@ cannot be found. */
 "Missing File %@" = "“%@” がありません";
@@ -76,19 +76,19 @@
 "This document has a bookmark for the page %@." = "このドキュメントには “%@” ページのブックマークがあります。";
 
 /* Offer to resume from bookmark alert informative text. */
-"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "このページから続かないとブックマークはそのままにされて、最初のページから始める事になります。";
+"If you don't resume from this page, the bookmark will be kept and you will start from the first page as usual." = "このページから再開しない場合、ブックマークはそのままにされて、最初のページから始まります。";
 
 /* Don't resume from bookmark button. */
-"Don't Resume" = "続かない";
+"Don't Resume" = "再開しない";
 
 /* Do resume from bookmark button. */
-"Resume" = "続く";
+"Resume" = "再開";
 
 /* The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL. */
-"The error %ld %@ was generated while loading the URL %@." = "エラー “%ld %@” は発生しました、URL “%@.” を読み込み中に。";
+"The error %ld %@ was generated while loading the URL %@." = "エラー “%ld %@” が発生しました。URL “%@.” を読み込むことができませんでした。";
 
 /* The URL could not be loaded for an unknown reason. %@ is replaced by the full URL. */
-"The URL %@ could not be loaded." = "URL “%@” は失敗しました。";
+"The URL %@ could not be loaded." = "URL “%@” を読み込むことができませんでした。";
 
 /* Replace file alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
 "%@ already exists in %@. Do you want to replace it?" = "“%@” はすでに “%@” に存在します。置き換えますか？";
@@ -97,43 +97,43 @@
 "%lu pages already exist in %@. Do you want to replace them?" = "%lu ページはすでに “%@” に存在します。置き換えますか？";
 
 /* Informative text for replacement alerts. */
-"Replacing a file overwrites its current contents." = "ファイルを置き換えたら今の内容が消されてしまいます。";
+"Replacing a file overwrites its current contents." = "ファイルを置き換えると、今の内容は失われます。";
 
 /* Single image save failure alert. The first %@ is replaced with the filename, the second is replaced with the destination name. */
-"The image %@ could not be saved to %@." = "画像 “%@” は “%@” に保存が出来ませんでした。";
+"The image %@ could not be saved to %@." = "画像 “%@” を “%@” に保存することが出来ませんでした。";
 
 /* Multiple image save failure alert. %lu is replaced with the number of files, %@ is replaced with the destination name. */
-"%lu images could not be saved to %@." = "%lu の画像が “%@” に保存が出来ませんでした。";
+"%lu images could not be saved to %@." = "%lu 枚の画像を “%@” へ保存することが出来ませんでした。";
 
 /* Informative text for save failure alerts. */
-"Make sure the volume is writable and has enough free space." = "ボリュームに書けるか、充分の空き領域があるかどうか確かめてください。";
+"Make sure the volume is writable and has enough free space." = "ボリュームが書き込み可能か、充分な空き領域があるかを確かめてください。";
 
 /* Appears in the image save alert beside each filename that conflicts with an existing file in the destination folder. */
 "File already exists." = "ファイルはすでに存在します。";
 
 /* Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename. */
-"The file referenced by the bookmark %@ could not be found." = "ブックマークと関係しているファイル “%@” が見つかりません。";
+"The file referenced by the bookmark %@ could not be found." = "ブックマークされたファイル “%@” が見つかりません。";
 
 /* Bookmarked file could not be found error informative text. */
-"It may have been moved or deleted." = "ファイルは動かされた、または消された。";
+"It may have been moved or deleted." = "ファイルが移動されたか、または削除されました。";
 
 /* XADMaster error reporting. %@ is replaced with the XADMaster error. */
-"The error %@ occurred while parsing the archive." = "アーカイブを読み中に “%@” は発しました";
+"The error %@ occurred while parsing the archive." = "アーカイブを読み中にエラー “%@” が発生しました";
 
 /* Informative string for secondary mouse button action. */
-"Secondary click goes to the previous page." = "副ボタンは先のページへ戻ります。";
-"Secondary click goes right." = "副ボタンは右に行きます。";
-"Secondary click goes left." = "副ボタンは左に行きます。";
+"Secondary click goes to the previous page." = "副ボタンは前ページへ移動します。";
+"Secondary click goes right." = "副ボタンは右ページに移動します。";
+"Secondary click goes left." = "副ボタンは左ページに移動します。";
 
 /* Flickr generic error message. %@ is replaced with the message as returned by Flickr. */
-"Flickr returned the error %@." = "Flickr はエラー “%@” を発しました。";
+"Flickr returned the error %@." = "Flickr でエラー “%@” が発生しました。";
 
 /* Flickr user not found error message. %@ is replaced with the user name/NSID. */
-"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr のユーザー “%@.” が見つかりません。このユーザーは存在していない可能性があり、または Flickr のプライバシー設定により検索は禁止されています。";
+"Flickr could not find the user %@. This user may not exist or may have disabled searches in the Flickr privacy settings." = "Flickr のユーザー “%@.” が見つかりません。このユーザーが存在していないか、または Flickr のプライバシー設定により検索が禁止されています。";
 
 /* Dialog button labels. */
 "OK" = "OK";
 "Cancel" = "キャンセル";
-"Delete Bookmark" = "ブックマークを消す";
+"Delete Bookmark" = "ブックマークを削除";
 "Replace" = "置き換え";
 "Choose" = "選択";
