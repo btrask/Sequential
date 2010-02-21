@@ -112,6 +112,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		[NSArchiver archivedDataWithRootObject:[NSColor blackColor]], PGBackgroundColorKey,
 		[NSNumber numberWithUnsignedInteger:PGNoPattern], PGBackgroundPatternKey,
 		[NSNumber numberWithInteger:PGNextPreviousAction], PGMouseClickActionKey,
+		[NSNumber numberWithUnsignedInteger:1], PGMaxDepthKey,
 		no, PGFullscreenKey,
 		[NSNumber numberWithInteger:PGFullscreenMapping], PGEscapeKeyMappingKey,
 		no, PGDimOtherScreensKey,

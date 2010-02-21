@@ -6,6 +6,9 @@
 "The end of the image" = "Am Ende des Bildes";
 "The beginning of the image" = "Am Anfang des Bildes";
 "The top edge of the end side" = "Am oberen Ende der Endseite";
+"Maximum depth:" = "Maximale Tiefe:";
+"1" = "1";
+"5" = "5";
 "Primary mouse clicks move to:" = "Linke Maustaste:";
 "When going backward, start at:" = "Beim Zurückgehen Start:";
 "Hold Control to preserve the current position." = "Taste “ctrl” halten, um die aktuelle Position beizubehalten.";

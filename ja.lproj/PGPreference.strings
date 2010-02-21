@@ -2,10 +2,13 @@
 "Toggles full screen" = "フルスクリーン表示の切り替え";
 "The page to the right" = "右のページに行く";
 "The page to the left" = "左のページに行く";
-"The next page" = "次のページへ行く";
+"The next page" = "次のページへ進む";
 "The end of the image" = "画像の最後の部分";
 "The beginning of the image" = "画像の最初の部分";
 "The top edge of the end side" = "画像の最後の側の上の部分";
+"Maximum depth:" = "フォルダに入る程度:";
+"1" = "1";
+"5" = "5";
 "Primary mouse clicks move to:" = "マウスボタンのクリック：";
 "When going backward, start at:" = "逆に進んだ時の位置：";
 "Hold Control to preserve the current position." = "Control と同時でそのままの動きにする。";

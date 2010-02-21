@@ -3,10 +3,12 @@
 "The page to the right" = "La page de droite";
 "The page to the left" = "La page de gauche";
 "The next page" = "La page suivante";
-"OtherViews" = "OtherViews";
 "The end of the image" = "La fin de l'image";
 "The beginning of the image" = "Le début de l'image";
 "The top edge of the end side" = "The top edge of the end side";
+"Maximum depth:" = "Exploration des dossiers:";
+"1" = "1";
+"5" = "5";
 "Primary mouse clicks move to:" = "Le clic principal vous déplace vers";
 "When going backward, start at:" = "Retour à l'image précédente:";
 "Hold Control to preserve the current position." = "Appuyez sur Ctrl pour conserver la position actuelle";

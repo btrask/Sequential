@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGPrefObject.h"
 
+extern NSString *const PGMaxDepthKey;
+
 @interface PGContainerAdapter : PGResourceAdapter
 {
 	@private
