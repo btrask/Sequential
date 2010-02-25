@@ -57,7 +57,7 @@ typedef NSUInteger PGDragMode;
 
 static inline NSPoint PGPointInRect(NSPoint aPoint, NSRect aRect)
 {
-	return NSMakePoint(MAX(MIN(aPoint.x, NSMaxX(aRect)), NSMinX(aRect)), MAX(MIN(aPoint.y, NSMaxY(aRect)), NSMinY(aRect)));
+	return NSMakePoint(CLAMP(NSMinX(aRect), aPoint.x, NSMaxX(aRect)), CLAMP(NSMinY(aRect), aPoint.y, NSMaxY(aRect)));
 }
 
 @interface PGClipView(Private)

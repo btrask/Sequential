@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other Sources
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 @implementation NSBezierPath(PGAppKitAdditions)
 
@@ -154,26 +155,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSImageRep(PGAppKitAdditions)
 
-+ (id)PG_bestImageRepWithData:(NSData *)data
+- (id)PG_thumbnailWithMaxSize:(NSSize)size orientation:(PGOrientation)orientation opaque:(BOOL)opaque
 {
-	if(!data) return nil;
-	NSArray *const reps = [NSBitmapImageRep imageRepsWithData:data];
-	if(1 == [reps count]) return [reps objectAtIndex:0];
-	NSInteger bestPixelCount = 0;
-	NSBitmapImageRep *bestRep = nil;
-	if(data) for(NSBitmapImageRep *const rep in reps) {
-		NSInteger const w = [rep pixelsWide], h = [rep pixelsHigh];
-		if(NSImageRepMatchesDevice == w || NSImageRepMatchesDevice == h) {
-			bestRep = rep;
-			break;
-		}
-		NSInteger const pixelCount = w * h;
-		if(pixelCount < bestPixelCount) continue;
-		if(pixelCount == bestPixelCount && [bestRep bitsPerPixel] > [rep bitsPerPixel]) continue;
-		bestRep = rep;
-		bestPixelCount = pixelCount;
+	if(!self) return nil;
+	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([self pixelsHigh], [self pixelsWide]) : NSMakeSize([self pixelsWide], [self pixelsHigh]);
+	NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1.0f, MIN(size.width / originalSize.width, size.height / originalSize.height))));
+	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
+	if(!thumbRep) return nil;
+	NSGraphicsContext *const context = [NSGraphicsContext graphicsContextWithBitmapImageRep:thumbRep];
+	[NSGraphicsContext setCurrentContext:context];
+	[context setImageInterpolation:NSImageInterpolationHigh];
+	NSRect rect = NSMakeRect(0.0f, 0.0f, s.width, s.height);
+	if(PGUpright != orientation) [[NSAffineTransform PG_transformWithRect:&rect orientation:orientation] concat];
+	if(opaque) {
+		[[NSColor whiteColor] set];
+		NSRectFill(rect);
 	}
-	return bestRep;
+	[self drawInRect:rect];
+	[context flushGraphics];
+	return thumbRep;
 }
 
 @end

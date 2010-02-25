@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceIdentifier.h"
 
 // Other Sources
+#import "PGAppKitAdditions.h"
 #import "PGGeometry.h"
 
 @interface PGPDFAdapter(Private)
@@ -130,7 +131,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return YES;
 }
-- (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withInfo:(NSDictionary *)info
+
+#pragma mark -PGResourceAdapter(PGAbstract)
+
+- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info
 {
 	NSPDFImageRep *rep = nil;
 	@synchronized(self) {
@@ -138,7 +142,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	if(rep) @synchronized(rep) {
 		[rep setCurrentPage:[[self identifier] index]];
-		return [self thumbnailWithImageRep:rep orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] size:size opque:YES];
+		return [rep PG_thumbnailWithMaxSize:size orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] opaque:YES];
 	}
 	return nil;
 }

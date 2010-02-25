@@ -24,6 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <AppKit/AppKit.h>
 
+// Other Sources
+#import "PGGeometryTypes.h"
+
 enum {
 	AENoIcon = 0,
 	AEPlayIcon = 1,
@@ -65,7 +68,7 @@ typedef NSUInteger AEIconType;
 
 @interface NSImageRep(PGAppKitAdditions)
 
-+ (id)PG_bestImageRepWithData:(NSData *)data;
+- (id)PG_thumbnailWithMaxSize:(NSSize)size orientation:(PGOrientation)orientation opaque:(BOOL)opaque;
 
 @end
 

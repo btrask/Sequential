@@ -33,9 +33,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGAppKitAdditions.h"
 
+static BOOL PGImageSourceGetBestImageIndex(CGImageSourceRef source, size_t *outIndex, NSDictionary **outProperties)
+{
+	if(!source) return NO;
+	NSDictionary *const propOptions = [NSDictionary dictionaryWithObjectsAndKeys:
+		[NSNumber numberWithBool:NO], kCGImageSourceShouldCache,
+		nil];
+	size_t const count = CGImageSourceGetCount(source);
+	size_t i = 0;
+	BOOL found = NO;
+	size_t bestIndex = 0;
+	NSDictionary *bestProperties = nil;
+	NSUInteger bestRes = 0;
+	NSUInteger bestDepth = 0;
+	for(; i < count; i++) {
+		NSDictionary *const properties = [(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, i, (CFDictionaryRef)propOptions) autorelease];
+		NSUInteger const res = [[properties objectForKey:(NSString *)kCGImagePropertyPixelWidth] unsignedIntegerValue] * [[properties objectForKey:(NSString *)kCGImagePropertyPixelHeight] unsignedIntegerValue];
+		if(res < bestRes) continue;
+		NSUInteger const depth = [[properties objectForKey:(NSString *)kCGImagePropertyDepth] unsignedIntegerValue];
+		if(depth < bestDepth) continue;
+		found = YES;
+		bestIndex = i;
+		bestProperties = properties;
+		bestRes = res;
+		bestDepth = depth;
+	}
+	if(!found) return NO;
+	if(outIndex) *outIndex = bestIndex;
+	if(outProperties) *outProperties = bestProperties;
+	return YES;
+}
+static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, size_t i)
+{
+	if(!source) return nil;
+	CGImageRef const image = CGImageSourceCreateImageAtIndex(source, i, NULL);
+	NSBitmapImageRep *const rep = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
+	CGImageRelease(image);
+	return rep;
+}
+
 @interface PGGenericImageAdapter(Private)
 
 - (void)_threaded_getImageRepWithInfo:(NSDictionary *)info;
+- (NSDictionary *)_imageSourceOptionsWithInfo:(NSDictionary *)info;
 - (void)_readExifWithData:(NSData *)data;
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep;
 
@@ -53,8 +93,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		data = [[self node] dataWithInfo:info fast:NO];
 	}
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
-	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:[NSImageRep PG_bestImageRepWithData:data] waitUntilDone:NO];
-	[pool release];
+
+	size_t index = 0;
+	NSDictionary *properties = nil;
+	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptionsWithInfo:info]);
+	if(PGImageSourceGetBestImageIndex(source, &index, &properties)) {
+		// TODO: Get the orientation from kCGImagePropertyOrientation instead of -_readExifWithData:.
+		[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:PGImageSourceImageRepAtIndex(source, index) waitUntilDone:NO];
+		CFRelease(source);
+	}
+	[pool drain];
+}
+- (NSDictionary *)_imageSourceOptionsWithInfo:(NSDictionary *)info
+{
+	return nil; // TODO: Set the kCGImageSourceTypeIdentifierHint.
 }
 - (void)_readExifWithData:(NSData *)data
 {
@@ -131,6 +183,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (BOOL)canGenerateRealThumbnail
 {
 	return YES;
+}
+
+#pragma mark -PGResourceAdapter(PGAbstract)
+
+- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info
+{
+	NSData *data = nil;
+	@synchronized(self) {
+		data = [[self node] dataWithInfo:info fast:NO];
+	}
+	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptionsWithInfo:info]);
+	size_t i = 0;
+	if(!PGImageSourceGetBestImageIndex(source, &i, NULL)) return nil;
+	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, i);
+	CFRelease(source);
+	return [rep PG_thumbnailWithMaxSize:size orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] opaque:NO];
 }
 
 #pragma mark NSObject

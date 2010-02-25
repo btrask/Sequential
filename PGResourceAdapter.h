@@ -82,11 +82,15 @@ typedef NSUInteger PGMatchPriority;
 - (NSImage *)realThumbnail;
 - (void)setRealThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateRealThumbnail;
-- (NSImage *)threaded_thumbnailOfSize:(CGFloat)size withInfo:(NSDictionary *)info;
-- (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withInfo:(NSDictionary *)info;
-- (NSImageRep *)thumbnailWithImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(CGFloat)size opque:(BOOL)flag;
+- (NSImage *)threaded_thumbnailOfSize:(NSSize)size withInfo:(NSDictionary *)info;
 - (void)invalidateThumbnail;
 
 - (void)noteResourceDidChange;
+
+@end
+
+@interface PGResourceAdapter(PGAbstract)
+
+- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info;
 
 @end

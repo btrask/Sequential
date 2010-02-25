@@ -253,41 +253,13 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	return NO;
 }
-- (NSImage *)threaded_thumbnailOfSize:(CGFloat)size withInfo:(NSDictionary *)info
+- (NSImage *)threaded_thumbnailOfSize:(NSSize)size withInfo:(NSDictionary *)info
 {
 	NSImageRep *const rep = [self threaded_thumbnailRepOfSize:size withInfo:info];
 	if(!rep) return nil;
 	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
 	[image addRepresentation:rep];
 	return image;
-}
-- (NSImageRep *)threaded_thumbnailRepOfSize:(CGFloat)size withInfo:(NSDictionary *)info
-{
-	NSData *data = nil;
-	@synchronized(self) {
-		data = [[self node] dataWithInfo:info fast:NO];
-	}
-	return [self thumbnailWithImageRep:[NSImageRep PG_bestImageRepWithData:data] orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] size:size opque:NO];
-}
-- (NSImageRep *)thumbnailWithImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(CGFloat)size opque:(BOOL)flag
-{
-	if(!rep) return nil;
-	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([rep pixelsHigh], [rep pixelsWide]) : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1.0f, MIN(size / originalSize.width, size / originalSize.height))));
-	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
-	if(!thumbRep) return nil;
-	NSGraphicsContext *const context = [NSGraphicsContext graphicsContextWithBitmapImageRep:thumbRep];
-	[NSGraphicsContext setCurrentContext:context];
-	[context setImageInterpolation:NSImageInterpolationHigh];
-	NSRect rect = NSMakeRect(0.0f, 0.0f, s.width, s.height);
-	if(PGUpright != orientation) [[NSAffineTransform PG_transformWithRect:&rect orientation:orientation] concat];
-	if(flag) {
-		[[NSColor whiteColor] set];
-		NSRectFill(rect);
-	}
-	[rep drawInRect:rect];
-	[context flushGraphics];
-	return thumbRep;
 }
 - (void)invalidateThumbnail
 {
@@ -576,7 +548,7 @@ NSString *const PGDateKey        = @"PGDate";
 - (void)main
 {
 	if([self isCancelled]) return;
-	NSImage *const thumbnail = [_adapter threaded_thumbnailOfSize:PGThumbnailSize withInfo:_info];
+	NSImage *const thumbnail = [_adapter threaded_thumbnailOfSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize) withInfo:_info];
 	if([self isCancelled]) return;
 	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:thumbnail waitUntilDone:NO];
 }

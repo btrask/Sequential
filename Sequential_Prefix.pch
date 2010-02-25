@@ -3,3 +3,4 @@
 #endif
 
 #define numberof(x) (sizeof(x) / sizeof(*x))
+#define CLAMP(min, x, max) MIN(MAX((min), (x)), (max))
