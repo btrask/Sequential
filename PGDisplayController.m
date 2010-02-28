@@ -657,7 +657,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (void)nodeLoadingDidProgress:(NSNotification *)aNotif
 {
-	NSLog(@"activity... %@ %f", [[[self activeNode] resourceAdapter] activity], [[[[self activeNode] resourceAdapter] activity] progress]);
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	[_loadingGraphic setProgress:[[[[self activeNode] resourceAdapter] activity] progress]];
 }
