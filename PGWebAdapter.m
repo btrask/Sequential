@@ -61,10 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGResourceAdapter
 
-- (BOOL)adapterIsViewable
-{
-	return YES;
-}
 - (void)load
 {
 	_triedLoad = YES;
