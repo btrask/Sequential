@@ -880,6 +880,10 @@
 			</array>
 		</dict>
 	</dict>
+	<key>PGDataProviderCustomizers</key>
+	<array>
+		<string>PGWebAdapter</string>
+	</array>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>

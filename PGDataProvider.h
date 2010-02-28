@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGDataProvider : NSObject <NSCopying>
 
 @property(readonly) PGResourceIdentifier *identifier;
+@property(readonly) NSURLResponse *response;
 // TODO: Add -fileName/-displayableName/-attributedString properties.
 
 @property(readonly) NSData *data;

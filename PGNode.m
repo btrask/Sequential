@@ -57,6 +57,8 @@ enum {
 
 @interface PGNode(Private)
 
+- (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
+
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 - (void)_setValue:(id)value forSortOrder:(PGSortOrder)order;
@@ -184,12 +186,12 @@ enum {
 	NSArray *const newAdapters = [p adaptersForNode:self];
 	if(![newAdapters count]) return [_adapter fallbackLoad];
 	[_adapters addObjectsFromArray:newAdapters];
-	_adapter = [_adapters lastObject];
+	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter loadIfNecessary];
 }
 - (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter
 {
-	NSParameterAssert([_adapters objectAtIndex:0] == adapter);
+	NSParameterAssert(adapter == _adapter);
 	NSParameterAssert(PGNodeLoading & _status);
 	_status &= ~PGNodeLoading;
 	[self noteIsViewableDidChange];
@@ -200,7 +202,8 @@ enum {
 {
 	NSParameterAssert(PGNodeLoading & _status);
 	[_adapters insertObject:[[[PGErrorAdapter alloc] initWithNode:self dataProvider:nil] autorelease] atIndex:0];
-	_adapter = [_adapters lastObject];
+	[[_adapter activity] setParentActivity:nil];
+	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter fallbackLoad];
 }
 
@@ -334,6 +337,18 @@ enum {
 
 #pragma mark -PGNode(Private)
 
+- (void)_setResourceAdapter:(PGResourceAdapter *)adapter
+{
+	if(adapter == _adapter) return;
+	[[_adapter activity] setParentActivity:nil];
+	_adapter = adapter;
+	PGActivity *const parentActivity = [[self parentAdapter] activity];
+	[[_adapter activity] setParentActivity:parentActivity ? parentActivity : [[self document] activity]];
+	[self noteIsViewableDidChange];
+}
+
+#pragma mark -
+
 - (void)_updateMenuItem
 {
 	if(!_allowMenuItemUpdates) return;
@@ -379,6 +394,8 @@ enum {
 
 - (void)dealloc
 {
+	[[_adapter activity] setParentActivity:nil];
+
 	// Using our generic -PG_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];

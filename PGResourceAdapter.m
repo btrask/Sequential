@@ -95,6 +95,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 	if((self = [super init])) {
 		_node = node;
 		_dataProvider = [provider retain];
+		_activity = [[PGActivity alloc] initWithOwner:self];
 	}
 	return self;
 }

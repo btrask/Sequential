@@ -86,6 +86,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return nil;
 }
+- (NSURLResponse *)response
+{
+	return nil;
+}
+
+#pragma mark -
+
 - (NSData *)data
 {
 	return nil;
@@ -297,6 +304,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return [[_response URL] PG_resourceIdentifier];
 }
+- (NSURLResponse *)response
+{
+	return [[_response retain] autorelease];
+}
+
+#pragma mark -
+
 - (NSData *)data
 {
 	return [[_data retain] autorelease];

@@ -76,6 +76,7 @@ static PGActivity *PGApplicationActivity;
 - (void)setParentActivity:(PGActivity *)activity
 {
 	@synchronized(self) {
+		if(activity == _parentActivity) return;
 		[_parentActivity _removeChildActivity:self];
 		_parentActivity = activity;
 		[_parentActivity _addChildActivity:self];

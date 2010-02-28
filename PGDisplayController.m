@@ -657,6 +657,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (void)nodeLoadingDidProgress:(NSNotification *)aNotif
 {
+	NSLog(@"activity... %@ %f", [[[self activeNode] resourceAdapter] activity], [[[[self activeNode] resourceAdapter] activity] progress]);
 	NSParameterAssert([aNotif object] == [self activeNode]);
 	[_loadingGraphic setProgress:[[[[self activeNode] resourceAdapter] activity] progress]];
 }
@@ -793,7 +794,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 }
 - (void)documentTimerIntervalDidChange:(NSNotification *)aNotif
 {
-	[self setTimerRunning:self.timerRunning];
+	[self setTimerRunning:[self timerRunning]];
 }
 
 #pragma mark -
@@ -863,7 +864,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeNode PG_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[_activeNode PG_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
 	[_activeNode becomeViewed];
-	[self setTimerRunning:self.timerRunning];
+	[self setTimerRunning:[self timerRunning]];
 }
 - (void)_readFinished
 {

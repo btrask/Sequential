@@ -62,21 +62,22 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 }
 - (void)load
 {
-	// TODO: Rewrite PGHTMLAdapter so that it does its own loading. That means that we will be able to report a more accurate status, as well as work with local files.
-//	NSParameterAssert(!_webView);
-//	NSURLResponse *const response = [[self info] objectForKey:PGURLResponseKey];
-//	NSData *const data = [self data];
-//	if(!data) return [[self node] loadFinished];
-//	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
-//	[_webView setFrameLoadDelegate:self];
-//	WebPreferences *const prefs = [WebPreferences standardPreferences];
-//	[prefs setJavaEnabled:NO];
-//	[prefs setPlugInsEnabled:NO];
-//	[prefs setJavaScriptEnabled:NO];
-//	[prefs setJavaScriptCanOpenWindowsAutomatically:NO];
-//	[prefs setLoadsImagesAutomatically:NO];
-//	[_webView setPreferences:prefs];
-//	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
+	NSParameterAssert(!_webView);
+	PGDataProvider *const dp = [self dataProvider];
+	NSData *const data = [dp data];
+	if(!data) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
+	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
+	[_webView setFrameLoadDelegate:self];
+	WebPreferences *const prefs = [WebPreferences standardPreferences];
+	[prefs setJavaEnabled:NO];
+	[prefs setPlugInsEnabled:NO];
+	[prefs setJavaScriptEnabled:NO];
+	[prefs setJavaScriptCanOpenWindowsAutomatically:NO];
+	[prefs setLoadsImagesAutomatically:NO];
+	[_webView setPreferences:prefs];
+	NSURLResponse *const response = [dp response];
+	if(response) [[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
+	else [[_webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[[dp identifier] URL]]];
 }
 - (void)read {}
 

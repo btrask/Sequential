@@ -36,15 +36,39 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGFoundationAdditions.h"
 
+@interface PGWebDataProvider : PGDataProvider
+{
+	@private
+	NSURL *_URL;
+}
+
+- (id)initWithURL:(NSURL *)URL;
+@property(readonly) NSURL *URL;
+
+@end
+
 @implementation PGWebAdapter
+
+#pragma mark +PGDataProviderCustomizing
+
++ (PGDataProvider *)customDataProviderWithResourceIdentifier:(PGResourceIdentifier *)ident displayableName:(NSString *)name
+{
+	if([ident isFileIdentifier]) return nil;
+	NSURL *const URL = [ident URL];
+	if([[NSArray arrayWithObjects:@"http", @"https", nil] containsObject:[URL scheme]]) return [[[PGWebDataProvider alloc] initWithURL:[ident URL]] autorelease];
+	return nil;
+}
 
 #pragma mark -PGResourceAdapter
 
+- (BOOL)adapterIsViewable
+{
+	return YES;
+}
 - (void)load
 {
-	NSParameterAssert(![self canGetData]);
 	_triedLoad = YES;
-	NSURL *const URL = [[(PGDataProvider *)[self dataProvider] identifier] URL];
+	NSURL *const URL = [(PGWebDataProvider *)[self dataProvider] URL];
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parent:self delegate:self];
@@ -67,6 +91,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	[super dealloc];
+}
+
+#pragma mark -<PGActivityOwner>
+
+- (CGFloat)progressForActivity:(PGActivity *)activity
+{
+	return [[_mainLoad activity] progress];
 }
 
 #pragma mark -<PGURLLoadDelegate>
@@ -92,8 +123,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if(sender == _mainLoad) {
 		[_faviconLoad cancelAndNotify:NO];
-		NSURLResponse *const resp = [_mainLoad response];
-		[[self node] loadWithDataProvider:[PGDataProvider providerWithURLResponse:resp data:[_mainLoad data]]];
+		[[self node] loadWithDataProvider:[PGDataProvider providerWithURLResponse:[_mainLoad response] data:[_mainLoad data]]];
 	} else if(sender == _faviconLoad) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconLoad data]] autorelease];
 		if(favicon) [[[self node] identifier] setIcon:favicon]; // Don't clear the favicon we already have if we can't load a new one.
@@ -110,6 +140,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(sender != _mainLoad) return;
 	[_faviconLoad cancelAndNotify:NO];
 	[[self node] loadSucceededForAdapter:self];
+}
+
+@end
+
+@implementation PGWebDataProvider
+
+#pragma mark -PGWebDataProvider
+
+- (id)initWithURL:(NSURL *)URL
+{
+	if((self = [super init])) {
+		_URL = [URL copy];
+	}
+	return self;
+}
+@synthesize URL = _URL;
+
+#pragma mark -PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node
+{
+	return [NSArray arrayWithObject:[PGWebAdapter class]];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_URL release];
+	[super dealloc];
 }
 
 @end
