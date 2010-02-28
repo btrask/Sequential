@@ -26,31 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGDocument;
 @class PGNode;
 @class PGContainerAdapter;
-@class PGResourceIdentifier;
-@class PGDisplayableIdentifier;
-#import "PGActivity.h"
-@class PGBookmark;
-
-// Other Sources
-#import "PGGeometryTypes.h"
-
-extern NSString *const PGIdentifierKey;
-extern NSString *const PGDataKey;
-extern NSString *const PGURLResponseKey;
-extern NSString *const PGAdapterClassKey;
-extern NSString *const PGFourCCDataKey;
-extern NSString *const PGMIMETypeKey;
-extern NSString *const PGOSTypeKey; // Unquoted string.
-extern NSString *const PGExtensionKey;
-extern NSString *const PGPasswordKey;
-extern NSString *const PGStringEncodingKey;
-
-extern NSString *const PGDataExistenceKey;
-enum {
-	PGDoesNotExist  = -1,
-	PGWillSoonExist = 0,
-	PGExists        = 1
-};
 
 enum {
 	PGLoadToMaxDepth = 0,
