@@ -450,9 +450,9 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 		if(![node shouldLoadAdapterClass:class]) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		NSUInteger const p = [self matchPriorityForTypeDictionary:typeDict];
-		if(p) [adapterByPriority setObject:class forKey:[NSNumber numberWithUnsignedInteger:p]];
+		if(p) [adapterByPriority setObject:[NSNumber numberWithUnsignedInteger:p] forKey:class];
 	}
-	return [adapterByPriority objectsForKeys:[[adapterByPriority allKeys] sortedArrayUsingSelector:@selector(compare:)] notFoundMarker:[PGResourceAdapter class]];
+	return [adapterByPriority keysSortedByValueUsingSelector:@selector(compare:)];
 }
 - (NSArray *)adaptersForNode:(PGNode *)node
 {
