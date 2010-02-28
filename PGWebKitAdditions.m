@@ -26,15 +26,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Models
 #import "PGResourceIdentifier.h"
+#import "PGDataProvider.h"
 
 // Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation DOMHTMLDocument(PGWebKitAdditions)
 
-- (NSArray *)PG_linkHrefIdentifiersWithSchemes:(NSArray *)schemes extensions:(NSArray *)exts
+- (NSArray *)PG_providersForLinkHrefsWithSchemes:(NSArray *)schemes
 {
 	NSMutableArray *const results = [NSMutableArray array];
+	NSMutableArray *const hrefs = [NSMutableArray array];
 	DOMHTMLCollection *const links = [self links];
 	NSUInteger i = 0;
 	NSUInteger const count = [links length];
@@ -46,20 +48,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
 			if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
 			if(![href length]) continue;
+			if([hrefs containsObject:href]) continue;
+			[hrefs addObject:href];
+
 			NSURL *const URL = [NSURL URLWithString:href];
-			if((schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) || (exts && ![exts containsObject:[[[URL path] pathExtension] lowercaseString]])) continue;
-			PGDisplayableIdentifier *const ident = [URL PG_displayableIdentifier];
-			if([results containsObject:ident]) continue;
-			[ident setCustomDisplayName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-			[results addObject:ident];
+			if(schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) continue;
+			[results addObject:[PGDataProvider providerWithResourceIdentifier:[URL PG_resourceIdentifier] displayableName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]]];
 		} while(NO);
 		[pool release];
 	}
 	return results;
 }
-- (NSArray *)PG_imageSrcIdentifiers
+- (NSArray *)PG_providersForImageSrcs
 {
 	NSMutableArray *const results = [NSMutableArray array];
+	NSMutableArray *const srcs = [NSMutableArray array];
 	DOMHTMLCollection *const images = [self images];
 	NSUInteger i = 0;
 	NSUInteger const count = [images length];
@@ -68,11 +71,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		do {
 			DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
 			if([img PG_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
-			PGDisplayableIdentifier *const ident = [[NSURL URLWithString:[img src]] PG_displayableIdentifier];
-			if([results containsObject:ident]) continue;
+			NSString *const src = [img src];
+			if([srcs containsObject:src]) continue;
+			[srcs addObject:src];
 			NSString *const title = [img title]; // Prefer the title to the alt attribute.
-			[ident setCustomDisplayName:[title length] ? title : [img alt]];
-			[results addObject:ident];
+			[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:[img src]] PG_resourceIdentifier] displayableName:[title length] ? title : [img alt]]];
 		} while(NO);
 		[pool release];
 	}

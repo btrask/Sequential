@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGNode.h"
 
-@interface PGArchiveAdapter : PGContainerAdapter <PGNodeDataSource>
+@interface PGArchiveAdapter : PGContainerAdapter
 {
 	@private
 	XADArchive *_archive;
@@ -37,7 +37,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGNode *_currentSubnode;
 }
 
-@property(readonly) XADArchive *archive;
 - (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes;
 
 @end

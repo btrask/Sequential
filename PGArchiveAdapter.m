@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
+#import "PGDataProvider.h"
 
 // Controllers
 #import "PGDocumentController.h"
@@ -36,8 +37,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGCancelableProxy.h"
 #import "PGFoundationAdditions.h"
 
-static NSString *const PGKnownToBeArchiveKey = @"PGKnownToBeArchive";
 static id PGArchiveAdapterList = nil;
+
+@interface PGDataProvider(PGArchiveDataProvider)
+
+- (XADArchive *)archive;
+- (int)entry;
+
+@end
+
+@interface PGArchiveDataProvider : PGDataProvider
+{
+	@private
+	XADArchive *_archive;
+	int _entry;
+}
+
+- (id)initWithArchive:(XADArchive *)archive entry:(int)entry;
+
+@end
+
+@interface PGFolderDataProvider : PGDataProvider
+
+@end
 
 @interface PGArchiveAdapter(Private)
 
@@ -49,19 +71,11 @@ static id PGArchiveAdapterList = nil;
 @interface XADArchive(PGAdditions)
 
 - (NSString *)PG_commonRootPath;
-- (NSString *)PG_OSTypeForEntry:(NSInteger)index standardFormat:(BOOL)flag;
-- (NSString *)PG_typeForEntry:(NSInteger)index preferOSType:(BOOL)flag;
+- (OSType)PG_OSTypeForEntry:(int)entry;
 
 @end
 
 @implementation PGArchiveAdapter
-
-#pragma mark +PGResourceAdapter
-
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
-{
-	return [[info objectForKey:PGKnownToBeArchiveKey] boolValue] ? PGMatchByIntrinsicAttribute : [super matchPriorityForNode:node withInfo:info];
-}
 
 #pragma mark +NSObject
 
@@ -72,10 +86,6 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark -PGArchiveAdapter
 
-- (XADArchive *)archive
-{
-	return [[_archive retain] autorelease];
-}
 - (NSArray *)nodesUnderPath:(NSString *)path parentAdapter:(PGContainerAdapter *)parent remainingIndexes:(NSMutableIndexSet *)indexes
 {
 	NSParameterAssert(path);
@@ -96,17 +106,15 @@ static id PGArchiveAdapterList = nil;
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
-		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:isEntrylessFolder ? PGOSTypeToStringQuoted('fold', NO) : [_archive PG_OSTypeForEntry:i standardFormat:NO], PGOSTypeKey, nil];
-		if(isFile) [node startLoadWithInfo:info];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
+		if(isFile) [node loadWithDataProvider:[[[PGArchiveDataProvider alloc] initWithArchive:_archive entry:i] autorelease]];
 		else {
-			[info setObject:[PGContainerAdapter class] forKey:PGAdapterClassKey];
-			[node startLoadWithInfo:info];
+			[node loadWithDataProvider:[[[PGFolderDataProvider alloc] init] autorelease]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
-			PGContainerAdapter *const adapter = (id)[node resourceAdapter];
+			PGContainerAdapter *const adapter = (PGContainerAdapter *)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
 		}
-		[identifier setIcon:[[node resourceAdapter] fastThumbnail]];
+		[identifier setIcon:[[[node resourceAdapter] dataProvider] icon]];
 		if(node) [children addObject:node];
 	}
 	return children;
@@ -116,7 +124,8 @@ static id PGArchiveAdapterList = nil;
 
 - (void)_threaded_setError:(NSError *)error forNode:(PGNode *)node;
 {
-	[node performSelectorOnMainThread:@selector(setError:) withObject:error waitUntilDone:YES];
+	// TODO: Figure this out...
+//	[node performSelectorOnMainThread:@selector(setError:) withObject:error waitUntilDone:YES];
 }
 - (void)_updateThumbnailsOfChildren
 {
@@ -140,21 +149,23 @@ static id PGArchiveAdapterList = nil;
 {
 	if(!_archive) {
 		XADError error = XADNoError;
-		PGResourceIdentifier *const ident = [[self info] objectForKey:PGIdentifierKey];
-		id const dataSource = [[self node] dataSource];
-		if([dataSource respondsToSelector:@selector(archive)]) _archive = [[XADArchive alloc] initWithArchive:[dataSource archive] entry:[ident index] delegate:self error:&error];
-		else if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
+		PGDataProvider *const dataProvider = [self dataProvider];
+		PGResourceIdentifier *const ident = [dataProvider identifier];
+		if([dataProvider archive]) @synchronized([dataProvider archive]) {
+			_archive = [[XADArchive alloc] initWithArchive:[dataProvider archive] entry:[dataProvider entry] delegate:self error:&error];
+		} else if([ident isFileIdentifier]) _archive = [[XADArchive alloc] initWithFile:[[ident URL] path] delegate:self error:&error]; // -data will return data for file URLs, but it's worth using -[XADArchive initWithFile:...].
 		else {
 			NSData *const data = [self data];
 			if(data) _archive = [[XADArchive alloc] initWithData:data delegate:self error:&error];
 		}
-		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFinished];
+		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
 	}
-	NSNumber *const encodingNum = [[self info] objectForKey:PGStringEncodingKey];
+	// TODO: Have some way of dealing with encodings.
+	NSNumber *const encodingNum = nil;//[[self info] objectForKey:PGStringEncodingKey];
 	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntegerValue]];
 	NSArray *const children = [self nodesUnderPath:[_archive PG_commonRootPath] parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	if(!_encodingError) [[self node] loadFinished];
+	if(!_encodingError) [[self node] loadSucceededForAdapter:self];
 }
 
 #pragma mark -NSObject
@@ -181,62 +192,180 @@ static id PGArchiveAdapterList = nil;
 	if(confidence < 0.8f && !_encodingError) {
 		_encodingError = YES;
 		[self _threaded_setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] forNode:[self node]];
-		[[self node] loadFinished];
+		[[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
 	}
 	return guess;
 }
 
-#pragma mark -<PGNodeDataSource>
+//#pragma mark -<PGNodeDataSource>
+//
+//- (NSDictionary *)fileAttributesForNode:(PGNode *)node
+//{
+//	NSUInteger const i = [[node identifier] index];
+//	if(NSNotFound == i) return nil;
+//	NSMutableDictionary *const attributes = [NSMutableDictionary dictionary];
+//	[attributes PG_setObject:[[_archive attributesOfEntry:i] objectForKey:XADCreationDateKey] forKey:NSFileCreationDate];
+//	if(![_archive entryIsDirectory:i]) [attributes setObject:[NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]] forKey:NSFileSize];
+//	return attributes;
+//}
+//- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info
+//{
+//	NSUInteger const i = [[sender identifier] index];
+//	if(NSNotFound == i) return;
+//	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
+//	if(![info objectForKey:PGOSTypeKey]) [info PG_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
+//	if(![info objectForKey:PGExtensionKey]) [info PG_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
+//}
+//- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
+//{
+//	NSUInteger const i = [[sender identifier] index];
+//	if(NSNotFound == i || flag || [_archive entryIsDirectory:i]) {
+//		if(outData) *outData = nil;
+//		return YES;
+//	}
+//	NSData *data = nil;
+//	@synchronized(_archive) {
+//		NSString *const pass = [info objectForKey:PGPasswordKey];
+//		if(pass) [_archive setPassword:pass];
+//		BOOL const neededPassword = _needsPassword;
+//		_needsPassword = NO;
+//		_currentSubnode = sender;
+//		[_archive clearLastError];
+//		data = [_archive contentsOfEntry:i];
+//		switch([_archive lastError]) {
+//			case XADNoError:
+//			case XADEncodingError:
+//				break;
+//			case XADPasswordError: 
+//				if(!_needsPassword) [self archiveNeedsPassword:_archive];
+//				break;
+//			default:
+//				[self _threaded_setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error “%@” occurred while parsing the archive.", @"XADMaster error reporting. %@ is replaced with the XADMaster error."), [_archive describeLastError]] userInfo:nil] forNode:_currentSubnode];
+//				break;
+//		}
+//		_currentSubnode = nil;
+//		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
+//	}
+//	if(outData) *outData = data;
+//	return YES;
+//}
 
-- (NSDictionary *)fileAttributesForNode:(PGNode *)node
+@end
+
+@implementation PGDataProvider(PGArchiveDataProvider)
+
+- (XADArchive *)archive
 {
-	NSUInteger const i = [[node identifier] index];
-	if(NSNotFound == i) return nil;
-	NSMutableDictionary *const attributes = [NSMutableDictionary dictionary];
-	[attributes PG_setObject:[[_archive attributesOfEntry:i] objectForKey:XADCreationDateKey] forKey:NSFileCreationDate];
-	if(![_archive entryIsDirectory:i]) [attributes setObject:[NSNumber numberWithUnsignedLongLong:[_archive representativeSizeOfEntry:i]] forKey:NSFileSize];
-	return attributes;
+	return nil;
 }
-- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info
+- (int)entry
 {
-	NSUInteger const i = [[sender identifier] index];
-	if(NSNotFound == i) return;
-	if([_archive entryIsArchive:i]) [info setObject:[NSNumber numberWithBool:YES] forKey:PGKnownToBeArchiveKey];
-	if(![info objectForKey:PGOSTypeKey]) [info PG_setObject:[_archive PG_OSTypeForEntry:i standardFormat:NO] forKey:PGOSTypeKey];
-	if(![info objectForKey:PGExtensionKey]) [info PG_setObject:[[_archive nameOfEntry:i] pathExtension] forKey:PGExtensionKey];
+	return 0;
 }
-- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
+
+@end
+
+@implementation PGArchiveDataProvider
+
+#pragma mark -PGArchiveDataProvider
+
+- (id)initWithArchive:(XADArchive *)archive entry:(int)entry;
 {
-	NSUInteger const i = [[sender identifier] index];
-	if(NSNotFound == i || flag || [_archive entryIsDirectory:i]) {
-		if(outData) *outData = nil;
-		return YES;
+	if((self = [super init])) {
+		_archive = [archive retain];
+		_entry = entry;
 	}
-	NSData *data = nil;
+	return self;
+}
+
+#pragma mark -PGDataProvider
+
+- (NSData *)data
+{
 	@synchronized(_archive) {
-		NSString *const pass = [info objectForKey:PGPasswordKey];
-		if(pass) [_archive setPassword:pass];
-		BOOL const neededPassword = _needsPassword;
-		_needsPassword = NO;
-		_currentSubnode = sender;
-		[_archive clearLastError];
-		data = [_archive contentsOfEntry:i];
-		switch([_archive lastError]) {
-			case XADNoError:
-			case XADEncodingError:
-				break;
-			case XADPasswordError: 
-				if(!_needsPassword) [self archiveNeedsPassword:_archive];
-				break;
-			default:
-				[self _threaded_setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error “%@” occurred while parsing the archive.", @"XADMaster error reporting. %@ is replaced with the XADMaster error."), [_archive describeLastError]] userInfo:nil] forNode:_currentSubnode];
-				break;
-		}
-		_currentSubnode = nil;
-		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
+		return [_archive contentsOfEntry:_entry]; // TODO: Handle encoding and password issues.
 	}
-	if(outData) *outData = data;
-	return YES;
+}
+- (NSDate *)dateCreated
+{
+	@synchronized(_archive) {
+		return [[_archive attributesOfEntry:_entry] objectForKey:XADCreationDateKey];
+	}
+}
+
+#pragma mark -
+
+- (OSType)typeCode
+{
+	@synchronized(_archive) {
+		return [_archive PG_OSTypeForEntry:_entry];
+	}
+}
+- (NSString *)extension
+{
+	@synchronized(_archive) {
+		return [[[_archive nameOfEntry:_entry] pathExtension] lowercaseString];
+	}
+}
+
+#pragma mark -
+
+- (NSData *)fourCCData
+{
+	return nil; // Too slow.
+}
+- (NSUInteger)size
+{
+	@synchronized(_archive) {
+		return (NSUInteger)[_archive representativeSizeOfEntry:_entry];
+	}
+}
+
+#pragma mark -PGDataProvider(PGArchiveDataProvider)
+
+- (XADArchive *)archive
+{
+	return _archive;
+}
+- (int)entry
+{
+	return _entry;
+}
+
+#pragma mark -PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node
+{
+	@synchronized(_archive) {
+		if([_archive entryIsArchive:_entry]) return [NSArray arrayWithObject:[PGArchiveAdapter class]];
+	}
+	return [super adapterClassesForNode:node];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_archive release];
+	[super dealloc];
+}
+
+@end
+
+@implementation PGFolderDataProvider
+
+#pragma mark -PGDataProvider
+
+- (OSType)typeCode
+{
+	return 'fold';
+}
+
+#pragma mark -PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node
+{
+	return [NSArray arrayWithObject:[PGContainerAdapter class]];
 }
 
 @end
@@ -259,21 +388,9 @@ static id PGArchiveAdapterList = nil;
 	}
 	return root ? root : @"";
 }
-- (NSString *)PG_OSTypeForEntry:(NSInteger)index standardFormat:(BOOL)flag
+- (OSType)PG_OSTypeForEntry:(int)entry
 {
-	OSType value;
-	if([self entryIsDirectory:index]) value = 'fold';
-	else {
-		NSNumber *const typeCode = [[self attributesOfEntry:index] objectForKey:NSFileHFSTypeCode];
-		if(!typeCode) return nil;
-		value = [typeCode unsignedLongValue];
-	}
-	return PGOSTypeToStringQuoted(value, flag);
-}
-- (NSString *)PG_typeForEntry:(NSInteger)index preferOSType:(BOOL)flag
-{
-	NSString *const osType = flag ? [self PG_OSTypeForEntry:index standardFormat:YES] : nil;
-	return osType ? osType : [[self nameOfEntry:index] pathExtension];
+	return [self entryIsDirectory:entry] ? 'fold' : [[[self attributesOfEntry:entry] objectForKey:NSFileHFSTypeCode] unsignedLongValue];
 }
 
 @end

@@ -29,22 +29,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGErrorAdapter
 
-#pragma mark +PGResourceAdapter
+#pragma mark -PGErrorAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
+- (id)initWithError:(NSError *)error
 {
-	return PGNotAMatch;
+	if((self = [super init])) {
+		_error = [error retain];
+	}
+	return self;
 }
 
 #pragma mark -PGResourceAdapter
 
 - (BOOL)adapterIsViewable
 {
-	return !![[self node] error];
+	return YES;
 }
 - (void)read
 {
-	[[self node] readFinishedWithImageRep:nil error:[[self node] error]];
+	[[self node] readFinishedWithImageRep:nil];
+}
+
+#pragma mark -PGResourceAdapter(PGErrorAdapter)
+
+- (NSError *)error
+{
+	return [[_error retain] autorelease];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_error release];
+	[super dealloc];
+}
+
+@end
+
+@implementation PGResourceAdapter(PGErrorAdapter)
+
+- (NSError *)error
+{
+	return nil;
 }
 
 @end

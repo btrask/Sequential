@@ -25,5 +25,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGResourceAdapter.h"
 
 @interface PGErrorAdapter : PGResourceAdapter
+{
+	@private
+	NSError *_error;
+}
+
+- (id)initWithError:(NSError *)error;
+
+@end
+
+@interface PGResourceAdapter(PGErrorAdapter)
+
+@property(readonly) NSError *error;
 
 @end

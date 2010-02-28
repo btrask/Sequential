@@ -696,7 +696,12 @@
 		<key>PGFlickrAdapter</key>
 		<dict/>
 		<key>PGFolderAdapter</key>
-		<dict/>
+		<dict>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.folder</string>
+			</array>
+		</dict>
 		<key>PGGenericImageAdapter</key>
 		<dict>
 			<key>CFBundleTypeExtensions</key>

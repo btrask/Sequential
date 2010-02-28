@@ -32,41 +32,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGAppKitAdditions.h"
 #import "PGGeometry.h"
 
-@interface PGPDFAdapter(Private)
+@interface PGPDFPageAdapter : PGResourceAdapter
 
-@property(readonly) NSPDFImageRep *_rep;
-@property(readonly) NSPDFImageRep *_threaded_rep;
+@end
+
+@interface PGPDFDataProvider : PGDataProvider
+{
+	@private
+	NSPDFImageRep *_mainRep;
+	NSPDFImageRep *_threadRep;
+	NSInteger _pageIndex;
+}
+
+- (id)initWithMainRep:(NSPDFImageRep *)mainRep threadRep:(NSPDFImageRep *)threadRep pageIndex:(NSInteger)page;
+@property(readonly) NSPDFImageRep *mainRep;
+@property(readonly) NSPDFImageRep *threadRep;
+@property(readonly) NSInteger pageIndex;
 
 @end
 
 @implementation PGPDFAdapter
 
-#pragma mark Private Protocol
-
-- (NSPDFImageRep *)_rep
-{
-	return [[_rep retain] autorelease];
-}
-- (NSPDFImageRep *)_threaded_rep
-{
-	@synchronized(self) {
-		return [[_threadedRep retain] autorelease];
-	}
-	return nil;
-}
-
-#pragma mark PGResourceAdapter
-
-- (BOOL)canSaveData
-{
-	return YES;
-}
-- (BOOL)hasSavableChildren
-{
-	return NO;
-}
-
-#pragma mark -
+#pragma mark -PGResourceAdapter
 
 - (PGLoadPolicy)descendentLoadPolicy
 {
@@ -75,37 +62,35 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)load
 {
 	NSData *const data = [self data];
-	if(!data) return [[self node] loadFinished];
-	if(![NSPDFImageRep canInitWithData:data]) return [[self node] loadFinished];
-	_rep = [[NSPDFImageRep alloc] initWithData:data];
-	if(!_rep) return [[self node] loadFinished];
-	_threadedRep = [_rep copy];
+	if(!data || ![NSPDFImageRep canInitWithData:data]) return [[self node] loadSucceededForAdapter:self];
+	NSPDFImageRep *const mainRep = [[NSPDFImageRep alloc] initWithData:data];
+	if(!mainRep) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Appropriate error.
+	NSPDFImageRep *const threadRep = [mainRep copy];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
 	NSInteger i = 0;
-	for(; i < [_rep pageCount]; i++) {
+	for(; i < [mainRep pageCount]; i++) {
 		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInteger:i + 1] descriptionWithLocale:localeDict]];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier dataSource:nil] autorelease];
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
-		[node startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[PGPDFPageAdapter class], PGAdapterClassKey, nil]];
+		[node loadWithDataProvider:[[[PGPDFDataProvider alloc] initWithMainRep:mainRep threadRep:threadRep pageIndex:i] autorelease]];
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGSortInnateOrder];
-	[[self node] loadFinished];
+	[[self node] loadSucceededForAdapter:self];
 }
 
-#pragma mark NSObject
+#pragma mark -
 
-- (void)dealloc
+- (BOOL)canSaveData
 {
-	[_rep release];
-	@synchronized(self) {
-		[_threadedRep release];
-		_threadedRep = nil;
-	}
-	[super dealloc];
+	return YES;
+}
+- (BOOL)hasSavableChildren
+{
+	return NO;
 }
 
 @end
@@ -121,7 +106,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
 	if(![[self node] isViewable] || [self node] == descendent) return nil;
-	NSInteger const index = [[[self node] identifier] index];
+	NSInteger const index = [[self dataProvider] pageIndex];
 	if(NSNotFound == index) return nil;
 	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
 	return [self node];
@@ -135,9 +120,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)read
 {
-	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
-	[rep setCurrentPage:[[[self node] identifier] index]];
-	[[self node] readFinishedWithImageRep:rep error:nil];
+	NSPDFImageRep *const rep = [[self dataProvider] mainRep];
+	[rep setCurrentPage:[[self dataProvider] pageIndex]];
+	[[self node] readFinishedWithImageRep:rep];
 }
 
 #pragma mark -
@@ -149,17 +134,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation
 {
-	NSPDFImageRep *rep = nil;
-	@synchronized(self) {
-		rep = [(PGPDFAdapter *)[self parentAdapter] _threaded_rep];
-	}
+	NSPDFImageRep *const rep = [(PGPDFDataProvider *)[self dataProvider] threadRep];
 	if(rep) @synchronized(rep) {
-		[rep setCurrentPage:[[[self node] identifier] index]];
-		return [rep PG_thumbnailWithMaxSize:size orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] opaque:YES];
+		[rep setCurrentPage:[[self dataProvider] pageIndex]];
+		return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:YES];
 	}
 	return nil;
+}
+
+@end
+
+@implementation PGPDFDataProvider
+
+#pragma mark -PGPDFDataProvider
+
+- (id)initWithMainRep:(NSPDFImageRep *)mainRep threadRep:(NSPDFImageRep *)threadRep pageIndex:(NSInteger)page
+{
+	if((self = [super init])) {
+		_mainRep = [mainRep retain];
+		_threadRep = [threadRep retain];
+		_pageIndex = page;
+	}
+	return self;
+}
+@synthesize mainRep = _mainRep;
+@synthesize threadRep = _threadRep;
+@synthesize pageIndex = _pageIndex;
+
+#pragma mark -PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node
+{
+	return [NSArray arrayWithObject:[PGPDFPageAdapter class]];
+}
+
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	[_mainRep release];
+	[_threadRep release];
+	[super dealloc];
 }
 
 @end

@@ -29,28 +29,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
+#import "PGDataProvider.h"
 
 // Other Sources
 #import "PGFoundationAdditions.h"
 
 @implementation PGFolderAdapter
 
-#pragma mark +PGResourceAdapter
-
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
-{
-	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
-	if(![ident isFileIdentifier]) return PGNotAMatch;
-	BOOL flag = NO;
-	return [[NSFileManager defaultManager] fileExistsAtPath:[[ident URLByFollowingAliases:YES] path] isDirectory:&flag] && flag ? PGMatchByIntrinsicAttribute : PGNotAMatch;
-}
-
 #pragma mark -PGFolderAdapter
 
 - (void)createChildren
 {
 	NSParameterAssert([self shouldLoad]);
-	NSURL *const URL = [[[self info] objectForKey:PGIdentifierKey] URLByFollowingAliases:YES];
+	NSURL *const URL = [[(PGDataProvider *)[self dataProvider] identifier] URLByFollowingAliases:YES];
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) return;
 
@@ -71,8 +62,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[oldPages removeObjectIdenticalTo:node];
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
-			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent dataSource:nil] autorelease];
-			[node startLoadWithInfo:nil];
+			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
+			[node loadWithDataProvider:nil];
 		}
 		if(node) [newPages addObject:node];
 	}
@@ -85,14 +76,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)load
 {
 	[self createChildren];
-	[[self node] loadFinished];
+	[[self node] loadSucceededForAdapter:self];
 }
 
 #pragma mark -<PGResourceAdapting>
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(![[[self node] identifier] hasTarget]) [[self node] removeFromDocument];
+	if(![[(PGDataProvider *)[self dataProvider] identifier] hasTarget]) [[self node] removeFromDocument];
 	else if(flag) [self createChildren];
 }
 

@@ -22,60 +22,43 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGResourceAdapting.h"
-
 // Models
-@class PGNode;
+#import "PGNode.h"
+#import "PGDataProvider.h"
+#import "PGActivity.h"
 
-extern NSString *const PGSubstitutedClassKey;
-
-extern NSString *const PGBundleTypeFourCCsKey;
-extern NSString *const PGCFBundleTypeMIMETypesKey;
-extern NSString *const PGCFBundleTypeOSTypesKey;
-extern NSString *const PGCFBundleTypeExtensionsKey;
-
-extern NSString *const PGOrientationKey;
-
-enum {
-	PGMatchByPriorAgreement     = 6000,
-	PGMatchByIntrinsicAttribute = 5000,
-	PGMatchByFourCC             = 4000,
-	PGMatchByMIMEType           = 3000,
-	PGMatchByOSType             = 2000,
-	PGMatchByExtension          = 1000,
-	PGNotAMatch                 = 0
-};
-typedef NSUInteger PGMatchPriority;
+extern NSString *const PGPasswordKey;
+extern NSString *const PGStringEncodingKey;
 
 @interface PGResourceAdapter : NSObject <PGActivityOwner, PGResourceAdapting>
 {
 	@private
-	PGMatchPriority _priority;
+	NSUInteger _priority;
 	PGNode *_node;
-	NSMutableDictionary *_info;
+	PGDataProvider *_dataProvider;
+	PGActivity *_activity;
+
 	NSImage *_realThumbnail;
 	NSOperation *_thumbnailGenerationOperation;
-	PGActivity *_activity;
 }
 
-+ (NSDictionary *)typesDictionary; // For all resource adapters.
-+ (NSDictionary *)typeDictionary; // For this class.
++ (NSDictionary *)typesDictionary;
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
-+ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfoDicts:(NSArray *)dicts;
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
-@property(assign) PGNode *node;
+- (id)initWithNode:(PGNode *)node dataProvider:(PGDataProvider *)provider;
+@property(readonly) PGNode *node;
+@property(readonly) id dataProvider;
 
 @property(readonly) PGContainerAdapter *containerAdapter;
 @property(readonly) PGContainerAdapter *rootContainerAdapter;
 
-@property(readonly) NSMutableDictionary *info;
 @property(readonly) NSData *data;
 @property(readonly) BOOL canGetData;
 @property(readonly) BOOL hasNodesWithData;
 
 @property(readonly) BOOL isContainer;
+@property(readonly) BOOL hasChildren;
 @property(readonly) BOOL isSortedFirstViewableNodeOfFolder;
 @property(readonly) BOOL hasRealThumbnail;
 @property(readonly, getter = isResolutionIndependent) BOOL resolutionIndependent;
@@ -101,11 +84,10 @@ typedef NSUInteger PGMatchPriority;
 - (NSImage *)realThumbnail;
 - (void)setRealThumbnail:(NSImage *)anImage;
 - (BOOL)canGenerateRealThumbnail;
-- (NSImage *)threaded_thumbnailOfSize:(NSSize)size withInfo:(NSDictionary *)info;
 - (void)invalidateThumbnail;
 
 - (PGOrientation)orientationWithBase:(BOOL)flag;
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu;
+- (void)addChildrenToMenu:(NSMenu *)menu;
 - (void)clearCache;
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
@@ -126,6 +108,14 @@ typedef NSUInteger PGMatchPriority;
 
 @interface PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info;
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation;
+
+@end
+
+@interface PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node;
+- (NSArray *)adaptersForNode:(PGNode *)node;
+- (NSUInteger)matchPriorityForTypeDictionary:(NSDictionary *)dict;
 
 @end

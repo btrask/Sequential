@@ -83,7 +83,6 @@
 		0E47942B0DF1832E0083B7CA /* Silhouette-White.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E47942A0DF1832E0083B7CA /* Silhouette-White.png */; };
 		0E5035410DDBBF070067FF6A /* Cursor-Hand-Pointing.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E5035400DDBBF070067FF6A /* Cursor-Hand-Pointing.png */; };
 		0E50357B0DDBFF550067FF6A /* PGEncodingAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E50357A0DDBFF550067FF6A /* PGEncodingAlert.m */; };
-		0E5038D50DE010D20067FF6A /* PGResourceAdapting.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5038D40DE010D20067FF6A /* PGResourceAdapting.m */; };
 		0E53BF510DB760EC0012AC5B /* HMBlkAppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */; };
 		0E53BF560DB761180012AC5B /* HMBlkAppKit.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */; };
 		0E56B8DD0E24918C00987F57 /* PGActivityPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E56B8DC0E24918C00987F57 /* PGActivityPanelController.m */; };
@@ -92,8 +91,6 @@
 		0E5EC1D60CEDFBBC00E7FF9A /* PGURLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
 		0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */; };
-		0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */; };
-		0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */; };
 		0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */; };
 		0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
@@ -143,6 +140,7 @@
 		0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC0F5F910F0C758000C8B8B /* PGLocalizing.m */; };
 		0EC11DF00CA02B7B003E492C /* PGZooming.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC11DEF0CA02B7B003E492C /* PGZooming.m */; };
 		0EC33E3F0E29B0A700450CF8 /* PGProgressIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */; };
+		0ECA9B681136CEF600BAFF5E /* PGDataProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECA9B671136CEF600BAFF5E /* PGDataProvider.m */; };
 		0ECD9FFE0CB3961B0059C754 /* PGFindView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECD9FFD0CB3961B0059C754 /* PGFindView.m */; };
 		0ECF36E80C7DC4FC0009EB00 /* PGSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */; };
 		0ED4A41A0DCBFDDA007C5A77 /* PGArchiveAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */; };
@@ -150,7 +148,6 @@
 		0ED4A8DD0DD00E18007C5A77 /* PGURLLoad.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */; };
 		0ED4AAF80DD18538007C5A77 /* PGFloatingPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */; };
 		0ED4AB170DD18730007C5A77 /* PGExifPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED4AB160DD18730007C5A77 /* PGExifPanelController.m */; };
-		0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */; };
 		0ED989A80F56A80C00AD91F5 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */; };
 		0ED989A90F56A81300AD91F5 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */; };
 		0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EDB9A750EA1896400B7342A /* PGColumnView.m */; };
@@ -526,8 +523,6 @@
 		0E5035400DDBBF070067FF6A /* Cursor-Hand-Pointing.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Cursor-Hand-Pointing.png"; sourceTree = "<group>"; };
 		0E5035790DDBFF550067FF6A /* PGEncodingAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGEncodingAlert.h; sourceTree = "<group>"; };
 		0E50357A0DDBFF550067FF6A /* PGEncodingAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGEncodingAlert.m; sourceTree = "<group>"; };
-		0E5038D30DE010D20067FF6A /* PGResourceAdapting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGResourceAdapting.h; sourceTree = "<group>"; };
-		0E5038D40DE010D20067FF6A /* PGResourceAdapting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGResourceAdapting.m; sourceTree = "<group>"; };
 		0E53BF500DB760EC0012AC5B /* HMBlkAppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HMBlkAppKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E56B8DB0E24918C00987F57 /* PGActivityPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGActivityPanelController.h; sourceTree = "<group>"; };
 		0E56B8DC0E24918C00987F57 /* PGActivityPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGActivityPanelController.m; sourceTree = "<group>"; };
@@ -550,6 +545,7 @@
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
 		0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDragHighlightView.m; sourceTree = "<group>"; };
 		0E82626B0CA950770041FA9D /* Sequential.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Sequential.icns; sourceTree = "<group>"; };
+		0E8680A6113A079600B78EAA /* PGResourceAdapting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGResourceAdapting.h; sourceTree = "<group>"; };
 		0E88D59E0E30C2E900871528 /* Corner-Bottom-Left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Corner-Bottom-Left.png"; sourceTree = "<group>"; };
 		0E88D59F0E30C2E900871528 /* Corner-Bottom-Right.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Corner-Bottom-Right.png"; sourceTree = "<group>"; };
 		0E88D5A00E30C2E900871528 /* Corner-Top-Left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Corner-Top-Left.png"; sourceTree = "<group>"; };
@@ -610,6 +606,8 @@
 		0EC11DEF0CA02B7B003E492C /* PGZooming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGZooming.m; sourceTree = "<group>"; };
 		0EC33E3D0E29B0A700450CF8 /* PGProgressIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGProgressIndicatorCell.h; sourceTree = "<group>"; };
 		0EC33E3E0E29B0A700450CF8 /* PGProgressIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGProgressIndicatorCell.m; sourceTree = "<group>"; };
+		0ECA9B661136CEF600BAFF5E /* PGDataProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDataProvider.h; sourceTree = "<group>"; };
+		0ECA9B671136CEF600BAFF5E /* PGDataProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDataProvider.m; sourceTree = "<group>"; };
 		0ECD9FFC0CB3961B0059C754 /* PGFindView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFindView.h; sourceTree = "<group>"; };
 		0ECD9FFD0CB3961B0059C754 /* PGFindView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFindView.m; sourceTree = "<group>"; };
 		0ECF36E60C7DC4FC0009EB00 /* PGSubscription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGSubscription.h; sourceTree = "<group>"; };
@@ -954,8 +952,7 @@
 				0E94F9CB0DAD37D000A23F73 /* PGPrefObject.m */,
 				2A37F4AEFDCFA73011CA2CEA /* PGDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* PGDocument.m */,
-				0E5038D30DE010D20067FF6A /* PGResourceAdapting.h */,
-				0E5038D40DE010D20067FF6A /* PGResourceAdapting.m */,
+				0E8680A6113A079600B78EAA /* PGResourceAdapting.h */,
 				0EF5431C0DC128B600905391 /* PGNode.h */,
 				0EF5431D0DC128B600905391 /* PGNode.m */,
 				0EE646040DC7C6E100A90F86 /* PGResourceAdapter.h */,
@@ -982,6 +979,8 @@
 				0EE6476E0DC8F96C00A90F86 /* PGGenericImageAdapter.m */,
 				0EE761790DDB7BDE00ED8ABB /* PGResourceIdentifier.h */,
 				0EE7617A0DDB7BDE00ED8ABB /* PGResourceIdentifier.m */,
+				0ECA9B661136CEF600BAFF5E /* PGDataProvider.h */,
+				0ECA9B671136CEF600BAFF5E /* PGDataProvider.m */,
 				0ECF36E60C7DC4FC0009EB00 /* PGSubscription.h */,
 				0ECF36E70C7DC4FC0009EB00 /* PGSubscription.m */,
 				0E01793E10FBEDBB0017FA5A /* PGActivity.h */,
@@ -1417,7 +1416,6 @@
 				0EE7617B0DDB7BDE00ED8ABB /* PGResourceIdentifier.m in Sources */,
 				0EE7617E0DDB7C4900ED8ABB /* PGLegacy.m in Sources */,
 				0E50357B0DDBFF550067FF6A /* PGEncodingAlert.m in Sources */,
-				0E5038D50DE010D20067FF6A /* PGResourceAdapting.m in Sources */,
 				0E4793930DF15FD90083B7CA /* PGAttachments.m in Sources */,
 				0E90163D0DF435AB004B6F69 /* PGPreferenceWindowController.m in Sources */,
 				0E9016AB0DF44A7E004B6F69 /* PGColorWell.m in Sources */,
@@ -1427,9 +1425,6 @@
 				0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */,
 				0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */,
 				0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */,
-				0ED5F5AB0E806F4E00715745 /* PGXMLAdapter.m in Sources */,
-				0E7B2CBC0E8E371900F537CD /* PGFlickrAdapter.m in Sources */,
-				0E7B2D160E8F9A4E00F537CD /* PGXMLParser.m in Sources */,
 				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
 				0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */,
 				0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */,
@@ -1449,6 +1444,7 @@
 				0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */,
 				0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */,
 				0E01794010FBEDBB0017FA5A /* PGActivity.m in Sources */,
+				0ECA9B681136CEF600BAFF5E /* PGDataProvider.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

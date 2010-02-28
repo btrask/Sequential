@@ -210,7 +210,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
 	if(tableColumn == nameColumn) {
-		[cell setIcon:[[(PGNode *)item identifier] icon]];
+		[cell setIcon:[[[(PGNode *)item resourceAdapter] dataProvider] icon]];
 		[cell setEnabled:[[item resourceAdapter] canSaveData]];
 	}
 }

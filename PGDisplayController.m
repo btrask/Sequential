@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGDocument.h"
 #import "PGNode.h"
+#import "PGErrorAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
@@ -118,9 +119,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)reveal:(id)sender
 {
 	if([[self activeDocument] isOnline]) {
-		if([[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] originalIdentifier] superURLByFollowingAliases:NO]]) return;
+		if([[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] originalIdentifier] URLByFollowingAliases:NO]]) return;
 	} else {
-		NSString *const path = [[[[self activeNode] identifier] superURLByFollowingAliases:NO] path];
+		NSString *const path = [[[[self activeNode] identifier] URLByFollowingAliases:NO] path];
 		if([[PGDocumentController sharedDocumentController] pathFinderRunning]) {
 			if([[[[NSAppleScript alloc] initWithSource:[NSString stringWithFormat:@"tell application \"Path Finder\"\nactivate\nreveal \"%@\"\nend tell", path]] autorelease] executeAndReturnError:NULL]) return;
 		} else {
@@ -345,7 +346,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)reload:(id)sender
 {
 	[reloadButton setEnabled:NO];
-	[[self activeNode] startLoadWithInfo:nil];
+	[[self activeNode] loadWithDataProvider:nil];
 	[self _readActiveNode];
 }
 - (IBAction)decrypt:(id)sender
@@ -353,12 +354,13 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGNode *const activeNode = [self activeNode];
 	[activeNode PG_addObserver:self selector:@selector(nodeLoadingDidProgress:) name:PGNodeLoadingDidProgressNotification];
 	[activeNode PG_addObserver:self selector:@selector(nodeReadyForViewing:) name:PGNodeReadyForViewingNotification];
-	[[[activeNode resourceAdapter] info] setObject:[passwordField stringValue] forKey:PGPasswordKey];
+	// TODO: Figure this out.
+//	[[[activeNode resourceAdapter] info] setObject:[passwordField stringValue] forKey:PGPasswordKey];
 	[activeNode becomeViewed];
 }
 - (IBAction)chooseEncoding:(id)sender
 {
-	NSDictionary *const errInfo = [[[self activeNode] error] userInfo];
+	NSDictionary *const errInfo = [[[[self activeNode] resourceAdapter] error] userInfo];
 	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntegerValue]] autorelease];
 	[alert beginSheetForWindow:[self windowForSheet] withDelegate:self];
 }
@@ -661,7 +663,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (void)nodeReadyForViewing:(NSNotification *)aNotif
 {
 	NSParameterAssert([aNotif object] == [self activeNode]);
-	NSError *const error = [[aNotif userInfo] objectForKey:PGErrorKey];
+	NSError *const error = [[[self activeNode] resourceAdapter] error];
 	if(!error) {
 		NSPoint const relativeCenter = [clipView relativeCenter];
 		NSImageRep *const rep = [[aNotif userInfo] objectForKey:PGImageRepKey];
@@ -673,19 +675,19 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[[self window] makeFirstResponder:clipView];
 	} else if(PGEqualObjects([error domain], PGNodeErrorDomain)) switch([error code]) {
 		case PGGenericError:
-			[errorLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[errorLabel PG_setAttributedStringValue:[[[_activeNode resourceAdapter] dataProvider] attributedString]];
 			[errorMessage setStringValue:[error localizedDescription]];
 			[errorView setFrameSize:NSMakeSize(NSWidth([errorView frame]), NSHeight([errorView frame]) - NSHeight([errorMessage frame]) + [[errorMessage cell] cellSizeForBounds:NSMakeRect(0.0f, 0.0f, NSWidth([errorMessage frame]), CGFLOAT_MAX)].height)];
 			[reloadButton setEnabled:YES];
 			[clipView setDocumentView:errorView];
 			break;
 		case PGPasswordError:
-			[passwordLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[passwordLabel PG_setAttributedStringValue:[[[_activeNode resourceAdapter] dataProvider] attributedString]];
 			[passwordField setStringValue:@""];
 			[clipView setDocumentView:passwordView];
 			break;
 		case PGEncodingError:
-			[encodingLabel PG_setAttributedStringValue:[[_activeNode identifier] attributedStringWithAncestory:NO]];
+			[encodingLabel PG_setAttributedStringValue:[[[_activeNode resourceAdapter] dataProvider] attributedString]];
 			[clipView setDocumentView:encodingView];
 			[[self window] makeFirstResponder:clipView];
 			break;
@@ -1369,7 +1371,8 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 - (void)encodingAlertDidEnd:(PGEncodingAlert *)sender selectedEncoding:(NSStringEncoding)encoding
 {
-	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
+	// TODO: How do we rewrite this to make sense?
+//	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
 }
 
 @end

@@ -46,7 +46,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	AliasHandle _alias;
 	BOOL _hasValidRef;
 	FSRef _ref;
-	NSString *_cachedURL;
+	NSURL *_cachedURL;
 }
 
 + (void)clearCache;

@@ -36,13 +36,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 
 // Other Sources
+#import "PGAppKitAdditions.h"
 #import "PGFoundationAdditions.h"
 
 NSString *const PGNodeLoadingDidProgressNotification = @"PGNodeLoadingDidProgress";
 NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
 
 NSString *const PGImageRepKey       = @"PGImageRep";
-NSString *const PGErrorKey          = @"PGError";
 
 NSString *const PGNodeErrorDomain        = @"PGNodeError";
 NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
@@ -57,9 +57,6 @@ enum {
 
 @interface PGNode(Private)
 
-- (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
-- (NSArray *)_standardizedInfo:(id)info;
-- (NSDictionary *)_standardizedInfoDictionary:(NSDictionary *)info;
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
 - (void)_setValue:(id)value forSortOrder:(PGSortOrder)order;
@@ -84,7 +81,7 @@ enum {
 
 #pragma mark -PGNode
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(NSObject<PGNodeDataSource> *)dataSource
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident
 {
 	if(!(self = [super init])) return nil;
 	NSParameterAssert(!parent != !doc);
@@ -95,10 +92,7 @@ enum {
 	_parentAdapter = parent;
 	_document = doc;
 	_identifier = [ident retain];
-	_dataSource = dataSource;
-	PGResourceAdapter *const adapter = [[[PGResourceAdapter alloc] init] autorelease];
-	_adapters = [[NSMutableArray alloc] initWithObjects:adapter, nil];
-	[self _setResourceAdapter:adapter];
+	_adapters = [[NSMutableArray alloc] init];
 	_menuItem = [[NSMenuItem alloc] init];
 	[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 	[_menuItem setAction:@selector(jumpToPage:)];
@@ -112,10 +106,6 @@ enum {
 {
 	return [[_identifier retain] autorelease];
 }
-- (NSObject<PGNodeDataSource> *)dataSource
-{
-	return _dataSource;
-}
 
 #pragma mark -
 
@@ -127,25 +117,6 @@ enum {
 {
 	PGContainerAdapter *const p = [self parentAdapter];
 	return p ? MAX([[p node] ancestorLoadPolicy], [p descendentLoadPolicy]) : PGLoadToMaxDepth;
-}
-- (NSError *)error
-{
-	return [[_error retain] autorelease];
-}
-- (void)setError:(NSError *)error
-{
-	if(PGNodeNothing == _status) return;
-	if(!_error) {
-		_error = [error copy];
-		_errorPhase = _status;
-	}
-	if(PGNodeLoading & _status && [_adapters count] > 1) {
-		(void)[[[_adapters lastObject] retain] autorelease];
-		if([_adapter shouldFallbackOnError]) [_adapters removeLastObject];
-		else [_adapters removeObjectsInRange:NSMakeRange(1, [_adapters count] - 1)];
-		[self _setResourceAdapter:[_adapters lastObject]];
-		[_adapter fallbackLoad];
-	}
 }
 - (NSImage *)thumbnail
 {
@@ -197,28 +168,6 @@ enum {
 
 #pragma mark -
 
-- (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag
-{
-	NSData *data = [[[info objectForKey:PGDataKey] retain] autorelease];
-	if(data) return data;
-	@synchronized(self) {
-		if([self dataSource] && ![[self dataSource] node:self getData:&data info:info fast:flag]) return nil;
-	}
-	if(data) return data;
-	PGResourceIdentifier *const identifier = [info objectForKey:PGIdentifierKey];
-	if([identifier isFileIdentifier]) {
-		NSURL *const URL = [identifier URLByFollowingAliases:YES];
-		if(URL) data = [NSData dataWithContentsOfURL:URL options:NSMappedRead | NSUncachedRead error:NULL];
-	}
-	return data;
-}
-- (BOOL)canGetDataWithInfo:(NSDictionary *)info
-{
-	return [self dataSource] || [info objectForKey:PGFourCCDataKey] || [info objectForKey:PGDataKey] || [[info objectForKey:PGIdentifierKey] isFileIdentifier];
-}
-
-#pragma mark -
-
 - (BOOL)shouldLoadAdapterClass:(Class)aClass
 {
 	if([aClass alwaysLoads]) return YES;
@@ -228,38 +177,31 @@ enum {
 		default: return NO;
 	}
 }
-- (void)startLoadWithInfo:(id)info
+- (void)loadWithDataProvider:(PGDataProvider *)provider
 {
-	NSParameterAssert(!(PGNodeLoading & _status));
 	_status |= PGNodeLoading;
-	[_error release];
-	_error = nil;
-	[self noteIsViewableDidChange];
-	[_adapters autorelease];
-	_adapters = [[PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]] mutableCopy];
-	[_adapters insertObject:[[[PGErrorAdapter alloc] init] autorelease] atIndex:0];
-	[self _setResourceAdapter:[_adapters lastObject]];
-	[_adapter loadIfNecessary];
-}
-- (void)continueLoadWithInfo:(id)info
-{
-	NSParameterAssert(PGNodeLoading & _status);
-	NSParameterAssert([(NSArray *)info count]); // Otherwise nothing has changed.
-	NSArray *const newAdapters = [PGResourceAdapter adapterClassesInstantiated:YES forNode:self withInfoDicts:[self _standardizedInfo:info]];
+	PGDataProvider *const p = provider ? provider : [PGDataProvider providerWithResourceIdentifier:[self identifier] displayableName:nil];
+	NSArray *const newAdapters = [p adaptersForNode:self];
 	if(![newAdapters count]) return [_adapter fallbackLoad];
 	[_adapters addObjectsFromArray:newAdapters];
-	NSParameterAssert([_adapters count]);
-	[self _setResourceAdapter:[_adapters lastObject]];
+	_adapter = [_adapters lastObject];
 	[_adapter loadIfNecessary];
 }
-- (void)loadFinished
+- (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter
 {
+	NSParameterAssert([_adapters objectAtIndex:0] == adapter);
 	NSParameterAssert(PGNodeLoading & _status);
 	_status &= ~PGNodeLoading;
 	[self noteIsViewableDidChange];
-	[self _updateFileAttributes];
 	[self readIfNecessary];
 	[[self document] noteNodeThumbnailDidChange:self recursively:NO];
+}
+- (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter
+{
+	NSParameterAssert(PGNodeLoading & _status);
+	[_adapters insertObject:[[[PGErrorAdapter alloc] initWithNode:self dataProvider:nil] autorelease] atIndex:0];
+	_adapter = [_adapters lastObject];
+	[_adapter fallbackLoad];
 }
 
 #pragma mark -
@@ -275,19 +217,11 @@ enum {
 {
 	if((PGNodeLoadingOrReading & _status) == PGNodeReading) [_adapter read];
 }
-- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep
 {
 	NSParameterAssert((PGNodeLoadingOrReading & _status) == PGNodeReading);
 	_status &= ~PGNodeReading;
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	[dict PG_setObject:aRep forKey:PGImageRepKey];
-	if(error) [dict setObject:error forKey:PGErrorKey];
-	else {
-		[dict PG_setObject:_error forKey:PGErrorKey];
-		[_error release];
-		_error = nil;
-	}
-	[self PG_postNotificationName:PGNodeReadyForViewingNotification userInfo:dict];
+	[self PG_postNotificationName:PGNodeReadyForViewingNotification userInfo:[NSDictionary dictionaryWithObjectsAndKeys:aRep, PGImageRepKey, nil]];
 }
 
 #pragma mark -
@@ -302,7 +236,6 @@ enum {
 	@synchronized(self) {
 		_parentAdapter = nil;
 		_document = nil;
-		_dataSource = nil;
 	}
 }
 - (NSComparisonResult)compare:(PGNode *)node
@@ -352,6 +285,16 @@ enum {
 	}
 	return wrote;
 }
+- (void)addToMenu:(NSMenu *)menu flatten:(BOOL)flatten
+{
+	[_menuItem PG_removeFromMenu];
+	if(flatten && [[self resourceAdapter] hasChildren]) {
+		[[self resourceAdapter] addChildrenToMenu:menu];
+	} else {
+		[[self resourceAdapter] addChildrenToMenu:[_menuItem submenu]];
+		[menu addItem:_menuItem];
+	}
+}
 
 #pragma mark -
 
@@ -383,8 +326,7 @@ enum {
 - (void)noteIsViewableDidChange
 {
 	BOOL const showsLoadingIndicator = !!(PGNodeLoading & _status);
-	BOOL const showsError = _error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading;
-	BOOL const viewable = showsLoadingIndicator || showsError || [_adapter adapterIsViewable];
+	BOOL const viewable = showsLoadingIndicator || [_adapter adapterIsViewable];
 	if(viewable == _viewable) return;
 	_viewable = viewable;
 	[[self document] noteNodeIsViewableDidChange:self];
@@ -392,41 +334,6 @@ enum {
 
 #pragma mark -PGNode(Private)
 
-- (void)_setResourceAdapter:(PGResourceAdapter *)adapter
-{
-	if(adapter == _adapter) return;
-	if([_adapter node] == self) [_adapter setNode:nil];
-	_adapter = adapter;
-	[_adapter setNode:self];
-	[self _updateMenuItem];
-}
-- (NSArray *)_standardizedInfo:(id)info
-{
-	NSMutableArray *const results = [NSMutableArray array];
-	for(NSDictionary *const dict in [info PG_asArray]) [results addObject:[self _standardizedInfoDictionary:dict]];
-	if(![results count]) [results addObject:[self _standardizedInfoDictionary:nil]];
-	return results;
-}
-- (NSDictionary *)_standardizedInfoDictionary:(NSDictionary *)info
-{
-	NSMutableDictionary *const mutableInfo = info ? [[info mutableCopy] autorelease] : [NSMutableDictionary dictionary];
-	[[self dataSource] node:self willLoadWithInfo:mutableInfo];
-	NSURLResponse *const response = [info objectForKey:PGURLResponseKey];
-	if(![mutableInfo objectForKey:PGIdentifierKey]) {
-		NSURL *const responseURL = [response URL];
-		[mutableInfo PG_setObject:responseURL ? [responseURL PG_resourceIdentifier] : [self identifier] forKey:PGIdentifierKey];
-	}
-	if(![mutableInfo objectForKey:PGMIMETypeKey]) [mutableInfo PG_setObject:[response MIMEType] forKey:PGMIMETypeKey];
-	if(![mutableInfo objectForKey:PGExtensionKey]) [mutableInfo PG_setObject:[[[[mutableInfo objectForKey:PGIdentifierKey] URL] path] pathExtension] forKey:PGExtensionKey];
-	if(![mutableInfo objectForKey:PGFourCCDataKey]) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		NSData *const data = [self dataWithInfo:mutableInfo fast:YES];
-		if(data && [data length] >= 4) [mutableInfo PG_setObject:[data subdataWithRange:NSMakeRange(0, 4)] forKey:PGFourCCDataKey];
-		[pool release]; // Dispose of the data ASAP.
-	}
-	[mutableInfo setObject:[NSNumber numberWithInteger:[self canGetDataWithInfo:mutableInfo] ? PGExists : PGDoesNotExist] forKey:PGDataExistenceKey];
-	return mutableInfo;
-}
 - (void)_updateMenuItem
 {
 	if(!_allowMenuItemUpdates) return;
@@ -445,29 +352,11 @@ enum {
 }
 - (void)_updateFileAttributes
 {
-	NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-	NSURL *const URL = [[self identifier] URL];
-	if([URL isFileURL]) [attributes addEntriesFromDictionary:[[NSFileManager defaultManager] attributesOfItemAtPath:[URL path] error:NULL]];
-	[attributes addEntriesFromDictionary:[[self dataSource] fileAttributesForNode:self]];
-	if(PGEqualObjects([attributes fileType], NSFileTypeDirectory)) [attributes removeObjectForKey:NSFileSize];
-	else if(![attributes objectForKey:NSFileSize]) {
-		NSData *const data = [[self resourceAdapter] data];
-		if(data) [attributes setObject:[NSNumber numberWithUnsignedInteger:[data length]] forKey:NSFileSize];
-	}
-	[self _setValue:[attributes fileModificationDate] forSortOrder:PGSortByDateModified];
-	[self _setValue:[attributes fileCreationDate] forSortOrder:PGSortByDateCreated];
-	[self _setValue:[attributes objectForKey:NSFileSize] forSortOrder:PGSortBySize];
-
-	NSDictionary *const info = [[self resourceAdapter] info];
-	NSString *kind = nil;
-	// Try every possible method to get a decent string. When a method succeeds, it overwrites previous attempts.
-	if(noErr == LSCopyKindStringForMIMEType((CFStringRef)[info objectForKey:PGMIMETypeKey], (CFStringRef *)&kind)) [kind autorelease]; // For some reason this produces extremely ugly strings, like "TextEdit.app Document".
-	if(noErr == LSCopyKindStringForTypeInfo(kLSUnknownType, kLSUnknownCreator, (CFStringRef)[info objectForKey:PGExtensionKey], (CFStringRef *)&kind)) [kind autorelease];
-	NSString *const workspaceKind = [[NSWorkspace sharedWorkspace] localizedDescriptionForType:[(NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (CFStringRef)[info objectForKey:PGMIMETypeKey], NULL) autorelease]]; // This produces ugly strings too ("Portable Network Graphics image"), but they still aren't nearly as bad.
-	if(workspaceKind) kind = workspaceKind;
-	if(noErr == LSCopyKindStringForTypeInfo(PGOSTypeFromString([info objectForKey:PGOSTypeKey]), kLSUnknownCreator, NULL, (CFStringRef *)&kind)) [kind autorelease];
-	if(noErr == LSCopyKindStringForURL((CFURLRef)URL, (CFStringRef *)&kind)) [kind autorelease];
-	[self _setValue:kind forSortOrder:PGSortByKind];
+	PGDataProvider *const dp = [[self resourceAdapter] dataProvider];
+	[self _setValue:[dp dateModified] forSortOrder:PGSortByDateModified];
+	[self _setValue:[dp dateCreated] forSortOrder:PGSortByDateCreated];
+	[self _setValue:[NSNumber numberWithUnsignedInteger:[dp size]] forSortOrder:PGSortBySize];
+	[self _setValue:[dp kindString] forSortOrder:PGSortByKind];
 }
 - (void)_setValue:(id)value forSortOrder:(PGSortOrder)order
 {
@@ -493,11 +382,10 @@ enum {
 	// Using our generic -PG_removeObserver is about twice as slow as removing the observer for the specific objects we care about. When closing huge folders of thousands of files, this makes a big difference. Even now it's still the slowest part.
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
-	[_adapter setNode:nil]; // PGGenericImageAdapter gets retained while it's loading in another thread, and when it finishes it might expect us to still be around.
 	[_identifier release];
-	[_menuItem release];
 	[_adapters release];
-	[_error release];
+
+	[_menuItem release];
 	[_dateModified release];
 	[_dateCreated release];
 	[_dataLength release];
@@ -554,21 +442,6 @@ enum {
 {
 	[self _updateMenuItem];
 	[_adapter noteSortOrderDidChange];
-}
-
-@end
-
-@implementation NSObject(PGNodeDataSource)
-
-- (NSDictionary *)fileAttributesForNode:(PGNode *)node
-{
-	return nil;
-}
-- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info {}
-- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag
-{
-	if(outData) *outData = nil;
-	return YES;
 }
 
 @end

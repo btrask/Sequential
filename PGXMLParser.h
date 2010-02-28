@@ -64,7 +64,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(readonly) NSString *title;
 @property(readonly) NSURL *URL;
 @property(readonly) NSError *error;
-@property(readonly) id info;
+@property(readonly) NSDictionary *info;
 @property(readonly) NSString *URLString;
 @property(readonly) NSString *errorString;
 

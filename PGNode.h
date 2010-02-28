@@ -22,19 +22,23 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGResourceAdapting.h"
-
 // Models
 @class PGDocument;
+#import "PGResourceAdapting.h"
 @class PGResourceAdapter;
 @class PGContainerAdapter;
+@class PGResourceIdentifier;
 @class PGDisplayableIdentifier;
+@class PGDataProvider;
+@class PGBookmark;
+
+// Other Sources
+#import "PGGeometryTypes.h"
 
 extern NSString *const PGNodeLoadingDidProgressNotification;
 extern NSString *const PGNodeReadyForViewingNotification;
 
 extern NSString *const PGImageRepKey;
-extern NSString *const PGErrorKey;
 
 extern NSString *const PGNodeErrorDomain;
 enum {
@@ -47,26 +51,20 @@ extern NSString *const PGDefaultEncodingKey;
 
 typedef NSUInteger PGNodeStatus;
 
-@protocol PGNodeDataSource;
-
 @interface PGNode : NSObject <PGResourceAdapting>
 {
 	@private
 	PGContainerAdapter *_parentAdapter;
 	PGDocument *_document;
 	PGDisplayableIdentifier *_identifier;
-	NSObject<PGNodeDataSource> *_dataSource;
 
 	NSMutableArray *_adapters;
 	PGResourceAdapter *_adapter;
 	PGNodeStatus _status;
-	NSError *_error;
-	PGNodeStatus _errorPhase;
 
 	BOOL _viewable;
 	NSMenuItem *_menuItem;
-	BOOL _allowMenuItemUpdates; // Just an optimization.
-
+	BOOL _allowMenuItemUpdates;
 	NSDate *_dateModified;
 	NSDate *_dateCreated;
 	NSNumber *_dataLength;
@@ -75,13 +73,11 @@ typedef NSUInteger PGNodeStatus;
 
 + (NSArray *)pasteboardTypes;
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(NSObject<PGNodeDataSource> *)dataSource;
+- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident;
 @property(readonly) PGDisplayableIdentifier *identifier;
-@property(readonly) NSObject<PGNodeDataSource> *dataSource;
 
 @property(readonly) PGResourceAdapter *resourceAdapter;
 @property(readonly) PGLoadPolicy ancestorLoadPolicy;
-@property(retain) NSError *error;
 @property(readonly) NSImage *thumbnail;
 @property(readonly) BOOL isViewable;
 @property(readonly) NSUInteger depth;
@@ -95,44 +91,27 @@ typedef NSUInteger PGNodeStatus;
 @property(readonly) NSNumber *dataLength;
 @property(readonly) NSString *kind;
 
-- (NSData *)dataWithInfo:(NSDictionary *)info fast:(BOOL)flag;
-- (BOOL)canGetDataWithInfo:(NSDictionary *)info;
-
 - (BOOL)shouldLoadAdapterClass:(Class)aClass;
-- (void)startLoadWithInfo:(id)info;
-- (void)continueLoadWithInfo:(id)info;
-- (void)loadFinished;
+- (void)loadWithDataProvider:(PGDataProvider *)provider;
+- (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter;
+- (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter;
 
 - (void)becomeViewed;
 - (void)readIfNecessary;
-- (void)readFinishedWithImageRep:(NSImageRep *)aRep error:(NSError *)error;
+- (void)readFinishedWithImageRep:(NSImageRep *)aRep;
 
 - (void)removeFromDocument;
 - (void)detachFromTree;
 - (NSComparisonResult)compare:(PGNode *)node; // Uses the document's sort mode.
 - (BOOL)writeToPasteboard:(NSPasteboard *)pboard types:(NSArray *)types;
+- (void)addToMenu:(NSMenu *)menu flatten:(BOOL)flatten;
+
+- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
+- (BOOL)isDescendantOfNode:(PGNode *)aNode;
 
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;
 
 - (void)noteIsViewableDidChange;
-
-// Previously in <PGResourceAdapting>:
-@property(readonly) PGNode *parentNode;
-@property(readonly) PGContainerAdapter *parentAdapter;
-@property(readonly) PGNode *rootNode;
-@property(readonly) PGDocument *document;
-
-- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
-- (BOOL)isDescendantOfNode:(PGNode *)aNode;
-
-@end
-
-@protocol PGNodeDataSource <NSObject>
-
-@optional
-- (NSDictionary *)fileAttributesForNode:(PGNode *)node;
-- (void)node:(PGNode *)sender willLoadWithInfo:(NSMutableDictionary *)info;
-- (BOOL)node:(PGNode *)sender getData:(out NSData **)outData info:(NSDictionary *)info fast:(BOOL)flag; // Return NO if a problem occurred. Implementations must be thread-safe.
 
 @end

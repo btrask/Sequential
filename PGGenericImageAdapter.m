@@ -74,8 +74,8 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 @interface PGGenericImageAdapter(Private)
 
-- (void)_threaded_getImageRepWithInfo:(NSDictionary *)info;
-- (NSDictionary *)_imageSourceOptionsWithInfo:(NSDictionary *)info;
+- (void)_threaded_imageRep;
+- (NSDictionary *)_imageSourceOptions;
 - (void)_readExifWithData:(NSData *)data;
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep;
 
@@ -85,18 +85,15 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 #pragma mark Private Protocol
 
-- (void)_threaded_getImageRepWithInfo:(NSDictionary *)info
+- (void)_threaded_imageRep
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-	NSData *data;
-	@synchronized(self) {
-		data = [[self node] dataWithInfo:info fast:NO];
-	}
+	NSData *const data = [[self dataProvider] data];
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
 
 	size_t index = 0;
 	NSDictionary *properties = nil;
-	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptionsWithInfo:info]);
+	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
 	if(PGImageSourceGetBestImageIndex(source, &index, &properties)) {
 		// TODO: Get the orientation from kCGImagePropertyOrientation instead of -_readExifWithData:.
 		[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:PGImageSourceImageRepAtIndex(source, index) waitUntilDone:NO];
@@ -104,9 +101,11 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	}
 	[pool drain];
 }
-- (NSDictionary *)_imageSourceOptionsWithInfo:(NSDictionary *)info
+- (NSDictionary *)_imageSourceOptions
 {
-	return nil; // TODO: Set the kCGImageSourceTypeIdentifierHint.
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+		[[self dataProvider] UTIType], kCGImageSourceTypeIdentifierHint,
+		nil];
 }
 - (void)_readExifWithData:(NSData *)data
 {
@@ -124,7 +123,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	[_cachedRep release];
 	_cachedRep = [aRep retain];
 	[[self document] noteNodeDidCache:[self node]];
-	[[self node] readFinishedWithImageRep:aRep error:nil];
+	[[self node] readFinishedWithImageRep:aRep];
 }
 
 #pragma mark PGResourceAdapting Protocol
@@ -141,7 +140,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	[self clearCache];
 	_readFailed = NO;
 	[[self node] noteIsViewableDidChange];
-	[[self node] loadFinished];
+	[[self node] loadSucceededForAdapter:self];
 }
 
 #pragma mark -
@@ -172,13 +171,13 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 {
 	if(_cachedRep) {
 		[[self document] noteNodeDidCache:[self node]];
-		[[self node] readFinishedWithImageRep:_cachedRep error:nil];
+		[[self node] readFinishedWithImageRep:_cachedRep];
 		return;
 	}
 	if(_reading) return;
 	_reading = YES;
 	_readFailed = NO;
-	[NSThread detachNewThreadSelector:@selector(_threaded_getImageRepWithInfo:) toTarget:self withObject:[[[self info] copy] autorelease]];
+	[NSThread detachNewThreadSelector:@selector(_threaded_imageRep) toTarget:self withObject:nil];
 }
 - (BOOL)canGenerateRealThumbnail
 {
@@ -187,18 +186,14 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 #pragma mark -PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepOfSize:(NSSize)size withInfo:(NSDictionary *)info
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation
 {
-	NSData *data = nil;
-	@synchronized(self) {
-		data = [[self node] dataWithInfo:info fast:NO];
-	}
-	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptionsWithInfo:info]);
+	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)[[self dataProvider] data], (CFDictionaryRef)[self _imageSourceOptions]);
 	size_t i = 0;
 	if(!PGImageSourceGetBestImageIndex(source, &i, NULL)) return nil;
 	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, i);
 	CFRelease(source);
-	return [rep PG_thumbnailWithMaxSize:size orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] opaque:NO];
+	return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:NO];
 }
 
 #pragma mark NSObject

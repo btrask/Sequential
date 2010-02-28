@@ -25,14 +25,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGContainerAdapter.h"
 
 @interface PGPDFAdapter : PGContainerAdapter
-{
-	@private
-	NSPDFImageRep *_rep;
-	NSPDFImageRep *_threadedRep;
-}
-
-@end
-
-@interface PGPDFPageAdapter : PGResourceAdapter
 
 @end

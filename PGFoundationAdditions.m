@@ -270,6 +270,7 @@ OSType PGOSTypeFromString(NSString *str)
 	static UniCharCount max1 = 0;
 	static UniCharCount max2 = 0;
 	UniCharCount const length1 = [self length], length2 = [aString length];
+	if(!length1 && !length2) return NSOrderedSame;
 	if(max1 < length1) {
 		max1 = length1;
 		str1 = str1 ? realloc(str1, max1 * sizeof(UniChar)) : malloc(max1 * sizeof(UniChar));

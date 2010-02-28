@@ -62,36 +62,21 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 }
 - (void)load
 {
-	NSParameterAssert(!_webView);
-	NSURLResponse *const response = [[self info] objectForKey:PGURLResponseKey];
-	NSData *const data = [self data];
-	if(!data) return [[self node] loadFinished];
-	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
-	[_webView setFrameLoadDelegate:self];
-	WebPreferences *const prefs = [WebPreferences standardPreferences];
-	[prefs setJavaEnabled:NO];
-	[prefs setPlugInsEnabled:NO];
-	[prefs setJavaScriptEnabled:NO];
-	[prefs setJavaScriptCanOpenWindowsAutomatically:NO];
-	[prefs setLoadsImagesAutomatically:NO];
-	[_webView setPreferences:prefs];
-	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
-}
-- (void)fallbackLoad
-{
-	DOMHTMLDocument *const doc = [[self info] objectForKey:PGDOMDocumentKey];
-	if(!doc) return [self load];
-	NSArray *identifiers = [doc PG_linkHrefIdentifiersWithSchemes:nil extensions:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:YES]];
-	if(![identifiers count]) identifiers = [doc PG_imageSrcIdentifiers];
-	NSMutableArray *const pages = [NSMutableArray array];
-	for(PGDisplayableIdentifier *const ident in identifiers) {
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident dataSource:nil] autorelease];
-		if(!node) continue;
-		[node startLoadWithInfo:nil];
-		[pages addObject:node];
-	}
-	[self setUnsortedChildren:pages presortedOrder:PGSortInnateOrder];
-	[[self node] loadFinished];
+	// TODO: Rewrite PGHTMLAdapter so that it does its own loading. That means that we will be able to report a more accurate status, as well as work with local files.
+//	NSParameterAssert(!_webView);
+//	NSURLResponse *const response = [[self info] objectForKey:PGURLResponseKey];
+//	NSData *const data = [self data];
+//	if(!data) return [[self node] loadFinished];
+//	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
+//	[_webView setFrameLoadDelegate:self];
+//	WebPreferences *const prefs = [WebPreferences standardPreferences];
+//	[prefs setJavaEnabled:NO];
+//	[prefs setPlugInsEnabled:NO];
+//	[prefs setJavaScriptEnabled:NO];
+//	[prefs setJavaScriptCanOpenWindowsAutomatically:NO];
+//	[prefs setLoadsImagesAutomatically:NO];
+//	[_webView setPreferences:prefs];
+//	[[_webView mainFrame] loadData:data MIMEType:[response MIMEType] textEncodingName:[response textEncodingName] baseURL:[response URL]];
 }
 - (void)read {}
 
@@ -113,7 +98,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 {
 	if(frame != [_webView mainFrame]) return;
 	[self _clearWebView];
-	[[self node] loadFinished];
+	[[self node] loadFailedWithError:error forAdapter:self];
 }
 
 - (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
@@ -130,8 +115,21 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self info] setObject:[frame DOMDocument] forKey:PGDOMDocumentKey];
-	[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[frame DOMDocument], PGDOMDocumentKey, [[frame dataSource] response], PGURLResponseKey, [NSNumber numberWithInteger:PGExists], PGDataExistenceKey, nil]];
+
+	DOMHTMLDocument *const doc = (DOMHTMLDocument *)[frame DOMDocument];
+	if(!doc) return [self load];
+	NSArray *providers = [doc PG_providersForLinkHrefsWithSchemes:nil];
+	if(![providers count]) providers = [doc PG_providersForImageSrcs];
+	NSMutableArray *const pages = [NSMutableArray array];
+	for(PGDataProvider *const provider in providers) {
+		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[[provider identifier] displayableIdentifier]] autorelease];
+		if(!node) continue;
+		[node loadWithDataProvider:provider];
+		[pages addObject:node];
+	}
+	[self setUnsortedChildren:pages presortedOrder:PGSortInnateOrder];
+	[[self node] loadSucceededForAdapter:self];
+
 	[self _clearWebView];
 }
 

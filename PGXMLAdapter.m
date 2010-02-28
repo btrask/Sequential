@@ -54,40 +54,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGXMLAdapter
 
-#pragma mark +PGResourceAdapter
-
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
-{
-	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
-	if(p) return p;
-	do {
-		if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist) break;
-		NSURL *const URL = [(PGResourceIdentifier *)[info objectForKey:PGIdentifierKey] URL];
-		if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) break;
-		if(![[URL path] hasPrefix:@"/photos"]) break;
-		[info setObject:[[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] PG_resourceIdentifier] forKey:PGIdentifierKey];
-		[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
-		return PGMatchByIntrinsicAttribute + 300;
-	} while(NO);
-	do {
-		DOMHTMLDocument *const doc = [info objectForKey:PGDOMDocumentKey];
-		if(!doc || ![doc isKindOfClass:[DOMHTMLDocument class]]) break;
-		NSURL *const docURL = [NSURL URLWithString:[doc URL]];
-		DOMNodeList *const elements = [doc getElementsByTagName:@"LINK"];
-		NSUInteger i = 0;
-		for(; i < [elements length]; i++) {
-			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
-			if(!PGEqualObjects([[link rel] lowercaseString], @"alternate")) continue;
-			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
-			NSURL *const linkURL = [NSURL URLWithString:[link href] relativeToURL:docURL];
-			if(!linkURL) continue;
-			[info setObject:[linkURL PG_resourceIdentifier] forKey:PGIdentifierKey];
-			[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
-			return PGMatchByIntrinsicAttribute + 300;
-		}
-	} while(NO);
-	return PGNotAMatch;
-}
+//#pragma mark +PGResourceAdapter
+//
+//+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSDictionary *)info
+//{
+//	PGMatchPriority const p = [super matchPriorityForNode:node withInfo:info];
+//	if(p) return p;
+//	do {
+//		if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist) break;
+//		NSURL *const URL = [(PGResourceIdentifier *)[info objectForKey:PGIdentifierKey] URL];
+//		if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) break;
+//		if(![[URL path] hasPrefix:@"/photos"]) break;
+//		[info setObject:[[NSURL URLWithString:[NSString stringWithFormat:@"http://www.flickr.com/services/oembed/?url=%@&format=xml", [URL absoluteString]]] PG_resourceIdentifier] forKey:PGIdentifierKey];
+//		[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
+//		return PGMatchByIntrinsicAttribute + 300;
+//	} while(NO);
+//	do {
+//		DOMHTMLDocument *const doc = [info objectForKey:PGDOMDocumentKey];
+//		if(!doc || ![doc isKindOfClass:[DOMHTMLDocument class]]) break;
+//		NSURL *const docURL = [NSURL URLWithString:[doc URL]];
+//		DOMNodeList *const elements = [doc getElementsByTagName:@"LINK"];
+//		NSUInteger i = 0;
+//		for(; i < [elements length]; i++) {
+//			DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[elements item:i];
+//			if(!PGEqualObjects([[link rel] lowercaseString], @"alternate")) continue;
+//			if(![[[self typeDictionary] objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[[link type] lowercaseString]]) continue;
+//			NSURL *const linkURL = [NSURL URLWithString:[link href] relativeToURL:docURL];
+//			if(!linkURL) continue;
+//			[info setObject:[linkURL PG_resourceIdentifier] forKey:PGIdentifierKey];
+//			[info setObject:[PGWebAdapter class] forKey:PGSubstitutedClassKey];
+//			return PGMatchByIntrinsicAttribute + 300;
+//		}
+//	} while(NO);
+//	return PGNotAMatch;
+//}
 
 #pragma mark -PGResourceAdapter
 
@@ -305,7 +305,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (id)info
 {
-	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
+	return nil; // TODO: Instead of this, create a data provider.
+//	return [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInteger:PGDoesNotExist], PGDataExistenceKey, [[self URL] PG_resourceIdentifier], PGIdentifierKey, _MIMEType, PGMIMETypeKey, nil];
 }
 
 #pragma mark -NSObject

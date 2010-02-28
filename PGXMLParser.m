@@ -161,16 +161,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSString *const errorString = [self errorString];
 	return errorString ? [NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:errorString userInfo:nil] : nil;
 }
-- (id)info
+- (NSDictionary *)info
 {
 	if([self createsMultipleNodes]) return nil;
-	if(![_subparsers count]) {
-		NSURL *const URL = [self URL];
-		return URL ? [NSDictionary dictionaryWithObjectsAndKeys:[URL PG_resourceIdentifier], PGIdentifierKey, nil] : nil;
-	}
-	NSMutableArray *const dicts = [NSMutableArray array];
-	for(PGXMLParser *const parser in _subparsers) [dicts addObjectsFromArray:[[parser info] PG_asArray]];
-	return dicts;
+	if([self _hasSubparser]) return [[self _subparser] info];
+	NSURL *const URL = [self URL];
+	return URL ? [NSDictionary dictionaryWithObjectsAndKeys:[URL PG_resourceIdentifier], PGIdentifierKey, nil] : nil;
 }
 - (NSString *)URLString
 {

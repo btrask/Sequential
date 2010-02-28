@@ -29,42 +29,36 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGNode.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
+#import "PGDataProvider.h"
 
 // Other Sources
 #import "PGAppKitAdditions.h"
 #import "PGCFMutableArray.h"
+#import "PGDebug.h"
 #import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
 
-NSString *const PGSubstitutedClassKey = @"PGSubstitutedClass";
+NSString *const PGPasswordKey = @"PGPassword";
+NSString *const PGStringEncodingKey = @"PGStringEncoding";
 
-NSString *const PGBundleTypeFourCCsKey      = @"PGBundleTypeFourCCs";
-NSString *const PGCFBundleTypeMIMETypesKey  = @"CFBundleTypeMIMETypes";
-NSString *const PGCFBundleTypeOSTypesKey    = @"CFBundleTypeOSTypes";
-NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
+static NSString *const PGBundleTypeFourCCsKey = @"PGBundleTypeFourCCs";
+static NSString *const PGLSItemContentTypes = @"LSItemContentTypes";
+static NSString *const PGCFBundleTypeMIMETypesKey = @"CFBundleTypeMIMETypes";
+static NSString *const PGCFBundleTypeOSTypesKey = @"CFBundleTypeOSTypes";
+static NSString *const PGCFBundleTypeExtensionsKey = @"CFBundleTypeExtensions";
 
-NSString *const PGOrientationKey = @"PGOrientation";
-NSString *const PGDateKey        = @"PGDate";
+static NSString *const PGOrientationKey = @"PGOrientation";
 
-#define PGThumbnailSize 128
+#define PGThumbnailSize 128.0f
 
 @interface PGThumbnailGenerationOperation : NSOperation
 {
 	@private
 	PGResourceAdapter *_adapter;
-	NSDictionary *_info;
+	PGOrientation _orientation;
 }
 
-- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter info:(NSDictionary *)info;
-
-@end
-
-@interface PGResourceAdapter(Private)
-
-- (id)_initWithPriority:(PGMatchPriority)priority info:(NSDictionary *)info;
-- (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter;
-
-- (void)_setRealThumbnailWithDictionary:(NSDictionary *)aDict;
+- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter orientation:(PGOrientation)orientation;
 
 @end
 
@@ -75,10 +69,6 @@ NSString *const PGDateKey        = @"PGDate";
 + (NSDictionary *)typesDictionary
 {
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"PGResourceAdapterClasses"];
-}
-+ (NSDictionary *)typeDictionary
-{
-	return [[self typesDictionary] objectForKey:NSStringFromClass(self)];
 }
 + (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag
 {
@@ -93,42 +83,6 @@ NSString *const PGDateKey        = @"PGDate";
 	}
 	return exts;
 }
-+ (NSArray *)adapterClassesInstantiated:(BOOL)flag forNode:(PGNode *)node withInfoDicts:(NSArray *)dicts
-{
-	NSParameterAssert(node);
-	NSParameterAssert(dicts);
-	NSMutableArray *const adapters = [NSMutableArray array];
-	NSDictionary *const types = [self typesDictionary];
-	for(NSDictionary *const info in dicts) {
-		Class const agreedClass = [info objectForKey:PGAdapterClassKey];
-		if(agreedClass) {
-			[adapters addObject:flag ? [[[agreedClass alloc] _initWithPriority:PGMatchByPriorAgreement info:info] autorelease] : agreedClass];
-			continue;
-		}
-		for(NSString *const classString in types) {
-			Class const class = NSClassFromString(classString);
-			if(![node shouldLoadAdapterClass:class]) continue;
-			NSMutableDictionary *const mutableInfo = [[info mutableCopy] autorelease];
-			PGMatchPriority const p = [class matchPriorityForNode:node withInfo:mutableInfo];
-			if(!p) continue;
-			Class altClass = [mutableInfo objectForKey:PGSubstitutedClassKey];
-			if(!altClass) altClass = class;
-			[adapters addObject:flag ? [[[altClass alloc] _initWithPriority:p info:mutableInfo] autorelease] : altClass];
-		}
-	}
-	if(flag) [adapters sortUsingSelector:@selector(_matchPriorityCompare:)];
-	return adapters;
-}
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
-{
-	if([[info objectForKey:PGDataExistenceKey] integerValue] == PGDoesNotExist) return PGNotAMatch;
-	NSDictionary *const type = [self typeDictionary];
-	if([[type objectForKey:PGBundleTypeFourCCsKey] containsObject:[info objectForKey:PGFourCCDataKey]]) return PGMatchByFourCC;
-	if([[type objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[info objectForKey:PGMIMETypeKey]]) return PGMatchByMIMEType;
-	if([[type objectForKey:PGCFBundleTypeOSTypesKey] containsObject:[info objectForKey:PGOSTypeKey]]) return PGMatchByOSType;
-	if([[type objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[info objectForKey:PGExtensionKey] lowercaseString]]) return PGMatchByExtension;
-	return PGNotAMatch;
-}
 + (BOOL)alwaysLoads
 {
 	return [PGResourceAdapter class] != self;
@@ -136,20 +90,16 @@ NSString *const PGDateKey        = @"PGDate";
 
 #pragma mark -PGResourceAdapter
 
-- (PGNode *)node
+- (id)initWithNode:(PGNode *)node dataProvider:(PGDataProvider *)provider
 {
-	return _node;
-}
-- (void)setNode:(PGNode *)aNode
-{
-	@synchronized(self) {
-		if(aNode == _node) return;
-		_node = aNode;
+	if((self = [super init])) {
+		_node = node;
+		_dataProvider = [provider retain];
 	}
-	PGResourceAdapter *const parent = [self parentAdapter];
-	[_activity setParentActivity:parent ? [parent activity] : [[self document] activity]];
-	[[self node] noteIsViewableDidChange];
+	return self;
 }
+@synthesize node = _node;
+@synthesize dataProvider = _dataProvider;
 
 #pragma mark -
 
@@ -164,21 +114,13 @@ NSString *const PGDateKey        = @"PGDate";
 
 #pragma mark -
 
-- (PGDisplayableIdentifier *)identifier
-{
-	return [[self node] identifier];
-}
-- (NSMutableDictionary *)info
-{
-	return [[_info retain] autorelease];
-}
 - (NSData *)data
 {
-	return [[self node] dataWithInfo:_info fast:NO];
+	return [[self dataProvider] data];
 }
 - (BOOL)canGetData
 {
-	return [[self node] canGetDataWithInfo:_info];
+	return [[self dataProvider] hasData];
 }
 - (BOOL)hasNodesWithData
 {
@@ -188,6 +130,10 @@ NSString *const PGDateKey        = @"PGDate";
 #pragma mark -
 
 - (BOOL)isContainer
+{
+	return NO;
+}
+- (BOOL)hasChildren
 {
 	return NO;
 }
@@ -248,14 +194,14 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (void)loadIfNecessary
 {
-	if(![self shouldLoad]) return [[self node] loadFinished];
+	if(![self shouldLoad]) return [[self node] loadSucceededForAdapter:self];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // We load recursively, so memory use can be a problem.
 	[self load];
 	[pool release];
 }
 - (void)load
 {
-	[[self node] loadFinished];
+	[[self node] loadSucceededForAdapter:self];
 }
 - (void)fallbackLoad
 {
@@ -267,7 +213,7 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (void)read
 {
-	[[self node] readFinishedWithImageRep:nil error:nil];
+	[[self node] readFinishedWithImageRep:nil];
 }
 
 #pragma mark -
@@ -277,42 +223,15 @@ NSString *const PGDateKey        = @"PGDate";
 	NSImage *const realThumbnail = [self realThumbnail];
 	if(realThumbnail) return realThumbnail;
 	if([self canGenerateRealThumbnail] && !_thumbnailGenerationOperation) {
-		NSMutableDictionary *const info = [[[self info] mutableCopy] autorelease];
-		[info setObject:[NSNumber numberWithUnsignedInteger:[self orientationWithBase:NO]] forKey:PGOrientationKey];
-		[info setObject:[NSDate date] forKey:PGDateKey];
-		_thumbnailGenerationOperation = [[PGThumbnailGenerationOperation alloc] initWithResourceAdapter:self info:info];
+		_thumbnailGenerationOperation = [[PGThumbnailGenerationOperation alloc] initWithResourceAdapter:self orientation:[self orientationWithBase:NO]];
 		[[self document] addOperation:_thumbnailGenerationOperation];
 	}
 	return [self fastThumbnail];
 }
 - (NSImage *)fastThumbnail
 {
-	NSImage *thumbnail = nil;
-	do {
-		PGResourceIdentifier *const ident = [[self node] identifier];
-		if([ident isFileIdentifier]) {
-			NSURL *const URL = [ident URL];
-			if(URL && [URL isFileURL]) thumbnail = [[NSWorkspace sharedWorkspace] iconForFile:[URL path]];
-		}
-		if(thumbnail) break;
-		NSDictionary *const info = [self info];
-		do {
-			OSType osType = PGOSTypeFromString([info objectForKey:PGOSTypeKey]);
-			NSString *const mimeType = [info objectForKey:PGMIMETypeKey];
-			if(!osType && !mimeType) break;
-			if('fold' == osType) osType = kGenericFolderIcon;
-			IconRef iconRef = NULL;
-			if(noErr != GetIconRefFromTypeInfo('????', osType, NULL, (CFStringRef)mimeType, kIconServicesNormalUsageFlag, &iconRef)) break;
-			thumbnail = [[[NSImage alloc] initWithIconRef:iconRef] autorelease];
-			ReleaseIconRef(iconRef);
-		} while(NO);
-		if(thumbnail) break;
-		NSString *const extension = [info objectForKey:PGExtensionKey];
-		if(extension) thumbnail = [[NSWorkspace sharedWorkspace] iconForFileType:extension];
-		if(thumbnail) break;
-		thumbnail = [[NSWorkspace sharedWorkspace] iconForFileType:@""];
-	} while(NO);
-	[thumbnail setSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize)]; // -iconForFile: returns images "sized" at 32x32, although they actually contain reps of at least 128x128. Our thumbnail view checks the size and doesn't upscale beyond that, though.
+	NSImage *const thumbnail = [[self dataProvider] icon];
+	[thumbnail setSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize)];
 	return thumbnail;
 }
 - (NSImage *)realThumbnail
@@ -334,14 +253,6 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	return NO;
 }
-- (NSImage *)threaded_thumbnailOfSize:(NSSize)size withInfo:(NSDictionary *)info
-{
-	NSImageRep *const rep = [self threaded_thumbnailRepOfSize:size withInfo:info];
-	if(!rep) return nil;
-	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
-	[image addRepresentation:rep];
-	return image;
-}
 - (void)invalidateThumbnail
 {
 	if(![self canGenerateRealThumbnail]) return;
@@ -359,18 +270,14 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	return flag ? [[self document] baseOrientation] : PGUpright;
 }
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu
-{
-	[[[self node] menuItem] PG_removeFromMenu];
-	[aMenu addItem:[[self node] menuItem]];
-}
+- (void)addChildrenToMenu:(NSMenu *)menu {}
 - (void)clearCache {}
 
 #pragma mark -
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
 {
-	return PGEqualObjects(ident, [self identifier]) ? [self node] : nil;
+	return PGEqualObjects(ident, [[self node] identifier]) ? [self node] : nil;
 }
 
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag
@@ -425,46 +332,26 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
 {
-	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] PG_matchesSearchTerms:terms] ? [self node] : nil;
+	return [[self node] isViewable] && [self node] != descendent && [[[[self node] identifier] displayName] PG_matchesSearchTerms:terms] ? [self node] : nil;
 }
 
 #pragma mark -
 
 - (void)noteResourceDidChange {}
 
-#pragma mark -PGResourceAdapter(Private)
-
-- (id)_initWithPriority:(PGMatchPriority)priority info:(NSDictionary *)info
-{
-	if((self = [self init])) {
-		_priority = priority;
-		[[self info] addEntriesFromDictionary:info];
-	}
-	return self;
-}
-- (NSComparisonResult)_matchPriorityCompare:(PGResourceAdapter *)adapter
-{
-	NSParameterAssert([adapter isKindOfClass:[PGResourceAdapter class]]);
-	if(_priority < adapter->_priority) return NSOrderedAscending;
-	if(_priority > adapter->_priority) return NSOrderedDescending;
-	return NSOrderedSame;
-}
-
 #pragma mark -NSObject
 
 - (id)init
 {
-	if((self = [super init])) {
-		_info = [[NSMutableDictionary alloc] init];
-		_activity = [[PGActivity alloc] initWithOwner:self];
-	}
-	return self;
+	PGAssertNotReached(@"Invalid initializer, use -initWithNode:dataProvider: instead."); // TODO: Remove this once we've confirmed that nobody is calling it.
+	[self release];
+	return nil;
 }
 - (void)dealloc
 {
 	[_activity invalidate];
 
-	[_info release];
+	[_dataProvider release];
 	[_realThumbnail release];
 	[_thumbnailGenerationOperation release];
 	[_activity release];
@@ -475,7 +362,7 @@ NSString *const PGDateKey        = @"PGDate";
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [[self node] identifier]];
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self dataProvider]];
 }
 
 #pragma mark -<PGActivityOwner>
@@ -519,11 +406,11 @@ NSString *const PGDateKey        = @"PGDate";
 
 #pragma mark -PGThumbnailGenerationOperation
 
-- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter info:(NSDictionary *)info
+- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter orientation:(PGOrientation)orientation
 {
 	if((self = [super init])) {
 		_adapter = [adapter retain];
-		_info = [info copy];
+		_orientation = orientation;
 	}
 	return self;
 }
@@ -533,9 +420,12 @@ NSString *const PGDateKey        = @"PGDate";
 - (void)main
 {
 	if([self isCancelled]) return;
-	NSImage *const thumbnail = [_adapter threaded_thumbnailOfSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize) withInfo:_info];
+	NSImageRep *const rep = [_adapter threaded_thumbnailRepWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize) orientation:_orientation];
+	if(!rep || [self isCancelled]) return;
+	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
+	[image addRepresentation:rep];
 	if([self isCancelled]) return;
-	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:thumbnail waitUntilDone:NO];
+	[_adapter performSelectorOnMainThread:@selector(setRealThumbnail:) withObject:image waitUntilDone:NO];
 }
 
 #pragma mark -NSObject
@@ -543,8 +433,41 @@ NSString *const PGDateKey        = @"PGDate";
 - (void)dealloc
 {
 	[_adapter release];
-	[_info release];
 	[super dealloc];
+}
+
+@end
+
+@implementation PGDataProvider(PGResourceAdapterLoading)
+
+- (NSArray *)adapterClassesForNode:(PGNode *)node
+{
+	NSParameterAssert(node);
+	NSDictionary *const types = [PGResourceAdapter typesDictionary];
+	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionary];
+	for(NSString *const classString in types) {
+		Class const class = NSClassFromString(classString);
+		if(![node shouldLoadAdapterClass:class]) continue;
+		NSDictionary *const typeDict = [types objectForKey:classString];
+		NSUInteger const p = [self matchPriorityForTypeDictionary:typeDict];
+		if(p) [adapterByPriority setObject:class forKey:[NSNumber numberWithUnsignedInteger:p]];
+	}
+	return [adapterByPriority objectsForKeys:[[adapterByPriority allKeys] sortedArrayUsingSelector:@selector(compare:)] notFoundMarker:[PGResourceAdapter class]];
+}
+- (NSArray *)adaptersForNode:(PGNode *)node
+{
+	NSMutableArray *const adapters = [NSMutableArray array];
+	for(Class const class in [self adapterClassesForNode:node]) [adapters addObject:[[[class alloc] initWithNode:node dataProvider:self] autorelease]];
+	return adapters;
+}
+- (NSUInteger)matchPriorityForTypeDictionary:(NSDictionary *)dict
+{
+	if([[dict objectForKey:PGBundleTypeFourCCsKey] containsObject:[self fourCCData]]) return 5;
+	if([[dict objectForKey:PGLSItemContentTypes] containsObject:[self UTIType]]) return 4;
+	if([[dict objectForKey:PGCFBundleTypeMIMETypesKey] containsObject:[self MIMEType]]) return 3;
+	if([[dict objectForKey:PGCFBundleTypeOSTypesKey] containsObject:PGOSTypeToStringQuoted([self typeCode], NO)]) return 2;
+	if([[dict objectForKey:PGCFBundleTypeExtensionsKey] containsObject:[[self extension] lowercaseString]]) return 1;
+	return 0;
 }
 
 @end

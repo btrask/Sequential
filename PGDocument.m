@@ -71,15 +71,15 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	if((self = [self init])) {
 		_originalIdentifier = [ident retain];
-		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident dataSource:nil];
-		[_node startLoadWithInfo:nil];
+		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident];
+		[_node loadWithDataProvider:nil];
 		PGDisplayableIdentifier *rootIdentifier = ident;
 		if([_originalIdentifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
 			[_node release];
 			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
 			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] PG_fileURL] PG_displayableIdentifier];
-			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier dataSource:nil];
-			[_node startLoadWithInfo:nil];
+			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier];
+			[_node loadWithDataProvider:nil];
 			[self _setInitialIdentifier:ident];
 		}
 		[_originalIdentifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
@@ -251,7 +251,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	NSInteger const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
-	[[[self node] resourceAdapter] addMenuItemsToMenu:_pageMenu];
+	[[self node] addToMenu:_pageMenu flatten:YES];
 	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
 	[self PG_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
 }

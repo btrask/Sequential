@@ -73,39 +73,40 @@ enum {
 
 #pragma mark +PGResourceAdapter
 
-+ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info
++ (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSDictionary *)info
 {
-	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
-	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
-	NSURL *const URL = [ident URL];
-	if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
-	if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
-
-	NSString *photo = nil;
-	NSString *user = nil;
-	NSString *group = nil;
-	NSString *tag = nil;
-	NSString *set = nil;
-	NSScanner *const scanner = [NSScanner scannerWithString:[URL path]];
-	if([scanner PG_scanFromString:@"/photos/" toString:@"/" intoString:&user]) {
-		if([[NSArray arrayWithObjects:@"tags", @"sets", nil] containsObject:user]) user = nil;
-		else {
-			[scanner scanString:@"/" intoString:NULL];
-			[scanner scanUpToString:@"/" intoString:&photo];
-			if([[NSArray arrayWithObjects:@"tags", @"sets", @"groups", @"archives", @"favorites", nil] containsObject:photo]) photo = nil;
-		}
-	}
-	[scanner PG_scanFromString:@"/groups/" toString:@"/" intoString:&group];
-	[scanner PG_scanFromString:@"/tags/" toString:@"/" intoString:&tag];
-	[scanner PG_scanFromString:@"/sets/" toString:@"/" intoString:&set];
-	if(!photo && !user && !group && !tag && !set) return PGNotAMatch;
-
-	[info PG_setObject:photo forKey:PGFlickrPhotoNameKey];
-	[info PG_setObject:user forKey:PGFlickrUserNameKey];
-	[info PG_setObject:group forKey:PGFlickrGroupNameKey];
-	[info PG_setObject:tag forKey:PGFlickrTagNameKey];
-	[info PG_setObject:set forKey:PGFlickrSetNameKey];
-	return PGMatchByIntrinsicAttribute + 700;
+	return PGNotAMatch; // TODO: We aren't allowed to modify the info (type), so come up with a different way to redirect.
+//	PGResourceIdentifier *const ident = [info objectForKey:PGIdentifierKey];
+//	if(!ident || [ident isFileIdentifier]) return PGNotAMatch;
+//	NSURL *const URL = [ident URL];
+//	if([[info objectForKey:PGDataExistenceKey] integerValue] != PGDoesNotExist || [info objectForKey:PGURLResponseKey]) return PGNotAMatch;
+//	if(!PGEqualObjects([URL host], @"flickr.com") && ![[URL host] hasSuffix:@".flickr.com"]) return PGNotAMatch; // Be careful not to allow domains like thisisnotflickr.com.
+//
+//	NSString *photo = nil;
+//	NSString *user = nil;
+//	NSString *group = nil;
+//	NSString *tag = nil;
+//	NSString *set = nil;
+//	NSScanner *const scanner = [NSScanner scannerWithString:[URL path]];
+//	if([scanner PG_scanFromString:@"/photos/" toString:@"/" intoString:&user]) {
+//		if([[NSArray arrayWithObjects:@"tags", @"sets", nil] containsObject:user]) user = nil;
+//		else {
+//			[scanner scanString:@"/" intoString:NULL];
+//			[scanner scanUpToString:@"/" intoString:&photo];
+//			if([[NSArray arrayWithObjects:@"tags", @"sets", @"groups", @"archives", @"favorites", nil] containsObject:photo]) photo = nil;
+//		}
+//	}
+//	[scanner PG_scanFromString:@"/groups/" toString:@"/" intoString:&group];
+//	[scanner PG_scanFromString:@"/tags/" toString:@"/" intoString:&tag];
+//	[scanner PG_scanFromString:@"/sets/" toString:@"/" intoString:&set];
+//	if(!photo && !user && !group && !tag && !set) return PGNotAMatch;
+//
+//	[info PG_setObject:photo forKey:PGFlickrPhotoNameKey];
+//	[info PG_setObject:user forKey:PGFlickrUserNameKey];
+//	[info PG_setObject:group forKey:PGFlickrGroupNameKey];
+//	[info PG_setObject:tag forKey:PGFlickrTagNameKey];
+//	[info PG_setObject:set forKey:PGFlickrSetNameKey];
+//	return PGMatchByIntrinsicAttribute + 700;
 }
 
 #pragma mark -PGResourceAdapter
@@ -178,8 +179,8 @@ enum {
 		[self setUnsortedChildren:[parser nodesWithParentAdapter:self] presortedOrder:PGSortInnateOrder];
 		[[self node] loadFinished];
 	} else {
-		NSArray *const info = [parser info];
-		if([info count]) [[self node] continueLoadWithInfo:info];
+		NSDictionary *const info = [parser info];
+		if(info) [[self node] continueLoadWithInfo:info];
 		else [[self node] setError:nil];
 	}
 }

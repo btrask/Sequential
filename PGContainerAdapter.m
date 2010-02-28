@@ -116,8 +116,8 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	NSRange const range = NSMakeRange(0, [children count]);
 	if(!inclusive) i += increment;
 	for(; NSLocationInRange(i, range); i += increment) {
-		PGNode *const child = [children objectAtIndex:i];
-		PGNode *const node = [child methodForSelector:sel](child, sel, forward, context, nil);
+		PGResourceAdapter *const adapter = [[children objectAtIndex:i] resourceAdapter];
+		PGNode *const node = [adapter methodForSelector:sel](adapter, sel, forward, context, nil);
 		if(node) return node;
 	}
 	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context];
@@ -130,16 +130,17 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	[[self document] noteSortedChildrenDidChange];
 }
 
-#pragma mark -PGResourceAdapter
+#pragma mark -NSObject
 
-- (void)setNode:(PGNode *)aNode
+- (void)dealloc
 {
-	[[[self node] menuItem] setSubmenu:nil];
-	[super setNode:aNode];
-	[[[self node] menuItem] setSubmenu:[[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil];
+	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
+	[_sortedChildren release];
+	[_unsortedChildren release];
+	[super dealloc];
 }
 
-#pragma mark -
+#pragma mark -<PGResourceAdapting>
 
 - (PGContainerAdapter *)containerAdapter
 {
@@ -161,6 +162,10 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 - (BOOL)isContainer
 {
 	return YES;
+}
+- (BOOL)hasChildren
+{
+	return !![[self unsortedChildren] count];
 }
 - (BOOL)hasSavableChildren
 {
@@ -195,14 +200,9 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu
+- (void)addChildrenToMenu:(NSMenu *)menu
 {
-	NSMenu *menu;
-	if([self parentNode]) {
-		[super addMenuItemsToMenu:aMenu];
-		menu = [[[self node] menuItem] submenu];
-	} else menu = aMenu;
-	for(PGNode *const child in [self sortedChildren]) [[child resourceAdapter] addMenuItemsToMenu:menu];
+	for(PGNode *const child in [self sortedChildren]) [child addToMenu:menu flatten:NO];
 }
 
 #pragma mark -
@@ -263,23 +263,13 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	return flag ? nil : [super sortedViewableNodeFirst:NO matchSearchTerms:terms stopAtNode:descendent];
 }
 
-#pragma mark -NSObject
-
-- (void)dealloc
-{
-	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
-	[_sortedChildren release];
-	[_unsortedChildren release];
-	[super dealloc];
-}
-
 #pragma mark -<PGResourceAdapting>
 
 - (void)noteSortOrderDidChange
 {
 	[_sortedChildren release];
 	_sortedChildren = nil;
-	for(PGNode *const child in _unsortedChildren) [child noteSortOrderDidChange];
+	for(PGNode *const child in _unsortedChildren) [[child resourceAdapter] noteSortOrderDidChange];
 }
 
 @end

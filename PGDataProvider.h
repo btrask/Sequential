@@ -1,4 +1,4 @@
-/* Copyright © 2007-2009, The Sequential Project
+/* Copyright © 2010, The Sequential Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -22,16 +22,42 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGResourceAdapting.h"
+// Models
+@class PGResourceIdentifier;
 
-NSString *const PGIdentifierKey = @"PGIdentifier";
-NSString *const PGDataKey = @"PGURLData";
-NSString *const PGDataExistenceKey = @"PGDataExistence";
-NSString *const PGURLResponseKey = @"PGURLResponse";
-NSString *const PGAdapterClassKey = @"PGAdapterClass";
-NSString *const PGFourCCDataKey = @"PGFourCCData";
-NSString *const PGMIMETypeKey = @"PGMIMEType";
-NSString *const PGOSTypeKey = @"PGOSType";
-NSString *const PGExtensionKey = @"PGExtension";
-NSString *const PGPasswordKey = @"PGPassword";
-NSString *const PGStringEncodingKey = @"PGStringEncoding";
+@interface PGDataProvider : NSObject <NSCopying>
+
+@property(readonly) PGResourceIdentifier *identifier;
+// TODO: Add -fileName/-displayableName/-attributedString properties.
+
+@property(readonly) NSData *data;
+@property(readonly) NSDate *dateModified;
+@property(readonly) NSDate *dateCreated;
+
+@property(readonly) NSString *UTIType;
+@property(readonly) NSString *MIMEType;
+@property(readonly) OSType typeCode;
+@property(readonly) NSString *extension;
+
+@property(readonly) NSImage *icon;
+@property(readonly) NSString *kindString;
+@property(readonly) BOOL hasData;
+@property(readonly) NSData *fourCCData;
+@property(readonly) NSUInteger size;
+
+@end
+
+@interface PGDataProvider(PGDataProviderCreation)
+
++ (id)providerWithResourceIdentifier:(PGResourceIdentifier *)ident displayableName:(NSString *)name;
++ (id)providerWithURLResponse:(NSURLResponse *)response data:(NSData *)data;
+
+@end
+
+@protocol PGDataProviderCustomizing
+
+@optional
++ (PGDataProvider *)customDataProviderWithResourceIdentifier:(PGResourceIdentifier *)ident displayableName:(NSString *)name;
++ (PGDataProvider *)customDataProviderWithURLResponse:(NSURLResponse *)response data:(NSData *)data;
+
+@end
