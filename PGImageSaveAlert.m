@@ -138,7 +138,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSUInteger i = [rows firstIndex];
 	for(; NSNotFound != i; i = [rows indexGreaterThanIndex:i]) {
 		id const node = [nodesOutline itemAtRow:i];
-		NSData *const data = [node data];
+		NSData *const data = [[node resourceAdapter] data];
 		if(data && [data writeToFile:[_destination stringByAppendingPathComponent:[self saveNameForNode:node]] atomically:NO]) continue;
 		[unsavedNodes addObject:node];
 		[unsavedRows addIndex:i];
@@ -167,7 +167,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(!_initialSelection) return;
 	NSMutableIndexSet *const indexes = [NSMutableIndexSet indexSet];
 	for(PGNode *const node in _initialSelection) {
-		if(![node canSaveData]) continue;
+		if(![[node resourceAdapter] canSaveData]) continue;
 		NSInteger const rowIndex = [nodesOutline rowForItem:node];
 		if(-1 != rowIndex) [indexes addIndex:(NSUInteger)rowIndex];
 	}
@@ -182,15 +182,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-	return item ? [[item sortedChildren] objectAtIndex:index] : _rootNode;
+	return item ? [[(PGContainerAdapter *)[item resourceAdapter] sortedChildren] objectAtIndex:index] : _rootNode;
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-	return [item hasSavableChildren];
+	return [[item resourceAdapter] hasSavableChildren];
 }
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-	return item ? [[item unsortedChildren] count] : 1;
+	return item ? [[(PGContainerAdapter *)[item resourceAdapter] unsortedChildren] count] : 1;
 }
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
@@ -211,7 +211,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if(tableColumn == nameColumn) {
 		[cell setIcon:[[(PGNode *)item identifier] icon]];
-		[cell setEnabled:[item canSaveData]];
+		[cell setEnabled:[[item resourceAdapter] canSaveData]];
 	}
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldEditTableColumn:(NSTableColumn *)tableColumn item:(id)item
@@ -226,7 +226,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
-	return [item canSaveData];
+	return [[item resourceAdapter] canSaveData];
 }
 
 #pragma mark -<NSWindowDelegate>

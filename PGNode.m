@@ -108,13 +108,17 @@ enum {
 	[_identifier PG_addObserver:self selector:@selector(identifierDisplayNameDidChange:) name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	return self;
 }
-
-#pragma mark -
-
+- (PGDisplayableIdentifier *)identifier
+{
+	return [[_identifier retain] autorelease];
+}
 - (NSObject<PGNodeDataSource> *)dataSource
 {
 	return _dataSource;
 }
+
+#pragma mark -
+
 - (PGResourceAdapter *)resourceAdapter
 {
 	return [[_adapter retain] autorelease];
@@ -262,7 +266,7 @@ enum {
 
 - (void)becomeViewed
 {
-	[[self activity] prioritize:self];
+	[[[self resourceAdapter] activity] prioritize:self];
 	if(PGNodeReading & _status) return;
 	_status |= PGNodeReading;
 	[self readIfNecessary];
@@ -328,7 +332,7 @@ enum {
 		}
 		wrote = YES;
 	}
-	NSData *const data = [self canGetData] ? [self data] : nil;
+	NSData *const data = [[self resourceAdapter] canGetData] ? [[self resourceAdapter] data] : nil;
 	if(data) {
 		if([types containsObject:NSRTFDPboardType]) {
 			[pboard addTypes:[NSArray arrayWithObject:NSRTFDPboardType] owner:nil];
@@ -351,6 +355,18 @@ enum {
 
 #pragma mark -
 
+- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode
+{
+	PGNode *const parent = [self parentNode];
+	return aNode == parent ? self : [parent ancestorThatIsChildOfNode:aNode];
+}
+- (BOOL)isDescendantOfNode:(PGNode *)aNode
+{
+	return [self ancestorThatIsChildOfNode:aNode] != nil;
+}
+
+#pragma mark -
+
 - (void)identifierIconDidChange:(NSNotification *)aNotif
 {
 	[self _updateMenuItem];
@@ -360,6 +376,18 @@ enum {
 	[self _updateMenuItem];
 	if([[self document] isCurrentSortOrder:PGSortByName]) [[self parentAdapter] noteChildValueForCurrentSortOrderDidChange:self];
 	[[self document] noteNodeDisplayNameDidChange:self];
+}
+
+#pragma mark -
+
+- (void)noteIsViewableDidChange
+{
+	BOOL const showsLoadingIndicator = !!(PGNodeLoading & _status);
+	BOOL const showsError = _error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading;
+	BOOL const viewable = showsLoadingIndicator || showsError || [_adapter adapterIsViewable];
+	if(viewable == _viewable) return;
+	_viewable = viewable;
+	[[self document] noteNodeIsViewableDidChange:self];
 }
 
 #pragma mark -PGNode(Private)
@@ -423,14 +451,14 @@ enum {
 	[attributes addEntriesFromDictionary:[[self dataSource] fileAttributesForNode:self]];
 	if(PGEqualObjects([attributes fileType], NSFileTypeDirectory)) [attributes removeObjectForKey:NSFileSize];
 	else if(![attributes objectForKey:NSFileSize]) {
-		NSData *const data = [self data];
+		NSData *const data = [[self resourceAdapter] data];
 		if(data) [attributes setObject:[NSNumber numberWithUnsignedInteger:[data length]] forKey:NSFileSize];
 	}
 	[self _setValue:[attributes fileModificationDate] forSortOrder:PGSortByDateModified];
 	[self _setValue:[attributes fileCreationDate] forSortOrder:PGSortByDateCreated];
 	[self _setValue:[attributes objectForKey:NSFileSize] forSortOrder:PGSortBySize];
 
-	NSDictionary *const info = [self info];
+	NSDictionary *const info = [[self resourceAdapter] info];
 	NSString *kind = nil;
 	// Try every possible method to get a decent string. When a method succeeds, it overwrites previous attempts.
 	if(noErr == LSCopyKindStringForMIMEType((CFStringRef)[info objectForKey:PGMIMETypeKey], (CFStringRef *)&kind)) [kind autorelease]; // For some reason this produces extremely ugly strings, like "TextEdit.app Document".
@@ -477,21 +505,6 @@ enum {
 	[super dealloc];
 }
 
-#pragma mark -
-
-- (IMP)methodForSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? [super methodForSelector:sel] : [_adapter methodForSelector:sel];
-}
-- (NSMethodSignature *)methodSignatureForSelector:(SEL)sel
-{
-	return [_adapter methodSignatureForSelector:sel];
-}
-- (void)forwardInvocation:(NSInvocation *)invocation
-{
-	[invocation invokeWithTarget:_adapter];
-}
-
 #pragma mark -NSObject(NSObject)
 
 - (NSUInteger)hash
@@ -508,13 +521,6 @@ enum {
 - (NSString *)description
 {
 	return [NSString stringWithFormat:@"<%@(%@) %p: %@>", [self class], [_adapter class], self, [self identifier]];
-}
-
-#pragma mark -
-
-- (BOOL)respondsToSelector:(SEL)sel
-{
-	return [super respondsToSelector:sel] ? YES : [_adapter respondsToSelector:sel];
 }
 
 #pragma mark -<PGResourceAdapting>
@@ -538,13 +544,6 @@ enum {
 
 #pragma mark -
 
-- (PGDisplayableIdentifier *)identifier
-{
-	return [[_identifier retain] autorelease];
-}
-
-#pragma mark -
-
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
 	[[self identifier] noteNaturalDisplayNameDidChange];
@@ -555,15 +554,6 @@ enum {
 {
 	[self _updateMenuItem];
 	[_adapter noteSortOrderDidChange];
-}
-- (void)noteIsViewableDidChange
-{
-	BOOL const showsLoadingIndicator = !!(PGNodeLoading & _status);
-	BOOL const showsError = _error && (PGNodeLoadingOrReading & _errorPhase) == PGNodeReading;
-	BOOL const viewable = showsLoadingIndicator || showsError || [_adapter adapterIsViewable];
-	if(viewable == _viewable) return;
-	_viewable = viewable;
-	[[self document] noteNodeIsViewableDidChange:self];
 }
 
 @end

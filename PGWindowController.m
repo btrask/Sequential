@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGDocument.h"
 #import "PGNode.h"
+#import "PGResourceAdapter.h"
 
 // Views
 #import "PGClipView.h"
@@ -75,7 +76,7 @@ static NSString *const PGMainWindowFrameKey = @"PGMainWindowFrame";
 {
 	[super nodeReadyForViewing:aNotif];
 	if(!_shouldZoomOnNextImageLoad) return;
-	if([[[self activeDocument] node] viewableNodeCount] != 1) {
+	if([[[[self activeDocument] node] resourceAdapter] viewableNodeCount] != 1) {
 		_shouldZoomOnNextImageLoad = NO;
 		return;
 	}

@@ -87,9 +87,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[self createChildren];
 	[[self node] loadFinished];
 }
+
+#pragma mark -<PGResourceAdapting>
+
 - (void)noteFileEventDidOccurDirect:(BOOL)flag
 {
-	if(![[self identifier] hasTarget]) [[self node] removeFromDocument];
+	if(![[[self node] identifier] hasTarget]) [[self node] removeFromDocument];
 	else if(flag) [self createChildren];
 }
 

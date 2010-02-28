@@ -59,56 +59,15 @@ enum {
 };
 typedef NSInteger PGLoadPolicy;
 
-@protocol PGResourceAdapting <PGActivityOwner>
+@protocol PGResourceAdapting
 
 @required
 @property(readonly) PGNode *parentNode;
 @property(readonly) PGContainerAdapter *parentAdapter;
-@property(readonly) PGContainerAdapter *containerAdapter;
 @property(readonly) PGNode *rootNode;
-@property(readonly) PGContainerAdapter *rootContainerAdapter;
 @property(readonly) PGDocument *document;
-
-@property(readonly) PGDisplayableIdentifier *identifier;
-@property(readonly) NSMutableDictionary *info;
-@property(readonly) NSData *data;
-@property(readonly) BOOL canGetData;
-@property(readonly) BOOL hasNodesWithData;
-
-@property(readonly) BOOL isContainer;
-@property(readonly) BOOL isSortedFirstViewableNodeOfFolder;
-@property(readonly) BOOL hasRealThumbnail;
-@property(readonly, getter = isResolutionIndependent) BOOL resolutionIndependent;
-@property(readonly) BOOL canSaveData;
-@property(readonly) BOOL hasSavableChildren;
-
-@property(readonly) NSArray *exifEntries;
-@property(readonly) NSUInteger viewableNodeIndex;
-@property(readonly) NSUInteger viewableNodeCount;
-
-- (PGOrientation)orientationWithBase:(BOOL)flag;
-- (void)clearCache;
-- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
-
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag;
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode; // Returns a node that will still exist after the change.
-- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)forward inclusive:(BOOL)inclusive;
-- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
-- (PGNode *)sortedViewableNodeInFolderFirst:(BOOL)flag;
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent;
-
-- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
-- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
-- (BOOL)isDescendantOfNode:(PGNode *)aNode;
-
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu;
 
 - (void)noteFileEventDidOccurDirect:(BOOL)flag;
 - (void)noteSortOrderDidChange;
-- (void)noteIsViewableDidChange;
 
 @end

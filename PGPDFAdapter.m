@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return nil;
 }
 
-#pragma mark PGResourceAdapting Protocol
+#pragma mark PGResourceAdapter
 
 - (BOOL)canSaveData
 {
@@ -66,7 +66,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	return NO;
 }
 
-#pragma mark PGResourceAdapter
+#pragma mark -
 
 - (PGLoadPolicy)descendentLoadPolicy
 {
@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableArray *const nodes = [NSMutableArray array];
 	NSInteger i = 0;
 	for(; i < [_rep pageCount]; i++) {
-		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:i] displayableIdentifier];
+		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInteger:i + 1] descriptionWithLocale:localeDict]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier dataSource:nil] autorelease];
 		if(!node) continue;
@@ -114,6 +114,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGResourceAdapter
 
+- (BOOL)isResolutionIndependent
+{
+	return YES;
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
+{
+	if(![[self node] isViewable] || [self node] == descendent) return nil;
+	NSInteger const index = [[[self node] identifier] index];
+	if(NSNotFound == index) return nil;
+	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
+	return [self node];
+}
+
+#pragma mark -
+
 - (BOOL)adapterIsViewable
 {
 	return YES;
@@ -121,7 +136,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)read
 {
 	NSPDFImageRep *const rep = [(PGPDFAdapter *)[self parentAdapter] _rep];
-	[rep setCurrentPage:[[self identifier] index]];
+	[rep setCurrentPage:[[[self node] identifier] index]];
 	[[self node] readFinishedWithImageRep:rep error:nil];
 }
 
@@ -141,25 +156,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		rep = [(PGPDFAdapter *)[self parentAdapter] _threaded_rep];
 	}
 	if(rep) @synchronized(rep) {
-		[rep setCurrentPage:[[self identifier] index]];
+		[rep setCurrentPage:[[[self node] identifier] index]];
 		return [rep PG_thumbnailWithMaxSize:size orientation:[[info objectForKey:PGOrientationKey] unsignedIntegerValue] opaque:YES];
 	}
 	return nil;
-}
-
-#pragma mark -<PGResourceAdapting>
-
-- (BOOL)isResolutionIndependent
-{
-	return YES;
-}
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
-{
-	if(![[self node] isViewable] || [self node] == descendent) return nil;
-	NSInteger const index = [[self identifier] index];
-	if(NSNotFound == index) return nil;
-	for(id const term in terms) if(![term isKindOfClass:[NSNumber class]] || [term integerValue] - 1 != index) return nil;
-	return [self node];
 }
 
 @end

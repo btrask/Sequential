@@ -119,12 +119,12 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 - (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setCustomDisplayName:title];
+	[[[self node] identifier] setCustomDisplayName:title];
 }
 - (void)webView:(WebView *)sender didReceiveIcon:(NSImage *)image forFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-	[[self identifier] setIcon:image];
+	[[[self node] identifier] setIcon:image];
 }
 
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame

@@ -146,9 +146,90 @@ NSString *const PGDateKey        = @"PGDate";
 		if(aNode == _node) return;
 		_node = aNode;
 	}
-	PGNode *const parent = [self parentNode];
+	PGResourceAdapter *const parent = [self parentAdapter];
 	[_activity setParentActivity:parent ? [parent activity] : [[self document] activity]];
-	[self noteIsViewableDidChange];
+	[[self node] noteIsViewableDidChange];
+}
+
+#pragma mark -
+
+- (PGContainerAdapter *)containerAdapter
+{
+	return [self parentAdapter];
+}
+- (PGContainerAdapter *)rootContainerAdapter
+{
+	return [[self parentAdapter] rootContainerAdapter];
+}
+
+#pragma mark -
+
+- (PGDisplayableIdentifier *)identifier
+{
+	return [[self node] identifier];
+}
+- (NSMutableDictionary *)info
+{
+	return [[_info retain] autorelease];
+}
+- (NSData *)data
+{
+	return [[self node] dataWithInfo:_info fast:NO];
+}
+- (BOOL)canGetData
+{
+	return [[self node] canGetDataWithInfo:_info];
+}
+- (BOOL)hasNodesWithData
+{
+	return [self canGetData];
+}
+
+#pragma mark -
+
+- (BOOL)isContainer
+{
+	return NO;
+}
+- (BOOL)isSortedFirstViewableNodeOfFolder
+{
+	PGContainerAdapter *const container = [self containerAdapter];
+	return !container || [container sortedFirstViewableNodeInFolderFirst:YES] == [self node];
+}
+- (BOOL)hasRealThumbnail
+{
+	return !!_realThumbnail;
+}
+- (BOOL)isResolutionIndependent
+{
+	return NO;
+}
+- (BOOL)canSaveData
+{
+	return NO;
+}
+- (BOOL)hasSavableChildren
+{
+	return NO;
+}
+
+#pragma mark -
+
+- (NSArray *)exifEntries
+{
+	return nil;
+}
+- (NSUInteger)viewableNodeIndex
+{
+	return [[self parentAdapter] viewableIndexOfChild:[self node]];
+}
+- (NSUInteger)viewableNodeCount
+{
+	return [[self node] isViewable] ? 1 : 0;
+}
+- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt
+{
+	return [self viewableNodeCount] > anInt;
 }
 
 #pragma mark -
@@ -208,7 +289,7 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	NSImage *thumbnail = nil;
 	do {
-		PGResourceIdentifier *const ident = [self identifier];
+		PGResourceIdentifier *const ident = [[self node] identifier];
 		if([ident isFileIdentifier]) {
 			NSURL *const URL = [ident URL];
 			if(URL && [URL isFileURL]) thumbnail = [[NSWorkspace sharedWorkspace] iconForFile:[URL path]];
@@ -274,6 +355,81 @@ NSString *const PGDateKey        = @"PGDate";
 
 #pragma mark -
 
+- (PGOrientation)orientationWithBase:(BOOL)flag
+{
+	return flag ? [[self document] baseOrientation] : PGUpright;
+}
+- (void)addMenuItemsToMenu:(NSMenu *)aMenu
+{
+	[[[self node] menuItem] PG_removeFromMenu];
+	[aMenu addItem:[[self node] menuItem]];
+}
+- (void)clearCache {}
+
+#pragma mark -
+
+- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
+{
+	return PGEqualObjects(ident, [self identifier]) ? [self node] : nil;
+}
+
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
+{
+	return [self sortedViewableNodeFirst:flag stopAtNode:nil includeSelf:YES];
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf
+{
+	return includeSelf && [[self node] isViewable] && [self node] != descendent ? [self node] : nil;
+}
+
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag
+{
+	return [self sortedViewableNodeNext:flag includeChildren:YES];
+}
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children
+{
+	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:) context:nil];
+}
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode
+{
+	if(!removedChildren) return [self node];
+	PGNode *const potentiallyRemovedAncestor = [[self node] ancestorThatIsChildOfNode:changedNode];
+	if(!potentiallyRemovedAncestor || NSNotFound == [removedChildren indexOfObjectIdenticalTo:potentiallyRemovedAncestor]) return [self node];
+	return [[[self sortedViewableNodeNext:flag] resourceAdapter] sortedViewableNodeNext:flag afterRemovalOfChildren:removedChildren fromNode:changedNode];
+}
+
+- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)forward inclusive:(BOOL)inclusive
+{
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
+	return node || forward ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];
+}
+- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
+{
+	return nil;
+}
+- (PGNode *)sortedViewableNodeInFolderFirst:(BOOL)flag
+{
+	PGContainerAdapter *ancestor = [self parentAdapter];
+	while(ancestor) {
+		PGNode *const node = [ancestor sortedViewableNodeFirst:flag];
+		if([self node] != node) return node;
+		ancestor = [ancestor parentAdapter];
+	}
+	return nil;
+}
+
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms
+{
+	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
+	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
+}
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
+{
+	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] PG_matchesSearchTerms:terms] ? [self node] : nil;
+}
+
+#pragma mark -
+
 - (void)noteResourceDidChange {}
 
 #pragma mark -PGResourceAdapter(Private)
@@ -319,7 +475,7 @@ NSString *const PGDateKey        = @"PGDate";
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [self identifier]];
+	return [NSString stringWithFormat:@"<%@ %p: %@>", [self class], self, [[self node] identifier]];
 }
 
 #pragma mark -<PGActivityOwner>
@@ -330,7 +486,7 @@ NSString *const PGDateKey        = @"PGDate";
 }
 - (NSString *)descriptionForActivity:(PGActivity *)activity
 {
-	return [[self identifier] displayName];
+	return [[[self node] identifier] displayName];
 }
 
 #pragma mark -<PGResourceAdapting>
@@ -343,17 +499,9 @@ NSString *const PGDateKey        = @"PGDate";
 {
 	return [_node parentAdapter];
 }
-- (PGContainerAdapter *)containerAdapter
-{
-	return [self parentAdapter];
-}
 - (PGNode *)rootNode
 {
 	return [[self node] rootNode];
-}
-- (PGContainerAdapter *)rootContainerAdapter
-{
-	return [[self parentAdapter] rootContainerAdapter];
 }
 - (PGDocument *)document
 {
@@ -362,171 +510,8 @@ NSString *const PGDateKey        = @"PGDate";
 
 #pragma mark -
 
-- (PGDisplayableIdentifier *)identifier
-{
-	return [[self node] identifier];
-}
-- (NSMutableDictionary *)info
-{
-	return [[_info retain] autorelease];
-}
-- (NSData *)data
-{
-	return [[self node] dataWithInfo:_info fast:NO];
-}
-- (BOOL)canGetData
-{
-	return [[self node] canGetDataWithInfo:_info];
-}
-- (BOOL)hasNodesWithData
-{
-	return [[self node] canGetData];
-}
-
-#pragma mark -
-
-- (BOOL)isContainer
-{
-	return NO;
-}
-- (BOOL)isSortedFirstViewableNodeOfFolder
-{
-	PGContainerAdapter *const container = [self containerAdapter];
-	return !container || [container sortedFirstViewableNodeInFolderFirst:YES] == [self node];
-}
-- (BOOL)hasRealThumbnail
-{
-	return !!_realThumbnail;
-}
-- (BOOL)isResolutionIndependent
-{
-	return NO;
-}
-- (BOOL)canSaveData
-{
-	return NO;
-}
-- (BOOL)hasSavableChildren
-{
-	return NO;
-}
-
-#pragma mark -
-
-- (NSArray *)exifEntries
-{
-	return nil;
-}
-- (NSUInteger)viewableNodeIndex
-{
-	return [[self parentAdapter] viewableIndexOfChild:[self node]];
-}
-- (NSUInteger)viewableNodeCount
-{
-	return [[self node] isViewable] ? 1 : 0;
-}
-
-#pragma mark -
-
-- (PGOrientation)orientationWithBase:(BOOL)flag
-{
-	return flag ? [[self document] baseOrientation] : PGUpright;
-}
-- (void)clearCache {}
-- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt
-{
-	return [self viewableNodeCount] > anInt;
-}
-
-#pragma mark -
-
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag
-{
-	return [self sortedViewableNodeFirst:flag stopAtNode:nil includeSelf:YES];
-}
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf
-{
-	return includeSelf && [[self node] isViewable] && [self node] != descendent ? [self node] : nil;
-}
-
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag
-{
-	return [self sortedViewableNodeNext:flag includeChildren:YES];
-}
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children
-{
-	return [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:) context:nil];
-}
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode
-{
-	if(!removedChildren) return [self node];
-	PGNode *const potentiallyRemovedAncestor = [[self node] ancestorThatIsChildOfNode:changedNode];
-	if(!potentiallyRemovedAncestor || NSNotFound == [removedChildren indexOfObjectIdenticalTo:potentiallyRemovedAncestor]) return [self node];
-	return [[self sortedViewableNodeNext:flag] sortedViewableNodeNext:flag afterRemovalOfChildren:removedChildren fromNode:changedNode];
-}
-
-- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)forward inclusive:(BOOL)inclusive
-{
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:@selector(sortedFirstViewableNodeInFolderFirst:) context:nil];
-	return node || forward ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:YES stopAtNode:[self node] includeSelf:YES];
-}
-- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag
-{
-	return nil;
-}
-- (PGNode *)sortedViewableNodeInFolderFirst:(BOOL)flag
-{
-	PGContainerAdapter *ancestor = [self parentAdapter];
-	while(ancestor) {
-		PGNode *const node = [ancestor sortedViewableNodeFirst:flag];
-		if([self node] != node) return node;
-		ancestor = [ancestor parentAdapter];
-	}
-	return nil;
-}
-
-- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms
-{
-	PGNode *const node = [[self parentAdapter] outwardSearchForward:flag fromChild:[self node] inclusive:NO withSelector:@selector(sortedViewableNodeFirst:matchSearchTerms:stopAtNode:) context:terms];
-	return node ? node : [[self rootContainerAdapter] sortedViewableNodeFirst:flag matchSearchTerms:terms stopAtNode:[self node]];
-}
-- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent
-{
-	return [[self node] isViewable] && [self node] != descendent && [[[self identifier] displayName] PG_matchesSearchTerms:terms] ? [self node] : nil;
-}
-
-#pragma mark -
-
-- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
-{
-	return PGEqualObjects(ident, [self identifier]) ? [self node] : nil;
-}
-- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode
-{
-	PGNode *const parent = [self parentNode];
-	return aNode == parent ? [self node] : [parent ancestorThatIsChildOfNode:aNode];
-}
-- (BOOL)isDescendantOfNode:(PGNode *)aNode
-{
-	return [self ancestorThatIsChildOfNode:aNode] != nil;
-}
-
-#pragma mark -
-
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu
-{
-	[[[self node] menuItem] PG_removeFromMenu];
-	[aMenu addItem:[[self node] menuItem]];
-}
-
-#pragma mark -
-
 - (void)noteFileEventDidOccurDirect:(BOOL)flag {}
 - (void)noteSortOrderDidChange {}
-- (void)noteIsViewableDidChange
-{
-	[[self node] noteIsViewableDidChange];
-}
 
 @end
 

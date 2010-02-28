@@ -94,7 +94,7 @@ static id PGArchiveAdapterList = nil;
 		if(PGEqualObjects(path, entryPath)) continue;
 		BOOL const isEntrylessFolder = !PGEqualObjects(subpath, entryPath);
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
-		PGDisplayableIdentifier *const identifier = [[[self identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
+		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier dataSource:self] autorelease];
 		NSMutableDictionary *const info = [NSMutableDictionary dictionaryWithObjectsAndKeys:isEntrylessFolder ? PGOSTypeToStringQuoted('fold', NO) : [_archive PG_OSTypeForEntry:i standardFormat:NO], PGOSTypeKey, nil];
@@ -124,6 +124,13 @@ static id PGArchiveAdapterList = nil;
 }
 
 #pragma mark -PGResourceAdapter
+
+- (BOOL)canSaveData
+{
+	return YES;
+}
+
+#pragma mark -
 
 - (PGLoadPolicy)descendentLoadPolicy
 {
@@ -229,13 +236,6 @@ static id PGArchiveAdapterList = nil;
 		if(neededPassword && !_needsPassword) [[PGArchiveAdapter PG_performOn:self allowOnce:YES withStorage:PGArchiveAdapterList] performSelectorOnMainThread:@selector(_updateThumbnailsOfChildren) withObject:nil waitUntilDone:NO];
 	}
 	if(outData) *outData = data;
-	return YES;
-}
-
-#pragma mark -<PGResourceAdapting>
-
-- (BOOL)canSaveData
-{
 	return YES;
 }
 

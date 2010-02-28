@@ -139,17 +139,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	[[[self node] menuItem] setSubmenu:[[self unsortedChildren] count] ? [[[NSMenu alloc] init] autorelease] : nil];
 }
 
-#pragma mark -NSObject
-
-- (void)dealloc
-{
-	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
-	[_sortedChildren release];
-	[_unsortedChildren release];
-	[super dealloc];
-}
-
-#pragma mark -<PGResourceAdapting>
+#pragma mark -
 
 - (PGContainerAdapter *)containerAdapter
 {
@@ -205,6 +195,27 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 #pragma mark -
 
+- (void)addMenuItemsToMenu:(NSMenu *)aMenu
+{
+	NSMenu *menu;
+	if([self parentNode]) {
+		[super addMenuItemsToMenu:aMenu];
+		menu = [[[self node] menuItem] submenu];
+	} else menu = aMenu;
+	for(PGNode *const child in [self sortedChildren]) [[child resourceAdapter] addMenuItemsToMenu:menu];
+}
+
+#pragma mark -
+
+- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
+{
+	if(!ident) return nil;
+	for(PGNode *const child in _unsortedChildren) {
+		PGNode *const node = [[child resourceAdapter] nodeForIdentifier:ident];
+		if(node) return node;
+	}
+	return [super nodeForIdentifier:ident];
+}
 - (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children
 {
 	PGNode *const node = children && flag ? [self sortedViewableNodeFirst:YES stopAtNode:nil includeSelf:NO] : nil;
@@ -252,26 +263,18 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	return flag ? nil : [super sortedViewableNodeFirst:NO matchSearchTerms:terms stopAtNode:descendent];
 }
 
-#pragma mark -
+#pragma mark -NSObject
 
-- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident
+- (void)dealloc
 {
-	if(!ident) return nil;
-	for(PGNode *const child in _unsortedChildren) {
-		PGNode *const node = [[child resourceAdapter] nodeForIdentifier:ident];
-		if(node) return node;
-	}
-	return [super nodeForIdentifier:ident];
+	[_unsortedChildren makeObjectsPerformSelector:@selector(detachFromTree)];
+	[_sortedChildren release];
+	[_unsortedChildren release];
+	[super dealloc];
 }
-- (void)addMenuItemsToMenu:(NSMenu *)aMenu
-{
-	NSMenu *menu;
-	if([self parentNode]) {
-		[super addMenuItemsToMenu:aMenu];
-		menu = [[[self node] menuItem] submenu];
-	} else menu = aMenu;
-	for(PGNode *const child in [self sortedChildren]) [[child resourceAdapter] addMenuItemsToMenu:menu];
-}
+
+#pragma mark -<PGResourceAdapting>
+
 - (void)noteSortOrderDidChange
 {
 	[_sortedChildren release];

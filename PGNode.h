@@ -49,7 +49,7 @@ typedef NSUInteger PGNodeStatus;
 
 @protocol PGNodeDataSource;
 
-@interface PGNode : NSObject
+@interface PGNode : NSObject <PGResourceAdapting>
 {
 	@private
 	PGContainerAdapter *_parentAdapter;
@@ -76,8 +76,9 @@ typedef NSUInteger PGNodeStatus;
 + (NSArray *)pasteboardTypes;
 
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident dataSource:(NSObject<PGNodeDataSource> *)dataSource;
-
+@property(readonly) PGDisplayableIdentifier *identifier;
 @property(readonly) NSObject<PGNodeDataSource> *dataSource;
+
 @property(readonly) PGResourceAdapter *resourceAdapter;
 @property(readonly) PGLoadPolicy ancestorLoadPolicy;
 @property(retain) NSError *error;
@@ -114,9 +115,17 @@ typedef NSUInteger PGNodeStatus;
 - (void)identifierIconDidChange:(NSNotification *)aNotif;
 - (void)identifierDisplayNameDidChange:(NSNotification *)aNotif;
 
-@end
+- (void)noteIsViewableDidChange;
 
-@interface PGNode(PGResourceAdapterProxy) <PGResourceAdapting>
+// Previously in <PGResourceAdapting>:
+@property(readonly) PGNode *parentNode;
+@property(readonly) PGContainerAdapter *parentAdapter;
+@property(readonly) PGNode *rootNode;
+@property(readonly) PGDocument *document;
+
+- (PGNode *)ancestorThatIsChildOfNode:(PGNode *)aNode;
+- (BOOL)isDescendantOfNode:(PGNode *)aNode;
+
 @end
 
 @protocol PGNodeDataSource <NSObject>

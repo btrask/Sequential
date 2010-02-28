@@ -104,7 +104,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[[self node] continueLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:resp, PGURLResponseKey, [resp MIMEType], PGMIMETypeKey, [_mainLoad data], PGDataKey, nil]];
 	} else if(sender == _faviconLoad) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconLoad data]] autorelease];
-		if(favicon) [[self identifier]	setIcon:favicon]; // Don't clear the favicon we already have if we can't load a new one.
+		if(favicon) [[[self node] identifier] setIcon:favicon]; // Don't clear the favicon we already have if we can't load a new one.
 	}
 }
 - (void)loadDidFail:(PGURLLoad *)sender

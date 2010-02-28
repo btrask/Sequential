@@ -47,7 +47,7 @@ enum {
 };
 typedef NSUInteger PGMatchPriority;
 
-@interface PGResourceAdapter : NSObject <PGResourceAdapting>
+@interface PGResourceAdapter : NSObject <PGActivityOwner, PGResourceAdapting>
 {
 	@private
 	PGMatchPriority _priority;
@@ -65,8 +65,27 @@ typedef NSUInteger PGMatchPriority;
 + (PGMatchPriority)matchPriorityForNode:(PGNode *)node withInfo:(NSMutableDictionary *)info;
 + (BOOL)alwaysLoads;
 
-- (PGNode *)node;
-- (void)setNode:(PGNode *)aNode;
+@property(assign) PGNode *node;
+
+@property(readonly) PGContainerAdapter *containerAdapter;
+@property(readonly) PGContainerAdapter *rootContainerAdapter;
+
+@property(readonly) NSMutableDictionary *info;
+@property(readonly) NSData *data;
+@property(readonly) BOOL canGetData;
+@property(readonly) BOOL hasNodesWithData;
+
+@property(readonly) BOOL isContainer;
+@property(readonly) BOOL isSortedFirstViewableNodeOfFolder;
+@property(readonly) BOOL hasRealThumbnail;
+@property(readonly, getter = isResolutionIndependent) BOOL resolutionIndependent;
+@property(readonly) BOOL canSaveData;
+@property(readonly) BOOL hasSavableChildren;
+
+@property(readonly) NSArray *exifEntries;
+@property(readonly) NSUInteger viewableNodeIndex;
+@property(readonly) NSUInteger viewableNodeCount;
+- (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
 
 - (BOOL)adapterIsViewable;
 - (BOOL)shouldLoad;
@@ -84,6 +103,22 @@ typedef NSUInteger PGMatchPriority;
 - (BOOL)canGenerateRealThumbnail;
 - (NSImage *)threaded_thumbnailOfSize:(NSSize)size withInfo:(NSDictionary *)info;
 - (void)invalidateThumbnail;
+
+- (PGOrientation)orientationWithBase:(BOOL)flag;
+- (void)addMenuItemsToMenu:(NSMenu *)aMenu;
+- (void)clearCache;
+
+- (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag stopAtNode:(PGNode *)descendent includeSelf:(BOOL)includeSelf;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag includeChildren:(BOOL)children;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag afterRemovalOfChildren:(NSArray *)removedChildren fromNode:(PGNode *)changedNode; // Returns a node that will still exist after the change.
+- (PGNode *)sortedFirstViewableNodeInFolderNext:(BOOL)forward inclusive:(BOOL)inclusive;
+- (PGNode *)sortedFirstViewableNodeInFolderFirst:(BOOL)flag;
+- (PGNode *)sortedViewableNodeInFolderFirst:(BOOL)flag;
+- (PGNode *)sortedViewableNodeNext:(BOOL)flag matchSearchTerms:(NSArray *)terms;
+- (PGNode *)sortedViewableNodeFirst:(BOOL)flag matchSearchTerms:(NSArray *)terms stopAtNode:(PGNode *)descendent;
 
 - (void)noteResourceDidChange;
 

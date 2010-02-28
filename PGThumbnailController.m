@@ -60,7 +60,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 + (BOOL)canShowThumbnailsForDocument:(PGDocument *)aDoc
 {
-	return [[aDoc node] hasViewableNodeCountGreaterThan:1];
+	return [[[aDoc node] resourceAdapter] hasViewableNodeCountGreaterThan:1];
 }
 + (BOOL)shouldShowThumbnailsForDocument:(PGDocument *)aDoc
 {
@@ -244,7 +244,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (BOOL)thumbnailBrowser:(PGThumbnailBrowser *)sender itemCanHaveChildren:(id)item
 {
-	return [item isContainer];
+	return [[item resourceAdapter] isContainer];
 }
 
 #pragma mark -<PGThumbnailBrowserDelegate>
@@ -252,7 +252,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)thumbnailBrowserSelectionDidChange:(PGThumbnailBrowser *)sender
 {
 	NSSet *const selection = [sender selection];
-	id const item = [selection anyObject];
+	PGNode *const item = [selection anyObject];
 	(void)[[self displayController] tryToSetActiveNode:[([selection count] == 1 ? item : [(PGNode *)item parentNode]) viewableAncestor] forward:YES];
 }
 - (void)thumbnailBrowser:(PGThumbnailBrowser *)sender numberOfColumnsDidChangeFrom:(NSUInteger)oldCount
@@ -264,23 +264,23 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 
 - (NSArray *)itemsForThumbnailView:(PGThumbnailView *)sender
 {
-	id const item = [sender representedObject];
-	if(item) return [item isContainer] ? [item sortedChildren] : nil;
+	PGNode *const item = [sender representedObject];
+	if(item) return [[item resourceAdapter] isContainer] ? [(PGContainerAdapter *)[item resourceAdapter] sortedChildren] : nil;
 	PGNode *const root = [[self document] node];
 	if([root isViewable]) return [root PG_asArray];
-	return [root isContainer] ? [(PGContainerAdapter *)root sortedChildren] : nil;
+	return [[root resourceAdapter] isContainer] ? [(PGContainerAdapter *)[root resourceAdapter] sortedChildren] : nil;
 }
 - (NSImage *)thumbnailView:(PGThumbnailView *)sender thumbnailForItem:(id)item
 {
-	return [item thumbnail];
+	return [[item resourceAdapter] thumbnail];
 }
 - (NSString *)thumbnailView:(PGThumbnailView *)sender labelForItem:(id)item
 {
-	return [item hasRealThumbnail] ? nil : [[(PGNode *)item identifier] displayName];
+	return [[item resourceAdapter] hasRealThumbnail] ? nil : [[(PGNode *)item identifier] displayName];
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender canSelectItem:(id)item;
 {
-	return [item hasViewableNodeCountGreaterThan:0];
+	return [[item resourceAdapter] hasViewableNodeCountGreaterThan:0];
 }
 - (NSColor *)thumbnailView:(PGThumbnailView *)sender labelColorForItem:(id)item
 {
@@ -311,7 +311,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 }
 - (BOOL)thumbnailView:(PGThumbnailView *)sender shouldRotateThumbnailForItem:(id)item
 {
-	return [item hasRealThumbnail];
+	return [[item resourceAdapter] hasRealThumbnail];
 }
 
 @end

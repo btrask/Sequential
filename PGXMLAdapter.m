@@ -98,7 +98,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	_triedLoading = YES;
 	PGXMLParser *const p = [PGXMLParser parserWithData:data baseURL:[(PGResourceIdentifier *)[[self info] objectForKey:PGIdentifierKey] URL] classes:[NSArray arrayWithObjects:[PGMediaRSSParser class], [PGOEmbedParser class], nil]];
 	NSString *const title = [p title];
-	if(title) [[self identifier] setCustomDisplayName:title];
+	if(title) [[[self node] identifier] setCustomDisplayName:title];
 	if(![p createsMultipleNodes]) {
 		id const info = [p info];
 		if(info) return [[self node] continueLoadWithInfo:info];

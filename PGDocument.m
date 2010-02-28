@@ -209,7 +209,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[[self displayController] showWindow:self];
 	if(new && !_openedBookmark) {
 		PGBookmark *const bookmark = [[PGBookmarkController sharedBookmarkController] bookmarkForIdentifier:[self originalIdentifier]];
-		if(bookmark && [[self node] nodeForIdentifier:[bookmark fileIdentifier]]) [[self displayController] offerToOpenBookmark:bookmark];
+		if(bookmark && [[[self node] resourceAdapter] nodeForIdentifier:[bookmark fileIdentifier]]) [[self displayController] offerToOpenBookmark:bookmark];
 	}
 }
 - (void)close
@@ -233,8 +233,8 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 
 - (void)noteNode:(PGNode *)node willRemoveNodes:(NSArray *)anArray
 {
-	PGNode *newStoredNode = [_storedNode sortedViewableNodeNext:YES afterRemovalOfChildren:anArray fromNode:node];
-	if(!newStoredNode) newStoredNode = [_storedNode sortedViewableNodeNext:NO afterRemovalOfChildren:anArray fromNode:node];
+	PGNode *newStoredNode = [[_storedNode resourceAdapter] sortedViewableNodeNext:YES afterRemovalOfChildren:anArray fromNode:node];
+	if(!newStoredNode) newStoredNode = [[_storedNode resourceAdapter] sortedViewableNodeNext:NO afterRemovalOfChildren:anArray fromNode:node];
 	if(_storedNode != newStoredNode) {
 		[_storedNode release];
 		_storedNode = [newStoredNode retain];
@@ -251,7 +251,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	NSInteger const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
 	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
-	[[self node] addMenuItemsToMenu:_pageMenu];
+	[[[self node] resourceAdapter] addMenuItemsToMenu:_pageMenu];
 	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
 	[self PG_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
 }
@@ -275,7 +275,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[_cachedNodes removeObjectIdenticalTo:node];
 	[_cachedNodes insertObject:node atIndex:0];
 	while([_cachedNodes count] > PGDocumentMaxCachedNodes) {
-		[[_cachedNodes lastObject] clearCache];
+		[[[_cachedNodes lastObject] resourceAdapter] clearCache];
 		[_cachedNodes removeLastObject];
 	}
 }
@@ -296,15 +296,15 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	NSUInteger const flags = [[[aNotif userInfo] objectForKey:PGSubscriptionRootFlagsKey] unsignedIntegerValue];
 	if(flags & (NOTE_DELETE | NOTE_REVOKE)) return [self close];
 	PGResourceIdentifier *const ident = [[[[aNotif userInfo] objectForKey:PGSubscriptionPathKey] PG_fileURL] PG_resourceIdentifier];
-	[[[self node] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
+	[[[[self node] resourceAdapter] nodeForIdentifier:ident] noteFileEventDidOccurDirect:YES];
 }
 
 #pragma mark -PGDocument(Private)
 
 - (PGNode *)_initialNode
 {
-	PGNode *const node = [[self node] nodeForIdentifier:_initialIdentifier];
-	return node ? node : [[self node] sortedViewableNodeFirst:YES];
+	PGNode *const node = [[[self node] resourceAdapter] nodeForIdentifier:_initialIdentifier];
+	return node ? node : [[[self node] resourceAdapter] sortedViewableNodeFirst:YES];
 }
 - (void)_setInitialIdentifier:(PGResourceIdentifier *)ident
 {
@@ -377,7 +377,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (void)dealloc
 {
 	[self PG_removeObserver];
-	[[_node activity] cancel:self];
+	[[[_node resourceAdapter] activity] cancel:self];
 	[_node detachFromTree];
 	[_operationQueue cancelAllOperations];
 	[_activity invalidate];

@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Models
 #import "PGNode.h"
+#import "PGResourceAdapter.h"
 #import "PGExifEntry.h"
 
 // Controllers
@@ -67,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
 	[_allEntries release];
-	_allEntries = [[[[self displayController] activeNode] exifEntries] copy];
+	_allEntries = [[[[[self displayController] activeNode] resourceAdapter] exifEntries] copy];
 	[self changeSearch:nil];
 }
 
