@@ -119,7 +119,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 
 	DOMHTMLDocument *const doc = (DOMHTMLDocument *)[frame DOMDocument];
 	if(!doc) return [self load];
-	NSArray *providers = [doc PG_providersForLinkHrefsWithSchemes:nil];
+	NSArray *providers = [doc PG_providersForLinkHrefsWithSchemes:[NSArray arrayWithObjects:@"http", @"https", nil]];
 	if(![providers count]) providers = [doc PG_providersForImageSrcs];
 	NSMutableArray *const pages = [NSMutableArray array];
 	for(PGDataProvider *const provider in providers) {

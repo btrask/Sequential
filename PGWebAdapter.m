@@ -39,11 +39,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGWebDataProvider : PGDataProvider
 {
 	@private
-	NSURL *_URL;
+	PGResourceIdentifier *_identifier;
 }
 
-- (id)initWithURL:(NSURL *)URL;
-@property(readonly) NSURL *URL;
+- (id)initWithResourceIdentifier:(PGResourceIdentifier *)identifier;
+@property(readonly) PGResourceIdentifier *identifier;
 
 @end
 
@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if([ident isFileIdentifier]) return nil;
 	NSURL *const URL = [ident URL];
-	if([[NSArray arrayWithObjects:@"http", @"https", nil] containsObject:[URL scheme]]) return [[[PGWebDataProvider alloc] initWithURL:[ident URL]] autorelease];
+	if([[NSArray arrayWithObjects:@"http", @"https", nil] containsObject:[URL scheme]]) return [[[PGWebDataProvider alloc] initWithResourceIdentifier:ident] autorelease];
 	return nil;
 }
 
@@ -68,7 +68,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)load
 {
 	_triedLoad = YES;
-	NSURL *const URL = [(PGWebDataProvider *)[self dataProvider] URL];
+	NSURL *const URL = [[(PGDataProvider *)[self dataProvider] identifier] URL];
+	if([URL isFileURL]) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parent:self delegate:self];
@@ -148,14 +149,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGWebDataProvider
 
-- (id)initWithURL:(NSURL *)URL
+- (id)initWithResourceIdentifier:(PGResourceIdentifier *)identifier
 {
 	if((self = [super init])) {
-		_URL = [URL copy];
+		_identifier = [identifier retain];
 	}
 	return self;
 }
-@synthesize URL = _URL;
+@synthesize identifier = _identifier;
 
 #pragma mark -PGDataProvider(PGResourceAdapterLoading)
 
@@ -168,7 +169,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)dealloc
 {
-	[_URL release];
+	[_identifier release];
 	[super dealloc];
 }
 
