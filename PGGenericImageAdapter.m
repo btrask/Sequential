@@ -33,39 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGAppKitAdditions.h"
 
-static BOOL PGImageSourceGetBestImageIndex(CGImageSourceRef source, size_t *outIndex, NSDictionary **outProperties)
-{
-	if(!source) return NO;
-	NSDictionary *const propOptions = [NSDictionary dictionaryWithObjectsAndKeys:
-		[NSNumber numberWithBool:NO], kCGImageSourceShouldCache,
-		nil];
-	size_t const count = CGImageSourceGetCount(source);
-	size_t i = 0;
-	BOOL found = NO;
-	size_t bestIndex = 0;
-	NSDictionary *bestProperties = nil;
-	NSUInteger bestRes = 0;
-	NSUInteger bestDepth = 0;
-	for(; i < count; i++) {
-		NSDictionary *const properties = [(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, i, (CFDictionaryRef)propOptions) autorelease];
-		NSUInteger const res = [[properties objectForKey:(NSString *)kCGImagePropertyPixelWidth] unsignedIntegerValue] * [[properties objectForKey:(NSString *)kCGImagePropertyPixelHeight] unsignedIntegerValue];
-		if(res < bestRes) continue;
-		NSUInteger const depth = [[properties objectForKey:(NSString *)kCGImagePropertyDepth] unsignedIntegerValue];
-		if(depth < bestDepth) continue;
-		found = YES;
-		bestIndex = i;
-		bestProperties = properties;
-		bestRes = res;
-		bestDepth = depth;
-	}
-	if(!found) return NO;
-	if(outIndex) *outIndex = bestIndex;
-	if(outProperties) *outProperties = bestProperties;
-	return YES;
-}
 static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, size_t i)
 {
 	if(!source) return nil;
+	if(i >= CGImageSourceGetCount(source)) return nil;
 	CGImageRef const image = CGImageSourceCreateImageAtIndex(source, i, NULL);
 	NSBitmapImageRep *const rep = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 	CGImageRelease(image);
@@ -90,15 +61,16 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	NSData *const data = [[self dataProvider] data];
 	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
+	// TODO: Get the orientation from kCGImagePropertyOrientation instead of -_readExifWithData:.
 
-	size_t index = 0;
-	NSDictionary *properties = nil;
-	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
-	if(PGImageSourceGetBestImageIndex(source, &index, &properties)) {
-		// TODO: Get the orientation from kCGImagePropertyOrientation instead of -_readExifWithData:.
-		[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:PGImageSourceImageRepAtIndex(source, index) waitUntilDone:NO];
+	NSImageRep *rep = nil;
+	if(data) {
+		CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
+		if(CGImageSourceGetCount(source) > 1) rep = [NSBitmapImageRep imageRepWithData:data]; // If the image is animated, we can't use the image source.
+		else rep = PGImageSourceImageRepAtIndex(source, 0);
 		CFRelease(source);
 	}
+	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:rep waitUntilDone:NO];
 	[pool drain];
 }
 - (NSDictionary *)_imageSourceOptions
@@ -188,10 +160,10 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 - (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation
 {
-	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)[[self dataProvider] data], (CFDictionaryRef)[self _imageSourceOptions]);
-	size_t i = 0;
-	if(!PGImageSourceGetBestImageIndex(source, &i, NULL)) return nil;
-	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, i);
+	NSData *const data = [[self dataProvider] data];
+	if(!data) return nil;
+	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
+	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, 0);
 	CFRelease(source);
 	return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:NO];
 }
