@@ -115,11 +115,6 @@ enum {
 {
 	return [[_adapter retain] autorelease];
 }
-- (PGLoadPolicy)ancestorLoadPolicy
-{
-	PGContainerAdapter *const p = [self parentAdapter];
-	return p ? MAX([[p node] ancestorLoadPolicy], [p descendentLoadPolicy]) : PGLoadToMaxDepth;
-}
 - (NSImage *)thumbnail
 {
 	return PGNodeLoading & _status ? nil : [[self resourceAdapter] thumbnail];
@@ -127,10 +122,6 @@ enum {
 - (BOOL)isViewable
 {
 	return _viewable;
-}
-- (NSUInteger)depth
-{
-	return [self parentNode] ? [[self parentNode] depth] + 1 : 0;
 }
 - (PGNode *)viewableAncestor
 {
@@ -170,15 +161,6 @@ enum {
 
 #pragma mark -
 
-- (BOOL)shouldLoadAdapterClass:(Class)aClass
-{
-	if([aClass alwaysLoads]) return YES;
-	switch([self ancestorLoadPolicy]) {
-		case PGLoadToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntegerValue];
-		case PGLoadAll: return YES;
-		default: return NO;
-	}
-}
 - (void)loadWithDataProvider:(PGDataProvider *)provider
 {
 	_status |= PGNodeLoading;

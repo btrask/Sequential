@@ -42,14 +42,14 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 
 @implementation PGContainerAdapter
 
-#pragma mark +PGResourceAdapter
+#pragma mark -PGContainerAdapter
 
-+ (BOOL)alwaysLoads
+- (PGRecursionPolicy)descendantRecursionPolicy
 {
-	return NO;
+	return [self recursionPolicy];
 }
 
-#pragma mark -PGContainerAdapter
+#pragma mark -
 
 - (NSArray *)sortedChildren
 {
@@ -130,6 +130,14 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	[[self document] noteSortedChildrenDidChange];
 }
 
+#pragma mark -PGResourceAdapter
+
+- (void)loadIfNecessary
+{
+	if([self shouldRecursivelyCreateChildren]) [super loadIfNecessary];
+	else [[self node] loadSucceededForAdapter:self];
+}
+
 #pragma mark -NSObject
 
 - (void)dealloc
@@ -188,7 +196,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	NSUInteger count = [[self node] isViewable] ? 1 : 0;
 	if(count > anInt) return YES;
-	for(id const child in [self sortedChildren]) {
+	for(id const child in [self unsortedChildren]) {
 		PGResourceAdapter *const adapter = [child resourceAdapter];
 		if([adapter hasViewableNodeCountGreaterThan:anInt - count]) return YES;
 		if(![child isViewable]) continue;

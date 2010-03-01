@@ -27,13 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @class PGNode;
 @class PGContainerAdapter;
 
-enum {
-	PGLoadToMaxDepth = 0,
-	PGLoadAll        = 1,
-	PGLoadNone       = 2
-};
-typedef NSInteger PGLoadPolicy;
-
 @protocol PGResourceAdapting
 
 @required

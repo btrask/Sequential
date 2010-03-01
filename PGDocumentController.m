@@ -153,7 +153,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[openPanel setAllowsMultipleSelection:YES];
 	NSURL *const URL = [[[self currentDocument] originalIdentifier] URL];
 	NSString *const path = [URL isFileURL] ? [URL path] : nil;
-	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedExtensionsWhichMustAlwaysLoad:NO]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
+	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedTypes]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
 }
 - (IBAction)openURL:(id)sender
 {

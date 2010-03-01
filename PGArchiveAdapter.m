@@ -132,6 +132,13 @@ static id PGArchiveAdapterList = nil;
 	[[self document] noteNodeThumbnailDidChange:[self node] recursively:YES];
 }
 
+#pragma mark -PGContainerAdapter
+
+- (PGRecursionPolicy)descendantRecursionPolicy
+{
+	return PGRecurseToAnyDepth;
+}
+
 #pragma mark -PGResourceAdapter
 
 - (BOOL)canSaveData
@@ -141,10 +148,6 @@ static id PGArchiveAdapterList = nil;
 
 #pragma mark -
 
-- (PGLoadPolicy)descendentLoadPolicy
-{
-	return PGLoadAll;
-}
 - (void)load
 {
 	if(!_archive) {

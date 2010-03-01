@@ -54,12 +54,15 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	_webView = nil;
 }
 
+#pragma mark -PGContainerAdapter
+
+- (PGRecursionPolicy)descendantRecursionPolicy
+{
+	return PGRecurseNoFurther;
+}
+
 #pragma mark -PGResourceAdapter
 
-- (PGLoadPolicy)descendentLoadPolicy
-{
-	return PGLoadNone;
-}
 - (void)load
 {
 	NSParameterAssert(!_webView);

@@ -53,12 +53,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation PGPDFAdapter
 
+#pragma mark -PGContainerAdapter
+
+- (PGRecursionPolicy)descendantRecursionPolicy
+{
+	return PGRecurseToAnyDepth;
+}
+
 #pragma mark -PGResourceAdapter
 
-- (PGLoadPolicy)descendentLoadPolicy
-{
-	return PGLoadAll;
-}
 - (void)load
 {
 	NSData *const data = [self data];

@@ -77,10 +77,8 @@ typedef NSUInteger PGNodeStatus;
 @property(readonly) PGDisplayableIdentifier *identifier;
 
 @property(readonly) PGResourceAdapter *resourceAdapter;
-@property(readonly) PGLoadPolicy ancestorLoadPolicy;
 @property(readonly) NSImage *thumbnail;
 @property(readonly) BOOL isViewable;
-@property(readonly) NSUInteger depth;
 @property(readonly) PGNode *viewableAncestor;
 @property(readonly) NSMenuItem *menuItem;
 @property(readonly) BOOL canBookmark;
@@ -91,7 +89,6 @@ typedef NSUInteger PGNodeStatus;
 @property(readonly) NSNumber *dataLength;
 @property(readonly) NSString *kind;
 
-- (BOOL)shouldLoadAdapterClass:(Class)aClass;
 - (void)loadWithDataProvider:(PGDataProvider *)provider;
 - (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter;
 - (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter;

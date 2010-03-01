@@ -30,6 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 extern NSString *const PGPasswordKey;
 extern NSString *const PGStringEncodingKey;
 
+enum {
+	PGRecurseToMaxDepth = 0,
+	PGRecurseToAnyDepth = 1,
+	PGRecurseNoFurther = 2,
+};
+typedef NSInteger PGRecursionPolicy;
+
 @interface PGResourceAdapter : NSObject <PGActivityOwner, PGResourceAdapting>
 {
 	@private
@@ -43,8 +50,7 @@ extern NSString *const PGStringEncodingKey;
 }
 
 + (NSDictionary *)typesDictionary;
-+ (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag;
-+ (BOOL)alwaysLoads;
++ (NSArray *)supportedTypes;
 
 - (id)initWithNode:(PGNode *)node dataProvider:(PGDataProvider *)provider;
 @property(readonly) PGNode *node;
@@ -52,6 +58,9 @@ extern NSString *const PGStringEncodingKey;
 
 @property(readonly) PGContainerAdapter *containerAdapter;
 @property(readonly) PGContainerAdapter *rootContainerAdapter;
+@property(readonly) NSUInteger depth;
+@property(readonly) PGRecursionPolicy recursionPolicy;
+@property(readonly) BOOL shouldRecursivelyCreateChildren;
 
 @property(readonly) NSData *data;
 @property(readonly) BOOL canGetData;
@@ -71,8 +80,6 @@ extern NSString *const PGStringEncodingKey;
 - (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
 
 - (BOOL)adapterIsViewable;
-- (BOOL)shouldLoad;
-- (PGLoadPolicy)descendentLoadPolicy;
 - (void)loadIfNecessary;
 - (void)load; // Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
 - (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.

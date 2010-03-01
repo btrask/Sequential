@@ -40,7 +40,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)createChildren
 {
-	NSParameterAssert([self shouldLoad]);
 	NSURL *const URL = [[(PGDataProvider *)[self dataProvider] identifier] URLByFollowingAliases:YES];
 	LSItemInfoRecord info;
 	if(LSCopyItemInfoForURL((CFURLRef)URL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsPackage) return;

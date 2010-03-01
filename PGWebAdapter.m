@@ -26,9 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Models
 #import "PGNode.h"
-#import "PGURLLoad.h"
+#import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGDataProvider.h"
+#import "PGURLLoad.h"
 
 // Controllers
 #import "PGDocumentController.h"
@@ -111,10 +112,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[_mainLoad cancelAndNotify:NO];
 		[_faviconLoad cancelAndNotify:NO];
 		[[self node] loadFailedWithError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] userInfo:nil] forAdapter:self];
-	} else if(![[[PGDataProvider providerWithURLResponse:resp data:nil] adapterClassesForNode:[self node]] count]) {
-		[_mainLoad cancelAndNotify:YES];
-		[_faviconLoad cancelAndNotify:YES];
+		return;
 	}
+	PGDataProvider *const potentialDataProvider = [PGDataProvider providerWithURLResponse:resp data:nil];
+	NSMutableArray *const potentialAdapterClasses = [[[potentialDataProvider adapterClassesForNode:[self node]] mutableCopy] autorelease];
+	if(![self shouldRecursivelyCreateChildren]) for(Class const adapterClass in [[potentialAdapterClasses copy] autorelease]) if([adapterClass isKindOfClass:[PGContainerAdapter class]]) [potentialAdapterClasses removeObjectIdenticalTo:adapterClass];
+	if([potentialAdapterClasses count]) return;
+	[_mainLoad cancelAndNotify:NO];
+	[_faviconLoad cancelAndNotify:NO];
+	[[self node] loadWithDataProvider:potentialDataProvider];
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {

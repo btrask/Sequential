@@ -70,22 +70,18 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"PGResourceAdapterClasses"];
 }
-+ (NSArray *)supportedExtensionsWhichMustAlwaysLoad:(BOOL)flag
++ (NSArray *)supportedTypes
 {
 	NSMutableArray *const exts = [NSMutableArray array];
 	NSDictionary *const types = [self typesDictionary];
 	for(NSString *const classString in types) {
 		id const adapterClass = NSClassFromString(classString);
-		if(!adapterClass || (flag && ![adapterClass alwaysLoads])) continue;
+		if(!adapterClass) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
 		for(NSString *const type in [typeDict objectForKey:PGCFBundleTypeOSTypesKey]) [exts addObject:PGOSTypeToStringQuoted(PGOSTypeFromString(type), YES)];
 	}
 	return exts;
-}
-+ (BOOL)alwaysLoads
-{
-	return [PGResourceAdapter class] != self;
 }
 
 #pragma mark -PGResourceAdapter
@@ -111,6 +107,25 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 - (PGContainerAdapter *)rootContainerAdapter
 {
 	return [[self parentAdapter] rootContainerAdapter];
+}
+- (NSUInteger)depth
+{
+	return [[self parentAdapter] depth] + 1;
+}
+- (PGRecursionPolicy)recursionPolicy
+{
+	PGContainerAdapter *const p = [self parentAdapter];
+	return p ? [p descendantRecursionPolicy] : PGRecurseToMaxDepth;
+}
+- (BOOL)shouldRecursivelyCreateChildren
+{
+	switch([self recursionPolicy]) {
+		case PGRecurseToMaxDepth: return [self depth] <= [[[NSUserDefaults standardUserDefaults] objectForKey:PGMaxDepthKey] unsignedIntegerValue] + 1;
+		case PGRecurseToAnyDepth: return YES;
+		case PGRecurseNoFurther: return NO;
+	}
+	PGAssertNotReached(@"Invalid recursion policy.");
+	return NO;
 }
 
 #pragma mark -
@@ -185,17 +200,8 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	return NO;
 }
-- (BOOL)shouldLoad
-{
-	return [[self node] shouldLoadAdapterClass:[self class]];
-}
-- (PGLoadPolicy)descendentLoadPolicy
-{
-	return PGLoadToMaxDepth;
-}
 - (void)loadIfNecessary
 {
-	if(![self shouldLoad]) return [[self node] loadSucceededForAdapter:self];
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init]; // We load recursively, so memory use can be a problem.
 	[self load];
 	[pool release];
@@ -448,7 +454,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionary];
 	for(NSString *const classString in types) {
 		Class const class = NSClassFromString(classString);
-		if(![node shouldLoadAdapterClass:class]) continue;
+		if(!class) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		NSUInteger const p = [self matchPriorityForTypeDictionary:typeDict];
 		if(p) [adapterByPriority setObject:[NSNumber numberWithUnsignedInteger:p] forKey:class];

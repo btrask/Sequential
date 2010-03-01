@@ -32,10 +32,12 @@ extern NSString *const PGMaxDepthKey;
 @interface PGContainerAdapter : PGResourceAdapter
 {
 	@private
-	NSArray        *_sortedChildren;
-	NSArray        *_unsortedChildren;
-	PGSortOrder     _unsortedOrder;
+	NSArray *_sortedChildren;
+	NSArray *_unsortedChildren;
+	PGSortOrder _unsortedOrder;
 }
+
+@property(readonly) PGRecursionPolicy descendantRecursionPolicy;
 
 @property(readonly) NSArray *sortedChildren;
 @property(readonly) NSArray *unsortedChildren;
