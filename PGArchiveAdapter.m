@@ -288,12 +288,14 @@ static id PGArchiveAdapterList = nil;
 	@synchronized(_archive) {
 		return [_archive contentsOfEntry:_entry]; // TODO: Handle encoding and password issues.
 	}
+	return nil;
 }
 - (NSDate *)dateCreated
 {
 	@synchronized(_archive) {
 		return [[_archive attributesOfEntry:_entry] objectForKey:XADCreationDateKey];
 	}
+	return nil;
 }
 
 #pragma mark -
@@ -303,12 +305,14 @@ static id PGArchiveAdapterList = nil;
 	@synchronized(_archive) {
 		return [_archive PG_OSTypeForEntry:_entry];
 	}
+	return 0;
 }
 - (NSString *)extension
 {
 	@synchronized(_archive) {
 		return [[[_archive nameOfEntry:_entry] pathExtension] lowercaseString];
 	}
+	return nil;
 }
 
 #pragma mark -
@@ -322,6 +326,7 @@ static id PGArchiveAdapterList = nil;
 	@synchronized(_archive) {
 		return (NSUInteger)[_archive representativeSizeOfEntry:_entry];
 	}
+	return 0;
 }
 
 #pragma mark -PGDataProvider(PGArchiveDataProvider)
