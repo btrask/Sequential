@@ -151,7 +151,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[openPanel setCanChooseDirectories:YES];
 	[openPanel setCanChooseFiles:YES];
 	[openPanel setAllowsMultipleSelection:YES];
-	NSURL *const URL = [[[self currentDocument] originalIdentifier] URL];
+	NSURL *const URL = [[[self currentDocument] rootIdentifier] URL];
 	NSString *const path = [URL isFileURL] ? [URL path] : nil;
 	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedTypes]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
 }
@@ -333,7 +333,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (PGDocument *)documentForIdentifier:(PGResourceIdentifier *)ident
 {
-	for(PGDocument *const doc in _documents) if(PGEqualObjects([doc originalIdentifier], ident)) return doc;
+	for(PGDocument *const doc in _documents) if(PGEqualObjects([doc rootIdentifier], ident)) return doc;
 	return nil;
 }
 - (PGDocument *)next:(BOOL)flag documentBeyond:(PGDocument *)document
@@ -374,7 +374,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 }
 - (void)noteNewRecentDocument:(PGDocument *)document
 {
-	PGDisplayableIdentifier *const identifier = [document originalIdentifier];
+	PGDisplayableIdentifier *const identifier = [document rootIdentifier];
 	if(!identifier) return;
 	NSMutableArray *const identifiers = [[[self recentDocumentIdentifiers] mutableCopy] autorelease];
 	[identifiers removeObject:identifier];

@@ -70,20 +70,11 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (id)initWithIdentifier:(PGDisplayableIdentifier *)ident
 {
 	if((self = [self init])) {
-		_originalIdentifier = [ident retain];
+		_rootIdentifier = [ident retain];
 		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident];
 		[_node loadWithDataProvider:nil];
-		PGDisplayableIdentifier *rootIdentifier = ident;
-		if([_originalIdentifier isFileIdentifier] && [[_node resourceAdapter] isKindOfClass:[PGGenericImageAdapter class]]) {
-			[_node release];
-			_node = nil; // Nodes check to see if they already exist, so make sure it doesn't.
-			rootIdentifier = [[[[[ident URL] path] stringByDeletingLastPathComponent] PG_fileURL] PG_displayableIdentifier];
-			_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:rootIdentifier];
-			[_node loadWithDataProvider:nil];
-			[self _setInitialIdentifier:ident];
-		}
-		[_originalIdentifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
-		_subscription = [[rootIdentifier subscriptionWithDescendents:YES] retain];
+		[_rootIdentifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
+		_subscription = [[_rootIdentifier subscriptionWithDescendents:YES] retain];
 		[_subscription PG_addObserver:self selector:@selector(subscriptionEventDidOccur:) name:PGSubscriptionEventDidOccurNotification];
 		[self noteSortedChildrenDidChange];
 	}
@@ -103,18 +94,8 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 
 #pragma mark -
 
-- (PGDisplayableIdentifier *)originalIdentifier
-{
-	return [[_originalIdentifier retain] autorelease];
-}
-- (PGDisplayableIdentifier *)rootIdentifier
-{
-	return [[self node] identifier];
-}
-- (PGNode *)node
-{
-	return [[_node retain] autorelease];
-}
+@synthesize rootIdentifier = _rootIdentifier;
+@synthesize node = _node;
 - (PGDisplayController *)displayController
 {
 	return [[_displayController retain] autorelease];
@@ -208,7 +189,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
 	if(new && !_openedBookmark) {
-		PGBookmark *const bookmark = [[PGBookmarkController sharedBookmarkController] bookmarkForIdentifier:[self originalIdentifier]];
+		PGBookmark *const bookmark = [[PGBookmarkController sharedBookmarkController] bookmarkForIdentifier:[self rootIdentifier]];
 		if(bookmark && [[[self node] resourceAdapter] nodeForIdentifier:[bookmark fileIdentifier]]) [[self displayController] offerToOpenBookmark:bookmark];
 	}
 }
@@ -382,7 +363,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 	[_operationQueue cancelAllOperations];
 	[_activity invalidate];
 
-	[_originalIdentifier release];
+	[_rootIdentifier release];
 	[_node release];
 	[_subscription release];
 	[_cachedNodes release];

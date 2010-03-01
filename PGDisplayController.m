@@ -119,7 +119,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)reveal:(id)sender
 {
 	if([[self activeDocument] isOnline]) {
-		if([[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] originalIdentifier] URLByFollowingAliases:NO]]) return;
+		if([[NSWorkspace sharedWorkspace] openURL:[[[self activeDocument] rootIdentifier] URLByFollowingAliases:NO]]) return;
 	} else {
 		NSString *const path = [[[[self activeNode] identifier] URLByFollowingAliases:NO] path];
 		if([[PGDocumentController sharedDocumentController] pathFinderRunning]) {

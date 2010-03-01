@@ -55,7 +55,7 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 @interface PGDocument : PGPrefObject <PGActivityOwner>
 {
 	@private
-	PGDisplayableIdentifier *_originalIdentifier;
+	PGDisplayableIdentifier *_rootIdentifier;
 	PGNode *_node;
 	PGSubscription *_subscription;
 	NSMutableArray *_cachedNodes;
@@ -82,7 +82,6 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 - (id)initWithURL:(NSURL *)aURL;
 - (id)initWithBookmark:(PGBookmark *)aBookmark;
 
-@property(readonly) PGDisplayableIdentifier *originalIdentifier;
 @property(readonly) PGDisplayableIdentifier *rootIdentifier;
 @property(readonly) PGNode *node;
 @property(retain) PGDisplayController *displayController;
