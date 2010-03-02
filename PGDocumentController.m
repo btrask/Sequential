@@ -674,7 +674,7 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem
 {
-	if(@selector(PG_grow:) == [anItem action]) return !!([self styleMask] & NSResizableWindowMask); // Categories can't call super, and there's only one method that validates every action, so sadly we have to use class posing for this.
+	if(@selector(PG_grow:) == [anItem action]) return [self styleMask] & NSResizableWindowMask && [[self standardWindowButton:NSWindowZoomButton] isEnabled];
 	return PGNSWindowValidateMenuItem(self, _cmd, anItem);
 }
 
