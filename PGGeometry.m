@@ -172,13 +172,40 @@ PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation loc, P
 
 #pragma mark PGOrientation
 
+PGOrientation PGOrientationWithTIFFOrientation(NSUInteger orientation)
+{
+	switch(orientation) {
+		case 2: return PGFlippedHorz;
+		case 3: return PGUpsideDown;
+		case 4: return PGFlippedVert;
+		case 5: return PGRotated90CCW | PGFlippedHorz;
+		case 6: return PGRotated90CW;
+		case 7: return PGRotated90CCW | PGFlippedVert;
+		case 8: return PGRotated90CCW;
+		default: return PGUpright;
+	}
+}
 PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2)
 {
 	PGOrientation n1 = o1, n2 = o2;
-	if(o1 & PGRotated90CC && !(o2 & PGRotated90CC)) n2 = ((o2 & PGFlippedHorz) >> 1) | ((o2 & PGFlippedVert) << 1);
+	if(o1 & PGRotated90CCW && !(o2 & PGRotated90CCW)) n2 = ((o2 & PGFlippedHorz) >> 1) | ((o2 & PGFlippedVert) << 1);
 	PGOrientation r = n1 ^ n2;
-	if(o1 & PGRotated90CC && o2 & PGRotated90CC) r ^= PGUpsideDown;
+	if(o1 & PGRotated90CCW && o2 & PGRotated90CCW) r ^= PGUpsideDown;
 	return r;
+}
+NSString *PGLocalizedStringWithOrientation(PGOrientation orientation)
+{
+	// TODO: Add these to the Localizable.strings files.
+	switch(orientation) {
+		case PGFlippedHorz: return NSLocalizedString(@"Flipped Horizontally", nil);
+		case PGUpsideDown: return NSLocalizedString(@"Upside Down", nil);
+		case PGFlippedVert: return NSLocalizedString(@"Flipped Vertically", nil);
+		case PGRotated90CCW | PGFlippedHorz: return NSLocalizedString(@"Rotated CCW & Flipped Horizontally", nil);
+		case PGRotated90CW: return NSLocalizedString(@"Rotated CW", nil);
+		case PGRotated90CCW | PGFlippedVert: return NSLocalizedString(@"Rotated CCW & Flipped Vertically", nil);
+		case PGRotated90CCW: return NSLocalizedString(@"Rotated CCW", nil);
+		default: return NSLocalizedString(@"Upright", nil);
+	}
 }
 
 #pragma mark PGInset

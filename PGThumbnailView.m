@@ -322,7 +322,7 @@ static void PGDrawGradient(void)
 			continue;
 		}
 		NSSize originalSize = [thumb size];
-		if(PGRotated90CC & _thumbnailOrientation) originalSize = NSMakeSize(originalSize.height, originalSize.width);
+		if(PGRotated90CCW & _thumbnailOrientation) originalSize = NSMakeSize(originalSize.height, originalSize.width);
 		NSRect const frame = [self frameOfItemAtIndex:i withMargin:NO];
 		NSRect const thumbnailRect = PGIntegralRect(PGCenteredSizeInRect(PGScaleSizeByFloat(originalSize, MIN(1, MIN(NSWidth(frame) / originalSize.width, NSHeight(frame) / originalSize.height))), frame));
 		BOOL const enabled = [[self dataSource] thumbnailView:self canSelectItem:item];

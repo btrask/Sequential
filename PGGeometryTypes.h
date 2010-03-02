@@ -53,9 +53,9 @@ enum {
 	PGUpright      = 0,
 	PGFlippedVert  = 1 << 0,
 	PGFlippedHorz  = 1 << 1,
-	PGRotated90CC  = 1 << 2, // Counter-Clockwise.
+	PGRotated90CCW  = 1 << 2, // Counter-Clockwise.
 	PGUpsideDown   = PGFlippedVert | PGFlippedHorz,
-	PGRotated270CC = PGFlippedVert | PGFlippedHorz | PGRotated90CC
+	PGRotated90CW = PGFlippedVert | PGFlippedHorz | PGRotated90CCW
 };
 typedef NSUInteger PGOrientation;
 

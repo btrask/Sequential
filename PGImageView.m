@@ -97,7 +97,7 @@ static NSSize PGRoundedCornerSizes[4];
 }
 - (NSSize)originalSize
 {
-	return PGRotated90CC & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
+	return PGRotated90CCW & _orientation ? NSMakeSize([_rep pixelsHigh], [_rep pixelsWide]) : NSMakeSize([_rep pixelsWide], [_rep pixelsHigh]);
 }
 - (CGFloat)averageScaleFactor
 {

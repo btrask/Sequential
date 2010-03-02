@@ -52,7 +52,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			*orientation = PGUpright;
 			return [NSImage imageNamed:flag ? @"Mirror-White" : @"Mirror-Black"];
 		case PGFlippedVert:
-			*orientation = PGRotated90CC;
+			*orientation = PGRotated90CCW;
 			return [NSImage imageNamed:flag ? @"Mirror-White" : @"Mirror-Black"];
 		default: return [NSImage imageNamed:flag ? @"Silhouette-White" : @"Silhouette-Black"];
 	}

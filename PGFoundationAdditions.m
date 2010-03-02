@@ -52,7 +52,7 @@ OSType PGOSTypeFromString(NSString *str)
 	NSAffineTransform *const transform = [self transform];
 	if(PGUpright == orientation) return transform;
 	[transform translateXBy:NSMidX(*rectPtr) yBy:NSMidY(*rectPtr)];
-	if(orientation & PGRotated90CC) {
+	if(orientation & PGRotated90CCW) {
 		[transform rotateByDegrees:90.0f];
 		rectPtr->size = NSMakeSize(NSHeight(*rectPtr), NSWidth(*rectPtr)); // Swap.
 	}

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other Sources
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 @interface NSObject(PGAdditions)
 
@@ -191,7 +192,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	// TODO: Create special formatters for certain properties.
 	// TODO: Automatically resize the first column to fit.
 	/*
-		kCGImagePropertyOrientation
 		kCGImagePropertyExifFNumber (?)
 		kCGImagePropertyExifExposureProgram (?)
 		kCGImagePropertyExifISOSpeedRatings (?)
@@ -211,6 +211,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if(densityWidth || densityHeight) [properties setObject:[NSString stringWithFormat:PGEqualObjects(densityWidth, densityHeight) ? @"%lu DPI" : @"%lux%lu DPI", (unsigned long)round([densityWidth doubleValue]), (unsigned long)round([densityHeight doubleValue])] forKey:@"Pixel Density"];
 
 	if([[dict objectForKey:(NSString *)kCGImagePropertyHasAlpha] boolValue]) [properties setObject:@"Yes" forKey:@"Alpha"];
+
+	PGOrientation const orientation = PGOrientationWithTIFFOrientation([[dict objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]);
+	if(PGUpright != orientation) [properties setObject:PGLocalizedStringWithOrientation(orientation) forKey:@"Orientation"];
 
 	NSDictionary *const TIFFDict = [dict objectForKey:(NSString *)kCGImagePropertyTIFFDictionary];
 	NSDictionary *const exifDict = [dict objectForKey:(NSString *)kCGImagePropertyExifDictionary];

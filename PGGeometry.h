@@ -60,7 +60,9 @@ extern PGRectEdgeMask PGReadingDirectionAndLocationToRectEdgeMask(PGPageLocation
 
 #pragma mark PGOrientation
 
+extern PGOrientation PGOrientationWithTIFFOrientation(NSUInteger orientation);
 extern PGOrientation PGAddOrientation(PGOrientation o1, PGOrientation o2);
+extern NSString *PGLocalizedStringWithOrientation(PGOrientation orientation);
 
 #pragma mark PGInset
 

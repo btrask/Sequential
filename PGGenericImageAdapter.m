@@ -80,16 +80,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 - (void)_setImageProperties:(NSDictionary *)properties
 {
 	PGOrientation const oldOrientation = _orientation;
-	switch([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]) {
-		case 2: _orientation = PGFlippedHorz; break;
-		case 3: _orientation = PGUpsideDown; break;
-		case 4: _orientation = PGFlippedVert; break;
-		case 5: _orientation = PGRotated90CC | PGFlippedHorz; break;
-		case 6: _orientation = PGRotated270CC; break;
-		case 7: _orientation = PGRotated90CC | PGFlippedVert; break;
-		case 8: _orientation = PGRotated90CC; break;
-		default: _orientation = PGUpright; break;
-	}
+	_orientation = PGOrientationWithTIFFOrientation([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]);
 	if(oldOrientation != _orientation) [self invalidateThumbnail];
 	[_imageProperties release];
 	_imageProperties = [properties copy];

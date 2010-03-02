@@ -882,7 +882,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	if(!rep) return NSZeroSize;
 	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
-	if(orientation & PGRotated90CC) {
+	if(orientation & PGRotated90CCW) {
 		CGFloat const w = originalSize.width;
 		originalSize.width = originalSize.height;
 		originalSize.height = w;
@@ -1349,9 +1349,9 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	PGOrientation o;
 	switch((NSInteger)round((deg + 360.0f) / 90.0f) % 4) {
 		case 0: o = PGUpright; break;
-		case 1: o = PGRotated90CC; break;
+		case 1: o = PGRotated90CCW; break;
 		case 2: o = PGUpsideDown; break;
-		case 3: o = PGRotated270CC; break;
+		case 3: o = PGRotated90CW; break;
 		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
 	}
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];

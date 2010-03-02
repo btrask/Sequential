@@ -158,7 +158,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (id)PG_thumbnailWithMaxSize:(NSSize)size orientation:(PGOrientation)orientation opaque:(BOOL)opaque
 {
 	if(!self) return nil;
-	NSSize const originalSize = PGRotated90CC & orientation ? NSMakeSize([self pixelsHigh], [self pixelsWide]) : NSMakeSize([self pixelsWide], [self pixelsHigh]);
+	NSSize const originalSize = PGRotated90CCW & orientation ? NSMakeSize([self pixelsHigh], [self pixelsWide]) : NSMakeSize([self pixelsWide], [self pixelsHigh]);
 	NSSize const s = PGIntegralSize(PGScaleSizeByFloat(originalSize, MIN(1.0f, MIN(size.width / originalSize.width, size.height / originalSize.height))));
 	NSBitmapImageRep *const thumbRep = [[[NSBitmapImageRep alloc] initWithBitmapDataPlanes:NULL pixelsWide:s.width pixelsHigh:s.height bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bytesPerRow:0 bitsPerPixel:0] autorelease];
 	if(!thumbRep) return nil;
