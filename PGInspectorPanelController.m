@@ -110,7 +110,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (NSDictionary *)_humanReadablePropertiesWithDictionary:(NSDictionary *)dict
 {
 	NSDictionary *const keyLabels = [NSDictionary dictionaryWithObjectsAndKeys:
-		@"Orientation", (NSString *)kCGImagePropertyOrientation,
 		@"Color Model", (NSString *)kCGImagePropertyColorModel,
 		@"Profile Name", (NSString *)kCGImagePropertyProfileName,
 		[NSDictionary dictionaryWithObjectsAndKeys:
