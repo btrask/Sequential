@@ -451,7 +451,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	NSParameterAssert(node);
 	NSDictionary *const types = [PGResourceAdapter typesDictionary];
-	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionary];
+	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], [PGResourceAdapter class], nil]; // TODO: This conflicts with PGErrorAdapter, which gets inserted afterward and therefore never has a chance to be used.
 	for(NSString *const classString in types) {
 		Class const class = NSClassFromString(classString);
 		if(!class) continue;
