@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	IBOutlet NSTableColumn *labelColumn;
 	IBOutlet NSTableColumn *valueColumn;
 	IBOutlet NSSearchField *searchField;
-	NSDictionary *_imageProperties;
+	NSDictionary *_properties;
 	NSDictionary *_matchingProperties;
 	NSArray *_matchingLabels;
 }

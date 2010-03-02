@@ -47,6 +47,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @end
 
+@interface PGInspectorPanelController(Private)
+
+- (NSDictionary *)_humanReadablePropertiesWithDictionary:(NSDictionary *)dict;
+- (NSString *)_stringWithDateTime:(NSString *)dateTime subsecTime:(NSString *)subsecTime;
+
+@end
+
 @implementation PGInspectorPanelController
 
 #pragma mark -PGInspectorPanelController
@@ -55,9 +62,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSMutableDictionary *const matchingProperties = [NSMutableDictionary dictionary];
 	NSArray *const terms = [[searchField stringValue] PG_searchTerms];
-	for(NSString *const label in _imageProperties) {
+	for(NSString *const label in _properties) {
 		if(![label PG_matchesSearchTerms:terms]) continue;
-		NSString *const value = [_imageProperties objectForKey:label];
+		NSString *const value = [_properties objectForKey:label];
 		if([[value description] PG_matchesSearchTerms:terms]) [matchingProperties setObject:value forKey:label];
 	}
 	[_matchingProperties release];
@@ -84,38 +91,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)displayControllerActiveNodeWasRead:(NSNotification *)aNotif
 {
-	// TODO: Create special formatters for certain properties.
-	// TODO: Automatically resize the first column to fit.
-	/*
-		kCGImagePropertyOrientation
-		kCGImagePropertyDepth
-		kCGImagePropertyDPIWidth, kCGImagePropertyDPIHeight
-		kCGImagePropertyPixelWidth, kCGImagePropertyPixelHeight
-		kCGImagePropertyPNGGamma (?)
-		kCGImagePropertyExifFNumber (?)
-		kCGImagePropertyExifExposureProgram (?)
-		kCGImagePropertyExifISOSpeedRatings (?)
-		kCGImagePropertyPNGInterlaceType Y/N
-		kCGImagePropertyHasAlpha Y/N
-		kCGImagePropertyTIFFDateTime/kCGImagePropertyExifSubsecTime
-		kCGImagePropertyExifDateTimeOriginal/kCGImagePropertyExifSubsecTimeOrginal
-		kCGImagePropertyExifDateTimeDigitized/kCGImagePropertyExifSubsecTimeDigitized
+	[_properties release];
+	_properties = [[self _humanReadablePropertiesWithDictionary:[[[[self displayController] activeNode] resourceAdapter] imageProperties]] copy];
+	[self changeSearch:nil];
+}
 
-		Check other properties as well.
-	*/
+#pragma mark -PGInspectorPanelController(Private)
+
+- (NSDictionary *)_humanReadablePropertiesWithDictionary:(NSDictionary *)dict
+{
 	NSDictionary *const keyLabels = [NSDictionary dictionaryWithObjectsAndKeys:
-		@"File Size", (NSString *)kCGImagePropertyFileSize,
-		@"Pixel Height", (NSString *)kCGImagePropertyPixelHeight,
-		@"Pixel Width", (NSString *)kCGImagePropertyPixelWidth,
-		@"DPI Height", (NSString *)kCGImagePropertyDPIHeight,
-		@"DPI Width", (NSString *)kCGImagePropertyDPIWidth,
-		@"Depth", (NSString *)kCGImagePropertyDepth,
 		@"Orientation", (NSString *)kCGImagePropertyOrientation,
-		@"Alpha", (NSString *)kCGImagePropertyHasAlpha,
 		@"Color Model", (NSString *)kCGImagePropertyColorModel,
 		@"Profile Name", (NSString *)kCGImagePropertyProfileName,
 		[NSDictionary dictionaryWithObjectsAndKeys:
-			@"TIFF Info", @".",
+			@"TIFF", @".",
 			@"Compression", (NSString *)kCGImagePropertyTIFFCompression,
 			@"Photometric Interpretation", (NSString *)kCGImagePropertyTIFFPhotometricInterpretation,
 			@"Document Name", (NSString *)kCGImagePropertyTIFFDocumentName,
@@ -124,7 +114,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Model", (NSString *)kCGImagePropertyTIFFModel,
 			@"Software", (NSString *)kCGImagePropertyTIFFSoftware,
 			@"Transfer Function", (NSString *)kCGImagePropertyTIFFTransferFunction,
-			@"Date/Time", (NSString *)kCGImagePropertyTIFFDateTime,
 			@"Artist", (NSString *)kCGImagePropertyTIFFArtist,
 			@"Host Computer", (NSString *)kCGImagePropertyTIFFHostComputer,
 			@"Copyright", (NSString *)kCGImagePropertyTIFFCopyright,
@@ -132,19 +121,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Primary Chromaticities", (NSString *)kCGImagePropertyTIFFPrimaryChromaticities,
 			nil], (NSString *)kCGImagePropertyTIFFDictionary,
 		[NSDictionary dictionaryWithObjectsAndKeys:
-			@"JFIF Info", @".",
+			@"JFIF", @".",
 			@"Progressive", (NSString *)kCGImagePropertyJFIFIsProgressive,
 			nil], (NSString *)kCGImagePropertyJFIFDictionary,
 		[NSDictionary dictionaryWithObjectsAndKeys:
-			@"Exif Info", @".",
+			@"Exif", @".",
 			@"Exposure Time", (NSString *)kCGImagePropertyExifExposureTime,
 			@"F Number", (NSString *)kCGImagePropertyExifFNumber,
 			@"Exposure Program", (NSString *)kCGImagePropertyExifExposureProgram,
 			@"Spectral Sensitivity", (NSString *)kCGImagePropertyExifSpectralSensitivity,
-			@"ISO Speed Ratings", (NSString *)kCGImagePropertyExifISOSpeedRatings,
 			@"OECF", (NSString *)kCGImagePropertyExifOECF,
-			@"Date/Time (Original)", (NSString *)kCGImagePropertyExifDateTimeOriginal,
-			@"Date/Time (Digitized)", (NSString *)kCGImagePropertyExifDateTimeDigitized,
 			@"Components Configuration", (NSString *)kCGImagePropertyExifComponentsConfiguration,
 			@"Compressed BPP", (NSString *)kCGImagePropertyExifCompressedBitsPerPixel,
 			@"Shutter Speed", (NSString *)kCGImagePropertyExifShutterSpeedValue,
@@ -160,9 +146,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Subject Area", (NSString *)kCGImagePropertyExifSubjectArea,
 			@"Maker Note", (NSString *)kCGImagePropertyExifMakerNote,
 			@"User Comment", (NSString *)kCGImagePropertyExifUserComment,
-			@"Subsec Time", (NSString *)kCGImagePropertyExifSubsecTime,
-			@"Subsec Time (Orginal)", (NSString *)kCGImagePropertyExifSubsecTimeOrginal,
-			@"Subsec Time (Digitized)", (NSString *)kCGImagePropertyExifSubsecTimeDigitized,
 			@"Flash Pix Version", (NSString *)kCGImagePropertyExifFlashPixVersion,
 			@"Color Space", (NSString *)kCGImagePropertyExifColorSpace,
 			@"Related Sound File", (NSString *)kCGImagePropertyExifRelatedSoundFile,
@@ -180,7 +163,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Exposure Mode", (NSString *)kCGImagePropertyExifExposureMode,
 			@"White Balance", (NSString *)kCGImagePropertyExifWhiteBalance,
 			@"Digital Zoom Ratio", (NSString *)kCGImagePropertyExifDigitalZoomRatio,
-			@"Focal Length In 35mm Film", (NSString *)kCGImagePropertyExifFocalLenIn35mmFilm,
+			@"Focal Length (35mm Film)", (NSString *)kCGImagePropertyExifFocalLenIn35mmFilm,
 			@"Scene Capture Type", (NSString *)kCGImagePropertyExifSceneCaptureType,
 			@"Gain Control", (NSString *)kCGImagePropertyExifGainControl,
 			@"Contrast", (NSString *)kCGImagePropertyExifContrast,
@@ -192,7 +175,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Gamma", (NSString *)kCGImagePropertyExifGamma,
 			nil], (NSString *)kCGImagePropertyExifDictionary,
 		[NSDictionary dictionaryWithObjectsAndKeys:
-			@"Exif (Aux) Info", @".",
+			@"Exif (Aux)", @".",
 			@"Lens Model", (NSString *)kCGImagePropertyExifAuxLensModel,
 			@"Serial Number", (NSString *)kCGImagePropertyExifAuxSerialNumber,
 			@"Lens ID", (NSString *)kCGImagePropertyExifAuxLensID,
@@ -202,18 +185,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Owner Name", (NSString *)kCGImagePropertyExifAuxOwnerName,
 			@"Firmware", (NSString *)kCGImagePropertyExifAuxFirmware,
 			nil], (NSString *)kCGImagePropertyExifAuxDictionary,
-		[NSDictionary dictionaryWithObjectsAndKeys:
-			@"PNG Info", @".",
-			@"Gamma", (NSString *)kCGImagePropertyPNGGamma,
-			@"Interlaced", (NSString *)kCGImagePropertyPNGInterlaceType,
-			@"sRGB Intent", (NSString *)kCGImagePropertyPNGsRGBIntent,
-			nil], (NSString *)kCGImagePropertyPNGDictionary,
 		nil];
-	NSDictionary *const properties = [[[[self displayController] activeNode] resourceAdapter] imageProperties];
-	[_imageProperties release];
-	_imageProperties = [[[properties PG_replacementUsingObject:keyLabels preserveUnknown:NO getTopLevelKey:NULL] PG_flattenedDictionary] copy];
-	NSLog(@"hmm... %@", properties);
-	[self changeSearch:nil];
+	NSMutableDictionary *const properties = [[[[dict PG_replacementUsingObject:keyLabels preserveUnknown:NO getTopLevelKey:NULL] PG_flattenedDictionary] mutableCopy] autorelease];
+
+	// TODO: Create special formatters for certain properties.
+	// TODO: Automatically resize the first column to fit.
+	/*
+		kCGImagePropertyOrientation
+		kCGImagePropertyExifFNumber (?)
+		kCGImagePropertyExifExposureProgram (?)
+		kCGImagePropertyExifISOSpeedRatings (?)
+
+		Check other properties as well.
+	*/
+
+	NSNumber *const depth = [dict objectForKey:(NSString *)kCGImagePropertyDepth];
+	if(depth) [properties setObject:[NSString stringWithFormat:@"%lu bits per sample", [depth unsignedLongValue]] forKey:@"Depth"];
+
+	NSNumber *const pixelWidth = [dict objectForKey:(NSString *)kCGImagePropertyPixelWidth];
+	NSNumber *const pixelHeight = [dict objectForKey:(NSString *)kCGImagePropertyPixelHeight];
+	if(pixelWidth || pixelHeight) [properties setObject:[NSString stringWithFormat:@"%lux%lu", [pixelWidth unsignedLongValue], [pixelHeight unsignedLongValue]] forKey:@"Pixel Count"];
+
+	NSNumber *const densityWidth = [dict objectForKey:(NSString *)kCGImagePropertyDPIWidth];
+	NSNumber *const densityHeight = [dict objectForKey:(NSString *)kCGImagePropertyDPIHeight];
+	if(densityWidth || densityHeight) [properties setObject:[NSString stringWithFormat:PGEqualObjects(densityWidth, densityHeight) ? @"%lu DPI" : @"%lux%lu DPI", (unsigned long)round([densityWidth doubleValue]), (unsigned long)round([densityHeight doubleValue])] forKey:@"Pixel Density"];
+
+	if([[dict objectForKey:(NSString *)kCGImagePropertyHasAlpha] boolValue]) [properties setObject:@"Yes" forKey:@"Alpha"];
+
+	NSString *const dateTime = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyTIFFDictionary] objectForKey:(NSString *)kCGImagePropertyTIFFDateTime] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTime]];
+	[properties PG_setObject:dateTime forKey:@"Date/Time"];
+
+	NSString *const dateTimeOriginal = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeOrginal]];
+	if(!PGEqualObjects(dateTime, dateTimeOriginal)) [properties PG_setObject:dateTimeOriginal forKey:@"Date/Time (Original)"];
+
+	NSString *const dateTimeDigitized = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifDateTimeDigitized] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeDigitized]];
+	if(!PGEqualObjects(dateTime, dateTimeDigitized)) [properties PG_setObject:dateTimeDigitized forKey:@"Date/Time (Digitized)"];
+
+	return properties;
+}
+- (NSString *)_stringWithDateTime:(NSString *)dateTime subsecTime:(NSString *)subsecTime
+{
+	if(!dateTime) return nil;
+	if(!subsecTime) return dateTime;
+	return [NSString stringWithFormat:@"%@.%@", dateTime, subsecTime];
 }
 
 #pragma mark -PGFloatingPanelController
@@ -238,7 +252,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	[propertiesTable setDelegate:nil];
 	[propertiesTable setDataSource:nil];
-	[_imageProperties release];
+	[_properties release];
 	[_matchingProperties release];
 	[_matchingLabels release];
 	[super dealloc];
