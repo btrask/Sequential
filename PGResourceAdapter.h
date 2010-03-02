@@ -74,7 +74,6 @@ typedef NSInteger PGRecursionPolicy;
 @property(readonly) BOOL canSaveData;
 @property(readonly) BOOL hasSavableChildren;
 
-@property(readonly) NSArray *exifEntries;
 @property(readonly) NSUInteger viewableNodeIndex;
 @property(readonly) NSUInteger viewableNodeCount;
 - (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
@@ -93,9 +92,10 @@ typedef NSInteger PGRecursionPolicy;
 - (BOOL)canGenerateRealThumbnail;
 - (void)invalidateThumbnail;
 
+@property(readonly) NSDictionary *imageProperties;
 - (PGOrientation)orientationWithBase:(BOOL)flag;
-- (void)addChildrenToMenu:(NSMenu *)menu;
 - (void)clearCache;
+- (void)addChildrenToMenu:(NSMenu *)menu;
 
 - (PGNode *)nodeForIdentifier:(PGResourceIdentifier *)ident;
 - (PGNode *)sortedViewableNodeFirst:(BOOL)flag;

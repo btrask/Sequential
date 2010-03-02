@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocument.h"
 #import "PGNode.h"
 #import "PGResourceIdentifier.h"
-#import "PGExifEntry.h"
 
 // Other Sources
 #import "PGAppKitAdditions.h"
@@ -47,7 +46,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 - (void)_threaded_imageRep;
 - (NSDictionary *)_imageSourceOptions;
-- (void)_readExifWithData:(NSData *)data;
+- (void)_setImageProperties:(NSDictionary *)properties;
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep;
 
 @end
@@ -60,13 +59,12 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	NSData *const data = [[self dataProvider] data];
-	[self performSelectorOnMainThread:@selector(_readExifWithData:) withObject:data waitUntilDone:NO];
-	// TODO: Get the orientation from kCGImagePropertyOrientation instead of -_readExifWithData:.
-
 	NSImageRep *rep = nil;
 	if(data) {
 		CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
-		if(CGImageSourceGetCount(source) > 1) rep = [NSBitmapImageRep imageRepWithData:data]; // If the image is animated, we can't use the image source.
+		size_t const imageCount = CGImageSourceGetCount(source);
+		if(imageCount) [self performSelectorOnMainThread:@selector(_setImageProperties:) withObject:[(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, 0, NULL) autorelease] waitUntilDone:NO];
+		if(imageCount > 1) rep = [NSBitmapImageRep imageRepWithData:data]; // If the image is animated, we can't use the image source.
 		else rep = PGImageSourceImageRepAtIndex(source, 0);
 		CFRelease(source);
 	}
@@ -79,13 +77,22 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 		[[self dataProvider] UTIType], kCGImageSourceTypeIdentifierHint,
 		nil];
 }
-- (void)_readExifWithData:(NSData *)data
+- (void)_setImageProperties:(NSDictionary *)properties
 {
-	if(_exifEntries || !data) return;
 	PGOrientation const oldOrientation = _orientation;
-	[PGExifEntry getEntries:&_exifEntries orientation:&_orientation forImageData:data];
-	[_exifEntries retain];
+	switch([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]) {
+		case 2: _orientation = PGFlippedHorz; break;
+		case 3: _orientation = PGUpsideDown; break;
+		case 4: _orientation = PGFlippedVert; break;
+		case 5: _orientation = PGRotated90CC | PGFlippedHorz; break;
+		case 6: _orientation = PGRotated270CC; break;
+		case 7: _orientation = PGRotated90CC | PGFlippedVert; break;
+		case 8: _orientation = PGRotated90CC; break;
+		default: _orientation = PGUpright; break;
+	}
 	if(oldOrientation != _orientation) [self invalidateThumbnail];
+	[_imageProperties release];
+	_imageProperties = [properties copy];
 }
 - (void)_readFinishedWithImageRep:(NSImageRep *)aRep
 {
@@ -117,9 +124,9 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 #pragma mark -
 
-- (NSArray *)exifEntries
+- (NSDictionary *)imageProperties
 {
-	return [[_exifEntries retain] autorelease];
+	return [[_imageProperties retain] autorelease];
 }
 - (PGOrientation)orientationWithBase:(BOOL)flag
 {
@@ -127,8 +134,8 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 }
 - (void)clearCache
 {
-	[_exifEntries release];
-	_exifEntries = nil;
+	[_imageProperties release];
+	_imageProperties = nil;
 	[_cachedRep release];
 	_cachedRep = nil;
 }
@@ -172,7 +179,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 - (void)dealloc
 {
-	[_exifEntries release];
+	[_imageProperties release];
 	[_cachedRep release];
 	[super dealloc];
 }

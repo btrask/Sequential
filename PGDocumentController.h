@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Controllers
 @class PGDisplayController;
 @class PGFullscreenController;
-@class PGExifPanelController;
+@class PGInspectorPanelController;
 @class PGTimerPanelController;
 @class PGActivityPanelController;
 
@@ -72,7 +72,6 @@ typedef NSUInteger PGImageScaleConstraint;
 	IBOutlet NSMenu *orientationMenu;
 
 	IBOutlet NSMenuItem *toggleFullscreen;
-	IBOutlet NSMenuItem *toggleInfo;
 	IBOutlet NSMenuItem *zoomIn;
 	IBOutlet NSMenuItem *zoomOut;
 	IBOutlet NSMenuItem *scaleSliderItem;
@@ -95,7 +94,7 @@ typedef NSUInteger PGImageScaleConstraint;
 	PGFullscreenController *_fullscreenController;
 	BOOL _inFullscreen;
 
-	PGExifPanelController *_exifPanel;
+	PGInspectorPanelController *_inspectorPanel;
 	PGTimerPanelController *_timerPanel;
 	PGActivityPanelController *_activityPanel;
 
@@ -115,7 +114,7 @@ typedef NSUInteger PGImageScaleConstraint;
 - (IBAction)clearRecentDocuments:(id)sender;
 - (IBAction)closeAll:(id)sender;
 
-- (IBAction)toggleExif:(id)sender;
+- (IBAction)toggleInspector:(id)sender;
 - (IBAction)toggleTimer:(id)sender;
 - (IBAction)toggleActivity:(id)sender;
 - (IBAction)selectPreviousDocument:(id)sender;
@@ -128,7 +127,6 @@ typedef NSUInteger PGImageScaleConstraint;
 - (BOOL)performZoomIn;
 - (BOOL)performZoomOut;
 - (BOOL)performToggleFullscreen;
-- (BOOL)performToggleInfo;
 
 @property(copy) NSArray *recentDocumentIdentifiers;
 @property(readonly) NSUInteger maximumRecentDocumentCount;

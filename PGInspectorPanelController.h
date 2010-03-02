@@ -24,14 +24,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGFloatingPanelController.h"
 
-@interface PGExifPanelController : PGFloatingPanelController
+@interface PGInspectorPanelController : PGFloatingPanelController
 {
-	IBOutlet NSTableView *entriesTable;
-	IBOutlet NSTableColumn *tagColumn;
+	IBOutlet NSTableView *propertiesTable;
+	IBOutlet NSTableColumn *labelColumn;
 	IBOutlet NSTableColumn *valueColumn;
 	IBOutlet NSSearchField *searchField;
-	NSArray *_allEntries;
-	NSArray *_matchingEntries;
+	NSDictionary *_imageProperties;
+	NSDictionary *_matchingProperties;
+	NSArray *_matchingLabels;
 }
 
 - (IBAction)changeSearch:(id)sender;

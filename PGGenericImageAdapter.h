@@ -27,11 +27,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @interface PGGenericImageAdapter : PGResourceAdapter
 {
 	@private
-	BOOL          _reading;
-	BOOL          _readFailed;
-	NSArray      *_exifEntries;
+	BOOL _reading;
+	BOOL _readFailed;
+	NSDictionary *_imageProperties;
 	PGOrientation _orientation;
-	NSImageRep   *_cachedRep;
+	NSImageRep *_cachedRep;
 }
 
 @end

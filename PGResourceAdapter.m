@@ -177,10 +177,6 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 
 #pragma mark -
 
-- (NSArray *)exifEntries
-{
-	return nil;
-}
 - (NSUInteger)viewableNodeIndex
 {
 	return [[self parentAdapter] viewableIndexOfChild:[self node]];
@@ -273,12 +269,16 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 
 #pragma mark -
 
+- (NSDictionary *)imageProperties
+{
+	return nil;
+}
 - (PGOrientation)orientationWithBase:(BOOL)flag
 {
 	return flag ? [[self document] baseOrientation] : PGUpright;
 }
-- (void)addChildrenToMenu:(NSMenu *)menu {}
 - (void)clearCache {}
+- (void)addChildrenToMenu:(NSMenu *)menu {}
 
 #pragma mark -
 

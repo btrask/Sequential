@@ -45,7 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDisplayController.h"
 #import "PGWindowController.h"
 #import "PGFullscreenController.h"
-#import "PGExifPanelController.h"
+#import "PGInspectorPanelController.h"
 #import "PGTimerPanelController.h"
 #import "PGActivityPanelController.h"
 #import "PGURLAlert.h"
@@ -177,9 +177,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 #pragma mark -
 
-- (IBAction)toggleExif:(id)sender
+- (IBAction)toggleInspector:(id)sender
 {
-	[_exifPanel toggleShown];
+	[_inspectorPanel toggleShown];
 }
 - (IBAction)toggleTimer:(id)sender
 {
@@ -233,10 +233,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (BOOL)performToggleFullscreen
 {
 	return [toggleFullscreen PG_performAction];
-}
-- (BOOL)performToggleInfo
-{
-	return [toggleInfo PG_performAction];
 }
 
 #pragma mark -
@@ -492,7 +488,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		_documents = [[NSMutableArray alloc] init];
 		_classesByExtension = [[NSMutableDictionary alloc] init];
 
-		_exifPanel = [[PGExifPanelController alloc] init];
+		_inspectorPanel = [[PGInspectorPanelController alloc] init];
 		_timerPanel = [[PGTimerPanelController alloc] init];
 		_activityPanel = [[PGActivityPanelController alloc] init];
 
@@ -523,7 +519,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[_recentDocumentIdentifiers release];
 	[_documents release];
 	[_fullscreenController release];
-	[_exifPanel release];
+	[_inspectorPanel release];
 	[_timerPanel release];
 	[_activityPanel release];
 	[_classesByExtension release];

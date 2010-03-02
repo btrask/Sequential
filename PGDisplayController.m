@@ -1007,16 +1007,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 
 #pragma mark -NSResponder
 
-- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
-{
-	NSUInteger const modifiers = (NSCommandKeyMask | NSShiftKeyMask | NSAlternateKeyMask) & [anEvent modifierFlags];
-	unsigned short const keyCode = [anEvent keyCode];
-	PGDocumentController *const d = [PGDocumentController sharedDocumentController];
-	if(!modifiers || NSCommandKeyMask & modifiers) switch(keyCode) {
-		case PGKeyI: return [d performToggleInfo];
-	}
-	return [super performKeyEquivalent:anEvent] || [d performKeyEquivalent:anEvent];
-}
 - (id)validRequestorForSendType:(NSString *)sendType returnType:(NSString *)returnType
 {
 	return ![returnType length] && [self writeSelectionToPasteboard:nil types:[NSArray arrayWithObject:sendType]] ? self : [super validRequestorForSendType:sendType returnType:returnType];
