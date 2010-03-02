@@ -212,13 +212,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 	if([[dict objectForKey:(NSString *)kCGImagePropertyHasAlpha] boolValue]) [properties setObject:@"Yes" forKey:@"Alpha"];
 
-	NSString *const dateTime = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyTIFFDictionary] objectForKey:(NSString *)kCGImagePropertyTIFFDateTime] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTime]];
+	NSDictionary *const TIFFDict = [dict objectForKey:(NSString *)kCGImagePropertyTIFFDictionary];
+	NSDictionary *const exifDict = [dict objectForKey:(NSString *)kCGImagePropertyExifDictionary];
+
+	NSString *const dateTime = [self _stringWithDateTime:[TIFFDict objectForKey:(NSString *)kCGImagePropertyTIFFDateTime] subsecTime:[exifDict objectForKey:(NSString *)kCGImagePropertyExifSubsecTime]];
 	[properties PG_setObject:dateTime forKey:@"Date/Time"];
 
-	NSString *const dateTimeOriginal = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeOrginal]];
+	NSString *const dateTimeOriginal = [self _stringWithDateTime:[exifDict objectForKey:(NSString *)kCGImagePropertyExifDateTimeOriginal] subsecTime:[exifDict objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeOrginal]];
 	if(!PGEqualObjects(dateTime, dateTimeOriginal)) [properties PG_setObject:dateTimeOriginal forKey:@"Date/Time (Original)"];
 
-	NSString *const dateTimeDigitized = [self _stringWithDateTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifDateTimeDigitized] subsecTime:[(NSDictionary *)[dict objectForKey:(NSString *)kCGImagePropertyExifDictionary] objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeDigitized]];
+	NSString *const dateTimeDigitized = [self _stringWithDateTime:[exifDict objectForKey:(NSString *)kCGImagePropertyExifDateTimeDigitized] subsecTime:[exifDict objectForKey:(NSString *)kCGImagePropertyExifSubsecTimeDigitized]];
 	if(!PGEqualObjects(dateTime, dateTimeDigitized)) [properties PG_setObject:dateTimeDigitized forKey:@"Date/Time (Digitized)"];
 
 	return properties;
