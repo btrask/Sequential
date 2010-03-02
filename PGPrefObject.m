@@ -50,11 +50,6 @@ static NSString *const PGTimerIntervalKey = @"PGTimerInterval";
 
 static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated after 1.3.2.
 
-NSArray *PGScaleModes(void)
-{
-	return [NSArray arrayWithObjects:[NSNumber numberWithInteger:PGConstantFactorScale], [NSNumber numberWithInteger:PGAutomaticScale], [NSNumber numberWithInteger:PGViewFitScale], [NSNumber numberWithInteger:PGActualSizeWithDPI], nil];
-}
-
 @implementation PGPrefObject
 
 #pragma mark +PGPrefObject
@@ -64,6 +59,10 @@ NSArray *PGScaleModes(void)
 	static PGPrefObject *obj = nil;
 	if(!obj) obj = [[self alloc] init];
 	return obj;
+}
++ (NSArray *)imageScaleModes
+{
+	return [NSArray arrayWithObjects:[NSNumber numberWithInteger:PGConstantFactorScale], [NSNumber numberWithInteger:PGAutomaticScale], [NSNumber numberWithInteger:PGViewFitScale], nil];
 }
 
 #pragma mark +NSObject
@@ -214,9 +213,8 @@ NSArray *PGScaleModes(void)
 		_showsInfo = [[d objectForKey:PGShowsInfoKey] boolValue];
 		_showsThumbnails = [[d objectForKey:PGShowsThumbnailsKey] boolValue];
 		_readingDirection = [[d objectForKey:PGReadingDirectionRightToLeftKey] boolValue] ? PGReadingDirectionRightToLeft : PGReadingDirectionLeftToRight;
-		_imageScaleMode = [[d objectForKey:PGImageScaleModeKey] integerValue];
-		if(_imageScaleMode < 0 || _imageScaleMode > 4) _imageScaleMode = PGConstantFactorScale;
-		if(PGDeprecatedVerticalFitScale == _imageScaleMode) _imageScaleMode = PGAutomaticScale;
+		NSNumber *const imageScaleMode = [d objectForKey:PGImageScaleModeKey];
+		_imageScaleMode = [[[self class] imageScaleModes] containsObject:imageScaleMode] ? [imageScaleMode integerValue] : PGConstantFactorScale;
 		_imageScaleFactor = (CGFloat)[[d objectForKey:PGImageScaleFactorKey] doubleValue];
 		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
 		_sortOrder = [[d objectForKey:PGSortOrderKey] integerValue];

@@ -47,10 +47,9 @@ enum {
 	PGAutomaticScale = 1,
 	PGDeprecatedVerticalFitScale = 2, // Deprecated after 1.0.3.
 	PGViewFitScale = 3, // Fits the entire image inside the screen/window.
-	PGActualSizeWithDPI = 4,
+	PGDeprecatedActualSizeWithDPI = 4, // Depcrecated after 2.1.2.
 };
 typedef NSInteger PGImageScaleMode;
-extern NSArray *PGScaleModes(void);
 
 enum {
 	PGUnsorted           = 0,
@@ -82,6 +81,7 @@ typedef NSInteger PGSortOrder;
 }
 
 + (id)globalPrefObject;
++ (NSArray *)imageScaleModes;
 
 @property(assign) BOOL showsInfo;
 @property(assign) BOOL showsThumbnails;

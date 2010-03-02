@@ -11,8 +11,8 @@
 			<string key="NS.object.0">740</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="891"/>
 			<integer value="1246"/>
+			<integer value="756"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -867,15 +867,6 @@
 									<object class="NSAttributedString" key="NSAttributedTitle">
 										<string key="NSString"/>
 									</object>
-								</object>
-								<object class="NSMenuItem" id="375465130">
-									<reference key="NSMenu" ref="690256735"/>
-									<string key="NSTitle">Actual Size with DPI</string>
-									<string key="NSKeyEquiv">d</string>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="421653445"/>
-									<reference key="NSMixedImage" ref="233298788"/>
-									<int key="NSTag">4</int>
 								</object>
 								<object class="NSMenuItem" id="494764354">
 									<reference key="NSMenu" ref="690256735"/>
@@ -1995,14 +1986,6 @@
 					<object class="IBActionConnection" key="connection">
 						<string key="label">changeImageScaleMode:</string>
 						<reference key="source" ref="992698201"/>
-						<reference key="destination" ref="375465130"/>
-					</object>
-					<int key="connectionID">1280</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">changeImageScaleMode:</string>
-						<reference key="source" ref="992698201"/>
 						<reference key="destination" ref="494764354"/>
 					</object>
 					<int key="connectionID">1281</int>
@@ -2674,7 +2657,6 @@
 							<reference ref="249214518"/>
 							<reference ref="560192130"/>
 							<reference ref="737387267"/>
-							<reference ref="375465130"/>
 							<reference ref="494764354"/>
 							<reference ref="348976634"/>
 							<reference ref="198347744"/>
@@ -2714,11 +2696,6 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">837</int>
 						<reference key="object" ref="198347744"/>
-						<reference key="parent" ref="690256735"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1189</int>
-						<reference key="object" ref="375465130"/>
 						<reference key="parent" ref="690256735"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -3165,8 +3142,6 @@
 				<boolean value="YES" key="1165.ImportedFromIB2"/>
 				<string key="1184.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1184.ImportedFromIB2"/>
-				<string key="1189.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="1189.ImportedFromIB2"/>
 				<string key="1193.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1193.ImportedFromIB2"/>
 				<string key="1196.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3349,7 +3324,7 @@
 				<boolean value="YES" key="694.ImportedFromIB2"/>
 				<string key="755.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="755.ImportedFromIB2"/>
-				<string key="756.IBEditorWindowLastContentRect">{{327, 776}, {211, 163}}</string>
+				<string key="756.IBEditorWindowLastContentRect">{{345, 514}, {168, 143}}</string>
 				<string key="756.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="756.ImportedFromIB2"/>
 				<string key="758.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

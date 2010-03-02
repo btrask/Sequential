@@ -881,7 +881,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (NSSize)_sizeForImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation scaleMode:(PGImageScaleMode)scaleMode factor:(float)factor
 {
 	if(!rep) return NSZeroSize;
-	NSSize originalSize = PGActualSizeWithDPI == scaleMode ? [rep size] : NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
+	NSSize originalSize = NSMakeSize([rep pixelsWide], [rep pixelsHigh]);
 	if(orientation & PGRotated90CCW) {
 		CGFloat const w = originalSize.width;
 		originalSize.width = originalSize.height;
@@ -891,7 +891,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(PGConstantFactorScale == scaleMode) {
 		newSize.width *= factor;
 		newSize.height *= factor;
-	} else if(PGActualSizeWithDPI != scaleMode) {
+	} else {
 		PGImageScaleConstraint const constraint = [[[NSUserDefaults standardUserDefaults] objectForKey:PGImageScaleConstraintKey] unsignedIntegerValue];
 		BOOL const resIndependent = [[[self activeNode] resourceAdapter] isResolutionIndependent];
 		NSSize const minSize = constraint != PGUpscaleOnly || resIndependent ? NSZeroSize : newSize;
