@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
+#import "PGZooming.h"
 
 @interface NSObject(PGAdditions)
 
@@ -50,6 +51,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface PGInspectorPanelController(Private)
 
+- (void)_updateColumnWidths;
 - (NSDictionary *)_humanReadablePropertiesWithDictionary:(NSDictionary *)dict;
 - (NSString *)_stringWithDateTime:(NSString *)dateTime subsecTime:(NSString *)subsecTime;
 
@@ -73,6 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[_matchingLabels release];
 	_matchingLabels = [[[matchingProperties allKeys] sortedArrayUsingSelector:@selector(compare:)] copy];
 	[propertiesTable reloadData];
+	[self _updateColumnWidths];
 }
 - (IBAction)copy:(id)sender
 {
@@ -99,6 +102,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGInspectorPanelController(Private)
 
+- (void)_updateColumnWidths
+{
+	[labelColumn setWidth:[labelColumn PG_zoomedWidth]];
+	[valueColumn setWidth:NSWidth([propertiesTable bounds]) - [labelColumn width]];
+}
 - (NSDictionary *)_humanReadablePropertiesWithDictionary:(NSDictionary *)dict
 {
 	NSDictionary *const keyLabels = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -190,7 +198,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableDictionary *const properties = [[[[dict PG_replacementUsingObject:keyLabels preserveUnknown:NO getTopLevelKey:NULL] PG_flattenedDictionary] mutableCopy] autorelease];
 
 	// TODO: Create special formatters for certain properties.
-	// TODO: Automatically resize the first column to fit.
 	/*
 		kCGImagePropertyExifFNumber (?)
 		kCGImagePropertyExifExposureProgram (?)
@@ -250,6 +257,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[[self displayController] PG_addObserver:self selector:@selector(displayControllerActiveNodeWasRead:) name:PGDisplayControllerActiveNodeWasReadNotification];
 	[self displayControllerActiveNodeWasRead:nil];
 	return YES;
+}
+
+#pragma mark -NSWindowController
+
+- (void)windowDidLoad
+{
+	[super windowDidLoad];
+	[self _updateColumnWidths];
 }
 
 #pragma mark -NSObject
