@@ -137,12 +137,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #pragma mark -PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size baseOrientation:(PGOrientation)baseOrientation
 {
 	NSPDFImageRep *const rep = [(PGPDFDataProvider *)[self dataProvider] threadRep];
 	if(rep) @synchronized(rep) {
 		[rep setCurrentPage:[[self dataProvider] pageIndex]];
-		return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:YES];
+		return [rep PG_thumbnailWithMaxSize:size orientation:baseOrientation opaque:YES];
 	}
 	return nil;
 }

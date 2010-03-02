@@ -55,10 +55,10 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	@private
 	PGResourceAdapter *_adapter;
-	PGOrientation _orientation;
+	PGOrientation _baseOrientation;
 }
 
-- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter orientation:(PGOrientation)orientation;
+- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter baseOrientation:(PGOrientation)baseOrientation;
 
 @end
 
@@ -226,7 +226,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 	NSImage *const realThumbnail = [self realThumbnail];
 	if(realThumbnail) return realThumbnail;
 	if([self canGenerateRealThumbnail] && !_thumbnailGenerationOperation) {
-		_thumbnailGenerationOperation = [[PGThumbnailGenerationOperation alloc] initWithResourceAdapter:self orientation:[self orientationWithBase:NO]];
+		_thumbnailGenerationOperation = [[PGThumbnailGenerationOperation alloc] initWithResourceAdapter:self baseOrientation:[[self document] baseOrientation]];
 		[[self document] addOperation:_thumbnailGenerationOperation];
 	}
 	return [self fastThumbnail];
@@ -413,11 +413,11 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 
 #pragma mark -PGThumbnailGenerationOperation
 
-- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter orientation:(PGOrientation)orientation
+- (id)initWithResourceAdapter:(PGResourceAdapter *)adapter baseOrientation:(PGOrientation)baseOrientation
 {
 	if((self = [super init])) {
 		_adapter = [adapter retain];
-		_orientation = orientation;
+		_baseOrientation = baseOrientation;
 	}
 	return self;
 }
@@ -427,7 +427,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 - (void)main
 {
 	if([self isCancelled]) return;
-	NSImageRep *const rep = [_adapter threaded_thumbnailRepWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize) orientation:_orientation];
+	NSImageRep *const rep = [_adapter threaded_thumbnailRepWithSize:NSMakeSize(PGThumbnailSize, PGThumbnailSize) baseOrientation:_baseOrientation];
 	if(!rep || [self isCancelled]) return;
 	NSImage *const image = [[[NSImage alloc] initWithSize:NSMakeSize([rep pixelsWide], [rep pixelsHigh])] autorelease];
 	[image addRepresentation:rep];

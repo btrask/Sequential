@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, size_t i)
 {
 	if(!source) return nil;
-	if(i >= CGImageSourceGetCount(source)) return nil;
 	CGImageRef const image = CGImageSourceCreateImageAtIndex(source, i, NULL);
 	NSBitmapImageRep *const rep = [[[NSBitmapImageRep alloc] initWithCGImage:image] autorelease];
 	CGImageRelease(image);
@@ -79,9 +78,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 }
 - (void)_setImageProperties:(NSDictionary *)properties
 {
-	PGOrientation const oldOrientation = _orientation;
 	_orientation = PGOrientationWithTIFFOrientation([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]);
-	if(oldOrientation != _orientation) [self invalidateThumbnail];
 	[_imageProperties release];
 	_imageProperties = [properties copy];
 }
@@ -156,14 +153,23 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 #pragma mark -PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size baseOrientation:(PGOrientation)baseOrientation
 {
 	NSData *const data = [[self dataProvider] data];
 	if(!data) return nil;
 	CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
-	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, 0);
+	if(!source) return nil;
+	size_t const count = CGImageSourceGetCount(source);
+	if(!count) {
+		CFRelease(source);
+		return nil;
+	}
+	size_t const thumbnailFrameIndex = count / 10;
+	NSBitmapImageRep *const rep = PGImageSourceImageRepAtIndex(source, thumbnailFrameIndex);
+	NSDictionary *const properties = [(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, thumbnailFrameIndex, NULL) autorelease];
 	CFRelease(source);
-	return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:NO];
+	PGOrientation const orientation = PGOrientationWithTIFFOrientation([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]);
+	return [rep PG_thumbnailWithMaxSize:size orientation:PGAddOrientation(orientation, baseOrientation) opaque:NO];
 }
 
 #pragma mark NSObject

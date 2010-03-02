@@ -115,7 +115,7 @@ typedef NSInteger PGRecursionPolicy;
 
 @interface PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size orientation:(PGOrientation)orientation;
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size baseOrientation:(PGOrientation)baseOrientation;
 
 @end
 
