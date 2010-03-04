@@ -154,7 +154,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			@"Subject Area", (NSString *)kCGImagePropertyExifSubjectArea,
 			@"Maker Note", (NSString *)kCGImagePropertyExifMakerNote,
 			@"User Comment", (NSString *)kCGImagePropertyExifUserComment,
-			@"Flash Pix Version", (NSString *)kCGImagePropertyExifFlashPixVersion,
 			@"Color Space", (NSString *)kCGImagePropertyExifColorSpace,
 			@"Related Sound File", (NSString *)kCGImagePropertyExifRelatedSoundFile,
 			@"Flash Energy", (NSString *)kCGImagePropertyExifFlashEnergy,
