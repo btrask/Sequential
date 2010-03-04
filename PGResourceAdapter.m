@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGGeometry.h"
 
 NSString *const PGPasswordKey = @"PGPassword";
-NSString *const PGStringEncodingKey = @"PGStringEncoding";
 
 static NSString *const PGBundleTypeFourCCsKey = @"PGBundleTypeFourCCs";
 static NSString *const PGLSItemContentTypes = @"LSItemContentTypes";

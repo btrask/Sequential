@@ -39,7 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Controllers
 @class PGThumbnailController;
-#import "PGEncodingAlert.h"
 
 // Other Sources
 #import "PGGeometryTypes.h"
@@ -52,7 +51,7 @@ extern NSString *const PGDisplayControllerTimerDidChangeNotification;
 #ifdef MAC_OS_X_VERSION_10_6
 NSWindowDelegate,
 #endif
-PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
+PGClipViewDelegate, PGDocumentWindowDelegate>
 {
 	@private
 	IBOutlet PGClipView *clipView;
@@ -65,8 +64,6 @@ PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 	IBOutlet NSView *passwordView;
 	IBOutlet NSTextField *passwordLabel;
 	IBOutlet NSTextField *passwordField;
-	IBOutlet NSView *encodingView;
-	IBOutlet NSTextField *encodingLabel;
 
 	PGDocument *_activeDocument;
 	PGNode *_activeNode;
@@ -136,7 +133,6 @@ PGClipViewDelegate, PGDocumentWindowDelegate, PGEncodingAlertDelegate>
 
 - (IBAction)reload:(id)sender;
 - (IBAction)decrypt:(id)sender;
-- (IBAction)chooseEncoding:(id)sender;
 
 @property(readonly) PGDocument *activeDocument;
 @property(readonly) PGNode *activeNode;

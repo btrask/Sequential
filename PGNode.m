@@ -45,8 +45,6 @@ NSString *const PGNodeReadyForViewingNotification    = @"PGNodeReadyForViewing";
 NSString *const PGImageRepKey       = @"PGImageRep";
 
 NSString *const PGNodeErrorDomain        = @"PGNodeError";
-NSString *const PGUnencodedStringDataKey = @"PGUnencodedStringData";
-NSString *const PGDefaultEncodingKey     = @"PGDefaultEncoding";
 
 enum {
 	PGNodeNothing = 0,

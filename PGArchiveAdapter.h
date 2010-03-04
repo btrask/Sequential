@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	@private
 	XADArchive *_archive;
-	BOOL _encodingError;
 	BOOL _needsPassword;
 	PGNode *_currentSubnode;
 }

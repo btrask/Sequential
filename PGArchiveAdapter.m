@@ -95,7 +95,6 @@ static id PGArchiveAdapterList = nil;
 	NSUInteger i = [indexes firstIndex];
 	for(; NSNotFound != i; i = [indexes indexGreaterThanIndex:i]) {
 		NSString *const entryPath = [_archive nameOfEntry:i];
-		if(_encodingError) return nil;
 		if(!entryPath) continue;
 		if([path length] && ![entryPath hasPrefix:path]) continue;
 		[indexes removeIndex:i];
@@ -163,12 +162,9 @@ static id PGArchiveAdapterList = nil;
 		}
 		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
 	}
-	// TODO: Have some way of dealing with encodings.
-	NSNumber *const encodingNum = nil;//[[self info] objectForKey:PGStringEncodingKey];
-	if(encodingNum) [_archive setNameEncoding:[encodingNum unsignedIntegerValue]];
 	NSArray *const children = [self nodesUnderPath:[_archive PG_commonRootPath] parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	if(!_encodingError) [[self node] loadSucceededForAdapter:self];
+	[[self node] loadSucceededForAdapter:self];
 }
 
 #pragma mark -NSObject
@@ -192,11 +188,6 @@ static id PGArchiveAdapterList = nil;
 }
 -(NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
 {
-	if(confidence < 0.8f && !_encodingError) {
-		_encodingError = YES;
-		[self _threaded_setError:[NSError errorWithDomain:PGNodeErrorDomain code:PGEncodingError userInfo:[NSDictionary dictionaryWithObjectsAndKeys:data, PGUnencodedStringDataKey, [NSNumber numberWithUnsignedInteger:guess], PGDefaultEncodingKey, nil]] forNode:[self node]];
-		[[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
-	}
 	return guess;
 }
 
@@ -237,8 +228,6 @@ static id PGArchiveAdapterList = nil;
 //		data = [_archive contentsOfEntry:i];
 //		switch([_archive lastError]) {
 //			case XADNoError:
-//			case XADEncodingError:
-//				break;
 //			case XADPasswordError: 
 //				if(!_needsPassword) [self archiveNeedsPassword:_archive];
 //				break;
@@ -286,7 +275,7 @@ static id PGArchiveAdapterList = nil;
 - (NSData *)data
 {
 	@synchronized(_archive) {
-		return [_archive contentsOfEntry:_entry]; // TODO: Handle encoding and password issues.
+		return [_archive contentsOfEntry:_entry]; // TODO: Handle password issues.
 	}
 	return nil;
 }

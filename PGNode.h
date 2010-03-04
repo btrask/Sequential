@@ -44,10 +44,7 @@ extern NSString *const PGNodeErrorDomain;
 enum {
 	PGGenericError  = 1,
 	PGPasswordError = 2,
-	PGEncodingError = 3
 };
-extern NSString *const PGUnencodedStringDataKey;
-extern NSString *const PGDefaultEncodingKey;
 
 typedef NSUInteger PGNodeStatus;
 

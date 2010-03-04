@@ -50,7 +50,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGBookmarkController.h"
 #import "PGThumbnailController.h"
 #import "PGImageSaveAlert.h"
-#import "PGEncodingAlert.h"
 
 // Other Sources
 #import "PGAppKitAdditions.h"
@@ -357,12 +356,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	// TODO: Figure this out.
 //	[[[activeNode resourceAdapter] info] setObject:[passwordField stringValue] forKey:PGPasswordKey];
 	[activeNode becomeViewed];
-}
-- (IBAction)chooseEncoding:(id)sender
-{
-	NSDictionary *const errInfo = [[[[self activeNode] resourceAdapter] error] userInfo];
-	PGEncodingAlert *const alert = [[[PGEncodingAlert alloc] initWithStringData:[errInfo objectForKey:PGUnencodedStringDataKey] guess:[[errInfo objectForKey:PGDefaultEncodingKey] unsignedIntegerValue]] autorelease];
-	[alert beginSheetForWindow:[self windowForSheet] withDelegate:self];
 }
 
 #pragma mark -
@@ -686,11 +679,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 			[passwordField setStringValue:@""];
 			[clipView setDocumentView:passwordView];
 			break;
-		case PGEncodingError:
-			[encodingLabel PG_setAttributedStringValue:[[[_activeNode resourceAdapter] dataProvider] attributedString]];
-			[clipView setDocumentView:encodingView];
-			[[self window] makeFirstResponder:clipView];
-			break;
 	}
 	if(![_imageView superview]) [_imageView setImageRep:nil orientation:PGUpright size:NSZeroSize];
 	[self _readFinished];
@@ -958,7 +946,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 {
 	[super windowDidLoad];
 	[passwordView retain];
-	[encodingView retain];
 
 	[[self window] useOptimizedDrawing:YES];
 	[[self window] setMinSize:PGWindowMinSize];
@@ -1035,7 +1022,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[self PG_removeObserver];
 	[self _setImageView:nil];
 	[passwordView release];
-	[encodingView release];
 	[_activeNode release];
 	[_graphicPanel release];
 	[_loadingGraphic release];
@@ -1355,14 +1341,6 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		default: PGAssertNotReached(@"Rotation wasn't simplified into an orientation.");
 	}
 	[[self activeDocument] setBaseOrientation:PGAddOrientation([[self activeDocument] baseOrientation], o)];
-}
-
-#pragma mark -<PGEncodingAlertDelegate>
-
-- (void)encodingAlertDidEnd:(PGEncodingAlert *)sender selectedEncoding:(NSStringEncoding)encoding
-{
-	// TODO: How do we rewrite this to make sense?
-//	if(encoding) [[self activeNode] startLoadWithInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:encoding], PGStringEncodingKey, nil]];
 }
 
 @end

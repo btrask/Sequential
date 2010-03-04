@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGActivity.h"
 
 extern NSString *const PGPasswordKey;
-extern NSString *const PGStringEncodingKey;
 
 enum {
 	PGRecurseToMaxDepth = 0,

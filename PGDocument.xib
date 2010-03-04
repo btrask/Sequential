@@ -13,7 +13,6 @@
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="100"/>
 			<integer value="49"/>
-			<integer value="107"/>
 			<integer value="158"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
@@ -283,51 +282,6 @@
 				<reference key="NSSuperview"/>
 				<string key="NSClassName">PGRoundedBackgroundView</string>
 			</object>
-			<object class="NSCustomView" id="1025111255">
-				<reference key="NSNextResponder"/>
-				<int key="NSvFlags">268</int>
-				<array class="NSMutableArray" key="NSSubviews">
-					<object class="NSButton" id="200591664">
-						<reference key="NSNextResponder" ref="1025111255"/>
-						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{81, 12}, {202, 32}}</string>
-						<reference key="NSSuperview" ref="1025111255"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSButtonCell" key="NSCell" id="1019829804">
-							<int key="NSCellFlags">67239424</int>
-							<int key="NSCellFlags2">134217728</int>
-							<string key="NSContents">Choose Encoding…</string>
-							<reference key="NSSupport" ref="804427203"/>
-							<reference key="NSControlView" ref="200591664"/>
-							<int key="NSButtonFlags">-2038284033</int>
-							<int key="NSButtonFlags2">1</int>
-							<string key="NSAlternateContents"/>
-							<string type="base64-UTF8" key="NSKeyEquivalent">DQ</string>
-							<int key="NSPeriodicDelay">200</int>
-							<int key="NSPeriodicInterval">25</int>
-						</object>
-					</object>
-					<object class="NSTextField" id="745832064">
-						<reference key="NSNextResponder" ref="1025111255"/>
-						<int key="NSvFlags">268</int>
-						<string key="NSFrame">{{17, 48}, {330, 17}}</string>
-						<reference key="NSSuperview" ref="1025111255"/>
-						<bool key="NSEnabled">YES</bool>
-						<object class="NSTextFieldCell" key="NSCell" id="718336439">
-							<int key="NSCellFlags">67239488</int>
-							<int key="NSCellFlags2">138414592</int>
-							<string key="NSContents">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
-							<reference key="NSSupport" ref="804427203"/>
-							<reference key="NSControlView" ref="745832064"/>
-							<reference key="NSBackgroundColor" ref="209921658"/>
-							<reference key="NSTextColor" ref="720128376"/>
-						</object>
-					</object>
-				</array>
-				<string key="NSFrameSize">{364, 85}</string>
-				<reference key="NSSuperview"/>
-				<string key="NSClassName">PGRoundedBackgroundView</string>
-			</object>
 			<object class="NSCustomView" id="750337150">
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">268</int>
@@ -482,14 +436,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">encodingView</string>
-						<reference key="source" ref="578072556"/>
-						<reference key="destination" ref="1025111255"/>
-					</object>
-					<int key="connectionID">123</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">passwordView</string>
 						<reference key="source" ref="578072556"/>
 						<reference key="destination" ref="526223446"/>
@@ -519,22 +465,6 @@
 						<reference key="destination" ref="394542526"/>
 					</object>
 					<int key="connectionID">128</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">chooseEncoding:</string>
-						<reference key="source" ref="578072556"/>
-						<reference key="destination" ref="200591664"/>
-					</object>
-					<int key="connectionID">129</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">encodingLabel</string>
-						<reference key="source" ref="578072556"/>
-						<reference key="destination" ref="745832064"/>
-					</object>
-					<int key="connectionID">146</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -713,32 +643,6 @@
 						<reference key="parent" ref="526223446"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">107</int>
-						<reference key="object" ref="1025111255"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="200591664"/>
-							<reference ref="745832064"/>
-						</array>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">Encoding</string>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">110</int>
-						<reference key="object" ref="200591664"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="1019829804"/>
-						</array>
-						<reference key="parent" ref="1025111255"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">140</int>
-						<reference key="object" ref="745832064"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="718336439"/>
-						</array>
-						<reference key="parent" ref="1025111255"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">158</int>
 						<reference key="object" ref="750337150"/>
 						<array class="NSMutableArray" key="children">
@@ -809,16 +713,6 @@
 						<reference key="parent" ref="247476905"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">210</int>
-						<reference key="object" ref="1019829804"/>
-						<reference key="parent" ref="200591664"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">211</int>
-						<reference key="object" ref="718336439"/>
-						<reference key="parent" ref="745832064"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">212</int>
 						<reference key="object" ref="168806977"/>
 						<reference key="parent" ref="850224826"/>
@@ -847,17 +741,10 @@
 				<boolean value="YES" key="103.ImportedFromIB2"/>
 				<string key="105.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="105.ImportedFromIB2"/>
-				<string key="107.IBEditorWindowLastContentRect">{{103, 1003}, {364, 85}}</string>
-				<string key="107.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="107.ImportedFromIB2"/>
-				<string key="110.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="110.ImportedFromIB2"/>
 				<string key="130.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="130.ImportedFromIB2"/>
 				<string key="132.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="132.ImportedFromIB2"/>
-				<string key="140.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="140.ImportedFromIB2"/>
 				<string key="158.IBEditorWindowLastContentRect">{{82, 989}, {364, 122}}</string>
 				<string key="158.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="158.ImportedFromIB2"/>
@@ -874,8 +761,6 @@
 				<string key="207.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="208.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="209.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="210.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="211.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="212.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="213.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="214.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1081,7 +966,6 @@
 						<string key="changeSortDirection:">id</string>
 						<string key="changeSortOrder:">id</string>
 						<string key="changeSortRepeat:">id</string>
-						<string key="chooseEncoding:">id</string>
 						<string key="copy:">id</string>
 						<string key="decrypt:">id</string>
 						<string key="firstOfFolder:">id</string>
@@ -1116,8 +1000,6 @@
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="clipView">PGClipView</string>
-						<string key="encodingLabel">NSTextField</string>
-						<string key="encodingView">NSView</string>
 						<string key="errorLabel">NSTextField</string>
 						<string key="errorMessage">NSTextField</string>
 						<string key="errorView">NSView</string>
