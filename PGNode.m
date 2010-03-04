@@ -180,7 +180,9 @@ enum {
 }
 - (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter
 {
+	NSParameterAssert(adapter == _adapter);
 	NSParameterAssert(PGNodeLoading & _status);
+	[_adapters removeObjectIdenticalTo:adapter];
 	[_adapters insertObject:[[[PGErrorAdapter alloc] initWithNode:self dataProvider:nil] autorelease] atIndex:0];
 	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter fallbackLoad];
