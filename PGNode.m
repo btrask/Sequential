@@ -182,7 +182,6 @@ enum {
 {
 	NSParameterAssert(PGNodeLoading & _status);
 	[_adapters insertObject:[[[PGErrorAdapter alloc] initWithNode:self dataProvider:nil] autorelease] atIndex:0];
-	[[_adapter activity] setParentActivity:nil];
 	[self _setResourceAdapter:[_adapters lastObject]];
 	[_adapter fallbackLoad];
 }
