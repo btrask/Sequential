@@ -1,4 +1,5 @@
 #import <XADMaster/XADArchiveParser.h>
+#import <XADMaster/CRC.h>
 
 @interface TestDelegate:NSObject
 @end
@@ -21,7 +22,21 @@
 		[data writeToFile:name atomically:YES];
 	}
 */
-	NSLog(@"Checksum: %@, Length: %d",[fh hasChecksum]?[fh isChecksumCorrect]?@"Correct":@"Incorrect":@"Unknown",[data length]);
+
+	uint32_t crc=0;
+	uint8_t xor=0;
+
+	const uint8_t *bytes=[data bytes];
+	int length=[data length];
+	if(bytes)
+	{
+		crc=XADCalculateCRC(0xffffffff,bytes,length,XADCRCTable_edb88320)^0xffffffff;
+		for(int i=0;i<length;i++) xor^=bytes[i];
+	}
+
+	NSLog(@"Checksum: %@, Length: %d, CRC32: %08x, XOR: %02x",
+	[fh hasChecksum]?[fh isChecksumCorrect]?@"Correct":@"Incorrect":@"Unknown",
+	[data length],crc,xor);
 
 	NSLog(@"\n%@",[data subdataWithRange:NSMakeRange(0,[data length]<256?[data length]:256)]);
 }

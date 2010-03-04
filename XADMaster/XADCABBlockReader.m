@@ -42,7 +42,7 @@
 
 		for(int block=0;block<numblocks[folder];block++)
 		{
-			uint32_t check=[parent readUInt32LE];
+			/*uint32_t check=*/[parent readUInt32LE];
 			int compbytes=[parent readUInt16LE];
 			int uncompbytes=[parent readUInt16LE];
 			[parent skipBytes:extbytes+compbytes];

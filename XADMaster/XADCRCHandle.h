@@ -10,6 +10,8 @@
 	const uint32_t *table;
 }
 
++(XADCRCHandle *)IEEECRC32HandleWithHandle:(CSHandle *)handle
+correctCRC:(uint32_t)correctcrc conditioned:(BOOL)conditioned;
 +(XADCRCHandle *)IEEECRC32HandleWithHandle:(CSHandle *)handle length:(off_t)length
 correctCRC:(uint32_t)correctcrc conditioned:(BOOL)conditioned;
 +(XADCRCHandle *)IBMCRC16HandleWithHandle:(CSHandle *)handle length:(off_t)length

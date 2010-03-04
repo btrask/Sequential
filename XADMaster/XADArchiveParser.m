@@ -32,10 +32,12 @@
 #import "XADARJParser.h"
 #import "XADNSISParser.h"
 #import "XADCABParser.h"
+#import "XADCFBFParser.h"
 #import "XADALZipParser.h"
 #import "XADNDSParser.h"
 #import "XADNSAParser.h"
 #import "XADSARParser.h"
+#import "XADSplitFileParser.h"
 #import "XADLibXADParser.h"
 
 #include <dirent.h>
@@ -128,6 +130,7 @@ static int maxheader=0;
 		[XADXZParser class],
 		[XADALZipParser class],
 		[XADCABParser class],
+		[XADCFBFParser class],
 		[XADCABSFXParser class],
 		[XADLZHParser class],
 		[XADLZHAmigaSFXParser class],
@@ -152,6 +155,7 @@ static int maxheader=0;
 		// Over-eager detectors
 		[XADLZMAAloneParser class],
 		[XADCpioParser class],
+		[XADSplitFileParser class],
 
 		// LibXAD
 		[XADLibXADParser class],
@@ -202,10 +206,10 @@ static int maxheader=0;
 	Class parserclass=[self archiveParserClassForHandle:handle name:filename];
 	if(!parserclass) return nil;
 
-	NSArray *volumes=[parserclass volumesForFilename:filename];
-	if(volumes&&[volumes count]>1)
+	@try
 	{
-		@try
+		NSArray *volumes=[parserclass volumesForFilename:filename];
+		if(volumes&&[volumes count]>1)
 		{
 			NSMutableArray *handles=[NSMutableArray array];
 			NSEnumerator *enumerator=[volumes objectEnumerator];
@@ -219,8 +223,8 @@ static int maxheader=0;
 			return [[[parserclass alloc] initWithHandle:multihandle name:filename
 			volumes:volumes] autorelease];
 		}
-		@catch(id e) { } // Fall through to a single file instead.
 	}
+	@catch(id e) { } // Fall through to a single file instead.
 
 	return [[[parserclass alloc] initWithHandle:handle name:filename] autorelease];
 }

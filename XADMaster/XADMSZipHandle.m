@@ -18,7 +18,7 @@
 	zs.next_out=outbuffer;
 	zs.avail_out=uncomplength; //sizeof(outbuffer);
 
-	int err=inflate(&zs,0);
+	/*int err=*/inflate(&zs,0);
 	inflateEnd(&zs);
 	/*if(err==Z_STREAM_END)
 	{

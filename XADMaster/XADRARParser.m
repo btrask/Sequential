@@ -3,6 +3,7 @@
 #import "XADRARAESHandle.h"
 #import "XADRARCrypt20Handle.h"
 #import "XADCRCHandle.h"
+#import "CSFileHandle.h"
 #import "CSMemoryHandle.h"
 #import "CSMultiHandle.h"
 #import "XADException.h"
@@ -91,22 +92,40 @@ static int TestSignature(const uint8_t *ptr)
 
 +(NSArray *)volumesForFilename:(NSString *)filename
 {
-	NSArray *matches;
+	// Open file to read the archive header flags.
+	CSFileHandle *fh=[CSFileHandle fileHandleForReadingAtPath:filename];
+	uint8_t header[12];
+	[fh readBytes:12 toBuffer:header];
+	uint16_t flags=CSUInt16LE(&header[10]);
 
-	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.part[0-9]+\\.rar$" options:REG_ICASE])
+	// Don't bother looking for volumes if it the volume bit is not set.
+	if(!(flags&1)) return nil;
+
+	// Check the old/new naming bit.
+	if(flags&0x10)
 	{
+		// New naming scheme. Find the last number in the name, and look for other files
+		// with the same number of digits in the same location.
+		NSArray *matches;
+		if(matches=[filename substringsCapturedByPattern:@"^(.*[^0-9])([0-9]+)(.*)\\.rar$" options:REG_ICASE])
 		return [self scanForVolumesWithFilename:filename
-		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.part[0-9]+\\.rar$",
-			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@[0-9]{%d}%@.rar$",
+			[[matches objectAtIndex:1] escapedPattern],
+			[[matches objectAtIndex:2] length],
+			[[matches objectAtIndex:3] escapedPattern]] options:REG_ICASE]
 		firstFileExtension:@"rar"];
 	}
-
-	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.(rar|r[0-9]{2}|s[0-9]{2})$" options:REG_ICASE])
+	else
 	{
-		return [self scanForVolumesWithFilename:filename
-		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(rar|r[0-9]{2}|s[0-9]{2})$",
-			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
-		firstFileExtension:@"rar"];
+		// Old naming scheme. Just look for rar/r01/s01 files.
+		NSArray *matches;
+		if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.(rar|r[0-9]{2}|s[0-9]{2})$" options:REG_ICASE])
+		{
+			return [self scanForVolumesWithFilename:filename
+			regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(rar|r[0-9]{2}|s[0-9]{2})$",
+				[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
+			firstFileExtension:@"rar"];
+		}
 	}
 
 	return nil;

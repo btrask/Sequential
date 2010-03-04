@@ -52,7 +52,6 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 	{
 		NSString *dirname=[filename stringByDeletingLastPathComponent];
 		NSMutableArray *volumes=[NSMutableArray arrayWithObject:filename];
-		NSString *volumename;
 
 		CSHandle *fh=[CSFileHandle fileHandleForReadingAtPath:filename];
 		CABHeader firsthead=ReadCABHeader(fh);
@@ -427,8 +426,6 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname)
 		if(handle) return handle;
 	}
 	@catch(id e) { }
-
-	NSMutableArray *volumes=[NSMutableArray array];
 
 	if(!dirname||[dirname length]==0) dirname=@".";
 	DIR *dir=opendir([dirname fileSystemRepresentation]);

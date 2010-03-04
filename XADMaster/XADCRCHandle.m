@@ -2,6 +2,15 @@
 
 @implementation XADCRCHandle
 
++(XADCRCHandle *)IEEECRC32HandleWithHandle:(CSHandle *)handle
+correctCRC:(uint32_t)correctcrc conditioned:(BOOL)conditioned
+{
+	if(conditioned) return [[[self alloc] initWithHandle:handle length:CSHandleMaxLength initialCRC:0xffffffff
+	correctCRC:correctcrc^0xffffffff CRCTable:XADCRCTable_edb88320] autorelease];
+	else return [[[self alloc] initWithHandle:handle length:CSHandleMaxLength initialCRC:0
+	correctCRC:correctcrc CRCTable:XADCRCTable_edb88320] autorelease];
+}
+
 +(XADCRCHandle *)IEEECRC32HandleWithHandle:(CSHandle *)handle length:(off_t)length
 correctCRC:(uint32_t)correctcrc conditioned:(BOOL)conditioned
 {

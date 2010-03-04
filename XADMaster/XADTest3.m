@@ -42,17 +42,30 @@ NSString *EscapeString(NSString *str)
 	NSNumber *size=[dict objectForKey:XADFileSizeKey];
 	CSHandle *fh;
 
-	if(dir&&[dir boolValue]) printf("- ");
-	else if(link) printf("- ");
+	if(dir&&[dir boolValue]) printf("-  ");
+	else if(link) printf("-  ");
 	else
 	{
 		fh=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 		[fh seekToEndOfFile];
 
-		if(!fh) printf("! ");
-		else if(size&&[size longLongValue]!=[fh offsetInFile]) printf("! ");
-		else if([fh hasChecksum]) printf("%c ",[fh isChecksumCorrect]?'o':'x');
-		else printf("? ");
+		if(!fh) printf("!  ");
+		else
+		{
+			if([fh hasChecksum])
+			{
+				if([fh isChecksumCorrect]) printf("o");
+				else printf("x");
+			}
+			else printf("?");
+
+			if(size)
+			{
+				if([size longLongValue]==[fh offsetInFile]) printf("  ");
+				else printf("x ");
+			}
+			else printf("  ");
+		}
 	}
 
 	NSString *name=EscapeString([[dict objectForKey:XADFileNameKey] string]);

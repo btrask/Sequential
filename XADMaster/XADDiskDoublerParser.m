@@ -3,6 +3,8 @@
 #import "XADCompactProRLEHandle.h"
 #import "XADCompactProLZHHandle.h"
 #import "XADStuffItHuffmanHandle.h"
+#import "XADDiskDoublerADnHandle.h"
+#import "XADDiskDoublerDDnHandle.h"
 #import "XADXORHandle.h"
 #import "XADCRCHandle.h"
 #import "XADChecksumHandle.h"
@@ -332,8 +334,11 @@
 		case 1: return @"Compress";
 		case 3: return @"RLE";
 		case 4: return @"Huffman"; // packit?
+		case 6: return @"ADS/AD2";
 		case 7: return @"LZSS";
 		case 8: return @"Compact Pro"; // Compact Pro
+		case 9: return @"AD/AD1";
+		case 10: return @"DDn";
 		default: return [NSString stringWithFormat:@"Method %d",method&0x7f];
 	}
 }
@@ -407,6 +412,19 @@
 				handle=[XADCRCHandle IBMCRC16HandleWithHandle:handle length:size
 				correctCRC:correctchecksum conditioned:NO];
 			}
+		}
+		break;
+
+		case 6:
+		case 9:
+		{
+			handle=[[[XADDiskDoublerADnHandle alloc] initWithHandle:handle length:size] autorelease];
+		}
+		break;
+
+		case 10:
+		{
+			handle=[[[XADDiskDoublerDDnHandle alloc] initWithHandle:handle length:size] autorelease];
 		}
 		break;
 

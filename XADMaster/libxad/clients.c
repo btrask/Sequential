@@ -52,7 +52,6 @@ void DebugClient(const struct xadArchiveInfo *ai, const xadSTRING *, ...);      
 
 #include "clients/Ace.c"
 #include "clients/AMPK.c"
-#include "clients/CAB.c"
 #include "clients/CrunchDisk.c"
 //#include "clients/DCS.c" // uses XPK only, not supported
 #include "clients/DMS.c"

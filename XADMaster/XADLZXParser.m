@@ -41,7 +41,7 @@
 		[fh skipBytes:2];
 		uint32_t date=[fh readUInt32LE];
 		uint32_t datacrc=[fh readUInt32LE];
-		uint32_t headercrc=[fh readUInt32LE];
+		/*uint32_t headercrc=*/[fh readUInt32LE];
 		int namelen=[fh readUInt8];
 
 		NSData *namedata=[fh readDataOfLength:namelen];

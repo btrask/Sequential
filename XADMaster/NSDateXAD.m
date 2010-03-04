@@ -29,10 +29,14 @@
 	return [NSCalendarDate dateWithYear:year month:month day:day hour:hour minute:minute second:second timeZone:nil];
 }
 
-+(NSDate *)XADDateWithWindowsFileTimeLow:(uint32_t)low high:(uint32_t)high;
++(NSDate *)XADDateWithWindowsFileTime:(uint64_t)filetime
 {
-	uint64_t ticks=((uint64_t)high<<32)|(uint64_t)low;
-	return [NSDate dateWithTimeIntervalSince1970:(double)ticks/10000000-11644473600];
+	return [NSDate XADDateWithTimeIntervalSince1601:(double)filetime/10000000];
+}
+
++(NSDate *)XADDateWithWindowsFileTimeLow:(uint32_t)low high:(uint32_t)high
+{
+	return [NSDate XADDateWithWindowsFileTime:((uint64_t)high<<32)|(uint64_t)low];
 }
 
 @end

@@ -13,19 +13,31 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	if([header length]<128) return NO;
 	const uint8_t *bytes=[header bytes];
 
-	if(CSUInt32BE(bytes+102)=='mBIN') return 3; // MacBinary III
-
+	// Check zero fill bytes.
 	if(bytes[0]!=0) return 0;
 	if(bytes[74]!=0) return 0;
-	if(XADCalculateCRC(0,bytes,124,XADCRCReverseTable_1021)==
-	XADUnReverseCRC16(CSUInt16BE(bytes+124))) return 2; // MacBinary II
-
 	if(bytes[82]!=0) return 0;
-	for(int i=101;i<=125;i++) if(bytes[i]!=0) return 0;
+	for(int i=108;i<=115;i++) if(bytes[i]!=0) return 0;
+
+	// Check for a valid name.
 	if(bytes[1]==0||bytes[1]>63) return 0;
 	for(int i=0;i<bytes[1];i++) if(bytes[i+2]==0) return 0;
-	if(CSUInt32BE(bytes+83)>0x7fffffff) return 0;
-	if(CSUInt32BE(bytes+87)>0x7fffffff) return 0;
+
+	// Check for a valid checksum.
+	if(XADCalculateCRC(0,bytes,124,XADCRCReverseTable_1021)==
+	XADUnReverseCRC16(CSUInt16BE(bytes+124)))
+	{
+		// Check for a valid signature.
+		if(CSUInt32BE(bytes+102)=='mBIN') return 3; // MacBinary III
+		else return 2; // MacBinary II
+	}
+
+	// Some final heuristics before accepting a version I file.
+	for(int i=99;i<=125;i++) if(bytes[i]!=0) return 0;
+	if(CSUInt32BE(bytes+83)>0x7fffffff) return 0; // Data fork size
+	if(CSUInt32BE(bytes+87)>0x7fffffff) return 0; // Resource fork size
+	if(CSUInt32BE(bytes+91)==0) return 0; // Creation date
+	if(CSUInt32BE(bytes+95)==0) return 0; // Last modified date
 
 	return 1; // MacBinary I
 }

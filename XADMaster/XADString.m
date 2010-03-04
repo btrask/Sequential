@@ -1,6 +1,6 @@
 #import "XADString.h"
 
-#import <UniversalDetector/UniversalDetector.h>
+#import "../UniversalDetector/UniversalDetector.h"
 
 
 
