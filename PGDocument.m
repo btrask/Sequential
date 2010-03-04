@@ -229,11 +229,10 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		_sortedChildrenChanged = YES;
 		return;
 	}
-	NSInteger const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems] + 1;
-	if([_pageMenu numberOfItems] < numberOfOtherItems) [_pageMenu addItem:[NSMenuItem separatorItem]];
+	NSInteger const numberOfOtherItems = [[[PGDocumentController sharedDocumentController] defaultPageMenu] numberOfItems];
 	while([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems];
 	[[self node] addToMenu:_pageMenu flatten:YES];
-	if([_pageMenu numberOfItems] == numberOfOtherItems) [_pageMenu removeItemAtIndex:numberOfOtherItems - 1];
+	if([_pageMenu numberOfItems] > numberOfOtherItems) [_pageMenu insertItem:[NSMenuItem separatorItem] atIndex:numberOfOtherItems];
 	[self PG_postNotificationName:PGDocumentSortedNodesDidChangeNotification];
 }
 - (void)noteNodeIsViewableDidChange:(PGNode *)node
