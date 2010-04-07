@@ -322,7 +322,8 @@ enum {
 {
 	if(adapter == _adapter) return;
 	[[_adapter activity] setParentActivity:nil];
-	_adapter = adapter;
+	[_adapter release];
+	_adapter = [adapter retain];
 	PGActivity *const parentActivity = [[self parentAdapter] activity];
 	[[_adapter activity] setParentActivity:parentActivity ? parentActivity : [[self document] activity]];
 	[self noteIsViewableDidChange];
@@ -382,6 +383,7 @@ enum {
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_identifier release];
 	[_adapters release];
+	[_adapter release];
 
 	[_menuItem release];
 	[_dateModified release];
