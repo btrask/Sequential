@@ -26,9 +26,7 @@
 		1B2F18990EE9A4440000DAFF /* XADSkipHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B2F17E50EE8AF7B0000DAFF /* XADSkipHandle.m */; };
 		1B32D0FD10F6E461002A2C76 /* XADCFBFParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B32D0FB10F6E461002A2C76 /* XADCFBFParser.m */; };
 		1B32D2AB10F8D11D002A2C76 /* XADBlockHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B32D2A910F8D11D002A2C76 /* XADBlockHandle.m */; };
-		1B32D3C610FA7A69002A2C76 /* XADSplitFileParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B32D3C410FA7A69002A2C76 /* XADSplitFileParser.h */; };
 		1B32D3C710FA7A69002A2C76 /* XADSplitFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B32D3C510FA7A69002A2C76 /* XADSplitFileParser.m */; };
-		1B3A64B61015030700AE25A8 /* XADLZHSFXParsers.h in Headers */ = {isa = PBXBuildFile; fileRef = 1B3A64B41015030700AE25A8 /* XADLZHSFXParsers.h */; };
 		1B3A64B71015030700AE25A8 /* XADLZHSFXParsers.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B3A64B51015030700AE25A8 /* XADLZHSFXParsers.m */; };
 		1B3A64C910150DB600AE25A8 /* XADLZHOldHandles.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B3A64C710150DB600AE25A8 /* XADLZHOldHandles.m */; };
 		1B3A650310154DCE00AE25A8 /* CSHexDump.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B3A650110154DCE00AE25A8 /* CSHexDump.m */; };
@@ -340,7 +338,7 @@
 		1B3A650110154DCE00AE25A8 /* CSHexDump.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSHexDump.m; sourceTree = "<group>"; };
 		1B3A66D51017B7E000AE25A8 /* XADNSISParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XADNSISParser.h; sourceTree = "<group>"; };
 		1B3A66D61017B7E000AE25A8 /* XADNSISParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XADNSISParser.m; sourceTree = "<group>"; };
-		1B3A68A2101BA12C00AE25A8 /* XADTest3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XADTest3; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B3A68A2101BA12C00AE25A8 /* XADTest4 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = XADTest4; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B3A68A9101BA14A00AE25A8 /* XADTest4.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XADTest4.m; sourceTree = "<group>"; };
 		1B3E2B530F27C8EA003EEF98 /* XADStuffItXEnglishHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XADStuffItXEnglishHandle.h; sourceTree = "<group>"; };
 		1B3E2B540F27C8EA003EEF98 /* XADStuffItXEnglishHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XADStuffItXEnglishHandle.m; sourceTree = "<group>"; };
@@ -656,7 +654,7 @@
 				1B5A7BA30A24F9B400B189EB /* XADTest */,
 				1BBAB68B0EC274A3007FE6A2 /* XADTest2 */,
 				1BC8931A0ED6F283006B47FE /* XADTest3 */,
-				1B3A68A2101BA12C00AE25A8 /* XADTest3 */,
+				1B3A68A2101BA12C00AE25A8 /* XADTest4 */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1339,151 +1337,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		8DC2EF500486A6940098B216 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1B2110720A4452C2005ED2AF /* XADRegex.h in Headers */,
-				1B06D55C0DDA627200D9C000 /* xadmaster.h in Headers */,
-				1B06D5950DDA644E00D9C000 /* SDI_compiler.h in Headers */,
-				1B06D5A00DDA665800D9C000 /* XADLibXADParser.h in Headers */,
-				1B06D5A40DDA666C00D9C000 /* XADZipParser.h in Headers */,
-				1B06D5A80DDA667A00D9C000 /* XADRARParser.h in Headers */,
-				1B06D5AC0DDA668500D9C000 /* XADStuffItParser.h in Headers */,
-				1B06D5B00DDA669100D9C000 /* XAD7ZipParser.h in Headers */,
-				1B06D5B40DDA669C00D9C000 /* XADBinHexParser.h in Headers */,
-				1B06D5BB0DDA67E000D9C000 /* XADString.h in Headers */,
-				1B578C340DDBC8BF005B0F68 /* XADException.h in Headers */,
-				1B578C580DDCFFD0005B0F68 /* XADGzipParser.h in Headers */,
-				1B578C5C0DDCFFE0005B0F68 /* XADBzip2Parser.h in Headers */,
-				1BBAB6780EC26AA6007FE6A2 /* XADArchiveParser.h in Headers */,
-				1BBAB6930EC274D8007FE6A2 /* XADArchive.h in Headers */,
-				1B3FAB000EC3859F006D2F06 /* CSHandle.h in Headers */,
-				1B3FAB020EC3859F006D2F06 /* CSSubHandle.h in Headers */,
-				1B3FAB040EC3859F006D2F06 /* CSMultiHandle.h in Headers */,
-				1B3FAB060EC3859F006D2F06 /* CSFileHandle.h in Headers */,
-				1B3FAB080EC3859F006D2F06 /* CSMemoryHandle.h in Headers */,
-				1B3FAB0A0EC3859F006D2F06 /* CSStreamHandle.h in Headers */,
-				1B3FAB0C0EC3859F006D2F06 /* CSBlockStreamHandle.h in Headers */,
-				1B3FAB0E0EC3859F006D2F06 /* CSByteStreamHandle.h in Headers */,
-				1B3FAB100EC3859F006D2F06 /* CSZlibHandle.h in Headers */,
-				1B3FAD670EC5D4E8006D2F06 /* XADMacArchiveParser.h in Headers */,
-				1B3FAD800EC6826E006D2F06 /* NSDateXAD.h in Headers */,
-				1BC884810ECCCE41006B47FE /* XADZipImplodeHandle.h in Headers */,
-				1BC884850ECCCE69006B47FE /* XADZipShrinkHandle.h in Headers */,
-				1BC885C90ECD11BC006B47FE /* XADZipCryptHandle.h in Headers */,
-				1BC885CD0ECD11CF006B47FE /* XADWinZipAESHandle.h in Headers */,
-				1BC889670ECF9AD5006B47FE /* XADTarParser.h in Headers */,
-				1BC8896B0ECF9AE2006B47FE /* XADCpioParser.h in Headers */,
-				1BC88A270ED06D76006B47FE /* XADPrefixCode.h in Headers */,
-				1BC88BF30ED1D95B006B47FE /* XADStuffIt5Parser.h in Headers */,
-				1BC88D450ED31A31006B47FE /* LZW.h in Headers */,
-				1BC88D4D0ED31A46006B47FE /* XADCompressParser.h in Headers */,
-				1BC88D4E0ED31A46006B47FE /* XADCompressHandle.h in Headers */,
-				1BC88D750ED31EC3006B47FE /* XADMacBinaryParser.h in Headers */,
-				1BC88D790ED31ECD006B47FE /* XADCompactProParser.h in Headers */,
-				1BC88D7D0ED31ED9006B47FE /* XADDiskDoublerParser.h in Headers */,
-				1BC88EF50ED36152006B47FE /* XADStuffItRLEHandle.h in Headers */,
-				1BC88FF10ED39F39006B47FE /* XADStuffItHuffmanHandle.h in Headers */,
-				1BC890410ED47D76006B47FE /* XADStuffItOldHandles.h in Headers */,
-				1BC890420ED47D76006B47FE /* XADLibXADIOHandle.h in Headers */,
-				1BC890430ED47D76006B47FE /* CSInputBuffer.h in Headers */,
-				1BC898EC0EDA1236006B47FE /* XADCompactProLZHHandle.h in Headers */,
-				1BC89A790EDB12F8006B47FE /* XADStuffIt13Handle.h in Headers */,
-				1BC89A7A0EDB12F8006B47FE /* XADLZSSHandle.h in Headers */,
-				1BC89CA00EDCAA51006B47FE /* Checksums.h in Headers */,
-				1BC89D790EDCC6ED006B47FE /* XADRARHandle.h in Headers */,
-				1BC89DEC0EDDBB33006B47FE /* XADRARAESHandle.h in Headers */,
-				1BC89F130EE0CD71006B47FE /* XADDeflateHandle.h in Headers */,
-				1BC8A07D0EE4C4DA006B47FE /* XADALZipParser.h in Headers */,
-				1BC8A0F10EE61C42006B47FE /* CSBzip2Handle.h in Headers */,
-				1B2F17E60EE8AF7B0000DAFF /* XADSkipHandle.h in Headers */,
-				1B2F17EA0EE8B9490000DAFF /* SystemSpecific.h in Headers */,
-				1B2F18400EE965880000DAFF /* XADPowerPackerParser.h in Headers */,
-				1BCD5C350EEC605400D86C43 /* RARUnpacker.h in Headers */,
-				1BCD5DA40EED8C9500D86C43 /* XADLZMAHandle.h in Headers */,
-				1BCD5DAA0EED8C9C00D86C43 /* LzmaDec.h in Headers */,
-				1BCD5DAB0EED8C9C00D86C43 /* Types.h in Headers */,
-				1BCD61570EF349EE00D86C43 /* Bra.h in Headers */,
-				1BCD616D0EF3582300D86C43 /* XAD7ZipBranchHandles.h in Headers */,
-				1BCD61970EF4208C00D86C43 /* XAD7ZipBCJ2Handle.h in Headers */,
-				1BCD62AB0EF4722400D86C43 /* XADXZParser.h in Headers */,
-				1BCD630E0EF487B500D86C43 /* XADXARParser.h in Headers */,
-				1BCD64240EF6CA0500D86C43 /* XADLZMAAloneParser.h in Headers */,
-				1BCD642B0EF6CA3F00D86C43 /* XADCRCSuffixHandle.h in Headers */,
-				1BCD642D0EF6CA3F00D86C43 /* XADCRCHandle.h in Headers */,
-				1BCD64340EF6CB5200D86C43 /* XADDigestHandle.h in Headers */,
-				1BCD65520EF8164900D86C43 /* RARBug.h in Headers */,
-				1BC9A7040F007A760094C7B5 /* XADStuffItXParser.h in Headers */,
-				1BC9A7080F007A910094C7B5 /* XADStuffItXCyanideHandle.h in Headers */,
-				1BC9A70C0F007AA20094C7B5 /* CarrylessRangeCoder.h in Headers */,
-				1BC9A7100F007AAF0094C7B5 /* BWT.h in Headers */,
-				1B880C270F09A23B0061CCBE /* XADStuffItXBlockHandle.h in Headers */,
-				1B880D030F0AAB6F0061CCBE /* XADPPMdParser.h in Headers */,
-				1B880D070F0AAB970061CCBE /* XADPPMdHandles.h in Headers */,
-				1BB8C5170F0C29F30074522A /* PPMdSubAllocator.h in Headers */,
-				1BB8C8570F0FFAB10074522A /* PPMdVariantG.h in Headers */,
-				1BB8C85B0F0FFB290074522A /* PPMdVariantH.h in Headers */,
-				1B2A408E0F13BDEB009B5B89 /* PPMdContext.h in Headers */,
-				1B2A42230F15237C009B5B89 /* PPMdSubAllocatorVariantG.h in Headers */,
-				1B2A42270F15238C009B5B89 /* PPMdSubAllocatorVariantH.h in Headers */,
-				1B2A435F0F158323009B5B89 /* PPMdVariantI.h in Headers */,
-				1B2A45FE0F19483E009B5B89 /* PPMdSubAllocatorVariantI.h in Headers */,
-				1B2A4A180F1D7E58009B5B89 /* StuffItXUtilities.h in Headers */,
-				1B2A4B030F20F994009B5B89 /* PPMdSubAllocatorBrimstone.h in Headers */,
-				1B3E2B550F27C8EA003EEF98 /* XADStuffItXEnglishHandle.h in Headers */,
-				1B3E2BF30F28D715003EEF98 /* XADRC4Handle.h in Headers */,
-				1B3E2C3A0F294DEE003EEF98 /* XADStuffItXDarkhorseHandle.h in Headers */,
-				1B3E2DF80F2CBE28003EEF98 /* XADStuffItXIronHandle.h in Headers */,
-				1B3E30D80F354174003EEF98 /* XADStuffItXBlendHandle.h in Headers */,
-				1B3E347A0F3E22FC003EEF98 /* XADLZHParser.h in Headers */,
-				1B3E34EC0F3E62C7003EEF98 /* XADLZHStaticHandle.h in Headers */,
-				1B3E35D50F3F96CF003EEF98 /* XADLZHDynamicHandle.h in Headers */,
-				1B3E35D90F3F9B17003EEF98 /* XADLArcHandles.h in Headers */,
-				1B3E377F0F422D2F003EEF98 /* NumberParsing.h in Headers */,
-				1B3E39F40F45F62F003EEF98 /* XADChecksumHandle.h in Headers */,
-				1B690E4F0F466C5400A415E0 /* XADPackItParser.h in Headers */,
-				1B690E7B0F47907600A415E0 /* XADRPMParser.h in Headers */,
-				1B69134E0F4CA45000A415E0 /* XADZipSFXParsers.h in Headers */,
-				1B216A750F8E8ADE001207C9 /* Progress.h in Headers */,
-				1B216A7A0F8E9064001207C9 /* CRC.h in Headers */,
-				1BA2650E0FC061E200279E95 /* XADRARCrypt20Handle.h in Headers */,
-				1BA266DE0FC78BF600279E95 /* XADPath.h in Headers */,
-				1B81DD460FFEB87B005C5B23 /* XADUnarchiver.h in Headers */,
-				1B95B42E1010D906009FA09E /* XADARJParser.h in Headers */,
-				1B95B516101119A5009FA09E /* XADXORHandle.h in Headers */,
-				1B95B5B010112815009FA09E /* XADARJFastestHandle.h in Headers */,
-				1B8A89D51012078C00C8534E /* XADNDSParser.h in Headers */,
-				1B3A64B61015030700AE25A8 /* XADLZHSFXParsers.h in Headers */,
-				1B3A64C810150DB600AE25A8 /* XADLZHOldHandles.h in Headers */,
-				1B3A650210154DCE00AE25A8 /* CSHexDump.h in Headers */,
-				1B3A66D71017B7E000AE25A8 /* XADNSISParser.h in Headers */,
-				1BA4DF0E101DFC73001AB3CA /* XADNSISBzip2Handle.h in Headers */,
-				1BE785C610AF78D0007EA6F6 /* XADNSAParser.h in Headers */,
-				1BE785EE10AF8607007EA6F6 /* XADSARParser.h in Headers */,
-				1BBC3D2510B0C9C700A05E29 /* XADXZHandle.h in Headers */,
-				1BBC3D2910B0D29100A05E29 /* XADLZMA2Handle.h in Headers */,
-				1BBC3D7C10B1DECE00A05E29 /* Lzma2Dec.h in Headers */,
-				1BBC3E6E10B2304C00A05E29 /* XAD7ZipFilterHandles.h in Headers */,
-				1BBC3F0E10B35A9500A05E29 /* XADLZXParser.h in Headers */,
-				1BBC3F1D10B386B100A05E29 /* XADLZXHandle.h in Headers */,
-				1BBC3FB310B7443000A05E29 /* XADMSLZXHandle.h in Headers */,
-				1BBC415710B85B4C00A05E29 /* XADCABParser.h in Headers */,
-				1BBC415B10B85B5E00A05E29 /* XADMSZipHandle.h in Headers */,
-				1BBC415F10B85B6600A05E29 /* XADQuantumHandle.h in Headers */,
-				1BBC42E010BA065D00A05E29 /* XADCABBlockHandle.h in Headers */,
-				1BE07E6A10C9953400B17F91 /* XADCABBlockReader.h in Headers */,
-				1BC574B710EEDA700056F44C /* XADDiskDoublerADnHandle.h in Headers */,
-				1BC5753910F0F62B0056F44C /* XADDiskDoublerDDnHandle.h in Headers */,
-				1B32D0FC10F6E461002A2C76 /* XADCFBFParser.h in Headers */,
-				1B32D2AA10F8D11D002A2C76 /* XADBlockHandle.h in Headers */,
-				1B32D3C610FA7A69002A2C76 /* XADSplitFileParser.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		1B3A6898101BA12C00AE25A8 /* XADTest4 */ = {
 			isa = PBXNativeTarget;
@@ -1499,7 +1352,7 @@
 			);
 			name = XADTest4;
 			productName = XADTest3;
-			productReference = 1B3A68A2101BA12C00AE25A8 /* XADTest3 */;
+			productReference = 1B3A68A2101BA12C00AE25A8 /* XADTest4 */;
 			productType = "com.apple.product-type.tool";
 		};
 		1B5A7BA20A24F9B400B189EB /* XADTest */ = {
@@ -2063,11 +1916,6 @@
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../UniversalDetector/build/Release\"";
 				FRAMEWORK_VERSION = A;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2108,11 +1956,6 @@
 				DEAD_CODE_STRIPPING = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
-				);
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../UniversalDetector/build/Release\"";
 				FRAMEWORK_VERSION = A;
 				GCC_CHAR_IS_UNSIGNED_CHAR = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -2153,7 +1996,6 @@
 					/Library/Frameworks,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_1 = "\"$(SYMROOT)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_2 = "\"../UniversalDetector/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"";
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_VERSION_i386 = 4.0;
@@ -2177,11 +2019,9 @@
 				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_1)",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_2)",
 					/Library/Frameworks,
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_1 = "\"$(SYMROOT)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"";
-				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_PROJECT_2 = "\"../UniversalDetector/build/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)\"";
 				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_VERSION_i386 = 4.0;
