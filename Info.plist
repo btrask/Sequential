@@ -886,23 +886,6 @@
 		<dict/>
 		<key>PGWebAdapter</key>
 		<dict/>
-		<key>PGXMLAdapter</key>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>xml</string>
-				<string>rss</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>text/xml</string>
-				<string>application/xml</string>
-				<string>text/xml+oembed</string>
-				<string>application/xml+oembed</string>
-				<string>text/rss+xml</string>
-				<string>application/rss+xml</string>
-			</array>
-		</dict>
 	</dict>
 	<key>PGDataProviderCustomizers</key>
 	<array>

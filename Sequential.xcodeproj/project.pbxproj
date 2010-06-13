@@ -502,10 +502,6 @@
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCancelableProxy.h; sourceTree = "<group>"; };
 		0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCancelableProxy.m; sourceTree = "<group>"; };
-		0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGFlickrAdapter.h; sourceTree = "<group>"; };
-		0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFlickrAdapter.m; sourceTree = "<group>"; };
-		0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLParser.h; sourceTree = "<group>"; };
-		0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLParser.m; sourceTree = "<group>"; };
 		0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGErrorAdapter.h; sourceTree = "<group>"; };
 		0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGErrorAdapter.m; sourceTree = "<group>"; };
 		0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGKeyboardLayout.h; sourceTree = "<group>"; };
@@ -586,8 +582,6 @@
 		0ED4AAF70DD18538007C5A77 /* PGFloatingPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGFloatingPanelController.m; sourceTree = "<group>"; };
 		0ED4AB150DD18730007C5A77 /* PGInspectorPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGInspectorPanelController.h; sourceTree = "<group>"; };
 		0ED4AB160DD18730007C5A77 /* PGInspectorPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGInspectorPanelController.m; sourceTree = "<group>"; };
-		0ED5F5A90E806F4E00715745 /* PGXMLAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLAdapter.h; sourceTree = "<group>"; };
-		0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLAdapter.m; sourceTree = "<group>"; };
 		0ED9899C0F56A7F900AD91F5 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EDB9A740EA1896400B7342A /* PGColumnView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGColumnView.h; sourceTree = "<group>"; };
 		0EDB9A750EA1896400B7342A /* PGColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGColumnView.m; sourceTree = "<group>"; };
@@ -875,14 +869,10 @@
 				0EF543230DC1291600905391 /* PGFolderAdapter.m */,
 				0EE646A80DC8416F00A90F86 /* PGHTMLAdapter.h */,
 				0EE646A90DC8416F00A90F86 /* PGHTMLAdapter.m */,
-				0ED5F5A90E806F4E00715745 /* PGXMLAdapter.h */,
-				0ED5F5AA0E806F4E00715745 /* PGXMLAdapter.m */,
 				0ED4A4180DCBFDDA007C5A77 /* PGArchiveAdapter.h */,
 				0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */,
 				0ED4A44B0DCC628F007C5A77 /* PGPDFAdapter.h */,
 				0ED4A44C0DCC628F007C5A77 /* PGPDFAdapter.m */,
-				0E7B2CBA0E8E371900F537CD /* PGFlickrAdapter.h */,
-				0E7B2CBB0E8E371900F537CD /* PGFlickrAdapter.m */,
 				0EE6476D0DC8F96C00A90F86 /* PGGenericImageAdapter.h */,
 				0EE6476E0DC8F96C00A90F86 /* PGGenericImageAdapter.m */,
 				0EE761790DDB7BDE00ED8ABB /* PGResourceIdentifier.h */,
@@ -895,8 +885,6 @@
 				0E01793F10FBEDBB0017FA5A /* PGActivity.m */,
 				0ED4A8DC0DD00E18007C5A77 /* PGURLLoad.h */,
 				0ED4A8DB0DD00E18007C5A77 /* PGURLLoad.m */,
-				0E7B2D140E8F9A4E00F537CD /* PGXMLParser.h */,
-				0E7B2D150E8F9A4E00F537CD /* PGXMLParser.m */,
 				0EE645930DC63C4700A90F86 /* PGBookmark.h */,
 				0EE645940DC63C4700A90F86 /* PGBookmark.m */,
 			);
