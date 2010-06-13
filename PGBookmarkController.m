@@ -72,8 +72,8 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 - (IBAction)open:(id)sender
 {
 	PGBookmark *const bookmark = [(NSMenuItem *)sender representedObject];
-	BOOL const delete = _deletesBookmarks || NSAlternateKeyMask & [[NSApp currentEvent] modifierFlags];
-	if(!delete && [bookmark isValid]) {
+	BOOL const deleteBookmark = _deletesBookmarks || NSAlternateKeyMask & [[NSApp currentEvent] modifierFlags];
+	if(!deleteBookmark && [bookmark isValid]) {
 		[[PGDocumentController sharedDocumentController] openDocumentWithBookmark:bookmark display:YES];
 		return;
 	}
@@ -81,7 +81,7 @@ static OSStatus PGBookmarkControllerFlagsChanged(EventHandlerCallRef inHandlerCa
 	[alert setAlertStyle:NSInformationalAlertStyle];
 	NSButton *const deleteButton = [alert addButtonWithTitle:NSLocalizedString(@"Delete Bookmark", nil)];
 	NSButton *const cancelButton = [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
-	if(_deletesBookmarks) return [self removeBookmark:bookmark];
+	if(deleteBookmark) return [self removeBookmark:bookmark];
 	[alert setMessageText:[NSString stringWithFormat:NSLocalizedString(@"The file referenced by the bookmark %@ could not be found.", @"Bookmarked file could not be found error. %@ is replaced with the missing page's saved filename."), [[bookmark fileIdentifier] displayName]]];
 	[alert setInformativeText:NSLocalizedString(@"It may have been moved or deleted.", @"Bookmarked file could not be found error informative text.")];
 	[deleteButton setKeyEquivalent:@""];
