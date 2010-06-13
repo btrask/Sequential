@@ -76,6 +76,23 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>7z</string>
+				<string>7Z</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/x-7z-compressed</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.7-zip.7-zip-archive</string>
+			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+		</dict>
+		<dict>
 			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>fold</string>
@@ -675,6 +692,7 @@
 				<string>cbz</string>
 				<string>rar</string>
 				<string>cbr</string>
+				<string>7z</string>
 			</array>
 			<key>CFBundleTypeMIMETypes</key>
 			<array>
@@ -686,11 +704,17 @@
 				<string>application/x-rar</string>
 				<string>application/x-rar-compressed</string>
 				<string>compressed/rar</string>
+				<string>application/x-7z-compressed</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>org.7-zip.7-zip-archive</string>
 			</array>
 			<key>PGBundleTypeFourCCs</key>
 			<array>
 				<data>UEsDBA==</data>
 				<data>UmFyIQ==</data>
+				<data>N3rCvMKv</data>
 			</array>
 		</dict>
 		<key>PGFlickrAdapter</key>
