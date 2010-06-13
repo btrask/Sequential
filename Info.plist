@@ -681,7 +681,7 @@
 	<key>NSPrincipalClass</key>
 	<string>PGApplication</string>
 	<key>NSSupportsSuddenTermination</key>
-	<string>YES</string>
+	<true/>
 	<key>PGResourceAdapterClasses</key>
 	<dict>
 		<key>PGArchiveAdapter</key>
