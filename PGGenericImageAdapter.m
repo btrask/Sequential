@@ -62,9 +62,11 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	if(data) {
 		CGImageSourceRef const source = CGImageSourceCreateWithData((CFDataRef)data, (CFDictionaryRef)[self _imageSourceOptions]);
 		size_t const imageCount = CGImageSourceGetCount(source);
-		if(imageCount) [self performSelectorOnMainThread:@selector(_setImageProperties:) withObject:[(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, 0, NULL) autorelease] waitUntilDone:NO];
-		if(imageCount > 1) rep = [NSBitmapImageRep imageRepWithData:data]; // If the image is animated, we can't use the image source.
-		else rep = PGImageSourceImageRepAtIndex(source, 0);
+		if(imageCount) {
+			[self performSelectorOnMainThread:@selector(_setImageProperties:) withObject:[(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, 0, NULL) autorelease] waitUntilDone:NO];
+			if(imageCount > 1) rep = [NSBitmapImageRep imageRepWithData:data]; // If the image is animated, we can't use the image source.
+			else rep = PGImageSourceImageRepAtIndex(source, 0);
+		}
 		CFRelease(source);
 	}
 	[self performSelectorOnMainThread:@selector(_readFinishedWithImageRep:) withObject:rep waitUntilDone:NO];
