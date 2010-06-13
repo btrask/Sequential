@@ -38,9 +38,8 @@ OSType PGOSTypeFromString(NSString *str)
 	switch([str length]) {
 		case 4: return UTGetOSTypeFromString((CFStringRef)str);
 		case 6: return NSHFSTypeCodeFromFileType(str);
+		default: return 0;
 	}
-	PGCAssertNotReached(@"Invalid OSType string.");
-	return 0;
 }
 
 @implementation NSAffineTransform(PGFoundationAdditions)
