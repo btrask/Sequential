@@ -483,6 +483,8 @@
 		0E3DA4480DB0B6A800BE502B /* HMBlkAppKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = HMBlkAppKit.xcodeproj; path = HMBlkAppKit/HMBlkAppKit.xcodeproj; sourceTree = "<group>"; };
 		0E42388D10F23BA6002FF32C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PGAbout.strings; sourceTree = "<group>"; };
 		0E42388E10F23BA6002FF32C /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PGPreference.strings; sourceTree = "<group>"; };
+		0E43EDC411C4BEBB00CDC06A /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PGAbout.strings; sourceTree = "<group>"; };
+		0E43EDC511C4BEBB00CDC06A /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PGPreference.strings; sourceTree = "<group>"; };
 		0E4793910DF15FD90083B7CA /* PGAttachments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGAttachments.h; sourceTree = "<group>"; };
 		0E4793920DF15FD90083B7CA /* PGAttachments.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGAttachments.m; sourceTree = "<group>"; };
 		0E4794280DF182C40083B7CA /* Silhouette-Black.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Silhouette-Black.png"; sourceTree = "<group>"; };
@@ -1416,6 +1418,7 @@
 				0E18D65610F12CCF00E5C216 /* it */,
 				0E18D66E10F12CD400E5C216 /* ja */,
 				0E18D6B210F12CE900E5C216 /* ru */,
+				0E43EDC411C4BEBB00CDC06A /* sv */,
 			);
 			name = PGAbout.strings;
 			sourceTree = "<group>";
@@ -1519,6 +1522,7 @@
 				0E18D65D10F12CCF00E5C216 /* it */,
 				0E18D67510F12CD400E5C216 /* ja */,
 				0E18D6B910F12CE900E5C216 /* ru */,
+				0E43EDC511C4BEBB00CDC06A /* sv */,
 			);
 			name = PGPreference.strings;
 			sourceTree = "<group>";
