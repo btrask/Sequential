@@ -153,7 +153,11 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[openPanel setAllowsMultipleSelection:YES];
 	NSURL *const URL = [[[self currentDocument] rootIdentifier] URL];
 	NSString *const path = [URL isFileURL] ? [URL path] : nil;
-	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedTypes]] == NSOKButton) [self application:NSApp openFiles:[openPanel filenames]];
+	if([openPanel runModalForDirectory:[path stringByDeletingLastPathComponent] file:[path lastPathComponent] types:[PGResourceAdapter supportedTypes]] == NSOKButton) {
+		PGDocument *const oldDoc = [self currentDocument];
+		[self application:NSApp openFiles:[openPanel filenames]];
+		if([[openPanel currentEvent] modifierFlags] & NSAlternateKeyMask && [self currentDocument] != oldDoc) [oldDoc close];
+	}
 }
 - (IBAction)openURL:(id)sender
 {
@@ -643,10 +647,13 @@ static PGDocumentController *PGSharedDocumentController = nil;
 @end
 @interface PGMenuItem : NSMenuItem
 @end
+@interface PGButton : NSButton
+@end
 
 static BOOL (*PGNSWindowValidateMenuItem)(id, SEL, NSMenuItem *);
 static BOOL (*PGNSMenuPerformKeyEquivalent)(id, SEL, NSEvent *);
 static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
+static BOOL (*PGNSButtonPerformKeyEquivalent)(id, SEL, NSEvent *);
 
 @implementation PGApplication
 
@@ -657,6 +664,7 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 	PGNSWindowValidateMenuItem = [NSWindow PG_useInstance:YES implementationFromClass:[PGWindow class] forSelector:@selector(validateMenuItem:)];
 	PGNSMenuPerformKeyEquivalent = [NSMenu PG_useInstance:YES implementationFromClass:[PGMenu class] forSelector:@selector(performKeyEquivalent:)];
 	PGNSMenuItemSetEnabled = [NSMenuItem PG_useInstance:YES implementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
+	PGNSButtonPerformKeyEquivalent = [NSButton PG_useInstance:YES implementationFromClass:[PGButton class] forSelector:@selector(performKeyEquivalent:)];
 
 	struct rlimit const lim = {RLIM_INFINITY, RLIM_INFINITY};
 	(void)setrlimit(RLIMIT_NOFILE, &lim); // We use a lot of file descriptors.
@@ -709,6 +717,25 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 {
 	PGNSMenuItemSetEnabled(self, _cmd, flag);
 	[[self view] PG_setEnabled:flag recursive:YES];
+}
+
+@end
+
+@implementation PGButton
+
+#pragma mark -NSView
+
+- (BOOL)performKeyEquivalent:(NSEvent *)anEvent
+{
+	if(PGNSButtonPerformKeyEquivalent(self, _cmd, anEvent)) return YES;
+	if(![[NSArray arrayWithObjects:@"\r", @"\n", nil] containsObject:[self keyEquivalent]]) return NO;
+	if(![[anEvent charactersIgnoringModifiers] isEqual:[self keyEquivalent]]) return NO;
+	NSUInteger const sharedModifiers = [anEvent modifierFlags] & [self keyEquivalentModifierMask];
+	if([self keyEquivalentModifierMask] == sharedModifiers) {
+		[[self cell] performClick:self];
+		return YES;
+	}
+	return NO;
 }
 
 @end

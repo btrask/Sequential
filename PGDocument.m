@@ -103,7 +103,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (void)setDisplayController:(PGDisplayController *)controller
 {
 	if(controller == _displayController) return;
-	[_displayController setActiveDocument:nil closeIfAppropriate:YES];
+	if([_displayController activeDocument] == self) [_displayController setActiveDocument:nil closeIfAppropriate:YES];
 	[_displayController release];
 	_displayController = [controller retain];
 	[_displayController setActiveDocument:self closeIfAppropriate:NO];
