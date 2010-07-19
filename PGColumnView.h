@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 
 @property(readonly) NSUInteger numberOfColumns;
-@property(readonly) NSArray *views;
+@property(readonly, copy) NSArray *views;
 @property(readonly) id lastView;
 @property(assign) CGFloat columnWidth;
 
