@@ -186,6 +186,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	BOOL const new = ![self displayController];
 	if(new) [self setDisplayController:[[PGDocumentController sharedDocumentController] displayControllerForNewDocument]];
+	else [[self displayController] setActiveDocument:self closeIfAppropriate:NO];
 	[[PGDocumentController sharedDocumentController] noteNewRecentDocument:self];
 	[[self displayController] showWindow:self];
 	if(new && !_openedBookmark) {
