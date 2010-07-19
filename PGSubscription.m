@@ -53,7 +53,7 @@ static id  PGActiveSubscriptions = nil;
 
 @end
 
-@interface PGFSEventBranchSubscription : PGSubscription
+@interface PGBranchSubscription : PGSubscription
 {
 	@private
 	FSEventStreamRef _eventStream;
@@ -76,7 +76,7 @@ static id  PGActiveSubscriptions = nil;
 {
 	id result;
 	if(!flag) result = [PGLeafSubscription alloc];
-	else result = [PGFSEventBranchSubscription alloc];
+	else result = [PGBranchSubscription alloc];
 	return [[result initWithPath:path] autorelease];
 }
 + (id)subscriptionWithPath:(NSString *)path
@@ -187,10 +187,10 @@ static id  PGActiveSubscriptions = nil;
 
 static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientCallBackInfo, size_t numEvents, void *eventPaths, const FSEventStreamEventFlags eventFlags[], const FSEventStreamEventId eventIds[])
 {
-	[(PGFSEventBranchSubscription *)clientCallBackInfo noteFileEventsDidOccurAtPaths:(id)eventPaths];
+	[(PGBranchSubscription *)clientCallBackInfo noteFileEventsDidOccurAtPaths:(id)eventPaths];
 }
 
-@implementation PGFSEventBranchSubscription
+@implementation PGBranchSubscription
 
 #pragma mark Instance Methods
 
