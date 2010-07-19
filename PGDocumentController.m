@@ -659,7 +659,7 @@ static void (*PGNSMenuItemSetEnabled)(id, SEL, BOOL);
 	PGNSMenuItemSetEnabled = [NSMenuItem PG_useInstance:YES implementationFromClass:[PGMenuItem class] forSelector:@selector(setEnabled:)];
 
 	struct rlimit const lim = {RLIM_INFINITY, RLIM_INFINITY};
-	(void)setrlimit(RLIMIT_NOFILE, &lim); // We use a lot of file descriptors, especially prior to Leopard where we don't have FSEvents.
+	(void)setrlimit(RLIMIT_NOFILE, &lim); // We use a lot of file descriptors.
 
 	[NSBundle PG_prepareToAutoLocalize];
 }
