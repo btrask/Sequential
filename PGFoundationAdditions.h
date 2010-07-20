@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGGeometryTypes.h"
 
+extern NSString *const PGCFBundleHelpBookNameKey;
+
 NS_INLINE BOOL PGEqualObjects(id<NSObject> a, id<NSObject> b)
 {
 	if(a == b) return YES;

@@ -213,7 +213,7 @@ static PGDocumentController *PGSharedDocumentController = nil;
 
 - (IBAction)showKeyboardShortcuts:(id)sender
 {
-	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts" inBook:@"Sequential Help"];
+	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"shortcuts" inBook:[[NSBundle mainBundle] objectForInfoDictionaryKey:PGCFBundleHelpBookNameKey]];
 }
 
 #pragma mark -

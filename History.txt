@@ -1,6 +1,7 @@
 2.1.3 (Upcoming release)
 - When opening a file with the Open dialog box, hold the Option key to simultaneously close the previous document.
 - When attempting to open a document that is already open, make sure it becomes active.
+- Fix problems that could prevent help pages from opening.
 
 2.1.2 (January 22nd, 2010)
 - The thumbnail sidebar now accepts keyboard focus.

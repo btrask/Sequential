@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGDebug.h"
 
+NSString *const PGCFBundleHelpBookNameKey = @"CFBundleHelpBookName";
+
 NSString *PGOSTypeToStringQuoted(OSType type, BOOL flag)
 {
 	return flag ? NSFileTypeForHFSTypeCode(type) : [(NSString *)UTCreateStringForOSType(type) autorelease];

@@ -70,7 +70,7 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 }
 - (IBAction)showPrefsHelp:(id)sender
 {
-	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"preferences" inBook:@"Sequential Help"];
+	[[NSHelpManager sharedHelpManager] openHelpAnchor:@"preferences" inBook:[[NSBundle mainBundle] objectForInfoDictionaryKey:PGCFBundleHelpBookNameKey]];
 }
 - (IBAction)changePane:(NSToolbarItem *)sender
 {

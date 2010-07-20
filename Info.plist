@@ -644,9 +644,9 @@
 	<key>CFBundleGetInfoString</key>
 	<string>2.1.2</string>
 	<key>CFBundleHelpBookFolder</key>
-	<string>SequentialHelp</string>
+	<string>Sequential.help</string>
 	<key>CFBundleHelpBookName</key>
-	<string>Sequential Help</string>
+	<string>com.SequentialX.Sequential.help</string>
 	<key>CFBundleIconFile</key>
 	<string>Sequential</string>
 	<key>CFBundleIdentifier</key>
