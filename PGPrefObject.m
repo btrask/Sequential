@@ -36,6 +36,7 @@ NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification = @"PGPrefO
 NSString *const PGPrefObjectAnimatesImagesDidChangeNotification = @"PGPrefObjectAnimatesImagesDidChange";
 NSString *const PGPrefObjectSortOrderDidChangeNotification = @"PGPrefObjectSortOrderDidChange";
 NSString *const PGPrefObjectTimerIntervalDidChangeNotification = @"PGPrefObjectTimerIntervalDidChange";
+NSString *const PGPrefObjectBaseOrientationDidChangeNotification = @"PGPrefObjectBaseOrientationDidChange";
 
 NSString *const PGPrefObjectAnimateKey = @"PGPrefObjectAnimate";
 
@@ -47,6 +48,7 @@ static NSString *const PGImageScaleFactorKey = @"PGImageScaleFactor";
 static NSString *const PGAnimatesImagesKey = @"PGAnimatesImages";
 static NSString *const PGSortOrderKey = @"PGSortOrder2";
 static NSString *const PGTimerIntervalKey = @"PGTimerInterval";
+static NSString *const PGBaseOrientationKey = @"PGBaseOrientation";
 
 static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated after 1.3.2.
 
@@ -79,6 +81,7 @@ static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated 
 		[NSNumber numberWithBool:YES], PGAnimatesImagesKey,
 		[NSNumber numberWithInteger:PGSortByName | PGSortRepeatMask], PGSortOrderKey,
 		[NSNumber numberWithDouble:30.0f], PGTimerIntervalKey,
+		[NSNumber numberWithUnsignedInteger:PGUpright], PGBaseOrientationKey,
 		nil]];
 }
 
@@ -199,6 +202,20 @@ static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated 
 
 #pragma mark -
 
+- (PGOrientation)baseOrientation
+{
+	return _baseOrientation;
+}
+- (void)setBaseOrientation:(PGOrientation)anOrientation
+{
+	if(anOrientation == _baseOrientation) return;
+	_baseOrientation = anOrientation;
+	[[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:anOrientation] forKey:PGBaseOrientationKey];
+	[self PG_postNotificationName:PGPrefObjectBaseOrientationDidChangeNotification];
+}
+
+#pragma mark -
+
 - (BOOL)isCurrentSortOrder:(PGSortOrder)order
 {
 	return (PGSortOrderMask & order) == (PGSortOrderMask & self.sortOrder);
@@ -219,6 +236,7 @@ static NSString *const PGSortOrderDeprecatedKey = @"PGSortOrder"; // Deprecated 
 		_animatesImages = [[d objectForKey:PGAnimatesImagesKey] boolValue];
 		_sortOrder = [[d objectForKey:PGSortOrderKey] integerValue];
 		_timerInterval = [[d objectForKey:PGTimerIntervalKey] doubleValue];
+		_baseOrientation = [[d objectForKey:PGBaseOrientationKey] unsignedIntegerValue];
 	}
 	return self;
 }

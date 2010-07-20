@@ -46,7 +46,6 @@ extern NSString *const PGDocumentSortedNodesDidChangeNotification;
 extern NSString *const PGDocumentNodeIsViewableDidChangeNotification;
 extern NSString *const PGDocumentNodeThumbnailDidChangeNotification;
 extern NSString *const PGDocumentNodeDisplayNameDidChangeNotification;
-extern NSString *const PGDocumentBaseOrientationDidChangeNotification;
 
 extern NSString *const PGDocumentNodeKey;
 extern NSString *const PGDocumentRemovedChildrenKey;
@@ -71,7 +70,6 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 	BOOL _openedBookmark;
 	PGDisplayController *_displayController;
 	NSMenu *_pageMenu;
-	PGOrientation _baseOrientation;
 	PGActivity *_activity;
 
 	NSUInteger _processingNodeCount;
@@ -87,7 +85,6 @@ extern NSString *const PGDocumentUpdateRecursivelyKey;
 @property(retain) PGDisplayController *displayController;
 @property(readonly, getter = isOnline) BOOL online;
 @property(readonly) NSMenu *pageMenu;
-@property PGOrientation baseOrientation;
 @property(getter = isProcessingNodes) BOOL processingNodes; // Batch changes for performance.
 
 - (void)getStoredNode:(out PGNode **)outNode imageView:(out PGImageView **)outImageView offset:(out NSSize *)outOffset query:(out NSString **)outQuery; // No arguments may be NULL.

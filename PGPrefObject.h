@@ -33,6 +33,7 @@ extern NSString *const PGPrefObjectUpscalesToFitScreenDidChangeNotification;
 extern NSString *const PGPrefObjectAnimatesImagesDidChangeNotification;
 extern NSString *const PGPrefObjectSortOrderDidChangeNotification;
 extern NSString *const PGPrefObjectTimerIntervalDidChangeNotification;
+extern NSString *const PGPrefObjectBaseOrientationDidChangeNotification;
 
 extern NSString *const PGPrefObjectAnimateKey;
 
@@ -78,6 +79,7 @@ typedef NSInteger PGSortOrder;
 	BOOL _animatesImages;
 	PGSortOrder _sortOrder;
 	NSTimeInterval _timerInterval;
+	PGOrientation _baseOrientation;
 }
 
 + (id)globalPrefObject;
@@ -92,6 +94,7 @@ typedef NSInteger PGSortOrder;
 @property(assign) BOOL animatesImages;
 @property(assign) PGSortOrder sortOrder;
 @property(assign) NSTimeInterval timerInterval;
+@property(assign) PGOrientation baseOrientation;
 
 - (BOOL)isCurrentSortOrder:(PGSortOrder)order; // Ignores sort options.
 

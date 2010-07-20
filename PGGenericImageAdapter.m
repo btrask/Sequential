@@ -155,7 +155,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 
 #pragma mark -PGResourceAdapter(PGAbstract)
 
-- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size baseOrientation:(PGOrientation)baseOrientation
+- (NSImageRep *)threaded_thumbnailRepWithSize:(NSSize)size
 {
 	NSData *const data = [[self dataProvider] data];
 	if(!data) return nil;
@@ -171,7 +171,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	NSDictionary *const properties = [(NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, thumbnailFrameIndex, NULL) autorelease];
 	CFRelease(source);
 	PGOrientation const orientation = PGOrientationWithTIFFOrientation([[properties objectForKey:(NSString *)kCGImagePropertyOrientation] unsignedIntegerValue]);
-	return [rep PG_thumbnailWithMaxSize:size orientation:PGAddOrientation(orientation, baseOrientation) opaque:NO];
+	return [rep PG_thumbnailWithMaxSize:size orientation:orientation opaque:NO];
 }
 
 #pragma mark NSObject

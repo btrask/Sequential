@@ -95,15 +95,15 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 - (void)setDocument:(PGDocument *)aDoc
 {
 	if(aDoc == _document) return;
+	[_document PG_removeObserver:self name:PGPrefObjectBaseOrientationDidChangeNotification];
 	[_document PG_removeObserver:self name:PGDocumentNodeThumbnailDidChangeNotification];
-	[_document PG_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
 	[_document PG_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 	[_document PG_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
 	_document = aDoc;
 	[_document PG_addObserver:self selector:@selector(documentNodeThumbnailDidChange:) name:PGDocumentNodeThumbnailDidChangeNotification];
-	[_document PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
 	[_document PG_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
 	[_document PG_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
+	[_document PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGPrefObjectBaseOrientationDidChangeNotification];
 	[self _updateWindowFrame];
 	[self displayControllerActiveNodeDidChange:nil];
 	[self documentBaseOrientationDidChange:nil];

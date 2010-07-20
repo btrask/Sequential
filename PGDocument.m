@@ -48,7 +48,6 @@ NSString *const PGDocumentSortedNodesDidChangeNotification     = @"PGDocumentSor
 NSString *const PGDocumentNodeIsViewableDidChangeNotification  = @"PGDocumentNodeIsViewableDidChange";
 NSString *const PGDocumentNodeThumbnailDidChangeNotification   = @"PGDocumentNodeThumbnailDidChange";
 NSString *const PGDocumentNodeDisplayNameDidChangeNotification = @"PGDocumentNodeDisplayNameDidChange";
-NSString *const PGDocumentBaseOrientationDidChangeNotification = @"PGDocumentBaseOrientationDidChange";
 
 NSString *const PGDocumentNodeKey = @"PGDocumentNode";
 NSString *const PGDocumentRemovedChildrenKey = @"PGDocumentRemovedChildren";
@@ -116,16 +115,6 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (NSMenu *)pageMenu
 {
 	return _pageMenu;
-}
-- (PGOrientation)baseOrientation
-{
-	return _baseOrientation;
-}
-- (void)setBaseOrientation:(PGOrientation)anOrientation
-{
-	if(anOrientation == _baseOrientation) return;
-	_baseOrientation = anOrientation;
-	[self PG_postNotificationName:PGDocumentBaseOrientationDidChangeNotification];
 }
 - (BOOL)isProcessingNodes
 {
@@ -339,6 +328,11 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	[super setTimerInterval:interval];
 	[[PGPrefObject globalPrefObject] setTimerInterval:interval];
+}
+- (void)setBaseOrientation:(PGOrientation)anOrientation
+{
+	[super setBaseOrientation:anOrientation];
+	[[PGPrefObject globalPrefObject] setBaseOrientation:anOrientation];
 }
 
 #pragma mark -NSObject

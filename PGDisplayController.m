@@ -451,7 +451,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 		[_activeDocument PG_removeObserver:self name:PGDocumentSortedNodesDidChangeNotification];
 		[_activeDocument PG_removeObserver:self name:PGDocumentNodeDisplayNameDidChangeNotification];
 		[_activeDocument PG_removeObserver:self name:PGDocumentNodeIsViewableDidChangeNotification];
-		[_activeDocument PG_removeObserver:self name:PGDocumentBaseOrientationDidChangeNotification];
+		[_activeDocument PG_removeObserver:self name:PGPrefObjectBaseOrientationDidChangeNotification];
 
 		[_activeDocument PG_removeObserver:self name:PGPrefObjectShowsInfoDidChangeNotification];
 		[_activeDocument PG_removeObserver:self name:PGPrefObjectShowsThumbnailsDidChangeNotification];
@@ -472,7 +472,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	[_activeDocument PG_addObserver:self selector:@selector(documentSortedNodesDidChange:) name:PGDocumentSortedNodesDidChangeNotification];
 	[_activeDocument PG_addObserver:self selector:@selector(documentNodeDisplayNameDidChange:) name:PGDocumentNodeDisplayNameDidChangeNotification];
 	[_activeDocument PG_addObserver:self selector:@selector(documentNodeIsViewableDidChange:) name:PGDocumentNodeIsViewableDidChangeNotification];
-	[_activeDocument PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGDocumentBaseOrientationDidChangeNotification];
+	[_activeDocument PG_addObserver:self selector:@selector(documentBaseOrientationDidChange:) name:PGPrefObjectBaseOrientationDidChangeNotification];
 
 	[_activeDocument PG_addObserver:self selector:@selector(documentShowsInfoDidChange:) name:PGPrefObjectShowsInfoDidChangeNotification];
 	[_activeDocument PG_addObserver:self selector:@selector(documentShowsThumbnailsDidChange:) name:PGPrefObjectShowsThumbnailsDidChangeNotification];
