@@ -448,7 +448,9 @@ static void PGDrawGradient(void)
 }
 - (IBAction)selectAll:(id)sender
 {
-	[self setSelection:[NSSet setWithArray:_items]];
+	NSMutableSet *const selection = [NSMutableSet set];
+	for(id const item in _items) if([[self dataSource] thumbnailView:self canSelectItem:item]) [selection addObject:item];
+	[self setSelection:selection];
 }
 
 #pragma mark -
