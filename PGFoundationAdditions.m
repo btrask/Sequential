@@ -146,21 +146,29 @@ OSType PGOSTypeFromString(NSString *str)
 
 @implementation NSNumber(PGFoundationAdditions)
 
-- (NSString *)PG_localizedStringAsBytes
+- (NSString *)PG_bytesAsLocalizedString
 {
-	CGFloat b = (CGFloat)[self unsignedLongLongValue];
+	static NSNumberFormatter *nf = nil;
+	if(!nf) {
+		nf = [[NSNumberFormatter alloc] init];
+		[nf setFormatterBehavior:NSNumberFormatterBehavior10_4];
+		[nf setNumberStyle:NSNumberFormatterDecimalStyle];
+		[nf setUsesSignificantDigits:YES];
+		[nf setMaximumSignificantDigits:3];
+	}
+	double b = [self doubleValue];
 	NSUInteger magnitude = 0;
-	for(; b >= 1024 && magnitude < 4; magnitude++) b /= 1024;
+	for(; b >= 1000 && magnitude < 4; magnitude++) b /= 1000;
 	NSString *unit = nil;
 	switch(magnitude) {
-		case 0: unit = @"B"; break;
-		case 1: unit = @"KB"; break;
-		case 2: unit = @"MB"; break;
-		case 3: unit = @"GB"; break;
-		case 4: unit = @"TB"; break;
+		case 0: unit = NSLocalizedString(@"B" , @"Units (bytes, kilobytes, etc)."); break;
+		case 1: unit = NSLocalizedString(@"KB", @"Units (bytes, kilobytes, etc)."); break;
+		case 2: unit = NSLocalizedString(@"MB", @"Units (bytes, kilobytes, etc)."); break;
+		case 3: unit = NSLocalizedString(@"GB", @"Units (bytes, kilobytes, etc)."); break;
+		case 4: unit = NSLocalizedString(@"TB", @"Units (bytes, kilobytes, etc)."); break;
 		default: PGAssertNotReached(@"Divided too far.");
 	}
-	return [NSString localizedStringWithFormat:@"%.1f %@", b, NSLocalizedString(unit, @"Units (bytes, kilobytes, etc).")];
+	return [NSString localizedStringWithFormat:@"%@ %@", [nf stringFromNumber:[NSNumber numberWithDouble:b]], unit];
 }
 
 @end

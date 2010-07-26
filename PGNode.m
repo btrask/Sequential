@@ -324,7 +324,7 @@ enum {
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
 		case PGSortByDateModified: date = [dp dateModified]; break;
 		case PGSortByDateCreated:  date = [dp dateCreated]; break;
-		case PGSortBySize: info = [[dp dataLength] PG_localizedStringAsBytes]; break;
+		case PGSortBySize: info = [[dp dataLength] PG_bytesAsLocalizedString]; break;
 		case PGSortByKind: info = [dp kindString]; break;
 	}
 	if(date && !info) info = [date PG_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];

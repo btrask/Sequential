@@ -84,7 +84,7 @@ extern OSType PGOSTypeFromString(NSString *);
 
 @interface NSNumber(PGFoundationAdditions)
 
-- (NSString *)PG_localizedStringAsBytes;
+- (NSString *)PG_bytesAsLocalizedString;
 
 @end
 
