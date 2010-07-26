@@ -344,6 +344,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 		[_pageMenu addItem:[NSMenuItem separatorItem]];
 		_cachedNodes = [[NSMutableArray alloc] init];
 		_operationQueue = [[NSOperationQueue alloc] init];
+		[_operationQueue setMaxConcurrentOperationCount:2]; // Our operations (thumbnail generation) are usually IO-bound, so too much concurrency is detrimental to performance.
 		_activity = [[PGActivity alloc] initWithOwner:self];
 		[_activity setParentActivity:[PGActivity applicationActivity]];
 	}
