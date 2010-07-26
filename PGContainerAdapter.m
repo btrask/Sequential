@@ -279,7 +279,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 {
 	[_sortedChildren release];
 	_sortedChildren = nil;
-	for(PGNode *const child in _unsortedChildren) [[child resourceAdapter] noteSortOrderDidChange];
+	for(PGNode *const child in _unsortedChildren) [child noteSortOrderDidChange];
 }
 
 @end

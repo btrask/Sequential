@@ -326,6 +326,7 @@ enum {
 	_adapter = [adapter retain];
 	PGActivity *const parentActivity = [[self parentAdapter] activity];
 	[[_adapter activity] setParentActivity:parentActivity ? parentActivity : [[self document] activity]];
+	[self _updateFileAttributes];
 	[self noteIsViewableDidChange];
 }
 
