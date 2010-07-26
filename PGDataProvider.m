@@ -134,13 +134,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	[pool drain];
 	return hasData;
 }
-- (NSUInteger)size
+- (NSNumber *)dataLength
 {
 	NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 	NSData *const fullData = [self data];
 	NSUInteger const size = [fullData length];
 	[pool drain];
-	return size;
+	return [NSNumber numberWithUnsignedInteger:size];
 }
 - (NSData *)fourCCData
 {
@@ -261,9 +261,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	return PGEqualObjects([self valueForFMAttributeName:NSFileType], NSFileTypeRegular);
 }
-- (NSUInteger)size
+- (NSNumber *)dataLength
 {
-	return (NSUInteger)[[self valueForFMAttributeName:NSFileSize] unsignedLongLongValue];
+	return [self valueForFMAttributeName:NSFileSize];
 }
 - (NSImage *)icon
 {

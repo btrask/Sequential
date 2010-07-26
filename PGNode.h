@@ -62,10 +62,6 @@ typedef NSUInteger PGNodeStatus;
 	BOOL _viewable;
 	NSMenuItem *_menuItem;
 	BOOL _allowMenuItemUpdates;
-	NSDate *_dateModified;
-	NSDate *_dateCreated;
-	NSNumber *_dataLength;
-	NSString *_kind;
 }
 
 + (NSArray *)pasteboardTypes;
@@ -80,11 +76,6 @@ typedef NSUInteger PGNodeStatus;
 @property(readonly) NSMenuItem *menuItem;
 @property(readonly) BOOL canBookmark;
 @property(readonly) PGBookmark *bookmark;
-
-@property(readonly) NSDate *dateModified;
-@property(readonly) NSDate *dateCreated;
-@property(readonly) NSNumber *dataLength;
-@property(readonly) NSString *kind;
 
 - (void)loadWithDataProvider:(PGDataProvider *)provider;
 - (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter;

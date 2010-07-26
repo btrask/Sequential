@@ -44,7 +44,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(readonly) NSString *kindString;
 @property(readonly) BOOL hasData;
 @property(readonly) NSData *fourCCData;
-@property(readonly) NSUInteger size;
+@property(readonly) NSNumber *dataLength;
 
 @end
 

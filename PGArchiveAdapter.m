@@ -310,12 +310,12 @@ static id PGArchiveAdapterList = nil;
 {
 	return nil; // Too slow.
 }
-- (NSUInteger)size
+- (NSNumber *)dataLength
 {
 	@synchronized(_archive) {
-		return (NSUInteger)[_archive representativeSizeOfEntry:_entry];
+		return [NSNumber numberWithLongLong:[_archive representativeSizeOfEntry:_entry]];
 	}
-	return 0;
+	return nil;
 }
 
 #pragma mark -PGDataProvider(PGArchiveDataProvider)

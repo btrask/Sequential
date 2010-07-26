@@ -59,7 +59,6 @@ enum {
 
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
-- (void)_setValue:(id)value forSortOrder:(PGSortOrder)order;
 
 @end
 
@@ -140,25 +139,6 @@ enum {
 
 #pragma mark -
 
-- (NSDate *)dateModified
-{
-	return _dateModified ? [[_dateModified retain] autorelease] : [NSDate distantPast];
-}
-- (NSDate *)dateCreated
-{
-	return _dateCreated ? [[_dateCreated retain] autorelease] : [NSDate distantPast];
-}
-- (NSNumber *)dataLength
-{
-	return _dataLength ? [[_dataLength retain] autorelease] : [NSNumber numberWithUnsignedInteger:0];
-}
-- (NSString *)kind
-{
-	return _kind ? [[_kind retain] autorelease] : @"";
-}
-
-#pragma mark -
-
 - (void)loadWithDataProvider:(PGDataProvider *)provider
 {
 	_status |= PGNodeLoading;
@@ -228,13 +208,15 @@ enum {
 	NSParameterAssert([self document]);
 	PGSortOrder const o = [[self document] sortOrder];
 	NSInteger const d = PGSortDescendingMask & o ? -1 : 1;
+	PGDataProvider *const dp1 = [[self resourceAdapter] dataProvider];
+	PGDataProvider *const dp2 = [[node resourceAdapter] dataProvider];
 	NSComparisonResult r = NSOrderedSame;
 	switch(PGSortOrderMask & o) {
 		case PGUnsorted:           return NSOrderedSame;
-		case PGSortByDateModified: r = [[self dateModified] compare:[node dateModified]]; break;
-		case PGSortByDateCreated:  r = [[self dateCreated] compare:[node dateCreated]]; break;
-		case PGSortBySize:         r = [[self dataLength] compare:[node dataLength]]; break;
-		case PGSortByKind:         r = [[self kind] compare:[node kind]]; break;
+		case PGSortByDateModified: r = [[dp1 dateModified] compare:[dp2 dateModified]]; break;
+		case PGSortByDateCreated:  r = [[dp1 dateCreated] compare:[dp2 dateCreated]]; break;
+		case PGSortBySize:         r = [[dp1 dataLength] compare:[dp2 dataLength]]; break;
+		case PGSortByKind:         r = [[dp1 kindString] compare:[dp2 kindString]]; break;
 		case PGSortShuffle:        return random() & 1 ? NSOrderedAscending : NSOrderedDescending;
 	}
 	return (NSOrderedSame == r ? [[[self identifier] displayName] PG_localizedCaseInsensitiveNumericCompare:[[node identifier] displayName]] : r) * d; // If the actual sort order doesn't produce a distinct ordering, then sort by name too.
@@ -338,11 +320,12 @@ enum {
 	NSMutableAttributedString *const label = [[[[self identifier] attributedStringWithAncestory:NO] mutableCopy] autorelease];
 	NSString *info = nil;
 	NSDate *date = nil;
+	PGDataProvider *const dp = [[self resourceAdapter] dataProvider];
 	switch(PGSortOrderMask & [[self document] sortOrder]) {
-		case PGSortByDateModified: date = _dateModified; break;
-		case PGSortByDateCreated:  date = _dateCreated; break;
-		case PGSortBySize: info = [_dataLength PG_localizedStringAsBytes]; break;
-		case PGSortByKind: info = _kind; break;
+		case PGSortByDateModified: date = [dp dateModified]; break;
+		case PGSortByDateCreated:  date = [dp dateCreated]; break;
+		case PGSortBySize: info = [[dp dataLength] PG_localizedStringAsBytes]; break;
+		case PGSortByKind: info = [dp kindString]; break;
 	}
 	if(date && !info) info = [date PG_localizedStringWithDateStyle:kCFDateFormatterShortStyle timeStyle:kCFDateFormatterShortStyle];
 	if(info) [label appendAttributedString:[[[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@" (%@)", info] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor], NSForegroundColorAttributeName, [NSFont boldSystemFontOfSize:12], NSFontAttributeName, nil]] autorelease]];
@@ -350,25 +333,6 @@ enum {
 }
 - (void)_updateFileAttributes
 {
-	PGDataProvider *const dp = [[self resourceAdapter] dataProvider];
-	[self _setValue:[dp dateModified] forSortOrder:PGSortByDateModified];
-	[self _setValue:[dp dateCreated] forSortOrder:PGSortByDateCreated];
-	[self _setValue:[NSNumber numberWithUnsignedInteger:[dp size]] forSortOrder:PGSortBySize];
-	[self _setValue:[dp kindString] forSortOrder:PGSortByKind];
-}
-- (void)_setValue:(id)value forSortOrder:(PGSortOrder)order
-{
-	id *attributePtr = NULL;
-	switch(PGSortOrderMask & order) {
-		case PGSortByDateModified: attributePtr = &_dateModified; break;
-		case PGSortByDateCreated:  attributePtr = &_dateCreated; break;
-		case PGSortBySize:         attributePtr = &_dataLength; break;
-		case PGSortByKind:         attributePtr = &_kind; break;
-	}
-	if(!attributePtr || PGEqualObjects(value, *attributePtr)) return;
-	[*attributePtr release];
-	*attributePtr = [value retain];
-	if(![[self document] isCurrentSortOrder:order]) return;
 	[[self parentAdapter] noteChildValueForCurrentSortOrderDidChange:self];
 	[self _updateMenuItem];
 }
@@ -387,10 +351,6 @@ enum {
 	[_adapter release];
 
 	[_menuItem release];
-	[_dateModified release];
-	[_dateCreated release];
-	[_dataLength release];
-	[_kind release];
 	[super dealloc];
 }
 
