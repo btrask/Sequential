@@ -39,7 +39,6 @@ typedef NSInteger PGRecursionPolicy;
 @interface PGResourceAdapter : NSObject <PGActivityOwner, PGResourceAdapting>
 {
 	@private
-	NSUInteger _priority;
 	PGNode *_node;
 	PGDataProvider *_dataProvider;
 	PGActivity *_activity;

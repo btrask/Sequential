@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	@private
 	PGResourceIdentifier *_identifier;
 	NSString *_displayableName;
-	OSType _fourCC;
 }
 
 - (id)initWithResourceIdentifier:(PGResourceIdentifier *)ident displayableName:(NSString *)name;

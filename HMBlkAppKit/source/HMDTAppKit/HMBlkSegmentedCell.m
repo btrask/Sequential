@@ -232,13 +232,13 @@ static NSDictionary*    _selectedLabelAttr = nil;
 			
 			// Draw image
 			rect = segmentRect;
-			if (i == 0) {
+			if (leftImage && i == 0) {
 				// Subtract left image width
 				rect.origin.x += [leftImage size].width;
 				rect.size.width -= [leftImage size].width;
 			}
 			
-			if (i == [self segmentCount] - 1) {
+			if (rightImage && i == [self segmentCount] - 1) {
 				// Subtract right image width
 				rect.size.width -= [rightImage size].width;
 			}

@@ -66,9 +66,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSData *const data = [self data];
 	if(!data || ![NSPDFImageRep canInitWithData:data]) return [[self node] loadSucceededForAdapter:self];
-	NSPDFImageRep *const mainRep = [[NSPDFImageRep alloc] initWithData:data];
+	NSPDFImageRep *const mainRep = [[[NSPDFImageRep alloc] initWithData:data] autorelease];
 	if(!mainRep) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Appropriate error.
-	NSPDFImageRep *const threadRep = [mainRep copy];
+	NSPDFImageRep *const threadRep = [[mainRep copy] autorelease];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
 	NSMutableArray *const nodes = [NSMutableArray array];
