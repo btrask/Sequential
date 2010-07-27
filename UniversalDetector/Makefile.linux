@@ -1,0 +1,149 @@
+# Lets roll our own makefile, with blackjack and hookers [because GNUSteps sucks.
+
+
+
+# Compilers and linkers
+
+OBJCC = gcc
+CC = gcc
+CPP = g++
+LD = g++
+AR = ar
+
+
+
+# Options for compilation
+
+GNUSTEP_OPTS =	-DGNUSTEP \
+		-DGNU_RUNTIME=1 \
+		-D_NATIVE_OBJC_EXCEPTIONS \
+		-fgnu-runtime \
+		-fexceptions \
+		-fobjc-exceptions \
+		-fconstant-string-class=NSConstantString
+
+GCC_OPTS = 	-c \
+		-O2 \
+		-Wno-import \
+		-Wno-multichar \
+		-g \
+		-isystem /usr/include/GNUstep
+
+OBJC_OPTS =	-std=gnu99
+
+C_OPTS =	-std=gnu99
+
+CXX_OPTS =
+
+OBJCFLAGS = $(OBJC_OPTS) $(GCC_OPTS) $(GNUSTEP_OPTS)
+CFLAGS = $(C_OPTS) $(GCC_OPTS)
+CXXFLAGS = $(CXX_OPTS) $(GCC_OPTS)
+
+
+
+
+# Files for compilation
+
+LIBRARY_OBJC_FILES =	UniversalDetector.m
+
+LIBRARY_C_FILES =	universalchardet/kludge.c
+
+LIBRARY_CXX_FILES =	WrappedUniversalDetector.cpp \
+			universalchardet/CharDistribution.cpp \
+			universalchardet/JpCntx.cpp \
+			universalchardet/LangBulgarianModel.cpp \
+			universalchardet/LangCyrillicModel.cpp \
+			universalchardet/LangGreekModel.cpp \
+			universalchardet/LangHebrewModel.cpp \
+			universalchardet/LangHungarianModel.cpp \
+			universalchardet/LangThaiModel.cpp \
+			universalchardet/nsBig5Prober.cpp \
+			universalchardet/nsCharSetProber.cpp \
+			universalchardet/nsEscCharsetProber.cpp \
+			universalchardet/nsEscSM.cpp \
+			universalchardet/nsEUCJPProber.cpp \
+			universalchardet/nsEUCKRProber.cpp \
+			universalchardet/nsEUCTWProber.cpp \
+			universalchardet/nsGB2312Prober.cpp \
+			universalchardet/nsHebrewProber.cpp \
+			universalchardet/nsLatin1Prober.cpp \
+			universalchardet/nsMBCSGroupProber.cpp \
+			universalchardet/nsMBCSSM.cpp \
+			universalchardet/nsSBCharSetProber.cpp \
+			universalchardet/nsSBCSGroupProber.cpp \
+			universalchardet/nsSJISProber.cpp \
+			universalchardet/nsUniversalDetector.cpp \
+			universalchardet/nsUTF8Prober.cpp
+
+ALL_OBJC_FILES =	$(LIBRARY_OBJC_FILES)
+
+ALL_C_FILES =		$(LIBRARY_C_FILES)
+
+ALL_CXX_FILES = 	$(LIBRARY_CXX_FILES)
+
+
+
+
+
+LIBRARY_OBJC_OBJS = 	$(LIBRARY_OBJC_FILES:.m=.o)
+
+LIBRARY_C_OBJS =	$(LIBRARY_C_FILES:.c=.o)
+
+LIBRARY_CXX_OBJS =	$(LIBRARY_CXX_FILES:.cpp=.o)
+
+LIBRARY_OBJS =		$(LIBRARY_OBJC_OBJS) \
+			$(LIBRARY_C_OBJS) \
+			$(LIBRARY_CXX_OBJS)
+
+ALL_OBJS =		$(LIBRARY_OBJS)
+
+
+
+
+EXECUTABLE_FILES =	
+
+LIBRARY_FILES =	libUniversalDetector.a
+
+
+
+
+# Suffix rules
+
+.SUFFIXES: .o .m .c
+
+.m.o:
+	$(OBJCC) $(OBJCFLAGS) $< -o $@	
+
+.c.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+
+
+
+# Compilation rules
+
+all: libUniversalDetector.a
+
+libUniversalDetector.a: $(LIBRARY_OBJS)
+	rm -f $@
+	$(AR) rcs $@ $^
+
+clean:
+	rm -f 	$(ALL_OBJS) \
+		$(EXECUTABLE_FILES) \
+		$(LIBRARY_FILES) \
+		*~ \
+		universalchardet/*~
+
+depend:
+	$(OBJCC) -MM $(OBJCFLAGS) $(ALL_OBJC_FILES) >Makefile.dependtmp
+	$(CC) -MM $(CFLAGS) $(ALL_C_FILES) >>Makefile.dependtmp
+	$(CXX) -MM $(CXXFLAGS) $(ALL_CXX_FILES) >>Makefile.dependtmp
+	sed 's/.*: *\([^ ]*\)\.\([^ ]*\)/\1.o: \1.\2/g' <Makefile.dependtmp >Makefile.depend
+	rm Makefile.dependtmp
+
+include Makefile.depend
+

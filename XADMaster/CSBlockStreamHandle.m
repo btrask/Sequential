@@ -8,9 +8,9 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 {
 	if(self=[super initWithName:descname length:length])
 	{
-		currblock=NULL;
-		blockstartpos=0;
-		blocklength=0;
+		_currblock=NULL;
+		_blockstartpos=0;
+		_blocklength=0;
 	}
 	return self;
 }
@@ -19,9 +19,9 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 {
 	if(self=[super initWithHandle:handle length:length bufferSize:buffersize])
 	{
-		currblock=NULL;
-		blockstartpos=0;
-		blocklength=0;
+		_currblock=NULL;
+		_blockstartpos=0;
+		_blocklength=0;
 	}
 	return self;
 }
@@ -33,13 +33,13 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 }
 
 
--(uint8_t *)blockPointer { return currblock; }
+-(uint8_t *)blockPointer { return _currblock; }
 
--(int)blockLength { return blocklength; }
+-(int)blockLength { return _blocklength; }
 
--(off_t)blockStartOffset { return blockstartpos; }
+-(off_t)blockStartOffset { return _blockstartpos; }
 
--(void)skipToNextBlock { [self seekToFileOffset:blockstartpos+blocklength]; }
+-(void)skipToNextBlock { [self seekToFileOffset:_blockstartpos+_blocklength]; }
 
 
 
@@ -47,14 +47,14 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 {
 	if(![self _prepareStreamSeekTo:offs]) return;
 
-	if(offs<blockstartpos) [super seekToFileOffset:0];
+	if(offs<_blockstartpos) [super seekToFileOffset:0];
 
-	while(blockstartpos+blocklength<=offs)
+	while(_blockstartpos+_blocklength<=offs)
 	{
 		[self _readNextBlock];
 		if(endofstream)
 		{
-			if(offs==blockstartpos) break;
+			if(offs==_blockstartpos) break;
 			else [self _raiseEOF];
 		}
 	}
@@ -64,9 +64,9 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 -(void)resetStream
 {
-	blockstartpos=0;
-	blocklength=0;
-	endofblocks=NO;
+	_blockstartpos=0;
+	_blocklength=0;
+	_endofblocks=NO;
 	[self resetBlockStream];
 	[self _readNextBlock];
 }
@@ -75,14 +75,14 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 {
 	int n=0;
 
-	if(streampos>=blockstartpos&&streampos<blockstartpos+blocklength)
+	if(streampos>=_blockstartpos&&streampos<_blockstartpos+_blocklength)
 	{
-		if(!currblock) return 0;
+		if(!_currblock) return 0;
 
-		int offs=streampos-blockstartpos;
-		int count=blocklength-offs;
+		int offs=streampos-_blockstartpos;
+		int count=_blocklength-offs;
 		if(count>num) count=num;
-		memcpy(buffer,currblock+offs,count);
+		memcpy(buffer,_currblock+offs,count);
 		n+=count;
 	}
 
@@ -91,8 +91,8 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 		[self _readNextBlock];
 		if(endofstream) break;
 
-		int count=imin(blocklength,num-n);
-		memcpy(buffer+n,currblock,count);
+		int count=imin(_blocklength,num-n);
+		memcpy(buffer+n,_currblock,count);
 		n+=count;
 	}
 
@@ -101,11 +101,11 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 -(void)_readNextBlock
 {
-	blockstartpos+=blocklength;
-	if(endofblocks) { [self endStream]; return; }
-	blocklength=[self produceBlockAtOffset:blockstartpos];
+	_blockstartpos+=_blocklength;
+	if(_endofblocks) { [self endStream]; return; }
+	_blocklength=[self produceBlockAtOffset:_blockstartpos];
 
-	if(blocklength<=0||!currblock) [self endStream];
+	if(_blocklength<=0||!_currblock) [self endStream];
 }
 
 -(void)resetBlockStream { }
@@ -116,12 +116,12 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 -(void)setBlockPointer:(uint8_t *)blockpointer
 {
-	currblock=blockpointer;
+	_currblock=blockpointer;
 }
 
 -(void)endBlockStream
 {
-	endofblocks=YES;
+	_endofblocks=YES;
 }
 
 @end

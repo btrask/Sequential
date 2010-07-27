@@ -26,8 +26,8 @@
 #include <proto/xadmaster.h>
 #include <proto/utility.h>
 #endif
-#include "functions.h"
-#include "SDI_compiler.h"
+#include "include/functions.h"
+#include "include/SDI_compiler.h"
 
 /************************************************************************
 *                                                                       *

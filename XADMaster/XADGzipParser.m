@@ -2,6 +2,7 @@
 #import "CSZlibHandle.h"
 #import "CRC.h"
 #import "Progress.h"
+#import "Scanning.h"
 
 
 
@@ -109,6 +110,7 @@
 
 
 
+
 @implementation XADGzipSFXParser
 
 +(int)requiredHeaderSize { return 5000; }
@@ -131,27 +133,24 @@
 	return NO;
 }
 
+static int MatchGzipSignature(const uint8_t *bytes,int available,off_t offset,void *state)
+{
+	if(available<3) return NO;
+	return bytes[0]==0x1f&&(bytes[1]==0x8b||bytes[1]==0x9e)&&bytes[2]==8;
+}
+
 -(void)parse
 {
-	CSHandle *fh=[self handle];
-	uint8_t buf[5000-2];
-	[fh skipBytes:2];
-	[fh readBytes:sizeof(buf) toBuffer:buf];
+	if(![[self handle] scanUsingMatchingFunction:MatchGzipSignature maximumLength:3])
+	[XADException raiseUnknownException];
 
-	for(int i=0;i<5000-5;i++)
-	{
-		if(buf[i]==0x1f&&(buf[i+1]==0x8b||buf[i+1]==0x9e)&&buf[i+2]==8)
-		{
-			[fh seekToFileOffset:i+2];
-			[super parse];
-			return;
-		}
-	}
+	[super parse];
 }
 
 -(NSString *)formatName { return @"Gzip (Self-extracting)"; }
 
 @end
+
 
 
 

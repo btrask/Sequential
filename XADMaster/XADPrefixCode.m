@@ -3,30 +3,108 @@
 
 NSString *XADInvalidPrefixCodeException=@"XADInvalidPrefixCodeException";
 
+
+struct XADCodeTreeNode
+{
+	int branches[2];
+};
+
+struct XADCodeTableEntry
+{
+	uint32_t length;
+	int32_t value;
+};
+
+
 @implementation XADPrefixCode
 
-static inline int *NodePointer(XADPrefixCode *self,int node) { return self->tree[node]; }
+static inline XADCodeTreeNode *NodePointer(XADPrefixCode *self,int node) { return &self->tree[node]; }
+static inline int Branch(XADPrefixCode *self,int node,int bit) { return NodePointer(self,node)->branches[bit]; }
+static inline void SetBranch(XADPrefixCode *self,int node,int bit,int nextnode) { NodePointer(self,node)->branches[bit]=nextnode; }
+
+static inline int LeftBranch(XADPrefixCode *self,int node) { return Branch(self,node,0); }
+static inline int RightBranch(XADPrefixCode *self,int node) { return Branch(self,node,1); }
+static inline void SetLeftBranch(XADPrefixCode *self,int node,int nextnode) { SetBranch(self,node,0,nextnode); }
+static inline void SetRightBranch(XADPrefixCode *self,int node,int nextnode) { SetBranch(self,node,1,nextnode); }
+
+static inline int LeafValue(XADPrefixCode *self,int node) { return LeftBranch(self,node); }
+static inline void SetLeafValue(XADPrefixCode *self,int node,int value) { SetLeftBranch(self,node,value); SetRightBranch(self,node,value); }
+
+static inline void SetEmptyNode(XADPrefixCode *self,int node) { SetLeftBranch(self,node,-1); SetRightBranch(self,node,-2); }
+
+static inline BOOL IsInvalidNode(XADPrefixCode *self,int node) { return node<0; }
+static inline BOOL IsOpenBranch(XADPrefixCode *self,int node,int bit) { return IsInvalidNode(self,Branch(self,node,bit)); }
+static inline BOOL IsEmptyNode(XADPrefixCode *self,int node) { return LeftBranch(self,node)==-1&&RightBranch(self,node)==-2; }
+static inline BOOL IsLeafNode(XADPrefixCode *self,int node) { return LeftBranch(self,node)==RightBranch(self,node); }
 
 static inline int NewNode(XADPrefixCode *self)
 {
-	self->tree=reallocf(self->tree,(self->numentries+1)*sizeof(int)*2);
-	NodePointer(self,self->numentries)[0]=-1;
-	NodePointer(self,self->numentries)[1]=-2;
+	self->tree=reallocf(self->tree,(self->numentries+1)*sizeof(XADCodeTreeNode));
+	SetEmptyNode(self,self->numentries);
 	return self->numentries++;
 }
 
-static inline BOOL IsEmptyNode(XADPrefixCode *self,int node) { return NodePointer(self,node)[0]==-1&&NodePointer(self,node)[1]==-2; }
-
-static inline int Branch(XADPrefixCode *self,int node,int bit) { return NodePointer(self,node)[bit]; }
-static inline BOOL IsOpenBranch(XADPrefixCode *self,int node,int bit) { return NodePointer(self,node)[bit]<0; }
-static inline void SetBranch(XADPrefixCode *self,int node,int bit,int nextnode) { NodePointer(self,node)[bit]=nextnode; }
-
-static inline int LeafValue(XADPrefixCode *self,int node) { return NodePointer(self,node)[0]; }
-static inline BOOL IsLeafNode(XADPrefixCode *self,int node) { return NodePointer(self,node)[0]==NodePointer(self,node)[1]; }
-static inline void SetLeafValue(XADPrefixCode *self,int node,int value) { NodePointer(self,node)[0]=NodePointer(self,node)[1]=value; }
 
 
 int CSInputNextSymbolUsingCode(CSInputBuffer *buf,XADPrefixCode *code)
+{
+	if(!code->table1) [code _makeTable];
+
+	int bits=CSInputPeekBitString(buf,code->tablesize);
+
+	int length=code->table1[bits].length;
+	int value=code->table1[bits].value;
+
+	if(length<0) [NSException raise:XADInvalidPrefixCodeException format:@"Invalid prefix code in bitstream"];
+
+	if(length<=code->tablesize)
+	{
+		CSInputSkipPeekedBits(buf,length);
+		return value;
+	}
+
+	CSInputSkipPeekedBits(buf,code->tablesize);
+
+	int node=value;
+	while(!IsLeafNode(code,node))
+	{
+		int bit=CSInputNextBit(buf);
+		if(IsOpenBranch(code,node,bit)) [NSException raise:XADInvalidPrefixCodeException format:@"Invalid prefix code in bitstream"];
+		node=Branch(code,node,bit);
+	}
+	return LeafValue(code,node);
+}
+
+int CSInputNextSymbolUsingCodeLE(CSInputBuffer *buf,XADPrefixCode *code)
+{
+	if(!code->table2) [code _makeTableLE];
+
+	int bits=CSInputPeekBitStringLE(buf,code->tablesize);
+
+	int length=code->table2[bits].length;
+	int value=code->table2[bits].value;
+
+	if(length<0) [NSException raise:XADInvalidPrefixCodeException format:@"Invalid prefix code in bitstream"];
+
+	if(length<=code->tablesize)
+	{
+		CSInputSkipPeekedBitsLE(buf,length);
+		return value;
+	}
+
+	CSInputSkipPeekedBitsLE(buf,code->tablesize);
+
+	int node=value;
+	while(!IsLeafNode(code,node))
+	{
+		int bit=CSInputNextBitLE(buf);
+		if(IsOpenBranch(code,node,bit)) [NSException raise:XADInvalidPrefixCodeException format:@"Invalid prefix code in bitstream"];
+		node=Branch(code,node,bit);
+	}
+	return LeafValue(code,node);
+}
+
+/*int CSInputNextSymbolUsingCode(CSInputBuffer *buf,XADPrefixCode *code)
 {
 	int node=0;
 	while(!IsLeafNode(code,node))
@@ -48,7 +126,7 @@ int CSInputNextSymbolUsingCodeLE(CSInputBuffer *buf,XADPrefixCode *code)
 		node=Branch(code,node,bit);
 	}
 	return LeafValue(code,node);
-}
+}*/
 
 
 
@@ -66,13 +144,15 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 	if(self=[super init])
 	{
 		tree=malloc(sizeof(int)*2);
-		tree[0][0]=-1;
-		tree[0][1]=-2;
+		SetEmptyNode(self,0);
 		numentries=1;
+		minlength=INT_MAX;
+		maxlength=INT_MIN;
 		isstatic=NO;
+
 		stack=nil;
 
-		for(int i=0;i<sizeof(tables)/sizeof(tables[0]);i++) tables[i]=NULL;
+		table1=table2=NULL;
 	}
 	return self;
 }
@@ -81,16 +161,17 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 {
 	if(self=[super init])
 	{
-		tree=statictable;
+		tree=(XADCodeTreeNode *)statictable; // TODO: fix the ugly cast
 		isstatic=YES;
 
-		for(int i=0;i<sizeof(tables)/sizeof(tables[0]);i++) tables[i]=NULL;
+		stack=nil;
+		table1=table2=NULL;
 	}
 	return self;
 }
 
 -(id)initWithLengths:(const int *)lengths numberOfSymbols:(int)numsymbols
-maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
+maximumLength:(int)maxcodelength shortestCodeIsZeros:(BOOL)zeros
 {
 	if(self=[self init])
 	{
@@ -98,7 +179,7 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 		{
 			int code=0,symbolsleft=numsymbols;
 
-			for(int length=1;length<=maxlength;length++)
+			for(int length=1;length<=maxcodelength;length++)
 			for(int i=0;i<numsymbols;i++)
 			{
 				if(lengths[i]!=length) continue;
@@ -123,6 +204,8 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 -(void)dealloc
 {
 	if(!isstatic) free(tree);
+	free(table1);
+	free(table2);
 	[stack release];
 	[super dealloc];
 }
@@ -136,7 +219,12 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 {
 	if(isstatic) [NSException raise:NSGenericException format:@"Attempted to add codes to a static prefix tree"];
 
-//NSLog(@"%d -> %x %d",value,code,length);
+	free(table1);
+	free(table2);
+	table1=table2=NULL;
+
+	if(length>maxlength) maxlength=length;
+	if(length<minlength) minlength=length;
 
 	repeatpos=length-1-repeatpos;
 	if(repeatpos==0||(repeatpos>=0&&(((code>>repeatpos-1)&3)==0||((code>>repeatpos-1)&3)==3)))
@@ -244,6 +332,97 @@ static uint32_t ReverseN(uint32_t val,int length)
 	NSNumber *num=[stack lastObject];
 	[stack removeLastObject];
 	currnode=[num intValue];
+}
+
+static void MakeTable(XADPrefixCode *code,int node,XADCodeTableEntry *table,int depth,int maxdepth)
+{
+	int currtablesize=1<<(maxdepth-depth);
+
+	if(IsLeafNode(code,node))
+	{
+		for(int i=0;i<currtablesize;i++)
+		{
+			table[i].length=depth;
+			table[i].value=LeafValue(code,node);
+		}
+	}
+	else if(IsInvalidNode(code,node))
+	{
+		for(int i=0;i<currtablesize;i++) table[i].length=-1;
+	}
+	else
+	{
+		if(depth==maxdepth)
+		{
+			table[0].length=maxdepth+1;
+			table[0].value=node;
+		}
+		else
+		{
+			MakeTable(code,LeftBranch(code,node),table,depth+1,maxdepth);
+			MakeTable(code,RightBranch(code,node),table+currtablesize/2,depth+1,maxdepth);
+		}
+	}
+}
+
+static void MakeTableLE(XADPrefixCode *code,int node,XADCodeTableEntry *table,int depth,int maxdepth)
+{
+	int currtablesize=1<<(maxdepth-depth);
+	int currstride=1<<depth;
+
+	if(IsLeafNode(code,node))
+	{
+		for(int i=0;i<currtablesize;i++)
+		{
+			table[i*currstride].length=depth;
+			table[i*currstride].value=LeafValue(code,node);
+		}
+	}
+	else if(IsInvalidNode(code,node))
+	{
+		for(int i=0;i<currtablesize;i++) table[i*currstride].length=-1;
+	}
+	else
+	{
+		if(depth==maxdepth)
+		{
+			table[0].length=maxdepth+1;
+			table[0].value=node;
+		}
+		else
+		{
+			MakeTableLE(code,LeftBranch(code,node),table,depth+1,maxdepth);
+			MakeTableLE(code,RightBranch(code,node),table+currstride,depth+1,maxdepth);
+		}
+	}
+}
+
+#define TableMaxSize 10
+
+-(void)_makeTable
+{
+	if(table1) return;
+
+	if(maxlength<minlength) tablesize=TableMaxSize; // no code lengths recorded
+	else if(maxlength>=TableMaxSize) tablesize=TableMaxSize;
+	else tablesize=maxlength;
+
+	table1=malloc(sizeof(XADCodeTableEntry)*(1<<tablesize));
+
+	MakeTable(self,0,table1,0,tablesize);
+}
+
+-(void)_makeTableLE
+{
+	if(table2) return;
+
+	if(maxlength<minlength) tablesize=TableMaxSize; // no code lengths recorded
+	else if(maxlength>=TableMaxSize) tablesize=TableMaxSize;
+	else tablesize=maxlength;
+
+	table2=malloc(sizeof(XADCodeTableEntry)*(1<<tablesize));
+
+	MakeTableLE(self,0,table2,0,tablesize);
 }
 
 @end

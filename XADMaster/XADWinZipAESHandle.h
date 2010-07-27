@@ -13,7 +13,7 @@
 	AES_KEY key;
 	uint8_t counter[16],aesbuffer[16];
 	HMAC_CTX hmac;
-	BOOL hmac_inited,hmac_correct;
+	BOOL hmac_inited,hmac_done,hmac_correct;
 }
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata keyLength:(int)keylength;

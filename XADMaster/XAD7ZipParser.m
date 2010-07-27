@@ -1,14 +1,14 @@
 #import "XAD7ZipParser.h"
 #import "XADLZMAHandle.h"
 #import "XADLZMA2Handle.h"
-#import "XAD7ZipFilterHandles.h"
 #import "XAD7ZipBranchHandles.h"
 #import "XAD7ZipBCJ2Handle.h"
 #import "XADDeflateHandle.h"
 #import "XADPPMdHandles.h"
 #import "XADZipShrinkHandle.h"
-#import "XADRARHandle.h"
+//#import "XADRARHandle.h"
 #import "XADCompressHandle.h"
+#import "XADDeltaHandle.h"
 #import "XADCRCHandle.h"
 #import "CSZlibHandle.h"
 #import "CSBzip2Handle.h"
@@ -75,13 +75,13 @@ static void FindAttribute(CSHandle *handle,int attribute)
 }
 
 
-+(NSArray *)volumesForFilename:(NSString *)filename
++(NSArray *)volumesForHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
 {
 	NSArray *matches;
 
-	if(matches=[filename substringsCapturedByPattern:@"^(.*\\.7z)\\.([0-9]+)$" options:REG_ICASE])
+	if(matches=[name substringsCapturedByPattern:@"^(.*\\.7z)\\.([0-9]+)$" options:REG_ICASE])
 	{
-		return [self scanForVolumesWithFilename:filename
+		return [self scanForVolumesWithFilename:name
 		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.([0-9]+)$",
 			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
 		firstFileExtension:nil];
@@ -730,7 +730,7 @@ packedStreams:(NSArray *)packedstreams packedStreamIndex:(int *)packedstreaminde
 		case 0x00000021: return [[[XADLZMA2Handle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		//case 0x02030200: return @"Swap2";
 		//case 0x02030400: return @"Swap4";
-		case 0x02040000: return [[[XAD7ZipDeltaHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
+		case 0x02040000: return [[[XADDeltaHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x03010100: return [[[XADLZMAHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x03030103: return [[[XAD7ZipBCJHandle alloc] initWithHandle:inhandle length:size propertyData:props] autorelease];
 		case 0x0303011b:

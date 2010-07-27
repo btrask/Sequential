@@ -8,8 +8,8 @@ void InitializeRangeCoder(CarrylessRangeCoder *self,CSInputBuffer *input,BOOL us
 	self->range=0xffffffff;
 	self->uselow=uselow;
 	self->bottom=bottom;
-
-	for(int i=0;i<4;i++) self->code=(self->code<<8)|CSInputNextByte(input);
+	self->code=CSInputNextUInt32BE(input);
+	//for(int i=0;i<4;i++) self->code=(self->code<<8)|CSInputNextByte(input);
 }
 
 

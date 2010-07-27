@@ -19,10 +19,9 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 {
 	if(self=[super initWithBlockReader:blockreader])
 	{
-		input=CSInputBufferAllocEmpty();
+		[self setInputBuffer:CSInputBufferAllocEmpty()];
 
-		dictionary=malloc(1<<windowbits);
-		dictionarymask=(1<<windowbits)-1;
+		InitializeLZSS(&lzss,1<<windowbits);
 
 		numslots6=windowbits*2;
 
@@ -37,8 +36,7 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 
 -(void)dealloc
 {
-	free(dictionary);
-	//CSInputBufferFree(input);
+	CleanupLZSS(&lzss);
 	[super dealloc];
 }
 
@@ -54,7 +52,7 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 
 	InitQuantumModel(&lengthmodel6,27);
 
-	memset(dictionary,0,dictionarymask+1);
+	RestartLZSS(&lzss);
 }
 
 -(int)produceCABBlockWithInputBuffer:(uint8_t *)buffer length:(int)complength atOffset:(off_t)pos length:(int)uncomplength
@@ -89,17 +87,17 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 	CSInputSetMemoryBuffer(input,buffer,complength,0);
 	InitQuantumCoder(&coder,input);
 
-	int dicpos=pos&dictionarymask;
-	int end=dicpos+uncomplength;
+//	int dicpos=pos&dictionarymask;
+	int end=LZSSPosition(&lzss)+uncomplength;
 
-	[self setBlockPointer:&dictionary[dicpos]];
+	[self setBlockPointer:CurrentLZSSWindowPointer(&lzss)];
 
-	while(dicpos<end)
+	while(LZSSPosition(&lzss)<end)
 	{
 		int selector=NextQuantumSymbolForModel(&coder,&selectormodel);
 		if(selector<4)
 		{
-			dictionary[dicpos++]=NextQuantumSymbolForModel(&coder,&literalmodel[selector])+selector*64;
+			EmitLZSSLiteral(&lzss,NextQuantumSymbolForModel(&coder,&literalmodel[selector])+selector*64);
 		}
 		else
 		{
@@ -131,11 +129,7 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 				CSInputNextBitString(input,OffsetAdditionalBitsTable[offsetslot])+1;
 			}
 
-			for(int i=0;i<length;i++)
-			{
-				dictionary[dicpos]=dictionary[(dicpos-offset)&dictionarymask];
-				dicpos++;
-			}
+			EmitLZSSMatch(&lzss,offset,length);
 		}
 	}
 	return uncomplength;

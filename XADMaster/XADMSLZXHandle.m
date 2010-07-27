@@ -7,10 +7,9 @@
 {
 	if(self=[super initWithBlockReader:blockreader])
 	{
-		input=CSInputBufferAllocEmpty();
+		[self setInputBuffer:CSInputBufferAllocEmpty()];
 
-		dictionary=malloc(1<<windowbits);
-		dictionarymask=(1<<windowbits)-1;
+		InitializeLZSS(&lzss,1<<windowbits);
 
 		if(windowbits==21) numslots=50;
 		else if(windowbits==20) numslots=42;
@@ -24,8 +23,7 @@
 
 -(void)dealloc
 {
-	free(dictionary);
-	//CSInputBufferFree(input);
+	CleanupLZSS(&lzss);
 
 	[maincode release];
 	[lengthcode release];
@@ -42,7 +40,8 @@
 	blockend=0;
 	memset(mainlengths,0,sizeof(mainlengths));
 	memset(lengthlengths,0,sizeof(lengthlengths));
-	memset(dictionary,0,dictionarymask+1);
+
+	RestartLZSS(&lzss);
 }
 
 -(int)produceCABBlockWithInputBuffer:(uint8_t *)buffer length:(int)complength atOffset:(off_t)pos length:(int)uncomplength
@@ -77,31 +76,30 @@
 	if(!headerhasbeenread)
 	{
 		ispreprocessed=CSInputNextBit(input);
-		if(ispreprocessed) preprocesssize=CSInputNextBitString(input,32);
+		if(ispreprocessed) preprocesssize=CSInputNextLongBitString(input,32);
 		headerhasbeenread=YES;
 	}
 
 	// Unpack data to dictionary using LZX.
-	uint8_t *dicbuffer=&dictionary[pos&dictionarymask];
-	int n=0;
-	while(n<uncomplength)
+	off_t unpackend=pos+uncomplength;
+	while(LZSSPosition(&lzss)<unpackend)
 	{
-		if(pos+n>=blockend) [self readBlockHeaderAtPosition:pos+n];
+		if(LZSSPosition(&lzss)>=blockend) [self readBlockHeaderAtPosition:LZSSPosition(&lzss)];
 
 		if(blocktype==3)
 		{
-			if(n==0 && (inputpos&1)==1) dicbuffer[n++]=CSInputNextByte(input); // single first byte in buffer
-			else if(CSInputFileOffset(input)==complength-1) dicbuffer[n++]=CSInputNextByte(input); // single last byte in buffer
-			else if(pos+n+1==blockend) // single last byte in block
+			if(LZSSPosition(&lzss)==pos && (inputpos&1)==1) EmitLZSSLiteral(&lzss,CSInputNextByte(input)); // single first byte in buffer
+			else if(CSInputFileOffset(input)==complength-1) EmitLZSSLiteral(&lzss,CSInputNextByte(input)); // single last byte in buffer
+			else if(LZSSPosition(&lzss)+1==blockend) // single last byte in block
 			{
 				CSInputNextByte(input); // skip padding
-				dicbuffer[n++]=CSInputNextByte(input);
+				EmitLZSSLiteral(&lzss,CSInputNextByte(input));
 			}
 			else
 			{
 				uint8_t byte=CSInputNextByte(input);
-				dicbuffer[n++]=CSInputNextByte(input);
-				dicbuffer[n++]=byte;
+				EmitLZSSLiteral(&lzss,CSInputNextByte(input));
+				EmitLZSSLiteral(&lzss,byte);
 			}
 		}
 		else
@@ -109,7 +107,7 @@
 			int symbol=CSInputNextSymbolUsingCode(input,maincode);
 			if(symbol<256)
 			{
-				dicbuffer[n++]=symbol;
+				EmitLZSSLiteral(&lzss,symbol);
 				continue;
 			}
 
@@ -154,18 +152,14 @@
 				r0=offset;
 			}
 
-			for(int i=0;i<length;i++)
-			{
-				dicbuffer[n]=dictionary[(pos+n-offset)&dictionarymask];
-				n++;
-			}
+			EmitLZSSMatch(&lzss,offset,length);
 		}
 	}
 
 	// Undo e8-encoding if needed
 	if(ispreprocessed && pos<32768*32768)
 	{
-		memcpy(outbuffer,dicbuffer,uncomplength);
+		CopyBytesFromLZSSWindow(&lzss,outbuffer,pos,uncomplength);
 
 		for(int i=0;i<uncomplength-10;i++)
 		{
@@ -185,7 +179,7 @@
 	}
 	else
 	{
-		[self setBlockPointer:dicbuffer];
+		[self setBlockPointer:LZSSWindowPointerForPosition(&lzss,pos)];
 	}
 
 	inputpos+=complength;

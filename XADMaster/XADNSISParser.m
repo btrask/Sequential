@@ -116,12 +116,11 @@ static BOOL LooksLikeZlib(uint8_t *sig)
 	{
 		uint8_t buf[20];
 		[fh readBytes:sizeof(buf) toBuffer:buf];
-		[fh skipBytes:-(int)sizeof(buf)];
 
-		if(IsOlderSignature(buf)) { [self parseOlderFormat]; return; }
-		if(IsOldSignature(buf)) { [self parseOldFormat]; return; }
-		if(IsNewSignature(buf)) { [self parseNewFormat]; return; }
-		[fh skipBytes:512];
+		if(IsOlderSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseOlderFormat]; return; }
+		if(IsOldSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseOldFormat]; return; }
+		if(IsNewSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseNewFormat]; return; }
+		[fh skipBytes:512-(int)sizeof(buf)];
 	}
 }
 

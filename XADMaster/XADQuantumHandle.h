@@ -1,4 +1,5 @@
 #import "XADCABBlockHandle.h"
+#import "LZSS.h"
 
 typedef struct QuantumCoder
 {
@@ -20,8 +21,7 @@ typedef struct QuantumModel
 
 @interface XADQuantumHandle:XADCABBlockHandle
 {
-	uint8_t *dictionary;
-	int dictionarymask;
+	LZSS lzss;
 
 	int numslots4,numslots5,numslots6;
 

@@ -4,14 +4,9 @@
 
 
 
+NSString *CSCannotOpenFileException=@"CSCannotOpenFileException";
 NSString *CSFileErrorException=@"CSFileErrorException";
 
-
-
-#if defined(__MINGW__)||defined(__COCOTRON__) // ugly kludge that breaks large files on mingw
-#define ftello(fh) ftell(fh)
-#define fseekgo(fh,offs,whence) fseek(fh,offs,whence)
-#endif
 
 
 
@@ -27,13 +22,17 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 {
 	if(!path) return nil;
 
-	#ifdef __MINGW__
-	FILE *fileh=_wfopen((const unichar*)[path fileSystemRepresentation],(const unichar*)[modes cStringUsingEncoding:NSUnicodeStringEncoding]);
-	#else
+	#if defined(__COCOTRON__) // Cocotron
+	FILE *fileh=_wfopen([path fileSystemRepresentationW],
+	(const wchar_t *)[modes cStringUsingEncoding:NSUnicodeStringEncoding]);
+	#elif defined(__MINGW32__) // GNUstep under mingw32 - sort of untested
+	FILE *fileh=_wfopen((const wchar_t *)[path fileSystemRepresentation],
+	(const wchar_t *)[modes cStringUsingEncoding:NSUnicodeStringEncoding]);
+	#else // Cocoa or GNUstep under Linux
 	FILE *fileh=fopen([path fileSystemRepresentation],[modes UTF8String]);
 	#endif
 
-	if(!fileh) [NSException raise:@"CSCannotOpenFileException"
+	if(!fileh) [NSException raise:CSCannotOpenFileException
 	format:@"Error attempting to open file \"%@\" in mode \"%@\".",path,modes];
 
 	CSFileHandle *handle=[[[CSFileHandle alloc] initWithFilePointer:fileh closeOnDealloc:YES name:path] autorelease];
@@ -81,6 +80,12 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 	[parent release];
 	[multilock release];
 	[super dealloc];
+}
+
+-(void)close
+{
+	if(fh&&close) fclose(fh);
+	fh=NULL;
 }
 
 

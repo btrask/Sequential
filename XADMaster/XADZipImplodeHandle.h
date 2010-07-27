@@ -1,7 +1,7 @@
-#import "XADLZSSHandle.h"
+#import "XADFastLZSSHandle.h"
 #import "XADPrefixCode.h"
 
-@interface XADZipImplodeHandle:XADLZSSHandle
+@interface XADZipImplodeHandle:XADFastLZSSHandle
 {
 	XADPrefixCode *literalcode,*lengthcode,*offsetcode;
 	int offsetbits;
@@ -14,6 +14,7 @@ largeDictionary:(BOOL)largedict hasLiterals:(BOOL)hasliterals;
 
 -(void)resetLZSSHandle;
 -(XADPrefixCode *)allocAndParseCodeOfSize:(int)size;
--(int)nextLiteralOrOffset:(int *)offset andLength:(int *)length atPosition:(off_t)pos;
+//-(int)nextLiteralOrOffset:(int *)offset andLength:(int *)length atPosition:(off_t)pos;
+-(void)expandFromPosition:(off_t)pos;
 
 @end

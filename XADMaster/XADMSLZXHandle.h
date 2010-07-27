@@ -1,10 +1,10 @@
 #import "XADCABBlockHandle.h"
 #import "XADPrefixCode.h"
+#import "LZSS.h"
 
 @interface XADMSLZXHandle:XADCABBlockHandle
 {
-	uint8_t *dictionary;
-	int dictionarymask;
+	LZSS lzss;
 
 	XADPrefixCode *maincode,*lengthcode,*offsetcode;
 

@@ -12,12 +12,7 @@ static void DecodeSymbol2VariantH(PPMdContext *self,PPMdModelVariantH *model);
 void StartPPMdModelVariantH(PPMdModelVariantH *self,CSInputBuffer *input,
 PPMdSubAllocatorVariantH *alloc,int maxorder,BOOL sevenzip)
 {
-	if(sevenzip)
-	{
-		CSInputSkipBytes(input,1);
-		InitializeRangeCoder(&self->core.coder,input,NO,0);
-	}
-	else InitializeRangeCoder(&self->core.coder,input,YES,0x8000);
+	RestartPPMdVariantHRangeCoder(self,input,sevenzip);
 
 	self->alloc=alloc;
 	self->core.alloc=&alloc->core;
@@ -47,6 +42,16 @@ PPMdSubAllocatorVariantH *alloc,int maxorder,BOOL sevenzip)
 	self->DummySEE2Cont.Shift=PERIOD_BITS;
 
 	RestartModel(self);
+}
+
+void RestartPPMdVariantHRangeCoder(PPMdModelVariantH *self,CSInputBuffer *input,BOOL sevenzip)
+{
+	if(sevenzip)
+	{
+		CSInputSkipBytes(input,1);
+		InitializeRangeCoder(&self->core.coder,input,NO,0);
+	}
+	else InitializeRangeCoder(&self->core.coder,input,YES,0x8000);
 }
 
 static void RestartModel(PPMdModelVariantH *self)
@@ -90,7 +95,6 @@ static void RestartModel(PPMdModelVariantH *self)
 
 int NextPPMdVariantHByte(PPMdModelVariantH *self)
 {
-//NSLog(@"%x %x",self->core.coder.range,self->core.coder.code);
 	if(self->MinContext->LastStateIndex!=0) DecodeSymbol1VariantH(self->MinContext,self);
 	else DecodeBinSymbolVariantH(self->MinContext,self);
 

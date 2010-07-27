@@ -161,16 +161,16 @@ void UnsortST4(uint8_t *dest,uint8_t *src,int blocklen,int firstindex,uint32_t *
 
 // MTF Decoder
 
-void ResetMTFDecoder(MTFState *mtf)
+void ResetMTFDecoder(MTFState *self)
 {
-	for(int i=0;i<256;i++) mtf->table[i]=i;
+	for(int i=0;i<256;i++) self->table[i]=i;
 }
 
-int DecodeMTF(MTFState *mtf,int symbol)
+int DecodeMTF(MTFState *self,int symbol)
 {
-	int res=mtf->table[symbol];
-	for(int i=symbol;i>0;i--) mtf->table[i]=mtf->table[i-1];
-	mtf->table[0]=res;
+	int res=self->table[symbol];
+	for(int i=symbol;i>0;i--) self->table[i]=self->table[i-1];
+	self->table[0]=res;
 	return res;
 }
 

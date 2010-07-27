@@ -1,14 +1,46 @@
 #import "XADStuffItXEnglishHandle.h"
+#import "CSMemoryHandle.h"
+#import "XADPPMdHandles.h"
 #import "XADException.h"
-#import "SystemSpecific.h"
+#import "CRC.h"
+
+#define NumberOfWords 100366
+#define UncompressedSize 881863
+#define CompressedSize 325602
+
+extern uint8_t StuffItXEnglishDictionary[];
 
 @implementation XADStuffItXEnglishHandle
 
-+(NSData *)dictionaryData
++(const uint8_t **)dictionaryPointers
 {
-	static NSData *dictionary=nil;
-	if(!dictionary) dictionary=[[NSData alloc] initWithContentsOfFile:PathForExternalResource(@"sitx_english.dat")];
-	return dictionary;
+	static const uint8_t **pointers=NULL;
+	if(!pointers)
+	{
+		CSHandle *mem=[CSMemoryHandle memoryHandleForReadingBuffer:StuffItXEnglishDictionary length:CompressedSize];
+		CSHandle *ppmd=[[[XADPPMdVariantIHandle alloc] initWithHandle:mem
+		length:UncompressedSize maxOrder:16 subAllocSize:16*1024*1024 modelRestorationMethod:0] autorelease];
+
+		NSData *dictionarywords=[ppmd copyDataOfLength:UncompressedSize];
+
+		const uint8_t *dictbytes=[dictionarywords bytes];
+
+		if((XADCalculateCRC(0xffffffff,dictbytes,UncompressedSize,
+		XADCRCTable_edb88320)^0xffffffff)!=0xfb1dcfd5) [XADException raiseUnknownException];
+
+		pointers=malloc(sizeof(uint8_t *)*(NumberOfWords+1));
+		pointers[0]=dictbytes;
+
+		const uint8_t *ptr=dictbytes;
+		for(int i=1;i<=NumberOfWords;i++)
+		{
+			while(*ptr!=0x0a) ptr++;
+			pointers[i]=++ptr;
+		}
+
+	}
+
+	return pointers;
 }
 
 -(void)resetByteStream
@@ -50,19 +82,12 @@
 			else index+=c2-'a'+1;
 		}
 
-		NSData *dictionary=[XADStuffItXEnglishHandle dictionaryData];
-		if(!dictionary) [XADException raiseNotSupportedException];
+		if(index>=NumberOfWords) [XADException raiseIllegalDataException];
 
-		const uint8_t *dictptr=[dictionary bytes];
-		int numentries=CSUInt32BE(dictptr);
+		const uint8_t **pointers=[XADStuffItXEnglishHandle dictionaryPointers];
 
-		if(index>=numentries) [XADException raiseIllegalDataException];
-
-		int dictval=(dictptr[index*3+4]<<16)|(dictptr[index*3+5]<<8)|dictptr[index*3+6];
-		int dictoffs=dictval&0x7ffff;
-		wordlen=dictval>>19;
-
-		memcpy(wordbuf,&dictptr[4+3*numentries+dictoffs],wordlen);
+		wordlen=pointers[index+1]-pointers[index]-1;
+		memcpy(wordbuf,pointers[index],wordlen);
 		wordoffs=0;
 
 		if(c==uppercode)

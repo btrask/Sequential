@@ -12,6 +12,8 @@
 	int windowmask,matchlength,matchoffset;
 }
 
+-(id)initWithName:(NSString *)descname windowSize:(int)windowsize;
+-(id)initWithName:(NSString *)descname length:(off_t)length windowSize:(int)windowsize;
 -(id)initWithHandle:(CSHandle *)handle windowSize:(int)windowsize;
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length windowSize:(int)windowsize;
 -(void)dealloc;

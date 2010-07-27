@@ -1,10 +1,16 @@
 #import "XADException.h"
 
+#import "CSFileHandle.h"
+#import "CSZlibHandle.h"
+#import "CSBzip2Handle.h"
+
 NSString *XADExceptionName=@"XADException";
 
 @implementation XADException
 
 +(void)raiseUnknownException  { [self raiseExceptionWithXADError:XADUnknownError]; }
++(void)raiseInputException  { [self raiseExceptionWithXADError:XADInputError]; }
++(void)raiseOutputException  { [self raiseExceptionWithXADError:XADOutputError]; }
 +(void)raiseIllegalDataException  { [self raiseExceptionWithXADError:XADIllegalDataError]; }
 +(void)raiseNotSupportedException  { [self raiseExceptionWithXADError:XADNotSupportedError]; }
 +(void)raisePasswordException { [self raiseExceptionWithXADError:XADPasswordError]; }
@@ -18,6 +24,33 @@ NSString *XADExceptionName=@"XADException";
 	[[[[NSException alloc] initWithName:XADExceptionName reason:[self describeXADError:errnum]
 	userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:errnum]
 	forKey:@"XADError"]] autorelease] raise];
+}
+
+
+
++(XADError)parseException:(id)exception
+{
+	if([exception isKindOfClass:[NSException class]])
+	{
+		NSException *e=exception;
+		NSString *name=[e name];
+		if([name isEqual:XADExceptionName])
+		{
+			return [[[e userInfo] objectForKey:@"XADError"] intValue];
+		}
+		else if([name isEqual:CSFileErrorException])
+		{
+			return XADUnknownError; // TODO: use ErrNo in userInfo to figure out better error
+		}
+		else if([name isEqual:CSOutOfMemoryException]) return XADOutOfMemoryError;
+		else if([name isEqual:CSEndOfFileException]) return XADInputError;
+		else if([name isEqual:CSNotImplementedException]) return XADNotSupportedError;
+		else if([name isEqual:CSNotSupportedException]) return XADNotSupportedError;
+		else if([name isEqual:CSZlibException]) return XADDecrunchError;
+		else if([name isEqual:CSBzip2Exception]) return XADDecrunchError;
+	}
+
+	return XADUnknownError;
 }
 
 +(NSString *)describeXADError:(XADError)error
@@ -53,7 +86,5 @@ NSString *XADExceptionName=@"XADException";
 	}
 	return nil;
 }
-
--(XADError)error { return error; }
 
 @end

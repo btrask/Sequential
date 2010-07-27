@@ -13,7 +13,7 @@ int main(int argc,char **argv)
 		[detector analyzeData:data];
 	}
 
-	printf("%s (%d) %d %f\n",[[detector MIMECharset] UTF8String],[detector encoding],[detector encoding],[detector confidence]);
+	printf("%s (%d) %d %f\n",[[detector MIMECharset] UTF8String],(int)[detector encoding],(int)[detector encoding],[detector confidence]);
 
 	[pool release];
 	return 0;

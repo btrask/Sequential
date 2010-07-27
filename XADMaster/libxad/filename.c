@@ -22,7 +22,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "functions.h"
+#include "include/functions.h"
 
 #include "cs_atarist_to_unicode.c"
 #include "cs_c64_to_unicode.c"
@@ -47,7 +47,8 @@ struct MyString {
 #define PATHSIGN       '/'
 #define PATHSIGNMAPPER '\\' /* maps the path sign if it represents no path */
 
-#ifndef NO_FILENAME_MANGLING
+//#ifndef NO_FILENAME_MANGLING
+#if 0
 
 /* converts string back to unicode */
 /* NOTE: len is the character len and not byte len for unicode */

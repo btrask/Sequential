@@ -1,5 +1,5 @@
-#import <XADMaster/XADArchiveParser.h>
-#import <XADMaster/CRC.h>
+#import "XADArchiveParser.h"
+#import "CRC.h"
 
 @interface TestDelegate:NSObject
 @end

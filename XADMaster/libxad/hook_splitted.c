@@ -26,8 +26,8 @@
 #include <proto/utility.h>
 #include <proto/xadmaster.h>
 #endif
-#include "functions.h"
-#include "SDI_compiler.h"
+#include "include/functions.h"
+#include "include/SDI_compiler.h"
 
 static xadERROR callsplitthook(struct xadSplitData *sd, struct xadArchiveInfoP *ai,
 xadUINT32 command, xadSignSize data, xadPTR bufptr, xadUINT32 bufsize)

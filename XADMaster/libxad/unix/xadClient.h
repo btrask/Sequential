@@ -23,11 +23,11 @@
 */
 
 /* we want xad's external prototypes for clients */
-#include <xadmaster.h>
+#include "../include/xadmaster.h"
 
 #include <ctype.h>
 #include <string.h>
-#include "ConvertE.c"
+#include "../include/ConvertE.c"
 
 #define XADRECOGDATA(name) static xadBOOL name##_RecogData( \
           xadSize size, \

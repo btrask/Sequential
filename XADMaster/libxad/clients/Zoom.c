@@ -24,7 +24,7 @@
 */
 
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 #include "xadCRC_1021.c"
 
 #ifndef XADMASTERVERSION

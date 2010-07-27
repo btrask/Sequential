@@ -34,8 +34,8 @@
 #include <time.h>
 #endif
 
-#include "functions.h"
-#include "ConvertE.c"
+#include "include/functions.h"
+#include "include/ConvertE.c"
 
 struct MyClockData
 {
@@ -323,12 +323,16 @@ FUNCxadConvertDates /* xadTAGPTR tags */
       gmttst = 0;
   }
 #else
+#ifndef __MINGW32__
   if(gmttst)
   {
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
     gmtoffs = tm->tm_gmtoff/60;
   }
+#else
+  gmttst=0;
+#endif
 #endif
 
   if(am)

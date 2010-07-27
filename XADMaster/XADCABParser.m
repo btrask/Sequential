@@ -5,8 +5,10 @@
 #import "XADMSLZXHandle.h"
 #import "XADCRCHandle.h"
 #import "NSDateXAD.h"
+#import "CSMemoryHandle.h"
 #import "CSFileHandle.h"
 #import "CSMultiHandle.h"
+#import "Scanning.h"
 
 #include <dirent.h>
 
@@ -29,7 +31,7 @@ typedef struct CABHeader
 static CABHeader ReadCABHeader(CSHandle *fh);
 static void SkipCString(CSHandle *fh);
 static NSData *ReadCString(CSHandle *fh);
-static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
+static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *dircontents);
 
 
 
@@ -45,16 +47,19 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 	return length>=4&&bytes[0]=='M'&&bytes[1]=='S'&&bytes[2]=='C'&&bytes[3]=='F';
 }
 
-+(NSArray *)volumesForFilename:(NSString *)filename
++(NSArray *)volumesForHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
 {
 	NSArray *res=nil;
 	@try
 	{
-		NSString *dirname=[filename stringByDeletingLastPathComponent];
-		NSMutableArray *volumes=[NSMutableArray arrayWithObject:filename];
-
-		CSHandle *fh=[CSFileHandle fileHandleForReadingAtPath:filename];
+		CSHandle *fh=[CSMemoryHandle memoryHandleForReadingData:data];
 		CABHeader firsthead=ReadCABHeader(fh);
+
+		if(!firsthead.prevvolume&&!firsthead.nextvolume) return nil;
+
+		NSString *dirname=[name stringByDeletingLastPathComponent];
+		NSArray *dircontents=[[NSFileManager defaultManager] contentsOfDirectoryAtPath:dirname error:NULL];
+		NSMutableArray *volumes=[NSMutableArray arrayWithObject:name];
 
 		NSData *namedata=firsthead.prevvolume;
 		int lastindex=firsthead.cabindex;
@@ -62,7 +67,7 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 		{
 			NSAutoreleasePool *pool=[NSAutoreleasePool new];
 
-			CSHandle *fh=FindHandleForName(namedata,dirname);
+			CSHandle *fh=FindHandleForName(namedata,dirname,dircontents);
 			[volumes insertObject:[fh name] atIndex:0];
 			CABHeader head=ReadCABHeader(fh);
 			if(head.cabindex!=lastindex-1) @throw @"Index mismatch";
@@ -82,7 +87,7 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 		{
 			NSAutoreleasePool *pool=[NSAutoreleasePool new];
 
-			CSHandle *fh=FindHandleForName(namedata,dirname);
+			CSHandle *fh=FindHandleForName(namedata,dirname,dircontents);
 			[volumes addObject:[fh name]];
 			CABHeader head=ReadCABHeader(fh);
 			if(head.cabindex!=lastindex+1) @throw @"Index mismatch";
@@ -167,7 +172,7 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 			NSDictionary *folder=[folders objectAtIndex:folderindex];
 
 			XADPath *name;
-			if(attribs&0x80) name=[self XADPathWithData:namedata encoding:NSUTF8StringEncoding separators:XADWindowsPathSeparator];
+			if(attribs&0x80) name=[self XADPathWithData:namedata encodingName:XADUTF8StringEncodingName separators:XADWindowsPathSeparator];
 			else name=[self XADPathWithData:namedata separators:XADWindowsPathSeparator];
 
 			NSMutableDictionary *dict=[NSMutableDictionary dictionaryWithObjectsAndKeys:
@@ -296,6 +301,32 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 
 @implementation XADCABSFXParser
 
+static int MatchCABSignature(const uint8_t *bytes,int available,off_t offset,void *state)
+{
+	if(available<32) return NO;
+
+	if(bytes[0]!='M'||bytes[1]!='S'||bytes[2]!='C'||bytes[3]!='F') return NO; // Signature
+
+	uint32_t len=CSUInt32LE(&bytes[8]);
+	uint32_t offs=CSUInt32LE(&bytes[16]);
+
+	if(offs>=len) return NO; // Internal consistency
+
+	if(state) // Check if cabinet fits in file
+	{
+		off_t size=*(off_t *)state;
+		if(len>size-offset) return NO;
+	}
+
+	if(bytes[24]!=1&&bytes[24]!=2&&bytes[24]!=3) return NO; // Major version
+	if(bytes[25]!=1) return NO; // Minor version
+
+	int flags=CSUInt16LE(&bytes[30]);
+	if(flags&0xfff8) return NO;
+
+	return YES;
+}
+
 +(int)requiredHeaderSize { return 65536; }
 
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
@@ -305,48 +336,21 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname);
 
 	if(length<20000||bytes[0]!='M'||bytes[1]!='Z') return NO;
 
-	// From libxad:
-	for(int i=8;i<=length+8;i++)
-	{
-		// word aligned code signature: 817C2404 "MSCF" (found at random, sorry)
-		if((i&1)==0)
-		if(bytes[i+0]==0x81 && bytes[i+1]==0x7c && bytes[i+2]==0x24 && bytes[i+3]==0x04 &&
-		bytes[i+4]=='M' && bytes[i+5]=='S' && bytes[i+6]=='C' && bytes[i+7]=='F') return YES;
-
-		// another revision: 7D817DDC "MSCF" (which might not be aligned)
-		if(bytes[i+0]==0x7d && bytes[i+1]==0x81 && bytes[i+2]==0x7d && bytes[i+3]==0xdc &&
-		bytes[i+4]=='M' && bytes[i+5]=='S' && bytes[i+6]=='C' && bytes[i+7]=='F') return YES;
-	}
+	for(int i=8;i<length;i++) if(MatchCABSignature(&bytes[i],length-i,i,NULL)) return YES;
 
 	return NO;
 }
 
-+(NSArray *)volumesForFilename:(NSString *)name { return nil; }
++(NSArray *)volumesForHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name { return nil; }
 
 -(void)parse
 {
 	CSHandle *fh=[self handle];
-	off_t remainingsize=[fh fileSize];
+	off_t size=[fh fileSize];
 
-	uint8_t buf[20];
-	[fh readBytes:sizeof(buf) toBuffer:buf];
+	if(![fh scanUsingMatchingFunction:MatchCABSignature maximumLength:3 context:&size])
+	[XADException raiseUnknownException];
 
-	for(;;)
-	{
-		if(buf[0]=='M'&&buf[1]=='S'&&buf[2]=='C'&&buf[3]=='F')
-		{
-			uint32_t len=CSUInt32LE(&buf[8]);
-			uint32_t offs=CSUInt32LE(&buf[16]);
-			if(len<=remainingsize&&offs<len) break;
-		}
-
-		memmove(buf,buf+1,sizeof(buf)-1);
-		if([fh readAtMost:1 toBuffer:&buf[sizeof(buf)-1]]==0) return;
-
-		remainingsize--;
-	}
-
-	[fh skipBytes:-sizeof(buf)];
 	[super parse];
 }
 
@@ -415,7 +419,7 @@ static NSData *ReadCString(CSHandle *fh)
 	return data;
 }
 
-static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname)
+static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *dircontents)
 {
 	NSString *filepart=[[[NSString alloc] initWithData:namedata encoding:NSWindowsCP1252StringEncoding] autorelease];
 	NSString *volumename=[dirname stringByAppendingPathComponent:filepart];
@@ -427,31 +431,21 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname)
 	}
 	@catch(id e) { }
 
-	if(!dirname||[dirname length]==0) dirname=@".";
-	DIR *dir=opendir([dirname fileSystemRepresentation]);
-	if(!dir) return nil;
-
-	struct dirent *ent;
-	while(ent=readdir(dir))
+	NSEnumerator *enumerator=[dircontents objectEnumerator];
+	NSString *direntry;
+	while(direntry=[enumerator nextObject])
 	{
-		int len=strlen(ent->d_name);
-		if(len==[namedata length]&&strncasecmp([namedata bytes],ent->d_name,len)==0)
+		if([filepart caseInsensitiveCompare:direntry]==NSOrderedSame)
 		{
-			NSString *filename=[dirname stringByAppendingPathComponent:[NSString stringWithUTF8String:ent->d_name]];
+			NSString *filename=[dirname stringByAppendingPathComponent:direntry];
 			@try
 			{
 				CSHandle *handle=[CSFileHandle fileHandleForReadingAtPath:filename];
-				if(handle)
-				{
-					closedir(dir);
-					return handle;
-				}
+				if(handle) return handle;
 			}
 			@catch(id e) { }
 		}
 	}
-
-	closedir(dir);
 
 	return nil;
 }

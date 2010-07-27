@@ -70,7 +70,7 @@ static uint64_t ParseInt(const uint8_t *buffer,int size,int type,int offset)
 			[fh skipBytes:4];
 			int sigentries=[fh readUInt32BE];
 			int sigbytes=[fh readUInt32BE];
-			[fh skipBytes:sigentries*16+(sigbytes+15&~15)];
+			[fh skipBytes:sigentries*16+(sigbytes+7&~7)];
 		}
 		break;
 

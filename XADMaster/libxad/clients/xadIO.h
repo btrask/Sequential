@@ -23,7 +23,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 
 /* These are used to keep definitions in sync when called in source
    direct mode */

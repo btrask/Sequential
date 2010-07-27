@@ -6,7 +6,7 @@
     #import <Cocoa/Cocoa.h>
 #endif
 
-#if !NSINTEGER_DEFINED
+#if !NSINTEGER_DEFINED && !defined(__COCOTRON__)
 typedef int NSInteger;
 typedef unsigned int NSUInteger;
 #endif

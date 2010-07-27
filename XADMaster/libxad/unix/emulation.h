@@ -22,7 +22,7 @@
 #ifndef EMULATION_H
 #define EMULATION_H
 
-#include "functions.h"
+#include "../include/functions.h"
 
 xadTAGPTR NextTagItem(xadTAGPTR *tp);
 xadTAGPTR FindTagItem(xadTag tagVal, xadTAGPTR tags);

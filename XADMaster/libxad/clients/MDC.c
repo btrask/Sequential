@@ -23,7 +23,7 @@
 */
 
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 #include "xadIO.c"
 #include "xadIO_XPK.c"
 

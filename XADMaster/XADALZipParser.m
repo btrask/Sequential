@@ -47,13 +47,13 @@ static void CalculateSillyTable(int *table,int param)
 	return length>=8&&bytes[0]=='A'&&bytes[1]=='L'&&bytes[2]=='Z'&&bytes[3]==1&&bytes[7]==0;
 }
 
-+(NSArray *)volumesForFilename:(NSString *)filename
++(NSArray *)volumesForHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
 {
 	NSArray *matches;
 
-	if(matches=[filename substringsCapturedByPattern:@"^(.*)\\.(alz|a[0-9]{2}|b[0-9]{2})$" options:REG_ICASE])
+	if(matches=[name substringsCapturedByPattern:@"^(.*)\\.(alz|a[0-9]{2}|b[0-9]{2})$" options:REG_ICASE])
 	{
-		return [self scanForVolumesWithFilename:filename
+		return [self scanForVolumesWithFilename:name
 		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(alz|a[0-9]{2}|b[0-9]{2})$",
 			[[matches objectAtIndex:1] escapedPattern]] options:REG_ICASE]
 		firstFileExtension:@"alz"];
@@ -73,7 +73,7 @@ static void CalculateSillyTable(int *table,int param)
 		off_t offs=0;
 		for(int i=0;i<count-1;i++)
 		{
-			offs+=[[volumes objectAtIndex:i] fileSize];
+			offs+=[(CSHandle *)[volumes objectAtIndex:i] fileSize];
 			[fh addSkipFrom:offs-16 to:offs+8];
 		}
 	}

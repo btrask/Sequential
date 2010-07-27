@@ -57,7 +57,7 @@ static void InitializeArithmeticDecoder(ArithmeticDecoder *decoder,CSInputBuffer
 {
 	decoder->input=input;
 	decoder->range=One;
-	decoder->code=CSInputNextBitString(input,NumBits);
+	decoder->code=CSInputNextLongBitString(input,NumBits);
 }
 
 static void ReadNextArithmeticCode(ArithmeticDecoder *decoder,int symlow,int symsize,int symtot)
@@ -177,7 +177,7 @@ static int NextArithmeticBitString(ArithmeticDecoder *decoder,ArithmeticModel *m
 
 			if(numbytes+zerocount>blocksize) [XADException raiseDecrunchException];
 
-			memset(block+numbytes,DecodeMTF(&mtf,0),zerocount);
+			memset(&block[numbytes],DecodeMTF(&mtf,0),zerocount);
 			numbytes+=zerocount;
 		}
 

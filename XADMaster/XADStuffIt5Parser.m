@@ -26,9 +26,9 @@
   xadUINT8[80] header text
   xadUINT32     ???
   xadUINT32     total archive size
-  xadUINT32     offset of first entry
-  xadUINT32     ???
-  xadUINT32     ???
+  xadUINT32     offset of some entry?
+  xadUINT16     number of entries in root directory
+  xadUINT32     offset of first entry in root directory
 */
 
 /* archive block entry                          directory:
@@ -100,18 +100,27 @@
 	[self setIsMacArchive:YES];
 
 	CSHandle *fh=[self handle];
+
 	off_t base=[fh offsetInFile];
 
 	[fh skipBytes:84];
-	uint32_t totalsize=[fh readUInt32BE];
+	/*uint32_t totalsize=*/[fh readUInt32BE];
+	/*uint32_t something=*/[fh readUInt32BE];
+	int numfiles=[fh readUInt16BE];
 	uint32_t firstoffs=[fh readUInt32BE];
 	[fh seekToFileOffset:firstoffs+base];
 
-	NSMutableDictionary *directories=[NSMutableDictionary dictionary];
-	XADPath *root=[self XADPath];
+	[self parseDirectoryWithNumberOfEntries:numfiles parent:[self XADPath]];
+}
 
-	while([fh offsetInFile]+48<=totalsize+base && [self shouldKeepParsing])
+-(void)parseDirectoryWithNumberOfEntries:(int)numentries parent:(XADPath *)parent
+{
+	CSHandle *fh=[self handle];
+
+	for(int i=0;i<numentries;i++)
 	{
+		if(![self shouldKeepParsing]) return;
+
 		off_t offs=[fh offsetInFile];
 
 		uint32_t headid=[fh readID];
@@ -127,7 +136,7 @@
 		uint32_t modificationdate=[fh readUInt32BE];
 		/*uint32_t prevoffs=*/[fh readUInt32BE];
 		/*uint32_t nextoffs=*/[fh readUInt32BE];
-		uint32_t diroffs=[fh readUInt32BE];
+		/*uint32_t diroffs=*/[fh readUInt32BE];
 		int namelength=[fh readUInt16BE];
 		/*int headercrc=*/[fh readUInt16BE];
 		uint32_t datalength=[fh readUInt32BE];
@@ -140,8 +149,8 @@
 		{
 			numfiles=[fh readUInt16BE];
 
-			if(datalength==0xffffffff) continue;
-			// Do nothing for these entries, whatever they are.
+			if(datalength==0xffffffff) { numentries++; continue; }
+			// Skip these entries, whatever they are.
 			// They seem to appear after every directory entry.
 		}
 		else
@@ -183,8 +192,7 @@
 		}
 
 		off_t datastart=[fh offsetInFile];
-		XADPath *parent=[directories objectForKey:[NSNumber numberWithUnsignedInt:diroffs]];
-		if(!parent) parent=root;
+
 		XADPath *path=[parent pathByAppendingPathComponent:[self XADStringWithData:namedata]];
 
 		if(flags&SIT5FLAGS_DIRECTORY)
@@ -200,8 +208,8 @@
 			nil];
 
 			[self addEntryWithDictionary:dict];
-			[directories setObject:path forKey:[NSNumber numberWithUnsignedLong:offs]];
 			[fh seekToFileOffset:datastart];
+			[self parseDirectoryWithNumberOfEntries:numfiles parent:path];
 		}
 		else
 		{

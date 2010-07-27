@@ -3,10 +3,8 @@
 #import "XADArchive.h"
 #import "CSMemoryHandle.h"
 #import "CSHandle.h"
-#import "CSFileHandle.h"
-#import "CSZlibHandle.h"
-#import "CSBzip2Handle.h"
 #import "Progress.h"
+#import "NSDateXAD.h"
 
 #import <sys/stat.h>
 #import <sys/time.h>
@@ -42,9 +40,9 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	return archive;
 }
 
-+(NSArray *)volumesForFile:(NSString *)filename
++(NSArray *)volumesForFile:(NSString *)filename // deprecated
 {
-	return [XADArchiveParser volumesForFilename:(NSString *)filename];
+	return [NSArray arrayWithObject:filename];
 }
 
 
@@ -106,7 +104,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 		delegate=del;
 
 		parser=[[XADArchiveParser archiveParserForHandle:[CSMemoryHandle memoryHandleForReadingData:data] name:@""] retain];
-		if(parser)
+		if(!parser)
 		{
 			if([self _parseWithErrorPointer:error]) return self;
 		}
@@ -187,7 +185,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 						}
 						@catch(id e)
 						{
-							lasterror=[self _parseException:e];
+							lasterror=[XADException parseException:e];
 							if(error) *error=lasterror;
 							immediatefailed=YES;
 						}
@@ -231,7 +229,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	@try { [parser parse]; }
 	@catch(id e)
 	{
-		lasterror=[self _parseException:e];
+		lasterror=[XADException parseException:e];
 		if(error) *error=lasterror;
 	}
 
@@ -293,14 +291,16 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 						if(!res&&lasterror==XADDataFormatError)
 						{
 							if(![self extractEntry:n to:immediatedestination
-							deferDirectories:YES resourceFork:NO]) immediatefailed=YES;
+							deferDirectories:YES resourceFork:NO])
+							immediatefailed=YES;
 						}
 						else immediatefailed=YES;
 					}
 					else
 					{
 						if(![self extractEntry:n to:immediatedestination
-						deferDirectories:YES resourceFork:NO]) immediatefailed=YES;
+						deferDirectories:YES resourceFork:NO])
+						immediatefailed=YES;
 					}
 				}
 
@@ -334,17 +334,22 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 			@try { res=[self extractArchiveEntry:n to:immediatedestination]; }
 			@catch(id e) { res=NO; }
 
-			if(!res&&lasterror==XADDataFormatError)
+			if(!res)
 			{
-				if(![self extractEntry:n to:immediatedestination
-				deferDirectories:YES resourceFork:YES]) immediatefailed=YES;
+				if(lasterror==XADDataFormatError)
+				{
+					if(![self extractEntry:n to:immediatedestination
+					deferDirectories:YES resourceFork:YES])
+					immediatefailed=YES;
+				}
+				else immediatefailed=YES;
 			}
-			else immediatefailed=YES;
 		}
 		else
 		{
 			if(![self extractEntry:n to:immediatedestination
-			deferDirectories:YES resourceFork:YES]) immediatefailed=YES;
+			deferDirectories:YES resourceFork:YES])
+			immediatefailed=YES;
 		}
 	}
 }
@@ -644,7 +649,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 			{
 				@try
 				{
-					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:NO];
+					CSHandle *handle=[parser handleForEntryWithDictionary:resdict wantChecksum:YES];
 					if(!handle) [XADException raiseDecrunchException];
 					NSData *forkdata=[handle remainingFileContents];
 					if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];
@@ -654,7 +659,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 				}
 				@catch(id e)
 				{
-					lasterror=[self _parseException:e];
+					lasterror=[XADException parseException:e];
 					XADAction action=[delegate archive:self extractionOfResourceForkForEntryDidFail:n error:lasterror];
 					if(action==XADSkipAction) break;
 					else if(action!=XADRetryAction) return nil;
@@ -677,10 +682,10 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(!dict) return [CSMemoryHandle memoryHandleForReadingData:[NSData data]]; // Special case for files with only a resource fork
 
 	@try
-	{ return [parser handleForEntryWithDictionary:dict wantChecksum:NO]; }
+	{ return [parser handleForEntryWithDictionary:dict wantChecksum:YES]; }
 	@catch(id e)
 	{
-		lasterror=[self _parseException:e];
+		lasterror=[XADException parseException:e];
 		if(error) *error=lasterror;
 	}
 	return nil;
@@ -699,10 +704,10 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	if(isdir&&[isdir boolValue]) return nil;
 
 	@try
-	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:NO]; }
+	{ return [parser handleForEntryWithDictionary:resdict wantChecksum:YES]; }
 	@catch(id e)
 	{
-		lasterror=[self _parseException:e];
+		lasterror=[XADException parseException:e];
 		if(error) *error=lasterror;
 	}
 	return nil;
@@ -715,7 +720,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 
 	@try
 	{
-		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:NO];
+		CSHandle *handle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 		if(!handle) [XADException raiseDecrunchException];
 		NSData *data=[handle remainingFileContents];
 		if([handle hasChecksum]&&![handle isChecksumCorrect]) [XADException raiseChecksumException];
@@ -724,35 +729,11 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 	}
 	@catch(id e)
 	{
-		lasterror=[self _parseException:e];
+		lasterror=[XADException parseException:e];
 	}
 	return nil;
 }
 
--(XADError)_parseException:(id)exception
-{
-	if([exception isKindOfClass:[NSException class]])
-	{
-		NSException *e=exception;
-		NSString *name=[e name];
-		if([name isEqual:XADExceptionName])
-		{
-			return [[[e userInfo] objectForKey:@"XADError"] intValue];
-		}
-		else if([name isEqual:CSFileErrorException])
-		{
-			return XADUnknownError; // TODO: use ErrNo in userInfo to figure out better error
-		}
-		else if([name isEqual:CSOutOfMemoryException]) return XADOutOfMemoryError;
-		else if([name isEqual:CSEndOfFileException]) return XADInputError;
-		else if([name isEqual:CSNotImplementedException]) return XADNotSupportedError;
-		else if([name isEqual:CSNotSupportedException]) return XADNotSupportedError;
-		else if([name isEqual:CSZlibException]) return XADDecrunchError;
-		else if([name isEqual:CSBzip2Exception]) return XADDecrunchError;
-	}
-
-	return XADUnknownError;
-}
 
 
 
@@ -1011,6 +992,7 @@ static double XADGetTime()
 			if(delegate&&[delegate archiveExtractionShouldStop:self]) [XADException raiseExceptionWithXADError:XADBreakError];
 
 			int actual=[srchandle readAtMost:sizeof(buf) toBuffer:buf];
+			if(actual)
 			if(write(fh,buf,actual)!=actual)
 			{
 				lasterror=XADOutputError;
@@ -1051,7 +1033,7 @@ static double XADGetTime()
 	}
 	@catch(id e)
 	{
-		lasterror=[self _parseException:e];
+		lasterror=[XADException parseException:e];
 		close(fh);
 		[pool release];
 		return NO;
@@ -1132,24 +1114,6 @@ static double XADGetTime()
 	return NO;
 }
 
-static NSDate *dateForJan1904()
-{
-	static NSDate *jan1904=nil;
-	if(!jan1904) jan1904=[[NSDate dateWithString:@"1904-01-01 00:00:00 +0000"] retain];
-	return jan1904;
-}
-
-static UTCDateTime NSDateToUTCDateTime(NSDate *date)
-{
-	NSTimeInterval seconds=[date timeIntervalSinceDate:dateForJan1904()];
-	UTCDateTime utc={
-		(UInt16)(seconds/4294967296.0),
-		(UInt32)seconds,
-		(UInt16)(seconds*65536.0)
-	};
-	return utc;
-}
-
 -(BOOL)_changeAllAttributesForEntry:(int)n atPath:(NSString *)path deferDirectories:(BOOL)defer resourceFork:(BOOL)resfork
 {
 	if(defer&&[self entryIsDirectory:n])
@@ -1168,41 +1132,52 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 			if([rsrchandle hasChecksum]&&![rsrchandle isChecksumCorrect]) [XADException raiseChecksumException];
 
 			// TODO: use xattrs?
-			if(![data writeToFile:[path stringByAppendingString:@"/..namedfork/rsrc"] atomically:NO])
+			NSString *rsrcpath=[path stringByAppendingString:@"/..namedfork/rsrc"];
+			if(![data writeToFile:rsrcpath atomically:NO])
 			{
 				// Change permissions and try again
 				const char *cpath=[path fileSystemRepresentation];
-				int oldperms=chmod(cpath,0700);
-				if(![data writeToFile:[path stringByAppendingString:@"/..namedfork/rsrc"] atomically:NO]) return NO;
-				chmod(cpath,oldperms);
+				struct stat st;
+
+				stat(cpath,&st);
+				chmod(cpath,0700);
+				if(![data writeToFile:rsrcpath atomically:NO]) return NO;
+				chmod(cpath,st.st_mode);
 			}
 		}
 		@catch(id e)
 		{
-			lasterror=[self _parseException:e];
+			lasterror=[XADException parseException:e];
 			return NO;
 		}
 	}
 
 	NSDictionary *dict=[self combinedParserDictionaryForEntry:n];
 
+	const char *cpath=[path fileSystemRepresentation];
+
 	FSRef ref;
 	FSCatalogInfo info;
-	if(FSPathMakeRefWithOptions((const UInt8 *)[path fileSystemRepresentation],
+	if(FSPathMakeRefWithOptions((const UInt8 *)cpath,
 	kFSPathMakeRefDoNotFollowLeafSymlink,&ref,NULL)!=noErr) return NO;
 	if(FSGetCatalogInfo(&ref,kFSCatInfoFinderInfo|kFSCatInfoPermissions|kFSCatInfoCreateDate|kFSCatInfoContentMod|kFSCatInfoAccessDate,&info,NULL,NULL,NULL)!=noErr) return NO;
 
 	NSNumber *permissions=[dict objectForKey:XADPosixPermissionsKey];
 	FSPermissionInfo *pinfo=(FSPermissionInfo *)&info.permissions;
-	if(permissions) pinfo->mode=[permissions unsignedShortValue];
+	if(permissions)
+	{
+		mode_t mask=umask(022);
+		umask(mask); // This is stupid. Is there no sane way to just READ the umask?
+		pinfo->mode=[permissions unsignedShortValue]&~(mask|S_ISUID|S_ISGID);
+	}
 
 	NSDate *creation=[dict objectForKey:XADCreationDateKey];
 	NSDate *modification=[dict objectForKey:XADLastModificationDateKey];
 	NSDate *access=[dict objectForKey:XADLastAccessDateKey];
 
-	if(creation) info.createDate=NSDateToUTCDateTime(creation);
-	if(modification) info.contentModDate=NSDateToUTCDateTime(modification);
-	if(access) info.accessDate=NSDateToUTCDateTime(access);
+	if(creation) info.createDate=[creation UTCDateTime];
+	if(modification) info.contentModDate=[modification UTCDateTime];
+	if(access) info.accessDate=[access UTCDateTime];
 
 	// TODO: Handle FinderInfo structure
 	NSNumber *type=[dict objectForKey:XADFileTypeKey];
@@ -1214,7 +1189,11 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 	if(creator) finfo->fileCreator=[creator unsignedLongValue];
 	if(finderflags) finfo->finderFlags=[finderflags unsignedShortValue];
 
-	if(FSSetCatalogInfo(&ref,kFSCatInfoFinderInfo|kFSCatInfoPermissions|kFSCatInfoCreateDate|kFSCatInfoContentMod|kFSCatInfoAccessDate,&info)!=noErr) return NO;
+	if(FSSetCatalogInfo(&ref,kFSCatInfoFinderInfo|kFSCatInfoPermissions|kFSCatInfoCreateDate|kFSCatInfoContentMod|kFSCatInfoAccessDate,&info)!=noErr)
+	{
+		chmod(cpath,0700);
+		if(FSSetCatalogInfo(&ref,kFSCatInfoFinderInfo|kFSCatInfoPermissions|kFSCatInfoCreateDate|kFSCatInfoContentMod|kFSCatInfoAccessDate,&info)!=noErr) return NO;
+	}
 
 	return YES;
 }
@@ -1389,10 +1368,8 @@ static UTCDateTime NSDateToUTCDateTime(NSDate *date)
 -(NSStringEncoding)archive:(XADArchive *)archive encodingForData:(NSData *)data guess:(NSStringEncoding)guess confidence:(float)confidence
 {
 	// Default implementation calls old method
-NSLog(@">>> %@ %d",data,[data length]);
 	NSMutableData *terminateddata=[[NSMutableData alloc] initWithData:data];
 	[terminateddata increaseLengthBy:1]; // append a 0 byte
-NSLog(@">>> %@ %s",terminateddata,[terminateddata bytes]);
 	NSStringEncoding enc=[self archive:archive encodingForName:[terminateddata bytes] guess:guess confidence:confidence];
 	[terminateddata release];
 	return enc;

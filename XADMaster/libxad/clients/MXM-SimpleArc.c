@@ -23,7 +23,7 @@
 */
 
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 
 #ifndef  XADMASTERVERSION
   #define XADMASTERVERSION      8

@@ -23,7 +23,7 @@
 */
 
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 #define XADIOGETBITSHIGH
 #define XADIOGETBITSLOW
 #define XADIOGETBITSLOWR

@@ -1,0 +1,162 @@
+UniversalDetector.o: UniversalDetector.m UniversalDetector.h \
+ WrappedUniversalDetector.h
+universalchardet/kludge.o: universalchardet/kludge.c universalchardet/prmem.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h
+WrappedUniversalDetector.o: WrappedUniversalDetector.cpp \
+ WrappedUniversalDetector.h universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h \
+ universalchardet/nscore.h universalchardet/nsUniversalDetector.h \
+ universalchardet/nsCharSetProber.h
+universalchardet/CharDistribution.o: universalchardet/CharDistribution.cpp \
+ universalchardet/CharDistribution.h universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h \
+ universalchardet/JISFreq.tab universalchardet/Big5Freq.tab \
+ universalchardet/EUCKRFreq.tab universalchardet/EUCTWFreq.tab \
+ universalchardet/GB2312Freq.tab
+universalchardet/JpCntx.o: universalchardet/JpCntx.cpp universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h \
+ universalchardet/JpCntx.h
+universalchardet/LangBulgarianModel.o: universalchardet/LangBulgarianModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/LangCyrillicModel.o: universalchardet/LangCyrillicModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/LangGreekModel.o: universalchardet/LangGreekModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/LangHebrewModel.o: universalchardet/LangHebrewModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/LangHungarianModel.o: universalchardet/LangHungarianModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/LangThaiModel.o: universalchardet/LangThaiModel.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/nsBig5Prober.o: universalchardet/nsBig5Prober.cpp \
+ universalchardet/nsBig5Prober.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/CharDistribution.h
+universalchardet/nsCharSetProber.o: universalchardet/nsCharSetProber.cpp \
+ universalchardet/nsCharSetProber.h universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h \
+ universalchardet/prmem.h
+universalchardet/nsEscCharsetProber.o: universalchardet/nsEscCharsetProber.cpp \
+ universalchardet/nsEscCharsetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/nsUniversalDetector.h
+universalchardet/nsEscSM.o: universalchardet/nsEscSM.cpp \
+ universalchardet/nsCodingStateMachine.h universalchardet/nsPkgInt.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/nsEUCJPProber.o: universalchardet/nsEUCJPProber.cpp \
+ universalchardet/nsEUCJPProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/JpCntx.h \
+ universalchardet/CharDistribution.h
+universalchardet/nsEUCKRProber.o: universalchardet/nsEUCKRProber.cpp \
+ universalchardet/nsEUCKRProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/CharDistribution.h
+universalchardet/nsEUCTWProber.o: universalchardet/nsEUCTWProber.cpp \
+ universalchardet/nsEUCTWProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/CharDistribution.h
+universalchardet/nsGB2312Prober.o: universalchardet/nsGB2312Prober.cpp \
+ universalchardet/nsGB2312Prober.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/CharDistribution.h
+universalchardet/nsHebrewProber.o: universalchardet/nsHebrewProber.cpp \
+ universalchardet/nsHebrewProber.h universalchardet/nsSBCharSetProber.h \
+ universalchardet/nsCharSetProber.h universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h
+universalchardet/nsLatin1Prober.o: universalchardet/nsLatin1Prober.cpp \
+ universalchardet/nsLatin1Prober.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/prmem.h
+universalchardet/nsMBCSGroupProber.o: universalchardet/nsMBCSGroupProber.cpp \
+ universalchardet/nsMBCSGroupProber.h universalchardet/nsSJISProber.h \
+ universalchardet/nsCharSetProber.h universalchardet/nscore.h \
+ universalchardet/prtypes.h universalchardet/prcpucfg.h \
+ universalchardet/protypes.h universalchardet/nsError.h \
+ universalchardet/nsCodingStateMachine.h universalchardet/nsPkgInt.h \
+ universalchardet/JpCntx.h universalchardet/CharDistribution.h \
+ universalchardet/nsUTF8Prober.h universalchardet/nsEUCJPProber.h \
+ universalchardet/nsGB2312Prober.h universalchardet/nsEUCKRProber.h \
+ universalchardet/nsBig5Prober.h universalchardet/nsEUCTWProber.h \
+ universalchardet/nsUniversalDetector.h
+universalchardet/nsMBCSSM.o: universalchardet/nsMBCSSM.cpp \
+ universalchardet/nsCodingStateMachine.h universalchardet/nsPkgInt.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/nsSBCharSetProber.o: universalchardet/nsSBCharSetProber.cpp \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h
+universalchardet/nsSBCSGroupProber.o: universalchardet/nsSBCSGroupProber.cpp \
+ universalchardet/prmem.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsSBCharSetProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/nsError.h \
+ universalchardet/nsSBCSGroupProber.h universalchardet/nsHebrewProber.h
+universalchardet/nsSJISProber.o: universalchardet/nsSJISProber.cpp \
+ universalchardet/nsSJISProber.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h universalchardet/JpCntx.h \
+ universalchardet/CharDistribution.h
+universalchardet/nsUniversalDetector.o: universalchardet/nsUniversalDetector.cpp \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsUniversalDetector.h \
+ universalchardet/nsMBCSGroupProber.h universalchardet/nsSJISProber.h \
+ universalchardet/nsCharSetProber.h \
+ universalchardet/nsCodingStateMachine.h universalchardet/nsPkgInt.h \
+ universalchardet/JpCntx.h universalchardet/CharDistribution.h \
+ universalchardet/nsUTF8Prober.h universalchardet/nsEUCJPProber.h \
+ universalchardet/nsGB2312Prober.h universalchardet/nsEUCKRProber.h \
+ universalchardet/nsBig5Prober.h universalchardet/nsEUCTWProber.h \
+ universalchardet/nsSBCSGroupProber.h \
+ universalchardet/nsEscCharsetProber.h universalchardet/nsLatin1Prober.h
+universalchardet/nsUTF8Prober.o: universalchardet/nsUTF8Prober.cpp \
+ universalchardet/nsUTF8Prober.h universalchardet/nsCharSetProber.h \
+ universalchardet/nscore.h universalchardet/prtypes.h \
+ universalchardet/prcpucfg.h universalchardet/protypes.h \
+ universalchardet/nsError.h universalchardet/nsCodingStateMachine.h \
+ universalchardet/nsPkgInt.h

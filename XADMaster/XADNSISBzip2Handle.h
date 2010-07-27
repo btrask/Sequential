@@ -1,6 +1,8 @@
 #import "CSBlockStreamHandle.h"
 #import "BWT.h"
 
+#import <stdbool.h>
+
 /* Constants for huffman coding */
 #define MAX_GROUPS			6
 #define GROUP_SIZE   		50		/* 64 would have been more efficient */

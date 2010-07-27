@@ -1,5 +1,4 @@
 #import "XADArchiveParser.h"
-#import "CSByteStreamHandle.h"
 
 @interface XADDiskDoublerParser:XADArchiveParser
 {

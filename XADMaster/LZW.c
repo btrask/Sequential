@@ -3,33 +3,33 @@
 
 LZW *AllocLZW(int maxsymbols,int reservedsymbols)
 {
-	LZW *lzw=malloc(sizeof(LZW)+sizeof(LZWTreeNode)*maxsymbols);
-	if(!lzw) return 0;
+	LZW *self=(LZW *)malloc(sizeof(LZW)+sizeof(LZWTreeNode)*maxsymbols);
+	if(!self) return 0;
 
-	lzw->nodes=(LZWTreeNode *)&lzw[1];
-	lzw->maxsymbols=maxsymbols;
-	lzw->reservedsymbols=reservedsymbols;
+	self->nodes=(LZWTreeNode *)&self[1];
+	self->maxsymbols=maxsymbols;
+	self->reservedsymbols=reservedsymbols;
 
 	for(int i=0;i<256;i++)
 	{
-		lzw->nodes[i].chr=i;
-		lzw->nodes[i].parent=-1;
+		self->nodes[i].chr=i;
+		self->nodes[i].parent=-1;
 	}
 
-	ClearLZWTable(lzw);
+	ClearLZWTable(self);
 
-	return lzw;
+	return self;
 }
 
-void FreeLZW(LZW *lzw)
+void FreeLZW(LZW *self)
 {
-	free(lzw);
+	free(self);
 }
 
-void ClearLZWTable(LZW *lzw)
+void ClearLZWTable(LZW *self)
 {
-	lzw->numsymbols=256+lzw->reservedsymbols;
-	lzw->prevsymbol=-1;
+	self->numsymbols=256+self->reservedsymbols;
+	self->prevsymbol=-1;
 }
 
 static uint8_t FindFirstByte(LZWTreeNode *nodes,int symbol)
@@ -38,85 +38,85 @@ static uint8_t FindFirstByte(LZWTreeNode *nodes,int symbol)
 	return nodes[symbol].chr;
 }
 
-int NextLZWSymbol(LZW *lzw,int symbol)
+int NextLZWSymbol(LZW *self,int symbol)
 {
-	if(lzw->prevsymbol<0)
+	if(self->prevsymbol<0)
 	{
-		if(symbol>=256+lzw->reservedsymbols) return LZWInvalidCodeError;
-		lzw->prevsymbol=symbol;
+		if(symbol>=256+self->reservedsymbols) return LZWInvalidCodeError;
+		self->prevsymbol=symbol;
 	}
 	else
 	{
 		int postfixbyte;
-		if(symbol<lzw->numsymbols) postfixbyte=FindFirstByte(lzw->nodes,symbol);
-		else if(symbol==lzw->numsymbols) postfixbyte=FindFirstByte(lzw->nodes,lzw->prevsymbol);
+		if(symbol<self->numsymbols) postfixbyte=FindFirstByte(self->nodes,symbol);
+		else if(symbol==self->numsymbols) postfixbyte=FindFirstByte(self->nodes,self->prevsymbol);
 		else return LZWInvalidCodeError;
 
-		if(lzw->numsymbols<lzw->maxsymbols)
+		if(self->numsymbols<self->maxsymbols)
 		{
-			lzw->nodes[lzw->numsymbols].parent=lzw->prevsymbol;
-			lzw->nodes[lzw->numsymbols].chr=postfixbyte;
-			lzw->numsymbols++;
+			self->nodes[self->numsymbols].parent=self->prevsymbol;
+			self->nodes[self->numsymbols].chr=postfixbyte;
+			self->numsymbols++;
 		}
 
-		lzw->prevsymbol=symbol;
+		self->prevsymbol=symbol;
 	}
 
-	if(lzw->numsymbols==lzw->maxsymbols) return LZWTooManyCodesError;
+	if(self->numsymbols==self->maxsymbols) return LZWTooManyCodesError;
 
 	return LZWNoError;
 }
 
-int LZWOutputLength(LZW *lzw)
+int LZWOutputLength(LZW *self)
 {
-	int symbol=lzw->prevsymbol;
+	int symbol=self->prevsymbol;
 	int n=0;
 
 	while(symbol>=0)
 	{
-		symbol=lzw->nodes[symbol].parent;
+		symbol=self->nodes[symbol].parent;
 		n++;
 	}
 
 	return n;
 }
 
-int LZWOutputToBuffer(LZW *lzw,uint8_t *buffer)
+int LZWOutputToBuffer(LZW *self,uint8_t *buffer)
 {
-	int symbol=lzw->prevsymbol;
-	int n=LZWOutputLength(lzw);
+	int symbol=self->prevsymbol;
+	int n=LZWOutputLength(self);
 	buffer+=n;
 
 	while(symbol>=0)
 	{
-		*--buffer=lzw->nodes[symbol].chr;
-		symbol=lzw->nodes[symbol].parent;
+		*--buffer=self->nodes[symbol].chr;
+		symbol=self->nodes[symbol].parent;
 	}
 
 	return n;
 }
 
-int LZWReverseOutputToBuffer(LZW *lzw,uint8_t *buffer)
+int LZWReverseOutputToBuffer(LZW *self,uint8_t *buffer)
 {
-	int symbol=lzw->prevsymbol;
+	int symbol=self->prevsymbol;
 	int n=0;
 
 	while(symbol>=0)
 	{
-		*buffer++=lzw->nodes[symbol].chr;
-		symbol=lzw->nodes[symbol].parent;
+		*buffer++=self->nodes[symbol].chr;
+		symbol=self->nodes[symbol].parent;
 		n++;
 	}
 
 	return n;
 }
 
-int LZWSymbolCount(LZW *lzw)
+int LZWSymbolCount(LZW *self)
 {
-	return lzw->numsymbols;
+	return self->numsymbols;
 }
 
-int LZWSymbolListFull(LZW *lzw)
+int LZWSymbolListFull(LZW *self)
 {
-	return lzw->numsymbols==lzw->maxsymbols;
+	return self->numsymbols==self->maxsymbols;
 }

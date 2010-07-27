@@ -22,11 +22,9 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
-#include "functions.h"
+#include "include/functions.h"
 #include "clientfunc.c"
 #include "copymem.c"
 #include "crc.c"
@@ -41,7 +39,7 @@
 #include "hook_disk.c"
 #endif
 #include "hook_diskarc.c"
-#include "hook_fh.c"
+#include "unix/hook_fh.c"
 #include "hook_mem.c"
 #include "hook_splitted.c"
 #include "hook_stream.c"

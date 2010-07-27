@@ -22,7 +22,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#include "functions.h"
+#include "include/functions.h"
 
 #define MakeXADFlag(fl) if(ti->ti_Data) flags |= fl; else flags &= ~fl
 

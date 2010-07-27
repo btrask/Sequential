@@ -1,4 +1,4 @@
-#import <XADMaster/XADArchiveParser.h>
+#import "XADArchiveParser.h"
 
 NSString *EscapeString(NSString *str)
 {
@@ -32,8 +32,6 @@ NSString *EscapeString(NSString *str)
 
 -(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
 {
-	NSAutoreleasePool *pool=[NSAutoreleasePool new];
-
 	for(int i=0;i<indent;i++) printf(" ");
 
 	NSNumber *dir=[dict objectForKey:XADIsDirectoryKey];
@@ -42,6 +40,8 @@ NSString *EscapeString(NSString *str)
 	NSNumber *size=[dict objectForKey:XADFileSizeKey];
 	CSHandle *fh;
 
+	BOOL failed=NO;
+
 	if(dir&&[dir boolValue]) printf("-  ");
 	else if(link) printf("-  ");
 	else
@@ -49,20 +49,20 @@ NSString *EscapeString(NSString *str)
 		fh=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 		[fh seekToEndOfFile];
 
-		if(!fh) printf("!  ");
+		if(!fh) { printf("!  "); failed=YES; }
 		else
 		{
 			if([fh hasChecksum])
 			{
 				if([fh isChecksumCorrect]) printf("o");
-				else printf("x");
+				else { printf("x"); failed=YES; }
 			}
 			else printf("?");
 
 			if(size)
 			{
 				if([size longLongValue]==[fh offsetInFile]) printf("  ");
-				else printf("x ");
+				else { printf("x "); failed=YES; }
 			}
 			else printf("  ");
 		}
@@ -94,6 +94,15 @@ NSString *EscapeString(NSString *str)
 
 	printf(")\n");
 
+	if(failed)
+	{
+		if(getenv("XADTestStrict"))
+		{
+			printf("Encountered failure in strict mode, exiting.\n");
+			exit(1);
+		}
+	}
+
 	NSNumber *arch=[dict objectForKey:XADIsArchiveKey];
 	if(arch&&[arch boolValue])
 	{
@@ -102,8 +111,6 @@ NSString *EscapeString(NSString *str)
 		[parser setDelegate:[[[ArchiveTester alloc] initWithIndentLevel:indent+2] autorelease]];
 		[parser parse];
 	}
-
-	[pool release];
 }
 
 -(BOOL)archiveParsingShouldStop:(XADArchiveParser *)parser

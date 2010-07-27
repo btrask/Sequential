@@ -1,5 +1,8 @@
 #import "XADPath.h"
 
+static BOOL HasDotPaths(NSArray *array);
+static void StripDotPaths(NSMutableArray *components);
+
 @implementation XADPath
 
 -(id)init
@@ -16,12 +19,35 @@
 {
 	if(self=[super init])
 	{
-		components=[pathcomponents retain];
+		if(HasDotPaths(pathcomponents))
+		{
+			NSMutableArray *tmp=[NSMutableArray arrayWithArray:pathcomponents];
+			StripDotPaths(tmp);
+			components=[tmp copy];
+		}
+		else
+		{
+			components=[pathcomponents retain];
+		}
+
 		source=nil;
 
 		NSEnumerator *enumerator=[components objectEnumerator];
 		XADString *string;
-		while(string=[enumerator nextObject]) [self _updateStringSourceWithString:string];
+		while(string=[enumerator nextObject])
+		{
+			XADStringSource *othersource=[string source];
+			if(othersource)
+			{
+				if(source)
+				{
+					if(othersource!=source)
+					[NSException raise:NSInvalidArgumentException format:@"Attempted to use XADStrings with different string sources in XADPath"];
+				}
+				else source=[othersource retain];
+			}
+		}
+
 	}
 	return self;
 }
@@ -40,7 +66,9 @@
 			[array addObject:[XADString XADStringWithString:[stringcomps objectAtIndex:i]]];
 		}
 
+		StripDotPaths(array);
 		components=[array copy];
+
 		source=nil;
 	}
 	return self;
@@ -52,23 +80,25 @@ static inline BOOL IsSeparator(char c,const char *separators)
 }
 
 -(id)initWithBytes:(const char *)bytes length:(int)length
-encoding:(NSStringEncoding)encoding separators:(const char *)separators
+encodingName:(NSString *)encoding separators:(const char *)separators
 {
-	return [self initWithBytes:bytes length:length encoding:encoding separators:separators source:nil];
+	return [self initWithBytes:bytes length:length encodingName:encoding separators:separators source:nil];
 }
 
 -(id)initWithBytes:(const char *)bytes length:(int)length
 separators:(const char *)separators source:(XADStringSource *)stringsource
 {
-	return [self initWithBytes:bytes length:length encoding:0 separators:separators source:stringsource];
+	return [self initWithBytes:bytes length:length encodingName:nil separators:separators source:stringsource];
 }
 
--(id)initWithBytes:(const char *)bytes length:(int)length encoding:(NSStringEncoding)encoding
+-(id)initWithBytes:(const char *)bytes length:(int)length encodingName:(NSString *)encoding
 separators:(const char *)separators source:(XADStringSource *)stringsource
 {
 	if(self=[super init])
 	{
 		NSMutableArray *array=[NSMutableArray array];
+
+		source=nil;
 
 		if(length>0)
 		{
@@ -87,15 +117,24 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 
 				if(encoding)
 				{
-					NSString *string=[[[NSString alloc] initWithData:data encoding:encoding] autorelease];
-					[array addObject:[[[XADString alloc] initWithString:string] autorelease]];
+					XADString *string=[[[XADString alloc] initWithData:data encodingName:encoding] autorelease];
+					[array addObject:string];
 				}
-				else [array addObject:[[[XADString alloc] initWithData:data source:stringsource] autorelease]];
+				else
+				{
+					XADString *string=[[[XADString alloc] initWithData:data source:stringsource] autorelease];
+					[array addObject:string];
+
+					if(!source)
+					{
+						if([string source]) source=[stringsource retain];
+					}
+				}
 			}
 		}
 
+		StripDotPaths(array);
 		components=[array copy];
-		source=[stringsource retain];
 	}
 	return self;
 }
@@ -107,37 +146,33 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 	[super dealloc];
 }
 
--(void)_updateStringSourceWithString:(XADString *)string
+
+
+
+-(XADString *)lastPathComponent
 {
-	XADStringSource *othersource=[string source];
-	if(source)
-	{
-		if(othersource&&othersource!=source)
-		[NSException raise:@"XADPathSourceMismatchException" format:@"Attempted to use XADStrings with different string sources in XADPath"];
-	}
-	else source=[othersource retain];
+	if([components count]) return [components lastObject];
+	else return [XADString XADStringWithString:@""];
 }
 
-
-
-// TODO: check for short paths for the following four?
-
--(XADString *)lastPathComponent { return [components lastObject]; }
-
--(XADString *)firstPathComponent { return [components objectAtIndex:0]; }
+-(XADString *)firstPathComponent
+{
+	if([components count]) return [components objectAtIndex:0];
+	else return [XADString XADStringWithString:@""];
+}
 
 -(XADPath *)pathByDeletingLastPathComponent
 {
-	return [[[XADPath alloc] initWithComponents:
-	[components subarrayWithRange:NSMakeRange(0,[components count]-1)]]
-	autorelease];
+	int count=[components count];
+	if(count) return [[[XADPath alloc] initWithComponents:[components subarrayWithRange:NSMakeRange(0,count-1)]] autorelease];
+	else return [[XADPath new] autorelease];
 }
 
 -(XADPath *)pathByDeletingFirstPathComponent
 {
-	return [[[XADPath alloc] initWithComponents:
-	[components subarrayWithRange:NSMakeRange(1,[components count]-1)]]
-	autorelease];
+	int count=[components count];
+	if(count) return [[[XADPath alloc] initWithComponents:[components subarrayWithRange:NSMakeRange(1,count-1)]] autorelease];
+	else return [[XADPath new] autorelease];
 }
 
 -(XADPath *)pathByAppendingPathComponent:(XADString *)component
@@ -152,29 +187,20 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 
 -(XADPath *)safePath
 {
-	NSMutableArray *safecomponents=[NSMutableArray arrayWithArray:components];
+	int count=[components count];
+	int first=0;
 
-	// Drop . anywhere in the path
-	for(int i=0;i<[safecomponents count];)
+	// Drop slashes and .. at the start of the path
+	while(first<count)
 	{
-		XADString *comp=[safecomponents objectAtIndex:i];
-		if([comp isEqual:@"."]) [safecomponents removeObjectAtIndex:i];
-		else i++;
+		NSString *component=[components objectAtIndex:first];
+		if(![component isEqual:@".."]&&![component isEqual:@"/"]) break;
 	}
 
-	// Drop all .. that can be dropped
-	for(int i=1;i<[safecomponents count];)
-	{
-		XADString *comp1=[safecomponents objectAtIndex:i-1];
-		XADString *comp2=[safecomponents objectAtIndex:i];
-		if(![comp1 isEqual:@".."]&&[comp2 isEqual:@".."])
-		{
-			[safecomponents removeObjectAtIndex:i];
-			[safecomponents removeObjectAtIndex:i-1];
-			if(i>1) i--;
-		}
-		else i++;
-	}
+	if(first==0) return self;
+	else return [[[XADPath alloc] initWithComponents:[components subarrayWithRange:NSMakeRange(first,count-first)]] autorelease];
+
+/*	NSMutableArray *safecomponents=[NSMutableArray arrayWithArray:components];
 
 	// Drop slashes and .. at the start of the path
 	while([safecomponents count])
@@ -184,7 +210,7 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 		else break;
 	}
 
-	return [[[XADPath alloc] initWithComponents:safecomponents] autorelease];
+	return [[[XADPath alloc] initWithComponents:safecomponents] autorelease];*/
 }
 
 
@@ -213,23 +239,24 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 
 -(NSString *)string
 {
-	return [self stringWithEncoding:[source encoding]];
+	return [self stringWithEncodingName:[source encodingName]];
 }
 
--(NSString *)stringWithEncoding:(NSStringEncoding)encoding
+-(NSString *)stringWithEncodingName:(NSString *)encoding
 {
 	NSMutableString *string=[NSMutableString string];
 
 	int count=[components count];
-	int i=0;
+	if(count==0) return @".";
 
+	int i=0;
 	if(count>1&&[[components objectAtIndex:0] isEqual:@"/"]) i++;
 
 	for(;i<count;i++)
 	{
 		if(i!=0) [string appendString:@"/"];
 
-		NSString *compstring=[[components objectAtIndex:i] stringWithEncoding:encoding];
+		NSString *compstring=[[components objectAtIndex:i] stringWithEncodingName:encoding];
 
 		if([compstring rangeOfString:@"/"].location==NSNotFound) [string appendString:compstring];
 		else
@@ -263,6 +290,11 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 	return data;
 }
 
+-(int)depth
+{
+	return [components count];
+}
+
 
 
 -(BOOL)encodingIsKnown
@@ -272,10 +304,10 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 	return NO;
 }
 
--(NSStringEncoding)encoding
+-(NSString *)encodingName
 {
-	if(!source) return NSUTF8StringEncoding; // TODO: what should this really return?
-	return [source encoding];
+	if(!source) return XADUTF8StringEncodingName; // TODO: what should this really return?
+	return [source encodingName];
 }
 
 -(float)confidence
@@ -296,7 +328,11 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 	return [self string];
 }
 
--(BOOL)isEqual:(id)other { return [other isKindOfClass:[XADPath class]]&&[components isEqual:((XADPath *)other)->components]; }
+-(BOOL)isEqual:(id)other
+{
+	if(![other isKindOfClass:[XADPath class]]) return NO;
+	return [components isEqual:((XADPath *)other)->components];
+}
 
 -(NSUInteger)hash
 {
@@ -307,4 +343,55 @@ separators:(const char *)separators source:(XADStringSource *)stringsource
 
 -(id)copyWithZone:(NSZone *)zone { return [self retain]; } // class is immutable, so just return self
 
+
+
+
+#ifdef __APPLE__
+-(NSString *)stringWithEncoding:(NSStringEncoding)encoding
+{
+	return [self stringWithEncodingName:(NSString *)CFStringConvertEncodingToIANACharSetName(
+	CFStringConvertNSStringEncodingToEncoding(encoding))];
+}
+
+-(NSStringEncoding)encoding
+{
+	if(!source) return NSUTF8StringEncoding; // TODO: what should this really return?
+	return [source encoding];
+}
+#endif
+
 @end
+
+
+
+static BOOL HasDotPaths(NSArray *array)
+{
+	if([array indexOfObject:@"."]!=NSNotFound) return YES;
+	if([array indexOfObject:@".."]!=NSNotFound) return YES;
+	return NO;
+}
+
+static void StripDotPaths(NSMutableArray *components)
+{
+	// Drop . anywhere in the path
+	for(int i=0;i<[components count];)
+	{
+		XADString *comp=[components objectAtIndex:i];
+		if([comp isEqual:@"."]) [components removeObjectAtIndex:i];
+		else i++;
+	}
+
+	// Drop all .. that can be dropped
+	for(int i=1;i<[components count];)
+	{
+		XADString *comp1=[components objectAtIndex:i-1];
+		XADString *comp2=[components objectAtIndex:i];
+		if(![comp1 isEqual:@".."]&&[comp2 isEqual:@".."])
+		{
+			[components removeObjectAtIndex:i];
+			[components removeObjectAtIndex:i-1];
+			if(i>1) i--;
+		}
+		else i++;
+	}
+}

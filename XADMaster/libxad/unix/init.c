@@ -19,13 +19,11 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "../config.h"
 #undef VERSION
-#endif
 
-#include "functions.h"
-#include "version.h"
+#include "../include/functions.h"
+#include "../include/version.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,10 +31,10 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <stdlib.h>
-#include <pthread.h>
+//#include <pthread.h>
 
 /* Lock this when you need to access globals! */
-static pthread_mutex_t GlobalMutex = PTHREAD_MUTEX_INITIALIZER;
+//static pthread_mutex_t GlobalMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static struct xadMasterBaseP *xadMasterBase = NULL;
 
@@ -196,7 +194,7 @@ struct xadMasterBase *xadOpenLibrary( xadINT32 version )
   if (XADMASTERVERSION < version)
     return NULL;
 
-  pthread_mutex_lock(&GlobalMutex);
+//  pthread_mutex_lock(&GlobalMutex);
 
   /* Allocate and init the private xadMasterBase. I've kept allocation and
    * initialisation separate, so that InitXADMasterBaseP() can eventually be
@@ -208,7 +206,7 @@ struct xadMasterBase *xadOpenLibrary( xadINT32 version )
   if ((xmb = (struct xadMasterBase *) xadMasterBase))
     xadMasterBase->xmb_Unix_AccessCount++;
 
-  pthread_mutex_unlock(&GlobalMutex);
+//  pthread_mutex_unlock(&GlobalMutex);
 
   return xmb;
 }
@@ -225,7 +223,7 @@ void xadCloseLibrary( struct xadMasterBase *xmb )
   if (xmb == NULL)
     return;
 
-  pthread_mutex_lock(&GlobalMutex);
+//  pthread_mutex_lock(&GlobalMutex);
 
   if (--xadMasterBase->xmb_Unix_AccessCount <= 0)
   {
@@ -235,5 +233,5 @@ void xadCloseLibrary( struct xadMasterBase *xmb )
     xadMasterBase = NULL;
   }
 
-  pthread_mutex_unlock(&GlobalMutex);
+//  pthread_mutex_unlock(&GlobalMutex);
 }

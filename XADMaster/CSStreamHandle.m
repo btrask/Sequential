@@ -173,5 +173,10 @@
 
 -(void)setStreamLength:(off_t)length { streamlength=length; }
 
+-(void)setInputBuffer:(CSInputBuffer *)inputbuffer
+{
+	CSInputBufferFree(input);
+	input=inputbuffer;
+}
 
 @end

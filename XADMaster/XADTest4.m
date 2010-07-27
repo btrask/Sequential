@@ -1,4 +1,4 @@
-#import <XADMaster/XADArchiveParser.h>
+#import "XADArchiveParser.h"
 
 @interface ArchiveTester:NSObject
 {
@@ -28,8 +28,6 @@
 
 -(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
 {
-	NSAutoreleasePool *pool=[NSAutoreleasePool new];
-
 	NSNumber *dir=[dict objectForKey:XADIsDirectoryKey];
 	NSNumber *link=[dict objectForKey:XADIsLinkKey];
 	CSHandle *fh=nil;
@@ -69,8 +67,6 @@
 		[parser parse];
 		[tester done:parser];
 	}
-
-	[pool release];
 }
 
 -(BOOL)archiveParsingShouldStop:(XADArchiveParser *)parser

@@ -48,6 +48,8 @@ NSString *CSNotSupportedException=@"CSNotSupportedException";
 	[super dealloc];
 }
 
+-(void)close {}
+
 
 
 //-(off_t)fileSize { [self _raiseNotImplemented:_cmd]; return 0; }

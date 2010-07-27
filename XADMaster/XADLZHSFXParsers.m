@@ -1,5 +1,6 @@
 #import "XADLZHSFXParsers.h"
 #import "XADXORHandle.h"
+#import "Scanning.h"
 
 @implementation XADLZHAmigaSFXParser
 
@@ -12,7 +13,7 @@
 
 	if(length<48) return NO;
 
-	return CSUInt32BE(bytes+11*4)==0x53465821;
+	return CSUInt32BE(&bytes[11*4])==0x53465821;
 }
 
 -(void)parse
@@ -100,20 +101,16 @@
 	return NO;
 }
 
+static int MatchLZHSignature(const uint8_t *bytes,int available,off_t offset,void *state)
+{
+	if(available<5) return NO;
+	return bytes[0]=='-'&&bytes[1]=='l'&&(bytes[2]=='h'||bytes[2]=='z')&&bytes[4]=='-';
+}
+
 -(void)parse
 {
-	CSHandle *fh=[self handle];
-
-	uint8_t buf[5];
-	[fh readBytes:sizeof(buf) toBuffer:buf];	
-
-	while(buf[0]!='-'||buf[1]!='l'||(buf[2]!='h'&&buf[2]!='z')||buf[4]!='-')
-	{
-		memmove(buf,buf+1,sizeof(buf)-1);
-		buf[sizeof(buf)-1]=[fh readUInt8];
-	}
-
-	[fh skipBytes:-sizeof(buf)];
+	if(![[self handle] scanUsingMatchingFunction:MatchLZHSignature maximumLength:3])
+	[XADException raiseUnknownException];
 
 	[super parse];
 }

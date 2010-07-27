@@ -49,6 +49,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 		currhandle=nil;
 		queuedditto=nil;
 		dittostack=[[NSMutableArray array] retain];
+		kludgedata=nil;
 	}
 	return self;
 }
@@ -65,12 +66,12 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	[self parseWithSeparateMacForks];
 
 	// If we have a queued ditto fork left over, get rid of it as it isn't a directory.
-	if(queuedditto) [self addQueuedDittoDictionaryAsDirectory:NO];
+	if(queuedditto) [self addQueuedDittoDictionaryAsDirectory:NO retainPosition:NO];
 }
 
 -(void)parseWithSeparateMacForks {}
 
--(void)addEntryWithDictionary:(NSMutableDictionary *)dict retainPosition:(BOOL)retainpos
+-(void)addEntryWithDictionary:(NSMutableDictionary *)dict retainPosition:(BOOL)retainpos cyclePools:(BOOL)cyclepools
 {
 	if(retainpos) [XADException raiseNotSupportedException];
 
@@ -81,7 +82,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 		NSNumber *isbin=[dict objectForKey:XADIsMacBinaryKey];
 		if(isbin&&[isbin boolValue]) [dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsArchiveKey];
 
-		[super addEntryWithDictionary:dict retainPosition:retainpos];
+		[super addEntryWithDictionary:dict retainPosition:retainpos cyclePools:cyclepools];
 		return;
 	}
 
@@ -103,44 +104,40 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 		if(queuedditto)
 		{
 			BOOL match=[[queuedditto objectForKey:XADFileNameKey] isEqual:name];
-			[self addQueuedDittoDictionaryAsDirectory:match];
+			[self addQueuedDittoDictionaryAsDirectory:match retainPosition:retainpos];
 		}
 
-		[super addEntryWithDictionary:dict retainPosition:retainpos];
+		[super addEntryWithDictionary:dict retainPosition:retainpos cyclePools:cyclepools];
 		return;
 	}
 
 	// If we have a queued ditto fork, get rid of it as it isn't a directory.
-	if(queuedditto) [self addQueuedDittoDictionaryAsDirectory:NO];
-
-	// Check if the file is a ditto fork
-	if([self parseAppleDoubleWithDictionary:dict name:name]) return;
+	if(queuedditto) [self addQueuedDittoDictionaryAsDirectory:NO retainPosition:retainpos];
 
 	// Check for MacBinary files
-	if([self parseMacBinaryWithDictionary:dict name:name]) return;
+	if([self parseMacBinaryWithDictionary:dict name:name retainPosition:retainpos cyclePools:cyclepools]) return;
+
+	// Check if the file is a ditto fork
+	if([self parseAppleDoubleWithDictionary:dict name:name retainPosition:retainpos cyclePools:cyclepools]) return;
 
 	// Nothing else worked, it's a normal file
-	[super addEntryWithDictionary:dict retainPosition:retainpos];
+	[super addEntryWithDictionary:dict retainPosition:retainpos cyclePools:cyclepools];
 }
 
 
 
--(BOOL)parseAppleDoubleWithDictionary:(NSMutableDictionary *)dict name:(XADPath *)name
-{
-//	dittoregex=[[XADRegex alloc] initWithPattern:@"(^__MACOSX/|\\./|^)((.*/)\\._|\\._)([^/]+)$" options:0];
 
+-(BOOL)parseAppleDoubleWithDictionary:(NSMutableDictionary *)dict name:(XADPath *)name
+retainPosition:(BOOL)retainpos cyclePools:(BOOL)cyclepools
+{
 	XADString *first=[name firstPathComponent];
 	XADString *last=[name lastPathComponent];
 	XADPath *basepath=[name pathByDeletingLastPathComponent];
 
 	if(![last hasASCIIPrefix:@"._"]) return NO;
 	XADString *newlast=[last XADStringByStrippingASCIIPrefixOfLength:2];
-/*	NSString *laststring=[last string];
-	if(![laststring hasPrefix:@"._"]) return NO;
-	XADString *newlast=[self XADStringWithString:[laststring substringFromIndex:2]];
-*/
 
-	if([first isEqual:@"__MACOSX"]||[first isEqual:@"."]) basepath=[basepath pathByDeletingFirstPathComponent];
+	if([first isEqual:@"__MACOSX"]) basepath=[basepath pathByDeletingFirstPathComponent];
 
 	XADPath *origname=[basepath pathByAppendingPathComponent:newlast];
 
@@ -148,38 +145,71 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	uint32_t finderoffs=0,finderlen=0;
 	CSHandle *fh=[self rawHandleForEntryWithDictionary:dict wantChecksum:YES];
 
+	if([[self handle] isKindOfClass:[CSStreamHandle class]])
+	{
+		// If this a stream, we need to avoid seeks, so buffer read data.
+		kludgedata=[NSMutableData data];
+	}
+	else kludgedata=nil;
+
 	@try
 	{
-		if([fh readUInt32BE]!=0x00051607) return NO;
-		if([fh readUInt32BE]!=0x00020000) return NO;
-		[fh skipBytes:16];
-		int num=[fh readUInt16BE];
-
-		for(int i=0;i<num;i++)
+		NSData *headdata=[fh readDataOfLengthAtMost:26];
+		[kludgedata appendData:headdata];
+		if([headdata length]==26)
 		{
-			uint32_t entryid=[fh readUInt32BE];
-			uint32_t entryoffs=[fh readUInt32BE];
-			uint32_t entrylen=[fh readUInt32BE];
-
-			switch(entryid)
+			const uint8_t *headbytes=[headdata bytes];
+			if(CSUInt32BE(&headbytes[0])==0x00051607
+			&&CSUInt32BE(&headbytes[4])==0x00020000)
 			{
-				case 2: // resource fork
-					rsrcoffs=entryoffs;
-					rsrclen=entrylen;
-				break;
-				case 9: // finder
-					finderoffs=entryoffs;
-					finderlen=entrylen;
-				break;
+				int num=CSUInt16BE(&headbytes[24]);
+
+				NSData *listdata=[fh readDataOfLengthAtMost:num*12];
+				[kludgedata appendData:listdata];
+				if([listdata length]==num*12)
+				{
+					const uint8_t *listbytes=[listdata bytes];
+					for(int i=0;i<num;i++)
+					{
+						uint32_t entryid=CSUInt32BE(&listbytes[12*i+0]);
+						uint32_t entryoffs=CSUInt32BE(&listbytes[12*i+4]);
+						uint32_t entrylen=CSUInt32BE(&listbytes[12*i+8]);
+
+						switch(entryid)
+						{
+							case 2: // resource fork
+								rsrcoffs=entryoffs;
+								rsrclen=entrylen;
+							break;
+							case 9: // finder
+								finderoffs=entryoffs;
+								finderlen=entrylen;
+							break;
+						}
+					}
+				}
 			}
 		}
 	}
-	@catch(id e)
+	@catch(id e) {}
+
+	if(!rsrcoffs&&!finderoffs)
 	{
-		return NO;
+		// For one reason or other, we failed to parse this as an AppleDouble file.
+		// If we cached the header data, handle this file even though it is not an
+		// AppleDouble file. Otherwise, return failure.
+		if(kludgedata)
+		{
+			currhandle=fh;
+			[super addEntryWithDictionary:dict retainPosition:retainpos cyclePools:cyclepools];
+			currhandle=nil;
+			kludgedata=nil;
+			return YES;
+		}
+		else return NO;
 	}
 
-	if(!rsrcoffs) return NO;
+	kludgedata=nil;
 
 	NSMutableDictionary *newdict=[NSMutableDictionary dictionaryWithDictionary:dict];
 
@@ -212,7 +242,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	{
 		currhandle=fh;
 		[self inspectEntryDictionary:newdict];
-		[super addEntryWithDictionary:newdict retainPosition:NO];
+		[super addEntryWithDictionary:newdict retainPosition:retainpos cyclePools:cyclepools];
 		currhandle=nil;
 	}
 	else
@@ -240,11 +270,11 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	queuedditto=[dict retain];
 }
 
--(void)addQueuedDittoDictionaryAsDirectory:(BOOL)isdir
+-(void)addQueuedDittoDictionaryAsDirectory:(BOOL)isdir retainPosition:(BOOL)retainpos
 {
 	if(isdir) [queuedditto setObject:[NSNumber numberWithBool:YES] forKey:XADIsDirectoryKey];
 	[self inspectEntryDictionary:queuedditto];
-	[super addEntryWithDictionary:queuedditto retainPosition:NO];
+	[super addEntryWithDictionary:queuedditto retainPosition:retainpos cyclePools:NO];
 	[queuedditto release];
 	queuedditto=nil;
 }
@@ -252,6 +282,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 
 
 -(BOOL)parseMacBinaryWithDictionary:(NSMutableDictionary *)dict name:(XADPath *)name
+retainPosition:(BOOL)retainpos cyclePools:(BOOL)cyclepools
 {
 	NSNumber *isbinobj=[dict objectForKey:XADIsMacBinaryKey];
 	BOOL isbin=isbinobj?[isbinobj boolValue]:NO;
@@ -259,17 +290,19 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 	NSNumber *checkobj=[dict objectForKey:XADMightBeMacBinaryKey];
 	BOOL check=checkobj?[checkobj boolValue]:NO;
 
+	// Return if this file is not known or suspected to be MacBinary.
 	if(!isbin&&!check) return NO;
+
+	// Don't bother checking files inside unseekable streams unless known to be MacBinary.
+	if(!isbin&&[[self handle] isKindOfClass:[CSStreamHandle class]]) return NO;
 
 	CSHandle *fh=[self rawHandleForEntryWithDictionary:dict wantChecksum:YES];
 
 	NSData *header=[fh readDataOfLengthAtMost:128];
 	if([header length]!=128) return NO;
 
-	if(!isbin)
-	{
-		if([XADMacArchiveParser macBinaryVersionForHeader:header]==0) return NO;
-	}
+	// Check the file if it is not known to be MacBinary.
+	if(!isbin&&[XADMacArchiveParser macBinaryVersionForHeader:header]==0) return NO;
 
 	// TODO: should this be turned on or not? probably not.
 	//[self setIsMacArchive:YES];
@@ -312,7 +345,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 		[newdict setObject:[NSNumber numberWithUnsignedInt:BlockSize(datasize)] forKey:XADCompressedSizeKey];
 
 		[self inspectEntryDictionary:newdict];
-		[super addEntryWithDictionary:newdict retainPosition:NO];
+		[super addEntryWithDictionary:newdict retainPosition:retainpos cyclePools:cyclepools&&!rsrcsize];
 	}
 
 	if(rsrcsize)
@@ -325,7 +358,7 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 		[newdict setObject:[NSNumber numberWithBool:YES] forKey:XADIsResourceForkKey];
 
 		[self inspectEntryDictionary:newdict];
-		[super addEntryWithDictionary:newdict retainPosition:NO];
+		[super addEntryWithDictionary:newdict retainPosition:retainpos cyclePools:cyclepools];
 	}
 
 	currhandle=nil;
@@ -351,6 +384,10 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 
 		return [handle nonCopiedSubHandleFrom:offset length:length];
 	}
+	else if(kludgedata)
+	{
+		return [[[XADKludgeHandle alloc] initWithHeaderData:kludgedata handle:currhandle] autorelease];
+	}
 
 	return [self rawHandleForEntryWithDictionary:dict wantChecksum:checksum];
 }
@@ -364,6 +401,59 @@ NSString *XADDisableMacForkExpansionKey=@"XADDisableMacForkExpansionKey";
 
 -(void)inspectEntryDictionary:(NSMutableDictionary *)dict
 {
+}
+
+@end
+
+
+
+
+@implementation XADKludgeHandle
+
+// A handle that provides a buffer of the first part of a stream, to avoid a reverse seek.
+// handle is a handle that has had a few bytes read from the beginning.
+// headerdata is those bytes.
+
+-(id)initWithHeaderData:(NSData *)headerdata handle:(CSHandle *)handle
+{
+	if(self=[super initWithName:[handle name] length:[handle fileSize]])
+	{
+		parent=[handle retain];
+		header=[headerdata retain];
+	}
+	return self;
+}
+
+-(void)dealloc
+{
+	[parent release];
+	[header release];
+	[super dealloc];
+}
+
+-(void)resetStream
+{
+	[parent seekToFileOffset:[header length]];
+}
+
+-(int)streamAtMost:(int)num toBuffer:(void *)buffer
+{
+	uint8_t *bytebuf=buffer;
+	int copiedbytes=0;
+
+	int length=[header length];
+	if(streampos<length)
+	{
+		if(num+streampos>length) copiedbytes=length-streampos;
+		else copiedbytes=num;
+
+		const uint8_t *headbytebuf=[header bytes];
+		memcpy(bytebuf,&headbytebuf[streampos],copiedbytes);
+
+		if(copiedbytes==num) return num;
+	}
+
+	return [parent readAtMost:num-copiedbytes toBuffer:&bytebuf[copiedbytes]]+copiedbytes;
 }
 
 @end

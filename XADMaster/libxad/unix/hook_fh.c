@@ -23,7 +23,7 @@
 */
 
 
-#include "functions.h"
+#include "../include/functions.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -262,8 +262,13 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
 
             if(!ret)
             {
+              #ifndef __MINGW32__
               if(mkdir(buf, S_IRWXU) == -1)
                 ret = XADERR_MAKEDIR;
+              #else
+              if(mkdir(buf) == -1)
+                ret = XADERR_MAKEDIR;
+              #endif
             }
           }
           buf[i] = name[i];
@@ -274,7 +279,7 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
     }
     else
       ret = XADERR_NOMEMORY;
-    if(!ret && ((ai->xaip_OutFileHandle = open(name, O_WRONLY|O_CREAT)) == -1))
+    if(!ret && ((ai->xaip_OutFileHandle = open(name, O_WRONLY|O_CREAT, S_IRWXU)) == -1))
       ret = XADERR_OPENFILE;
   }
 

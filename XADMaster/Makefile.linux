@@ -1,0 +1,351 @@
+# Lets roll our own makefile, with blackjack and hookers [because GNUSteps sucks.
+
+
+
+# Compilers and linkers
+
+OBJCC = gcc
+CC = gcc
+CPP = g++
+LD = gcc
+AR = ar
+
+
+
+# Options for compilation
+
+GNUSTEP_OPTS =	-DGNUSTEP \
+		-DGNU_RUNTIME=1 \
+		-D_NATIVE_OBJC_EXCEPTIONS \
+		-fgnu-runtime \
+		-fexceptions \
+		-fobjc-exceptions \
+		-fconstant-string-class=NSConstantString
+
+GCC_OPTS = 	-c \
+		-O2 \
+		-Wno-import \
+		-Wno-multichar \
+		-g \
+		-D_FILE_OFFSET_BITS=64 \
+		-isystem /usr/include/GNUstep
+
+OBJC_OPTS =	-std=gnu99
+
+C_OPTS =	-std=gnu99
+
+CXX_OPTS =
+
+OBJCFLAGS = $(OBJC_OPTS) $(GCC_OPTS) $(GNUSTEP_OPTS)
+CFLAGS = $(C_OPTS) $(GCC_OPTS)
+CXXFLAGS = $(CXX_OPTS) $(GCC_OPTS)
+
+
+
+# Options for linking
+
+LIBS =	-Wl,--no-whole-archive \
+	-lgnustep-base \
+	-lcrypto \
+	-lbz2 \
+	-licuuc \
+	-lobjc \
+	-lstdc++ \
+	-lm
+
+LDFLAGS =	-Wl,--whole-archive \
+		-fexceptions \
+		-fgnu-runtime
+
+
+
+# Files for compilation
+
+LIBRARY_OBJC_FILES =	CarrylessRangeCoder.m \
+			Checksums.m \
+			CRC.m \
+			CSBlockStreamHandle.m \
+			CSByteStreamHandle.m \
+			CSBzip2Handle.m \
+			CSFileHandle.m \
+			CSHandle.m \
+			CSHexDump.m \
+			CSInputBuffer.m \
+			CSMemoryHandle.m \
+			CSMultiHandle.m \
+			CSStreamHandle.m \
+			CSSubHandle.m \
+			CSZlibHandle.m \
+			NSDateXAD.m \
+			NumberParsing.m \
+			PPMdContext.m \
+			PPMdSubAllocatorBrimstone.m \
+			PPMdSubAllocatorVariantG.m \
+			PPMdSubAllocatorVariantH.m \
+			PPMdSubAllocatorVariantI.m \
+			PPMdVariantG.m \
+			PPMdVariantH.m \
+			PPMdVariantI.m \
+			Progress.m \
+			StuffItXUtilities.m \
+			XAD7ZipBCJ2Handle.m \
+			XAD7ZipBranchHandles.m \
+			XAD7ZipParser.m \
+			XADALZipParser.m \
+			XADArchiveParser.m \
+			XADARJFastestHandle.m \
+			XADARJParser.m \
+			XADBinHexParser.m \
+			XADBlockHandle.m \
+			XADBzip2Parser.m \
+			XADCABBlockHandle.m \
+			XADCABBlockReader.m \
+			XADCABParser.m \
+			XADCFBFParser.m \
+			XADChecksumHandle.m \
+			XADCompactProLZHHandle.m \
+			XADCompactProParser.m \
+			XADCompactProRLEHandle.m \
+			XADCompressHandle.m \
+			XADCompressParser.m \
+			XADCpioParser.m \
+			XADCRCHandle.m \
+			XADCRCSuffixHandle.m \
+			XADDeflateHandle.m \
+			XADDeltaHandle.m \
+			XADDigestHandle.m \
+			XADDiskDoublerADnHandle.m \
+			XADDiskDoublerDDnHandle.m \
+			XADDiskDoublerParser.m \
+			XADException.m \
+			XADFastLZSSHandle.m \
+			XADGzipParser.m \
+			XADLArcHandles.m \
+			XADLibXADIOHandle.m \
+			XADLibXADParser.m \
+			XADLZHDynamicHandle.m \
+			XADLZHOldHandles.m \
+			XADLZHParser.m \
+			XADLZHSFXParsers.m \
+			XADLZHStaticHandle.m \
+			XADLZMA2Handle.m \
+			XADLZMAAloneParser.m \
+			XADLZMAHandle.m \
+			XADLZSSHandle.m \
+			XADLZXHandle.m \
+			XADLZXParser.m \
+			XADMacArchiveParser.m \
+			XADMacBinaryParser.m \
+			XADMSLZXHandle.m \
+			XADMSZipHandle.m \
+			XADNDSParser.m \
+			XADNowCompressParser.m \
+			XADNSAParser.m \
+			XADNSISBzip2Handle.m \
+			XADNSISParser.m \
+			XADPackItParser.m \
+			XADPath.m \
+			XADPowerPackerParser.m \
+			XADPPMdHandles.m \
+			XADPPMdParser.m \
+			XADPrefixCode.m \
+			XADQuantumHandle.m \
+			XADRARAESHandle.m \
+			XADRAR13CryptHandle.m \
+			XADRAR15CryptHandle.m \
+			XADRAR15Handle.m \
+			XADRAR20CryptHandle.m \
+			XADRAR20Handle.m \
+			XADRAR30Handle.m \
+			XADRAR30Filter.m \
+			XADRARParser.m \
+			XADRARVirtualMachine.m \
+			XADRC4Handle.m \
+			XADRegex.m \
+			XADRPMParser.m \
+			XADSARParser.m \
+			XADSkipHandle.m \
+			XADSplitFileParser.m \
+			XADString.m \
+			XADStringICU.m \
+			XADStuffIt13Handle.m \
+			XADStuffIt5Parser.m \
+			XADStuffItArsenicHandle.m \
+			XADStuffItHuffmanHandle.m \
+			XADStuffItOldHandles.m \
+			XADStuffItParser.m \
+			XADStuffItRLEHandle.m \
+			XADStuffItXBlendHandle.m \
+			XADStuffItXBlockHandle.m \
+			XADStuffItXCyanideHandle.m \
+			XADStuffItXDarkhorseHandle.m \
+			XADStuffItXEnglishHandle.m \
+			XADStuffItXIronHandle.m \
+			XADStuffItXParser.m \
+			XADTarParser.m \
+			XADTarSparseHandle.m \
+			XADUnarchiver.m \
+			XADUnarchiverLinux.m \
+			XADWinZipAESHandle.m \
+			XADXARParser.m \
+			XADXORHandle.m \
+			XADXZHandle.m \
+			XADXZParser.m \
+			XADZipCryptHandle.m \
+			XADZipImplodeHandle.m \
+			XADZipParser.m \
+			XADZipSFXParsers.m \
+			XADZipShrinkHandle.m \
+
+LIBRARY_C_FILES =	BWT.c \
+			LZSS.c \
+			LZW.c \
+			StuffItXEnglishDictionary.c \
+			RARAudioDecoder.c \
+			RARBug.c \
+			RARVirtualMachine.c \
+			libxad/all.c \
+			libxad/clients.c \
+			libxad/unix/emulation.c \
+			libxad/unix/init.c \
+			lzma/LzmaDec.c \
+			lzma/BraIA64.c \
+			lzma/Bra86.c \
+			lzma/Bra.c \
+			lzma/Lzma2Dec.c \
+
+LIBRARY_CXX_FILES =		
+
+XADTEST2_FILES =	XADTest2.m
+
+XADTEST3_FILES =	XADTest3.m
+
+XADTEST4_FILES =	XADTest4.m
+
+UNAR_FILES =		unar.m
+
+LSAR_FILES =		lsar.m \
+			CSJSONPrinter.m
+
+CMDLINE_FILES =		CSCommandLineParser.m \
+			CommandLineCommon.m \
+			NSStringPrinting.m
+
+ALL_OBJC_FILES =	$(LIBRARY_OBJC_FILES) \
+			$(XADTEST2_FILES) \
+			$(XADTEST3_FILES) \
+			$(XADTEST4_FILES) \
+			$(UNAR_FILES) \
+			$(LSAR_FILES) \
+			$(CMDLINE_FILES)
+
+ALL_C_FILES = 		$(LIBRARY_C_FILES)
+
+ALL_CXX_FILES = 	$(LIBRARY_CXX_FILES)
+
+
+
+
+LIBRARY_OBJC_OBJS =	$(LIBRARY_OBJC_FILES:.m=.o)
+
+LIBRARY_C_OBJS =	$(LIBRARY_C_FILES:.c=.o)
+
+LIBRARY_CXX_OBJS =	$(LIBRARY_CXX_FILES:.cpp=.o)
+
+LIBRARY_OBJS =		$(LIBRARY_OBJC_OBJS) \
+			$(LIBRARY_C_OBJS) \
+			$(LIBRARY_CXX_OBJS)
+
+XADTEST2_OBJS =		$(XADTEST2_FILES:.m=.o)
+
+XADTEST3_OBJS =		$(XADTEST3_FILES:.m=.o)
+
+XADTEST4_OBJS =		$(XADTEST4_FILES:.m=.o)
+
+UNAR_OBJS =		$(UNAR_FILES:.m=.o)
+
+LSAR_OBJS =		$(LSAR_FILES:.m=.o)
+
+CMDLINE_OBJS=		$(CMDLINE_FILES:.m=.o)
+
+ALL_OBJS = 		$(LIBRARY_OBJS) \
+			$(XADTEST2_OBJS) \
+			$(XADTEST3_OBJS) \
+			$(XADTEST4_OBJS) \
+			$(UNAR_OBJS) \
+			$(LSAR_OBJS) \
+			$(CMDLINE_OBJS)
+
+
+
+
+EXECUTABLE_FILES =	XADTest2 \
+			XADTest3 \
+			XADTest4 \
+			unar \
+			lsar
+
+LIBRARY_FILES = 	libXADMaster.a
+
+
+
+# Suffix rules
+
+.SUFFIXES: .o .m .c
+
+.m.o:
+	$(OBJCC) $(OBJCFLAGS) $< -o $@	
+
+.c.o:
+	$(CC) $(CFLAGS) $< -o $@
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) $< -o $@
+
+
+
+
+# Compilation rules
+
+all: unar lsar XADTest2 XADTest3 XADTest4
+
+libXADMaster.a: $(LIBRARY_OBJS)
+	rm -f $@
+	$(AR) rcs $@ $^
+
+../UniversalDetector/libUniversalDetector.a:
+	make -C ../UniversalDetector -f Makefile.linux
+
+XADTest2: $(XADTEST2_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+XADTest3: $(XADTEST3_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+XADTest4: $(XADTEST4_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+unar: $(UNAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+lsar: $(LSAR_OBJS) $(CMDLINE_OBJS) libXADMaster.a ../UniversalDetector/libUniversalDetector.a
+	$(LD) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+clean:
+	rm -f 	$(ALL_OBJS) \
+		$(EXECUTABLE_FILES) \
+		$(LIBRARY_FILES) \
+		*~ \
+		lzma/*~ \
+		unrar/*~
+	make -C ../UniversalDetector -f Makefile.linux clean
+
+depend:
+	$(OBJCC) -MM $(OBJCFLAGS) $(ALL_OBJC_FILES) >Makefile.dependtmp
+	$(CC) -MM $(CFLAGS) $(ALL_C_FILES) >>Makefile.dependtmp
+	#$(CXX) -MM $(CXXFLAGS) $(ALL_CXX_FILES) >>Makefile.dependtmp
+	sed 's/.*: *\([^ ]*\)\.\([^ ]*\)/\1.o: \1.\2/g' <Makefile.dependtmp >Makefile.depend
+	rm Makefile.dependtmp
+
+include Makefile.depend
+

@@ -26,7 +26,7 @@
 PackDev has empty labels always. */
 
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 #include "xadXPK.c"
 
 #ifndef XADMASTERVERSION

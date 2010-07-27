@@ -1,8 +1,9 @@
 #include "WrappedUniversalDetector.h"
 
-#include "nscore.h"
-#include "nsUniversalDetector.h"
-#include "nsCharSetProber.h"
+#include "universalchardet/nscore.h"
+#include "universalchardet/nsUniversalDetector.h"
+#include "universalchardet/nsCharSetProber.h"
+
 
 class wrappedUniversalDetector:public nsUniversalDetector
 {

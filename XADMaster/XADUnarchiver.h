@@ -1,33 +1,87 @@
 #import <Foundation/Foundation.h>
 
-#import "XADArchive.h"
+#import "XADArchiveParser.h"
 
+#define XADIgnoredForkStyle 0
+#define XADMacOSXForkStyle 1
+#define XADHiddenAppleDoubleForkStyle 2
+#define XADVisibleAppleDoubleForkStyle 3
+
+#ifdef __APPLE__
+#define XADDefaultForkStyle XADMacOSXForkStyle
+#else
+#define XADDefaultForkStyle XADVisibleAppleDoubleForkStyle
+#endif
 
 @interface XADUnarchiver:NSObject
 {
-	XADArchive *archive;
-	NSString *dest;
+	XADArchiveParser *parser;
+	NSString *destination;
+	int forkstyle;
+	BOOL preservepermissions;
+	double updateinterval;
+
+	id delegate;
+
+	NSMutableArray *deferreddirectories;
 }
 
-+(XADUnarchiver *)unarchiverForArchive:(XADArchive *)archive;
-+(XADUnarchiver *)unarchiverForFilename:(NSString *)filename;
++(XADUnarchiver *)unarchiverForArchiveParser:(XADArchiveParser *)archiveparser;
++(XADUnarchiver *)unarchiverForPath:(NSString *)path;
 
--(id)initWithArchive:(XADArchive *)archive;
+-(id)initWithArchiveParser:(XADArchiveParser *)archiveparser;
 -(void)dealloc;
 
+-(XADArchiveParser *)archiveParser;
+
 -(id)delegate;
--(void)setDelegate:(id)delegate;
+-(void)setDelegate:(id)newdelegate;
+
+//-(NSString *)password;
+//-(void)setPassword:(NSString *)password;
+
+//-(NSStringEncoding)encoding;
+//-(void)setEncoding:(NSStringEncoding)encoding;
 
 -(NSString *)destination;
--(void)setDestination:(NSString *)destination;
+-(void)setDestination:(NSString *)destpath;
 
--(NSString *)password;
--(void)setPassword:(NSString *)password;
+-(int)macResourceForkStyle;
+-(void)setMacResourceForkStyle:(int)style;
 
--(NSStringEncoding)encoding;
--(void)setEncoding:(NSStringEncoding)encoding;
+-(BOOL)preservesPermissions;
+-(void)setPreserevesPermissions:(BOOL)preserveflag;
 
--(void)unarchive;
+-(double)updateInterval;
+-(void)setUpdateInterval:(double)interval;
+
+-(XADError)parseAndUnarchive;
+
+-(XADError)extractEntryWithDictionary:(NSDictionary *)dict;
+-(XADError)extractEntryWithDictionary:(NSDictionary *)dict forceDirectories:(BOOL)force;
+-(XADError)extractEntryWithDictionary:(NSDictionary *)dict as:(NSString *)path;
+-(XADError)extractEntryWithDictionary:(NSDictionary *)dict as:(NSString *)path forceDirectories:(BOOL)force;
+-(XADError)finishExtractions;
+
+-(XADError)_extractFileEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath;
+-(XADError)_extractResourceForkEntryWithDictionary:(NSDictionary *)dict asAppleDoubleFile:(NSString *)destpath;
+-(XADError)_extractDirectoryEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath;
+-(XADError)_extractLinkEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath;
+-(XADError)_extractArchiveEntryWithDictionary:(NSDictionary *)dict to:(NSString *)destpath name:(NSString *)filename;
+-(XADError)_extractEntryWithDictionary:(NSDictionary *)dict toHandle:(CSHandle *)fh;
+
+-(XADError)_updateFileAttributesAtPath:(NSString *)path forEntryWithDictionary:(NSDictionary *)dict
+deferDirectories:(BOOL)defer;
+-(XADError)_ensureDirectoryExists:(NSString *)path;
+
+@end
+
+
+@interface XADUnarchiver (PlatformSpecific)
+
+-(XADError)_extractResourceForkEntryWithDictionary:(NSDictionary *)dict asPlatformSpecificForkForFile:(NSString *)destpath;
+-(XADError)_createPlatformSpecificLinkToPath:(NSString *)link from:(NSString *)path;
+-(XADError)_updatePlatformSpecificFileAttributesAtPath:(NSString *)path forEntryWithDictionary:(NSDictionary *)dict;
 
 @end
 
@@ -35,26 +89,27 @@
 
 @interface NSObject (XADUnarchiverDelegate)
 
--(void)unarchiverNeedsPassword:(XADUnrchiver *)unarchiver;
+-(void)unarchiverNeedsPassword:(XADUnarchiver *)unarchiver;
 
--(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldStartUnarchivingEntry:(NSDictionary *)dict;
--(void)unarchiver:(XADUnarchiver *)unarchiver willStartUnarchivingEntry:(NSDictionary *)dict;
--(void)unarchiver:(XADUnarchiver *)unarchiver finishedUnarchivingEntry:(NSDictionary *)dict;
-//-(void)unarchiver:(XADUnarchiver *)unarchiver failedToUnarchiveEntry:(NSDictionary *)dict;
+-(NSString *)unarchiver:(XADUnarchiver *)unarchiver pathForExtractingEntryWithDictionary:(NSDictionary *)dict;
+-(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path;
+-(void)unarchiver:(XADUnarchiver *)unarchiver willExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path;
+-(void)unarchiver:(XADUnarchiver *)unarchiver didExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path error:(XADError)error;
 
-//-(NSStringEncoding)unarchiver:(XADUnarchiver *)unarchiver encodingForString:(XADString *)data guess:(NSStringEncoding)guess confidence:(float)confidence;
+-(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldCreateDirectory:(NSString *)directory;
 
-/*-(XADAction)archive:(XADArchive *)archive nameDecodingDidFailForEntry:(int)n data:(NSData *)data;
+-(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldExtractArchiveEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path;
+-(void)unarchiver:(XADUnarchiver *)unarchiver willExtractArchiveEntryWithDictionary:(NSDictionary *)dict withUnarchiver:(XADUnarchiver *)subunarchiver to:(NSString *)path;
+-(void)unarchiver:(XADUnarchiver *)unarchiver didExtractArchiveEntryWithDictionary:(NSDictionary *)dict withUnarchiver:(XADUnarchiver *)subunarchiver to:(NSString *)path error:(XADError)error;
 
--(BOOL)archiveExtractionShouldStop:(XADArchive *)archive;
--(BOOL)archive:(XADArchive *)archive shouldCreateDirectory:(NSString *)directory;
--(XADAction)archive:(XADArchive *)archive entry:(int)n collidesWithFile:(NSString *)file newFilename:(NSString **)newname;
--(XADAction)archive:(XADArchive *)archive entry:(int)n collidesWithDirectory:(NSString *)file newFilename:(NSString **)newname;
--(XADAction)archive:(XADArchive *)archive creatingDirectoryDidFailForEntry:(int)n;
+-(NSString *)unarchiver:(XADUnarchiver *)unarchiver linkDestinationForEntryWithDictionary:(NSDictionary *)dict from:(NSString *)path;
+//-(XADAction)unarchiver:(XADUnarchiver *)unarchiver creatingDirectoryDidFailForEntry:(int)n;
 
--(void)archiveNeedsPassword:(XADArchive *)archive;
-*/
-
--(void)unarchiver:(XADUnarchiver *)unarchiver progressReportForFile:(int)file fileProgress:(double)fileprogress totalProgress:(double)totalprogress;
+-(BOOL)extractionShouldStopForUnarchiver:(XADUnarchiver *)unarchiver;
+-(void)unarchiver:(XADUnarchiver *)unarchiver extractionProgressForEntryWithDictionary:(NSDictionary *)dict
+fileFraction:(double)fileprogress estimatedTotalFraction:(double)totalprogress;
 
 @end
+
+
+double _XADUnarchiverGetTime();

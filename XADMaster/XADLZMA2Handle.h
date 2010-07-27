@@ -4,7 +4,9 @@
 #define _LZMA_UINT32_IS_ULONG
 #endif
 
+#define Byte LzmaByte
 #import "lzma/Lzma2Dec.h"
+#undef Byte
 
 @interface XADLZMA2Handle:CSStreamHandle
 {

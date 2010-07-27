@@ -41,12 +41,30 @@
 
 -(BOOL)done { return UniversalDetectorDone(detector); }
 
+/*
+The possible return values of -[UniversalDetector MIMECharset] should be as follows:
+
+@"UTF-8",@"UTF-16BE",@"UTF-16LE",@"UTF-32BE",@"UTF-32LE",
+@"ISO-8859-2",@"ISO-8859-5",@"ISO-8859-7",@"ISO-8859-8",@"ISO-8859-8-I",
+@"windows-1250",@"windows-1251",@"windows-1252",@"windows-1253",@"windows-1255",
+@"KOI8-R",@"Shift_JIS",@"EUC-JP",@"EUC-KR"/ * actually CP949 * /, @"x-euc-tw",
+@"ISO-2022-JP",@"ISO-2022-CN",@"ISO-2022-KR",
+@"Big5",@"GB2312",@"HZ-GB-2312",@"gb18030",@"GB18030",
+@"IBM855",@"IBM866",@"TIS-620",@"X-ISO-10646-UCS-4-2143",@"X-ISO-10646-UCS-4-3412",
+@"x-mac-cyrillic",@"x-mac-hebrew",
+*/
+
 -(NSString *)MIMECharset
 {
 	if(!charset)
 	{
 		const char *cstr=UniversalDetectorCharset(detector,&confidence);
 		if(!cstr) return nil;
+
+		// nsUniversalDetector detects CP949 but returns "EUC-KR" because CP949
+		// lacks an IANA name. Kludge the name to make sure decoding succeeds.
+		if(strcmp(cstr,"EUC-KR")==0) cstr="CP949";
+
 		charset=[[NSString alloc] initWithUTF8String:cstr];
 	}
 	return charset;
@@ -58,8 +76,7 @@
 	return confidence;
 }
 
-#ifndef GNUSTEP
-
+#ifdef __APPLE__
 -(NSStringEncoding)encoding
 {
 	NSString *mimecharset=[self MIMECharset];
@@ -68,72 +85,7 @@
 	CFStringEncoding cfenc=CFStringConvertIANACharSetNameToEncoding((CFStringRef)mimecharset);
 	if(cfenc==kCFStringEncodingInvalidId) return 0;
 
-	// UniversalDetector detects CP949 but returns "EUC-KR" because CP949 lacks an IANA name.
-	// Kludge to make strings decode properly anyway.
-	if(cfenc==kCFStringEncodingEUC_KR) cfenc=kCFStringEncodingDOSKorean;
-
 	return CFStringConvertEncodingToNSStringEncoding(cfenc);
-}
-
-#else
-
--(NSStringEncoding)encoding
-{
-	static NSDictionary *encodingdictionary=nil;
-	if(!encodingdictionary) encodingdictionary=[[NSDictionary alloc] initWithObjectsAndKeys:
-		// Foundation
-		[NSNumber numberWithUnsignedInt:NSJapaneseEUCStringEncoding],@"EUC-JP",
-		[NSNumber numberWithUnsignedInt:NSJapaneseEUCStringEncoding],@"EUCJP",
-		[NSNumber numberWithUnsignedInt:NSISO2022JPStringEncoding],@"ISO-2022-JP",
-		[NSNumber numberWithUnsignedInt:NSISOLatin2StringEncoding],@"ISO-8859-2",
-		[NSNumber numberWithUnsignedInt:NSShiftJISStringEncoding],@"Shift_JIS",
-		[NSNumber numberWithUnsignedInt:NSShiftJISStringEncoding],@"SJIS",
-		[NSNumber numberWithUnsignedInt:NSUTF8StringEncoding],@"UTF-8",
-		[NSNumber numberWithUnsignedInt:NSUTF8StringEncoding],@"UTF8",
-		[NSNumber numberWithUnsignedInt:NSWindowsCP1250StringEncoding],@"windows-1250",
-		[NSNumber numberWithUnsignedInt:NSWindowsCP1251StringEncoding],@"windows-1251",
-		[NSNumber numberWithUnsignedInt:NSWindowsCP1252StringEncoding],@"windows-1252",
-		[NSNumber numberWithUnsignedInt:NSWindowsCP1253StringEncoding],@"windows-1253",
-		// GNUstep only
-		[NSNumber numberWithUnsignedInt:NSBIG5StringEncoding],@"Big5",
-		[NSNumber numberWithUnsignedInt:NSKoreanEUCStringEncoding],@"EUC-KR",
-		[NSNumber numberWithUnsignedInt:NSKoreanEUCStringEncoding],@"EUCKR",
-		[NSNumber numberWithUnsignedInt:NSGB2312StringEncoding],@"GB2312",
-		[NSNumber numberWithUnsignedInt:NSGB2312StringEncoding],@"HZ-GB-2312",
-		[NSNumber numberWithUnsignedInt:NSISOCyrillicStringEncoding],@"ISO-8859-5",
-		[NSNumber numberWithUnsignedInt:NSISOGreekStringEncoding],@"ISO-8859-7",
-		[NSNumber numberWithUnsignedInt:NSISOHebrewStringEncoding],@"ISO-8859-8",
-		[NSNumber numberWithUnsignedInt:NSKOI8RStringEncoding],@"KOI8-R",
-		// GNUstep only, approximate
-		[NSNumber numberWithUnsignedInt:NSGB2312StringEncoding],@"gb18030",
-		[NSNumber numberWithUnsignedInt:NSGB2312StringEncoding],@"GB18030",
-		[NSNumber numberWithUnsignedInt:NSISOHebrewStringEncoding],@"ISO-8859-8-I",
-		[NSNumber numberWithUnsignedInt:NSISOHebrewStringEncoding],@"windows-1255",
-		// Unsupported
-		/*[NSNumber numberWithUnsignedInt:],@"EUCTW",
-		[NSNumber numberWithUnsignedInt:],@"IBM855",
-		[NSNumber numberWithUnsignedInt:],@"IBM866",
-		[NSNumber numberWithUnsignedInt:],@"ISO-2022-CN",
-		[NSNumber numberWithUnsignedInt:],@"ISO-2022-KR",
-		[NSNumber numberWithUnsignedInt:],@"TIS-620",
-		[NSNumber numberWithUnsignedInt:],@"UTF-16BE",
-		[NSNumber numberWithUnsignedInt:],@"UTF-16LE",
-		[NSNumber numberWithUnsignedInt:],@"UTF-32BE",
-		[NSNumber numberWithUnsignedInt:],@"UTF-32LE",
-		[NSNumber numberWithUnsignedInt:],@"x-euc-tw",
-		[NSNumber numberWithUnsignedInt:],@"X-ISO-10646-UCS-4-2143",
-		[NSNumber numberWithUnsignedInt:],@"X-ISO-10646-UCS-4-3412",
-		[NSNumber numberWithUnsignedInt:],@"x-mac-cyrillic",
-		[NSNumber numberWithUnsignedInt:],@"x-mac-hebrew",*/
-	nil];
-
-	NSString *mimecharset=[self MIMECharset];
-	if(!mimecharset) return 0;
-
-	NSNumber *encoding=[encodingdictionary objectForKey:mimecharset];
-	if(!encoding) return 0;
-
-	return [encoding unsignedIntValue];
 }
 
 #endif

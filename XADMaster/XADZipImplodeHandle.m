@@ -55,24 +55,27 @@ largeDictionary:(BOOL)largedict hasLiterals:(BOOL)hasliterals
 	return [[XADPrefixCode alloc] initWithLengths:codelengths numberOfSymbols:size maximumLength:16 shortestCodeIsZeros:NO];
 }
 
--(int)nextLiteralOrOffset:(int *)offset andLength:(int *)length atPosition:(off_t)pos
+-(void)expandFromPosition:(off_t)pos;
 {
-	if(CSInputNextBitLE(input))
+	while(XADLZSSShouldKeepExpanding(self))
 	{
-		if(literals) return CSInputNextSymbolUsingCodeLE(input,literalcode);
-		else return CSInputNextBitStringLE(input,8);
-	}
-	else
-	{
-		*offset=CSInputNextBitStringLE(input,offsetbits);
-		*offset|=CSInputNextSymbolUsingCodeLE(input,offsetcode)<<offsetbits;
-		*offset+=1;
+		if(CSInputNextBitLE(input))
+		{
+			if(literals) XADLZSSLiteral(self,CSInputNextSymbolUsingCodeLE(input,literalcode),NULL);
+			else XADLZSSLiteral(self,CSInputNextBitStringLE(input,8),NULL);
+		}
+		else
+		{
+			int offset=CSInputNextBitStringLE(input,offsetbits);
+			offset|=CSInputNextSymbolUsingCodeLE(input,offsetcode)<<offsetbits;
+			offset+=1;
 
-		*length=CSInputNextSymbolUsingCodeLE(input,lengthcode)+2;
-		if(*length==65) *length+=CSInputNextBitStringLE(input,8);
-		if(literals) (*length)++;
+			int length=CSInputNextSymbolUsingCodeLE(input,lengthcode)+2;
+			if(length==65) length+=CSInputNextBitStringLE(input,8);
+			if(literals) length++;
 
-		return XADLZSSMatch;
+			XADLZSSMatch(self,offset,length,NULL);
+		}
 	}
 }
 

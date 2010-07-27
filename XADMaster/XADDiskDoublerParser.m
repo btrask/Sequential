@@ -6,6 +6,7 @@
 #import "XADDiskDoublerADnHandle.h"
 #import "XADDiskDoublerDDnHandle.h"
 #import "XADXORHandle.h"
+#import "XADDeltaHandle.h"
 #import "XADCRCHandle.h"
 #import "XADChecksumHandle.h"
 #import "NSDateXAD.h"
@@ -435,6 +436,10 @@
 	switch(delta)
 	{
 		case 0: break; // No delta processing
+
+		case 1:
+			handle=[[[XADDeltaHandle alloc] initWithHandle:handle length:size] autorelease];
+		break;
 
 		default: return nil;
 	}

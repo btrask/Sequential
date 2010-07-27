@@ -1,6 +1,6 @@
 #import "XADArchiveParser.h"
 
-@interface XADXARParser:XADArchiveParser
+@interface XADXARParser:XADArchiveParser <NSXMLParserDelegate>
 {
 	off_t heapoffset;
 	int state;

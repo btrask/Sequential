@@ -1,7 +1,7 @@
 #import "XADXZHandle.h"
 #import "XADLZMA2Handle.h"
-#import "XAD7ZipFilterHandles.h"
 #import "XAD7ZipBranchHandles.h"
+#import "XADDeltaHandle.h"
 #import "XADException.h"
 #import "CRC.h"
 #import "Progress.h"
@@ -117,7 +117,7 @@ static uint64_t ParseInteger(CSHandle *fh);
 			{
 				switch(ids[i])
 				{
-					case 3: handle=[[[XAD7ZipDeltaHandle alloc] initWithHandle:handle propertyData:properties[i]] autorelease]; break;
+					case 3: handle=[[[XADDeltaHandle alloc] initWithHandle:handle propertyData:properties[i]] autorelease]; break;
 
 					case 4: handle=[[[XAD7ZipBCJHandle alloc] initWithHandle:handle propertyData:properties[i]] autorelease]; break;
 					case 5: handle=[[[XAD7ZipPPCHandle alloc] initWithHandle:handle propertyData:properties[i]] autorelease]; break;

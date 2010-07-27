@@ -25,10 +25,10 @@
 /* xadmaster.h is included without its public library prototypes, so we
  * can define them ourselves using xadMasterBaseP instead of xadMasterBase */
 #define XAD_NO_PROTOTYPES 1
-#include <xadmaster.h>
+#include "xadmaster.h"
 
 /* include all library-internal structures, including xadMasterBaseP */
-#include <privdefs.h>
+#include "privdefs.h"
 
 /************************************************************************
 *                                                                       *

@@ -22,17 +22,15 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
-#include <xadmaster.h>
+#include "include/xadmaster.h"
 #ifdef DEBUG
 void DebugFileSearched(const struct xadArchiveInfo *ai, const xadSTRING *, ...); /* print with 'D' */
 void DebugClient(const struct xadArchiveInfo *ai, const xadSTRING *, ...);       /* print with 'D' */
 #endif
 
-#include "version.h"
+#include "include/version.h"
 #define XADMASTERFILE
 
 #define XADIOGETBITSHIGH

@@ -4,6 +4,52 @@
 
 
 
+NSString *XADUTF8StringEncodingName=@"utf-8";
+
+NSString *XADISOLatin1StringEncodingName=@"iso-8859-1";
+NSString *XADISOLatin2StringEncodingName=@"iso-8859-2";
+NSString *XADISOLatin3StringEncodingName=@"iso-8859-3";
+NSString *XADISOLatin4StringEncodingName=@"iso-8859-4";
+NSString *XADISOLatin5StringEncodingName=@"iso-8859-5";
+NSString *XADISOLatin6StringEncodingName=@"iso-8859-6";
+NSString *XADISOLatin7StringEncodingName=@"iso-8859-7";
+NSString *XADISOLatin8StringEncodingName=@"iso-8859-8";
+NSString *XADISOLatin9StringEncodingName=@"iso-8859-9";
+NSString *XADISOLatin10StringEncodingName=@"iso-8859-10";
+NSString *XADISOLatin11StringEncodingName=@"iso-8859-11";
+NSString *XADISOLatin12StringEncodingName=@"iso-8859-12";
+NSString *XADISOLatin13StringEncodingName=@"iso-8859-13";
+NSString *XADISOLatin14StringEncodingName=@"iso-8859-14";
+NSString *XADISOLatin15StringEncodingName=@"iso-8859-15";
+NSString *XADISOLatin16StringEncodingName=@"iso-8859-16";
+
+NSString *XADShiftJISStringEncodingName=@"shift_jis";
+
+NSString *XADWindowsCP1250StringEncodingName=@"windows-1250";
+NSString *XADWindowsCP1251StringEncodingName=@"windows-1251";
+NSString *XADWindowsCP1252StringEncodingName=@"windows-1252";
+NSString *XADWindowsCP1253StringEncodingName=@"windows-1253";
+NSString *XADWindowsCP1254StringEncodingName=@"windows-1254";
+
+NSString *XADMacOSRomanStringEncodingName=@"macintosh";
+NSString *XADMacOSJapaneseStringEncodingName=@"x-mac-japanese";
+NSString *XADMacOSTraditionalChineseStringEncodingName=@"x-mac-trad-chinese";
+NSString *XADMacOSKoreanStringEncodingName=@"x-mac-korean";
+NSString *XADMacOSArabicStringEncodingName=@"x-mac-arabic";
+NSString *XADMacOSHebrewStringEncodingName=@"x-mac-hebrew";
+NSString *XADMacOSGreekStringEncodingName=@"x-mac-greek";
+NSString *XADMacOSCyrillicStringEncodingName=@"x-mac-cyrillic";
+NSString *XADMacOSSimplifiedChineseStringEncodingName=@"x-mac-simp-chinese";
+NSString *XADMacOSRomanianStringEncodingName=@"x-mac-romanian";
+NSString *XADMacOSUkranianStringEncodingName=@"x-mac-ukrainian";
+NSString *XADMacOSThaiStringEncodingName=@"x-mac-thai";
+NSString *XADMacOSCentralEuropeanRomanStringEncodingName=@"x-mac-centraleurroman";
+NSString *XADMacOSIcelandicStringEncodingName=@"x-mac-icelandic";
+NSString *XADMacOSTurkishStringEncodingName=@"x-mac-turkish";
+NSString *XADMacOSCroatianStringEncodingName=@"x-mac-croatian";
+
+
+
 @implementation XADString
 
 +(XADString *)XADStringWithString:(NSString *)knownstring
@@ -22,6 +68,18 @@
 		data=[bytedata retain];
 		string=nil;
 		source=[stringsource retain];
+	}
+	return self;
+}
+
+-(id)initWithData:(NSData *)bytedata encodingName:(NSString *)encoding
+{
+	if(self=[super init])
+	{
+		// TODO: handle decoding failures
+		string=[[XADString stringForData:bytedata encodingName:encoding] retain];
+		data=nil;
+		source=nil;
 	}
 	return self;
 }
@@ -49,14 +107,14 @@
 
 -(NSString *)string
 {
-	return [self stringWithEncoding:[source encoding]];
+	return [self stringWithEncodingName:[source encodingName]];
 }
 
--(NSString *)stringWithEncoding:(NSStringEncoding)encoding
+-(NSString *)stringWithEncodingName:(NSString *)encoding
 {
 	if(string) return string;
 
-	NSString *decstr=[[[NSString alloc] initWithData:data encoding:encoding] autorelease];
+	NSString *decstr=[XADString stringForData:data encodingName:encoding];
 	if(decstr) return decstr;
 
 	// Fall back on escaped ASCII if the encoding was unusable
@@ -77,7 +135,29 @@
 {
 	if(data) return data;
 
-	return [string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
+	int length=[string length];
+	NSMutableData *encdata=[NSMutableData dataWithCapacity:length];
+
+	for(int i=0;i<length;i++)
+	{
+		char bytes[8];
+		unichar c=[string characterAtIndex:i];
+		if(c<0x80)
+		{
+			bytes[0]=c;
+			[encdata appendBytes:bytes length:1];
+		}
+		else
+		{
+			sprintf(bytes,"%%u%04x",c&0xffff);
+			[encdata appendBytes:bytes length:6];
+		}
+	}
+
+	return [NSData dataWithData:encdata];
+
+	// Do not use this because Cocotron doesn't support it.
+	//return [string dataUsingEncoding:NSNonLossyASCIIStringEncoding];
 }
 
 
@@ -89,10 +169,10 @@
 	return NO;
 }
 
--(NSStringEncoding)encoding
+-(NSString *)encodingName
 {
-	if(!source) return NSUTF8StringEncoding; // TODO: what should this really return?
-	return [source encoding];
+	if(!source) return XADUTF8StringEncodingName; // TODO: what should this really return?
+	return [source encodingName];
 }
 
 -(float)confidence
@@ -115,17 +195,28 @@
 		int length=[asciiprefix length];
 		if([data length]<length) return NO;
 
-		char cstr[length+1];
-		if(![asciiprefix getCString:cstr maxLength:length+1 encoding:NSASCIIStringEncoding]) return NO;
+		const uint8_t *bytes=[data bytes];
+		for(int i=0;i<length;i++) if(bytes[i]!=[asciiprefix characterAtIndex:i]) return NO;
 
-		return !strncmp([data bytes],cstr,length);
+		return YES;
 	}
 }
 
 -(XADString *)XADStringByStrippingASCIIPrefixOfLength:(int)length
 {
-	if(string) return [[[XADString alloc] initWithString:[string substringFromIndex:length]] autorelease];
-	else return [[[XADString alloc] initWithData:[data subdataWithRange:NSMakeRange(length,[data length]-length)] source:source] autorelease];
+	if(string)
+	{
+		return [[[XADString alloc]
+		initWithString:[string substringFromIndex:length]]
+		autorelease];
+	}
+	else
+	{
+		return [[[XADString alloc]
+		initWithData:[data subdataWithRange:
+		NSMakeRange(length,[data length]-length)]
+		source:source] autorelease];
+	}
 }
 
 
@@ -140,11 +231,6 @@
 		if(string&&xadstr->string) return [string isEqual:xadstr->string];
 		else if(data&&xadstr->data&&source==xadstr->source) return [data isEqual:xadstr->data];
 		else return NO;
-
-/*		if(string) return [string isEqual:[xadstr string]];
-		else if(xadstr->string) return [xadstr->string isEqual:[self string]];
-		else if(source==xadstr->source||[source encoding]==[xadstr->source encoding]) return [data isEqual:xadstr->data];
-		else return [[self string] isEqual:[xadstr string]];*/
 	}
 	else return NO;
 }
@@ -169,6 +255,21 @@
 	else return [[XADString allocWithZone:zone] initWithData:data source:source];
 }
 
+
+#ifdef __APPLE__
+-(NSString *)stringWithEncoding:(NSStringEncoding)encoding
+{
+	return [self stringWithEncodingName:(NSString *)CFStringConvertEncodingToIANACharSetName(
+	CFStringConvertNSStringEncodingToEncoding(encoding))];
+}
+
+-(NSStringEncoding)encoding
+{
+	if(!source) return NSUTF8StringEncoding; // TODO: what should this really return?
+	return [source encoding];
+}
+#endif
+
 @end
 
 
@@ -180,7 +281,7 @@
 	if(self=[super init])
 	{
 		detector=[UniversalDetector new]; // can return nil if UniversalDetector is not found
-		fixedencoding=0;
+		fixedencodingname=nil;
 		mac=NO;
 	}
 	return self;
@@ -189,6 +290,7 @@
 -(void)dealloc
 {
 	[detector release];
+	[fixedencodingname release];
 	[super dealloc];
 }
 
@@ -204,23 +306,26 @@
 	return YES;
 }
 
--(NSStringEncoding)encoding
+-(NSString *)encodingName
 {
-	if(fixedencoding) return fixedencoding;
-	if(!detector) return NSWindowsCP1252StringEncoding;
+	if(fixedencodingname) return fixedencodingname;
+	if(!detector) return XADWindowsCP1252StringEncodingName;
 
-	NSStringEncoding encoding=[detector encoding];
-	if(!encoding) encoding=NSWindowsCP1252StringEncoding;
+	NSString *encoding=[detector MIMECharset];
+	if(!encoding) encoding=XADWindowsCP1252StringEncodingName;
 
 	// Kludge to use Mac encodings instead of the similar Windows encodings for Mac archives
 	// TODO: improve
 	if(mac)
 	{
-		if(encoding==NSWindowsCP1252StringEncoding) return NSMacOSRomanStringEncoding;
+		static NSDictionary *macalternatives=nil;
+		if(!macalternatives) macalternatives=[[NSDictionary alloc] initWithObjectsAndKeys:
+			XADMacOSRomanStringEncodingName,XADWindowsCP1252StringEncodingName,
+			XADMacOSJapaneseStringEncodingName,XADShiftJISStringEncodingName,
+		nil];
 
-		NSStringEncoding macjapanese=CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingMacJapanese);
-		if(encoding==NSShiftJISStringEncoding) return macjapanese;
-		//else if(encoding!=NSUTF8StringEncoding&&encoding!=macjapanese) encoding=NSMacOSRomanStringEncoding;
+		NSString *macalternative=[macalternatives objectForKey:[encoding lowercaseString]];
+		if(macalternative) return macalternative;
 	}
 
 	return encoding;
@@ -228,10 +333,9 @@
 
 -(float)confidence
 {
-	if(fixedencoding) return 1;
+	if(fixedencodingname) return 1;
 	if(!detector) return 0;
-	NSStringEncoding encoding=[detector encoding];
-	if(!encoding) return 0;
+	if(![detector MIMECharset]) return 0;
 	return [detector confidence];
 }
 
@@ -240,19 +344,40 @@
 	return detector;
 }
 
--(void)setFixedEncoding:(NSStringEncoding)encoding
+-(void)setFixedEncodingName:(NSString *)encoding
 {
-	fixedencoding=encoding;
+	[fixedencodingname autorelease];
+	fixedencodingname=[encoding retain];
 }
 
 -(BOOL)hasFixedEncoding
 {
-	return fixedencoding!=0;
+	return fixedencodingname!=nil;
 }
 
 -(void)setPrefersMacEncodings:(BOOL)prefermac
 {
 	mac=prefermac;
 }
+
+
+
+#ifdef __APPLE__
+-(NSStringEncoding)encoding
+{
+	NSString *encodingname=[self encodingName];
+	if(!encodingname) return 0;
+
+	CFStringEncoding cfenc=CFStringConvertIANACharSetNameToEncoding((CFStringRef)encodingname);
+	if(cfenc==kCFStringEncodingInvalidId) return 0;
+
+	return CFStringConvertEncodingToNSStringEncoding(cfenc);
+}
+
+-(void)setFixedEncoding:(NSStringEncoding)encoding
+{
+	[self setFixedEncodingName:(NSString *)CFStringConvertEncodingToIANACharSetName(encoding)];
+}
+#endif
 
 @end

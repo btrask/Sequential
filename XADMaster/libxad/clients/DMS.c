@@ -56,7 +56,7 @@ not use one, will fail. The other way round should work.
 [ xadUINT8      size of filename, when there was a comment]
 */
 
-#include "xadClient.h"
+#include "../unix/xadClient.h"
 
 #ifndef XADMASTERVERSION
   #define XADMASTERVERSION      10
