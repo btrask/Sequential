@@ -75,7 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowWillShow
 {
-	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:PGAnimationFramerate / 2.0f options:PGRetainTarget | PGRepeatOnInterval] retain];
+	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f options:PGRetainTarget | PGRepeatOnInterval] retain];
 	[self _update];
 }
 - (void)windowWillClose
