@@ -68,6 +68,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	return [[[PGResourceDataProvider alloc] initWithResourceIdentifier:ident displayableName:name] autorelease];
 }
++ (id)providerWithResourceIdentifier:(PGResourceIdentifier *)ident
+{
+	return [self providerWithResourceIdentifier:ident displayableName:nil];
+}
 + (id)providerWithURLResponse:(NSURLResponse *)response data:(NSData *)data
 {
 	for(NSString *const classString in [[[NSBundle bundleForClass:self] infoDictionary] objectForKey:@"PGDataProviderCustomizers"]) {

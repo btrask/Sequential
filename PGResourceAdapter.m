@@ -190,6 +190,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 
 #pragma mark -
 
+@synthesize error = _error;
 - (BOOL)adapterIsViewable
 {
 	return NO;
@@ -202,15 +203,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 }
 - (void)load
 {
-	[[self node] loadSucceededForAdapter:self];
-}
-- (void)fallbackLoad
-{
-	[self load];
-}
-- (BOOL)shouldFallbackOnError
-{
-	return YES;
+	[[self node] loadFinishedForAdapter:self];
 }
 - (void)read
 {
@@ -348,7 +341,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 
 - (id)init
 {
-	PGAssertNotReached(@"Invalid initializer, use -initWithNode:dataProvider: instead."); // TODO: Remove this once we've confirmed that nobody is calling it.
+	PGAssertNotReached(@"Invalid initializer, use -initWithNode:dataProvider: instead.");
 	[self release];
 	return nil;
 }
@@ -357,9 +350,10 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 	[_activity invalidate];
 
 	[_dataProvider release];
+	[_activity release];
+	[_error release];
 	[_realThumbnail release];
 	[_thumbnailGenerationOperation release];
-	[_activity release];
 	[super dealloc];
 }
 
@@ -448,7 +442,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	NSParameterAssert(node);
 	NSDictionary *const types = [PGResourceAdapter typesDictionary];
-	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], [PGResourceAdapter class], nil]; // TODO: This conflicts with PGErrorAdapter, which gets inserted afterward and therefore never has a chance to be used.
+	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionary];
 	for(NSString *const classString in types) {
 		Class const class = NSClassFromString(classString);
 		if(!class) continue;

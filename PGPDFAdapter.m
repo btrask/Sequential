@@ -65,9 +65,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)load
 {
 	NSData *const data = [self data];
-	if(!data || ![NSPDFImageRep canInitWithData:data]) return [[self node] loadSucceededForAdapter:self];
+	if(!data || ![NSPDFImageRep canInitWithData:data]) return [[self node] loadFinishedForAdapter:self];
 	NSPDFImageRep *const mainRep = [[[NSPDFImageRep alloc] initWithData:data] autorelease];
-	if(!mainRep) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Appropriate error.
+	if(!mainRep) return [[self node] fallbackFromFailedAdapter:self];
 	NSPDFImageRep *const threadRep = [[mainRep copy] autorelease];
 
 	NSDictionary *const localeDict = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
@@ -78,11 +78,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInteger:i + 1] descriptionWithLocale:localeDict]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
 		if(!node) continue;
-		[node loadWithDataProvider:[[[PGPDFDataProvider alloc] initWithMainRep:mainRep threadRep:threadRep pageIndex:i] autorelease]];
+		[node setDataProvider:[[[PGPDFDataProvider alloc] initWithMainRep:mainRep threadRep:threadRep pageIndex:i] autorelease]];
 		[nodes addObject:node];
 	}
 	[self setUnsortedChildren:nodes presortedOrder:PGSortInnateOrder];
-	[[self node] loadSucceededForAdapter:self];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 #pragma mark -

@@ -68,7 +68,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	NSParameterAssert(!_webView);
 	PGDataProvider *const dp = [self dataProvider];
 	NSData *const data = [dp data];
-	if(!data) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
+	if(!data) return [[self node] fallbackFromFailedAdapter:self];
 	_webView = [[WebView alloc] initWithFrame:NSZeroRect];
 	[_webView setFrameLoadDelegate:self];
 	WebPreferences *const prefs = [WebPreferences standardPreferences];
@@ -102,7 +102,8 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 {
 	if(frame != [_webView mainFrame]) return;
 	[self _clearWebView];
-	[[self node] loadFailedWithError:error forAdapter:self];
+	[self setError:error];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 - (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
@@ -119,21 +120,23 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 - (void)webView:(WebView *)sender didFinishLoadForFrame:(WebFrame *)frame
 {
 	if(frame != [_webView mainFrame]) return;
-
-	DOMHTMLDocument *const doc = (DOMHTMLDocument *)[frame DOMDocument];
-	if(!doc) return [self load];
-	NSArray *providers = [doc PG_providersForLinkHrefsWithSchemes:[NSArray arrayWithObjects:@"http", @"https", nil]];
-	if(![providers count]) providers = [doc PG_providersForImageSrcs];
-	NSMutableArray *const pages = [NSMutableArray array];
-	for(PGDataProvider *const provider in providers) {
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[[provider identifier] displayableIdentifier]] autorelease];
-		if(!node) continue;
-		[node loadWithDataProvider:provider];
-		[pages addObject:node];
+	DOMHTMLDocument *const doc = [[(DOMHTMLDocument *)[frame DOMDocument] retain] autorelease];
+	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
+		NSMutableArray *const providers = [NSMutableArray array];
+		[providers addObjectsFromArray:[doc PG_providersForLinkHrefsWithSchemes:[NSArray arrayWithObjects:@"http", @"https", nil]]];
+		[providers addObjectsFromArray:[doc PG_providersForImageSrcs]];
+		NSMutableArray *const pages = [NSMutableArray array];
+		for(PGDataProvider *const provider in providers) {
+			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[[provider identifier] displayableIdentifier]] autorelease];
+			if(!node) continue;
+			[node setDataProvider:provider];
+			[pages addObject:node];
+		}
+		[self setUnsortedChildren:pages presortedOrder:PGSortInnateOrder];
+		[[self node] loadFinishedForAdapter:self];
+	} else {
+		[[self node] fallbackFromFailedAdapter:self];
 	}
-	[self setUnsortedChildren:pages presortedOrder:PGSortInnateOrder];
-	[[self node] loadSucceededForAdapter:self];
-
 	[self _clearWebView];
 }
 

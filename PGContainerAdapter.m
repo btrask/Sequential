@@ -137,7 +137,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 - (void)loadIfNecessary
 {
 	if([self shouldRecursivelyCreateChildren]) [super loadIfNecessary];
-	else [[self node] loadSucceededForAdapter:self];
+	else [[self node] loadFinishedForAdapter:self];
 }
 
 #pragma mark -NSObject

@@ -29,7 +29,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGDocument.h"
 #import "PGNode.h"
-#import "PGErrorAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGGenericImageAdapter.h"
 #import "PGResourceIdentifier.h"
@@ -345,7 +344,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 - (IBAction)reload:(id)sender
 {
 	[reloadButton setEnabled:NO];
-	[[self activeNode] loadWithDataProvider:nil];
+	[[self activeNode] reload];
 	[self _readActiveNode];
 }
 - (IBAction)decrypt:(id)sender

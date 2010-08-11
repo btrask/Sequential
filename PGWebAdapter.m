@@ -64,20 +64,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 - (void)load
 {
-	_triedLoad = YES;
 	NSURL *const URL = [[(PGDataProvider *)[self dataProvider] identifier] URL];
-	if([URL isFileURL]) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
+	if([URL isFileURL]) return [[self node] fallbackFromFailedAdapter:self];
 	[_faviconLoad cancelAndNotify:NO];
 	[_faviconLoad release];
 	_faviconLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"/favicon.ico" relativeToURL:URL] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parent:self delegate:self];
 	[_mainLoad cancelAndNotify:NO];
 	[_mainLoad release];
 	_mainLoad = [[PGURLLoad alloc] initWithRequest:[NSURLRequest requestWithURL:URL cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:15.0f] parent:self delegate:self];
-}
-- (void)fallbackLoad
-{
-	if(_triedLoad) [[self node] loadFailedWithError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:@"DEBUG" userInfo:nil] forAdapter:self]; // TODO: What should we do here?
-	else [self load];
 }
 
 #pragma mark -NSObject
@@ -111,7 +105,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([resp respondsToSelector:@selector(statusCode)] && ([resp statusCode] < 200 || [resp statusCode] >= 300)) {
 		[_mainLoad cancelAndNotify:NO];
 		[_faviconLoad cancelAndNotify:NO];
-		[[self node] loadFailedWithError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] userInfo:nil] forAdapter:self];
+		[self setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The error %ld %@ was generated while loading the URL %@.", @"The URL returned a error status code. %ld is replaced by the status code, the first %@ is replaced by the human-readable error (automatically localized), the second %@ is replaced by the full URL."), (long)[resp statusCode], [NSHTTPURLResponse localizedStringForStatusCode:[resp statusCode]], [resp URL]] userInfo:nil]];
+		[[self node] loadFinishedForAdapter:self];
 		return;
 	}
 	PGDataProvider *const potentialDataProvider = [PGDataProvider providerWithURLResponse:resp data:nil];
@@ -120,13 +115,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([potentialAdapterClasses count]) return;
 	[_mainLoad cancelAndNotify:NO];
 	[_faviconLoad cancelAndNotify:NO];
-	[[self node] loadWithDataProvider:potentialDataProvider];
+	[[self node] setDataProvider:potentialDataProvider];
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {
 	if(sender == _mainLoad) {
 		[_faviconLoad cancelAndNotify:NO];
-		[[self node] loadWithDataProvider:[PGDataProvider providerWithURLResponse:[_mainLoad response] data:[_mainLoad data]]];
+		[[self node] setDataProvider:[PGDataProvider providerWithURLResponse:[_mainLoad response] data:[_mainLoad data]]];
 	} else if(sender == _faviconLoad) {
 		NSImage *const favicon = [[[NSImage alloc] initWithData:[_faviconLoad data]] autorelease];
 		if(favicon) [[[self node] identifier] setIcon:favicon]; // Don't clear the favicon we already have if we can't load a new one.
@@ -136,13 +131,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	if(sender != _mainLoad) return;
 	[_faviconLoad cancelAndNotify:NO];
-	[[self node] loadFailedWithError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainLoad request] URL]] userInfo:nil] forAdapter:self];
+	[self setError:[NSError PG_errorWithDomain:PGNodeErrorDomain code:PGGenericError localizedDescription:[NSString stringWithFormat:NSLocalizedString(@"The URL %@ could not be loaded.", @"The URL could not be loaded for an unknown reason. %@ is replaced by the full URL."), [[_mainLoad request] URL]] userInfo:nil]];
+	[[self node] loadFinishedForAdapter:self];
 }
 - (void)loadDidCancel:(PGURLLoad *)sender
 {
 	if(sender != _mainLoad) return;
 	[_faviconLoad cancelAndNotify:NO];
-	[[self node] loadSucceededForAdapter:self];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 @end

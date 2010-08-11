@@ -62,7 +62,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
 			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
-			[node loadWithDataProvider:nil];
+			[node setDataProvider:[PGDataProvider providerWithResourceIdentifier:pageIdent]];
 		}
 		if(node) [newPages addObject:node];
 	}
@@ -75,7 +75,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)load
 {
 	[self createChildren];
-	[[self node] loadSucceededForAdapter:self];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 #pragma mark -<PGResourceAdapting>

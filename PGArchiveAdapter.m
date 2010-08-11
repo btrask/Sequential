@@ -106,9 +106,9 @@ static id PGArchiveAdapterList = nil;
 		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
 		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
-		if(isFile) [node loadWithDataProvider:[[[PGArchiveDataProvider alloc] initWithArchive:_archive entry:i] autorelease]];
+		if(isFile) [node setDataProvider:[[[PGArchiveDataProvider alloc] initWithArchive:_archive entry:i] autorelease]];
 		else {
-			[node loadWithDataProvider:[[[PGFolderDataProvider alloc] init] autorelease]];
+			[node setDataProvider:[[[PGFolderDataProvider alloc] init] autorelease]];
 			if(isEntrylessFolder) [indexes addIndex:i]; // We ended up taking care of a folder in its path instead.
 			PGContainerAdapter *const adapter = (PGContainerAdapter *)[node resourceAdapter];
 			[adapter setUnsortedChildren:[self nodesUnderPath:subpath parentAdapter:adapter remainingIndexes:indexes] presortedOrder:PGUnsorted];
@@ -160,11 +160,11 @@ static id PGArchiveAdapterList = nil;
 			NSData *const data = [self data];
 			if(data) _archive = [[XADArchive alloc] initWithData:data delegate:self error:&error];
 		}
-		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] loadFailedWithError:nil forAdapter:self]; // TODO: Return an appropriate error.
+		if(!_archive || error != XADNoError || [_archive isCorrupted]) return [[self node] fallbackFromFailedAdapter:self]; // TODO: Return an appropriate error.
 	}
 	NSArray *const children = [self nodesUnderPath:[_archive PG_commonRootPath] parentAdapter:self remainingIndexes:[NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, [_archive numberOfEntries])]];
 	[self setUnsortedChildren:children presortedOrder:PGUnsorted];
-	[[self node] loadSucceededForAdapter:self];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 #pragma mark -NSObject

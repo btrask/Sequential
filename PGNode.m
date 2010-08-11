@@ -27,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 #import "PGDocument.h"
 #import "PGResourceAdapter.h"
-#import "PGErrorAdapter.h"
 #import "PGContainerAdapter.h"
 #import "PGResourceIdentifier.h"
 #import "PGBookmark.h"
@@ -56,6 +55,7 @@ enum {
 @interface PGNode(Private)
 
 - (void)_setResourceAdapter:(PGResourceAdapter *)adapter;
+- (void)_stopLoading;
 
 - (void)_updateMenuItem;
 - (void)_updateFileAttributes;
@@ -91,7 +91,6 @@ enum {
 	_parentAdapter = parent;
 	_document = doc;
 	_identifier = [ident retain];
-	_adapters = [[NSMutableArray alloc] init];
 	_menuItem = [[NSMenuItem alloc] init];
 	[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
 	[_menuItem setAction:@selector(jumpToPage:)];
@@ -108,10 +107,50 @@ enum {
 
 #pragma mark -
 
+- (PGDataProvider *)dataProvider
+{
+	return [[_dataProvider retain] autorelease];
+}
+- (void)setDataProvider:(PGDataProvider *)dp
+{
+	NSParameterAssert(dp);
+	if(dp == _dataProvider) return;
+	[_dataProvider release];
+	_dataProvider = [dp retain];
+	[self reload];
+}
+- (void)reload
+{
+	_status |= PGNodeLoading;
+	[_potentialAdapters release];
+	_potentialAdapters = [[_dataProvider adaptersForNode:self] mutableCopy];
+	[self _setResourceAdapter:[_potentialAdapters lastObject]];
+	[_potentialAdapters removeLastObject];
+	[_adapter loadIfNecessary];
+}
 - (PGResourceAdapter *)resourceAdapter
 {
 	return [[_adapter retain] autorelease];
 }
+- (void)loadFinishedForAdapter:(PGResourceAdapter *)adapter
+{
+	NSParameterAssert(PGNodeLoading & _status);
+	NSParameterAssert(adapter == _adapter);
+	[self _stopLoading];
+	[self readIfNecessary];
+}
+- (void)fallbackFromFailedAdapter:(PGResourceAdapter *)adapter
+{
+	NSParameterAssert(PGNodeLoading & _status);
+	NSParameterAssert(adapter == _adapter);
+	[self _setResourceAdapter:[_potentialAdapters lastObject]];
+	[_potentialAdapters removeLastObject];
+	if(_adapter) [_adapter loadIfNecessary];
+	else [self _stopLoading];
+}
+
+#pragma mark -
+
 - (NSImage *)thumbnail
 {
 	return PGNodeLoading & _status ? nil : [[self resourceAdapter] thumbnail];
@@ -135,37 +174,6 @@ enum {
 - (PGBookmark *)bookmark
 {
 	return [[[PGBookmark alloc] initWithNode:self] autorelease];
-}
-
-#pragma mark -
-
-- (void)loadWithDataProvider:(PGDataProvider *)provider
-{
-	_status |= PGNodeLoading;
-	PGDataProvider *const p = provider ? provider : [PGDataProvider providerWithResourceIdentifier:[self identifier] displayableName:nil];
-	NSArray *const newAdapters = [p adaptersForNode:self];
-	if(![newAdapters count]) return [_adapter fallbackLoad];
-	[_adapters addObjectsFromArray:newAdapters];
-	[self _setResourceAdapter:[_adapters lastObject]];
-	[_adapter loadIfNecessary];
-}
-- (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter
-{
-	NSParameterAssert(adapter == _adapter);
-	NSParameterAssert(PGNodeLoading & _status);
-	_status &= ~PGNodeLoading;
-	[self noteIsViewableDidChange];
-	[self readIfNecessary];
-	[[self document] noteNodeThumbnailDidChange:self recursively:NO];
-}
-- (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter
-{
-	NSParameterAssert(adapter == _adapter);
-	NSParameterAssert(PGNodeLoading & _status);
-	[_adapters removeObjectIdenticalTo:adapter];
-	[_adapters insertObject:[[[PGErrorAdapter alloc] initWithNode:self dataProvider:nil] autorelease] atIndex:0];
-	[self _setResourceAdapter:[_adapters lastObject]];
-	[_adapter fallbackLoad];
 }
 
 #pragma mark -
@@ -311,6 +319,14 @@ enum {
 	[self _updateFileAttributes];
 	[self noteIsViewableDidChange];
 }
+- (void)_stopLoading
+{
+	[_potentialAdapters release];
+	_potentialAdapters = nil;
+	_status &= ~PGNodeLoading;
+	[self noteIsViewableDidChange];
+	[[self document] noteNodeThumbnailDidChange:self recursively:NO];
+}
 
 #pragma mark -
 
@@ -347,7 +363,9 @@ enum {
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierIconDidChangeNotification];
 	[_identifier PG_removeObserver:self name:PGDisplayableIdentifierDisplayNameDidChangeNotification];
 	[_identifier release];
-	[_adapters release];
+
+	[_dataProvider release];
+	[_potentialAdapters release];
 	[_adapter release];
 
 	[_menuItem release];

@@ -42,6 +42,7 @@ typedef NSInteger PGRecursionPolicy;
 	PGNode *_node;
 	PGDataProvider *_dataProvider;
 	PGActivity *_activity;
+	NSError *_error;
 
 	NSImage *_realThumbnail;
 	NSOperation *_thumbnailGenerationOperation;
@@ -76,12 +77,11 @@ typedef NSInteger PGRecursionPolicy;
 @property(readonly) NSUInteger viewableNodeCount;
 - (BOOL)hasViewableNodeCountGreaterThan:(NSUInteger)anInt;
 
+@property(retain) NSError *error;
 - (BOOL)adapterIsViewable;
 - (void)loadIfNecessary;
-- (void)load; // Sent by -[PGResourceAdapter loadIfNecessary], never call it directly. -loadFinished must be sent sometime hereafter.
-- (void)fallbackLoad; // By default sends -load. Sent by -[PGNode continueLoadWithInfo:]. -loadFinished must be sent sometime hereafter.
-- (BOOL)shouldFallbackOnError;
-- (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep:error: must be sent sometime hereafter.
+- (void)load; // Sent by -loadIfNecessary, never call it directly. -[node loadFinishedForAdapter:] OR -[node fallbackFromFailedAdapter:] must be sent sometime hereafter.
+- (void)read; // Sent by -[PGNode readIfNecessary], never call it directly. -readFinishedWithImageRep: must be sent sometime hereafter.
 
 - (NSImage *)thumbnail;
 - (NSImage *)fastThumbnail;

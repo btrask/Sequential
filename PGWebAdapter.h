@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	@private
 	PGURLLoad *_mainLoad;
 	PGURLLoad *_faviconLoad;
-	BOOL       _triedLoad;
 }
 
 @end

@@ -55,7 +55,8 @@ typedef NSUInteger PGNodeStatus;
 	PGDocument *_document;
 	PGDisplayableIdentifier *_identifier;
 
-	NSMutableArray *_adapters;
+	PGDataProvider *_dataProvider;
+	NSMutableArray *_potentialAdapters;
 	PGResourceAdapter *_adapter;
 	PGNodeStatus _status;
 
@@ -69,17 +70,18 @@ typedef NSUInteger PGNodeStatus;
 - (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident;
 @property(readonly) PGDisplayableIdentifier *identifier;
 
+@property(retain) PGDataProvider *dataProvider;
+- (void)reload;
 @property(readonly) PGResourceAdapter *resourceAdapter;
+- (void)loadFinishedForAdapter:(PGResourceAdapter *)adapter;
+- (void)fallbackFromFailedAdapter:(PGResourceAdapter *)adapter;
+
 @property(readonly) NSImage *thumbnail;
 @property(readonly) BOOL isViewable;
 @property(readonly) PGNode *viewableAncestor;
 @property(readonly) NSMenuItem *menuItem;
 @property(readonly) BOOL canBookmark;
 @property(readonly) PGBookmark *bookmark;
-
-- (void)loadWithDataProvider:(PGDataProvider *)provider;
-- (void)loadSucceededForAdapter:(PGResourceAdapter *)adapter;
-- (void)loadFailedWithError:(NSError *)error forAdapter:(PGResourceAdapter *)adapter;
 
 - (void)becomeViewed;
 - (void)readIfNecessary;

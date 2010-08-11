@@ -89,7 +89,6 @@
 		0E5EC1D60CEDFBBC00E7FF9A /* PGURLAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5EC1D50CEDFBBC00E7FF9A /* PGURLAlert.m */; };
 		0E6CD0990CD8FFEA00B9BF98 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */; };
 		0E7B0A2A0EB85E66009A7F07 /* PGCancelableProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */; };
-		0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */; };
 		0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */; };
 		0E7D74460C9ED641004AA269 /* PGDragHighlightView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E7D74450C9ED641004AA269 /* PGDragHighlightView.m */; };
 		0E82626C0CA950770041FA9D /* Sequential.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E82626B0CA950770041FA9D /* Sequential.icns */; };
@@ -534,8 +533,6 @@
 		0E6CD0980CD8FFEA00B9BF98 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
 		0E7B0A280EB85E66009A7F07 /* PGCancelableProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCancelableProxy.h; sourceTree = "<group>"; };
 		0E7B0A290EB85E66009A7F07 /* PGCancelableProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCancelableProxy.m; sourceTree = "<group>"; };
-		0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGErrorAdapter.h; sourceTree = "<group>"; };
-		0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGErrorAdapter.m; sourceTree = "<group>"; };
 		0E7B2FF40E9266A600F537CD /* PGKeyboardLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGKeyboardLayout.h; sourceTree = "<group>"; };
 		0E7B2FF50E9266A600F537CD /* PGKeyboardLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGKeyboardLayout.m; sourceTree = "<group>"; };
 		0E7D74440C9ED641004AA269 /* PGDragHighlightView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDragHighlightView.h; sourceTree = "<group>"; };
@@ -898,8 +895,6 @@
 				0EF5431D0DC128B600905391 /* PGNode.m */,
 				0EE646040DC7C6E100A90F86 /* PGResourceAdapter.h */,
 				0EE646050DC7C6E100A90F86 /* PGResourceAdapter.m */,
-				0E7B2DEE0E8FB20800F537CD /* PGErrorAdapter.h */,
-				0E7B2DEF0E8FB20800F537CD /* PGErrorAdapter.m */,
 				0EE645A90DC6508C00A90F86 /* PGWebAdapter.h */,
 				0EE645AA0DC6508C00A90F86 /* PGWebAdapter.m */,
 				0EE647700DC8FA3A00A90F86 /* PGContainerAdapter.h */,
@@ -1376,7 +1371,6 @@
 				0E92E1360E2CA88400276801 /* PGGeometry.m in Sources */,
 				0E255B9B0E3A9A1E00EDF04C /* PGTimerPanelController.m in Sources */,
 				0E255BA70E3A9D2E00EDF04C /* PGTimerButton.m in Sources */,
-				0E7B2DF00E8FB20800F537CD /* PGErrorAdapter.m in Sources */,
 				0E7B2FF60E9266A600F537CD /* PGKeyboardLayout.m in Sources */,
 				0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */,
 				0EDB9A790EA1899300B7342A /* PGThumbnailBrowser.m in Sources */,

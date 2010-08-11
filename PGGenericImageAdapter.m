@@ -109,7 +109,7 @@ static NSBitmapImageRep *PGImageSourceImageRepAtIndex(CGImageSourceRef source, s
 	[self clearCache];
 	_readFailed = NO;
 	[[self node] noteIsViewableDidChange];
-	[[self node] loadSucceededForAdapter:self];
+	[[self node] loadFinishedForAdapter:self];
 }
 
 #pragma mark -
