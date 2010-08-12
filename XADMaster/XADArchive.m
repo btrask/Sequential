@@ -104,7 +104,7 @@ NSString *XADFinderFlags=@"XADFinderFlags";
 		delegate=del;
 
 		parser=[[XADArchiveParser archiveParserForHandle:[CSMemoryHandle memoryHandleForReadingData:data] name:@""] retain];
-		if(!parser)
+		if(parser)
 		{
 			if([self _parseWithErrorPointer:error]) return self;
 		}
