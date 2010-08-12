@@ -442,7 +442,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	NSParameterAssert(node);
 	NSDictionary *const types = [PGResourceAdapter typesDictionary];
-	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionary];
+	NSMutableDictionary *const adapterByPriority = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], [PGResourceAdapter class], nil];
 	for(NSString *const classString in types) {
 		Class const class = NSClassFromString(classString);
 		if(!class) continue;
