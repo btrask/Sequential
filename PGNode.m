@@ -144,9 +144,9 @@ enum {
 	NSParameterAssert(PGNodeLoading & _status);
 	NSParameterAssert(adapter == _adapter);
 	[self _setResourceAdapter:[_potentialAdapters lastObject]];
+	if(![_potentialAdapters count]) return [self _stopLoading];
 	[_potentialAdapters removeLastObject];
-	if(_adapter) [_adapter loadIfNecessary];
-	else [self _stopLoading];
+	[_adapter loadIfNecessary];
 }
 
 #pragma mark -

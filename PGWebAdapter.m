@@ -115,7 +115,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	if([potentialAdapterClasses count]) return;
 	[_mainLoad cancelAndNotify:NO];
 	[_faviconLoad cancelAndNotify:NO];
-	[[self node] setDataProvider:potentialDataProvider];
+	[[self node] fallbackFromFailedAdapter:self];
 }
 - (void)loadDidSucceed:(PGURLLoad *)sender
 {
