@@ -111,7 +111,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	PGDataProvider *const potentialDataProvider = [PGDataProvider providerWithURLResponse:resp data:nil];
 	NSMutableArray *const potentialAdapterClasses = [[[potentialDataProvider adapterClassesForNode:[self node]] mutableCopy] autorelease];
-	if(![self shouldRecursivelyCreateChildren]) for(Class const adapterClass in [[potentialAdapterClasses copy] autorelease]) if([adapterClass isKindOfClass:[PGContainerAdapter class]]) [potentialAdapterClasses removeObjectIdenticalTo:adapterClass];
+	if(![self shouldRecursivelyCreateChildren]) for(Class const adapterClass in [[potentialAdapterClasses copy] autorelease]) if([adapterClass isKindOfClass:[PGContainerAdapter class]]) [potentialAdapterClasses removeObjectIdenticalTo:adapterClass]; // Instead of using -isKindOfClass:, add a class method or something.
 	if([potentialAdapterClasses count]) return;
 	[_mainLoad cancelAndNotify:NO];
 	[_faviconLoad cancelAndNotify:NO];

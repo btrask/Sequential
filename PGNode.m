@@ -125,7 +125,7 @@ enum {
 	[_potentialAdapters release];
 	_potentialAdapters = [[_dataProvider adaptersForNode:self] mutableCopy];
 	[self _setResourceAdapter:[_potentialAdapters lastObject]];
-	[_potentialAdapters removeLastObject];
+	if([_potentialAdapters count]) [_potentialAdapters removeLastObject];
 	[_adapter loadIfNecessary];
 }
 - (PGResourceAdapter *)resourceAdapter
