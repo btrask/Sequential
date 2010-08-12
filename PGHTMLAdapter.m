@@ -123,8 +123,9 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	DOMHTMLDocument *const doc = [[(DOMHTMLDocument *)[frame DOMDocument] retain] autorelease];
 	if([doc isKindOfClass:[DOMHTMLDocument class]]) {
 		NSMutableArray *const providers = [NSMutableArray array];
-		[providers addObjectsFromArray:[doc PG_providersForLinkHrefsWithSchemes:[NSArray arrayWithObjects:@"http", @"https", nil]]];
-		[providers addObjectsFromArray:[doc PG_providersForImageSrcs]];
+		[providers addObjectsFromArray:[doc PG_providersForLinksWithMIMETypes:[PGResourceAdapter supportedMIMETypes]]];
+		[providers addObjectsFromArray:[doc PG_providersForAnchorsWithSchemes:[NSArray arrayWithObjects:@"http", @"https", nil]]];
+		[providers addObjectsFromArray:[doc PG_providersForImages]];
 		NSMutableArray *const pages = [NSMutableArray array];
 		for(PGDataProvider *const provider in providers) {
 			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[[provider identifier] displayableIdentifier]] autorelease];

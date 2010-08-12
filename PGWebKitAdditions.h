@@ -26,8 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @interface DOMHTMLDocument(PGWebKitAdditions)
 
-- (NSArray *)PG_providersForLinkHrefsWithSchemes:(NSArray *)schemes;
-- (NSArray *)PG_providersForImageSrcs;
+- (NSArray *)PG_providersForLinksWithMIMETypes:(NSArray *)MIMETypes;
+- (NSArray *)PG_providersForAnchorsWithSchemes:(NSArray *)schemes;
+- (NSArray *)PG_providersForImages;
 
 @end
 

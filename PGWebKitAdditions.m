@@ -33,16 +33,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation DOMHTMLDocument(PGWebKitAdditions)
 
-- (NSArray *)PG_providersForLinkHrefsWithSchemes:(NSArray *)schemes
+- (NSArray *)PG_providersForLinksWithMIMETypes:(NSArray *)MIMETypes
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	NSMutableArray *const hrefs = [NSMutableArray array];
-	DOMHTMLCollection *const links = [self links];
+	DOMNodeList *const links = [self getElementsByTagName:@"LINK"];
 	NSUInteger i = 0;
-	NSUInteger const count = [links length];
+	for(; i < [links length]; i++) {
+		DOMHTMLLinkElement *const link = (DOMHTMLLinkElement *)[links item:i];
+		if(![[[link rel] componentsSeparatedByString:@" "] containsObject:@"alternate"]) continue;
+		if(MIMETypes && ![MIMETypes containsObject:[link type]]) continue;
+		NSString *const href = [link href];
+		if([hrefs containsObject:href]) continue;
+		[hrefs addObject:href];
+		[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:href] PG_resourceIdentifier]]];
+	}
+	return results;
+}
+- (NSArray *)PG_providersForAnchorsWithSchemes:(NSArray *)schemes
+{
+	NSMutableArray *const results = [NSMutableArray array];
+	NSMutableArray *const hrefs = [NSMutableArray array];
+	DOMHTMLCollection *const anchors = [self links];
+	NSUInteger i = 0;
+	NSUInteger const count = [anchors length];
 	for(; i < count; i++) {
-		DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
-		NSString *href = [a href];
+		DOMHTMLAnchorElement *const anchor = (DOMHTMLAnchorElement *)[anchors item:i];
+		NSString *href = [anchor href];
 		NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
 		if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
 		if(![href length]) continue;
@@ -51,11 +68,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 		NSURL *const URL = [NSURL URLWithString:href];
 		if(schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) continue;
-		[results addObject:[PGDataProvider providerWithResourceIdentifier:[URL PG_resourceIdentifier] displayableName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]]];
+		[results addObject:[PGDataProvider providerWithResourceIdentifier:[URL PG_resourceIdentifier] displayableName:[[anchor innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]]];
 	}
 	return results;
 }
-- (NSArray *)PG_providersForImageSrcs
+- (NSArray *)PG_providersForImages
 {
 	NSMutableArray *const results = [NSMutableArray array];
 	NSMutableArray *const srcs = [NSMutableArray array];

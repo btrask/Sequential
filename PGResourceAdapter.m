@@ -68,18 +68,31 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 {
 	return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"PGResourceAdapterClasses"];
 }
-+ (NSArray *)supportedTypes
++ (NSArray *)supportedFileTypes
 {
-	NSMutableArray *const exts = [NSMutableArray array];
+	NSMutableArray *const fileTypes = [NSMutableArray array];
 	NSDictionary *const types = [self typesDictionary];
 	for(NSString *const classString in types) {
 		id const adapterClass = NSClassFromString(classString);
 		if(!adapterClass) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
-		[exts addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
-		for(NSString *const type in [typeDict objectForKey:PGCFBundleTypeOSTypesKey]) [exts addObject:PGOSTypeToStringQuoted(PGOSTypeFromString(type), YES)];
+		[fileTypes addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeExtensionsKey]];
+		for(NSString *const type in [typeDict objectForKey:PGCFBundleTypeOSTypesKey]) [fileTypes addObject:PGOSTypeToStringQuoted(PGOSTypeFromString(type), YES)];
 	}
-	return exts;
+	return fileTypes;
+}
++ (NSArray *)supportedMIMETypes
+{
+	NSMutableArray *const MIMETypes = [NSMutableArray array];
+	NSDictionary *const types = [self typesDictionary];
+	for(NSString *const classString in types) {
+		id const adapterClass = NSClassFromString(classString);
+		if(!adapterClass) continue;
+		NSDictionary *const typeDict = [types objectForKey:classString];
+		[MIMETypes addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeMIMETypesKey]];
+	}
+	NSLog(@"%@", MIMETypes);
+	return MIMETypes;
 }
 
 #pragma mark -PGResourceAdapter

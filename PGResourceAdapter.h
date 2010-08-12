@@ -49,7 +49,8 @@ typedef NSInteger PGRecursionPolicy;
 }
 
 + (NSDictionary *)typesDictionary;
-+ (NSArray *)supportedTypes;
++ (NSArray *)supportedFileTypes;
++ (NSArray *)supportedMIMETypes;
 
 - (id)initWithNode:(PGNode *)node dataProvider:(PGDataProvider *)provider;
 @property(readonly) PGNode *node;
