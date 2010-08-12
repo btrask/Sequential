@@ -41,21 +41,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSUInteger i = 0;
 	NSUInteger const count = [links length];
 	for(; i < count; i++) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		do {
-			DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
-			NSString *href = [a href];
-			NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
-			if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
-			if(![href length]) continue;
-			if([hrefs containsObject:href]) continue;
-			[hrefs addObject:href];
+		DOMHTMLAnchorElement *const a = (DOMHTMLAnchorElement *)[links item:i];
+		NSString *href = [a href];
+		NSUInteger anchorStart = [href rangeOfString:@"#" options:NSBackwardsSearch].location;
+		if(NSNotFound != anchorStart) href = [href substringToIndex:anchorStart];
+		if(![href length]) continue;
+		if([hrefs containsObject:href]) continue;
+		[hrefs addObject:href];
 
-			NSURL *const URL = [NSURL URLWithString:href];
-			if(schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) continue;
-			[results addObject:[PGDataProvider providerWithResourceIdentifier:[URL PG_resourceIdentifier] displayableName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]]];
-		} while(NO);
-		[pool release];
+		NSURL *const URL = [NSURL URLWithString:href];
+		if(schemes && ![schemes containsObject:[[URL scheme] lowercaseString]]) continue;
+		[results addObject:[PGDataProvider providerWithResourceIdentifier:[URL PG_resourceIdentifier] displayableName:[[a innerText] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]]];
 	}
 	return results;
 }
@@ -67,17 +63,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSUInteger i = 0;
 	NSUInteger const count = [images length];
 	for(; i < count; i++) {
-		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
-		do {
-			DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
-			if([img PG_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
-			NSString *const src = [img src];
-			if([srcs containsObject:src]) continue;
-			[srcs addObject:src];
-			NSString *const title = [img title]; // Prefer the title to the alt attribute.
-			[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:[img src]] PG_resourceIdentifier] displayableName:[title length] ? title : [img alt]]];
-		} while(NO);
-		[pool release];
+		DOMHTMLImageElement *const img = (DOMHTMLImageElement *)[images item:i];
+		if([img PG_hasAncestorWithNodeName:@"A"]) continue; // I have a hypothesis that images within links are rarely interesting in and of themselves, so don't load them.
+		NSString *const src = [img src];
+		if([srcs containsObject:src]) continue;
+		[srcs addObject:src];
+		NSString *const title = [img title]; // Prefer the title to the alt attribute.
+		[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:[img src]] PG_resourceIdentifier] displayableName:[title length] ? title : [img alt]]];
 	}
 	return results;
 }
