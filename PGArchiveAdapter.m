@@ -70,6 +70,7 @@ static id PGArchiveAdapterList = nil;
 
 @interface XADArchive(PGAdditions)
 
+- (BOOL)PG_entryIsInvisibleForName:(NSString *)name;
 - (NSString *)PG_commonRootPath;
 - (OSType)PG_OSTypeForEntry:(int)entry;
 
@@ -97,8 +98,8 @@ static id PGArchiveAdapterList = nil;
 		NSString *const entryPath = [_archive nameOfEntry:i];
 		if(!entryPath) continue;
 		if([path length] && ![entryPath hasPrefix:path]) continue;
+		if([_archive PG_entryIsInvisibleForName:entryPath]) continue;
 		[indexes removeIndex:i];
-		if([[entryPath lastPathComponent] hasPrefix:@"."]) continue;
 		NSString *const subpath = [path stringByAppendingPathComponent:[[entryPath substringFromIndex:[path length]] PG_firstPathComponent]];
 		if(PGEqualObjects(path, entryPath)) continue;
 		BOOL const isEntrylessFolder = !PGEqualObjects(subpath, entryPath);
@@ -369,12 +370,19 @@ static id PGArchiveAdapterList = nil;
 
 @implementation XADArchive(PGAdditions)
 
+- (BOOL)PG_entryIsInvisibleForName:(NSString *)name
+{
+	if([name hasPrefix:@"."]) return YES;
+	if(NSNotFound != [name rangeOfString:@"/."].location) return YES;
+	return NO;
+}
 - (NSString *)PG_commonRootPath
 {
 	NSInteger i;
 	NSString *root = nil;
 	for(i = 0; i < [self numberOfEntries]; i++) {
 		NSString *entryName = [self nameOfEntry:i];
+		if([self PG_entryIsInvisibleForName:entryName]) continue;
 		if(![self entryIsDirectory:i]) entryName = [entryName stringByDeletingLastPathComponent];
 		else if([entryName hasSuffix:@"/"]) entryName = [entryName substringToIndex:[entryName length] - 1];
 		if(!root) root = entryName;
