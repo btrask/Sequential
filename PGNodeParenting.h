@@ -1,4 +1,4 @@
-/* Copyright © 2007-2009, The Sequential Project
+/* Copyright © 2010, The Sequential Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -22,41 +22,13 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
-#import "PGResourceAdapter.h"
-
 // Models
-#import "PGPrefObject.h"
-#import "PGNodeParenting.h"
+@class PGDocument;
+@class PGContainerAdapter;
 
-extern NSString *const PGMaxDepthKey;
+@protocol PGNodeParenting
 
-@interface PGContainerAdapter : PGResourceAdapter
-{
-	@private
-	NSArray *_sortedChildren;
-	NSArray *_unsortedChildren;
-	PGSortOrder _unsortedOrder;
-}
+@property(readonly) PGDocument *document;
+@property(readonly) PGContainerAdapter *containerAdapter;
 
-@property(readonly) PGRecursionPolicy descendantRecursionPolicy;
-
-@property(readonly) NSArray *sortedChildren;
-@property(readonly) NSArray *unsortedChildren;
-- (void)setUnsortedChildren:(NSArray *)anArray presortedOrder:(PGSortOrder)order;
-- (void)removeChild:(PGNode *)child;
-
-- (PGNode *)childForIdentifier:(PGResourceIdentifier *)anIdent;
-- (NSUInteger)viewableIndexOfChild:(PGNode *)aNode;
-- (PGNode *)outwardSearchForward:(BOOL)forward fromChild:(PGNode *)start inclusive:(BOOL)inclusive withSelector:(SEL)sel context:(id)context;
-/* The selector 'sel' should have one of the following forms:
-- (PGNode *)selector;
-- (PGNode *)selectorForward:(BOOL)flag;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context;
-- (PGNode *)selectorForward:(BOOL)flag withContext:(id)context ignored:(id)nil1; */
-
-- (void)noteChildValueForCurrentSortOrderDidChange:(PGNode *)child;
-
-@end
-
-@interface PGContainerAdapter(PGResourceAdapterMethods) <PGNodeParenting>
 @end

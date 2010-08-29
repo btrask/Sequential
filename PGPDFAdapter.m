@@ -76,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	for(; i < [mainRep pageCount]; i++) {
 		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[[NSNumber numberWithUnsignedInteger:i + 1] descriptionWithLocale:localeDict]];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:identifier] autorelease];
+		PGNode *const node = [[[PGNode alloc] initWithParent:self identifier:identifier] autorelease];
 		if(!node) continue;
 		[node setDataProvider:[[[PGPDFDataProvider alloc] initWithMainRep:mainRep threadRep:threadRep pageIndex:i] autorelease]];
 		[nodes addObject:node];

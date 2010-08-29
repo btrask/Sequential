@@ -24,6 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Models
 @class PGDocument;
+#import "PGNodeParenting.h"
 #import "PGResourceAdapting.h"
 @class PGResourceAdapter;
 @class PGContainerAdapter;
@@ -51,8 +52,7 @@ typedef NSUInteger PGNodeStatus;
 @interface PGNode : NSObject <PGResourceAdapting>
 {
 	@private
-	PGContainerAdapter *_parentAdapter;
-	PGDocument *_document;
+	id<PGNodeParenting> _parent;
 	PGDisplayableIdentifier *_identifier;
 
 	PGDataProvider *_dataProvider;
@@ -67,7 +67,7 @@ typedef NSUInteger PGNodeStatus;
 
 + (NSArray *)pasteboardTypes;
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident;
+- (id)initWithParent:(id<PGNodeParenting>)parent identifier:(PGDisplayableIdentifier *)ident;
 @property(readonly) PGDisplayableIdentifier *identifier;
 
 @property(retain) PGDataProvider *dataProvider;

@@ -654,6 +654,7 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Sequential.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sequential.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B573CFF3122AC22200F4B7CA /* PGNodeParenting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGNodeParenting.h; sourceTree = "<group>"; };
 		B581795A121490A60041F0F4 /* PGXMLAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLAdapter.h; sourceTree = "<group>"; };
 		B581795B121490A60041F0F4 /* PGXMLAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLAdapter.m; sourceTree = "<group>"; };
 		B5FE965911F5C9C10010BBCA /* Sequential.help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sequential.help; sourceTree = "<group>"; };
@@ -893,6 +894,7 @@
 				0E94F9CB0DAD37D000A23F73 /* PGPrefObject.m */,
 				2A37F4AEFDCFA73011CA2CEA /* PGDocument.h */,
 				2A37F4ACFDCFA73011CA2CEA /* PGDocument.m */,
+				B573CFF3122AC22200F4B7CA /* PGNodeParenting.h */,
 				0E8680A6113A079600B78EAA /* PGResourceAdapting.h */,
 				0EF5431C0DC128B600905391 /* PGNode.h */,
 				0EF5431D0DC128B600905391 /* PGNode.m */,

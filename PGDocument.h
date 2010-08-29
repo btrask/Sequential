@@ -25,6 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGPrefObject.h"
 
 // Models
+#import "PGNodeParenting.h"
 @class PGNode;
 @class PGResourceIdentifier;
 @class PGDisplayableIdentifier;
@@ -51,7 +52,7 @@ extern NSString *const PGDocumentNodeKey;
 extern NSString *const PGDocumentRemovedChildrenKey;
 extern NSString *const PGDocumentUpdateRecursivelyKey;
 
-@interface PGDocument : PGPrefObject <PGActivityOwner>
+@interface PGDocument : PGPrefObject <PGActivityOwner, PGNodeParenting>
 {
 	@private
 	PGDisplayableIdentifier *_rootIdentifier;

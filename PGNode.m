@@ -80,16 +80,14 @@ enum {
 
 #pragma mark -PGNode
 
-- (id)initWithParentAdapter:(PGContainerAdapter *)parent document:(PGDocument *)doc identifier:(PGDisplayableIdentifier *)ident
+- (id)initWithParent:(id<PGNodeParenting>)parent identifier:(PGDisplayableIdentifier *)ident
 {
 	if(!(self = [super init])) return nil;
-	NSParameterAssert(!parent != !doc);
 	if(!ident) {
 		[self release];
 		return nil;
 	}
-	_parentAdapter = parent;
-	_document = doc;
+	_parent = parent;
 	_identifier = [ident retain];
 	_menuItem = [[NSMenuItem alloc] init];
 	[_menuItem setRepresentedObject:[NSValue valueWithNonretainedObject:self]];
@@ -206,8 +204,7 @@ enum {
 - (void)detachFromTree
 {
 	@synchronized(self) {
-		_parentAdapter = nil;
-		_document = nil;
+		_parent = nil;
 	}
 }
 - (NSComparisonResult)compare:(PGNode *)node
@@ -394,11 +391,11 @@ enum {
 
 - (PGNode *)parentNode
 {
-	return [_parentAdapter node];
+	return [[_parent containerAdapter] node];
 }
 - (PGContainerAdapter *)parentAdapter
 {
-	return _parentAdapter;
+	return [_parent containerAdapter];
 }
 - (PGNode *)rootNode
 {
@@ -406,7 +403,7 @@ enum {
 }
 - (PGDocument *)document
 {
-	return _document ? _document : [_parentAdapter document];
+	return [_parent document];
 }
 
 #pragma mark -

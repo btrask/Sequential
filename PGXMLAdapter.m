@@ -85,7 +85,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 		PGDisplayableIdentifier *const ident = [[NSURL URLWithString:URLString] PG_displayableIdentifier];
 		[ident setCustomDisplayName:title];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:ident] autorelease];
+		PGNode *const node = [[[PGNode alloc] initWithParent:self identifier:ident] autorelease];
 		if(!node) continue;
 		[node setDataProvider:[PGDataProvider providerWithResourceIdentifier:ident]];
 		[items addObject:node];

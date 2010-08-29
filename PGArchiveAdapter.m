@@ -106,7 +106,7 @@ static id PGArchiveAdapterList = nil;
 		BOOL const isFile = !isEntrylessFolder && ![_archive entryIsDirectory:i];
 		PGDisplayableIdentifier *const identifier = [[[[self node] identifier] subidentifierWithIndex:isEntrylessFolder ? NSNotFound : i] displayableIdentifier];
 		[identifier setNaturalDisplayName:[subpath lastPathComponent]];
-		PGNode *const node = [[[PGNode alloc] initWithParentAdapter:parent document:nil identifier:identifier] autorelease];
+		PGNode *const node = [[[PGNode alloc] initWithParent:parent identifier:identifier] autorelease];
 		if(isFile) [node setDataProvider:[[[PGArchiveDataProvider alloc] initWithArchive:_archive entry:i] autorelease]];
 		else {
 			[node setDataProvider:[[[PGFolderDataProvider alloc] init] autorelease]];

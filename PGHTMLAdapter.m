@@ -128,7 +128,7 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 		[providers addObjectsFromArray:[doc PG_providersForImages]];
 		NSMutableArray *const pages = [NSMutableArray array];
 		for(PGDataProvider *const provider in providers) {
-			PGNode *const node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:[[provider identifier] displayableIdentifier]] autorelease];
+			PGNode *const node = [[[PGNode alloc] initWithParent:self identifier:[[provider identifier] displayableIdentifier]] autorelease];
 			if(!node) continue;
 			[node setDataProvider:provider];
 			[pages addObject:node];

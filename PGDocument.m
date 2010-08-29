@@ -70,7 +70,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	if((self = [self init])) {
 		_rootIdentifier = [ident retain];
-		_node = [[PGNode alloc] initWithParentAdapter:nil document:self identifier:ident];
+		_node = [[PGNode alloc] initWithParent:self identifier:ident];
 		[_node setDataProvider:[PGDataProvider providerWithResourceIdentifier:ident]];
 		[_rootIdentifier PG_addObserver:self selector:@selector(identifierIconDidChange:) name:PGDisplayableIdentifierIconDidChangeNotification];
 		_subscription = [[_rootIdentifier subscriptionWithDescendents:YES] retain];
@@ -382,6 +382,17 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 - (NSString *)descriptionForActivity:(PGActivity *)activity
 {
 	return [[[self node] identifier] displayName];
+}
+
+#pragma mark -<PGNodeParent>
+
+- (PGDocument *)document
+{
+	return self;
+}
+- (PGContainerAdapter *)containerAdapter
+{
+	return nil;
 }
 
 @end

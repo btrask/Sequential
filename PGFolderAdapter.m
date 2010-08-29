@@ -61,7 +61,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 			[oldPages removeObjectIdenticalTo:node];
 			[node noteFileEventDidOccurDirect:NO];
 		} else {
-			node = [[[PGNode alloc] initWithParentAdapter:self document:nil identifier:pageIdent] autorelease];
+			node = [[[PGNode alloc] initWithParent:self identifier:pageIdent] autorelease];
 			[node setDataProvider:[PGDataProvider providerWithResourceIdentifier:pageIdent]];
 		}
 		if(node) [newPages addObject:node];
