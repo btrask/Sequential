@@ -623,20 +623,30 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.xml</string>
+			</array>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>rss</string>
 				<string>RSS</string>
+				<string>xml</string>
+				<string>XML</string>
 			</array>
 			<key>CFBundleMIMETypes</key>
 			<array>
-				<string>text/rss+xml</string>
 				<string>application/rss+xml</string>
+				<string>text/rss+xml</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.rss</string>
+			</array>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
@@ -886,6 +896,24 @@
 		<dict/>
 		<key>PGWebAdapter</key>
 		<dict/>
+		<key>PGMediaRSSAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xml</string>
+				<string>rss</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/rss+xml</string>
+				<string>text/rss+xml</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.rss</string>
+				<string>public.xml</string>
+			</array>
+		</dict>
 	</dict>
 	<key>PGDataProviderCustomizers</key>
 	<array>

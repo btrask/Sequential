@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 		NSString *const href = [link href];
 		if([hrefs containsObject:href]) continue;
 		[hrefs addObject:href];
-		[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:href] PG_resourceIdentifier]]];
+		[results addObject:[PGDataProvider providerWithResourceIdentifier:[[NSURL URLWithString:href] PG_resourceIdentifier] displayableName:[link title]]];
 	}
 	return results;
 }

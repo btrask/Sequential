@@ -166,6 +166,7 @@
 		8D15AC310486D014006FF6A4 /* PGDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4ACFDCFA73011CA2CEA /* PGDocument.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC320486D014006FF6A4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2A37F4B0FDCFA73011CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D15AC340486D014006FF6A4 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */; };
+		B581795C121490A60041F0F4 /* PGXMLAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = B581795B121490A60041F0F4 /* PGXMLAdapter.m */; };
 		B5FE96BD11F5C9C10010BBCA /* Sequential.help in Resources */ = {isa = PBXBuildFile; fileRef = B5FE965911F5C9C10010BBCA /* Sequential.help */; };
 /* End PBXBuildFile section */
 
@@ -653,6 +654,8 @@
 		2A37F4C5FDCFA73011CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D15AC360486D014006FF6A4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D15AC370486D014006FF6A4 /* Sequential.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sequential.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B581795A121490A60041F0F4 /* PGXMLAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGXMLAdapter.h; sourceTree = "<group>"; };
+		B581795B121490A60041F0F4 /* PGXMLAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGXMLAdapter.m; sourceTree = "<group>"; };
 		B5FE965911F5C9C10010BBCA /* Sequential.help */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sequential.help; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -903,6 +906,8 @@
 				0EF543230DC1291600905391 /* PGFolderAdapter.m */,
 				0EE646A80DC8416F00A90F86 /* PGHTMLAdapter.h */,
 				0EE646A90DC8416F00A90F86 /* PGHTMLAdapter.m */,
+				B581795A121490A60041F0F4 /* PGXMLAdapter.h */,
+				B581795B121490A60041F0F4 /* PGXMLAdapter.m */,
 				0ED4A4180DCBFDDA007C5A77 /* PGArchiveAdapter.h */,
 				0ED4A4190DCBFDDA007C5A77 /* PGArchiveAdapter.m */,
 				0ED4A44B0DCC628F007C5A77 /* PGPDFAdapter.h */,
@@ -1390,6 +1395,7 @@
 				0EC0F5FA10F0C758000C8B8B /* PGLocalizing.m in Sources */,
 				0E01794010FBEDBB0017FA5A /* PGActivity.m in Sources */,
 				0ECA9B681136CEF600BAFF5E /* PGDataProvider.m in Sources */,
+				B581795C121490A60041F0F4 /* PGXMLAdapter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

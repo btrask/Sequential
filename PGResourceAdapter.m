@@ -91,7 +91,6 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		[MIMETypes addObjectsFromArray:[typeDict objectForKey:PGCFBundleTypeMIMETypesKey]];
 	}
-	NSLog(@"%@", MIMETypes);
 	return MIMETypes;
 }
 
