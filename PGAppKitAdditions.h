@@ -74,7 +74,7 @@ typedef NSUInteger AEIconType;
 
 @interface NSMenu(PGAppKitAdditions)
 
-- (void)PG_removeAllItems; // Available on 10.5.
+- (void)PG_removeAllItems; // -[NSMenu removeAllItems] requires 10.6.
 
 @end
 
@@ -102,8 +102,6 @@ typedef NSUInteger AEIconType;
 
 @interface NSWindow(PGAppKitAdditions)
 
-- (BOOL)PG_isVisible; // Works around a bug with -[NSWindow isVisible] on Tiger.
-- (CGFloat)PG_userSpaceScaleFactor; // Returns 1.0 if not supported.
 - (NSRect)PG_contentRect;
 - (void)PG_setContentRect:(NSRect)aRect;
 

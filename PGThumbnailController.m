@@ -188,7 +188,7 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 	NSWindow *const p = [_displayController window];
 	if(!p) return;
 	NSRect const r = [p PG_contentRect];
-	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window PG_userSpaceScaleFactor], NSHeight(r));
+	NSRect const newFrame = NSMakeRect(NSMinX(r), NSMinY(r), (MIN([_browser numberOfColumns], PGMaxVisibleColumns) * [_browser columnWidth]) * [_window userSpaceScaleFactor], NSHeight(r));
 	if(NSEqualRects(newFrame, [_window frame])) return;
 	[_window setFrame:newFrame display:YES];
 	[self PG_postNotificationName:PGThumbnailControllerContentInsetDidChangeNotification];

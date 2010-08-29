@@ -52,8 +52,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSRect f = [self contentRectForFrameRect:[self frame]];
 	NSSize s = [[self contentView] PG_zoomedFrameSize];
-	s.width /= [self PG_userSpaceScaleFactor];
-	s.height /= [self PG_userSpaceScaleFactor];
+	s.width /= [self userSpaceScaleFactor];
+	s.height /= [self userSpaceScaleFactor];
 	f.origin.y += NSHeight(f) - s.height;
 	f.size = s;
 	return [self PG_constrainedFrameRect:[self frameRectForContentRect:f]];

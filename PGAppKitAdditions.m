@@ -291,14 +291,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @implementation NSWindow(PGAppKitAdditions)
 
-- (BOOL)PG_isVisible
-{
-	return [NSApp isActive] || ![self hidesOnDeactivate];
-}
-- (CGFloat)PG_userSpaceScaleFactor
-{
-	return [self respondsToSelector:@selector(userSpaceScaleFactor)] ? [self userSpaceScaleFactor] : 1.0f;
-}
 - (NSRect)PG_contentRect
 {
 	Rect r;
