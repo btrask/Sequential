@@ -150,7 +150,7 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 	[super dealloc];
 }
 
-#pragma mark -<PGResourceAdapting>
+#pragma mark -<PGResourceAdapter>
 
 - (PGContainerAdapter *)containerAdapter
 {
