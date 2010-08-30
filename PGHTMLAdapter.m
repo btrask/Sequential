@@ -141,11 +141,4 @@ NSString *const PGDOMDocumentKey = @"PGDOMDocument";
 	[self _clearWebView];
 }
 
-#pragma mark -<PGResourceAdapting>
-
-- (CGFloat)loadProgress
-{
-	return 1.0f;
-}
-
 @end
