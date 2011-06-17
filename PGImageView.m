@@ -341,7 +341,7 @@ static NSSize PGRoundedCornerSizes[4];
 }
 - (BOOL)_shouldDrawRoundedCorners
 {
-	return _usesRoundedCorners && _immediateSize.width >= 16.0f && _immediateSize.height >= 16.0f;
+	return _usesRoundedCorners && _immediateSize.width > 64.0f && _immediateSize.height > 64.0f;
 }
 - (BOOL)_needsToDrawRoundedCornersForImageRect:(NSRect)r rects:(NSRect const *)rects count:(NSUInteger)count
 {
