@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <fcntl.h>
 
 // Other Sources
-#import "PGCancelableProxy.h"
 #import "PGFoundationAdditions.h"
 
 NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventDidOccur";
@@ -36,20 +35,16 @@ NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventD
 NSString *const PGSubscriptionPathKey      = @"PGSubscriptionPath";
 NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
-static NSInteger PGKQueue              = -1;
-static id  PGActiveSubscriptions = nil;
-
 @interface PGLeafSubscription : PGSubscription
 {
 	@private
-	NSInteger _descriptor;
+	int _descriptor;
 }
 
 + (void)threaded_sendFileEvents;
++ (void)mainThread_sendFileEvent:(NSDictionary *)info;
 
 - (id)initWithPath:(NSString *)path;
-@property(readonly) PGSubscription *rootSubscription;
-- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum;
 
 @end
 
@@ -100,60 +95,77 @@ static id  PGActiveSubscriptions = nil;
 
 @end
 
+static NSString *const PGLeafSubscriptionValueKey = @"PGLeafSubscriptionValue";
+static NSString *const PGLeafSubscriptionFlagsKey = @"PGLeafSubscriptionFlags";
+
+static int PGKQueue = -1;
+static CFMutableSetRef PGActiveSubscriptions = nil;
+
 @implementation PGLeafSubscription
 
 #pragma mark Class Methods
 
++ (void)initialize
+{
+	if([PGLeafSubscription class] != self) return;
+	PGKQueue = kqueue();
+	PGActiveSubscriptions = CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
+	[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:self withObject:nil];
+}
 + (void)threaded_sendFileEvents
 {
 	for(;;) {
 		NSAutoreleasePool *const pool = [[NSAutoreleasePool alloc] init];
 		struct kevent ev;
 		(void)kevent(PGKQueue, NULL, 0, &ev, 1, NULL);
-		[[PGLeafSubscription PG_performOn:(id)ev.udata allowOnce:NO withStorage:PGActiveSubscriptions] performSelectorOnMainThread:@selector(noteFileEventDidOccurWithFlags:) withObject:[NSNumber numberWithUnsignedInt:ev.fflags] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(mainThread_sendFileEvent:) withObject:[NSDictionary dictionaryWithObjectsAndKeys:
+			[NSValue valueWithNonretainedObject:(PGLeafSubscription *)ev.udata], PGLeafSubscriptionValueKey,
+			[NSNumber numberWithUnsignedInt:ev.fflags], PGLeafSubscriptionFlagsKey,
+			nil] waitUntilDone:NO];
 		[pool release];
 	}
+}
++ (void)mainThread_sendFileEvent:(NSDictionary *)info
+{
+	PGSubscription *const subscription = [[info objectForKey:PGLeafSubscriptionValueKey] nonretainedObjectValue];
+	if(!CFSetContainsValue(PGActiveSubscriptions, subscription)) return;
+	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
+	NSString *const path = [subscription path];
+	if(path) [dict setObject:path forKey:PGSubscriptionPathKey];
+	NSNumber *const flags = [info objectForKey:PGLeafSubscriptionFlagsKey];
+	if(flags) [dict setObject:flags forKey:PGSubscriptionRootFlagsKey];
+	[subscription PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
 #pragma mark Instance Methods
 
 - (id)initWithPath:(NSString *)path
 {
+	NSAssert([NSThread isMainThread], @"PGSubscription is not thread safe.");
 	errno = 0;
 	if((self = [super init])) {
+		CFSetAddValue(PGActiveSubscriptions, self);
 		char const *const rep = [path fileSystemRepresentation];
 		_descriptor = open(rep, O_EVTONLY);
 		if(-1 == _descriptor) {
 			[self release];
 			return nil;
 		}
-		if(-1 == PGKQueue) {
-			PGKQueue = kqueue();
-			PGActiveSubscriptions = [[PGCancelableProxy storage] retain];
-			[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:[self class] withObject:nil];
-		}
-		[self PG_allowPerformsWithStorage:PGActiveSubscriptions];
-		struct kevent ev;
-		EV_SET(&ev, _descriptor, EVFILT_VNODE, EV_ADD | EV_CLEAR, NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE, 0, self);
-		struct timespec timeout = {0, 0};
+		struct kevent const ev = {
+			.ident = _descriptor,
+			.filter = EVFILT_VNODE,
+			.flags = EV_ADD | EV_CLEAR,
+			.fflags = NOTE_DELETE | NOTE_WRITE | NOTE_EXTEND | NOTE_ATTRIB | NOTE_LINK | NOTE_RENAME | NOTE_REVOKE,
+			.data = 0,
+			.udata = self,
+		};
+		struct timespec const timeout = {0, 0};
 		if(-1 == kevent(PGKQueue, &ev, 1, NULL, 0, &timeout)) {
 			[self release];
 			return nil;
 		}
 	}
 	return self;
-}
-- (PGSubscription *)rootSubscription
-{
-	return self;
-}
-- (void)noteFileEventDidOccurWithFlags:(NSNumber *)flagsNum
-{
-	NSMutableDictionary *const dict = [NSMutableDictionary dictionary];
-	NSString *const path = [self path];
-	if(path) [dict setObject:path forKey:PGSubscriptionPathKey];
-	if(flagsNum) [dict setObject:flagsNum forKey:PGSubscriptionRootFlagsKey];
-	[[self rootSubscription] PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
 #pragma mark NSCopying Protocol
@@ -176,9 +188,24 @@ static id  PGActiveSubscriptions = nil;
 
 #pragma mark NSObject
 
+- (id)retain
+{
+	NSAssert([NSThread isMainThread], @"PGSubscription is not thread safe.");
+	return [super retain];
+}
+- (oneway void)release
+{
+	NSAssert([NSThread isMainThread], @"PGSubscription is not thread safe.");
+	[super release];
+}
+- (id)autorelease
+{
+	NSAssert([NSThread isMainThread], @"PGSubscription is not thread safe.");
+	return [super autorelease];
+}
 - (void)dealloc
 {
-	[self PG_cancelPerformsWithStorage:PGActiveSubscriptions];
+	CFSetRemoveValue(PGActiveSubscriptions, self);
 	if(-1 != _descriptor) close(_descriptor);
 	[super dealloc];
 }

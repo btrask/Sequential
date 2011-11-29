@@ -34,10 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGDocumentController.h"
 
 // Other Sources
-#import "PGCancelableProxy.h"
 #import "PGFoundationAdditions.h"
-
-static id PGArchiveAdapterList = nil;
 
 @interface PGDataProvider(PGArchiveDataProvider)
 
@@ -77,13 +74,6 @@ static id PGArchiveAdapterList = nil;
 @end
 
 @implementation PGArchiveAdapter
-
-#pragma mark +NSObject
-
-+ (void)initialize
-{
-	if([PGArchiveAdapter class] == self) PGArchiveAdapterList = [[PGCancelableProxy storage] retain];
-}
 
 #pragma mark -PGArchiveAdapter
 
@@ -172,7 +162,6 @@ static id PGArchiveAdapterList = nil;
 
 - (void)dealloc
 {
-	[self PG_cancelPerformsWithStorage:PGArchiveAdapterList];
 	@synchronized(_archive) {
 		[_archive release];
 		_archive = nil;
