@@ -204,7 +204,6 @@ NSString *const PGThumbnailControllerContentInsetDidChangeNotification = @"PGThu
 		[_window setReleasedWhenClosed:NO];
 		[_window setDelegate:self];
 		[_window setAcceptsEvents:YES];
-		[_window setCanBecomeKey:YES];
 		_browser = [_window content];
 		[_browser setDelegate:self];
 		[_browser setDataSource:self];
