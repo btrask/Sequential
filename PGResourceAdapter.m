@@ -33,7 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other Sources
 #import "PGAppKitAdditions.h"
-#import "PGCFMutableArray.h"
 #import "PGDebug.h"
 #import "PGFoundationAdditions.h"
 #import "PGGeometry.h"

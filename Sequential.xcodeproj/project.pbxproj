@@ -66,7 +66,6 @@
 		0E1D39F40A7F24E700C542A6 /* PGFullscreenWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D39F30A7F24E700C542A6 /* PGFullscreenWindow.m */; };
 		0E1D3A4C0A7FA7B500C542A6 /* PGClipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */; };
 		0E1D3EC90A8091FE00C542A6 /* PGDocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */; };
-		0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */; };
 		0E20FDBA10967449007EE24A /* PGOrientationMenuItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E20FDB910967449007EE24A /* PGOrientationMenuItemCell.m */; };
 		0E246B4310887CF200C30936 /* PGFoundationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4210887CF200C30936 /* PGFoundationAdditions.m */; };
 		0E246B4610887DC600C30936 /* PGAppKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E246B4510887DC600C30936 /* PGAppKitAdditions.m */; };
@@ -488,8 +487,6 @@
 		0E1D3A4B0A7FA7B500C542A6 /* PGClipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGClipView.m; sourceTree = "<group>"; };
 		0E1D3EC70A8091FD00C542A6 /* PGDocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDocumentController.h; sourceTree = "<group>"; };
 		0E1D3EC80A8091FE00C542A6 /* PGDocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDocumentController.m; sourceTree = "<group>"; };
-		0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGCFMutableArray.h; sourceTree = "<group>"; };
-		0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGCFMutableArray.m; sourceTree = "<group>"; };
 		0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = XADMaster.xcodeproj; path = XADMaster/XADMaster.xcodeproj; sourceTree = "<group>"; };
 		0E20FDB810967449007EE24A /* PGOrientationMenuItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGOrientationMenuItemCell.h; sourceTree = "<group>"; };
 		0E20FDB910967449007EE24A /* PGOrientationMenuItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGOrientationMenuItemCell.m; sourceTree = "<group>"; };
@@ -938,8 +935,6 @@
 				0E246B4510887DC600C30936 /* PGAppKitAdditions.m */,
 				0E4793910DF15FD90083B7CA /* PGAttachments.h */,
 				0E4793920DF15FD90083B7CA /* PGAttachments.m */,
-				0E20AF350EA6E325002A7854 /* PGCFMutableArray.h */,
-				0E20AF360EA6E325002A7854 /* PGCFMutableArray.m */,
 				0E246BBB108880F800C30936 /* PGDebug.h */,
 				0E246BBC108880F800C30936 /* PGDebug.m */,
 				0E2500C00FA4755A002CCCBA /* PGDelayedPerforming.h */,
@@ -1378,7 +1373,6 @@
 				0EDB9A760EA1896400B7342A /* PGColumnView.m in Sources */,
 				0EDB9A790EA1899300B7342A /* PGThumbnailBrowser.m in Sources */,
 				0EDB9BFF0EA1E27D00B7342A /* PGThumbnailView.m in Sources */,
-				0E20AF370EA6E325002A7854 /* PGCFMutableArray.m in Sources */,
 				0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */,
 				0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */,
 				0EF9B2550FA348F700B7E16A /* PGIconTextFieldCell.m in Sources */,
