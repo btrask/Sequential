@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGProgressIndicatorCell.h"
 
 // Other Sources
-#import "PGDelayedPerforming.h"
 #import "PGFoundationAdditions.h"
 #import "PGGeometry.h"
 
@@ -75,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 - (void)windowWillShow
 {
-	_updateTimer = [[self PG_performSelector:@selector(_update) withObject:nil fireDate:nil interval:1.0f options:PGRetainTarget | PGRepeatOnInterval] retain];
+	_updateTimer = [[NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(_update) userInfo:nil repeats:YES] retain];
 	[self _update];
 }
 - (void)windowWillClose
