@@ -1,4 +1,4 @@
-/* Copyright © 2007-2009, The Sequential Project
+/* Copyright © 2007-2011, The Sequential Project
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 NSString *const PGSubscriptionEventDidOccurNotification = @"PGSubscriptionEventDidOccur";
 
-NSString *const PGSubscriptionPathKey      = @"PGSubscriptionPath";
+NSString *const PGSubscriptionPathKey = @"PGSubscriptionPath";
 NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
 @interface PGLeafSubscription : PGSubscription
@@ -65,7 +65,7 @@ NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 
 @implementation PGSubscription
 
-#pragma mark Class Methods
+#pragma mark +PGSubscription
 
 + (id)subscriptionWithPath:(NSString *)path descendents:(BOOL)flag
 {
@@ -79,14 +79,14 @@ NSString *const PGSubscriptionRootFlagsKey = @"PGSubscriptionRootFlags";
 	return [self subscriptionWithPath:path descendents:NO];
 }
 
-#pragma mark Instance Methods
+#pragma mark -PGSubscription
 
 - (NSString *)path
 {
 	return nil;
 }
 
-#pragma mark NSObject Protocol
+#pragma mark -NSObject<NSObject>
 
 - (NSString *)description
 {
@@ -103,15 +103,8 @@ static CFMutableSetRef PGActiveSubscriptions = nil;
 
 @implementation PGLeafSubscription
 
-#pragma mark Class Methods
+#pragma mark +PGLeafSubscription
 
-+ (void)initialize
-{
-	if([PGLeafSubscription class] != self) return;
-	PGKQueue = kqueue();
-	PGActiveSubscriptions = CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
-	[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:self withObject:nil];
-}
 + (void)threaded_sendFileEvents
 {
 	for(;;) {
@@ -137,7 +130,17 @@ static CFMutableSetRef PGActiveSubscriptions = nil;
 	[subscription PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:dict];
 }
 
-#pragma mark Instance Methods
+#pragma mark +NSObject
+
++ (void)initialize
+{
+	if([PGLeafSubscription class] != self) return;
+	PGKQueue = kqueue();
+	PGActiveSubscriptions = CFSetCreateMutable(kCFAllocatorDefault, 0, NULL);
+	[NSThread detachNewThreadSelector:@selector(threaded_sendFileEvents) toTarget:self withObject:nil];
+}
+
+#pragma mark -PGLeafSubscription
 
 - (id)initWithPath:(NSString *)path
 {
@@ -168,14 +171,7 @@ static CFMutableSetRef PGActiveSubscriptions = nil;
 	return self;
 }
 
-#pragma mark NSCopying Protocol
-
-- (id)copyWithZone:(NSZone *)zone
-{
-	return [self retain];
-}
-
-#pragma mark PGSubscription
+#pragma mark -PGSubscription
 
 - (NSString *)path
 {
@@ -186,7 +182,16 @@ static CFMutableSetRef PGActiveSubscriptions = nil;
 	return result;
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
+
+- (void)dealloc
+{
+	CFSetRemoveValue(PGActiveSubscriptions, self);
+	if(-1 != _descriptor) close(_descriptor);
+	[super dealloc];
+}
+
+#pragma mrk -NSObject<NSObject>
 
 - (id)retain
 {
@@ -203,12 +208,6 @@ static CFMutableSetRef PGActiveSubscriptions = nil;
 	NSAssert([NSThread isMainThread], @"PGSubscription is not thread safe.");
 	return [super autorelease];
 }
-- (void)dealloc
-{
-	CFSetRemoveValue(PGActiveSubscriptions, self);
-	if(-1 != _descriptor) close(_descriptor);
-	[super dealloc];
-}
 
 @end
 
@@ -219,7 +218,7 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 
 @implementation PGBranchSubscription
 
-#pragma mark Instance Methods
+#pragma mark -PGBranchSubscription
 
 - (id)initWithPath:(NSString *)path
 {
@@ -260,14 +259,14 @@ static void PGEventStreamCallback(ConstFSEventStreamRef streamRef, void *clientC
 	[self PG_postNotificationName:PGSubscriptionEventDidOccurNotification userInfo:[aNotif userInfo]];
 }
 
-#pragma mark PGSubscription
+#pragma mark -PGSubscription
 
 - (NSString *)path
 {
 	return [_rootSubscription path];
 }
 
-#pragma mark NSObject
+#pragma mark -NSObject
 
 - (void)dealloc
 {
