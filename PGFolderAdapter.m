@@ -34,7 +34,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 // Other Sources
 #import "PGFoundationAdditions.h"
 
+static NSArray *PGIgnoredPaths = nil;
+
 @implementation PGFolderAdapter
+
+#pragma mark +NSObject
+
++ (void)initialize
+{
+	if([PGFolderAdapter class] != self) return;
+	PGIgnoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];
+}
 
 #pragma mark -PGFolderAdapter
 
@@ -50,9 +60,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSString *const path = [URL path];
 	for(NSString *const pathComponent in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:path error:NULL]) {
 		NSString *const pagePath = [path stringByAppendingPathComponent:pathComponent];
-		static NSArray *ignoredPaths = nil;
-		if(!ignoredPaths) ignoredPaths = [[NSArray alloc] initWithObjects:@"/net", @"/etc", @"/home", @"/tmp", @"/var", @"/mach_kernel.ctfsys", @"/mach.sym", nil];
-		if([ignoredPaths containsObject:pagePath]) continue;
+		if([PGIgnoredPaths containsObject:pagePath]) continue;
 		NSURL *const pageURL = [pagePath PG_fileURL];
 		if(LSCopyItemInfoForURL((CFURLRef)pageURL, kLSRequestBasicFlagsOnly, &info) != noErr || info.flags & kLSItemInfoIsInvisible) continue;
 		PGDisplayableIdentifier *const pageIdent = [pageURL PG_displayableIdentifier];
