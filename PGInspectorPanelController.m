@@ -66,9 +66,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSMutableDictionary *const matchingProperties = [NSMutableDictionary dictionary];
 	NSArray *const terms = [[searchField stringValue] PG_searchTerms];
 	for(NSString *const label in _properties) {
-		if(![label PG_matchesSearchTerms:terms]) continue;
 		NSString *const value = [_properties objectForKey:label];
-		if([[value description] PG_matchesSearchTerms:terms]) [matchingProperties setObject:value forKey:label];
+		if([label PG_matchesSearchTerms:terms] || [[value description] PG_matchesSearchTerms:terms]) {
+			[matchingProperties setObject:value forKey:label];
+		}
 	}
 	[_matchingProperties release];
 	_matchingProperties = [matchingProperties copy];
