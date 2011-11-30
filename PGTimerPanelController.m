@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 @property(readonly) PGPrefObject *_currentPrefObject;
 - (void)_update;
-- (void)_updateOnTimer:(NSNumber *)changed;
+- (void)_updateOnTimer:(NSTimer *)timer;
 
 @end
 
@@ -58,7 +58,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 {
 	NSTimeInterval const interval = round([sender doubleValue]);
 	[[self _currentPrefObject] setTimerInterval:interval];
-	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
+	[self _updateOnTimer:nil];
 }
 
 #pragma mark -
@@ -88,11 +88,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[timerButton setEnabled:!!d];
 	[timerButton setIconType:run ? AEStopIcon : AEPlayIcon];
-	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
+	[self _updateOnTimer:nil];
 }
-- (void)_updateOnTimer:(NSNumber *)changed
+- (void)_updateOnTimer:(NSTimer *)timer
 {
-	NSParameterAssert(changed);
 	NSTimeInterval const interval = [[self _currentPrefObject] timerInterval];
 	BOOL const running = [self displayController].timerRunning;
 	NSTimeInterval timeRemaining = interval;
@@ -102,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[timerButton setProgress:running ? (CGFloat)((interval - timeRemaining) / interval) : 0.0f];
 	[remainingField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), timeRemaining]];
-	if([changed boolValue]) {
+	if(!timer) {
 		[totalField setStringValue:[NSString localizedStringWithFormat:NSLocalizedString(@"%.1f seconds", @"Display string for timer intervals. %.1f is replaced with the remaining seconds and tenths of seconds."), interval]];
 		[intervalSlider setDoubleValue:interval];
 		[intervalSlider setEnabled:!![self displayController]];
@@ -139,7 +138,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 - (void)windowDidLoad
 {
 	[super windowDidLoad];
-	[self _updateOnTimer:[NSNumber numberWithBool:YES]];
+	[self _updateOnTimer:nil];
 }
 
 #pragma mark -NSObject
