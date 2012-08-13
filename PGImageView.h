@@ -56,15 +56,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 @property(readonly) NSSize size;
 @property(readonly) NSSize originalSize;
 @property(readonly) CGFloat averageScaleFactor;
-@property(assign) CGFloat rotationInDegrees;
-@property(assign) BOOL antialiasWhenUpscaling;
+@property(assign, nonatomic) CGFloat rotationInDegrees;
+@property(assign, nonatomic) BOOL antialiasWhenUpscaling;
 @property(readonly) NSImageInterpolation interpolation;
-@property(assign) BOOL usesRoundedCorners;
-@property(assign) BOOL usesCaching;
+@property(assign, nonatomic) BOOL usesRoundedCorners;
+@property(assign, nonatomic) BOOL usesCaching;
 
 @property(readonly) BOOL canAnimateRep;
-@property(assign) BOOL animates;
-@property(assign, getter = isPaused) BOOL paused;
+@property(assign, nonatomic) BOOL animates;
+@property(assign, nonatomic, getter = isPaused) BOOL paused;
 
 - (void)setImageRep:(NSImageRep *)rep orientation:(PGOrientation)orientation size:(NSSize)size;
 - (void)setSize:(NSSize)size allowAnimation:(BOOL)flag; // Use this function to control how big the image is displayed. PGImageView manages its own frame size.

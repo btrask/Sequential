@@ -74,17 +74,17 @@ typedef NSUInteger PGScrollToRectType;
 	NSTimeInterval _lastAnimationTime;
 }
 
-@property(assign) NSResponder<PGClipViewDelegate> *delegate;
-@property(retain) NSView *documentView;
+@property(assign, nonatomic) NSResponder<PGClipViewDelegate> *delegate;
+@property(retain, nonatomic) NSView *documentView;
 @property(readonly) NSRect documentFrame;
-@property(assign) PGInset boundsInset;
+@property(assign, nonatomic) PGInset boundsInset;
 @property(readonly) NSRect insetBounds;
-@property(retain) NSColor *backgroundColor;
-@property(assign) BOOL showsBorder;
-@property(retain) NSCursor *cursor;
-@property(assign, getter = isScrolling) BOOL scrolling;
-@property(assign) BOOL allowsAnimation;
-@property(assign) BOOL acceptsFirstResponder;
+@property(retain, nonatomic) NSColor *backgroundColor;
+@property(assign, nonatomic) BOOL showsBorder;
+@property(retain, nonatomic) NSCursor *cursor;
+@property(assign, nonatomic, getter = isScrolling) BOOL scrolling;
+@property(assign, nonatomic) BOOL allowsAnimation;
+@property(assign, nonatomic) BOOL acceptsFirstResponder;
 
 @property(readonly) NSPoint position;
 @property(readonly) NSPoint center;

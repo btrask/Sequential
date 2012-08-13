@@ -34,10 +34,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 }
 
 @property(readonly) NSAttributedString *attributedStringValue;
-@property(copy) NSString *stringValue;
-@property(assign) NSUInteger index;
-@property(assign) NSUInteger count;
+@property(copy, nonatomic) NSString *stringValue;
+@property(assign, nonatomic) NSUInteger index;
+@property(assign, nonatomic) NSUInteger count;
 @property(readonly) BOOL showsProgressBar;
-@property(assign) PGRectCorner originCorner;
+@property(assign, nonatomic) PGRectCorner originCorner;
 
 @end

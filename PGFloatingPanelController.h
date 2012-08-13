@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGDisplayController *_displayController;
 }
 
-@property(assign, getter = isShown) BOOL shown;
+@property(assign, nonatomic, getter = isShown) BOOL shown;
 - (PGDisplayController *)displayController;
 - (void)toggleShown;
 

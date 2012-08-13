@@ -54,8 +54,8 @@ PGThumbnailBrowserDataSource, PGThumbnailBrowserDelegate, PGThumbnailViewDataSou
 + (BOOL)canShowThumbnailsForDocument:(PGDocument *)aDoc;
 + (BOOL)shouldShowThumbnailsForDocument:(PGDocument *)aDoc;
 
-@property(assign) PGDisplayController *displayController;
-@property(assign) PGDocument *document;
+@property(assign, nonatomic) PGDisplayController *displayController;
+@property(assign, nonatomic) PGDocument *document;
 @property(readonly) PGInset contentInset;
 @property(readonly) NSSet *selectedNodes;
 

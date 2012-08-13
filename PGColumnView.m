@@ -28,6 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import "PGClipView.h"
 #include <tgmath.h>
 
+// Other Sources
+#import "PGGeometry.h"
+
 @implementation PGColumnView
 
 #pragma mark -PGColumnView

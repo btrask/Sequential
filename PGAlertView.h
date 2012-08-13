@@ -85,7 +85,7 @@ typedef NSUInteger PGAlertGraphicType;
 
 + (id)loadingGraphic;
 
-@property(assign) CGFloat progress;
+@property(assign, nonatomic) CGFloat progress;
 
 @end
 

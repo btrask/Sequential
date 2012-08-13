@@ -128,16 +128,16 @@ typedef NSUInteger PGImageScaleConstraint;
 - (BOOL)performZoomOut;
 - (BOOL)performToggleFullscreen;
 
-@property(copy) NSArray *recentDocumentIdentifiers;
+@property(copy, nonatomic) NSArray *recentDocumentIdentifiers;
 @property(readonly) NSUInteger maximumRecentDocumentCount;
 @property(readonly) PGDisplayController *displayControllerForNewDocument;
-@property(assign, getter = isFullscreen) BOOL fullscreen;
+@property(assign, nonatomic, getter = isFullscreen) BOOL fullscreen;
 @property(readonly) BOOL canToggleFullscreen;
 @property(readonly, copy) NSArray *documents;
 @property(readonly) NSMenu *scaleMenu;
 @property(readonly) NSSlider *scaleSlider;
 @property(readonly) NSMenu *defaultPageMenu;
-@property(assign) PGDocument *currentDocument;
+@property(assign, nonatomic) PGDocument *currentDocument;
 @property(readonly) BOOL pathFinderRunning;
 
 - (void)addDocument:(PGDocument *)document;

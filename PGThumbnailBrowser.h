@@ -39,10 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	NSUInteger _updateCount;
 }
 
-@property(assign) NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *dataSource;
-@property(assign) NSObject<PGThumbnailBrowserDelegate> *delegate;
-@property(assign) PGOrientation thumbnailOrientation;
-@property(copy) NSSet *selection;
+@property(assign, nonatomic) NSObject<PGThumbnailBrowserDataSource, PGThumbnailViewDataSource> *dataSource;
+@property(assign, nonatomic) NSObject<PGThumbnailBrowserDelegate> *delegate;
+@property(assign, nonatomic) PGOrientation thumbnailOrientation;
+@property(copy, nonatomic) NSSet *selection;
 
 - (void)redisplayItem:(id)item recursively:(BOOL)flag;
 

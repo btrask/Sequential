@@ -40,13 +40,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	id _selectionAnchor;
 }
 
-@property(assign) NSObject<PGThumbnailViewDataSource> *dataSource;
-@property(assign) NSObject<PGThumbnailViewDelegate> *delegate;
-@property(retain) id representedObject;
-@property(assign) PGOrientation thumbnailOrientation;
+@property(assign, nonatomic) NSObject<PGThumbnailViewDataSource> *dataSource;
+@property(assign, nonatomic) NSObject<PGThumbnailViewDelegate> *delegate;
+@property(retain, nonatomic) id representedObject;
+@property(assign, nonatomic) PGOrientation thumbnailOrientation;
 
 @property(readonly) NSArray *items;
-@property(copy) NSSet *selection;
+@property(copy, nonatomic) NSSet *selection;
 @property(readonly) id selectionAnchor;
 - (void)selectItem:(id)item byExtendingSelection:(BOOL)extend;
 - (void)deselectItem:(id)item;

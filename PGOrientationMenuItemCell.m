@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 // Other Sources
 #import "PGFoundationAdditions.h"
+#import "PGGeometry.h"
 
 @implementation PGOrientationMenuIconCell
 
