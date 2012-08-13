@@ -296,9 +296,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #if __LP64__
 	return [self contentRectForFrameRect:[self frame]]; // TODO: Make sure this works right when the window is being dragged/resized.
 #else
-	HIRect r;
-	HIWindowGetBounds([self windowRef], kWindowContentRgn, kHICoordSpace72DPIGlobal, &r); // Updated in realtime, unlike -frame. See http://web.archive.org/web/20100113062205/http://rentzsch.com/cocoa/nswindowFrameLies.
-	return NSRectFromCGRect(r);
+	HIRect rect;
+	HIWindowGetBounds([self windowRef], kWindowContentRgn, kHICoordSpace72DPIGlobal, &rect); // Updated in realtime, unlike -frame. See http://web.archive.org/web/20100113062205/http://rentzsch.com/cocoa/nswindowFrameLies.
+	NSRect const r = NSRectFromCGRect(rect);
+	return NSMakeRect(NSMinX(r), (CGFloat)CGDisplayPixelsHigh(kCGDirectMainDisplay) - NSMaxY(r), NSWidth(r), NSHeight(r));
 #endif
 }
 - (void)PG_setContentRect:(NSRect)aRect
