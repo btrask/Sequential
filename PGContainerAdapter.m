@@ -122,7 +122,8 @@ NSString *const PGMaxDepthKey = @"PGMaxDepth";
 		PGNode *const node = search(adapter, sel, forward, context, nil);
 		if(node) return node;
 	}
-	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context];
+	return [[self parentAdapter] outwardSearchForward:forward fromChild:[self node] inclusive:inclusive withSelector:sel context:context]; // TODO: I think this is a bug. Instead of passing up `inclusive`, we should always say YES for our parent nodes. The original `inclusive` parameter should only apply to the original node.
+	// Or maybe it should always be NO. If we say yes, we go right back into the child we just came out of.
 }
 - (void)noteChildValueForCurrentSortOrderDidChange:(PGNode *)child
 {
