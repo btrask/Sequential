@@ -35,7 +35,7 @@ static NSMutableData *MakeBMPContainer(int width,int height,uint32_t length,int 
 	{
 		NSMutableData *namedata=[NSMutableData data];
 		uint8_t c;
-		while(c=[fh readUInt8]) [namedata appendBytes:&c length:1];
+		while((c=[fh readUInt8])) [namedata appendBytes:&c length:1];
 
 		int method=[fh readUInt8];
 		uint32_t dataoffs=[fh readUInt32BE];

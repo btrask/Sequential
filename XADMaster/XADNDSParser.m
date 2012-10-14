@@ -141,7 +141,7 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 			{
 				int ch=[fh readUInt16LE];
 				if(!ch) break;
-				[string appendFormat:@"%C",ch];
+				[string appendFormat:@"%d",ch];
 			}
 
 			NSData *data=[string dataUsingEncoding:NSUTF8StringEncoding];

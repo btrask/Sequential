@@ -57,7 +57,7 @@ struct xadMasterBaseP *xadOpenLibrary(xadINT32 version);
 		namedata=[[[self name] dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
 		[namedata increaseLengthBy:1];
 
-		if(archive=xadAllocObjectA(xmb,XADOBJ_ARCHIVEINFO,NULL))
+		if((archive=xadAllocObjectA(xmb,XADOBJ_ARCHIVEINFO,NULL)))
 		{
 			indata.fh=handle;
 			indata.name=[namedata bytes];

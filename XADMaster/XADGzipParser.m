@@ -50,13 +50,13 @@
 		{
 			filename=[NSMutableData data];
 			uint8_t chr;
-			while(chr=[handle readUInt8]) [filename appendBytes:&chr length:1];
+			while((chr=[handle readUInt8])) [filename appendBytes:&chr length:1];
 		}
 		if(flags&0x10) // FCOMMENT: comment
 		{
 			comment=[NSMutableData data];
 			uint8_t chr;
-			while(chr=[handle readUInt8]) [comment appendBytes:&chr length:1];
+			while((chr=[handle readUInt8])) [comment appendBytes:&chr length:1];
 		}
 		if(flags&0x02) // FHCRC: header crc
 		{

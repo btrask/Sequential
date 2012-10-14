@@ -153,7 +153,7 @@ static CSHandle *HandleForElement(CSHandle *fh,StuffItXElement *element,BOOL wan
 		break;
 
 		default:
-			NSLog(@"File uses SITX compression method %d\n",element->alglist[0]);
+			NSLog(@"File uses SITX compression method %lld\n",element->alglist[0]);
 			return nil;
 	}
 
@@ -191,7 +191,7 @@ static CSHandle *HandleForElement(CSHandle *fh,StuffItXElement *element,BOOL wan
 */
 
 		default:
-			NSLog(@"File uses SITX preprocessing method %d\n",element->alglist[2]);
+			NSLog(@"File uses SITX preprocessing method %lld\n",element->alglist[2]);
 			return nil;
 	}
 

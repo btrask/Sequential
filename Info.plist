@@ -2,17 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSMinimumSystemVersionByArchitecture</key>
-	<dict>
-		<key>x86_64</key>
-		<string>10.6</string>
-	</dict>
-	<key>LSArchitecturePriority</key>
-	<array>
-		<string>x86_64</string>
-		<string>i386</string>
-		<string>ppc</string>
-	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
@@ -85,12 +74,12 @@
 			<array>
 				<string>application/x-7z-compressed</string>
 			</array>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>org.7-zip.7-zip-archive</string>
 			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Viewer</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeOSTypes</key>
@@ -629,17 +618,17 @@
 			</array>
 		</dict>
 		<dict>
+			<key>CFBundleMIMETypes</key>
+			<array>
+				<string>application/rss+xml</string>
+				<string>text/rss+xml</string>
+			</array>
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>rss</string>
 				<string>RSS</string>
 				<string>xml</string>
 				<string>XML</string>
-			</array>
-			<key>CFBundleMIMETypes</key>
-			<array>
-				<string>application/rss+xml</string>
-				<string>text/rss+xml</string>
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
@@ -667,6 +656,8 @@
 	<string>${PRODUCT_NAME}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.1.2</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -684,14 +675,31 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>2.1.2</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>LSArchitecturePriority</key>
+	<array>
+		<string>x86_64</string>
+		<string>i386</string>
+		<string>ppc</string>
+	</array>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.5.8</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>x86_64</key>
+		<string>10.6</string>
+	</dict>
 	<key>NSMainNibFile</key>
 	<string>PGMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>PGApplication</string>
 	<key>NSSupportsSuddenTermination</key>
 	<true/>
+	<key>PGDataProviderCustomizers</key>
+	<array>
+		<string>PGWebAdapter</string>
+	</array>
 	<key>PGResourceAdapterClasses</key>
 	<dict>
 		<key>PGArchiveAdapter</key>
@@ -722,9 +730,15 @@
 			</array>
 			<key>PGBundleTypeFourCCs</key>
 			<array>
-				<data>UEsDBA==</data>
-				<data>UmFyIQ==</data>
-				<data>N3rCvMKv</data>
+				<data>
+				UEsDBA==
+				</data>
+				<data>
+				UmFyIQ==
+				</data>
+				<data>
+				N3rCvMKv
+				</data>
 			</array>
 		</dict>
 		<key>PGFlickrAdapter</key>
@@ -864,6 +878,24 @@
 				<string>application/xhtml+xml</string>
 			</array>
 		</dict>
+		<key>PGMediaRSSAdapter</key>
+		<dict>
+			<key>CFBundleTypeExtensions</key>
+			<array>
+				<string>xml</string>
+				<string>rss</string>
+			</array>
+			<key>CFBundleTypeMIMETypes</key>
+			<array>
+				<string>application/rss+xml</string>
+				<string>text/rss+xml</string>
+			</array>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>public.rss</string>
+				<string>public.xml</string>
+			</array>
+		</dict>
 		<key>PGPDFAdapter</key>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -889,36 +921,16 @@
 			</array>
 			<key>PGBundleTypeFourCC</key>
 			<array>
-				<data>JVBERg==</data>
+				<data>
+				JVBERg==
+				</data>
 			</array>
 		</dict>
 		<key>PGResourceAdapter</key>
 		<dict/>
 		<key>PGWebAdapter</key>
 		<dict/>
-		<key>PGMediaRSSAdapter</key>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>xml</string>
-				<string>rss</string>
-			</array>
-			<key>CFBundleTypeMIMETypes</key>
-			<array>
-				<string>application/rss+xml</string>
-				<string>text/rss+xml</string>
-			</array>
-			<key>LSItemContentTypes</key>
-			<array>
-				<string>public.rss</string>
-				<string>public.xml</string>
-			</array>
-		</dict>
 	</dict>
-	<key>PGDataProviderCustomizers</key>
-	<array>
-		<string>PGWebAdapter</string>
-	</array>
 	<key>SUAllowsAutomaticUpdates</key>
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
@@ -927,9 +939,9 @@
 	<false/>
 	<key>SUFeedURL</key>
 	<string>http://www.sequentialx.com/sequential.xml</string>
-	<key>SUShowReleaseNotes</key>
-	<false/>
 	<key>SUPublicDSAKeyFile</key>
 	<string>dsa_pub.pem</string>
+	<key>SUShowReleaseNotes</key>
+	<false/>
 </dict>
 </plist>

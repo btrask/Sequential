@@ -25,7 +25,9 @@
 
 @implementation CSChecksumWrapperHandle
 {
+#ifndef CSChecksumWrapperHandle
 	CSHandle *parent,*checksum;
+#endif
 }
 
 -(id)initWithHandle:(CSHandle *)handle checksumHandle:(CSHandle *)checksumhandle

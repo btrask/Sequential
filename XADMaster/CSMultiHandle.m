@@ -22,7 +22,7 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 	va_list va;
 
 	va_start(va,firsthandle);
-	while(handle=va_arg(va,CSHandle *)) [array addObject:handle];
+	while((handle=va_arg(va,CSHandle *))) [array addObject:handle];
 	va_end(va);
 
 	return [self multiHandleWithHandleArray:array];
@@ -31,7 +31,7 @@ NSString *CSSizeOfSegmentUnknownException=@"CSSizeOfSegmentUnknownException";
 
 -(id)initWithHandles:(NSArray *)handlearray
 {
-	if(self=[super initWithName:[NSString stringWithFormat:@"%@, and %d more combined",[[handlearray objectAtIndex:0] name],[handlearray count]-1]])
+	if(self=[super initWithName:[NSString stringWithFormat:@"%@, and %ld more combined",[[handlearray objectAtIndex:0] name],[handlearray count]-1]])
 	{
 		handles=[handlearray copy];
 		currhandle=0;

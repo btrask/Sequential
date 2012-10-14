@@ -372,8 +372,8 @@ static void EmitLongMatch(XADRAR15Handle *self,off_t *posptr)
 	if(offset>=self->maximumoffset) length++;
 	if(offset<=256) length+=8;
 
-	if(self->runningaveragebelowmaximum>0xb0 || self->runningaverageliteral>=0x2a00
-	&& self->runningaveragelength<0x40) self->maximumoffset=0x7f00;
+	if(self->runningaveragebelowmaximum>0xb0 || (self->runningaverageliteral>=0x2a00
+	&& self->runningaveragelength<0x40)) self->maximumoffset=0x7f00;
 	else self->maximumoffset=0x2001;
 
 

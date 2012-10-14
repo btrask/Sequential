@@ -415,7 +415,7 @@ static NSData *ReadCString(CSHandle *fh)
 {
 	NSMutableData *data=[NSMutableData data];
 	uint8_t b;
-	while(b=[fh readUInt8]) [data appendBytes:&b length:1];
+	while((b=[fh readUInt8])) [data appendBytes:&b length:1];
 	return data;
 }
 

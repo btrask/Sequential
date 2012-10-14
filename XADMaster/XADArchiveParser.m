@@ -274,7 +274,7 @@ static int maxheader=0;
 
 -(id)initWithHandle:(CSHandle *)handle name:(NSString *)name
 {
-	if(self=[self _initWithHandle:handle])
+	if((self=[self _initWithHandle:handle]))
 	{
 		[self setObject:[name lastPathComponent] forPropertyKey:XADArchiveNameKey];
 		[self setObject:[NSArray arrayWithObject:name] forPropertyKey:XADVolumesKey];
@@ -284,7 +284,7 @@ static int maxheader=0;
 
 -(id)initWithHandle:(CSHandle *)handle name:(NSString *)name volumes:(NSArray *)volumes
 {
-	if(self=[self _initWithHandle:handle])
+	if((self=[self _initWithHandle:handle]))
 	{
 		[self setObject:[name lastPathComponent] forPropertyKey:XADArchiveNameKey];
 		[self setObject:volumes forPropertyKey:XADVolumesKey];
