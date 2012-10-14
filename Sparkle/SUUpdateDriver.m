@@ -7,8 +7,9 @@
 //
 
 #import "SUUpdateDriver.h"
+#import "SUHost.h"
 
-NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
+NSString * const SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 
 @implementation SUUpdateDriver
 - initWithUpdater:(SUUpdater *)anUpdater
@@ -18,7 +19,7 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
 	return self;
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [host bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [host bundlePath], [host installationPath]]; }
 
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)h
 {
@@ -39,6 +40,17 @@ NSString *SUUpdateDriverFinishedNotification = @"SUUpdateDriverFinished";
     [host release];
 	[appcastURL release];
     [super dealloc];
+}
+
+- (SUHost*)host
+{
+    return host;
+}
+
+- (void)setHost:(SUHost*)newHost
+{
+    [host release];
+    host = [newHost retain];
 }
 
 @end

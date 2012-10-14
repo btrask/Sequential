@@ -1,16 +1,16 @@
 #import "XADStuffItXBlockHandle.h"
 #import "StuffItXUtilities.h"
-#import "SystemSpecific.h"
 
 @implementation XADStuffItXBlockHandle
 
 -(id)initWithHandle:(CSHandle *)handle
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name]]))
 	{
 		parent=[handle retain];
 		startoffs=[parent offsetInFile];
 		buffer=NULL;
+		currsize=0;
 	}
 	return self;
 }
@@ -32,8 +32,13 @@
 	int size=ReadSitxP2(parent);
 	if(!size) return -1;
 
-	buffer=reallocf(buffer,size);
-	[self setBlockPointer:buffer];
+	if(size>currsize)
+	{
+		free(buffer);
+		buffer=malloc(size);
+		currsize=size;
+		[self setBlockPointer:buffer];
+	}
 
 	return [parent readAtMost:size toBuffer:buffer];
 }

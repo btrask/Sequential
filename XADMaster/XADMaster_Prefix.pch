@@ -3,7 +3,7 @@
 //
 
 #ifdef __OBJC__
-    #import <Cocoa/Cocoa.h>
+	#import <Foundation/Foundation.h>
 #endif
 
 #if !NSINTEGER_DEFINED && !defined(__COCOTRON__)

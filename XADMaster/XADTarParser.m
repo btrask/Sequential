@@ -6,6 +6,7 @@
 #define TAR_FORMAT_GNU 1 // GNU and OLDGNU are basically identical
 #define TAR_FORMAT_USTAR 2 // POSIX-ish tar formats
 #define TAR_FORMAT_STAR 3 // STAR is POSIX-ish, but not similiar enough to ustar and posix.2001 tar.
+#define TAR_FORMAT_V7_RECOGNIZED 4
 
 // TODO: star.
 
@@ -21,8 +22,15 @@
 	int tarFormat = TAR_FORMAT_V7;
 	unsigned char magic[8];
 	[header getBytes:magic range:NSMakeRange(257,8)]; // "ustar\000" (ustar) / "ustar  \0" (gnu)
+	
 	unsigned char starExtendedMagic[4];
 	[header getBytes:starExtendedMagic range:NSMakeRange(508,4)]; // "tar\0"
+	
+	unsigned int checksum = [XADTarParser readOctalNumberInRangeFromBuffer:NSMakeRange(148,8) buffer:header];
+	if( [XADTarParser isTarChecksumCorrect:header checksum:checksum] == YES )
+	{
+		tarFormat = TAR_FORMAT_V7_RECOGNIZED;
+	}
 
 	if( memcmp( magic, (unsigned char[]){ 117, 115, 116, 97, 114, 0, 48, 48 }, 8 ) == 0 )
 	{
@@ -32,6 +40,7 @@
 		}
 		else
 		{
+// 			printf("TAR: Ustar format.\n" );
 			tarFormat = TAR_FORMAT_USTAR;
 		}
 	}
@@ -43,7 +52,8 @@
 	return( tarFormat );
 }
 
-// Recognize files by name or magic. (tar v7 files have no magic.)
+// Recognize files by name or magic. (tar v7 files have no magic, are recognized as
+// TAR_FORMAT_V7_RECOGNIZED via checksums)
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
 {
 	if([data length]<512) return NO;
@@ -106,8 +116,20 @@
 	return( decimal );
 }
 
-+(int64_t)readOctalNumberInRangeFromBuffer:(NSRange)range buffer:(NSData *)buffer
++(uint64_t)readOctalNumberInRangeFromBuffer:(NSRange)range buffer:(NSData *)buffer
 {
+	// This implementation only supports numbers up to 2^64. If we ever need bigger numbers,
+	// that needs to change.
+	// Also, negative values are not supported. This could be an issue if the mtime field was
+	// supposed to be negative, but it is probably fair to assume that we will not be
+	// extracting star archives with files last modified before 1970.
+	uint8_t num_string[8];
+	uint8_t mask = 0x80;
+	[buffer getBytes:num_string range:NSMakeRange(range.location,8)];
+	if( (num_string[0]&mask) == 0x80 ) {
+		[buffer getBytes:num_string range:NSMakeRange(range.location + range.length - 8,8)];
+		return CSUInt64BE(num_string);
+	}
 	return( [XADTarParser octalToDecimal:[XADTarParser readNumberInRangeFromBuffer:range buffer:buffer]] );
 }
 
@@ -135,6 +157,12 @@
 	unsignedChecksum += 8 * ' ';
 
 	return( checksum == signedChecksum || checksum == unsignedChecksum );
+}
+
+-(void)dealloc
+{
+	[currentGlobalHeader release];
+	[super dealloc];
 }
 
 -(void)parseSparseHeadersFromData:(NSData*)header numHeaders:(int)num toDict:(NSMutableDictionary *)dict
@@ -173,7 +201,8 @@
 	unsigned int gid = [XADTarParser readOctalNumberInRangeFromBuffer:NSMakeRange(116,8) buffer:header];
 	[dict setObject:[NSNumber numberWithInt:gid] forKey:XADPosixGroupKey];
 
-	off_t size = [XADTarParser readOctalNumberInRangeFromBuffer:NSMakeRange(124,12) buffer:header];
+	uint64_t size = [XADTarParser readOctalNumberInRangeFromBuffer:NSMakeRange(124,12) buffer:header];
+	
 	[dict setObject:[NSNumber numberWithLongLong:size] forKey:XADFileSizeKey];
 	[dict setObject:[NSNumber numberWithLongLong:(size+(512-size%512))] forKey:XADCompressedSizeKey];
 	[dict setObject:[NSNumber numberWithLongLong:size] forKey:XADDataLengthKey];
@@ -216,6 +245,8 @@
 	if( strncmp( name, "././@LongLink", 13 ) == 0 ) {
 		return( 1 );
 	}
+
+// 	printf( "Generictar: Name %s / %u\n", name, size );
 
 	return( 0 );
 }
@@ -348,6 +379,8 @@
 	// Global header parse.
 	[self parsePaxTarHeader:currentGlobalHeader toDict:dict];
 
+// 	printf( "Ustar header parse after global\n" );
+
 	// Needed later for extended headers, possibly.
 	CSHandle *handle = [self handle];
 	long size = [[dict objectForKey:XADDataLengthKey] longValue];
@@ -376,7 +409,8 @@
 		// POSIX.2001 global header.
 		case 'g': {
 			// Read in the header and store for parsing
-			currentGlobalHeader = [handle readDataOfLength:size];
+			[currentGlobalHeader release];
+			currentGlobalHeader = [[handle readDataOfLength:size] retain];
 			[handle seekToFileOffset:offset];
 
 			// Parse next header.
@@ -412,7 +446,7 @@
 	// In case of LongName / LongLink, we need the data.
 	CSHandle *handle = [self handle];
 	long size = [[dict objectForKey:XADDataLengthKey] longValue];
-	off_t offset = [handle offsetInFile];;
+	off_t offset = [handle offsetInFile];
 	offset += size;
 	offset += (offset % 512 == 0 ? 0 : 512 - (offset % 512) );
 
@@ -420,10 +454,12 @@
 	if( typeFlag == 'L' || typeFlag == 'K' ) {
 		// Read in the header
 		NSData *longHeader = [handle readDataOfLength:size];
-		char longHeaderBytes[size];
-		memset( longHeaderBytes, '\0', size );
-		[longHeader getBytes:longHeaderBytes range:NSMakeRange(0,size - 1)];
 		[handle seekToFileOffset:offset];
+
+		// Check if there is a terminating null byte, and eliminate it.
+		int length=[longHeader length];
+		const uint8_t *bytes=[longHeader bytes];
+		if(length>0 && bytes[length-1]==0) longHeader=[longHeader subdataWithRange:NSMakeRange(0,length-1)];
 		
 		// Prepare a new dictionary with the next header.
 		NSData *header = [handle readDataOfLength:512];
@@ -433,10 +469,10 @@
 
 		// Set the proper key.
 		if( typeFlag == 'L' ) {
-			[dict setObject:[self XADPathWithCString:longHeaderBytes separators:XADUnixPathSeparator] forKey:XADFileNameKey];
+			[dict setObject:[self XADPathWithData:longHeader separators:XADUnixPathSeparator] forKey:XADFileNameKey];
 		}
 		else {
-			[dict setObject:[self XADStringWithCString:longHeaderBytes] forKey:XADLinkDestinationKey];
+			[dict setObject:[self XADStringWithData:longHeader] forKey:XADLinkDestinationKey];
 		}
 	}
 
@@ -475,7 +511,7 @@
 	off_t size = [[dict objectForKey:XADDataLengthKey] longLongValue];
 	off_t offset = [handle offsetInFile];
 	[dict setObject:[NSNumber numberWithLong:offset] forKey:XADDataOffsetKey];
-	[self addEntryWithDictionary:dict cyclePools:YES];
+	[self addEntryWithDictionary:dict];
 	offset += size;
 	offset += (offset % 512 == 0 ? 0 : 512 - (offset % 512) );
 	[handle seekToFileOffset:offset];
@@ -484,31 +520,47 @@
 -(void)parseWithSeparateMacForks
 {
 	// Reset global current header for posix.2001;
-	currentGlobalHeader = [NSData data];
+	currentGlobalHeader = [NSData new];
 	
 	CSHandle *handle = [self handle];
+	int tarFormat = -1;
 
-	// Be a little more memory-efficient.
-
-	NSData *header = [handle readDataOfLength:512];
-		
-	int tarFormat = [XADTarParser getTarType:header];
-
-	BOOL isArchiverOver = NO;
-	while( !isArchiverOver && [self shouldKeepParsing])
+	while([self shouldKeepParsing])
 	{
+		NSAutoreleasePool *pool = [NSAutoreleasePool new];
+
+		// Read next header.
+		if([handle atEndOfFile]) break;
+		NSData *header = [handle readDataOfLength:512];
+
+		// Figure out format if we haven't yet done so.
+		if( tarFormat == -1 ) tarFormat = [XADTarParser getTarType:header];
+		
+		// See if there are 512 nullbytes. That means the file is over.
+		const char *firstBytes = [header bytes];
+		BOOL isArchiverOver = YES;
+		for( int i = 0; i < 512; i++ ) {		
+			if( firstBytes[i] != '\000' ) {
+				isArchiverOver = NO;
+			}
+		}
+		if( isArchiverOver )
+		{
+			[pool release];
+			break;
+		}
+
 		NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
 		// Reset sparseity.
 		[dict setObject:[NSNumber numberWithBool:NO] forKey:@"TARIsSparseFile"];
-
 
 		int wrongFormat = [self parseGenericTarHeader:header toDict:dict];
 		if( wrongFormat == 1 ) {
 			tarFormat = TAR_FORMAT_GNU;
 		}
 
-		if( tarFormat == TAR_FORMAT_V7 ) {
+		if( tarFormat == TAR_FORMAT_V7 || tarFormat == TAR_FORMAT_V7_RECOGNIZED ) {
 			[self addTarEntryWithDictionaryAndSeek:dict];
 		}
 		else if( tarFormat == TAR_FORMAT_USTAR )
@@ -523,20 +575,12 @@
 		}
 		else
 		{
-			// TODO: star
-			[XADException raiseNotSupportedException];
+			// Handled like an ustar archive.
+			[self parseUstarTarHeader:header toDict:dict];
+			[self addTarEntryWithDictionaryAndSeek:dict];
 		}
 
-		// Read next header.
-		if([handle atEndOfFile]) break;
-		header = [handle readDataOfLength:512];
-		
-		// See if the first byte is \0. This should mean that the archive is now over.
-		char firstByte = 1;
-		[header getBytes:&firstByte length:1];
-		if( firstByte == '\000' ) {
-			isArchiverOver = YES;
-		}
+		[pool release];
 	}
 }
 

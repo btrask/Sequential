@@ -9,7 +9,7 @@
 
 -(id)initWithName:(NSString *)descname length:(off_t)length
 {
-	if(self=[super initWithName:descname])
+	if((self=[super initWithName:descname]))
 	{
 		streampos=0;
 		streamlength=length;
@@ -39,7 +39,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length bufferSize:(int)buffersize;
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name]]))
 	{
 		streampos=0;
 		streamlength=length;

@@ -5,9 +5,9 @@ static inline uint16_t ror16(uint16_t val,int n) { return (val>>n)|(val<<(16-n))
 
 @implementation XADRAR15CryptHandle
 
--(id)initWithHandle:(CSHandle *)handle password:(NSData *)passdata
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata
 {
-	if(self=[super initWithHandle:handle])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		password=[passdata retain];
 	}

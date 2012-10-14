@@ -8,7 +8,7 @@ static int start_bunzip(bunzip_data *bd,CSHandle *inhandle,uint32_t *dbuf,bool h
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length hasRandomizationBit:(BOOL)hasrandbit
 {
-	if(self=[super initWithName:[handle name] length:length])
+	if((self=[super initWithName:[handle name] length:length]))
 	{
 		parent=[handle retain];
 		startoffs=[handle offsetInFile];

@@ -5,7 +5,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithHandle:handle length:length windowSize:4096])
+	if((self=[super initWithHandle:handle length:length windowSize:4096]))
 	{
 		static const int lengths[64]=
 		{

@@ -5,8 +5,8 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithHandle:[[[XADLZXSwapHandle alloc] initWithHandle:handle] autorelease]
-	length:length windowSize:65536])
+	if((self=[super initWithHandle:[[[XADLZXSwapHandle alloc] initWithHandle:handle] autorelease]
+	length:length windowSize:65536]))
 	{
 		maincode=offsetcode=nil;
 	}

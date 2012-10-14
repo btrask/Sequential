@@ -1,9 +1,11 @@
 #import "XADArchiveParser.h"
+#import "CSMemoryHandle.h"
 
 @interface XADStuffItXParser:XADArchiveParser
 {
-	NSMutableDictionary *currstream;
-	CSHandle *currstreamhandle;
+	NSData *repeatedentrydata;
+	NSArray *repeatedentries;
+	BOOL repeatedentryhaschecksum,repeatedentryiscorrect;
 }
 
 +(int)requiredHeaderSize;
@@ -15,5 +17,17 @@
 -(CSHandle *)handleForEntryWithDictionary:(NSDictionary *)dict wantChecksum:(BOOL)checksum;
 -(CSHandle *)handleForSolidStreamWithObject:(id)obj wantChecksum:(BOOL)checksum;
 -(NSString *)formatName;
+
+@end
+
+@interface XADStuffItXRepeatedEntryHandle:CSMemoryHandle
+{
+	BOOL haschecksum,ischecksumcorrect;
+}
+
+-(id)initWithData:(NSData *)data hasChecksum:(BOOL)hascheck isChecksumCorrect:(BOOL)iscorrect;
+
+-(BOOL)hasChecksum;
+-(BOOL)isChecksumCorrect;
 
 @end

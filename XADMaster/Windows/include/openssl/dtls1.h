@@ -1,7 +1,7 @@
 /* ssl/dtls1.h */
-/*
+/* 
  * DTLS implementation written by Nagendra Modadugu
- * (nagendra@cs.stanford.edu) for the OpenSSL project 2005.
+ * (nagendra@cs.stanford.edu) for the OpenSSL project 2005.  
  */
 /* ====================================================================
  * Copyright (c) 1999-2005 The OpenSSL Project.  All rights reserved.
@@ -11,7 +11,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *    notice, this list of conditions and the following disclaimer. 
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -57,8 +57,8 @@
  *
  */
 
-#ifndef HEADER_DTLS1_H
-#define HEADER_DTLS1_H
+#ifndef HEADER_DTLS1_H 
+#define HEADER_DTLS1_H 
 
 #include <openssl/buffer.h>
 #include <openssl/pqueue.h>
@@ -122,7 +122,7 @@ struct dtls1_retransmit_state
 #ifndef OPENSSL_NO_COMP
 	COMP_CTX *compress;				/* compression */
 #else
-	char *compress;
+	char *compress;	
 #endif
 	SSL_SESSION *session;
 	unsigned short epoch;
@@ -149,10 +149,10 @@ struct dtls1_timeout_st
 	{
 	/* Number of read timeouts so far */
 	unsigned int read_timeouts;
-
+	
 	/* Number of write timeouts so far */
 	unsigned int write_timeouts;
-
+	
 	/* Number of alerts received so far */
 	unsigned int num_alerts;
 	};
@@ -176,10 +176,10 @@ typedef struct dtls1_state_st
 	unsigned char rcvd_cookie[DTLS1_COOKIE_LENGTH];
 	unsigned int cookie_len;
 
-	/*
+	/* 
 	 * The current data and handshake epoch.  This is initially
 	 * undefined, and starts at zero once the initial handshake is
-	 * completed
+	 * completed 
 	 */
 	unsigned short r_epoch;
 	unsigned short w_epoch;

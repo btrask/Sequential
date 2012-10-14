@@ -74,7 +74,9 @@ static uint64_t ParseInt(const uint8_t *buffer,int size,int type,int offset)
 		}
 		break;
 
-		default: [XADException raiseNotSupportedException];
+		default:
+			[self reportInterestingFileWithReason:@"Unsupported signature type %d",sigtype];
+			[XADException raiseNotSupportedException];
 	}
 
 	const char *archiveext="cpio";

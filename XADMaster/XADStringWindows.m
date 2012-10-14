@@ -13,19 +13,35 @@ static NSDictionary *DescriptionForWindowsCodePageDictionary();
 
 @implementation XADString (PlatformSpecific)
 
++(BOOL)canDecodeData:(NSData *)data encodingName:(NSString *)encoding
+{
+	return [self canDecodeBytes:[data bytes] length:[data length] encodingName:encoding];
+}
+
++(BOOL)canDecodeBytes:(const void *)bytes length:(size_t)length encodingName:(NSString *)encoding
+{
+	int codepage=EncodingNameToWindowsCodePage(encoding);
+	if(!codepage) return NO;
+
+	int numchars=MultiByteToWideChar(codepage,MB_ERR_INVALID_CHARS,bytes,length,NULL,0);
+	return numchars!=0;
+}
+
 +(NSString *)stringForData:(NSData *)data encodingName:(NSString *)encoding
+{
+	return [self stringForBytes:[data bytes] length:[data length] encodingName:encoding];
+}
+
++(NSString *)stringForBytes:(const void *)bytes length:(size_t)length encodingName:(NSString *)encoding;
 {
 	int codepage=EncodingNameToWindowsCodePage(encoding);
 	if(!codepage) return nil;
 
-	int numbytes=[data length];
-	const uint8_t *bytebuf=[data bytes];
-
-	int numchars=MultiByteToWideChar(codepage,MB_ERR_INVALID_CHARS,bytebuf,numbytes,NULL,0);
+	int numchars=MultiByteToWideChar(codepage,MB_ERR_INVALID_CHARS,bytes,length,NULL,0);
 	if(numchars==0) return nil;
 
 	unichar *charbuf=malloc(sizeof(unichar)*numchars);
-	MultiByteToWideChar(codepage,MB_ERR_INVALID_CHARS,bytebuf,numbytes,charbuf,numchars);
+	MultiByteToWideChar(codepage,MB_ERR_INVALID_CHARS,bytes,length,charbuf,numchars);
 
 	return [[[NSString alloc] initWithCharactersNoCopy:charbuf length:numchars freeWhenDone:YES] autorelease];
 }

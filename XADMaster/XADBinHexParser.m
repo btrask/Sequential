@@ -98,7 +98,7 @@
 	uint32_t resourcelen=[fh readUInt32BE];
 	/*uint16_t crc=*/[fh readUInt16BE];
 
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 		[self XADPathWithData:namedata separators:XADNoPathSeparator],XADFileNameKey,
 		[NSNumber numberWithUnsignedInt:datalen],XADFileSizeKey,
 		[NSNumber numberWithUnsignedInt:(datalen*4)/3],XADCompressedSizeKey,
@@ -111,7 +111,7 @@
 	nil]];
 
 	if(resourcelen)
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
 		[self XADPathWithData:namedata separators:XADNoPathSeparator],XADFileNameKey,
 		[NSNumber numberWithUnsignedInt:resourcelen],XADFileSizeKey,
 		//[NSNumber numberWithUnsignedInt:(resourcelen*4)/3],XADCompressedSizeKey,

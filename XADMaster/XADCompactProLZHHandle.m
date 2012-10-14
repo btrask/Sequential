@@ -5,7 +5,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle blockSize:(int)blocklen
 {
-	if(self=[super initWithHandle:handle windowSize:8192])
+	if((self=[super initWithHandle:handle windowSize:8192]))
 	{
 		blocksize=blocklen;
 		literalcode=lengthcode=offsetcode=nil;

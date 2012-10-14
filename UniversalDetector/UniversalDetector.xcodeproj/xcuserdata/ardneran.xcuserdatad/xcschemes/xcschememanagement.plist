@@ -7,22 +7,27 @@
 		<key>DetectorTest.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>19</integer>
+			<integer>24</integer>
 		</dict>
 		<key>UniversalDetector.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>16</integer>
+			<integer>20</integer>
 		</dict>
-		<key>libUniversalDetector (Windows).xcscheme</key>
+		<key>libUniversalDetector.a.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>18</integer>
+			<integer>21</integer>
 		</dict>
-		<key>libUniversalDetector.xcscheme</key>
+		<key>libUniversalDetector.ios.a.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>17</integer>
+			<integer>23</integer>
+		</dict>
+		<key>libUniversalDetector.win.a.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>22</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
@@ -33,6 +38,11 @@
 			<true/>
 		</dict>
 		<key>1B23E0861190F29400620319</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1B467B0415CD9B1F001AB1DD</key>
 		<dict>
 			<key>primary</key>
 			<true/>

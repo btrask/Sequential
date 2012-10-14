@@ -12,7 +12,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length maxOrder:(int)maxorder subAllocSize:(int)suballocsize
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		alloc=CreateSubAllocatorVariantG(suballocsize);
 		max=maxorder;
@@ -26,7 +26,7 @@
 	[super dealloc];
 }
 
--(void)resetByteStream { StartPPMdModelVariantG(&model,input,&alloc->core,max,NO); }
+-(void)resetByteStream { StartPPMdModelVariantG(&model,(PPMdReadFunction *)CSInputNextByte,input,&alloc->core,max,NO); }
 
 -(uint8_t)produceByteAtOffset:(off_t)pos
 {
@@ -49,7 +49,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length maxOrder:(int)maxorder subAllocSize:(int)suballocsize
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		alloc=CreateSubAllocatorVariantH(suballocsize);
 		max=maxorder;
@@ -63,7 +63,7 @@
 	[super dealloc];
 }
 
--(void)resetByteStream { StartPPMdModelVariantH(&model,input,alloc,max,NO); }
+-(void)resetByteStream { StartPPMdModelVariantH(&model,(PPMdReadFunction *)CSInputNextByte,input,alloc,max,NO); }
 
 -(uint8_t)produceByteAtOffset:(off_t)pos
 {
@@ -86,7 +86,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length maxOrder:(int)maxorder subAllocSize:(int)suballocsize modelRestorationMethod:(int)mrmethod
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		alloc=CreateSubAllocatorVariantI(suballocsize);
 		max=maxorder;
@@ -101,7 +101,7 @@
 	[super dealloc];
 }
 
--(void)resetByteStream { StartPPMdModelVariantI(&model,input,alloc,max,method); }
+-(void)resetByteStream { StartPPMdModelVariantI(&model,(PPMdReadFunction *)CSInputNextByte,input,alloc,max,method); }
 
 -(uint8_t)produceByteAtOffset:(off_t)pos
 {
@@ -124,7 +124,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length maxOrder:(int)maxorder subAllocSize:(int)suballocsize
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		alloc=CreateSubAllocatorBrimstone(suballocsize);
 		max=maxorder;
@@ -138,7 +138,7 @@
 	[super dealloc];
 }
 
--(void)resetByteStream { StartPPMdModelVariantG(&model,input,&alloc->core,max,YES); }
+-(void)resetByteStream { StartPPMdModelVariantG(&model,(PPMdReadFunction *)CSInputNextByte,input,&alloc->core,max,YES); }
 
 -(uint8_t)produceByteAtOffset:(off_t)pos
 {
@@ -153,6 +153,6 @@
 
 @implementation XAD7ZipPPMdHandle
 
--(void)resetByteStream { StartPPMdModelVariantH(&model,input,alloc,max,YES); }
+-(void)resetByteStream { StartPPMdModelVariantH(&model,(PPMdReadFunction *)CSInputNextByte,input,alloc,max,YES); }
 
 @end

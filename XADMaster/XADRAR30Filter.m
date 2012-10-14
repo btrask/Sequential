@@ -25,7 +25,7 @@ startPosition:(off_t)startpos length:(int)length
 -(id)initWithProgramInvocation:(XADRARProgramInvocation *)program
 startPosition:(off_t)startpos length:(int)length
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		invocation=[program retain];
 		blockstartpos=startpos;

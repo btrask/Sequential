@@ -7,7 +7,7 @@
 	uint16_t key0,key1,key2,key3;
 }
 
--(id)initWithHandle:(CSHandle *)handle password:(NSData *)passdata;
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata;
 -(void)dealloc;
 
 -(void)resetByteStream;

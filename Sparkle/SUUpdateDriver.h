@@ -11,7 +11,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString *SUUpdateDriverFinishedNotification;
+extern NSString * const SUUpdateDriverFinishedNotification;
 
 @class SUHost, SUUpdater;
 @interface SUUpdateDriver : NSObject
@@ -27,6 +27,8 @@ extern NSString *SUUpdateDriverFinishedNotification;
 - (void)checkForUpdatesAtURL:(NSURL *)URL host:(SUHost *)host;
 - (void)abortUpdate;
 - (BOOL)finished;
+- (SUHost*)host;
+- (void)setHost:(SUHost*)newHost;
 
 @end
 

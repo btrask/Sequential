@@ -1,5 +1,5 @@
 #import "XADPrefixCode.h"
-#import "SystemSpecific.h"
+#import "Realloc.h"
 
 NSString *XADInvalidPrefixCodeException=@"XADInvalidPrefixCodeException";
 
@@ -39,7 +39,7 @@ static inline BOOL IsLeafNode(XADPrefixCode *self,int node) { return LeftBranch(
 
 static inline int NewNode(XADPrefixCode *self)
 {
-	self->tree=reallocf(self->tree,(self->numentries+1)*sizeof(XADCodeTreeNode));
+	self->tree=Realloc(self->tree,(self->numentries+1)*sizeof(XADCodeTreeNode));
 	SetEmptyNode(self,self->numentries);
 	return self->numentries++;
 }
@@ -141,7 +141,7 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 
 -(id)init
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		tree=malloc(sizeof(int)*2);
 		SetEmptyNode(self,0);
@@ -159,7 +159,7 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 
 -(id)initWithStaticTable:(int (*)[2])statictable
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		tree=(XADCodeTreeNode *)statictable; // TODO: fix the ugly cast
 		isstatic=YES;
@@ -173,21 +173,24 @@ maximumLength:(int)maxlength shortestCodeIsZeros:(BOOL)zeros
 -(id)initWithLengths:(const int *)lengths numberOfSymbols:(int)numsymbols
 maximumLength:(int)maxcodelength shortestCodeIsZeros:(BOOL)zeros
 {
-	if(self=[self init])
+	if((self=[self init]))
 	{
 		@try
 		{
 			int code=0,symbolsleft=numsymbols;
 
 			for(int length=1;length<=maxcodelength;length++)
-			for(int i=0;i<numsymbols;i++)
 			{
-				if(lengths[i]!=length) continue;
-				// Instead of reversing to get a low-bit-first code, we shift and use high-bit-first.
-				if(zeros) [self addValue:i forCodeWithHighBitFirst:code>>32-length length:length];
-				else [self addValue:i forCodeWithHighBitFirst:~code>>32-length length:length];
-				code+=1<<32-length;
-				if(--symbolsleft==0) return self; // early exit if all codes have been handled
+				for(int i=0;i<numsymbols;i++)
+				{
+					if(lengths[i]!=length) continue;
+					// Instead of reversing to get a low-bit-first code, we shift and use high-bit-first.
+					if(zeros) [self addValue:i forCodeWithHighBitFirst:code length:length];
+					else [self addValue:i forCodeWithHighBitFirst:~code length:length];
+					code++;
+					if(--symbolsleft==0) return self; // early exit if all codes have been handled
+				}
+				code<<=1;
 			}
 		}
 		@catch (id e)

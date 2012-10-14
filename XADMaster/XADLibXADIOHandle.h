@@ -134,10 +134,11 @@ void xadIODropBitsHigh(struct xadInOut *io, xadUINT8 bits);
 
 	off_t inlen,outlen;
 	uint8_t inbuf[XIDBUFSIZE],outbuf[XIDBUFSIZE];
-	struct xadInOut io;
+	struct xadInOut iostruct;
 }
 
--(id)initWithHandle:(CSHandle *)handle inputLength:(off_t)inlength outputLength:(off_t)outlength;
+-(id)initWithHandle:(CSHandle *)handle;
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)outlength;
 -(void)dealloc;
 
 -(off_t)fileSize;

@@ -1,0 +1,9 @@
+ArithmeticDecoder.o: ArithmeticDecoder.c ArithmeticDecoder.h \
+ InputStream.h
+Decompressor.o: Decompressor.c Decompressor.h InputStream.h \
+ ArithmeticDecoder.h JPEG.h LZMA.h ../lzma/LzmaDec.h ../lzma/Types.h
+JPEG.o: JPEG.c JPEG.h
+RawDecoder.o: RawDecoder.c Decompressor.h InputStream.h \
+ ArithmeticDecoder.h JPEG.h
+Test.o: Test.c ArithmeticDecoder.h InputStream.h
+../lzma/LzmaDec.o: ../lzma/LzmaDec.c ../lzma/LzmaDec.h ../lzma/Types.h

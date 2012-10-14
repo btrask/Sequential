@@ -27,7 +27,7 @@ uint32_t CSInputNextRARVMNumber(CSInputBuffer *input)
 
 -(id)init
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		InitializeRARVirtualMachine(&vm);
 	}
@@ -92,7 +92,7 @@ uint32_t CSInputNextRARVMNumber(CSInputBuffer *input)
 
 -(id)initWithByteCode:(const uint8_t *)bytes length:(int)length
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		opcodes=[NSMutableData new];
 		staticdata=nil;
@@ -291,7 +291,7 @@ value:(uint32_t *)valueptr byteMode:(BOOL)bytemode isRelativeJump:(BOOL)isrel cu
 
 -(id)initWithProgramCode:(XADRARProgramCode *)code globalData:(NSData *)data registers:(uint32_t *)registers
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		programcode=[code retain];
 

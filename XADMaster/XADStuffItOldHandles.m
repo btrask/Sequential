@@ -360,7 +360,10 @@ static xadINT32 SIT_14(struct xadInOut *io)
 
 -(xadINT32)unpackData
 {
-	return SIT_mw([self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32]);
+	struct xadInOut *io=[self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32];
+	xadINT32 err=SIT_mw(io);
+	if(!err) err=xadIOWriteBuf(io);
+	return err;
 }
 
 @end
@@ -369,7 +372,10 @@ static xadINT32 SIT_14(struct xadInOut *io)
 
 -(xadINT32)unpackData
 {
-	return SIT_14([self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32]);
+	struct xadInOut *io=[self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32];
+	xadINT32 err=SIT_14(io);
+	if(!err) err=xadIOWriteBuf(io);
+	return err;
 }
 @end
 

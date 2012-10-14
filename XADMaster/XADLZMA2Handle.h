@@ -5,8 +5,14 @@
 #endif
 
 #define Byte LzmaByte
+#define UInt16 LzmaUInt16
+#define UInt32 LzmaUInt32
+#define UInt64 LzmaUInt64
 #import "lzma/Lzma2Dec.h"
 #undef Byte
+#undef UInt32
+#undef UInt16
+#undef UInt64
 
 @interface XADLZMA2Handle:CSStreamHandle
 {

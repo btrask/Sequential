@@ -20,7 +20,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "../unix/xadClient.h"
@@ -51,7 +51,7 @@ struct CrunchDisk {
 /* CYL0 xxxx - unpacked data */
 /* CYL1 xxxx - packed data */
 
-static const xadSTRPTR crunchdisktypes[3] = {"stored", "powerpacked", "XPK"};
+static const xadSTRPTR crunchdisktypes[3] = {(xadSTRPTR)"stored", (xadSTRPTR)"powerpacked", (xadSTRPTR)"XPK"};
 
 #define PPgetbits(n, res) {xadUINT32 i = n, r = 0; while(i--){  \
         if(shift_in & (1<<8)) shift_in = (1<<16) + *(--src);    \

@@ -23,7 +23,7 @@ NSString *EscapeString(NSString *str)
 
 -(id)initWithIndentLevel:(int)indentlevel
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		indent=indentlevel;
 	}
@@ -71,7 +71,13 @@ NSString *EscapeString(NSString *str)
 	NSString *name=EscapeString([[dict objectForKey:XADFileNameKey] string]);
 	printf("%s (",[name UTF8String]);
 
-	if(dir&&[dir boolValue]) printf("dir");
+	if(dir&&[dir boolValue])
+	{
+		printf("dir");
+
+		NSNumber *rsrc=[dict objectForKey:XADIsResourceForkKey];
+		if(rsrc&&[rsrc boolValue]) printf(", rsrc");
+	}
 	else if(link) printf("-> %s",[link UTF8String]);
 	else
 	{
@@ -136,11 +142,11 @@ int main(int argc,char **argv)
 		char *pass=getenv("XADTestPassword");
 		if(pass) [parser setPassword:[NSString stringWithUTF8String:pass]];
 
-		//@try {
+		@try {
 			[parser parse];
-		//} @catch(id e) {
-		//	printf("*** Exception: %s\n",[[e description] UTF8String]);
-		//}
+		} @catch(id e) {
+			printf("*** Exception: %s\n",[[e description] UTF8String]);
+		}
 
 		[pool release];
 	}

@@ -130,6 +130,11 @@ off_t CSInputFileOffset(CSInputBuffer *self)
 	else return self->currbyte;
 }
 
+off_t CSInputBufferBitOffset(CSInputBuffer *self)
+{
+	return CSInputBufferOffset(self)*8-(self->numbits&7);
+}
+
 
 
 
@@ -285,7 +290,8 @@ void CSInputSkipBits(CSInputBuffer *self,int numbits)
 	else
 	{
 		int skipbits=numbits-(self->numbits&7);
-		CSInputSkipBytes(self,skipbits>>8);
+		CSInputSkipToByteBoundary(self);
+		CSInputSkipBytes(self,skipbits>>3);
 		if(skipbits&7) CSInputNextBitString(self,skipbits&7);
 	}
 }
@@ -296,7 +302,8 @@ void CSInputSkipBitsLE(CSInputBuffer *self,int numbits)
 	else
 	{
 		int skipbits=numbits-(self->numbits&7);
-		CSInputSkipBytes(self,skipbits>>8);
+		CSInputSkipToByteBoundary(self);
+		CSInputSkipBytes(self,skipbits>>3);
 		if(skipbits&7) CSInputNextBitStringLE(self,skipbits&7);
 	}	
 }

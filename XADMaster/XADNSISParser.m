@@ -75,23 +75,41 @@ static BOOL LooksLikeZlib(uint8_t *sig)
 
 +(int)requiredHeaderSize { return 0x10000; }
 
-+(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
++(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data
+name:(NSString *)name propertiesToAdd:(NSMutableDictionary *)props
 {
 	const uint8_t *bytes=[data bytes];
 	int length=[data length];
 
 	for(int offs=0;offs<length+4+16;offs+=512)
 	{
-		if(IsOlderSignature(bytes+offs)) return YES;
-		if(IsOldSignature(bytes+offs)) return YES;
-		if(IsNewSignature(bytes+offs)) return YES;
+		if(IsOlderSignature(bytes+offs)) 
+		{
+			[props setObject:[NSNumber numberWithLongLong:offs]
+			forKey:@"NSISOlderOffset"];
+			return YES;
+		}
+
+		if(IsOldSignature(bytes+offs))
+		{
+			[props setObject:[NSNumber numberWithLongLong:offs]
+			forKey:@"NSISOldOffset"];
+			return YES;
+		}
+
+		if(IsNewSignature(bytes+offs))
+		{
+			[props setObject:[NSNumber numberWithLongLong:offs]
+			forKey:@"NSISNewOffset"];
+			return YES;
+		}
 	}
 	return NO;
 }
 
 -(id)initWithHandle:(CSHandle *)handle name:(NSString *)name
 {
-	if(self=[super initWithHandle:handle name:name])
+	if((self=[super initWithHandle:handle name:name]))
 	{
 		solidhandle=nil;
 		detectedformat=UndetectedFormat;
@@ -111,16 +129,30 @@ static BOOL LooksLikeZlib(uint8_t *sig)
 {
 	CSHandle *fh=[self handle];
 
-	[fh skipBytes:512];
-	for(;;)
-	{
-		uint8_t buf[20];
-		[fh readBytes:sizeof(buf) toBuffer:buf];
+	NSNumber *offs;
 
-		if(IsOlderSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseOlderFormat]; return; }
-		if(IsOldSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseOldFormat]; return; }
-		if(IsNewSignature(buf)) { [fh skipBytes:-(int)sizeof(buf)]; [self parseNewFormat]; return; }
-		[fh skipBytes:512-(int)sizeof(buf)];
+	offs=[[self properties] objectForKey:@"NSISOlderOffset"];
+	if(offs)
+	{
+		[fh seekToFileOffset:[offs longLongValue]];
+		[self parseOlderFormat];
+		return;
+	}
+
+	offs=[[self properties] objectForKey:@"NSISOldOffset"];
+	if(offs)
+	{
+		[fh seekToFileOffset:[offs longLongValue]];
+		[self parseOldFormat];
+		return;
+	}
+
+	offs=[[self properties] objectForKey:@"NSISNewOffset"];
+	if(offs)
+	{
+		[fh seekToFileOffset:[offs longLongValue]];
+		[self parseNewFormat];
+		return;
 	}
 }
 
@@ -485,7 +517,7 @@ stringStartOffset:(int)stringoffs stringEndOffset:(int)stringendoffs unicode:(BO
 
 	NSEnumerator *enumerator=[array objectEnumerator];
 	NSMutableDictionary *dict;
-	while(dict=[enumerator nextObject]) [self addEntryWithDictionary:dict];
+	while((dict=[enumerator nextObject])) [self addEntryWithDictionary:dict];
 }
 
 -(void)makeEntryArrayStrictlyIncreasing:(NSMutableArray *)array
@@ -1029,12 +1061,8 @@ stringStartOffset:(int)stringoffs stringEndOffset:(int)stringendoffs currentPath
 	NSArray *parts;
 	if([string length]==0) parts=[NSArray array];
 	else parts=[string componentsSeparatedByString:@"\\"];
-	NSMutableArray *array=[NSMutableArray arrayWithCapacity:[parts count]];
-	NSEnumerator *enumerator=[parts objectEnumerator];
-	NSString *part;
-	while(part=[enumerator nextObject]) [array addObject:[self XADStringWithString:part]];
 
-	XADPath *path=[[[XADPath alloc] initWithComponents:array] autorelease];
+	XADPath *path=[XADPath pathWithStringComponents:parts];
 
 	if(prependdir) return [prependdir pathByAppendingPath:path];
 	else return path;

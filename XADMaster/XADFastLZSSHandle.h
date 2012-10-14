@@ -1,5 +1,6 @@
 #import "CSStreamHandle.h"
 #import "LZSS.h"
+#import "XADException.h"
 
 @interface XADFastLZSSHandle:CSStreamHandle
 {
@@ -36,7 +37,7 @@ static inline BOOL XADLZSSShouldKeepExpanding(XADFastLZSSHandle *self)
 	return LZSSPosition(&self->lzss)<self->bufferend;
 }
 
-static inline void XADLZSSLiteral(XADFastLZSSHandle *self,uint8_t byte,off_t *pos)
+static inline void XADEmitLZSSLiteral(XADFastLZSSHandle *self,uint8_t byte,off_t *pos)
 {
 	if(LZSSPosition(&self->lzss)==self->flushbarrier) XADLZSSFlushToBuffer(self);
 
@@ -44,8 +45,13 @@ static inline void XADLZSSLiteral(XADFastLZSSHandle *self,uint8_t byte,off_t *po
 	if(pos) *pos=LZSSPosition(&self->lzss);
 }
 
-static inline void XADLZSSMatch(XADFastLZSSHandle *self,int offset,int length,off_t *pos)
+static inline void XADEmitLZSSMatch(XADFastLZSSHandle *self,int offset,int length,off_t *pos)
 {
+	// You can not emit more than the window size, or data would get lost. If you need to do this,
+	// you need to divide the match into smaller parts so you can call ShouldKeepExpanding in between and
+	// exit if needed. See XADStacLZSHandle for an example.
+	if(length>LZSSWindowSize(&self->lzss)) [XADException raiseDecrunchException];
+
 	if(LZSSPosition(&self->lzss)+length>self->flushbarrier) XADLZSSFlushToBuffer(self);
 
 	EmitLZSSMatch(&self->lzss,offset,length);

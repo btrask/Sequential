@@ -16,7 +16,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "../config.h"
@@ -149,7 +149,7 @@ static struct xadMasterBaseP *InitXADMasterBaseP( struct xadMasterBaseP *xmb )
   if (xmb == NULL)
     return NULL;
 
-  xmb->xmb_DefaultName            = "unnamed.dat";
+  xmb->xmb_DefaultName            = (xadSTRPTR)"unnamed.dat";
   xmb->xmb_FirstClient            = NULL;
   xmb->xmb_ExtClients             = NULL;
   xmb->xmb_NumExtClients          = 0;

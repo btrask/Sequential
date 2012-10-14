@@ -41,10 +41,9 @@ void UnsortBWT(uint8_t *dest,uint8_t *src,int blocklen,int firstindex,uint32_t *
 void UnsortST4(uint8_t *dest,uint8_t *src,int blocklen,int firstindex,uint32_t *transform)
 {
 	int counts[256];
-	int array2[256*256];
-
 	for(int i=0;i<256;i++) counts[i]=0;
-	for(int i=0;i<256*256;i++) array2[i]=0;
+
+	int *array2=calloc(sizeof(int),256*256);
 
 	for(int i=0;i<blocklen;i++) counts[src[i]]++;
 
@@ -128,6 +127,8 @@ void UnsortST4(uint8_t *dest,uint8_t *src,int blocklen,int firstindex,uint32_t *
 		tval=transform[index];
 		dest[i]=tval>>24;
 	}
+
+	free(array2);
 }
 
 /*void UnsortBWTStuffItX(uint8_t *dest,int blocklen,int firstindex,uint8_t *src,uint32_t *transform)

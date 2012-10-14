@@ -1,5 +1,4 @@
 #import "XADFastLZSSHandle.h"
-#import "XADException.h"
 
 // TODO: Seeking
 
@@ -12,7 +11,7 @@
 
 -(id)initWithName:(NSString *)descname length:(off_t)length windowSize:(int)windowsize
 {
-	if(self=[super initWithName:descname length:length])
+	if((self=[super initWithName:descname length:length]))
 	{
 		InitializeLZSS(&lzss,windowsize);
 	}
@@ -26,7 +25,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length windowSize:(int)windowsize
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		InitializeLZSS(&lzss,windowsize);
 	}

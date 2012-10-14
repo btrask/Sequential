@@ -11,7 +11,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *    notice, this list of conditions and the following disclaimer. 
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -189,7 +189,7 @@ typedef struct	krb5_authorization_st
 
 DECLARE_STACK_OF(KRB5_AUTHDATA)
 
-
+			
 /*	-- Unencrypted authenticator
 **	Authenticator ::=    [APPLICATION 2] SEQUENCE    {
 **		authenticator-vno[0]          INTEGER,

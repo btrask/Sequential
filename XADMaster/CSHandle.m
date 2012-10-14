@@ -15,7 +15,7 @@ NSString *CSNotSupportedException=@"CSNotSupportedException";
 
 -(id)initWithName:(NSString *)descname
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		name=[descname retain];
 
@@ -29,7 +29,7 @@ NSString *CSNotSupportedException=@"CSNotSupportedException";
 
 -(id)initAsCopyOf:(CSHandle *)other
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		name=[[[other name] stringByAppendingString:@" (copy)"] retain];
 
@@ -115,6 +115,13 @@ CSReadValueImpl(int64_t,readInt64LE,CSInt64LE)
 CSReadValueImpl(uint16_t,readUInt16LE,CSUInt16LE)
 CSReadValueImpl(uint32_t,readUInt32LE,CSUInt32LE)
 CSReadValueImpl(uint64_t,readUInt64LE,CSUInt64LE)
+
+-(int16_t)readInt16InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readInt16BE]; else return [self readInt16LE]; }
+-(int32_t)readInt32InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readInt32BE]; else return [self readInt32LE]; }
+-(int64_t)readInt64InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readInt64BE]; else return [self readInt64LE]; }
+-(uint16_t)readUInt16InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readUInt16BE]; else return [self readUInt16LE]; }
+-(uint32_t)readUInt32InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readUInt32BE]; else return [self readUInt32LE]; }
+-(uint64_t)readUInt64InBigEndianOrder:(BOOL)isbigendian { if(isbigendian) return [self readUInt64BE]; else return [self readUInt64LE]; }
 
 CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 
@@ -239,7 +246,7 @@ CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 		actual=[self readAtMost:sizeof(buffer) toBuffer:buffer];
 		[data appendBytes:buffer length:actual];
 	}
-	while(actual==sizeof(buffer));
+	while(actual!=0);
 
 	return [NSData dataWithData:data];
 }
@@ -273,7 +280,8 @@ CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 
 -(void)readBytes:(int)num toBuffer:(void *)buffer
 {
-	if([self readAtMost:num toBuffer:buffer]!=num) [self _raiseEOF];
+	int actual=[self readAtMost:num toBuffer:buffer];
+	if(actual!=num) [self _raiseEOF];
 }
 
 
@@ -309,6 +317,21 @@ CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 	return [[[CSSubHandle alloc] initWithHandle:[[self copy] autorelease] from:start length:length] autorelease];
 }
 
+-(CSHandle *)subHandleToEndOfFileFrom:(off_t)start
+{
+	off_t size=[self fileSize];
+	if(size==CSHandleMaxLength)
+	{
+		return [[[CSSubHandle alloc] initWithHandle:[[self copy] autorelease]
+		from:start length:CSHandleMaxLength] autorelease];
+	}
+	else
+	{
+		return [[[CSSubHandle alloc] initWithHandle:[[self copy] autorelease]
+		from:start length:size-start] autorelease];
+	}
+}
+
 -(CSHandle *)nonCopiedSubHandleOfLength:(off_t)length
 {
 	return [[[CSSubHandle alloc] initWithHandle:self from:[self offsetInFile] length:length] autorelease];
@@ -317,6 +340,21 @@ CSReadValueImpl(uint32_t,readID,CSUInt32BE)
 -(CSHandle *)nonCopiedSubHandleFrom:(off_t)start length:(off_t)length
 {
 	return [[[CSSubHandle alloc] initWithHandle:self from:start length:length] autorelease];
+}
+
+-(CSHandle *)nonCopiedSubHandleToEndOfFileFrom:(off_t)start
+{
+	off_t size=[self fileSize];
+	if(size==CSHandleMaxLength)
+	{
+		return [[[CSSubHandle alloc] initWithHandle:self
+		from:start length:CSHandleMaxLength] autorelease];
+	}
+	else
+	{
+		return [[[CSSubHandle alloc] initWithHandle:self
+		from:start length:size-start] autorelease];
+	}
 }
 
 

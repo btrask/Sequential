@@ -6,7 +6,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle name:(NSString *)name
 {
-	if(self=[super initWithHandle:handle name:name])
+	if((self=[super initWithHandle:handle name:name]))
 	{
 		sectable=NULL;
 	}
@@ -232,7 +232,7 @@
 	uint32_t left=[[entry objectForKey:@"CFBFLeftChild"] unsignedIntValue];
 	if(left!=0xffffffff) [self processEntry:left atPath:path entries:entries];
 
-	XADPath *filename=[path pathByAppendingPathComponent:[entry objectForKey:@"CFBFFileName"]];
+	XADPath *filename=[path pathByAppendingXADStringComponent:[entry objectForKey:@"CFBFFileName"]];
 	[entry setObject:filename forKey:XADFileNameKey];
 	[self addEntryWithDictionary:entry];
 

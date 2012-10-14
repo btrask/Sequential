@@ -1,5 +1,5 @@
 #import "XADTarSparseHandle.h"
-#import "SystemSpecific.h"
+#import "Realloc.h"
 
 @implementation XADTarSparseHandle
 
@@ -89,7 +89,7 @@
 	}
 
 	// Make two new regions.
-	regions = reallocf( regions, sizeof( XADTarSparseRegion ) * ( numRegions + 2 ) );
+	regions = Realloc( regions, sizeof( XADTarSparseRegion ) * ( numRegions + 2 ) );
 
 	// Start processing at the end.
 	regions[ numRegions + 1 ].offset = start + length;
@@ -126,7 +126,7 @@
 	XADTarSparseRegion inRegion = regions[ [self regionIndexForOffset:([self fileSize] - 1)] ];
 	
 	// Make a new region.
-	regions = reallocf( regions, sizeof( XADTarSparseRegion ) * ( numRegions + 1 ) );
+	regions = Realloc( regions, sizeof( XADTarSparseRegion ) * ( numRegions + 1 ) );
 
 	// Figure out the current size.
 	off_t sizeBeforeAdding = 0;

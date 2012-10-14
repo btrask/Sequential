@@ -6,8 +6,8 @@
 {
 	XADRARParser *parser;
 
-	NSArray *parts;
-	int part;
+	NSArray *files;
+	int file;
 	off_t endpos;
 
 	XADPrefixCode *lengthcode1,*lengthcode2;
@@ -33,11 +33,11 @@
 	int shortoffsettable[256];
 }
 
--(id)initWithRARParser:(XADRARParser *)parent parts:(NSArray *)partarray;
+-(id)initWithRARParser:(XADRARParser *)parent files:(NSArray *)filearray;
 -(void)dealloc;
 
 -(void)resetLZSSHandle;
--(void)startNextPart;
+-(void)startNextFile;
 -(void)expandFromPosition:(off_t)pos;
 
 @end

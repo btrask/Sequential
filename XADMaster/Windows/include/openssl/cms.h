@@ -10,7 +10,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
+ *    notice, this list of conditions and the following disclaimer. 
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -179,9 +179,9 @@ CMS_ContentInfo *CMS_encrypt(STACK_OF(X509) *certs, BIO *in,
 int CMS_decrypt(CMS_ContentInfo *cms, EVP_PKEY *pkey, X509 *cert,
 				BIO *dcont, BIO *out,
 				unsigned int flags);
-
+	
 int CMS_decrypt_set1_pkey(CMS_ContentInfo *cms, EVP_PKEY *pk, X509 *cert);
-int CMS_decrypt_set1_key(CMS_ContentInfo *cms,
+int CMS_decrypt_set1_key(CMS_ContentInfo *cms, 
 				unsigned char *key, size_t keylen,
 				unsigned char *id, size_t idlen);
 
@@ -213,14 +213,14 @@ int CMS_RecipientInfo_kekri_get0_id(CMS_RecipientInfo *ri,
 					ASN1_OBJECT **potherid,
 					ASN1_TYPE **pothertype);
 
-int CMS_RecipientInfo_set0_key(CMS_RecipientInfo *ri,
+int CMS_RecipientInfo_set0_key(CMS_RecipientInfo *ri, 
 				unsigned char *key, size_t keylen);
 
-int CMS_RecipientInfo_kekri_id_cmp(CMS_RecipientInfo *ri,
+int CMS_RecipientInfo_kekri_id_cmp(CMS_RecipientInfo *ri, 
 					const unsigned char *id, size_t idlen);
 
 int CMS_RecipientInfo_decrypt(CMS_ContentInfo *cms, CMS_RecipientInfo *ri);
-
+	
 int CMS_uncompress(CMS_ContentInfo *cms, BIO *dcont, BIO *out,
 							unsigned int flags);
 CMS_ContentInfo *CMS_compress(BIO *in, int comp_nid, unsigned int flags);

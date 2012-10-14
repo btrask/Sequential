@@ -1,6 +1,7 @@
 #import "XADLZXParser.h"
 #import "XADLZXHandle.h"
 #import "XADCRCHandle.h"
+#import "NSDateXAD.h"
 
 
 
@@ -65,7 +66,7 @@
 		// Dates from 2000 to 2005 LZX/Dr.Titus patch are correct
 		// Dates from 2034 to 2041 Dr.Titus patch are correct
 
-		NSDate *dateobj=[NSCalendarDate dateWithYear:year month:month day:day hour:hour minute:minute second:second timeZone:nil];
+		NSDate *dateobj=[NSDate XADDateWithYear:year month:month day:day hour:hour minute:minute second:second timeZone:nil];
 
 		NSMutableDictionary *dict=[NSMutableDictionary dictionaryWithObjectsAndKeys:
 			[self XADPathWithData:namedata separators:XADUnixPathSeparator],XADFileNameKey,
@@ -100,6 +101,22 @@
 		}
 		if(osname) [dict setObject:[self XADStringWithString:osname] forKey:@"LZXOSName"];
 
+		if(os==10)
+		{
+			// Decode Amiga protection bits
+			int prot=0;
+			if(!(attributes&0x01)) prot|=0x08; // Read
+			if(!(attributes&0x02)) prot|=0x04; // Write
+			if(!(attributes&0x04)) prot|=0x01; // Delete
+			if(!(attributes&0x08)) prot|=0x02; // Execute
+			if(attributes&0x10) prot|=0x10; // Archive
+			if(attributes&0x20) prot|=0x80; // Hold
+			if(attributes&0x40) prot|=0x40; // Script
+			if(attributes&0x80) prot|=0x20; // Pure
+			
+			[dict setObject:[NSNumber numberWithInt:prot] forKey:XADAmigaProtectionBitsKey];
+		}
+
 		[solidfiles addObject:dict];
 		solidsize+=filesize;
 
@@ -114,7 +131,7 @@
 
 			NSEnumerator *enumerator=[solidfiles objectEnumerator];
 			NSMutableDictionary *dict;
-			while(dict=[enumerator nextObject])
+			while((dict=[enumerator nextObject]))
 			{
 				[dict setObject:solidobj forKey:XADSolidObjectKey];
 				[dict setObject:[NSNumber numberWithLongLong:

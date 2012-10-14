@@ -27,7 +27,7 @@ static NSData *ReadNullTerminatedString(CSHandle *fh);
 		if(bytes[i]==0x60&&bytes[i+1]==0xea)
 		{
 			int size=CSUInt16LE(&bytes[i+2]);
-			if(size<=2600 && i+4+size+4<=length)
+			if(size>=32 && size<=2600 && i+4+size+4<=length)
 			{
 				uint32_t headcrc=XADCalculateCRC(0xffffffff,&bytes[i+4],size,XADCRCTable_edb88320);
 				uint32_t storedcrc=CSUInt32LE(&bytes[i+4+size]);
@@ -56,7 +56,7 @@ static NSData *ReadNullTerminatedString(CSHandle *fh);
 			off_t pos=[fh offsetInFile];
 
 			headersize=[fh readUInt16LE];
-			if(headersize<=2600)
+			if(headersize>=32 && headersize<=2600)
 			{
 				header=[fh readDataOfLength:headersize];
 				uint32_t crc=[fh readUInt32LE];
@@ -67,8 +67,6 @@ static NSData *ReadNullTerminatedString(CSHandle *fh);
 			[fh seekToFileOffset:pos];
 		}
 	}
-
-	if(headersize<32) [XADException raiseIllegalDataException];
 
 	const uint8_t *headerbytes=[header bytes];
 
@@ -241,6 +239,7 @@ static NSData *ReadNullTerminatedString(CSHandle *fh);
 		break;
 
 		default:
+			[self reportInterestingFileWithReason:@"Unsupported compression method %d",method];
 			return nil;
 	}
 

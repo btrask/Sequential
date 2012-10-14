@@ -1,4 +1,6 @@
 #import "XADUnarchiver.h"
+#import "XADPlatform.h"
+#import "XADAppleDouble.h"
 #import "CSFileHandle.h"
 #import "Progress.h"
 
@@ -11,14 +13,19 @@
 
 +(XADUnarchiver *)unarchiverForPath:(NSString *)path
 {
-	XADArchiveParser *archiveparser=[XADArchiveParser archiveParserForPath:path];
+	return [self unarchiverForPath:path error:NULL];
+}
+
++(XADUnarchiver *)unarchiverForPath:(NSString *)path error:(XADError *)errorptr
+{
+	XADArchiveParser *archiveparser=[XADArchiveParser archiveParserForPath:path error:errorptr];
 	if(!archiveparser) return nil;
 	return [[[self alloc] initWithArchiveParser:archiveparser] autorelease];
 }
 
 -(id)initWithArchiveParser:(XADArchiveParser *)archiveparser
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		parser=[archiveparser retain];
 		destination=nil;
@@ -26,10 +33,10 @@
 		preservepermissions=NO;
 		updateinterval=0.1;
 		delegate=nil;
+		shouldstop=NO;
 
 		deferreddirectories=[NSMutableArray new];
-
-		[parser setDelegate:self];
+		deferredlinks=[NSMutableArray new];
 	}
 	return self;
 }
@@ -39,6 +46,7 @@
 	[parser release];
 	[destination release];
 	[deferreddirectories release];
+	[deferredlinks release];
 	[super dealloc];
 }
 
@@ -48,12 +56,6 @@
 -(id)delegate { return delegate; }
 
 -(void)setDelegate:(id)newdelegate { delegate=newdelegate; }
-
-//-(NSString *)password;
-//-(void)setPassword:(NSString *)password;
-
-//-(NSStringEncoding)encoding;
-//-(void)setEncoding:(NSStringEncoding)encoding;
 
 -(NSString *)destination { return destination; }
 
@@ -77,65 +79,59 @@
 
 
 
+
 -(XADError)parseAndUnarchive
 {
-	@try
-	{
-		[parser parse];
-	}
-	@catch(id e)
-	{
-		return [XADException parseException:e];
-	}
+	id olddelegate=[parser delegate];
 
-	return [self finishExtractions];
+	[parser setDelegate:self];
+	XADError error=[parser parseWithoutExceptions];
+	[parser setDelegate:olddelegate];
+	if(error) return error;
+
+	if([self _shouldStop]) return XADBreakError;
+
+	error=[self finishExtractions];
+	if(error) return error;
+
+	error=[parser testChecksumWithoutExceptions];
+	if(error) return error;
+
+	return XADNoError;
 }
+
+-(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
+{
+	//if([self _shouldStop]) return; // Unnecessary - XADArchiveParser handles it.
+	[self extractEntryWithDictionary:dict];
+}
+
+-(BOOL)archiveParsingShouldStop:(XADArchiveParser *)parser
+{
+	return [self _shouldStop];
+}
+
+-(void)archiveParserNeedsPassword:(XADArchiveParser *)parser
+{
+	[delegate unarchiverNeedsPassword:self];
+}
+
+-(void)archiveParser:(XADArchiveParser *)parser findsFileInterestingForReason:(NSString *)reason
+{
+	[delegate unarchiver:self findsFileInterestingForReason:reason];
+}
+
+
+
 
 -(XADError)extractEntryWithDictionary:(NSDictionary *)dict
 {
-	return [self extractEntryWithDictionary:dict forceDirectories:NO];
+	return [self extractEntryWithDictionary:dict as:nil forceDirectories:NO];
 }
 
 -(XADError)extractEntryWithDictionary:(NSDictionary *)dict forceDirectories:(BOOL)force
 {
-	NSAutoreleasePool *pool=[NSAutoreleasePool new];
-
-	NSString *path=nil;
-
-	// Ask the delegate for its opinion on the output path.
-	if(delegate) path=[delegate unarchiver:self pathForExtractingEntryWithDictionary:dict];
-
-	// If we were not given a path, pick one ourselves.
-	if(!path)
-	{
-		XADPath *name=[[dict objectForKey:XADFileNameKey] safePath];
-		if(destination) path=[destination stringByAppendingPathComponent:[name string]];
-		else path=[name string];
-	}
-
-	// If we are unpacking a resource fork, we may need to modify the path
-	NSNumber *resnum=[dict objectForKey:XADIsResourceForkKey];
-	if(resnum&&[resnum boolValue])
-	{
-		switch(forkstyle)
-		{
-			case XADHiddenAppleDoubleForkStyle:
-				// TODO: is this path generation correct?
-				path=[[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:
-				[@"._" stringByAppendingString:[path lastPathComponent]]];
-			break;
-
-			case XADVisibleAppleDoubleForkStyle:
-				path=[path stringByAppendingPathExtension:@"rsrc"];
-			break;
-		}
-	}
-
-	XADError error=[self extractEntryWithDictionary:dict as:path forceDirectories:force];
-
-	[pool release];
-
-	return error;
+	return [self extractEntryWithDictionary:dict as:nil forceDirectories:force];
 }
 
 -(XADError)extractEntryWithDictionary:(NSDictionary *)dict as:(NSString *)path
@@ -156,18 +152,33 @@
 	BOOL isres=resnum&&[resnum boolValue];
 	BOOL isarchive=archivenum&&[archivenum boolValue];
 
-	// Ask for permission and report that we are starting.
+	// If we were not given a path, pick one ourselves.
+	if(!path)
+	{
+		XADPath *name=[dict objectForKey:XADFileNameKey];
+		NSString *namestring=[name sanitizedPathString];
+
+		if(destination) path=[destination stringByAppendingPathComponent:namestring];
+		else path=namestring;
+
+		// Adjust path for resource forks.
+		path=[self adjustPathString:path forEntryWithDictionary:dict];
+	}
+
+	// Ask for permission and possibly a path, and report that we are starting.
 	if(delegate)
 	{
-		if(![delegate unarchiver:self shouldExtractEntryWithDictionary:dict to:path])
+		if(![delegate unarchiver:self shouldExtractEntryWithDictionary:dict suggestedPath:&path])
 		{
 			[pool release];
-			return XADBreakError;
+			return XADNoError;
 		}
 		[delegate unarchiver:self willExtractEntryWithDictionary:dict to:path];
 	}
 
-	XADError error=[self _ensureDirectoryExists:[path stringByDeletingLastPathComponent]];
+	XADError error;
+	
+	error=[self _ensureDirectoryExists:[path stringByDeletingLastPathComponent]];
 	if(error) goto end;
 
 	// Attempt to extract embedded archives if requested.
@@ -194,11 +205,33 @@
 
 			case XADMacOSXForkStyle:
 				if(!isdir)
-				error=[self _extractResourceForkEntryWithDictionary:dict asPlatformSpecificForkForFile:path];
+				error=[XADPlatform extractResourceForkEntryWithDictionary:dict unarchiver:self toPath:path];
 			break;
 
 			case XADHiddenAppleDoubleForkStyle:
 			case XADVisibleAppleDoubleForkStyle:
+				error=[self _extractResourceForkEntryWithDictionary:dict asAppleDoubleFile:path];
+			break;
+
+			case XADHFVExplorerAppleDoubleForkStyle:
+				// We need to make sure there is an empty file for the data fork in all
+				// cases, so just try to recover the original filename and create an empty
+				// file there in case one doesn't exist, and this isn't a directory.
+				// Kludge in the same file attributes as the resource fork. If there is
+				// an actual data fork later, it will overwrite this file. There special-case
+				// code to avoid collision warnings.
+				if(![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:NULL] && !isdir)
+				{
+					NSString *dirpart=[path stringByDeletingLastPathComponent];
+					NSString *namepart=[path lastPathComponent];
+					if([namepart hasPrefix:@"%"])
+					{
+						NSString *originalname=[namepart substringFromIndex:1];
+						NSString *datapath=[dirpart stringByAppendingPathComponent:originalname];
+						[[NSData data] writeToFile:datapath atomically:NO];
+						[self _updateFileAttributesAtPath:datapath forEntryWithDictionary:dict deferDirectories:!force];
+					}
+				}
 				error=[self _extractResourceForkEntryWithDictionary:dict asAppleDoubleFile:path];
 			break;
 
@@ -221,12 +254,10 @@
 		error=[self _extractFileEntryWithDictionary:dict as:path];
 	}
 
-	// Update file attributes
 	if(!error)
 	{
 		error=[self _updateFileAttributesAtPath:path forEntryWithDictionary:dict deferDirectories:!force];
 	}
-
 
 	// Report success or failure
 	end:
@@ -239,6 +270,9 @@
 
 	return error;
 }
+
+
+
 
 static NSInteger SortDirectoriesByDepthAndResource(id entry1,id entry2,void *context)
 {
@@ -264,11 +298,48 @@ static NSInteger SortDirectoriesByDepthAndResource(id entry1,id entry2,void *con
 
 -(XADError)finishExtractions
 {
+	XADError error;
+
+	error=[self _fixDeferredLinks];
+	if(error) return error;
+
+	error=[self _fixDeferredDirectories];
+	if(error) return error;
+
+	return XADNoError;
+}
+
+-(XADError)_fixDeferredLinks
+{
+	NSEnumerator *enumerator=[deferredlinks objectEnumerator];
+	NSArray *entry;
+	while((entry=[enumerator nextObject]))
+	{
+		NSString *path=[entry objectAtIndex:0];
+		NSString *linkdest=[entry objectAtIndex:1];
+		NSDictionary *dict=[entry objectAtIndex:2];
+
+		XADError error;
+
+		error=[XADPlatform createLinkAtPath:path withDestinationPath:linkdest];
+		if(error) return error;
+
+		error=[self _updateFileAttributesAtPath:path forEntryWithDictionary:dict deferDirectories:NO];
+		if(error) return error;
+	}
+
+	[deferredlinks removeAllObjects];
+
+	return XADNoError;
+}
+
+-(XADError)_fixDeferredDirectories
+{
 	[deferreddirectories sortUsingFunction:SortDirectoriesByDepthAndResource context:NULL];
 
 	NSEnumerator *enumerator=[deferreddirectories objectEnumerator];
 	NSArray *entry;
-	while(entry=[enumerator nextObject])
+	while((entry=[enumerator nextObject]))
 	{
 		NSString *path=[entry objectAtIndex:0];
 		NSDictionary *dict=[entry objectAtIndex:1];
@@ -285,51 +356,38 @@ static NSInteger SortDirectoriesByDepthAndResource(id entry1,id entry2,void *con
 
 
 
+-(XADUnarchiver *)unarchiverForEntryWithDictionary:(NSDictionary *)dict
+wantChecksum:(BOOL)checksum error:(XADError *)errorptr
+{
+	XADArchiveParser *subparser=[XADArchiveParser
+	archiveParserForEntryWithDictionary:dict
+	archiveParser:parser wantChecksum:checksum error:errorptr];
+	if(!subparser) return nil;
+
+	XADUnarchiver *subunarchiver=[XADUnarchiver unarchiverForArchiveParser:subparser];
+	[subunarchiver setDelegate:delegate];
+	[subunarchiver setDestination:destination];
+	[subunarchiver setMacResourceForkStyle:forkstyle];
+	[subunarchiver setPreserevesPermissions:preservepermissions];
+	[subunarchiver setUpdateInterval:updateinterval];
+
+	return subunarchiver;
+}
+
+
+
+
 -(XADError)_extractFileEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath
 {
 	CSHandle *fh;
 	@try { fh=[CSFileHandle fileHandleForWritingAtPath:destpath]; }
 	@catch(id e) { return XADOpenFileError; }
 
-	XADError err=[self _extractEntryWithDictionary:dict toHandle:fh];
+	XADError err=[self runExtractorWithDictionary:dict outputHandle:fh];
 
 	[fh close];
 
 	return err;
-}
-
--(XADError)_extractResourceForkEntryWithDictionary:(NSDictionary *)dict asAppleDoubleFile:(NSString *)destpath
-{
-	CSHandle *fh;
-	@try { fh=[CSFileHandle fileHandleForWritingAtPath:destpath]; }
-	@catch(id e) { return XADOpenFileError; }
-
-	uint8_t header[0x32]=
-	{
-		0x00,0x05,0x16,0x07,0x00,0x02,0x00,0x00,
-		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-		0x00,0x02,
-		0x00,0x00,0x00,0x09,0x00,0x00,0x00,0x32,0x00,0x00,0x00,0x20,
-		0x00,0x00,0x00,0x02,0x00,0x00,0x00,0x52,0x00,0x00,0x00,0x00,
-	};
-
-	off_t size=0;
-	NSNumber *sizenum=[dict objectForKey:XADFileSizeKey];
-	if(sizenum) size=[sizenum longLongValue];
-
-	CSSetUInt32BE(&header[46],size);
-	[fh writeBytes:sizeof(header) fromBuffer:header];
-
-	NSData *finderinfo=[parser finderInfoForDictionary:dict];
-	if([finderinfo length]<32) return XADUnknownError;
-	[fh writeBytes:32 fromBuffer:[finderinfo bytes]];
-
-	XADError error=XADNoError;
-	if(size) error=[self _extractEntryWithDictionary:dict toHandle:fh];
-
-	[fh close];
-
-	return error;
 }
 
 -(XADError)_extractDirectoryEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath
@@ -339,112 +397,96 @@ static NSInteger SortDirectoriesByDepthAndResource(id entry1,id entry2,void *con
 
 -(XADError)_extractLinkEntryWithDictionary:(NSDictionary *)dict as:(NSString *)destpath
 {
-	NSString *link=nil;
+	XADError error;
+	XADString *link=[parser linkDestinationForDictionary:dict error:&error];
+	if(!link) return error;
 
-	if(delegate)
+	NSString *linkdest=nil;
+	if(delegate) linkdest=[delegate unarchiver:self destinationForLink:link from:destpath];
+	if(!linkdest) return XADNoError; // Handle nil returns as a request to skip.
+
+	// Check if the link destination is an absolute path, or if it contains
+	// any .. path components.
+	if([linkdest hasPrefix:@"/"] || [linkdest isEqual:@".."] ||
+	[linkdest hasPrefix:@"../"] || [linkdest hasSuffix:@"/.."] ||
+	[linkdest rangeOfString:@"/../"].location!=NSNotFound)
 	{
-		link=[delegate unarchiver:self linkDestinationForEntryWithDictionary:dict from:destpath];
+		// If so, consider it unsafe, and create a placeholder file instead,
+		// and create the real link only in finishExtractions.
+		CSHandle *fh;
+		@try { fh=[CSFileHandle fileHandleForWritingAtPath:destpath]; }
+		@catch(id e)
+		{
+			unlink([destpath fileSystemRepresentation]);
+			@try { fh=[CSFileHandle fileHandleForWritingAtPath:destpath]; }
+			@catch(id e) { return XADOpenFileError; }
+		}
+		[fh close];
+
+		[deferredlinks addObject:[NSArray arrayWithObjects:destpath,linkdest,dict,nil]];
+		return XADNoError;
 	}
-
-	if(!link) link=[[parser linkDestinationForDictionary:dict] string];
-
-	if(!link) return XADBadParametersError; // TODO: better error
-
-	return [self _createPlatformSpecificLinkToPath:link from:destpath];
+	else
+	{
+		return [XADPlatform createLinkAtPath:destpath withDestinationPath:linkdest];
+	}
 }
 
 -(XADError)_extractArchiveEntryWithDictionary:(NSDictionary *)dict to:(NSString *)destpath name:(NSString *)filename
 {
-	@try
+	XADError error;
+	XADUnarchiver *subunarchiver=[self unarchiverForEntryWithDictionary:dict
+	wantChecksum:YES error:&error];
+	if(!subunarchiver)
 	{
-		CSHandle *srchandle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
-		if(!srchandle) return XADNotSupportedError;
-
-		XADArchiveParser *subparser=[XADArchiveParser archiveParserForHandle:srchandle name:filename]; // TODO: provide a name?
-		if(!subparser) return XADSubArchiveError;
-
-		XADUnarchiver *unarchiver=[XADUnarchiver unarchiverForArchiveParser:subparser];
-
-		[unarchiver setDelegate:delegate];
-		[unarchiver setDestination:destpath];
-		[unarchiver setMacResourceForkStyle:forkstyle];
-		[unarchiver setPreserevesPermissions:preservepermissions];
-		[unarchiver setUpdateInterval:updateinterval];
-
-		[delegate unarchiver:self willExtractArchiveEntryWithDictionary:dict
-		withUnarchiver:unarchiver to:destpath];
-
-		XADError error=[unarchiver parseAndUnarchive];
-
-		[delegate unarchiver:self didExtractArchiveEntryWithDictionary:dict
-		withUnarchiver:unarchiver to:destpath error:error];
-
-		return error;
+		if(error) return error;
+		else return XADSubArchiveError;
 	}
-	@catch(id e)
-	{
-		return [XADException parseException:e];
-	}
-	return XADUnknownError; // Kludge to keep gcc quiet
+
+	[subunarchiver setDestination:destpath];
+
+	[delegate unarchiver:self willExtractArchiveEntryWithDictionary:dict
+	withUnarchiver:subunarchiver to:destpath];
+
+	error=[subunarchiver parseAndUnarchive];
+
+	[delegate unarchiver:self didExtractArchiveEntryWithDictionary:dict
+	withUnarchiver:subunarchiver to:destpath error:error];
+
+	return error;
 }
 
 
-
--(XADError)_extractEntryWithDictionary:(NSDictionary *)dict toHandle:(CSHandle *)fh
+-(XADError)_extractResourceForkEntryWithDictionary:(NSDictionary *)dict asAppleDoubleFile:(NSString *)destpath
 {
+	CSHandle *fh;
+	@try { fh=[CSFileHandle fileHandleForWritingAtPath:destpath]; }
+	@catch(id e) { return XADOpenFileError; }
+
+	off_t ressize=0;
+	NSNumber *sizenum=[dict objectForKey:XADFileSizeKey];
+	if(sizenum) ressize=[sizenum longLongValue];
+
+	NSDictionary *extattrs=[parser extendedAttributesForDictionary:dict];
+
 	@try
 	{
-		CSHandle *srchandle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
-		if(!srchandle) return XADNotSupportedError;
-
-		NSNumber *sizenum=[dict objectForKey:XADFileSizeKey];
-		off_t size=0;
-		if(sizenum) size=[sizenum longLongValue];
-
-		off_t done=0;
-		double updatetime=0;
-		uint8_t buf[0x40000];
-
-		for(;;)
-		{
-			if(delegate&&[delegate extractionShouldStopForUnarchiver:self]) return XADBreakError;
-
-			int actual=[srchandle readAtMost:sizeof(buf) toBuffer:buf];
-			if(actual)
-			{
-				// TODO: combine the except parsing for input and output
-				@try { [fh writeBytes:actual fromBuffer:buf]; }
-				@catch(id e) { return XADOutputError; }
-			}
-
-			done+=actual;
-
-			double currtime=_XADUnarchiverGetTime();
-			if(currtime-updatetime>updateinterval)
-			{
-				updatetime=currtime;
-
-				off_t progress;
-				if(sizenum) progress=(double)done/(double)size;
-				else progress=[srchandle estimatedProgress];
-
-				[delegate unarchiver:self extractionProgressForEntryWithDictionary:dict
-				fileFraction:progress estimatedTotalFraction:[[parser handle] estimatedProgress]];
-			}
-
-			if(actual==0) break;
-		}
-
-		if(sizenum&&done!=size) return XADDecrunchError; // kind of hacky
-		if([srchandle hasChecksum]&&![srchandle isChecksumCorrect]) return XADChecksumError;
+		// TODO: Should this function handle exceptions itself?
+		[XADAppleDouble writeAppleDoubleHeaderToHandle:fh resourceForkSize:ressize
+		extendedAttributes:extattrs];
 	}
-	@catch(id e)
-	{
-		return [XADException parseException:e];
-	}
+	@catch(id e) { return [XADException parseException:e]; }
 
-	return XADNoError;
+	// Write resource fork.
+	XADError error=XADNoError;
+	if(ressize) error=[self runExtractorWithDictionary:dict outputHandle:fh];
+
+	[fh close];
+
+	return error;
 }
+
+
 
 -(XADError)_updateFileAttributesAtPath:(NSString *)path forEntryWithDictionary:(NSDictionary *)dict
 deferDirectories:(BOOL)defer
@@ -459,7 +501,8 @@ deferDirectories:(BOOL)defer
 		}
 	}
 
-	return [self _updatePlatformSpecificFileAttributesAtPath:path forEntryWithDictionary:dict];
+	return [XADPlatform updateFileAttributesAtPath:path forEntryWithDictionary:dict
+	parser:parser preservePermissions:preservepermissions];
 }
 
 -(XADError)_ensureDirectoryExists:(NSString *)path
@@ -481,35 +524,168 @@ deferDirectories:(BOOL)defer
 
 		if(delegate)
 		{
-			if(![delegate unarchiver:self shouldCreateDirectory:path]) return XADBreakError;
+			if(![delegate unarchiver:self shouldCreateDirectory:path]) return XADMakeDirectoryError;
 		}
 
-		if([manager createDirectoryAtPath:path withIntermediateDirectories:NO attributes:nil error:NULL]) return XADNoError;
+		#if MAC_OS_X_VERSION_MIN_REQUIRED>=1050
+		if([manager createDirectoryAtPath:path
+		withIntermediateDirectories:NO attributes:nil error:NULL]) return XADNoError;
+		#else
+		if([manager createDirectoryAtPath:path attributes:nil]) return XADNoError;
+		#endif
 		else return XADMakeDirectoryError;
 	}
 }
 
 
 
-
--(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
+-(XADError)runExtractorWithDictionary:(NSDictionary *)dict outputHandle:(CSHandle *)handle
 {
-	// TODO: conditionals?
-	[self extractEntryWithDictionary:dict];
+	return [self runExtractorWithDictionary:dict outputTarget:self
+	selector:@selector(_outputToHandle:bytes:length:) argument:handle];
 }
 
--(BOOL)archiveParsingShouldStop:(XADArchiveParser *)parser
+-(XADError)_outputToHandle:(CSHandle *)handle bytes:(uint8_t *)bytes length:(int)length
+{
+	// TODO: combine the exception parsing for input and output
+	@try { [handle writeBytes:length fromBuffer:bytes]; }
+	@catch(id e) { return XADOutputError; }
+	return XADNoError;
+}
+
+-(XADError)runExtractorWithDictionary:(NSDictionary *)dict
+outputTarget:(id)target selector:(SEL)selector argument:(id)argument
+{
+	XADError (*outputfunc)(id,SEL,id,uint8_t *,int);
+	outputfunc=(void *)[target methodForSelector:selector];
+
+	uint8_t *buf=NULL;
+
+	@try
+	{
+		// Send a progress report to show that we are starting.
+		[delegate unarchiver:self extractionProgressForEntryWithDictionary:dict
+		fileFraction:0 estimatedTotalFraction:[[parser handle] estimatedProgress]];
+
+		// Try to find the size of this entry.
+		NSNumber *sizenum=[dict objectForKey:XADFileSizeKey];
+		off_t size=0;
+		if(sizenum)
+		{
+			size=[sizenum longLongValue];
+
+			// If this file is empty, don't bother reading anything, just
+			// call the output function once with 0 bytes and return.
+			if(size==0) return outputfunc(target,selector,argument,(uint8_t *)"",0);
+		}
+
+		// Create handle and start unpacking.
+		CSHandle *srchandle=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
+		if(!srchandle) return XADNotSupportedError;
+
+		off_t done=0;
+		double updatetime=0;
+
+		const int bufsize=0x40000;
+		buf=malloc(bufsize);
+		if(!buf) [XADException raiseOutOfMemoryException];
+
+		for(;;)
+		{
+			if([self _shouldStop]) return XADBreakError;
+
+			// Read some data, and send it to the output function.
+			// Stop if no more data was available.
+			int actual=[srchandle readAtMost:bufsize toBuffer:buf];
+			if(actual)
+			{
+				XADError error=outputfunc(target,selector,argument,buf,actual);
+				if(error) return error;
+			}
+			else break;
+
+			done+=actual;
+
+			// Occasionally, send a progress message.
+			double currtime=[XADPlatform currentTimeInSeconds];
+			if(currtime-updatetime>updateinterval)
+			{
+				updatetime=currtime;
+
+				double progress;
+				if(sizenum) progress=(double)done/(double)size;
+				else progress=[srchandle estimatedProgress];
+
+				[delegate unarchiver:self extractionProgressForEntryWithDictionary:dict
+				fileFraction:progress estimatedTotalFraction:[[parser handle] estimatedProgress]];
+			}
+		}
+
+		// Check if the file has already been marked as corrupt, and
+		// give up without testing checksum if so.
+		NSNumber *iscorrupt=[dict objectForKey:XADIsCorruptedKey];
+		if(iscorrupt&&[iscorrupt boolValue]) return XADDecrunchError;
+
+		// If the file has a checksum, check it. Otherwise, if it has a
+		// size, check that the size ended up correct.
+		if([srchandle hasChecksum])
+		{
+			if(![srchandle isChecksumCorrect]) return XADChecksumError;
+		}
+		else
+		{
+			if(sizenum&&done!=size) return XADDecrunchError; // kind of hacky
+		}
+
+		// Send a final progress report.
+		[delegate unarchiver:self extractionProgressForEntryWithDictionary:dict
+		fileFraction:1 estimatedTotalFraction:[[parser handle] estimatedProgress]];
+	}
+	@catch(id e)
+	{
+		return [XADException parseException:e];
+	}
+
+	free(buf);
+
+	return XADNoError;
+}
+
+-(NSString *)adjustPathString:(NSString *)path forEntryWithDictionary:(NSDictionary *)dict
+{
+	// If we are unpacking a resource fork, we may need to modify the path.
+	NSNumber *resnum=[dict objectForKey:XADIsResourceForkKey];
+	if(resnum&&[resnum boolValue])
+	{
+		switch(forkstyle)
+		{
+			case XADHiddenAppleDoubleForkStyle:
+				// TODO: is this path generation correct?
+				return [[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:
+				[@"._" stringByAppendingString:[path lastPathComponent]]];
+			break;
+
+			case XADVisibleAppleDoubleForkStyle:
+				return [path stringByAppendingPathExtension:@"rsrc"];
+			break;
+
+			case XADHFVExplorerAppleDoubleForkStyle:
+				// TODO: is this path generation correct?
+				return [[path stringByDeletingLastPathComponent] stringByAppendingPathComponent:
+				[@"%" stringByAppendingString:[path lastPathComponent]]];
+			break;
+		}
+	}
+	return path;
+}
+
+-(BOOL)_shouldStop
 {
 	if(!delegate) return NO;
-	return [delegate extractionShouldStopForUnarchiver:self];
-}
+	if(shouldstop) return YES;
 
--(void)archiveParserNeedsPassword:(XADArchiveParser *)parser
-{
-	if(!delegate) return;
-	[delegate unarchiverNeedsPassword:self];
+	return shouldstop=[delegate extractionShouldStopForUnarchiver:self];
 }
-
 
 @end
 
@@ -520,7 +696,19 @@ deferDirectories:(BOOL)defer
 -(void)unarchiverNeedsPassword:(XADUnarchiver *)unarchiver {}
 
 -(NSString *)unarchiver:(XADUnarchiver *)unarchiver pathForExtractingEntryWithDictionary:(NSDictionary *)dict { return nil; }
--(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path { return YES; }
+
+-(BOOL)unarchiver:(XADUnarchiver *)unarchiver shouldExtractEntryWithDictionary:(NSDictionary *)dict suggestedPath:(NSString **)pathptr
+{
+	// Kludge to handle old-style interface.
+	if([self respondsToSelector:@selector(unarchiver:shouldExtractEntryWithDictionary:to:)])
+	{
+		NSString *path=[self unarchiver:unarchiver pathForExtractingEntryWithDictionary:dict];
+		if(path) *pathptr=path;
+		return [self unarchiver:unarchiver shouldExtractEntryWithDictionary:dict to:*pathptr];
+	}
+	else return YES;
+}
+
 -(void)unarchiver:(XADUnarchiver *)unarchiver willExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path {}
 -(void)unarchiver:(XADUnarchiver *)unarchiver didExtractEntryWithDictionary:(NSDictionary *)dict to:(NSString *)path error:(XADError)error {}
 
@@ -530,12 +718,25 @@ deferDirectories:(BOOL)defer
 -(void)unarchiver:(XADUnarchiver *)unarchiver willExtractArchiveEntryWithDictionary:(NSDictionary *)dict withUnarchiver:(XADUnarchiver *)subunarchiver to:(NSString *)path {}
 -(void)unarchiver:(XADUnarchiver *)unarchiver didExtractArchiveEntryWithDictionary:(NSDictionary *)dict withUnarchiver:(XADUnarchiver *)subunarchiver to:(NSString *)path error:(XADError)error {}
 
--(NSString *)unarchiver:(XADUnarchiver *)unarchiver linkDestinationForEntryWithDictionary:(NSDictionary *)dict from:(NSString *)path { return nil; }
-//-(XADAction)unarchiver:(XADUnarchiver *)unarchiver creatingDirectoryDidFailForEntry:(int)n;
+-(NSString *)unarchiver:(XADUnarchiver *)unarchiver destinationForLink:(XADString *)link from:(NSString *)path
+{
+	// Kludge to handle old-style interface.
+	if([self respondsToSelector:@selector(unarchiver:linkDestinationForEntryWithDictionary:from:)])
+	{
+		return [self unarchiver:unarchiver linkDestinationForEntryWithDictionary:
+		[NSMutableDictionary dictionaryWithObjectsAndKeys:
+			link,XADLinkDestinationKey,
+			[NSNumber numberWithBool:YES],XADIsLinkKey,
+		nil] from:path];
+	}
+	else return [link string];
+}
 
 -(BOOL)extractionShouldStopForUnarchiver:(XADUnarchiver *)unarchiver { return NO; }
 -(void)unarchiver:(XADUnarchiver *)unarchiver extractionProgressForEntryWithDictionary:(NSDictionary *)dict
 fileFraction:(double)fileprogress estimatedTotalFraction:(double)totalprogress {}
+
+-(void)unarchiver:(XADUnarchiver *)unarchiver findsFileInterestingForReason:(NSString *)reason {}
 
 @end
 

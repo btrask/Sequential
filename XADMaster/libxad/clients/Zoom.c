@@ -20,7 +20,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -742,7 +742,7 @@ XADGETINFO(Zoom)
                 ti->xti_Size = 80+21;
                 xadConvertDates(XADM XAD_DATEDATESTAMP, &zn.DateStamp,
                 XAD_GETDATEXADDATE, &xd, TAG_DONE);
-                sprintf(buf, "%02d.%02d.%04d %02d:%02d:%02d\n\n",
+                sprintf((char *)buf, "%02d.%02d.%04d %02d:%02d:%02d\n\n",
                 (xadUINT32)xd.xd_Day, (xadUINT32)xd.xd_Month,
                 (xadUINT32)xd.xd_Year, (xadUINT32)xd.xd_Hour,
                 (xadUINT32)xd.xd_Minute, (xadUINT32)xd.xd_Second);

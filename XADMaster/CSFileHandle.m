@@ -46,7 +46,7 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 
 -(id)initWithFilePointer:(FILE *)file closeOnDealloc:(BOOL)closeondealloc name:(NSString *)descname
 {
-	if(self=[super initWithName:descname])
+	if((self=[super initWithName:descname]))
 	{
 		fh=file;
  		close=closeondealloc;
@@ -58,7 +58,7 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 
 -(id)initAsCopyOf:(CSFileHandle *)other
 {
-	if(self=[super initAsCopyOf:other])
+	if((self=[super initAsCopyOf:other]))
 	{
 		fh=other->fh;
  		close=NO;
@@ -98,8 +98,14 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 
 -(off_t)fileSize
 {
+	#if defined(__MINGW32__)
+	struct _stati64 s;
+	if(_fstati64(fileno(fh),&s)) [self _raiseError];
+	#else
 	struct stat s;
 	if(fstat(fileno(fh),&s)) [self _raiseError];
+	#endif
+
 	return s.st_size;
 }
 
@@ -121,6 +127,7 @@ NSString *CSFileErrorException=@"CSFileErrorException";
 -(void)seekToFileOffset:(off_t)offs
 {
 	if(multilock) { [multilock lock]; }
+	//if(offs>[self fileSize]) [self _raiseEOF];
 	if(fseeko(fh,offs,SEEK_SET)) [self _raiseError];
 	if(multilock) { pos=ftello(fh); [multilock unlock]; }
 }

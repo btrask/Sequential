@@ -1,0 +1,267 @@
+# Source files
+
+LIBRARY_OBJC_FILES =	CarrylessRangeCoder.m \
+			Checksums.m \
+			CRC.m \
+			CSBlockStreamHandle.m \
+			CSByteStreamHandle.m \
+			CSBzip2Handle.m \
+			CSFileHandle.m \
+			CSHandle.m \
+			CSHexDump.m \
+			CSInputBuffer.m \
+			CSMemoryHandle.m \
+			CSMultiHandle.m \
+			CSStreamHandle.m \
+			CSSubHandle.m \
+			CSZlibHandle.m \
+			NSDateXAD.m \
+			NumberParsing.m \
+			Progress.m \
+			StuffItXUtilities.m \
+			XAD7ZipBCJ2Handle.m \
+			XAD7ZipBranchHandles.m \
+			XAD7ZipParser.m \
+			XADALZipParser.m \
+			XADAppleDouble.m \
+			XADAppleSingleParser.m \
+			XADArParser.m \
+			XADArchiveParser.m \
+			XADArchiveParserDescriptions.m \
+			XADARCCrunchHandle.m \
+			XADARCCrushHandle.m \
+			XADARCDistillHandle.m \
+			XADARCParser.m \
+			XADARJFastestHandle.m \
+			XADARJParser.m \
+			XADBinHexParser.m \
+			XADBlockHandle.m \
+			XADBzip2Parser.m \
+			XADCABBlockHandle.m \
+			XADCABBlockReader.m \
+			XADCABParser.m \
+			XADCFBFParser.m \
+			XADChecksumHandle.m \
+			XADCompactProLZHHandle.m \
+			XADCompactProParser.m \
+			XADCompactProRLEHandle.m \
+			XADCompressHandle.m \
+			XADCompressParser.m \
+			XADCpioParser.m \
+			XADCRCHandle.m \
+			XADCRCSuffixHandle.m \
+			XADCrunchHandles.m \
+			XADCrunchParser.m \
+			XADDeflateHandle.m \
+			XADDeltaHandle.m \
+			XADDigestHandle.m \
+			XADDiskDoublerADnHandle.m \
+			XADDiskDoublerDDnHandle.m \
+			XADDiskDoublerMethod2Handle.m \
+			XADDiskDoublerParser.m \
+			XADException.m \
+			XADFastLZSSHandle.m \
+			XADGzipParser.m \
+			XADISO9660Parser.m \
+			XADLArcHandles.m \
+			XADLBRParser.m \
+			XADLibXADIOHandle.m \
+			XADLibXADParser.m \
+			XADLZHDynamicHandle.m \
+			XADLZHOldHandles.m \
+			XADLZHParser.m \
+			XADLZHSFXParsers.m \
+			XADLZHStaticHandle.m \
+			XADLZMA2Handle.m \
+			XADLZMAAloneParser.m \
+			XADLZMAHandle.m \
+			XADLZSSHandle.m \
+			XADLZXHandle.m \
+			XADLZXParser.m \
+			XADMacArchiveParser.m \
+			XADMacBinaryParser.m \
+			XADMSLZXHandle.m \
+			XADMSZipHandle.m \
+			XADNDSParser.m \
+			XADNowCompressHandle.m \
+			XADNowCompressParser.m \
+			XADNSAParser.m \
+			XADNSISBzip2Handle.m \
+			XADNSISParser.m \
+			XADPackItParser.m \
+			XADPaddedBlockHandle.m \
+			XADPath.m \
+			XADPDFParser.m \
+			XADPNGWriter.m \
+			XADPowerPackerParser.m \
+			XADPPMdHandles.m \
+			XADPPMdParser.m \
+			XADPrefixCode.m \
+			XADQuantumHandle.m \
+			XADRARAESHandle.m \
+			XADRAR13CryptHandle.m \
+			XADRAR15CryptHandle.m \
+			XADRAR15Handle.m \
+			XADRAR20CryptHandle.m \
+			XADRAR20Handle.m \
+			XADRAR30Handle.m \
+			XADRAR30Filter.m \
+			XADRARInputHandle.m \
+			XADRARParser.m \
+			XADRARVirtualMachine.m \
+			XADRC4Handle.m \
+			XADRegex.m \
+			XADRLE90Handle.m \
+			XADRPMParser.m \
+			XADSARParser.m \
+			XADSimpleUnarchiver.m \
+			XADSkipHandle.m \
+			XADSplitFileParser.m \
+			XADSqueezeHandle.m \
+			XADSqueezeParser.m \
+			XADStacLZSHandle.m \
+			XADString.m \
+			XADStuffIt13Handle.m \
+			XADStuffIt5Parser.m \
+			XADStuffItArsenicHandle.m \
+			XADStuffItHuffmanHandle.m \
+			XADStuffItOldHandles.m \
+			XADStuffItParser.m \
+			XADStuffItSplitParser.m \
+			XADStuffItXBlendHandle.m \
+			XADStuffItXBlockHandle.m \
+			XADStuffItXCyanideHandle.m \
+			XADStuffItXDarkhorseHandle.m \
+			XADStuffItXEnglishHandle.m \
+			XADStuffItXIronHandle.m \
+			XADStuffItXX86Handle.m \
+			XADStuffItXParser.m \
+			XADSWFGeometry.m \
+			XADSWFParser.m \
+			XADSWFTagParser.m \
+			XADTarParser.m \
+			XADTarSparseHandle.m \
+			XADUnarchiver.m \
+			XADWinZipAESHandle.m \
+			XADWinZipJPEGHandle.m \
+			XADWinZipWavPackHandle.m \
+			XADXARParser.m \
+			XADXORHandle.m \
+			XADXORSumHandle.m \
+			XADXZHandle.m \
+			XADXZParser.m \
+			XADZipCryptHandle.m \
+			XADZipImplodeHandle.m \
+			XADZipParser.m \
+			XADZipSFXParsers.m \
+			XADZipShrinkHandle.m \
+			XADZooParser.m \
+			PDF/CCITTHandle.m \
+			PDF/LZWHandle.m \
+			PDF/NSDictionaryNumberExtension.m \
+			PDF/PDFEncryptionHandler.m \
+			PDF/PDFEncryptionUtils.m \
+			PDF/PDFParser.m \
+			PDF/PDFStream.m
+
+LIBRARY_C_FILES =	BWT.c \
+			LZSS.c \
+			LZW.c \
+			StuffItXEnglishDictionary.c \
+			RARAudioDecoder.c \
+			RARBug.c \
+			RARVirtualMachine.c \
+			libxad/all.c \
+			libxad/clients.c \
+			libxad/unix/emulation.c \
+			libxad/unix/init.c \
+			lzma/LzmaDec.c \
+			lzma/BraIA64.c \
+			lzma/Bra86.c \
+			lzma/Bra.c \
+			lzma/Lzma2Dec.c \
+			PPMd/Context.c \
+			PPMd/RangeCoder.c \
+			PPMd/SubAllocatorBrimstone.c \
+			PPMd/SubAllocatorVariantG.c \
+			PPMd/SubAllocatorVariantH.c \
+			PPMd/SubAllocatorVariantI.c \
+			PPMd/VariantG.c \
+			PPMd/VariantH.c \
+			PPMd/VariantI.c \
+			wavpack/bits.c \
+			wavpack/float.c \
+			wavpack/metadata.c \
+			wavpack/unpack.c \
+			wavpack/words.c \
+			wavpack/wputils.c \
+			WinZipJPEG/ArithmeticDecoder.c \
+			WinZipJPEG/Decompressor.c \
+			WinZipJPEG/JPEG.c
+
+LIBRARY_CXX_FILES =		
+
+XADTEST2_OBJC_FILES =	XADTest2.m
+
+XADTEST3_OBJC_FILES =	XADTest3.m
+
+XADTEST4_OBJC_FILES =	XADTest4.m
+
+XADTEST5_OBJC_FILES =	XADTest5.m
+
+XADTEST6_OBJC_FILES =	XADTest6.m
+
+UNAR_OBJC_FILES =	unar.m
+
+LSAR_OBJC_FILES =	lsar.m \
+			CSJSONPrinter.m
+
+CMDLINE_OBJC_FILES =	CSCommandLineParser.m \
+			CommandLineCommon.m \
+			NSStringPrinting.m
+
+# Object files
+
+LIBRARY_OBJS =		$(LIBRARY_OBJC_FILES:%.m=$(BUILD_DIR)/%.o) \
+			$(PLATFORM_C_FILES:%.c=$(BUILD_DIR)/%.o) \
+			$(PLATFORM_OBJC_FILES:%.m=$(BUILD_DIR)/%.o) \
+			$(LIBRARY_C_FILES:%.c=$(BUILD_DIR)/%.o) \
+			$(LIBRARY_CXX_FILES:%.cpp=$(BUILD_DIR)/%.o)
+
+XADTEST2_OBJS =		$(XADTEST2_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+XADTEST3_OBJS =		$(XADTEST3_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+XADTEST4_OBJS =		$(XADTEST4_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+XADTEST5_OBJS =		$(XADTEST5_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+XADTEST6_OBJS =		$(XADTEST6_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+UNAR_OBJS =		$(UNAR_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+LSAR_OBJS =		$(LSAR_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+CMDLINE_OBJS=		$(CMDLINE_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+OBJS = 	$(LIBRARY_OBJS) \
+	$(XADTEST2_OBJS) \
+	$(XADTEST3_OBJS) \
+	$(XADTEST4_OBJS) \
+	$(XADTEST5_OBJS) \
+	$(XADTEST6_OBJS) \
+	$(UNAR_OBJS) \
+	$(LSAR_OBJS) \
+	$(CMDLINE_OBJS)
+
+# Other files
+
+EXECUTABLE_FILES =	XADTest2 \
+			XADTest3 \
+			XADTest4 \
+			XADTest5 \
+			XADTest6 \
+			unar \
+			lsar
+
+LIBRARY_FILES = 	libXADMaster.a

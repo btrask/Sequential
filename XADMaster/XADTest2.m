@@ -2,13 +2,25 @@
 #import "CRC.h"
 
 @interface TestDelegate:NSObject
+{
+	int count;
+}
 @end
 
 @implementation TestDelegate
 
+-(id)init
+{
+	if((self=[super init]))
+	{
+		count=0;
+	}
+	return self;
+}
+
 -(void)archiveParser:(XADArchiveParser *)parser foundEntryWithDictionary:(NSDictionary *)dict
 {
-	NSLog(@"%@",dict);
+	NSLog(@"Entry %d: %@",count++,dict);
 
 	CSHandle *fh=[parser handleForEntryWithDictionary:dict wantChecksum:YES];
 
@@ -34,9 +46,9 @@
 		for(int i=0;i<length;i++) xor^=bytes[i];
 	}
 
-	NSLog(@"Checksum: %@, Length: %d, CRC32: %08x, XOR: %02x",
+	NSLog(@"Checksum: %@, Length: %qd, CRC32: %08x, XOR: 0x%02x (%d)",
 	[fh hasChecksum]?[fh isChecksumCorrect]?@"Correct":@"Incorrect":@"Unknown",
-	[data length],crc,xor);
+	(uint64_t)[data length],crc,xor,xor);
 
 	NSLog(@"\n%@",[data subdataWithRange:NSMakeRange(0,[data length]<256?[data length]:256)]);
 }
@@ -64,6 +76,7 @@ int main(int argc,char **argv)
 		char *pass=getenv("XADTestPassword");
 		if(pass) [parser setPassword:[NSString stringWithUTF8String:pass]];
 
+		NSLog(@"Archive format: \"%@\", properties: %@",[parser formatName],[parser properties]);
 		[parser parse];
 		NSLog(@"Archive format: \"%@\", properties: %@",[parser formatName],[parser properties]);
 

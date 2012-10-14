@@ -19,7 +19,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -824,494 +824,6 @@ static xadINT32 CBMunpack(struct xadInOut *io)
   return io->xio_Error;
 }
 
-/* ARC crunch *************************************************************************************/
-
-struct ArcCrunchEntry { /* string table entry format */
-  xadINT8   used;               /* true when this entry is in use */
-  xadUINT8  follower;   /* char following string */
-  xadUINT16  next;              /* ptr to next in collision list */
-  xadUINT16  predecessor;       /* code for preceeding string */
-};
-
-#define ARCTABSIZE      4096
-#define ARCNO_PRED      0xFFFF
-
-struct ArcCrunchData {
-  struct xadInOut *io;
-  struct ArcCrunchEntry string_tab[ARCTABSIZE];
-  xadUINT8 newhash;
-  xadUINT8 stack[ARCTABSIZE];
-};
-
-static void ARCupd_tab(xadUINT16 pred, xadUINT8 foll, struct ArcCrunchData *ad)
-{
-  xadUINT16 local, tempnext;    /* scratch storage */
-  struct ArcCrunchEntry *ep;    /* allows faster table handling */
-
-  if(ad->newhash)
-    local = (((pred + foll) & 0xFFFF) * 15073) & 0xFFF;
-  else
-  {
-    local = (pred + foll) | 0x0800;        /* create the hash key */
-    local = ((local*local) >> 6) & 0x0FFF; /* square it and take middle 12 bits */
-  }
-
-  if(ad->string_tab[local].used) /* a collision has occured */
-  {
-    while((tempnext = ad->string_tab[local].next))      /* while more duplicates */
-      local = tempnext;
-
-    /* We must find an empty spot. We start looking 101 places down the table from the last duplicate. */
-    tempnext = (local + 101) & 0x0FFF;
-    ep = &ad->string_tab[tempnext];     /* initialize pointer */
-
-    while(ep->used) /* while empty spot not found */
-    {
-      if(++tempnext == ARCTABSIZE) /* if we are at the end */
-      {
-        tempnext = 0;   /* wrap to beginning of table */
-        ep = ad->string_tab;
-      }
-      else
-        ++ep;   /* point to next element in table */
-    }
-
-    /* local still has the pointer to the last duplicate, while
-     * tempnext has the pointer to the spot we found.  We use
-     * this to maintain the chain of pointers to duplicates. */
-    ad->string_tab[local].next = tempnext;
-
-    local = tempnext;
-  }
-  ep = &ad->string_tab[local];
-
-  ep->used = XADTRUE;           /* this spot is now in use */
-  ep->next = 0;                 /* no duplicates after this yet */
-  ep->predecessor = pred;       /* note code of preceeding string */
-  ep->follower = foll;          /* note char after string */
-}
-
-static xadINT32 ARCuncrunch(struct xadInOut *io, xadUINT8 fasthash)
-{
-  xadINT32 err = 0;
-  struct xadMasterBase *xadMasterBase = io->xio_xadMasterBase;
-  struct ArcCrunchData *ad;
-  xadUINT8 finchar;
-  xadUINT16 code, newcode, oldcode, code_count, sp;
-  struct ArcCrunchEntry *ep;   /* allows faster table handling */
-
-  if((ad = (struct ArcCrunchData *) xadAllocVec(XADM sizeof(struct ArcCrunchData), XADMEMF_PUBLIC|XADMEMF_CLEAR)))
-  {
-    ad->io = io;
-    sp = 0;                                     /* clear out the stack */
-    code_count = ARCTABSIZE - 256;              /* note space left in table */
-    ad->newhash = fasthash;
-/*  memset(ad->string_tab, 0, sizeof(ArcCrunchEntry)*ARCTABSIZE)); */
-
-    /* reuse oldcode as loop counter */
-    for(oldcode = 0; oldcode < 256; oldcode++) /* list all single byte strings */
-      ARCupd_tab(ARCNO_PRED, oldcode, ad);
-
-    oldcode = xadIOGetBitsHigh(io,12);
-    finchar = ad->string_tab[oldcode].follower;
-    xadIOPutChar(io, finchar);
-
-    while(!(io->xio_Flags & (XADIOF_LASTOUTBYTE|XADIOF_ERROR)))
-    {
-      code = newcode = xadIOGetBitsHigh(io,12);
-      ep = &ad->string_tab[code];       /* initialize pointer */
-
-      if(!ep->used) /* if code isn't known */
-      {
-        code = oldcode;
-        ep = &ad->string_tab[code];     /* re-initialize pointer */
-        ad->stack[sp++] = finchar;
-      }
-      while(ep->predecessor != ARCNO_PRED && !(io->xio_Flags & XADIOF_ERROR))
-      {
-        if(sp >= ARCTABSIZE-1)
-        {
-          io->xio_Flags |= XADIOF_ERROR;
-          io->xio_Error = XADERR_DECRUNCH;
-        }
-        ad->stack[sp++] = ep->follower; /* decode string backwards */
-        code = ep->predecessor;
-        ep = &ad->string_tab[code];
-      }
-      if(!(io->xio_Flags & XADIOF_ERROR))
-      {
-        ad->stack[sp++] = finchar = ep->follower;       /* save first character also */
-
-        /* The above loop will terminate, one way or another, with
-         * string_tab[code].follower equal to the first character in the string. */
-
-        if(code_count) /* if room left in string table */
-        {
-          ARCupd_tab(oldcode, finchar, ad);
-          --code_count;
-        }
-        oldcode = newcode;
-        while(sp > 0 && !(io->xio_Flags & (XADIOF_LASTOUTBYTE|XADIOF_ERROR)))
-          xadIOPutChar(io, ad->stack[--sp]); /* leave ptr at next empty slot */
-      }
-    }
-    if(!err)
-      err = io->xio_Error;
-
-    xadFreeObjectA(XADM ad, 0);
-  }
-  else
-    err = XADERR_NOMEMORY;
-  return err;
-}
-
-/* Crunch algorithm *******************************************************************************/
-
-#define CRUNCH_TABLE_SIZE  4096 /* size of main lzw table for 12 bit codes */
-#define CRUNCH_XLATBL_SIZE 5003 /* size of physical translation table */
-
-/* special values for predecessor in table */
-#define CRUNCH_NOPRED 0x3fff     /* no predecessor in table */
-#define CRUNCH_EMPTY  0x8000     /* empty table entry (xlatbl only) */
-#define CRUNCH_REFERENCED 0x2000 /* table entry referenced if this bit set */
-#define CRUNCH_IMPRED 0x7fff     /* impossible predecessor */
-
-#define CRUNCH_EOFCOD 0x100      /* special code for end-of-file */
-#define CRUNCH_RSTCOD 0x101      /* special code for adaptive reset */
-#define CRUNCH_NULCOD 0x102      /* special filler code */
-#define CRUNCH_SPRCOD 0x103      /* spare special code */
-
-struct CrunchEntry
-{
-  xadUINT16 predecessor;         /* index to previous entry, if any */
-  xadUINT8 suffix;                   /* character suffixed to previous entries */
-};
-
-struct CrunchData
-{
-  struct xadInOut *  io;
-  xadUINT16              lastpr;    /* last predecessor (in main loop) */
-  xadUINT16              entry; /* next available main table entry */
-  xadUINT16              xlatbl[CRUNCH_XLATBL_SIZE]; /* auxilliary physical translation table */
-  struct CrunchEntry table[CRUNCH_TABLE_SIZE];   /* main table */
-  xadUINT8              stack[CRUNCH_TABLE_SIZE];   /* byte string stack used by decode */
-  xadUINT8              codlen;    /* variable code length in bits (9-12) */
-  xadUINT8              fulflg;    /* full flag - set once main table is full */
-  xadUINT8              entflg;    /* inhibit main loop from entering this code */
-  xadUINT8              finchar;   /* first character of last substring output */
-};
-
-/* enter the next code into the lzw table */
-static void CRUNCHenterxOLD(struct CrunchData *cd, xadUINT16 pred, xadUINT8 suff)
-{
-  xadINT32 lasthash,hashval,a;
-
-  if(pred == CRUNCH_NOPRED && !suff)
-    hashval=0x800; /* special case (leaving the zero code free for EOF) */
-  else
-  {
-    /* normally we do a slightly awkward mid-square thing */
-    a = (((pred+suff)|0x800)&0x1FFF);
-    hashval = (a>>1);
-    hashval = (((hashval*(hashval+(a&1)))>>4)&0xfff);
-  }
-
-  /* first, check link chain from there */
-  while(cd->xlatbl[hashval] != CRUNCH_EMPTY)
-  {
-    hashval = cd->xlatbl[hashval];
-  }
-
-  if(hashval >= CRUNCH_TABLE_SIZE)
-  {
-    cd->io->xio_Error = XADERR_DECRUNCH;
-    return;
-  }
-
-  if(cd->table[hashval].predecessor != CRUNCH_EMPTY)
-  {
-    lasthash=hashval;
-    /* slightly odd approach if it's not in that - first try skipping
-     * 101 entries, then try them one-by-one. If should be impossible
-     * for this to loop indefinitely, if the table isn't full. (And we
-     * shouldn't have been called if it was full...)
-     */
-    hashval += 101;
-    hashval &= 0xfff;
-    for(a = 0; cd->table[hashval].predecessor != CRUNCH_EMPTY
-    && a < CRUNCH_TABLE_SIZE; ++a)
-    {
-      ++hashval;
-      hashval &= 0xfff;
-    }
-
-    /* add link to here from the end of the chain */
-    cd->xlatbl[lasthash] = hashval;
-  }
-
-  /* make the new entry */
-  cd->table[hashval].predecessor = pred;
-  cd->table[hashval].suffix = suff;
-  ++cd->entry;
-}
-
-/* enter the next code into the lzw table */
-static void CRUNCHenterx(struct CrunchData *cd, xadUINT16 pred, xadUINT8 suff)
-{
-  struct CrunchEntry *ep = cd->table + cd->entry;
-  xadINT32 disp;
-  xadUINT16 *p;
-  /* update xlatbl to point to this entry */
-  /* find an empty entry in xlatbl which hashes from this predecessor/suffix */
-  /* combo, and store the index of the next available lzw table entry in it */
-
-  disp = ((((pred>>4) & 0xff) ^suff) | ((pred&0xf)<<8)) + 1;
-  p = cd->xlatbl+disp;
-  disp -= CRUNCH_XLATBL_SIZE;
-
-  /*follow secondary hash chain as necessary to find an empty slot*/
-  while(*p != CRUNCH_EMPTY)
-  {
-    p += disp;
-    if(p < cd->xlatbl || p > cd->xlatbl+CRUNCH_XLATBL_SIZE)
-      p += CRUNCH_XLATBL_SIZE;
-  }
-
-  /* stuff next available index into this slot */
-  *p = cd->entry;
-
-  /* make the new entry */
-  ep->predecessor = pred;
-  ep->suffix = suff;
-  ++cd->entry;
-
-  /* if only one entry of the current code length remains, update to */
-  /* next code length because main loop is reading one code ahead */
-  if(cd->entry >= ((1<<cd->codlen)-1))
-  {
-    if(cd->codlen < 12)
-    {
-      /* table not full, just make length one more bit */
-      ++cd->codlen;
-    }
-    else
-    {
-      /* table almost full (fulflg==0) or full (fulflg==1) */
-      /* just increment fulflg - when it gets to 2 we will */
-      /* never be called again */
-      ++cd->fulflg;
-    }
-  }
-}
-
-/* initialize the lzw and physical translation tables */
-static void CRUNCHinitb2(struct CrunchData *cd)
-{
-  xadINT32 i;
-
-  cd->entry  = 0;
-  cd->fulflg = 0;
-  cd->codlen = 9;
-  cd->entflg = 1;
-
-  /* first mark all entries of xlatbl as empty */
-  for(i = 0; i < CRUNCH_XLATBL_SIZE; ++i)
-    cd->xlatbl[i] = CRUNCH_EMPTY;
-  /* enter atomic and reserved codes into lzw table */
-  for(i = 0; i < 0x100; ++i)
-    CRUNCHenterx(cd, CRUNCH_NOPRED, i); /* first 256 atomic codes */
-  for(i=0; i < 4; ++i)
-    CRUNCHenterx(cd, CRUNCH_IMPRED, 0); /* reserved codes */
-}
-
-/* attempt to reassign an existing code which has */
-/* been defined, but never referenced */
-static void CRUNCHentfil(struct CrunchData *cd, xadUINT16 pred, xadUINT8 suff)
-{
-  xadINT32 disp;
-  struct CrunchEntry *ep;
-  xadUINT16 *p;
-
-  disp = ((((pred>>4) & 0xff) ^suff) | ((pred&0xf)<<8)) + 1;
-  p = cd->xlatbl+disp;
-  disp -= CRUNCH_XLATBL_SIZE;
-
-  /* search the candidate codes (all those which hash from this new */
-  /* predecessor and suffix) for an unreferenced one */
-  while(*p != CRUNCH_EMPTY)
-  {
-    /* candidate code */
-    ep = cd->table + *p;
-    if(((ep->predecessor)&CRUNCH_REFERENCED)==0)
-    {
-      /* entry reassignable, so do it! */
-      ep->predecessor = pred;
-      ep->suffix = suff;
-      /* discontinue search */
-      break;
-    }
-    /* candidate unsuitable - follow secondary hash chain */
-    /* and keep searching */
-    p += disp;
-    if(p < cd->xlatbl || p > cd->xlatbl+CRUNCH_XLATBL_SIZE)
-      p += CRUNCH_XLATBL_SIZE;
-  }
-}
-
-/* decode this code */
-static xadUINT8 CRUNCHdecode(struct CrunchData *cd, xadUINT16 code)
-{
-  xadUINT8 *stackp; /* byte string stack pointer */
-  struct CrunchEntry *ep = cd->table + code;
-
-  if(code >= cd->entry)
-  {
-    /* the ugly exception, "WsWsW" */
-    cd->entflg = 1;
-    CRUNCHenterx(cd, cd->lastpr, cd->finchar);
-  }
-
-  /* mark corresponding table entry as referenced */
-  ep->predecessor |= CRUNCH_REFERENCED;
-
-  /* walk back the lzw table starting with this code */
-  stackp = cd->stack;
-  while(ep > cd->table + 255) /* i.e. code not atomic */
-  {
-    *(stackp++) = ep->suffix;
-    ep = cd->table + (ep->predecessor&0xFFF);
-  }
-  /* then emit all bytes corresponding to this code in forward order */
-  cd->finchar = xadIOPutChar(cd->io, ep->suffix);
-  while(stackp > cd->stack)     /* the rest */
-    xadIOPutChar(cd->io, *(--stackp));
-  return cd->entflg;
-}
-
-xadINT32 CRUNCHuncrunch(struct xadInOut *io, xadUINT32 mode)
-{
-  struct xadMasterBase *xadMasterBase = io->xio_xadMasterBase;
-  xadUINT16 pred; /* current predecessor (in main loop) */
-  struct CrunchData *cd;
-  xadINT32 err, i;
-
-  if((cd = (struct CrunchData *) xadAllocVec(XADM sizeof(struct CrunchData), XADMEMF_PUBLIC|XADMEMF_CLEAR)))
-  {
-    cd->io = io;
-
-    /* main decoding loop */
-    pred = CRUNCH_NOPRED;
-    if(mode)
-    {
-      xadUINT8 *stackp, *stacke; /* byte string stack pointer */
-      struct CrunchEntry *ep;
-
-      stackp = cd->stack;
-      stacke = cd->stack+CRUNCH_TABLE_SIZE-2;
-
-      /* first mark all entries of xlatbl as empty */
-      for(i = 0; i < CRUNCH_TABLE_SIZE; ++i)
-        cd->xlatbl[i] = CRUNCH_EMPTY;
-      cd->table[0].predecessor = CRUNCH_NOPRED;
-      for(i = 1; i < CRUNCH_TABLE_SIZE; ++i)
-        cd->table[i].predecessor = CRUNCH_EMPTY;
-      /* enter atomic and reserved codes into lzw table */
-      for(i = 0; i < 0x100; ++i)
-        CRUNCHenterxOLD(cd, CRUNCH_NOPRED, i); /* first 256 atomic codes */
-
-      while(!io->xio_Error)
-      {
-        /* remember last predecessor */
-        cd->lastpr = pred;
-        /* read and process one code */
-
-        pred = xadIOGetBitsHigh(io, 12);
-
-        if(pred == 0) /* end-of-file code */
-          break; /* all lzw codes read */
-
-        ep = cd->table + (cd->table[pred].predecessor == CRUNCH_EMPTY ? cd->lastpr : pred);
-
-        /* walk back the lzw table starting with this code */
-        while(ep->predecessor < CRUNCH_TABLE_SIZE)
-        {
-          if(stackp >= stacke)
-          {
-            cd->io->xio_Error = XADERR_DECRUNCH;
-            break;
-          }
-          *(stackp++) = ep->suffix;
-          ep = cd->table + ep->predecessor;
-        }
-        if(ep->predecessor != CRUNCH_EMPTY)
-          *(stackp++) = ep->suffix;
-
-        cd->finchar = *(stackp-1);
-
-        /* then emit all bytes corresponding to this code in forward order */
-        while(stackp > cd->stack)
-          xadIOPutChar(cd->io, *(--stackp));
-
-        if(cd->table[pred].predecessor == CRUNCH_EMPTY)
-          xadIOPutChar(cd->io, cd->finchar);
-
-        if(cd->entry < CRUNCH_TABLE_SIZE-1 &&
-        cd->lastpr != CRUNCH_NOPRED) /* new code */
-          CRUNCHenterxOLD(cd, cd->lastpr, cd->finchar);
-      }
-    }
-    else
-    {
-      CRUNCHinitb2(cd);
-
-      while(!io->xio_Error)
-      {
-        /* remember last predecessor */
-        cd->lastpr = pred;
-        /* read and process one code */
-
-        pred = xadIOGetBitsHigh(io, cd->codlen);
-        if(pred == CRUNCH_EOFCOD) /* end-of-file code */
-        {
-          break; /* all lzw codes read */
-        }
-        else if(pred == CRUNCH_RSTCOD) /* reset code */
-        {
-          pred = CRUNCH_NOPRED;
-          CRUNCHinitb2(cd);
-        }
-        else if(pred == CRUNCH_NULCOD || pred == CRUNCH_SPRCOD)
-        {
-          pred = cd->lastpr;
-        }
-        else /* a normal code (nulls already deleted) */
-        {
-          /* check for table full */
-          if(cd->fulflg != 2)
-          {
-            /* strategy if table not full */
-            if(!CRUNCHdecode(cd, pred))
-              CRUNCHenterx(cd, cd->lastpr, cd->finchar);
-            else
-              cd->entflg = 0;
-          }
-          else
-          {
-            /* strategy if table is full */
-            CRUNCHdecode(cd, pred);
-            CRUNCHentfil(cd, cd->lastpr, cd->finchar); /* attempt to reassign */
-          }
-        }
-      }
-    }
-    err = io->xio_Error;
-    xadFreeObjectA(XADM cd, 0);
-  }
-  else
-    err = XADERR_NOMEMORY;
-  return err;
-}
-
 /**************************************************************************************************/
 
 XADRECOGDATA(AMPK)
@@ -1366,7 +878,7 @@ struct AMPKFile {
 
 #define AMPKFile_TRUESIZE 18
 
-static const xadSTRPTR ampktype[4] = {"stored", "medium", "fast", "slow"};
+static const xadSTRPTR ampktype[4] = {(xadSTRPTR)"stored", (xadSTRPTR)"medium", (xadSTRPTR)"fast", (xadSTRPTR)"slow"};
 
 XADGETINFO(AMPK)
 {
@@ -1587,7 +1099,7 @@ struct AmUnpackPriv {
   xadUINT16 Mode;
 };
 
-static const xadSTRPTR apuptype[2] = {"internal", "XPK"};
+static const xadSTRPTR apuptype[2] = {(xadSTRPTR)"internal", (xadSTRPTR)"XPK"};
 
 /* This Client does not scan all correct IFF file possibilities, but only
 IFF-APUP file structures, which really exist. */
@@ -2187,260 +1699,6 @@ XADUNARCHIVE(LHWARP)
 
 /************************************************************************************************************************/
 
-#define ARCMETHOD_END           0
-#define ARCMETHOD_OLDUNPACKED   1
-#define ARCMETHOD_UNPACKED      2
-#define ARCMETHOD_PACKED        3
-#define ARCMETHOD_SQUEEZED      4
-#define ARCMETHOD_CRUNCHED      5
-#define ARCMETHOD_PACKCRUN      6
-#define ARCMETHOD_PACKFASTHASH  7
-#define ARCMETHOD_PACKLZW       8
-#define ARCMETHOD_SQUASHED      9
-#define ARCMETHOD_COMPRESSED    0x7F
-#define ARCMETHOD_DIRECTORY     0x1E
-#define ARCMETHOD_DIRECTORY2    0x82
-#define ARCMETHOD_DIRECTORYEND  0x1F
-#define ARCMETHOD_DIRECTORYEND2 0x80
-
-struct ArcHeader {
-  xadUINT8 Skip;                /* This is skipped for reading, to allow correct alignment! */
-  xadUINT8 ID;
-  xadUINT8 Method;
-  xadUINT8 FileName[13];
-  xadUINT8 CompSize[4];
-  xadUINT8 Date[2];
-  xadUINT8 Time[2];
-  xadUINT8 CRC[2];
-  xadUINT8 Size[4];
-  xadUINT8 LoadAddr[4]; /* Archimedes */
-  xadUINT8 ExecAddr[4]; /* Archimedes */
-  xadUINT8 FileAttr[4]; /* Archimedes */
-};
-
-struct ArcPrivate {
-  xadUINT16 CRC;
-  xadUINT8 Method;
-};
-
-#define ARCPI(a)        ((struct ArcPrivate *) ((a)->xfi_PrivateInfo))
-
-static const xadSTRPTR arctypes[] = {
-"stored", "stored", "packed", "squeezed", "crunched", "pack+crunch",
-"fastpacked", "LZW packed", "squashed", "compressed"};
-
-XADRECOGDATA(Arc)
-{
-  xadUINT32 i;                                /* non empty name and size < 0x00FFFFFF */
-  if(*data == 0x1A && data[1] > 0 && (data[1] <= 9 || data[1] == 0x1E
-  || (data[1] >= 0x80 && data[1] <= 0x89) || data[1] == 0xFF) && data[2] && !data[18])
-  {
-    for(i = 2; data[i] && i < 15; ++i)
-    {
-      if((data[i]&0x7F) < ' ')
-        return 0;
-    }
-    return 1;
-  }
-  return 0;
-}
-
-XADGETINFO(Arc)
-{
-  struct xadFileInfo *fi, *ld = 0;
-  xadINT32 err = 0, namesize = 0, i;
-  struct ArcHeader ah;
-  while(!err && ai->xai_InPos < ai->xai_InSize)
-  {
-    if(!(err = xadHookAccess(XADM XADAC_READ, 2, ((xadSTRPTR)(&ah))+1, ai)))
-    {
-      if(ah.ID != 0x1A)
-      {
-        ai->xai_Flags |= XADAIF_FILECORRUPT;
-        ai->xai_LastError = err = XADERR_ILLEGALDATA;
-        break;
-      }
-      else if(ah.Method == ARCMETHOD_DIRECTORYEND || ah.Method == ARCMETHOD_DIRECTORYEND2)
-      {
-        if(ld)
-          ld = (struct xadFileInfo *) ld->xfi_PrivateInfo;
-
-        if(ld)
-          namesize = strlen(ld->xfi_FileName)+1;
-        else
-          namesize = 0;
-      }
-      else if(ah.Method)
-      {
-        i = (ah.Method == ARCMETHOD_OLDUNPACKED ? 23 : 27);
-        if(ah.Method & 0x80) /* Archimedes */
-          i += 12;
-
-        if(!(err = xadHookAccess(XADM XADAC_READ, i, ((xadSTRPTR)(&ah))+3, ai)))
-        {
-          if(!(fi = (struct xadFileInfo *) xadAllocObject(XADM XADOBJ_FILEINFO, XAD_OBJNAMESIZE, 14+namesize,
-          ah.Method == ARCMETHOD_DIRECTORY ? TAG_IGNORE : XAD_OBJPRIVINFOSIZE, sizeof(struct ArcPrivate), TAG_DONE)))
-           return XADERR_NOMEMORY;
-          else
-          {
-            if(namesize)
-            {
-              xadCopyMem(XADM ld->xfi_FileName, fi->xfi_FileName, namesize-1);
-              fi->xfi_FileName[namesize-1] = '/';
-            }
-            xadCopyMem(XADM ah.FileName, fi->xfi_FileName+namesize, 13);
-            xadConvertDates(XADM XAD_DATEMSDOS, (EndGetI16(ah.Date)<<16)+EndGetI16(ah.Time), XAD_GETDATEXADDATE,
-            &fi->xfi_Date, TAG_DONE);
-
-            if(ah.Method == ARCMETHOD_DIRECTORY ||
-            (ah.Method == ARCMETHOD_DIRECTORY2 && (EndGetI32(ah.LoadAddr)&0xFFFFFF00) == 0xFFFDDC00))
-            {
-              fi->xfi_Flags |= XADFIF_DIRECTORY;
-              fi->xfi_PrivateInfo = (xadPTR) ld;
-              ld = fi;
-              namesize = strlen(fi->xfi_FileName)+1;
-            }
-            else
-            {
-              ARCPI(fi)->CRC = EndGetI16(ah.CRC);
-              fi->xfi_DataPos = ai->xai_InPos;
-              ARCPI(fi)->Method = ah.Method & 0x7F;
-#ifdef DEBUG
-  if(ARCPI(fi)->Method == 1 || ARCPI(fi)->Method == 5 || ARCPI(fi)->Method == 6 ||
-  ARCPI(fi)->Method == 7)
-  {
-    DebugFileSearched(ai, "Unknown or untested compression method %ld.",
-    ARCPI(fi)->Method);
-  }
-#endif
-              if(ah.Method == ARCMETHOD_OLDUNPACKED)
-              {
-                fi->xfi_Size = fi->xfi_CrunchSize = EndGetI32(ah.CompSize);
-              }
-              else
-              {
-                fi->xfi_Size = EndGetI32(ah.Size);
-                fi->xfi_CrunchSize = EndGetI32(ah.CompSize);
-              }
-              fi->xfi_Flags |= XADFIF_SEEKDATAPOS|XADFIF_EXTRACTONBUILD;
-              if(ARCPI(fi)->Method <= 9)
-                fi->xfi_EntryInfo = arctypes[ARCPI(fi)->Method-1];
-              else if(ARCPI(fi)->Method == ARCMETHOD_COMPRESSED)
-                fi->xfi_EntryInfo = arctypes[9];
-            }
-
-            err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS,
-            ai->xai_InPos+fi->xfi_CrunchSize, TAG_DONE);
-          }
-        }
-      }
-      else
-        break;
-    }
-
-    if(err)
-    {
-      ai->xai_Flags |= XADAIF_FILECORRUPT;
-      ai->xai_LastError = err;
-    }
-  }
-
-  return (ai->xai_FileInfo ? 0 : err);
-}
-
-static void ARCDecrypt(struct xadInOut *io, xadUINT32 size)
-{
-  xadSTRPTR p, a;
-
-  p = (xadSTRPTR) io->xio_InFuncPrivate;
-  a = (xadSTRPTR) io->xio_InBuffer;
-  while(size--)
-  {
-    if(!p || !*p) /* !p for start and !*p for end of PWD */
-      p = io->xio_ArchiveInfo->xai_Password;
-    *(a++) ^= *(p++);
-  }
-
-  io->xio_InFuncPrivate = p;
-}
-
-XADUNARCHIVE(Arc)
-{
-  xadINT32 err = 0;
-  struct xadFileInfo *fi;
-  struct xadInOut *io;
-
-  fi = ai->xai_CurFile;
-
-  if((io = xadIOAlloc(XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32, ai, xadMasterBase)))
-  {
-    io->xio_InSize = fi->xfi_CrunchSize;
-    io->xio_OutSize = fi->xfi_Size;
-    if(ai->xai_Password)
-      io->xio_InFunc = ARCDecrypt;
-
-    switch(ARCPI(fi)->Method)
-    {
-    case ARCMETHOD_PACKED:
-      io->xio_PutFunc = xadIOPutFuncRLE90; /* no break */
-    case ARCMETHOD_OLDUNPACKED: case ARCMETHOD_UNPACKED:
-      while(!(io->xio_Flags & (XADIOF_LASTOUTBYTE|XADIOF_ERROR)))
-        xadIOPutChar(io, xadIOGetChar(io));
-      break;
-    case ARCMETHOD_SQUEEZED:
-      io->xio_PutFunc = xadIOPutFuncRLE90;
-      err = ARCunsqueeze(io);
-      break;
-    case ARCMETHOD_PACKCRUN:
-      io->xio_PutFunc = xadIOPutFuncRLE90; /* no break */
-    case ARCMETHOD_CRUNCHED:
-      io->xio_Flags |= XADIOF_NOINENDERR;
-      err = ARCuncrunch(io, 0);
-      break;
-    case ARCMETHOD_PACKFASTHASH:
-      io->xio_PutFunc = xadIOPutFuncRLE90;
-      io->xio_Flags |= XADIOF_NOINENDERR;
-      err = ARCuncrunch(io, 1);
-      break;
-    case ARCMETHOD_PACKLZW:
-      io->xio_PutFunc = xadIOPutFuncRLE90;
-      if(!xadIOGetChar(io) == 12)
-        err = XADERR_DECRUNCH;
-      else
-        err = xadIO_Compress(io, 12|UCOMPBLOCK_MASK);
-      break;
-    case ARCMETHOD_SQUASHED:
-      err = xadIO_Compress(io, 13|UCOMPBLOCK_MASK);
-      break;
-    case ARCMETHOD_COMPRESSED:
-      {
-        xadINT32 a;
-        a = xadIOGetChar(io);
-        if(!io->xio_Error)
-          err = xadIO_Compress(io, a|UCOMPBLOCK_MASK);
-        else
-          err = io->xio_Error;
-      }
-      break;
-    default: err = XADERR_DATAFORMAT; break;
-    }
-
-    if(!err)
-      err = xadIOWriteBuf(io);
-
-    if(!err && io->xio_CRC16 != ARCPI(fi)->CRC)
-     err = XADERR_CHECKSUM;
-
-    xadFreeObjectA(XADM io, 0);
-  }
-  else
-    err = XADERR_NOMEMORY;
-
-  return err;
-}
-
-/************************************************************************************************************************/
-
 /*
    00 - Archive version
         01 = original
@@ -2472,6 +1730,10 @@ used when the filetype is REL.
 Immediately following the filename (for version 1 archives) is the RLE
 control byte, and then follows the LZ table and compressed data.
 */
+
+static const xadSTRPTR arctypes[] = {
+(xadSTRPTR)"stored", (xadSTRPTR)"stored", (xadSTRPTR)"packed", (xadSTRPTR)"squeezed", (xadSTRPTR)"crunched", (xadSTRPTR)"pack+crunch",
+(xadSTRPTR)"fastpacked", (xadSTRPTR)"LZW packed", (xadSTRPTR)"squashed", (xadSTRPTR)"compressed"};
 
 XADRECOGDATA(ArcCBM)
 {
@@ -2700,7 +1962,7 @@ XADGETINFO(ArcCBM)
                 blocksize = ((blocksize+253)/254)*254 + ai->xai_InPos - insize;
                 if(blocksize > ai->xai_InSize)
                   blocksize = ai->xai_InSize;
-                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, blocksize, TAG_DONE);
+                err = xadAddFileEntry(XADM fi, ai, XAD_SETINPOS, (xadSignSize)blocksize, TAG_DONE);
               }
               else
                 err = ArcCBMScanSize(ai, fi, data, xadMasterBase); /* also does addentry */
@@ -3010,125 +2272,6 @@ XADUNARCHIVE(Warp)
 
 /**************************************************************************************************/
 
-
-/* FileFormat:
- * xadUINT16            ID=0x76FF
- * xadUINT16            Checksum
- * STRING           Original Filename (0 terminated)
- * xadINT8[x]          Crunched data
- * The rest is optional:
- * xadUINT16            ID=0x77FF
- * xadUINT16            Date Modified MS-DOS format
- * xadUINT16            Time Modified MS-DOS format
- * xadUINT16            ???
- */
-
-
-XADRECOGDATA(SQ)
-{
-  if(data[0] == 0x76 && data[1] == 0xFF && (data[4] >= 0x20 && data[4] <= 0x7E))
-    return 1;
-  return 0;
-}
-
-XADGETINFO(SQ)
-{
-  struct xadFileInfo *fi;
-  xadUINT32 s = 1024, nl;
-  xadUINT8 *buf;
-  xadINT32 err;
-
-  if(s > ai->xai_InSize)
-    s = ai->xai_InSize;
-  if((buf = (xadUINT8 *) xadAllocVec(XADM s, XADMEMF_PUBLIC)))
-  {
-    if(!(err = xadHookAccess(XADM XADAC_READ, s, buf, ai)))
-    {
-      for(nl = 4; nl < s-2 && buf[nl]; ++nl)
-        ;
-      if(nl == s-2)
-        err = XADERR_ILLEGALDATA;
-      else
-      {
-        ++nl;
-        if((fi = (struct xadFileInfo *) xadAllocObject(XADM XADOBJ_FILEINFO,
-        XAD_OBJNAMESIZE, nl-4, TAG_DONE)))
-        {
-          xadCopyMem(XADM buf+4, fi->xfi_FileName, nl-4);
-          fi->xfi_PrivateInfo = (xadPTR)(uintptr_t) EndGetI16(buf+2);
-          fi->xfi_Flags = XADFIF_SEEKDATAPOS;
-          if(buf[nl] || buf[nl+1]) /* empty file ??? */
-            fi->xfi_Flags |= XADFIF_NOUNCRUNCHSIZE;
-
-          if(ai->xai_InSize == s)
-            xadCopyMem(XADM buf+s-8, buf, 8);
-          else
-          {
-            if(!(err = xadHookAccess(XADM XADAC_INPUTSEEK, ai->xai_InSize-ai->xai_InPos-8, 0, ai)))
-              err = xadHookAccess(XADM XADAC_READ, 8, buf, ai);
-          }
-
-          if(buf[0] == 0x77 && buf[1] == 0xFF)
-          {
-            fi->xfi_CrunchSize = ai->xai_InSize-nl-8;
-            xadConvertDates(XADM XAD_DATEMSDOS, (EndGetI16(buf+2)<<16)|EndGetI16(buf+4), XAD_GETDATEXADDATE,
-            &fi->xfi_Date, TAG_DONE);
-          }
-          else
-          {
-            fi->xfi_CrunchSize = ai->xai_InSize-nl;
-            fi->xfi_Flags |= XADFIF_NODATE;
-            xadConvertDates(XADM XAD_DATECURRENTTIME, 1, XAD_GETDATEXADDATE,
-            &fi->xfi_Date, TAG_DONE);
-          }
-          fi->xfi_DataPos = nl;
-          if(err)
-            xadFreeObjectA(XADM fi, 0);
-          else
-            err = xadAddFileEntryA(XADM fi, ai, 0);
-        }
-        else
-          err = XADERR_NOMEMORY;
-      }
-    }
-    xadFreeObjectA(XADM buf, 0);
-  }
-  else
-    err = XADERR_NOMEMORY;
-  return err;
-}
-
-XADUNARCHIVE(SQ)
-{
-  xadINT32 err;
-  struct xadFileInfo *fi;
-  struct xadInOut *io;
-
-  fi = ai->xai_CurFile;
-
-  if((io = xadIOAlloc(XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOOUTENDERR
-  |XADIOF_NOCRC32|XADIOF_NOCRC16, ai, xadMasterBase)))
-  {
-    io->xio_InSize = fi->xfi_CrunchSize;
-    io->xio_OutFunc = xadIOChecksum;
-/*    io->xio_OutSize = 0; */
-    io->xio_PutFunc = xadIOPutFuncRLE90;
-    if(!(err = ARCunsqueeze(io)))
-      err = xadIOWriteBuf(io);
-
-    if(!err && (xadUINT16) ((uintptr_t) io->xio_OutFuncPrivate) != (xadUINT16) ((uintptr_t) fi->xfi_PrivateInfo))
-      err = XADERR_CHECKSUM;
-
-    xadFreeObjectA(XADM io, 0);
-  }
-  else
-    err = XADERR_NOMEMORY;
-
-  return err;
-}
-
-/**************************************************************************************************/
-
 /*
 All words are in Intel format
 
@@ -3153,7 +2296,7 @@ XADRECOGDATA(Crunch)
 {
   int i;
 
-  if(size >= 11 && data[0]==0x76 && (data[1]==0xFE || data[1]==0xFD))
+  if(size >= 11 && data[0]==0x76 && data[1]==0xFD)
   {
     for(i = 2; data[i] && i < size; ++i)
       ;
@@ -3217,11 +2360,11 @@ XADGETINFO(Crunch)
 
         if((data[i+1] & 0xF0) == 0x10)
         {
-          fi->xfi_EntryInfo = data[1] == 0xFE ? "LZW 1" : "LZHUF 1";
+          fi->xfi_EntryInfo = data[1] == 0xFE ? (xadSTRPTR)"LZW 1" : (xadSTRPTR)"LZHUF 1";
         }
         else
         {
-          fi->xfi_EntryInfo = data[1] == 0xFE ? "LZW 2" : "LZHUF 2";
+          fi->xfi_EntryInfo = data[1] == 0xFE ? (xadSTRPTR)"LZW 2" : (xadSTRPTR)"LZHUF 2";
         }
 
         /* fill in today's date */
@@ -3253,14 +2396,7 @@ XADUNARCHIVE(Crunch)
       io->xio_InSize = ai->xai_CurFile->xfi_CrunchSize;
       io->xio_OutFunc = xadIOChecksum;
 /*    io->xio_OutSize = 0; */
-      if((xadUINT32)(uintptr_t) ai->xai_CurFile->xfi_PrivateInfo == 0xFD)
         err = DecrAMPK3(io, ((data[1] & 0xF0) == 0x10) ? 1 : 2);
-      else
-      {
-        io->xio_PutFunc        = xadIOPutFuncRLE90;
-        io->xio_PutFuncPrivate = xadIOPutFuncRLE90TYPE2;
-        err = CRUNCHuncrunch(io, ((data[1] & 0xF0) == 0x10) ? 1 : 0);
-      }
 
       if(!err)
         err = xadIOWriteBuf(io);
@@ -3292,31 +2428,15 @@ XADCLIENT(Crunch) {
   256,
   XADCF_FILEARCHIVER|XADCF_FREEFILEINFO|XADCF_NOCHECKSIZE|XADCF_FREEXADSTRINGS,
   XADCID_CRUNCH,
-  "Crunch",
+  "Crunch-LZHUF",
   XADRECOGDATAP(Crunch),
   XADGETINFOP(Crunch),
   XADUNARCHIVEP(Crunch),
   NULL
 };
 
-XADCLIENT(SQ) {
-  (struct xadClient *)&Crunch_Client,
-  XADCLIENT_VERSION,
-  XADMASTERVERSION,
-  SQ_VERSION,
-  SQ_REVISION,
-  6,
-  XADCF_FILEARCHIVER|XADCF_FREEFILEINFO,
-  XADCID_SQ,
-  "SQ",
-  XADRECOGDATAP(SQ),
-  XADGETINFOP(SQ),
-  XADUNARCHIVEP(SQ),
-  NULL
-};
-
 XADCLIENT(Warp) {
-  (struct xadClient *)&SQ_Client,
+  (struct xadClient *)&Crunch_Client,
   XADCLIENT_VERSION,
   XADMASTERVERSION,
   WARP_VERSION,
@@ -3365,24 +2485,8 @@ XADCLIENT(ArcCBM) {
   NULL
 };
 
-XADCLIENT(Arc) {
-  (struct xadClient *)&ArcCBM_Client,
-  XADCLIENT_VERSION,
-  XADMASTERVERSION,
-  ARC_VERSION,
-  ARC_REVISION,
-  29,
-  XADCF_FILEARCHIVER|XADCF_FREEFILEINFO,
-  XADCID_ARC,
-  "Arc",
-  XADRECOGDATAP(Arc),
-  XADGETINFOP(Arc),
-  XADUNARCHIVEP(Arc),
-  NULL
-};
-
 XADCLIENT(CompDisk) {
-  (struct xadClient *)&Arc_Client,
+  (struct xadClient *)&ArcCBM_Client,
   XADCLIENT_VERSION,
   XADMASTERVERSION,
   COMPDISK_VERSION,

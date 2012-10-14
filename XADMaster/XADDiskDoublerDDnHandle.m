@@ -10,7 +10,7 @@ static void CopyBytesWithRepeat(uint8_t *dest,uint8_t *src,int length)
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithHandle:handle length:length windowSize:65536])
+	if((self=[super initWithHandle:handle length:length windowSize:65536]))
 	{
 		lengthcode=nil;
 	}

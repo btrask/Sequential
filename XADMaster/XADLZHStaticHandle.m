@@ -5,7 +5,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length windowBits:(int)bits
 {
-	if(self=[super initWithHandle:handle length:length windowSize:1<<bits])
+	if((self=[super initWithHandle:handle length:length windowSize:1<<bits]))
 	{
 		literalcode=distancecode=nil;
 		windowbits=bits;

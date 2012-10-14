@@ -12,7 +12,7 @@ static const int MetaCodeLengths[37];
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithHandle:handle length:length windowSize:65536])
+	if((self=[super initWithHandle:handle length:length windowSize:65536]))
 	{
 		firstcode=secondcode=offsetcode=nil;
 	}

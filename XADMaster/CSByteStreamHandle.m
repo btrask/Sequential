@@ -6,7 +6,7 @@ NSString *CSByteStreamEOFReachedException=@"CSByteStreamEOFReachedException";
 
 -(id)initWithName:(NSString *)descname length:(off_t)length
 {
-	if(self=[super initWithName:descname length:length])
+	if((self=[super initWithName:descname length:length]))
 	{
 		bytestreamproducebyte_ptr=(uint8_t (*)(id,SEL,off_t))[self methodForSelector:@selector(produceByteAtOffset:)];
 	}
@@ -15,7 +15,7 @@ NSString *CSByteStreamEOFReachedException=@"CSByteStreamEOFReachedException";
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length bufferSize:(int)buffersize;
 {
-	if(self=[super initWithHandle:handle length:length bufferSize:buffersize])
+	if((self=[super initWithHandle:handle length:length bufferSize:buffersize]))
 	{
 		bytestreamproducebyte_ptr=(uint8_t (*)(id,SEL,off_t))[self methodForSelector:@selector(produceByteAtOffset:)];
 	}

@@ -5,7 +5,7 @@
 
 -(id)initWithBlockReader:(XADCABBlockReader *)blockreader windowBits:(int)windowbits
 {
-	if(self=[super initWithBlockReader:blockreader])
+	if((self=[super initWithBlockReader:blockreader]))
 	{
 		[self setInputBuffer:CSInputBufferAllocEmpty()];
 

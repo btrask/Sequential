@@ -3,11 +3,11 @@
 #import "XADCRCHandle.h"
 #import "NSDateXAD.h"
 
-#import "XADStuffItRLEHandle.h"
 #import "XADStuffItHuffmanHandle.h"
 #import "XADStuffItArsenicHandle.h"
 #import "XADStuffIt13Handle.h"
 #import "XADStuffItOldHandles.h"
+#import "XADRLE90Handle.h"
 #import "XADCompressHandle.h"
 #import "XADLZHDynamicHandle.h"
 
@@ -56,7 +56,7 @@
 #define SITFH_HDRCRC       110 /* xadUINT16 crc of file header */
 #define SIT_FILEHDRSIZE    112
 
-#define StuffItEncrytedFlag         16      /* password protected bit */
+#define StuffItEncryptedFlag         16      /* password protected bit */
 #define StuffItStartFolder      32      /* start of folder */
 #define StuffItEndFolder      33      /* end of folder */
 
@@ -96,7 +96,7 @@
 			if(namelen>63) namelen=63;
 
 			XADString *name=[self XADStringWithBytes:header+SITFH_FNAME length:namelen];
-			XADPath *path=[currdir pathByAppendingPathComponent:name];
+			XADPath *path=[currdir pathByAppendingXADStringComponent:name];
 
 			off_t start=[fh offsetInFile];
 
@@ -144,7 +144,7 @@
 					XADString *compressionname=[self nameOfCompressionMethod:resourcemethod];
 					if(compressionname) [dict setObject:compressionname forKey:XADCompressionNameKey];
 
-					if(resourcemethod&StuffItEncrytedFlag) [dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsEncryptedKey];
+					if(resourcemethod&StuffItEncryptedFlag) [dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsEncryptedKey];
 
 					// TODO: deal with this? if(!datalen&&datamethod==0) size=crunchsize
 
@@ -173,13 +173,10 @@
 
 					// TODO: deal with this? if(!datalen&&datamethod==0) size=crunchsize
 
-					//if(method!=0&&method!=2&&method!=3&&method!=5&&method!=8&&method!=13&&method!=14&&method!=15)
-					//DebugFileSearched(ai, "Unknown or untested compression method %ld.",SITPI(fi)->Method);
-
 					XADString *compressionname=[self nameOfCompressionMethod:datamethod];
 					if(compressionname) [dict setObject:compressionname forKey:XADCompressionNameKey];
 
-					if(datamethod&StuffItEncrytedFlag) [dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsEncryptedKey];
+					if(datamethod&StuffItEncryptedFlag) [dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsEncryptedKey];
 
 					[self addEntryWithDictionary:dict];
 				}
@@ -216,25 +213,40 @@
 
 	int compressionmethod=[[dict objectForKey:@"StuffItCompressionMethod"] intValue];
 	off_t size=[[dict objectForKey:XADFileSizeKey] longLongValue];
-	off_t compsize=[[dict objectForKey:XADCompressedSizeKey] longLongValue];
 
+	NSNumber *enc=[dict objectForKey:XADIsEncryptedKey];
+	if(enc&&[enc boolValue])
+	{
+		fh=[self decryptHandleForEntryWithDictionary:dict handle:fh];
+	}
+	
 	CSHandle *handle;
 	switch(compressionmethod&0x0f)
 	{
 		case 0: handle=fh; break;
-		case 1: handle=[[[XADStuffItRLEHandle alloc] initWithHandle:fh length:size] autorelease]; break;
+		case 1: handle=[[[XADRLE90Handle alloc] initWithHandle:fh length:size] autorelease]; break;
 		case 2: handle=[[[XADCompressHandle alloc] initWithHandle:fh length:size flags:0x8e] autorelease]; break;
 		case 3: handle=[[[XADStuffItHuffmanHandle alloc] initWithHandle:fh length:size] autorelease]; break;
 		//case 5: handle=[[[XADStuffItLZAHHandle alloc] initWithHandle:fh inputLength:compsize outputLength:size] autorelease]; break;
 		case 5: handle=[[[XADLZHDynamicHandle alloc] initWithHandle:fh length:size] autorelease]; break;
 		// TODO: Figure out if the initialization of the window differs between LHArc and StuffIt
 		//case 6:  fixed huffman
-		case 8: handle=[[[XADStuffItMWHandle alloc] initWithHandle:fh inputLength:compsize outputLength:size] autorelease]; break;
+		case 8:
+		{
+			[self reportInterestingFileWithReason:@"Compression method 8 (MW)"];
+			handle=[[[XADStuffItMWHandle alloc] initWithHandle:fh length:size] autorelease]; break;
+		}
 		case 13: handle=[[[XADStuffIt13Handle alloc] initWithHandle:fh length:size] autorelease]; break;
-		case 14: handle=[[[XADStuffIt14Handle alloc] initWithHandle:fh inputLength:compsize outputLength:size] autorelease]; break;
+		case 14:
+		{
+			[self reportInterestingFileWithReason:@"Compression method 14"];
+			handle=[[[XADStuffIt14Handle alloc] initWithHandle:fh length:size] autorelease]; break;
+		}
 		case 15: handle=[[[XADStuffItArsenicHandle alloc] initWithHandle:fh length:size] autorelease]; break;
 
-		default: return nil;
+		default:
+			[self reportInterestingFileWithReason:@"Unsupported compression method %d",compressionmethod&0x0f];
+			return nil;
 	}
 
 	if(checksum)
@@ -246,6 +258,12 @@
 	}
 
 	return handle;
+}
+
+-(CSHandle *)decryptHandleForEntryWithDictionary:(NSDictionary *)dict handle:(CSHandle *)fh
+{
+	[XADException raiseNotSupportedException];
+	return fh;
 }
 
 -(NSString *)formatName { return @"StuffIt"; }

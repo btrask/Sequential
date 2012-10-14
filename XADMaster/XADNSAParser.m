@@ -87,6 +87,8 @@ static NSMutableData *MakeBMPContainer(int width,int height,uint32_t length,int 
 			return [CSBzip2Handle bzip2HandleWithHandle:handle length:length];
 	}
 
+	[self reportInterestingFileWithReason:@"Unsupported compression method %d",method];
+
 	return nil;
 }
 

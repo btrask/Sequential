@@ -1,0 +1,22 @@
+Context.o: Context.c Context.h RangeCoder.h SubAllocator.h
+RangeCoder.o: RangeCoder.c RangeCoder.h
+SubAllocatorBrimstone.o: SubAllocatorBrimstone.c SubAllocatorBrimstone.h \
+  SubAllocator.h
+SubAllocatorVariantG.o: SubAllocatorVariantG.c SubAllocatorVariantG.h \
+  SubAllocator.h
+SubAllocatorVariantH.o: SubAllocatorVariantH.c SubAllocatorVariantH.h \
+  SubAllocator.h
+SubAllocatorVariantI.o: SubAllocatorVariantI.c SubAllocatorVariantI.h \
+  SubAllocator.h
+VariantG.o: VariantG.c VariantG.h Context.h RangeCoder.h SubAllocator.h
+VariantH.o: VariantH.c VariantH.h Context.h RangeCoder.h SubAllocator.h \
+  SubAllocatorVariantH.h
+VariantI.o: VariantI.c VariantI.h Context.h RangeCoder.h SubAllocator.h \
+  SubAllocatorVariantI.h
+SimpleDecompressor.o: SimpleDecompressor.c VariantG.h Context.h \
+  RangeCoder.h SubAllocator.h VariantH.h SubAllocatorVariantH.h \
+  VariantI.h SubAllocatorVariantI.h SubAllocatorVariantG.h \
+  SubAllocatorBrimstone.h
+Fuzzer.o: Fuzzer.c VariantG.h Context.h RangeCoder.h SubAllocator.h \
+  VariantH.h SubAllocatorVariantH.h VariantI.h SubAllocatorVariantI.h \
+  SubAllocatorVariantG.h SubAllocatorBrimstone.h

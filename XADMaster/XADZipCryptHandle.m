@@ -20,7 +20,7 @@ static uint8_t DecryptByte(XADZipCryptHandle *self)
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata testByte:(uint8_t)testbyte
 {
-	if(self=[super initWithHandle:handle length:length-12])
+	if((self=[super initWithHandle:handle length:length-12]))
 	{
 		password=[passdata retain];
 		test=testbyte;

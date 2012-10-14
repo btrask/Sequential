@@ -19,7 +19,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -565,7 +565,7 @@ static xadINT32 AceExtractEntry(struct AceData *ad, struct xadFileInfo *fi)
 
 /****************************************************************************/
 
-static const xadSTRPTR acetypes[2] = {"stored", "lz77"};
+static const xadSTRPTR acetypes[2] = {(xadSTRPTR)"stored", (xadSTRPTR)"lz77"};
 
 XADGETINFO(Ace)
 {
@@ -597,7 +597,7 @@ XADGETINFO(Ace)
             {
               if((fi2 = xadAllocObjectA(XADM XADOBJ_FILEINFO, 0)))
               {
-                fi2->xfi_FileName = "AceInfo.TXT";
+                fi2->xfi_FileName = (xadSTRPTR)"AceInfo.TXT";
                 fi2->xfi_EntryNumber = num++;
                 fi2->xfi_DataPos = ai->xai_InPos-i+29+bptr[26];
                 fi2->xfi_CrunchSize = EndGetI16(bptr+bptr[26]+27);
@@ -665,7 +665,7 @@ XADGETINFO(Ace)
               i = EndGetI32(bptr+15);
               if(i & 0x10)
                 fi2->xfi_Flags |= XADFIF_DIRECTORY;
-              xadConvertProtection(XADM XAD_PROTMSDOS, EndGetI32(bptr+15), XAD_GETPROTAMIGA, &fi2->xfi_Protection, TAG_DONE);
+              //xadConvertProtection(XADM XAD_PROTMSDOS, EndGetI32(bptr+15), XAD_GETPROTAMIGA, &fi2->xfi_Protection, TAG_DONE);
               xadConvertDates(XADM XAD_DATEMSDOS, EndGetI32(bptr+11), XAD_GETDATEXADDATE, &fi2->xfi_Date, TAG_DONE);
               if(bptr[2] & ACEFFLAG_PASSWORD)
               {

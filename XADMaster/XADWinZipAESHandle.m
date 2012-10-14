@@ -6,7 +6,7 @@
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata keyLength:(int)keylength
 {
 	off_t actuallength=length-keylength/2-12;
-	if(self=[super initWithName:[handle name] length:actuallength])
+	if((self=[super initWithName:[handle name] length:actuallength]))
 	{
 		parent=[handle retain];
 		password=[passdata retain];

@@ -34,7 +34,7 @@ NSString *CSZlibException=@"CSZlibException";
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length header:(BOOL)header name:(NSString *)descname
 {
-	if(self=[super initWithName:descname length:length])
+	if((self=[super initWithName:descname length:length]))
 	{
 		parent=[handle retain];
 		startoffs=[parent offsetInFile];
@@ -51,7 +51,7 @@ NSString *CSZlibException=@"CSZlibException";
 
 -(id)initAsCopyOf:(CSZlibHandle *)other
 {
-	if(self=[super initAsCopyOf:other])
+	if((self=[super initAsCopyOf:other]))
 	{
 		parent=[other->parent copy];
 		startoffs=other->startoffs;
@@ -98,8 +98,19 @@ NSString *CSZlibException=@"CSZlibException";
 	zs.next_out=buffer;
 	zs.avail_out=num;
 
-	while(zs.avail_out)
+	for(;;)
 	{
+		int err=inflate(&zs,0);
+		if(err==Z_STREAM_END)
+		{
+			if(seekback) [parent skipBytes:-(off_t)zs.avail_in];
+			[self endStream];
+			return num-zs.avail_out;
+		}
+		else if(err!=Z_OK && err!=Z_BUF_ERROR) [self _raiseZlib];
+
+		if(!zs.avail_out) return num;
+
 		if(!zs.avail_in)
 		{
 			zs.avail_in=[parent readAtMost:sizeof(inbuffer) toBuffer:inbuffer];
@@ -115,18 +126,7 @@ NSString *CSZlibException=@"CSZlibException";
 				else [parent _raiseEOF];
 			}
 		}
-
-		int err=inflate(&zs,0);
-		if(err==Z_STREAM_END)
-		{
-			if(seekback) [parent skipBytes:-(off_t)zs.avail_in];
-			[self endStream];
-			break;
-		}
-		else if(err!=Z_OK) [self _raiseZlib];
 	}
-
-	return num-zs.avail_out;
 }
 
 -(void)_raiseZlib

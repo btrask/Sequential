@@ -4,6 +4,7 @@
 {
 	uint8_t *block,*sorted;
 	uint32_t *table;
+	size_t currsize;
 }
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length;

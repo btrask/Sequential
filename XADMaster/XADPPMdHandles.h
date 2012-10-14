@@ -1,11 +1,11 @@
 #import "CSByteStreamHandle.h"
-#import "PPMdVariantG.h"
-#import "PPMdVariantH.h"
-#import "PPMdVariantI.h"
-#import "PPMdSubAllocatorVariantG.h"
-#import "PPMdSubAllocatorVariantH.h"
-#import "PPMdSubAllocatorVariantI.h"
-#import "PPMdSubAllocatorBrimstone.h"
+#import "PPMd/VariantG.h"
+#import "PPMd/VariantH.h"
+#import "PPMd/VariantI.h"
+#import "PPMd/SubAllocatorVariantG.h"
+#import "PPMd/SubAllocatorVariantH.h"
+#import "PPMd/SubAllocatorVariantI.h"
+#import "PPMd/SubAllocatorBrimstone.h"
 
 @interface XADPPMdVariantGHandle:CSByteStreamHandle
 {

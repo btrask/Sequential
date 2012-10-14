@@ -10,12 +10,23 @@
 
 #import "SUAutomaticUpdateAlert.h"
 #import "SUHost.h"
+#import "SUConstants.h"
 
 @implementation SUAutomaticUpdateDriver
 
 - (void)unarchiverDidFinish:(SUUnarchiver *)ua
 {
 	alert = [[SUAutomaticUpdateAlert alloc] initWithAppcastItem:updateItem host:host delegate:self];
+	
+	// If the app is a menubar app or the like, we need to focus it first and alter the
+	// update prompt to behave like a normal window. Otherwise if the window were hidden
+	// there may be no way for the application to be activated to make it visible again.
+	if ([host isBackgroundApplication])
+	{
+		[[alert window] setHidesOnDeactivate:NO];
+		[NSApp activateIgnoringOtherApps:YES];
+	}		
+	
 	if ([NSApp isActive])
 		[[alert window] makeKeyAndOrderFront:self];
 	else
@@ -33,7 +44,7 @@
 	switch (choice)
 	{
 		case SUInstallNowChoice:
-			[self installUpdate];
+			[self installWithToolAndRelaunch:YES];
 			break;
 			
 		case SUInstallLaterChoice:
@@ -50,22 +61,15 @@
 
 - (BOOL)shouldInstallSynchronously { return postponingInstallation; }
 
-- (void)installUpdate
+- (void)installWithToolAndRelaunch:(BOOL)relaunch
 {
 	showErrors = YES;
-	[super installUpdate];
+	[super installWithToolAndRelaunch:relaunch];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)note
 {
-	[self installUpdate];
-}
-
-- (void)installerFinishedForHost:(SUHost *)aHost
-{
-	if (aHost != host) { return; }
-	if (!postponingInstallation)
-		[self relaunchHostApp];
+	[self installWithToolAndRelaunch:NO];
 }
 
 - (void)abortUpdateWithError:(NSError *)error
