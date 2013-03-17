@@ -6,7 +6,11 @@
 //  Copyright 2007 Andy Matuschak. All rights reserved.
 //
 
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 #import "SUStandardVersionComparator.h"
 
 @implementation SUStandardVersionComparator
@@ -22,15 +26,19 @@
 typedef enum {
     kNumberType,
     kStringType,
-    kPeriodType
+    kSeparatorType,
 } SUCharacterType;
 
 - (SUCharacterType)typeOfCharacter:(NSString *)character
 {
     if ([character isEqualToString:@"."]) {
-        return kPeriodType;
+        return kSeparatorType;
     } else if ([[NSCharacterSet decimalDigitCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
         return kNumberType;
+    } else if ([[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
+        return kSeparatorType;
+    } else if ([[NSCharacterSet punctuationCharacterSet] characterIsMember:[character characterAtIndex:0]]) {
+        return kSeparatorType;
     } else {
         return kStringType;
     }	
@@ -40,7 +48,8 @@ typedef enum {
 {
     NSString *character;
     NSMutableString *s;
-    NSInteger i, n, oldType, newType;
+    NSUInteger i, n;
+	SUCharacterType oldType, newType;
     NSMutableArray *parts = [NSMutableArray array];
     if ([version length] == 0) {
         // Nothing to do here
@@ -52,11 +61,10 @@ typedef enum {
     for (i = 1; i <= n; ++i) {
         character = [version substringWithRange:NSMakeRange(i, 1)];
         newType = [self typeOfCharacter:character];
-        if (oldType != newType || oldType == kPeriodType) {
+        if (oldType != newType || oldType == kSeparatorType) {
             // We've reached a new segment
-			NSString *aPart = [[NSString alloc] initWithString:s];
+			NSString *aPart = [[[NSString alloc] initWithString:s] autorelease];
             [parts addObject:aPart];
-			[aPart release];
             [s setString:character];
         } else {
             // Add character to string and continue
@@ -76,8 +84,10 @@ typedef enum {
     NSArray *partsB = [self splitVersionString:versionB];
     
     NSString *partA, *partB;
-    NSInteger i, n, typeA, typeB, intA, intB;
-    
+    NSUInteger i, n;
+	int intA, intB;
+    SUCharacterType typeA, typeB;
+	
     n = MIN([partsA count], [partsB count]);
     for (i = 0; i < n; ++i) {
         partA = [partsA objectAtIndex:i];

@@ -8,12 +8,17 @@ static xadUINT8 xadIOGetFunc(struct xadInOut *io);
 
 @implementation XADLibXADIOHandle
 
--(id)initWithHandle:(CSHandle *)handle inputLength:(off_t)inlength outputLength:(off_t)outlength
+-(id)initWithHandle:(CSHandle *)handle
 {
-	if(self=[super initWithData:[NSMutableData dataWithCapacity:outlength]])
+	return [self initWithHandle:handle length:0];
+}
+
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)outlength
+{
+	if((self=[super initWithData:[NSMutableData dataWithCapacity:outlength]]))
 	{
 		parent=[handle retain];
-		inlen=inlength;
+		inlen=[handle fileSize];
 		outlen=outlength;
 		unpacked=NO;
 	}
@@ -111,37 +116,36 @@ static xadUINT8 xadIOGetFunc(struct xadInOut *io);
 {
 	unpacked=YES;
 	xadUINT32 err=[self unpackData];
-	[(NSMutableData *)backingdata appendBytes:io.xio_OutBuffer length:io.xio_OutBufferPos];
 
 	if(err) [XADException raiseExceptionWithXADError:err];
 }
 
 -(struct xadInOut *)ioStructWithFlags:(xadUINT32)flags
 {
-	memset(&io,0,sizeof(io));
+	memset(&iostruct,0,sizeof(iostruct));
 
-	io.xio_Flags=flags;
-    io.xio_PutFunc=xadIOPutFunc;
-    io.xio_GetFunc=xadIOGetFunc;
+	iostruct.xio_Flags=flags;
+    iostruct.xio_PutFunc=xadIOPutFunc;
+    iostruct.xio_GetFunc=xadIOGetFunc;
 
 	if(flags&XADIOF_ALLOCINBUFFER)
 	{
-		io.xio_InBuffer=inbuf;
-		io.xio_InBufferSize=io.xio_InBufferPos=XIDBUFSIZE;
+		iostruct.xio_InBuffer=inbuf;
+		iostruct.xio_InBufferSize=iostruct.xio_InBufferPos=XIDBUFSIZE;
 	}
 	if(flags & XADIOF_ALLOCOUTBUFFER)
 	{
-		io.xio_OutBuffer=outbuf;
-		io.xio_OutBufferSize=XIDBUFSIZE;
+		iostruct.xio_OutBuffer=outbuf;
+		iostruct.xio_OutBufferSize=XIDBUFSIZE;
 	}
 
-	io.xio_InSize=inlen;
-	io.xio_OutSize=outlen;
+	iostruct.xio_InSize=inlen;
+	iostruct.xio_OutSize=outlen;
 
-	io.inputhandle=parent;
-	io.outputdata=(NSMutableData *)backingdata;
+	iostruct.inputhandle=parent;
+	iostruct.outputdata=(NSMutableData *)backingdata;
 
-	return &io;
+	return &iostruct;
 }
 
 -(xadINT32)unpackData { return XADERR_NOTSUPPORTED; }

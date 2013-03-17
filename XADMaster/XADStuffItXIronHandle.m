@@ -3,7 +3,6 @@
 #import "StuffItXUtilities.h"
 #import "CarrylessRangeCoder.h"
 #import "BWT.h"
-#import "SystemSpecific.h"
 
 
 
@@ -37,9 +36,10 @@ static int NextBitWithDoubleWeights(CarrylessRangeCoder *coder,uint32_t *weight1
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		block=NULL;
+		currsize=0;
 	}
 	return self;
 }
@@ -75,10 +75,14 @@ static int NextBitWithDoubleWeights(CarrylessRangeCoder *coder,uint32_t *weight1
 
 	int blocksize=CSInputNextSitxP2(input);
 
-	// TODO: maybe avoid copying memory?
-	block=reallocf(block,blocksize*6);
-	sorted=block+blocksize;
-	table=(uint32_t *)(block+2*blocksize);
+	if(blocksize>currsize)
+	{
+		free(block);
+		block=malloc(blocksize*6);
+		sorted=block+blocksize;
+		table=(uint32_t *)(block+2*blocksize);
+		currsize=blocksize;
+	}
 
 	if(CSInputNextBitLE(input)==0) // compressed
 	{

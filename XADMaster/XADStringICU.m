@@ -4,26 +4,50 @@
 
 @implementation XADString (PlatformSpecific)
 
++(BOOL)canDecodeData:(NSData *)data encodingName:(NSString *)encoding
+{
+	return [self canDecodeBytes:[data bytes] length:[data length] encodingName:encoding];
+}
+
++(BOOL)canDecodeBytes:(const void *)bytes length:(size_t)length encodingName:(NSString *)encoding
+{
+	if(length==0) return YES;
+
+	UErrorCode err=U_ZERO_ERROR;
+	UConverter *conv=ucnv_open([encoding UTF8String],&err);
+	if(!conv) return NO;
+
+	ucnv_setToUCallBack(conv,UCNV_TO_U_CALLBACK_STOP,NULL,NULL,NULL,&err);
+	if(U_FAILURE(err)) { ucnv_close(conv); return NO; }
+
+	int numchars=ucnv_toUChars(conv,NULL,0,bytes,length,&err);
+	ucnv_close(conv);
+
+	return err==U_BUFFER_OVERFLOW_ERROR;
+}
+
 +(NSString *)stringForData:(NSData *)data encodingName:(NSString *)encoding
 {
-	if([data length]==0) return @"";
+	return [self stringForBytes:[data bytes] length:[data length] encodingName:encoding];
+}
+
++(NSString *)stringForBytes:(const void *)bytes length:(size_t)length encodingName:(NSString *)encoding;
+{
+	if(length==0) return @"";
 
 	UErrorCode err=U_ZERO_ERROR;
 	UConverter *conv=ucnv_open([encoding UTF8String],&err);
 	if(!conv) return nil;
 
-	int numbytes=[data length];
-	const char *bytebuf=[data bytes];
-
 	ucnv_setToUCallBack(conv,UCNV_TO_U_CALLBACK_STOP,NULL,NULL,NULL,&err);
 	if(U_FAILURE(err)) { ucnv_close(conv); return nil; }
 
-	int numchars=ucnv_toUChars(conv,NULL,0,bytebuf,numbytes,&err);
+	int numchars=ucnv_toUChars(conv,NULL,0,bytes,length,&err);
 	if(err!=U_BUFFER_OVERFLOW_ERROR) { ucnv_close(conv); return nil; }
 
 	err=U_ZERO_ERROR;
 	unichar *charbuf=malloc(numchars*sizeof(unichar));
-	ucnv_toUChars(conv,charbuf,numchars,bytebuf,numbytes,&err);
+	ucnv_toUChars(conv,charbuf,numchars,bytes,length,&err);
 
 	ucnv_close(conv);
 

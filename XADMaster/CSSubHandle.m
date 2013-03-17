@@ -4,7 +4,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle from:(off_t)from length:(off_t)length
 {
-	if(self=[super initWithName:[NSString stringWithFormat:@"%@ (Subrange from %qd, length %qd)",[handle name],from,length]])
+	if((self=[super initWithName:[NSString stringWithFormat:@"%@ (Subrange from %qd, length %qd)",[handle name],from,length]]))
 	{
 		parent=[handle retain];
 		start=from;
@@ -21,7 +21,7 @@
 
 -(id)initAsCopyOf:(CSSubHandle *)other
 {
-	if(self=[super initAsCopyOf:other])
+	if((self=[super initAsCopyOf:other]))
 	{
 		parent=[other->parent copy];
 		start=other->start;
@@ -35,6 +35,10 @@
 	[parent release];
 	[super dealloc];
 }
+
+-(CSHandle *)parentHandle { return parent; }
+
+-(off_t)startOffsetInParent { return start; }
 
 -(off_t)fileSize
 {

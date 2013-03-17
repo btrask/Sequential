@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	}
 	[result setIcon:[aCoder decodeObjectForKey:@"Icon"]];
 	[result setCustomDisplayName:[aCoder decodeObjectForKey:@"DisplayName"]];
-	return result;
+	return (PGDynamicURL *) result;
 }
 
 @end
@@ -74,7 +74,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGDisplayableIdentifier *const fileIdent = [[docIdent subidentifierWithIndex:[aCoder decodeIntegerForKey:@"PageIndex"]] displayableIdentifier];
 	[fileIdent setIcon:[aCoder decodeObjectForKey:@"PageIcon"]];
 	[fileIdent setCustomDisplayName:[aCoder decodeObjectForKey:@"PageName"]];
-	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
+	return (PGIndexBookmark *)[[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:nil];
 }
 
 @end
@@ -87,7 +87,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 	PGDisplayableIdentifier *fileIdent = [aCoder decodeObjectForKey:@"FileURL"];
 	if(!fileIdent) fileIdent = [aCoder decodeObjectForKey:@"FileAlias"];
 	PGDisplayableIdentifier *const docIdent = [aCoder decodeBoolForKey:@"OpenImageDirectly"] ? fileIdent : [[[[[fileIdent URL] path] stringByDeletingLastPathComponent] PG_fileURL] PG_displayableIdentifier];
-	return [[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
+	return (PGFileBookmark *)[[PGBookmark alloc] initWithDocumentIdentifier:docIdent fileIdentifier:fileIdent displayName:[aCoder decodeObjectForKey:@"BackupPageName"]];
 }
 
 @end

@@ -48,7 +48,7 @@ static inline int NextRangeBit(XAD7ZipBCJ2Handle *self,uint16_t *prob)
 -(id)initWithHandle:(CSHandle *)handle callHandle:(CSHandle *)callhandle
 jumpHandle:(CSHandle *)jumphandle rangeHandle:(CSHandle *)rangehandle length:(off_t)length
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		calls=[callhandle retain];
 		jumps=[jumphandle retain];

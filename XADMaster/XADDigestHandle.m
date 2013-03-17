@@ -39,7 +39,7 @@ digestName:(NSString *)digestname correctDigest:(NSData *)correctdigest
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 digestType:(const EVP_MD *)digesttype correctDigest:(NSData *)correctdigest
 {
-	if(self=[super initWithName:[handle name] length:length])
+	if((self=[super initWithName:[handle name] length:length]))
 	{
 		parent=[handle retain];
 		digest=[correctdigest retain];

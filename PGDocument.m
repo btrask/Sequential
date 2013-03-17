@@ -280,7 +280,7 @@ NSString *const PGDocumentUpdateRecursivelyKey = @"PGDocumentUpdateRecursively";
 {
 	if(ident == _initialIdentifier) return;
 	[_initialIdentifier release];
-	_initialIdentifier = [ident retain];
+	_initialIdentifier = (PGDisplayableIdentifier *)[ident retain];
 }
 
 #pragma mark -PGPrefObject

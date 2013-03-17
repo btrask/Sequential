@@ -10,12 +10,12 @@ static void ResetTable(int *table,int *reverse);
 
 @implementation XADRAR15Handle
 
--(id)initWithRARParser:(XADRARParser *)parent parts:(NSArray *)partarray
+-(id)initWithRARParser:(XADRARParser *)parent files:(NSArray *)filearray
 {
-	if(self=[super initWithName:[parent filename] windowSize:0x10000])
+	if((self=[super initWithName:[parent filename] windowSize:0x10000]))
 	{
 		parser=parent;
-		parts=[partarray retain];
+		files=[filearray retain];
 
 		lengthcode1=[[XADPrefixCode alloc] initWithLengths:(int[256]){
 		2,2,3,4,4,5,5,6,6,6,6,7,7,7,7,7,8,8,8,8,9,9,9,9,10,10,10,10,10,10,10,10,12,12,
@@ -185,7 +185,7 @@ static void ResetTable(int *table,int *reverse);
 
 -(void)resetLZSSHandle
 {
-	part=0;
+	file=0;
 	endpos=0;
 
 	numrepeatedliterals=0;
@@ -217,17 +217,18 @@ static void ResetTable(int *table,int *reverse);
 	memset(oldoffset,0,sizeof(oldoffset));
 	oldoffsetindex=0;
 
-	[self startNextPart];
+	[self startNextFile];
 }
 
--(void)startNextPart
+-(void)startNextFile
 {
 	flagbits=0;
 	storedblock=NO;
 	numrepeatedlastmatches=0;
 
-	off_t partlength;
-	CSInputBuffer *buf=[parser inputBufferForNextPart:&part parts:parts length:&partlength];
+	CSInputBuffer *buf=[parser inputBufferForFileWithIndex:file files:files];
+	off_t partlength=[parser outputLengthOfFileWithIndex:file files:files];
+	file++;
 
 	[self setInputBuffer:buf];
 	endpos+=partlength;
@@ -237,7 +238,7 @@ static void ResetTable(int *table,int *reverse);
 {
 	while(XADLZSSShouldKeepExpanding(self))
 	{
-		if(pos==endpos) [self startNextPart];
+		if(pos==endpos) [self startNextFile];
 
 		if(storedblock)
 		{
@@ -310,7 +311,7 @@ static void EmitLiteral(XADRAR15Handle *self,off_t *posptr)
 				int offset=CSInputNextSymbolUsingCode(self->input,self->huffmancode2)<<5;
 				offset|=CSInputNextBitString(self->input,5);
 
-				XADLZSSMatch(self,offset,length,posptr);
+				XADEmitLZSSMatch(self,offset,length,posptr);
 				return;
 			}
 		}
@@ -333,7 +334,7 @@ static void EmitLiteral(XADRAR15Handle *self,off_t *posptr)
 	}
 
 	uint8_t byte=LookupByte(self->literaltable,self->literalreverse,0xa1,index);
-	XADLZSSLiteral(self,byte,posptr);
+	XADEmitLZSSLiteral(self,byte,posptr);
 }
 
 static void EmitLongMatch(XADRAR15Handle *self,off_t *posptr)
@@ -372,8 +373,8 @@ static void EmitLongMatch(XADRAR15Handle *self,off_t *posptr)
 	if(offset>=self->maximumoffset) length++;
 	if(offset<=256) length+=8;
 
-	if(self->runningaveragebelowmaximum>0xb0 || self->runningaverageliteral>=0x2a00
-	&& self->runningaveragelength<0x40) self->maximumoffset=0x7f00;
+	if(self->runningaveragebelowmaximum>0xb0 || (self->runningaverageliteral>=0x2a00
+	&& self->runningaveragelength<0x40)) self->maximumoffset=0x7f00;
 	else self->maximumoffset=0x2001;
 
 
@@ -399,7 +400,7 @@ static void EmitLongMatch(XADRAR15Handle *self,off_t *posptr)
 	self->lastoffset=self->oldoffset[self->oldoffsetindex++&3]=offset;
 	self->lastlength=length;
 
-	XADLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
+	XADEmitLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
 }
 
 static void EmitShortMatch(XADRAR15Handle *self,off_t *posptr)
@@ -410,7 +411,7 @@ static void EmitShortMatch(XADRAR15Handle *self,off_t *posptr)
 	{
 		if(CSInputNextBit(self->input))
 		{
-			XADLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
+			XADEmitLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
 			return;
 		}
 		else self->numrepeatedlastmatches=0;
@@ -450,13 +451,13 @@ static void EmitShortMatch(XADRAR15Handle *self,off_t *posptr)
 		self->lastoffset=self->oldoffset[self->oldoffsetindex++&3]=offset;
 		self->lastlength=length;
 
-		XADLZSSMatch(self,offset,length,posptr);
+		XADEmitLZSSMatch(self,offset,length,posptr);
 	}
 	else if(selector==9)
     {
 		self->numrepeatedlastmatches++;
 
-		XADLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
+		XADEmitLZSSMatch(self,self->lastoffset,self->lastlength,posptr);
     }
 	else if(selector<14)
 	{
@@ -477,7 +478,7 @@ static void EmitShortMatch(XADRAR15Handle *self,off_t *posptr)
 		self->lastoffset=self->oldoffset[self->oldoffsetindex++&3]=offset;
 		self->lastlength=length;
 
-		XADLZSSMatch(self,offset,length,posptr);
+		XADEmitLZSSMatch(self,offset,length,posptr);
 	}
 	else //if(length==14)
 	{
@@ -489,7 +490,7 @@ static void EmitShortMatch(XADRAR15Handle *self,off_t *posptr)
 		self->lastoffset=offset;
 		self->lastlength=length;
 
-		XADLZSSMatch(self,offset,length,posptr);
+		XADEmitLZSSMatch(self,offset,length,posptr);
 	}
 }
 

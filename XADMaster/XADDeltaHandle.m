@@ -19,7 +19,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length deltaDistance:(int)deltadistance
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		distance=deltadistance;
 	}

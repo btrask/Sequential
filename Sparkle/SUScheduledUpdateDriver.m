@@ -7,7 +7,11 @@
 //
 
 #import "SUScheduledUpdateDriver.h"
-#import "Sparkle.h"
+#import "SUUpdater.h"
+
+#import "SUAppcast.h"
+#import "SUAppcastItem.h"
+#import "SUVersionComparisonProtocol.h"
 
 @implementation SUScheduledUpdateDriver
 
@@ -19,6 +23,8 @@
 
 - (void)didNotFindUpdate
 {
+	if ([[updater delegate] respondsToSelector:@selector(updaterDidNotFindUpdate:)])
+		[[updater delegate] updaterDidNotFindUpdate:updater];
 	[self abortUpdate]; // Don't tell the user that no update was found; this was a scheduled update.
 }
 

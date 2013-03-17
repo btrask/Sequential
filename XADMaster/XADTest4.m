@@ -11,7 +11,7 @@
 
 -(id)initWithIndentLevel:(int)indentlevel
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		indent=indentlevel;
 		successcount=unknowncount=dircount=linkcount=0;

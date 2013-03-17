@@ -11,6 +11,7 @@
 
 @interface NTSynchronousTask : NSObject
 {
+@private
     NSTask *mv_task;
     NSPipe *mv_outputPipe;
     NSPipe *mv_inputPipe;
@@ -22,7 +23,13 @@
 
 // pass nil for directory if not needed
 // returns the result
-+ (NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
++(int)	task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input output: (NSData**)outData;
+
++(NSData*)task:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
+
+- (void)run:(NSString*)toolPath directory:(NSString*)currentDirectory withArgs:(NSArray*)args input:(NSData*)input;
+- (int)result;
+- (NSData *)output;
 
 @end
 

@@ -96,7 +96,7 @@
 
 	NSEnumerator *enumerator=[entries objectEnumerator];
 	NSMutableDictionary *dict;
-	while(dict=[enumerator nextObject]) [self addEntryWithDictionary:dict];
+	while((dict=[enumerator nextObject])) [self addEntryWithDictionary:dict];
 }
 
 -(BOOL)parseDirectoryWithPath:(XADPath *)parent numberOfEntries:(int)numentries entryArray:(NSMutableArray *)entries
@@ -109,7 +109,7 @@
 
 		int namelen=[fh readUInt8];
 		NSData *namedata=[fh readDataOfLength:namelen&0x7f];
-		XADPath *path=[parent pathByAppendingPathComponent:[self XADStringWithData:namedata]];
+		XADPath *path=[parent pathByAppendingXADStringComponent:[self XADStringWithData:namedata]];
 
 		if(namelen&0x80)
 		{

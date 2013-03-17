@@ -4,7 +4,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle blockSize:(int)size
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name]]))
 	{
 		parent=[handle retain];
 		currpos=0;
@@ -18,7 +18,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)maxlength blockSize:(int)size
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name]]))
 	{
 		parent=[handle retain];
 		currpos=0;

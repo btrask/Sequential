@@ -36,7 +36,7 @@
 
 		off_t start=[handle offsetInFile];
 
-		BOOL comp;
+		BOOL comp,encrypted;
 		CSHandle *fh;
 		CSInputBuffer *input=NULL;
 		NSMutableDictionary *datadesc;
@@ -44,6 +44,7 @@
 		if(magic=='PMag')
 		{
 			comp=NO;
+			encrypted=NO;
 			fh=handle;
 		}
 		else if(magic=='PMa4'||magic=='PMa5'||magic=='PMa6')
@@ -51,16 +52,22 @@
 			comp=YES;
 
 			CSHandle *src;
-			if(magic=='PMa4') src=handle;
+			if(magic=='PMa4')
+			{
+				src=handle;
+				encrypted=NO;
+			}
 			else if(magic=='PMa5')
 			{
 				src=[[[XADPackItXORHandle alloc] initWithHandle:handle
 				password:[[self password] dataUsingEncoding:NSMacOSRomanStringEncoding]] autorelease];
+				encrypted=YES;
 			}
 			else if(magic=='PMa6')
 			{
 				src=[[[XADPackItDESHandle alloc] initWithHandle:handle
 				password:[[self password] dataUsingEncoding:NSMacOSRomanStringEncoding]] autorelease];
+				encrypted=YES;
 			}
 
 			XADStuffItHuffmanHandle *hh=[[[XADStuffItHuffmanHandle alloc] initWithHandle:src] autorelease];
@@ -149,6 +156,7 @@
 				[NSDate XADDateWithTimeIntervalSince1904:modification],XADLastModificationDateKey,
 				[NSDate XADDateWithTimeIntervalSince1904:creation],XADCreationDateKey,
 				[self XADStringWithString:comp?@"Huffman":@"None"],XADCompressionNameKey,
+				[NSNumber numberWithBool:encrypted],XADIsEncryptedKey,
 
 				datadesc,XADSolidObjectKey,
 				[NSNumber numberWithUnsignedInt:0],XADSolidOffsetKey,
@@ -168,6 +176,7 @@
 				[NSDate XADDateWithTimeIntervalSince1904:modification],XADLastModificationDateKey,
 				[NSDate XADDateWithTimeIntervalSince1904:creation],XADCreationDateKey,
 				[self XADStringWithString:comp?@"Huffman":@"None"],XADCompressionNameKey,
+				[NSNumber numberWithBool:encrypted],XADIsEncryptedKey,
 				[NSNumber numberWithBool:YES],XADIsResourceForkKey,
 
 				datadesc,XADSolidObjectKey,
@@ -239,7 +248,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		const uint8_t *passbytes=[passdata bytes];
 		int passlen=[passdata length];
@@ -294,7 +303,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		const uint8_t *passbytes=[passdata bytes];
 		int passlen=[passdata length];

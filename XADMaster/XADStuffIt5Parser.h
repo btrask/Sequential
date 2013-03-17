@@ -7,7 +7,7 @@
 +(int)requiredHeaderSize;
 +(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name;
 -(void)parse;
--(void)parseDirectoryWithNumberOfEntries:(int)numentries parent:(XADPath *)parent;
+-(void)parseWithNumberOfTopLevelEntries:(int)numentries;
 -(NSString *)formatName;
 
 @end

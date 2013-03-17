@@ -6,6 +6,8 @@
 	int indentlevel;
 	NSString *indentstring;
 	BOOL asciimode;
+
+	BOOL needseparator;
 }
 
 -(id)init;
@@ -40,6 +42,7 @@
 -(void)printDictionaryKeysAndObjects:(NSDictionary *)dictionary;
 
 -(void)startNewLine;
+-(void)printSeparatorIfNeeded;
 
 -(NSString *)stringByEscapingString:(NSString *)string;
 -(NSString *)stringByEncodingBytes:(const uint8_t *)bytes length:(int)length;

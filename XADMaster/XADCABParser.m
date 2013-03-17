@@ -4,6 +4,7 @@
 #import "XADQuantumHandle.h"
 #import "XADMSLZXHandle.h"
 #import "XADCRCHandle.h"
+#import "XADPlatform.h"
 #import "NSDateXAD.h"
 #import "CSMemoryHandle.h"
 #import "CSFileHandle.h"
@@ -55,10 +56,14 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *d
 		CSHandle *fh=[CSMemoryHandle memoryHandleForReadingData:data];
 		CABHeader firsthead=ReadCABHeader(fh);
 
-		if(!firsthead.prevvolume&&!firsthead.nextvolume) return nil;
+		if(!firsthead.prevvolume && !firsthead.nextvolume) return nil;
 
 		NSString *dirname=[name stringByDeletingLastPathComponent];
-		NSArray *dircontents=[[NSFileManager defaultManager] contentsOfDirectoryAtPath:dirname error:NULL];
+		if(!dirname) dirname=@".";
+
+		NSArray *dircontents=[XADPlatform contentsOfDirectoryAtPath:dirname];
+		if(!dircontents) return [NSArray array];
+
 		NSMutableArray *volumes=[NSMutableArray arrayWithObject:name];
 
 		NSData *namedata=firsthead.prevvolume;
@@ -172,8 +177,8 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *d
 			NSDictionary *folder=[folders objectAtIndex:folderindex];
 
 			XADPath *name;
-			if(attribs&0x80) name=[self XADPathWithData:namedata encodingName:XADUTF8StringEncodingName separators:XADWindowsPathSeparator];
-			else name=[self XADPathWithData:namedata separators:XADWindowsPathSeparator];
+			if(attribs&0x80) name=[self XADPathWithData:namedata encodingName:XADUTF8StringEncodingName separators:XADEitherPathSeparator];
+			else name=[self XADPathWithData:namedata separators:XADEitherPathSeparator];
 
 			NSMutableDictionary *dict=[NSMutableDictionary dictionaryWithObjectsAndKeys:
 				name,XADFileNameKey,
@@ -288,7 +293,9 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *d
 		case 1: return [[[XADMSZipHandle alloc] initWithBlockReader:blocks] autorelease];
 		case 2: return [[[XADQuantumHandle alloc] initWithBlockReader:blocks windowBits:(method>>8)&0x1f] autorelease];
 		case 3: return [[[XADMSLZXHandle alloc] initWithBlockReader:blocks windowBits:(method>>8)&0x1f] autorelease];
-		default: return nil;
+		default:
+			[self reportInterestingFileWithReason:@"Unsupported compression method %d",method&0x0f];
+			return nil;
 	}
 }
 
@@ -329,14 +336,22 @@ static int MatchCABSignature(const uint8_t *bytes,int available,off_t offset,voi
 
 +(int)requiredHeaderSize { return 65536; }
 
-+(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name
++(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data
+name:(NSString *)name propertiesToAdd:(NSMutableDictionary *)props
 {
 	const uint8_t *bytes=[data bytes];
 	int length=[data length];
 
 	if(length<20000||bytes[0]!='M'||bytes[1]!='Z') return NO;
 
-	for(int i=8;i<length;i++) if(MatchCABSignature(&bytes[i],length-i,i,NULL)) return YES;
+	for(int i=8;i<length;i++)
+	{
+		if(MatchCABSignature(&bytes[i],length-i,i,NULL))
+		{
+			[props setObject:[NSNumber numberWithInt:i] forKey:@"CABSFXOffset"];
+			return YES;
+		}
+	}
 
 	return NO;
 }
@@ -345,11 +360,8 @@ static int MatchCABSignature(const uint8_t *bytes,int available,off_t offset,voi
 
 -(void)parse
 {
-	CSHandle *fh=[self handle];
-	off_t size=[fh fileSize];
-
-	if(![fh scanUsingMatchingFunction:MatchCABSignature maximumLength:3 context:&size])
-	[XADException raiseUnknownException];
+	off_t offs=[[[self properties] objectForKey:@"CABSFXOffset"] longLongValue];
+	[[self handle] seekToFileOffset:offs];
 
 	[super parse];
 }
@@ -415,7 +427,7 @@ static NSData *ReadCString(CSHandle *fh)
 {
 	NSMutableData *data=[NSMutableData data];
 	uint8_t b;
-	while(b=[fh readUInt8]) [data appendBytes:&b length:1];
+	while((b=[fh readUInt8])) [data appendBytes:&b length:1];
 	return data;
 }
 
@@ -433,7 +445,7 @@ static CSHandle *FindHandleForName(NSData *namedata,NSString *dirname,NSArray *d
 
 	NSEnumerator *enumerator=[dircontents objectEnumerator];
 	NSString *direntry;
-	while(direntry=[enumerator nextObject])
+	while((direntry=[enumerator nextObject]))
 	{
 		if([filepart caseInsensitiveCompare:direntry]==NSOrderedSame)
 		{

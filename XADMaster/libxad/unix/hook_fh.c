@@ -19,7 +19,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -160,7 +160,7 @@ FUNCHOOK(InHookFH)
       return XADERR_NOMEMORY;
     param->xhp_DataPos = 0;
     if(ai->xaip_InFileName)
-      if(-1 == (ai->xaip_InFileHandle = open(ai->xaip_InFileName, O_RDONLY)))
+      if(-1 == (ai->xaip_InFileHandle = open((const char *)ai->xaip_InFileName, O_RDONLY)))
         return XADERR_OPENFILE;
     break;
   case XADHC_ABORT:
@@ -185,7 +185,7 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
 
   while(!ret && doloop)
   {
-    if(stat(name, &statBuf) == -1)
+    if(stat((const char *)name, &statBuf) == -1)
       break;
 
     n = name;
@@ -230,11 +230,11 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
   }
 
   if(!ret && ((ai->xaip_OutFileHandle =
-  open(name, O_WRONLY|O_CREAT, S_IRWXU))) == -1)
+  open((const char *)name, O_WRONLY|O_CREAT, S_IRWXU))) == -1)
   {
     xadSTRPTR buf;
 
-    i = strlen(name)+1;
+    i = strlen((const char *)name)+1;
     if((buf = (xadSTRPTR) xadAllocVec(XADM i, XADMEMF_PUBLIC)))
     {
       i = 0;
@@ -245,7 +245,7 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
         if(name[i] == '/')
         {
           buf[i] = 0;
-          if(stat(buf, &statBuf) != -1)
+          if(stat((const char *)buf, &statBuf) != -1)
           {
             if(!(flags & XADAIF_MAKEDIRECTORY))
             {
@@ -263,10 +263,10 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
             if(!ret)
             {
               #ifndef __MINGW32__
-              if(mkdir(buf, S_IRWXU) == -1)
+              if(mkdir((const char *)buf, S_IRWXU) == -1)
                 ret = XADERR_MAKEDIR;
               #else
-              if(mkdir(buf) == -1)
+              if(mkdir((const char *)buf) == -1)
                 ret = XADERR_MAKEDIR;
               #endif
             }
@@ -279,7 +279,7 @@ static xadINT32 opendestfile(struct xadArchiveInfoP *ai)
     }
     else
       ret = XADERR_NOMEMORY;
-    if(!ret && ((ai->xaip_OutFileHandle = open(name, O_WRONLY|O_CREAT, S_IRWXU)) == -1))
+    if(!ret && ((ai->xaip_OutFileHandle = open((const char *)name, O_WRONLY|O_CREAT, S_IRWXU)) == -1))
       ret = XADERR_OPENFILE;
   }
 
@@ -313,7 +313,7 @@ FUNCHOOK(OutHookFH)
       close(ai->xaip_OutFileHandle);
       ai->xaip_OutFileHandle = 0;
       if(!(ai->xaip_ArchiveInfo.xai_Flags & XADAIF_NOKILLPARTIAL))
-        remove(ai->xaip_OutFileName);
+        remove((const char *)ai->xaip_OutFileName);
     }
     break;
   case XADHC_FREE: /* free filehandle */

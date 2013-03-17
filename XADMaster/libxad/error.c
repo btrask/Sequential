@@ -19,12 +19,12 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "include/functions.h"
 
-static const xadSTRPTR errtxt[] = {
+static const char *errtxt[] = {
 "no error",
 "unknown error",
 "error reading input",
@@ -61,7 +61,7 @@ FUNCxadGetErrorText /* xadERROR errnum */
   if(errnum < XADERR_OK || errnum > XADERR_ENCODING)
     errnum = XADERR_UNKNOWN;
 
-  return errtxt[errnum];
+  return (xadSTRPTR)errtxt[errnum];
 }
 ENDFUNC
 

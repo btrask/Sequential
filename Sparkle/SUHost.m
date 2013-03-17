@@ -7,30 +7,41 @@
 
 #import "SUHost.h"
 
+#import "SUConstants.h"
 #import "SUSystemProfiler.h"
 #import <sys/mount.h> // For statfs for isRunningOnReadOnlyVolume
+#import "SULog.h"
+
 
 @implementation SUHost
 
 - (id)initWithBundle:(NSBundle *)aBundle
 {
-    if (aBundle == nil) aBundle = [NSBundle mainBundle];
 	if ((self = [super init]))
 	{
+		if (aBundle == nil) aBundle = [NSBundle mainBundle];
         bundle = [aBundle retain];
 		if (![bundle bundleIdentifier])
-			NSLog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+			SULog(@"Sparkle Error: the bundle being updated at %@ has no CFBundleIdentifier! This will cause preference read/write to not work properly.", bundle);
+
+		defaultsDomain = [[bundle objectForInfoDictionaryKey:SUDefaultsDomainKey] retain];
+		if (!defaultsDomain)
+			defaultsDomain = [[bundle bundleIdentifier] retain];
+
+		// If we're using the main bundle's defaults we'll use the standard user defaults mechanism, otherwise we have to get CF-y.
+		usesStandardUserDefaults = [defaultsDomain isEqualToString:[[NSBundle mainBundle] bundleIdentifier]];
     }
     return self;
 }
 
 - (void)dealloc
 {
+	[defaultsDomain release];
 	[bundle release];
 	[super dealloc];
 }
 
-- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@>", [self class], [self bundlePath]]; }
+- (NSString *)description { return [NSString stringWithFormat:@"%@ <%@, %@>", [self class], [self bundlePath], [self installationPath]]; }
 
 - (NSBundle *)bundle
 {
@@ -40,6 +51,32 @@
 - (NSString *)bundlePath
 {
     return [bundle bundlePath];
+}
+
+- (NSString *)appSupportPath
+{
+    NSArray *appSupportPaths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *appSupportPath = nil;
+    if (!appSupportPaths || [appSupportPaths count] == 0)
+    {
+        SULog(@"Failed to find app support directory! Using ~/Library/Application Support...");
+        appSupportPath = [@"~/Library/Application Support" stringByExpandingTildeInPath];
+    }
+    else
+        appSupportPath = [appSupportPaths objectAtIndex:0];
+    appSupportPath = [appSupportPath stringByAppendingPathComponent:[self name]];
+    return appSupportPath;
+}
+
+- (NSString *)installationPath
+{
+#if NORMALIZE_INSTALLED_APP_NAME
+    // We'll install to "#{CFBundleName}.app", but only if that path doesn't already exist. If we're "Foo 4.2.app," and there's a "Foo.app" in this directory, we don't want to overwrite it! But if there's no "Foo.app," we'll take that name.
+    NSString *normalizedAppPath = [[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[[[bundle bundlePath] stringByDeletingLastPathComponent] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.%@", [bundle objectForInfoDictionaryKey:@"CFBundleName"], [[bundle bundlePath] pathExtension]]]])
+        return normalizedAppPath;
+#endif
+	return [bundle bundlePath];
 }
 
 - (NSString *)name
@@ -55,7 +92,10 @@
 
 - (NSString *)version
 {
-	return [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	NSString *version = [bundle objectForInfoDictionaryKey:@"CFBundleVersion"];
+	if (!version || [version isEqualToString:@""])
+		[NSException raise:@"SUNoVersionException" format:@"This host (%@) has no CFBundleVersion! This attribute is required.", [self bundlePath]];
+	return version;
 }
 
 - (NSString *)displayVersion
@@ -80,7 +120,17 @@
 		iconPath = [bundle pathForResource:[bundle objectForInfoDictionaryKey:@"CFBundleIconFile"] ofType: nil];
 	NSImage *icon = [[[NSImage alloc] initWithContentsOfFile:iconPath] autorelease];
 	// Use a default icon if none is defined.
-	if (!icon) { icon = [[NSWorkspace sharedWorkspace] iconForFileType:NSFileTypeForHFSTypeCode(kGenericApplicationIcon)]; }
+	if (!icon) {
+		BOOL isMainBundle = (bundle == [NSBundle mainBundle]);
+		
+		// Starting with 10.6, iconForFileType: accepts a UTI.
+		NSString *fileType = nil;
+		if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5)
+			fileType = isMainBundle ? NSFileTypeForHFSTypeCode(kGenericApplicationIcon) : @".bundle";
+		else
+			fileType = isMainBundle ? (NSString*)kUTTypeApplication : (NSString*)kUTTypeBundle;
+		icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileType];
+	}
 	return icon;
 }
 
@@ -95,8 +145,8 @@
 {
 	ProcessSerialNumber PSN;
 	GetCurrentProcess(&PSN);
-	NSDictionary * processInfo = (NSDictionary *)ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
-	BOOL isElement = [[processInfo objectForKey:@"LSUIElement"] boolValue];
+	CFDictionaryRef processInfo = ProcessInformationCopyDictionary(&PSN, kProcessDictionaryIncludeAllInformationMask);
+	BOOL isElement = [[(NSDictionary *)processInfo objectForKey:@"LSUIElement"] boolValue];
 	if (processInfo)
 		CFRelease(processInfo);
 	return isElement;
@@ -111,7 +161,8 @@
 	// More likely, we've got a reference to a Resources file by filename:
 	NSString *keyFilename = [self objectForInfoDictionaryKey:SUPublicDSAKeyFileKey];
 	if (!keyFilename) { return nil; }
-	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] usedEncoding:NULL error:NULL];
+	NSError *ignoreErr = nil;
+	return [NSString stringWithContentsOfFile:[bundle pathForResource:keyFilename ofType:nil] encoding:NSASCIIStringEncoding error: &ignoreErr];
 }
 
 - (NSArray *)systemProfile
@@ -131,41 +182,36 @@
 
 - (id)objectForUserDefaultsKey:(NSString *)defaultName
 {
-	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistratioDomain, so anything
+	// Under Tiger, CFPreferencesCopyAppValue doesn't get values from NSRegistrationDomain, so anything
 	// passed into -[NSUserDefaults registerDefaults:] is ignored.  The following line falls
 	// back to using NSUserDefaults, but only if the host bundle is the main bundle.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 		return [[NSUserDefaults standardUserDefaults] objectForKey:defaultName];
 	
-	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
-#if MAC_OS_X_VERSION_MAX_ALLOWED > 1050
-	return [NSMakeCollectable(obj) autorelease];
-#else
-	return [(id)obj autorelease];
-#endif	
+	CFPropertyListRef obj = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
+	return [(id)CFMakeCollectable(obj) autorelease];
 }
 
 - (void)setObject:(id)value forUserDefaultsKey:(NSString *)defaultName;
 {
-	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setObject:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, value, (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
 - (BOOL)boolForUserDefaultsKey:(NSString *)defaultName
 {
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 		return [[NSUserDefaults standardUserDefaults] boolForKey:defaultName];
 	
 	BOOL value;
-	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)[bundle bundleIdentifier]);
+	CFPropertyListRef plr = CFPreferencesCopyAppValue((CFStringRef)defaultName, (CFStringRef)defaultsDomain);
 	if (plr == NULL)
 		value = NO;
 	else
@@ -178,20 +224,19 @@
 
 - (void)setBool:(BOOL)value forUserDefaultsKey:(NSString *)defaultName
 {
-	// If we're using a .app, we'll use the standard user defaults mechanism; otherwise, we have to get CF-y.
-	if (bundle == [NSBundle mainBundle])
+	if (usesStandardUserDefaults)
 	{
 		[[NSUserDefaults standardUserDefaults] setBool:value forKey:defaultName];
 	}
 	else
 	{
-		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)[bundle bundleIdentifier],  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
-		CFPreferencesSynchronize((CFStringRef)[bundle bundleIdentifier], kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
+		CFPreferencesSetValue((CFStringRef)defaultName, (CFBooleanRef)[NSNumber numberWithBool:value], (CFStringRef)defaultsDomain,  kCFPreferencesCurrentUser,  kCFPreferencesAnyHost);
+		CFPreferencesSynchronize((CFStringRef)defaultsDomain, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
 	}
 }
 
 - (id)objectForKey:(NSString *)key {
-    return [self objectForUserDefaultsKey:key] ?: [self objectForInfoDictionaryKey:key];
+    return [self objectForUserDefaultsKey:key] ? [self objectForUserDefaultsKey:key] : [self objectForInfoDictionaryKey:key];
 }
 
 - (BOOL)boolForKey:(NSString *)key {
@@ -211,13 +256,13 @@
 	OSErr err3 = Gestalt(gestaltSystemVersionBugFix, &bugfix);
 	if (!err1 && !err2 && !err3)
 	{
-		verStr = [NSString stringWithFormat:@"%d.%d.%d", major, minor, bugfix];
+		verStr = [NSString stringWithFormat:@"%ld.%ld.%ld", (long)major, (long)minor, (long)bugfix];
 	}
 	else
 #endif
 	{
 	 	NSString *versionPlistPath = @"/System/Library/CoreServices/SystemVersion.plist";
-		verStr = [[[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"] retain];
+		verStr = [[NSDictionary dictionaryWithContentsOfFile:versionPlistPath] objectForKey:@"ProductVersion"];
 	}
 	return verStr;
 }

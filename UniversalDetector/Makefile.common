@@ -1,0 +1,51 @@
+# Source files
+
+LIBRARY_OBJC_FILES =	UniversalDetector.m
+
+LIBRARY_C_FILES =	universalchardet/kludge.c
+
+LIBRARY_CXX_FILES =	WrappedUniversalDetector.cpp \
+			universalchardet/CharDistribution.cpp \
+			universalchardet/JpCntx.cpp \
+			universalchardet/LangBulgarianModel.cpp \
+			universalchardet/LangCyrillicModel.cpp \
+			universalchardet/LangGreekModel.cpp \
+			universalchardet/LangHebrewModel.cpp \
+			universalchardet/LangHungarianModel.cpp \
+			universalchardet/LangThaiModel.cpp \
+			universalchardet/nsBig5Prober.cpp \
+			universalchardet/nsCharSetProber.cpp \
+			universalchardet/nsEscCharsetProber.cpp \
+			universalchardet/nsEscSM.cpp \
+			universalchardet/nsEUCJPProber.cpp \
+			universalchardet/nsEUCKRProber.cpp \
+			universalchardet/nsEUCTWProber.cpp \
+			universalchardet/nsGB2312Prober.cpp \
+			universalchardet/nsHebrewProber.cpp \
+			universalchardet/nsLatin1Prober.cpp \
+			universalchardet/nsMBCSGroupProber.cpp \
+			universalchardet/nsMBCSSM.cpp \
+			universalchardet/nsSBCharSetProber.cpp \
+			universalchardet/nsSBCSGroupProber.cpp \
+			universalchardet/nsSJISProber.cpp \
+			universalchardet/nsUniversalDetector.cpp \
+			universalchardet/nsUTF8Prober.cpp
+
+DETECTORTEST_OBJC_FILES = DetectorTest.m
+
+# Object files
+
+LIBRARY_OBJS = 		$(LIBRARY_OBJC_FILES:%.m=$(BUILD_DIR)/%.o) \
+			$(LIBRARY_C_FILES:%.c=$(BUILD_DIR)/%.o) \
+			$(LIBRARY_CXX_FILES:%.cpp=$(BUILD_DIR)/%.o)
+
+DETECTORTEST_OBJS =	$(DETECTORTEST_OBJC_FILES:%.m=$(BUILD_DIR)/%.o)
+
+OBJS = $(LIBRARY_OBJS) \
+	$(DETECTORTEST_OBJS)
+
+# Other files
+
+EXECUTABLE_FILES = DetectorTest
+
+LIBRARY_FILES =	libUniversalDetector.a

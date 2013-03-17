@@ -4,6 +4,10 @@
 #define _LZMA_UINT32_IS_ULONG
 #endif
 
+#define Byte LzmaByte
+#define UInt16 LzmaUInt16
+#define UInt32 LzmaUInt32
+#define UInt64 LzmaUInt64
 #import "lzma/Bra.h"
 
 @implementation XAD7ZipBranchHandle
@@ -25,7 +29,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length propertyData:(NSData *)propertydata
 {
-	if(self=[super initWithName:[handle name] length:length])
+	if((self=[super initWithName:[handle name] length:length]))
 	{
 		parent=[handle retain];
 		startoffs=[handle offsetInFile];

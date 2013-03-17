@@ -6,7 +6,7 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 -(id)initWithName:(NSString *)descname length:(off_t)length
 {
-	if(self=[super initWithName:descname length:length])
+	if((self=[super initWithName:descname length:length]))
 	{
 		_currblock=NULL;
 		_blockstartpos=0;
@@ -17,7 +17,7 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length bufferSize:(int)buffersize;
 {
-	if(self=[super initWithHandle:handle length:length bufferSize:buffersize])
+	if((self=[super initWithHandle:handle length:length bufferSize:buffersize]))
 	{
 		_currblock=NULL;
 		_blockstartpos=0;
@@ -33,14 +33,6 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 }
 
 
--(uint8_t *)blockPointer { return _currblock; }
-
--(int)blockLength { return _blocklength; }
-
--(off_t)blockStartOffset { return _blockstartpos; }
-
--(void)skipToNextBlock { [self seekToFileOffset:_blockstartpos+_blocklength]; }
-
 
 
 -(void)seekToFileOffset:(off_t)offs
@@ -49,7 +41,7 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 
 	if(offs<_blockstartpos) [super seekToFileOffset:0];
 
-	while(_blockstartpos+_blocklength<=offs)
+	while(_blockstartpos+_blocklength<offs)
 	{
 		[self _readNextBlock];
 		if(endofstream)
@@ -68,7 +60,6 @@ static inline int imin(int a,int b) { return a<b?a:b; }
 	_blocklength=0;
 	_endofblocks=NO;
 	[self resetBlockStream];
-	[self _readNextBlock];
 }
 
 -(int)streamAtMost:(int)num toBuffer:(void *)buffer

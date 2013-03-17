@@ -1,5 +1,5 @@
-#import <Cocoa/Cocoa.h>
-#import <UniversalDetector/UniversalDetector.h>
+#import <Foundation/Foundation.h>
+#import "UniversalDetector.h"
 
 int main(int argc,char **argv)
 {
@@ -13,7 +13,11 @@ int main(int argc,char **argv)
 		[detector analyzeData:data];
 	}
 
-	printf("%s (%d) %d %f\n",[[detector MIMECharset] UTF8String],(int)[detector encoding],(int)[detector encoding],[detector confidence]);
+	#ifdef __APPLE__
+	printf("%s (%d) %f\n",[[detector MIMECharset] UTF8String],(int)[detector encoding],[detector confidence]);
+	#else
+	printf("%s %f\n",[[detector MIMECharset] UTF8String],[detector confidence]);
+	#endif
 
 	[pool release];
 	return 0;

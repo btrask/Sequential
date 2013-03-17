@@ -5,7 +5,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle reservedBytes:(int)reserved
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		parent=[handle retain];
 		extbytes=reserved;

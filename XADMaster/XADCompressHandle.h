@@ -6,10 +6,9 @@
 	BOOL blockmode;
 
 	LZW *lzw;
-	int symbolsize,symbolcounter;
+	int symbolcounter;
 
-	uint8_t *buffer;
-	int bufsize,currbyte;
+	uint8_t *buffer,*bufferend;
 }
 
 -(id)initWithHandle:(CSHandle *)handle flags:(int)compressflags;

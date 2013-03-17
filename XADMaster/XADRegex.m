@@ -1,6 +1,10 @@
 #import "XADRegex.h"
 
-static NSString *nullstring=nil;
+static BOOL IsRegexSpecialCharacter(unichar c)
+{
+	return c=='^'||c=='.'||c=='['||c=='$'||c=='('||c==')'||
+	c=='|'||c=='*'||c=='+'||c=='?'||c=='{'||c=='\\';
+}
 
 @implementation XADRegex
 
@@ -10,18 +14,84 @@ static NSString *nullstring=nil;
 +(XADRegex *)regexWithPattern:(NSString *)pattern
 { return [[[XADRegex alloc] initWithPattern:pattern options:0] autorelease]; }
 
-+(NSString *)null { return nullstring; }
-
-+(void)initialize
++(NSString *)null
 {
+	static NSString *nullstring=nil;
 	if(!nullstring) nullstring=[[NSMutableString alloc] initWithString:@""];
+	return nullstring;
+}
+
++(NSString *)patternForLiteralString:(NSString *)string
+{
+	int len=[string length];
+	NSMutableString *escaped=[NSMutableString stringWithCapacity:len];
+
+	for(int i=0;i<len;i++)
+	{
+		unichar c=[string characterAtIndex:i];
+		if(IsRegexSpecialCharacter(c)) [escaped appendFormat:@"\\%C",c];
+		else [escaped appendFormat:@"%C",c];
+	}
+	return [NSString stringWithString:escaped];
+}
+
++(NSString *)patternForGlob:(NSString *)glob
+{
+	int len=[glob length];
+	NSMutableString *pattern=[NSMutableString stringWithCapacity:len+2];
+
+	[pattern appendString:@"^"];
+
+	for(int i=0;i<len;i++)
+	{
+		unichar c=[glob characterAtIndex:i];
+		if(c=='\\')
+		{
+			if(i==len-1) [pattern appendString:@"\\"];
+			else
+			{
+				i++;
+				unichar c=[glob characterAtIndex:i];
+				if(IsRegexSpecialCharacter(c)) [pattern appendFormat:@"\\%C",c];
+				else [pattern appendFormat:@"%C",c];
+			}
+		}
+		else if(c=='*')
+		{
+			[pattern appendString:@".*"];
+		}
+		else if(c=='?')
+		{
+			[pattern appendString:@"."];
+		}
+		else if(c=='[')
+		{
+			[pattern appendString:@"["];
+		}
+		else if(c==']')
+		{
+			[pattern appendString:@"]"];
+		}
+		else if(IsRegexSpecialCharacter(c))
+		{
+			[pattern appendFormat:@"\\%C",c];
+		}
+		else
+		{
+			[pattern appendFormat:@"%C",c];
+		}
+	}
+
+	[pattern appendString:@"$"];
+
+	return [NSString stringWithString:pattern];
 }
 
 -(id)initWithPattern:(NSString *)pattern options:(int)options
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
-		patternstring=[patternstring retain];
+		patternstring=[pattern retain];
 		currdata=nil;
 		matches=NULL;
 
@@ -48,6 +118,7 @@ static NSString *nullstring=nil;
 {
 	[patternstring release];
 	regfree(&preg);
+	free(matches);
 	[currdata release];
 	[super dealloc];
 }
@@ -94,7 +165,8 @@ static NSString *nullstring=nil;
 	for(int i=0;i<=preg.re_nsub;i++)
 	{
 		NSString *str=[self stringForMatch:i];
-		[array addObject:str?str:nullstring];
+		if(str) [array addObject:str];
+		else [array addObject:[XADRegex null]];
 	}
 	return [NSArray arrayWithArray:array];
 }
@@ -199,20 +271,7 @@ static NSString *nullstring=nil;
 -(NSArray *)componentsSeparatedByPattern:(NSString *)pattern options:(int)options
 { return [[XADRegex regexWithPattern:pattern options:options] componentsOfSeparatedString:self]; }
 
--(NSString *)escapedPattern
-{
-	int len=[self length];
-	NSMutableString *escaped=[NSMutableString stringWithCapacity:len];
-
-	for(int i=0;i<len;i++)
-	{
-		unichar c=[self characterAtIndex:i];
-		if(c=='^'||c=='.'||c=='['||c=='$'||c=='('||c==')'
-		||c=='|'||c=='*'||c=='+'||c=='?'||c=='{'||c=='\\') [escaped appendFormat:@"\\%C",c];
-		else [escaped appendFormat:@"%C",c];
-	}
-	return [NSString stringWithString:escaped];
-}
+-(NSString *)escapedPattern { return [XADRegex patternForLiteralString:self]; }
 
 @end
 

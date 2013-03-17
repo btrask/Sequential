@@ -104,12 +104,12 @@
 static int MatchLZHSignature(const uint8_t *bytes,int available,off_t offset,void *state)
 {
 	if(available<5) return NO;
-	return bytes[0]=='-'&&bytes[1]=='l'&&(bytes[2]=='h'||bytes[2]=='z')&&bytes[4]=='-';
+	return bytes[2]=='-'&&bytes[3]=='l'&&(bytes[4]=='h'||bytes[4]=='z')&&bytes[6]=='-';
 }
 
 -(void)parse
 {
-	if(![[self handle] scanUsingMatchingFunction:MatchLZHSignature maximumLength:3])
+	if(![[self handle] scanUsingMatchingFunction:MatchLZHSignature maximumLength:7])
 	[XADException raiseUnknownException];
 
 	[super parse];

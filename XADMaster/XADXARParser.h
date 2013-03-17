@@ -1,14 +1,18 @@
 #import "XADArchiveParser.h"
 
+#if MAC_OS_X_VERSION_MAX_ALLOWED>=1060
 @interface XADXARParser:XADArchiveParser <NSXMLParserDelegate>
+#else
+@interface XADXARParser:XADArchiveParser
+#endif
 {
 	off_t heapoffset;
 	int state;
 
-	NSDictionary *filedefinitions,*datadefinitions,*resforkdefinitions,*finderdefinitions;
+	NSDictionary *filedefinitions,*datadefinitions,*eadefinitions;
 
-	NSMutableDictionary *currfile,*currext;
-	NSMutableArray *files,*filestack;
+	NSMutableDictionary *currfile,*currea;
+	NSMutableArray *files,*filestack,*curreas;
 	NSMutableString *currstring;
 }
 

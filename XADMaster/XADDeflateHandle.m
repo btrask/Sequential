@@ -10,8 +10,8 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length variant:(int)deflatevariant
 {
-	if(self=[super initWithHandle:handle length:length
-	windowSize:deflatevariant==XADDeflate64DeflateVariant?65536:32768])
+	if((self=[super initWithHandle:handle length:length
+	windowSize:deflatevariant==XADDeflate64DeflateVariant?65536:32768]))
 	{
 		variant=deflatevariant;
 		literalcode=distancecode=nil;

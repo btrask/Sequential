@@ -9,7 +9,7 @@
 
 -(id)initWithName:(NSString *)descname length:(off_t)length windowSize:(int)windowsize
 {
-	if(self=[super initWithName:descname length:length])
+	if((self=[super initWithName:descname length:length]))
 	{
 		nextliteral_ptr=(int (*)(id,SEL,int *,int *,off_t))
 		[self methodForSelector:@selector(nextLiteralOrOffset:andLength:atPosition:)];
@@ -27,7 +27,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length windowSize:(int)windowsize
 {
-	if(self=[super initWithHandle:handle length:length])
+	if((self=[super initWithHandle:handle length:length]))
 	{
 		nextliteral_ptr=(int (*)(id,SEL,int *,int *,off_t))
 		[self methodForSelector:@selector(nextLiteralOrOffset:andLength:atPosition:)];

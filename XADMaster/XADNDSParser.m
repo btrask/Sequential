@@ -1,8 +1,7 @@
 #import "XADNDSParser.h"
 #import "CSMemoryHandle.h"
 #import "CRC.h"
-
-#include <zlib.h>
+#import "XADPNGWriter.h"
 
 static NSData *ConvertTiledIconToPNG(uint8_t *tiledata,uint16_t *palette);
 static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes,int length);
@@ -117,8 +116,8 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 		[fh readBytes:sizeof(palette) toBuffer:palette];
 
 		NSData *pngdata=ConvertTiledIconToPNG(tiledata,palette);
-		[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-			[basepath pathByAppendingPathComponent:[self XADStringWithString:@"Icon.png"]],XADFileNameKey,
+		[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+			[basepath pathByAppendingXADStringComponent:[self XADStringWithString:@"Icon.png"]],XADFileNameKey,
 			[NSNumber numberWithUnsignedLong:[pngdata length]],XADFileSizeKey,
 			[NSNumber numberWithUnsignedLong:0x210],XADCompressedSizeKey,
 			pngdata,@"NDSData",
@@ -139,15 +138,15 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 			NSMutableString *string=[NSMutableString string];
 			for(int j=0;j<128;j++)
 			{
-				int ch=[fh readUInt16LE];
+				unichar ch=[fh readUInt16LE];
 				if(!ch) break;
 				[string appendFormat:@"%C",ch];
 			}
 
 			NSData *data=[string dataUsingEncoding:NSUTF8StringEncoding];
 
-			[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-				[basepath pathByAppendingPathComponent:[self XADStringWithString:filenames[i]]],XADFileNameKey,
+			[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+				[basepath pathByAppendingXADStringComponent:[self XADStringWithString:filenames[i]]],XADFileNameKey,
 				[NSNumber numberWithUnsignedLong:[data length]],XADFileSizeKey,
 				[NSNumber numberWithUnsignedLong:0x100],XADCompressedSizeKey,
 				data,@"NDSData",
@@ -155,8 +154,8 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 		}
 	}
 
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-		[basepath pathByAppendingPathComponent:[self XADStringWithString:
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[basepath pathByAppendingXADStringComponent:[self XADStringWithString:
 		[NSString stringWithFormat:@"ARM9-%08x-%08x.bin",arm9_addr,arm9_entry]]],XADFileNameKey,
 		[NSNumber numberWithUnsignedLong:arm9_size],XADFileSizeKey,
 		[NSNumber numberWithUnsignedLong:arm9_size],XADCompressedSizeKey,
@@ -164,8 +163,8 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 		[NSNumber numberWithUnsignedLong:arm9_offs],XADDataOffsetKey,
 	nil]];
 
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-		[basepath pathByAppendingPathComponent:[self XADStringWithString:
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[basepath pathByAppendingXADStringComponent:[self XADStringWithString:
 		[NSString stringWithFormat:@"ARM7-%08x-%08x.bin",arm7_addr,arm7_entry]]],XADFileNameKey,
 		[NSNumber numberWithUnsignedLong:arm7_size],XADFileSizeKey,
 		[NSNumber numberWithUnsignedLong:arm7_size],XADCompressedSizeKey,
@@ -174,9 +173,9 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 	nil]];
 
 	if(arm9_overlay_size)
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-		[basepath pathByAppendingPathComponent:[self XADStringWithString:
-		[NSString stringWithFormat:@"ARM9.ovt",arm9_addr]]],XADFileNameKey,
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[basepath pathByAppendingXADStringComponent:[self XADStringWithString:
+		[NSString stringWithFormat:@"ARM9-%08x.ovt",arm9_addr]]],XADFileNameKey,
 		[NSNumber numberWithUnsignedLong:arm9_overlay_size],XADFileSizeKey,
 		[NSNumber numberWithUnsignedLong:arm9_overlay_size],XADCompressedSizeKey,
 		[NSNumber numberWithUnsignedLong:arm9_overlay_size],XADDataLengthKey,
@@ -184,9 +183,9 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 	nil]];
 
 	if(arm7_overlay_size)
-	[self addEntryWithDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
-		[basepath pathByAppendingPathComponent:[self XADStringWithString:
-		[NSString stringWithFormat:@"ARM7.ovt",arm7_addr]]],XADFileNameKey,
+	[self addEntryWithDictionary:[NSMutableDictionary dictionaryWithObjectsAndKeys:
+		[basepath pathByAppendingXADStringComponent:[self XADStringWithString:
+		[NSString stringWithFormat:@"ARM7-%08x.ovt",arm7_addr]]],XADFileNameKey,
 		[NSNumber numberWithUnsignedLong:arm7_overlay_size],XADFileSizeKey,
 		[NSNumber numberWithUnsignedLong:arm7_overlay_size],XADCompressedSizeKey,
 		[NSNumber numberWithUnsignedLong:arm7_overlay_size],XADDataLengthKey,
@@ -198,7 +197,7 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 		XADPath *directories[4096];
 		memset(directories,0,sizeof(directories));
 
-		directories[0]=[basepath pathByAppendingPathComponent:[self XADStringWithString:@"Datafiles"]];
+		directories[0]=[basepath pathByAppendingXADStringComponent:[self XADStringWithString:@"Datafiles"]];
 
 		[fh seekToFileOffset:fnt_offs+6];
 		int numdirs=[fh readUInt16LE];
@@ -222,7 +221,7 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 
 				NSData *namedata=[fh readDataOfLength:len&0x7f];
 				XADString *name=[self XADStringWithData:namedata];
-				XADPath *path=[dirpath pathByAppendingPathComponent:name];
+				XADPath *path=[dirpath pathByAppendingXADStringComponent:name];
 
 				if(len&0x80) // directory
 				{
@@ -276,11 +275,9 @@ static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes
 
 static NSData *ConvertTiledIconToPNG(uint8_t *tiledata,uint16_t *palette)
 {
-	NSMutableData *data=[NSMutableData dataWithCapacity:672];
+	XADPNGWriter *png=[XADPNGWriter PNGWriter];
 
-	[data appendBytes:"\211PNG\r\n\032\n" length:8];
-
-	AppendPNGChunk(data,'IHDR',(uint8_t *)"\000\000\000\040\000\000\000\040\004\003\000\000\000",13);
+	[png addIHDRWithWidth:32 height:32 bitDepth:4 colourType:3];
 
 	uint8_t plte[3*16];
 	for(int i=0;i<16;i++)
@@ -293,44 +290,26 @@ static NSData *ConvertTiledIconToPNG(uint8_t *tiledata,uint16_t *palette)
 		plte[3*i+2]=(b*0x21)>>2;
 	}
 
-	AppendPNGChunk(data,'PLTE',plte,sizeof(plte));
+	[png addChunk:'PLTE' bytes:plte length:sizeof(plte)];
 
-	uint8_t idat[7+32*17+4]="\170\234\001\040\002\337\375";
+	[png startIDAT];
 
 	for(int y=0;y<32;y++)
 	{
-		idat[7+y*17]=0;
+		uint8_t row[16];
 		for(int x=0;x<16;x++)
 		{
 			int val=tiledata[(x/4+(y/8)*4)*32+(x&3)+(y&7)*4];
-			idat[7+y*17+1+x]=(val>>4)|(val<<4);
+			row[x]=(val>>4)|(val<<4);
 		}
+		[png addIDATRow:row];
 	}
 
-	CSSetUInt32BE(&idat[sizeof(idat)-4],adler32(1,&idat[7],sizeof(idat)-7-4));
+	[png endIDAT];
 
-	AppendPNGChunk(data,'IDAT',idat,sizeof(idat));
+	[png addIEND];
 
-	AppendPNGChunk(data,'IEND',(uint8_t *)"",0);
-
-	return data;
+	return [png data];
 }
 
-static void AppendPNGChunk(NSMutableData *data,uint32_t chunktype,uint8_t *bytes,int length)
-{
-	uint8_t buf[4];
-	uint32_t crc=0xffffffff;
 
-	CSSetUInt32BE(buf,length);
-	[data appendBytes:buf length:4];
-
-	CSSetUInt32BE(buf,chunktype);
-	[data appendBytes:buf length:4];
-	crc=XADCalculateCRC(crc,buf,4,XADCRCTable_edb88320);
-
-	[data appendBytes:bytes length:length];
-	crc=XADCalculateCRC(crc,bytes,length,XADCRCTable_edb88320);
-
-	CSSetUInt32BE(buf,~crc);
-	[data appendBytes:buf length:4];
-}

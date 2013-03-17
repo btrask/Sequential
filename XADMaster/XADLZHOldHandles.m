@@ -1112,8 +1112,10 @@ static xadINT32 LhA_Decrunch(struct xadInOut *io, xadUINT32 Method)
 
 -(xadINT32)unpackData
 {
-	return LhA_Decrunch([self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR],
-	LZHUFF2_METHOD);
+	struct xadInOut *io=[self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR];
+	xadINT32 err=LhA_Decrunch(io,LZHUFF2_METHOD);
+	if(!err) err=xadIOWriteBuf(io);
+	return err;
 }
 
 @end
@@ -1122,8 +1124,10 @@ static xadINT32 LhA_Decrunch(struct xadInOut *io, xadUINT32 Method)
 
 -(xadINT32)unpackData
 {
-	return LhA_Decrunch([self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR],
-	LZHUFF3_METHOD);
+	struct xadInOut *io=[self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR];
+	xadINT32 err=LhA_Decrunch(io,LZHUFF3_METHOD);
+	if(!err) err=xadIOWriteBuf(io);
+	return err;
 }
 @end
 
@@ -1131,8 +1135,10 @@ static xadINT32 LhA_Decrunch(struct xadInOut *io, xadUINT32 Method)
 
 -(xadINT32)unpackData
 {
-	return LhA_Decrunch([self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR],
-	PMARC2_METHOD);
+	struct xadInOut *io=[self ioStructWithFlags:XADIOF_ALLOCINBUFFER|XADIOF_ALLOCOUTBUFFER|XADIOF_NOCRC32|XADIOF_NOINENDERR];
+	xadINT32 err=LhA_Decrunch(io,PMARC2_METHOD);
+	if(!err) err=xadIOWriteBuf(io);
+	return err;
 }
 @end
 

@@ -2,18 +2,18 @@
 #import "XADRARParser.h"
 #import "LZSS.h"
 #import "XADPrefixCode.h"
-#import "PPMdVariantH.h"
-#import "PPMdSubAllocatorVariantH.h"
+#import "PPMd/VariantH.h"
+#import "PPMd/SubAllocatorVariantH.h"
 #import "XADRARVirtualMachine.h"
 
-@interface XADRAR30Handle:CSBlockStreamHandle
+@interface XADRAR30Handle:CSBlockStreamHandle 
 {
 	XADRARParser *parser;
 
-	NSArray *parts;
-	int part;
+	NSArray *files;
+	int file;
 	off_t lastend;
-	BOOL startnewpart,startnewtable;
+	BOOL startnewfile,startnewtable;
 
 	LZSS lzss;
 
@@ -33,11 +33,12 @@
 	off_t filterstart;
 	int lastfilternum;
 	int oldfilterlength[1024],usagecount[1024];
+	off_t currfilestartpos;
 
 	int lengthtable[299+60+17+28];
 }
 
--(id)initWithRARParser:(XADRARParser *)parent parts:(NSArray *)partarray;
+-(id)initWithRARParser:(XADRARParser *)parent files:(NSArray *)filearray;
 -(void)dealloc;
 
 -(void)resetBlockStream;

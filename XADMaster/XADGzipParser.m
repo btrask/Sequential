@@ -50,13 +50,13 @@
 		{
 			filename=[NSMutableData data];
 			uint8_t chr;
-			while(chr=[handle readUInt8]) [filename appendBytes:&chr length:1];
+			while((chr=[handle readUInt8])) [filename appendBytes:&chr length:1];
 		}
 		if(flags&0x10) // FCOMMENT: comment
 		{
 			comment=[NSMutableData data];
 			uint8_t chr;
-			while(chr=[handle readUInt8]) [comment appendBytes:&chr length:1];
+			while((chr=[handle readUInt8])) [comment appendBytes:&chr length:1];
 		}
 		if(flags&0x02) // FHCRC: header crc
 		{
@@ -81,7 +81,7 @@
 		[NSNumber numberWithUnsignedInt:os],@"GzipOS",
 	nil];
 
-	if([contentname matchedByPattern:@"\\.(tar|cpio)" options:REG_ICASE])
+	if([contentname matchedByPattern:@"\\.(tar|cpio|pax)$" options:REG_ICASE])
 	[dict setObject:[NSNumber numberWithBool:YES] forKey:XADIsArchiveKey];
 
 	off_t filesize=[handle fileSize];
@@ -115,7 +115,8 @@
 
 +(int)requiredHeaderSize { return 5000; }
 
-+(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data name:(NSString *)name;
++(BOOL)recognizeFileWithHandle:(CSHandle *)handle firstBytes:(NSData *)data
+name:(NSString *)name propertiesToAdd:(NSMutableDictionary *)props
 {
 	const uint8_t *bytes=[data bytes];
 	int length=[data length];
@@ -127,22 +128,20 @@
 
 	for(int i=2;i<length-3;i++)
 	{
-		if(bytes[i]==0x1f&&(bytes[i+1]==0x8b||bytes[i+1]==0x9e)&&bytes[i+2]==8) return YES;
+		if(bytes[i]==0x1f&&(bytes[i+1]==0x8b||bytes[i+1]==0x9e)&&bytes[i+2]==8)
+		{
+			[props setObject:[NSNumber numberWithInt:i] forKey:@"GzipSFXOffset"];
+			return YES;
+		}
     }
 
 	return NO;
 }
 
-static int MatchGzipSignature(const uint8_t *bytes,int available,off_t offset,void *state)
-{
-	if(available<3) return NO;
-	return bytes[0]==0x1f&&(bytes[1]==0x8b||bytes[1]==0x9e)&&bytes[2]==8;
-}
-
 -(void)parse
 {
-	if(![[self handle] scanUsingMatchingFunction:MatchGzipSignature maximumLength:3])
-	[XADException raiseUnknownException];
+	off_t offs=[[[self properties] objectForKey:@"GzipSFXOffset"] longLongValue];
+	[[self handle] seekToFileOffset:offs];
 
 	[super parse];
 }
@@ -163,7 +162,8 @@ static int MatchGzipSignature(const uint8_t *bytes,int available,off_t offset,vo
 
 -(id)initWithHandle:(CSHandle *)handle
 {
-	if(self=[super initWithName:[handle name]])
+    
+	if((self=[super initWithName:[handle name]]))
 	{
 		parent=[handle retain];
 		startoffs=[parent offsetInFile];

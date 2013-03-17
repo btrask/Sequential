@@ -28,13 +28,18 @@ static NSString *SwitchOptionType=@"SwitchOptionType";
 static NSString *HelpOptionType=@"HelpOptionType";
 static NSString *AliasOptionType=@"AliasOptionType";
 
-
+#if MAC_OS_X_VERSION_MAX_ALLOWED<1050
+@interface NSScanner (BuildKludge)
+-(BOOL)scanHexLongLong:(unsigned long long *)val;
+-(BOOL)scanHexDouble:(double *)val;
+@end
+#endif
 
 @implementation CSCommandLineParser
 
 -(id)init
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		options=[NSMutableDictionary new];
 		optionordering=[NSMutableArray new];
@@ -163,7 +168,7 @@ description:(NSString *)description argumentDescription:(NSString *)argdescripti
 		NSUInteger index=[allowedvalues indexOfObject:[defaultvalue lowercaseString]];
 		if(index==NSNotFound) [NSException raise:NSInvalidArgumentException format:
 		@"Default value \"%@\" is not in the array of allowed values.",defaultvalue];
-		[dict setObject:[NSNumber numberWithUnsignedInteger:index] forKey:DefaultValueKey];
+		[dict setObject:[NSNumber numberWithUnsignedInt:index] forKey:DefaultValueKey];
 	}
 
 	[options setObject:dict forKey:option];
@@ -337,7 +342,7 @@ description:(NSString *)description argumentDescription:(NSString *)argdescripti
 {
 	NSEnumerator *enumerator=[requiredoptions objectEnumerator];
 	NSString *requiredoption;
-	while(requiredoption=[enumerator nextObject]) [self addRequiredOption:requiredoption];
+	while((requiredoption=[enumerator nextObject])) [self addRequiredOption:requiredoption];
 }
 
 -(void)addRequiredOption:(NSString *)requiredoption forOption:(NSString *)option
@@ -358,7 +363,7 @@ description:(NSString *)description argumentDescription:(NSString *)argdescripti
 {
 	NSEnumerator *enumerator=[requiredoptions objectEnumerator];
 	NSString *requiredoption;
-	while(requiredoption=[enumerator nextObject]) [self addRequiredOption:requiredoption forOption:option];
+	while((requiredoption=[enumerator nextObject])) [self addRequiredOption:requiredoption forOption:option];
 }
 
 
@@ -405,10 +410,10 @@ errors:(NSMutableArray *)errors
 	NSEnumerator *enumerator=[arguments objectEnumerator];
 	NSString *argument;
 	BOOL stillparsing=YES;
-	while(argument=[enumerator nextObject])
+	while((argument=[enumerator nextObject]))
 	{
 		// Check for options, unless we have seen a stop marker.
-		if(stillparsing && [argument characterAtIndex:0]=='-')
+		if(stillparsing && [argument length]>1 && [argument characterAtIndex:0]=='-')
 		{
 			// Check for a stop marker.
 			if([argument isEqual:@"--"])
@@ -503,7 +508,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 		}
 
 		[dict setObject:[allowedvalues objectAtIndex:index] forKey:StringValueKey];
-		[dict setObject:[NSNumber numberWithUnsignedInteger:index] forKey:NumberValueKey];
+		[dict setObject:[NSNumber numberWithUnsignedInt:index] forKey:NumberValueKey];
 	}
 	else if(type==IntegerOptionType)
 	{
@@ -561,7 +566,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 {
 	NSEnumerator *enumerator=[options objectEnumerator];
 	NSMutableDictionary *dict;
-	while(dict=[enumerator nextObject])
+	while((dict=[enumerator nextObject]))
 	{
 		id defaultvalue=[dict objectForKey:DefaultValueKey];
 		if(!defaultvalue) continue;
@@ -576,7 +581,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 		{
 			if(![dict objectForKey:NumberValueKey])
 			{
-				NSUInteger index=[defaultvalue unsignedIntegerValue];
+				int index=[defaultvalue unsignedIntValue];
 				NSArray *allowedvalues=[dict objectForKey:AllowedValuesKey];
 				[dict setObject:[allowedvalues objectAtIndex:index] forKey:StringValueKey];
 				[dict setObject:defaultvalue forKey:NumberValueKey];
@@ -601,7 +606,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 
 	NSEnumerator *enumerator=[options objectEnumerator];
 	NSDictionary *dict;
-	while(dict=[enumerator nextObject])
+	while((dict=[enumerator nextObject]))
 	{
 		NSArray *names=[dict objectForKey:NamesKey];
 		NSString *name=[names objectAtIndex:0];
@@ -619,11 +624,11 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 
 -(void)_requireOptionsInArray:(NSArray *)requiredoptions when:(NSString *)when errors:(NSMutableArray *)errors
 {
-	NSMutableSet *set=[NSMutableSet new];
+	NSMutableSet *set=[NSMutableSet set];
 
 	NSEnumerator *enumerator=[requiredoptions objectEnumerator];
 	NSString *requiredoption;
-	while(requiredoption=[enumerator nextObject])
+	while((requiredoption=[enumerator nextObject]))
 	{
 		if(![self _isOptionDefined:requiredoption]) [set addObject:requiredoption];
 	}
@@ -634,7 +639,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 
 	enumerator=[optionordering objectEnumerator];
 	NSString *option;
-	while(option=[enumerator nextObject])
+	while((option=[enumerator nextObject]))
 	{
 		if([set containsObject:option]) [array addObject:[self _describeOption:option]];
 	}
@@ -678,7 +683,7 @@ name:(NSString *)option value:(NSString *)value errors:(NSMutableArray *)errors
 {
 	NSEnumerator *enumerator=[errors objectEnumerator];
 	NSString *error;
-	while(error=[enumerator nextObject])
+	while((error=[enumerator nextObject]))
 	{
 		[error print];
 		[@"\n" print];

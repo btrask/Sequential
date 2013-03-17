@@ -17,7 +17,7 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 
 -(id)initWithBlockReader:(XADCABBlockReader *)blockreader windowBits:(int)windowbits
 {
-	if(self=[super initWithBlockReader:blockreader])
+	if((self=[super initWithBlockReader:blockreader]))
 	{
 		[self setInputBuffer:CSInputBufferAllocEmpty()];
 
@@ -118,7 +118,7 @@ static void UpdateQuantumModel(QuantumModel *model,int index);
 				offset=OffsetBaseTable[offsetslot]+
 				CSInputNextBitString(input,OffsetAdditionalBitsTable[offsetslot])+1;
 			}
-			else if(selector==6)
+			else //if(selector==6)
 			{
 				int lengthslot=NextQuantumSymbolForModel(&coder,&lengthmodel6);
 				length=LengthBaseTable[lengthslot]+

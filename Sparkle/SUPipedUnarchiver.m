@@ -8,16 +8,18 @@
 
 #import "SUPipedUnarchiver.h"
 #import "SUUnarchiver_Private.h"
+#import "SULog.h"
+
 
 @implementation SUPipedUnarchiver
 
-+ (SEL)_selectorConformingToTypeOfPath:(NSString *)path
++ (SEL)selectorConformingToTypeOfPath:(NSString *)path
 {
 	static NSDictionary *typeSelectorDictionary;
 	if (!typeSelectorDictionary)
-		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"_extractZIP", @".zip", @"_extractTAR", @".tar",
-								   @"_extractTGZ", @".tar.gz", @"_extractTGZ", @".tgz",
-								   @"_extractTBZ", @".tar.bz2", @"_extractTBZ", @".tbz", nil] retain];
+		typeSelectorDictionary = [[NSDictionary dictionaryWithObjectsAndKeys:@"extractZIP", @".zip", @"extractTAR", @".tar",
+								   @"extractTGZ", @".tar.gz", @"extractTGZ", @".tgz",
+								   @"extractTBZ", @".tar.bz2", @"extractTBZ", @".tbz", nil] retain];
 
 	NSString *lastPathComponent = [path lastPathComponent];
 	NSEnumerator *typeEnumerator = [typeSelectorDictionary keyEnumerator];
@@ -33,22 +35,31 @@
 
 - (void)start
 {
-	[NSThread detachNewThreadSelector:[[self class] _selectorConformingToTypeOfPath:archivePath] toTarget:self withObject:nil];
+	[NSThread detachNewThreadSelector:[[self class] selectorConformingToTypeOfPath:archivePath] toTarget:self withObject:nil];
 }
 
-+ (BOOL)_canUnarchivePath:(NSString *)path
++ (BOOL)canUnarchivePath:(NSString *)path
 {
-	return ([self _selectorConformingToTypeOfPath:path] != nil);
+	return ([self selectorConformingToTypeOfPath:path] != nil);
 }
 
 // This method abstracts the types that use a command line tool piping data from stdin.
-- (void)_extractArchivePipingDataToCommand:(NSString *)command
+- (void)extractArchivePipingDataToCommand:(NSString *)command
 {
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	FILE *fp = NULL, *cmdFP = NULL;
 	
+	SULog(@"Extracting %@ using '%@'",archivePath,command);
+    
 	// Get the file size.
+#if MAC_OS_X_VERSION_MIN_REQUIRED <= MAC_OS_X_VERSION_10_4
 	NSNumber *fs = [[[NSFileManager defaultManager] fileAttributesAtPath:archivePath traverseLink:NO] objectForKey:NSFileSize];
+#else
+	NSNumber *fs = [[[NSFileManager defaultManager] attributesOfItemAtPath:archivePath error:nil] objectForKey:NSFileSize];
+#endif
 	if (fs == nil) goto reportError;
 	
 	// Thank you, Allan Odgaard!
@@ -56,54 +67,77 @@
 	fp = fopen([archivePath fileSystemRepresentation], "r");
 	if (!fp) goto reportError;
 	
+    char *oldDestinationString = getenv("DESTINATION");
 	setenv("DESTINATION", [[archivePath stringByDeletingLastPathComponent] fileSystemRepresentation], 1);
 	cmdFP = popen([command fileSystemRepresentation], "w");
+	size_t written;
 	if (!cmdFP) goto reportError;
 	
 	char buf[32*1024];
-	long len;
+	size_t len;
 	while((len = fread(buf, 1, 32*1024, fp)))
 	{				
-		fwrite(buf, 1, len, cmdFP);
-		[self performSelectorOnMainThread:@selector(_notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithLong:len] waitUntilDone:NO];
+		written = fwrite(buf, 1, len, cmdFP);
+		if( written < len )
+		{
+			pclose(cmdFP);
+			goto reportError;
+		}
+			
+		[self performSelectorOnMainThread:@selector(notifyDelegateOfExtractedLength:) withObject:[NSNumber numberWithUnsignedLong:len] waitUntilDone:NO];
 	}
 	pclose(cmdFP);
 	
-	[self performSelectorOnMainThread:@selector(_notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
+	if( ferror( fp ) )
+		goto reportError;
+	
+	[self performSelectorOnMainThread:@selector(notifyDelegateOfSuccess) withObject:nil waitUntilDone:NO];
 	goto finally;
 	
 reportError:
-	[self performSelectorOnMainThread:@selector(_notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
+	[self performSelectorOnMainThread:@selector(notifyDelegateOfFailure) withObject:nil waitUntilDone:NO];
 	
 finally:
 	if (fp)
 		fclose(fp);
-	[pool drain];
+    if (oldDestinationString)
+        setenv("DESTINATION", oldDestinationString, 1);
+    else
+        unsetenv("DESTINATION");
+	[pool release];
 }
 
-- (void)_extractTAR
+- (void)extractTAR
 {
-	return [self _extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+	return [self extractArchivePipingDataToCommand:@"tar -xC \"$DESTINATION\""];
 }
 
-- (void)_extractTGZ
+- (void)extractTGZ
 {
-	return [self _extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+	return [self extractArchivePipingDataToCommand:@"tar -zxC \"$DESTINATION\""];
 }
 
-- (void)_extractTBZ
+- (void)extractTBZ
 {
-	return [self _extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+	return [self extractArchivePipingDataToCommand:@"tar -jxC \"$DESTINATION\""];
 }
 
-- (void)_extractZIP
+- (void)extractZIP
 {
-	return [self _extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
+	// *** GETS CALLED ON NON-MAIN THREAD!!!
+	
+	return [self extractArchivePipingDataToCommand:@"ditto -x -k - \"$DESTINATION\""];
 }
 
 + (void)load
 {
-	[self _registerImplementation:self];
+	[self registerImplementation:self];
 }
 
 @end

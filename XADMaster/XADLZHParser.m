@@ -6,9 +6,6 @@
 #import "XADCRCHandle.h"
 #import "NSDateXAD.h"
 
-// TODO: Move the other really obscure algorithms over from libxad, and add support
-// for the other related formats, such as Zoo, Savage, and the SFX variants.
-
 @implementation XADLZHParser
 
 +(int)requiredHeaderSize { return 7; }
@@ -45,15 +42,18 @@
 {
 	CSHandle *fh=[self handle];
 
-	while([self shouldKeepParsing])
+	int guessedos=0;
+
+	while([self shouldKeepParsing] && ![fh atEndOfFile])
 	{
 		off_t start=[fh offsetInFile];
 
-		int firstword;
-		@try { firstword=[fh readInt16LE]; }
-		@catch(id e) { break; }
+		uint8_t b1=[fh readUInt8];
+		if(b1==0) break;
 
-		if((firstword&0xff)==0) break;
+		uint8_t b2=[fh readUInt8];
+
+		int firstword=b1|(b2<<8);
 
 		uint8_t method[5];
 		[fh readBytes:5 toBuffer:method];
@@ -62,7 +62,7 @@
 		uint32_t size=[fh readUInt32LE];
 		uint32_t time=[fh readUInt32LE];
 
-		int dosattrs=[fh readUInt8];
+		int attrs=[fh readUInt8];
 		int level=[fh readUInt8];
 
 		NSString *compname=[[[NSString alloc] initWithBytes:method length:5 encoding:NSISOLatin1StringEncoding] autorelease];
@@ -81,7 +81,6 @@
 			headersize=(firstword&0xff)+2;
 
 			[dict setObject:[NSDate XADDateWithMSDOSDateTime:time] forKey:XADLastModificationDateKey];
-			[dict setObject:[NSNumber numberWithInt:dosattrs] forKey:XADDOSFileAttributesKey];
 
 			int namelen=[fh readUInt8];
 			[dict setObject:[fh readDataOfLength:namelen] forKey:@"LHAHeaderFileNameData"];
@@ -107,6 +106,8 @@
 		}
 		else if(level==2)
 		{
+			[self reportInterestingFileWithReason:@"LZH level 2 file"];
+
 			headersize=firstword;
 
 			[dict setObject:[NSDate dateWithTimeIntervalSince1970:time] forKey:XADLastModificationDateKey];
@@ -125,6 +126,8 @@
 		}
 		else if(level==3)
 		{
+			[self reportInterestingFileWithReason:@"LZH level 3 file"];
+
 			if(firstword!=4) [XADException raiseNotSupportedException];
 
 			[dict setObject:[NSDate dateWithTimeIntervalSince1970:time] forKey:XADLastModificationDateKey];
@@ -145,7 +148,29 @@
 		}
 		else [XADException raiseIllegalDataException];
 
-		if(level==1||level==2||level==3)
+		if(level==0)
+		{
+			if(!guessedos)
+			{
+				NSString *name=[self filename];
+
+				if([name matchedByPattern:@"\\.(lha|run)$"
+				options:REG_ICASE]) guessedos='A';
+				else guessedos='M';
+			}
+
+			if(guessedos=='M')
+			{
+				[dict setObject:[self XADStringWithString:@"MS-DOS"] forKey:@"LHAGuessedOSName"];
+				[dict setObject:[NSNumber numberWithInt:attrs] forKey:XADDOSFileAttributesKey];
+			}
+			else
+			{
+				[dict setObject:[self XADStringWithString:@"Amiga"] forKey:@"LHAGuessedOSName"];
+				[dict setObject:[NSNumber numberWithInt:attrs] forKey:XADAmigaProtectionBitsKey];
+			}
+		}
+		else
 		{
 			[dict setObject:[NSNumber numberWithInt:os] forKey:@"LHAOS"];
 
@@ -170,6 +195,14 @@
 				//case '': methodname=@""; break;
 			}
 			if(osname) [dict setObject:[self XADStringWithString:osname] forKey:@"LHAOSName"];
+
+			[dict setObject:[NSNumber numberWithInt:attrs] forKey:XADDOSFileAttributesKey];
+
+			if(os=='m')
+			{
+				[self setIsMacArchive:YES];
+				[dict setObject:[NSNumber numberWithBool:YES] forKey:XADMightBeMacBinaryKey];
+			}
 		}
 
 		[dict setValue:[NSNumber numberWithUnsignedInt:compsize] forKey:XADCompressedSizeKey];
@@ -178,12 +211,6 @@
 
 		if(memcmp(method,"-lhd-",5)==0) [dict setValue:[NSNumber numberWithBool:YES] forKey:XADIsDirectoryKey];
 
-		if(os=='m')
-		{
-			[self setIsMacArchive:YES];
-			[dict setObject:[NSNumber numberWithBool:YES] forKey:XADMightBeMacBinaryKey];
-		}
-
 		NSData *filenamedata=[dict objectForKey:@"LHAExtFileNameData"];
 		if(!filenamedata) filenamedata=[dict objectForKey:@"LHAHeaderFileNameData"];
 		NSData *directorydata=[dict objectForKey:@"LHAExtDirectoryData"];
@@ -191,7 +218,8 @@
 		if(directorydata)
 		{
 			path=[self XADPathWithData:directorydata separators:"\xff"];
-			if(filenamedata) path=[path pathByAppendingPathComponent:[self XADStringWithData:filenamedata]];
+			if(filenamedata&&[filenamedata length])
+			path=[path pathByAppendingXADStringComponent:[self XADStringWithData:filenamedata]];
 		}
 		else if(filenamedata) path=[self XADPathWithData:filenamedata separators:"\xff\\/"];
 
@@ -238,6 +266,7 @@
 
 		case 0x42:
 			// 64-bit file sizes
+			[self reportInterestingFileWithReason:@"64-bit file"];
 			[XADException raiseNotSupportedException];
 		break;
 
@@ -307,13 +336,13 @@
 	}
 	else if([method isEqual:@"-lh2-"])
 	{
-		off_t compsize=[[dict objectForKey:XADCompressedSizeKey] longLongValue];
-		handle=[[[XADLZH2Handle alloc] initWithHandle:handle inputLength:compsize outputLength:size] autorelease];
+		[self reportInterestingFileWithReason:@"-lh2- compression"];
+		handle=[[[XADLZH2Handle alloc] initWithHandle:handle length:size] autorelease];
 	}
 	else if([method isEqual:@"-lh3-"])
 	{
-		off_t compsize=[[dict objectForKey:XADCompressedSizeKey] longLongValue];
-		handle=[[[XADLZH3Handle alloc] initWithHandle:handle inputLength:compsize outputLength:size] autorelease];
+		[self reportInterestingFileWithReason:@"-lh3- compression"];
+		handle=[[[XADLZH3Handle alloc] initWithHandle:handle length:size] autorelease];
 	}
 	else if([method isEqual:@"-lh4-"])
 	{
@@ -349,11 +378,12 @@
 	}
 	else if([method isEqual:@"-pm2-"])
 	{
-		off_t compsize=[[dict objectForKey:XADCompressedSizeKey] longLongValue];
-		handle=[[[XADPMArc2Handle alloc] initWithHandle:handle inputLength:compsize outputLength:size] autorelease];
+		[self reportInterestingFileWithReason:@"-pm2- compression"];
+		handle=[[[XADPMArc2Handle alloc] initWithHandle:handle length:size] autorelease];
 	}
 	else // not supported
 	{
+		[self reportInterestingFileWithReason:@"Unsupported compression method %@",method];
 		return nil; 
 	}
 

@@ -1,0 +1,135 @@
+# Compilers and linkers
+
+OBJCC_I386 = /Xcode3/usr/bin/gcc-4.2 -arch i386
+OBJCC_PPC = /Xcode3/usr/bin/gcc-4.0 -arch ppc
+CC_I386 = /Xcode3/usr/bin/gcc-4.2 -arch i386
+CC_PPC = /Xcode3/usr/bin/gcc-4.0 -arch ppc
+CXX_I386 = /Xcode3/usr/bin/g++-4.2 -arch i386
+CXX_PPC = /Xcode3/usr/bin/g++-4.0 -arch ppc
+LD = /Xcode3/usr/bin/gcc-4.0
+AR = ar
+SDK = -isysroot /Xcode3/SDKs/MacOSX10.5.sdk
+
+# Options for compilation
+
+GCC_OPTS = 	-O2 \
+		-Wno-import \
+		-Wno-multichar \
+		-mmacosx-version-min=10.3.9
+
+OBJC_OPTS =	-std=gnu99 \
+		$(SDK)
+
+C_OPTS =	-std=gnu99 \
+		$(SDK)
+
+CXX_OPTS =	$(SDK)
+
+AUTODEPENDENCY_CFLAGS=-MMD -MF$(@:.o=.d) -MT$@
+
+ALL_OBJCFLAGS = $(OBJC_OPTS) $(GCC_OPTS) $(OBJCFLAGS)
+ALL_CFLAGS = $(C_OPTS) $(GCC_OPTS) $(CFLAGS)
+ALL_CXXFLAGS = $(CXX_OPTS) $(GCC_OPTS) $(CXXFLAGS)
+
+# Options for linking
+
+LIBS =	-framework Foundation \
+	-lobjc \
+	-lstdc++ \
+	-lm
+
+ALL_LDFLAGS =	-arch i386 -arch ppc \
+		-mmacosx-version-min=10.3.9 \
+		$(SDK) \
+		$(LDFLAGS)
+
+# Paths
+
+SOURCE_DIR = .
+BUILD_DIR = Build
+
+# Files
+
+include Makefile.common
+
+# Framework
+
+FRAMEWORK_NAME = UniversalDetector
+
+FRAMEWORK_FILES = $(FRAMEWORK_NAME).framework
+
+FRAMEWORK_HEADER_FILES = UniversalDetector.h
+
+FRAMEWORK_LDFLAGS =	-arch i386 -arch ppc \
+			-mmacosx-version-min=10.3.9 \
+			-dynamiclib \
+			-install_name @executable_path/../Frameworks/$(FRAMEWORK_NAME).framework/$(FRAMEWORK_NAME) \
+			$(SDK) \
+			$(LDFLAGS)
+
+# Compilation rules
+
+all: $(FRAMEWORK_FILES) $(EXECUTABLE_FILES) $(LIBRARY_FILES)
+
+$(FRAMEWORK_NAME).framework: \
+$(FRAMEWORK_NAME).framework/Versions/A/$(FRAMEWORK_NAME) \
+$(FRAMEWORK_NAME).framework/Versions/A/Resources/Info.plist \
+$(FRAMEWORK_NAME).framework/Versions/A/Resources/en.lproj/InfoPlist.strings \
+$(FRAMEWORK_HEADER_FILES:%=$(FRAMEWORK_NAME).framework/Versions/A/Headers/%)
+	ln -sf A $(FRAMEWORK_NAME).framework/Versions/Current
+	ln -sf Versions/Current/$(FRAMEWORK_NAME) $(FRAMEWORK_NAME).framework/$(FRAMEWORK_NAME)
+	ln -sf Versions/Current/Resources $(FRAMEWORK_NAME).framework/Resources
+	ln -sf Versions/Current/Headers $(FRAMEWORK_NAME).framework/Headers
+
+$(FRAMEWORK_NAME).framework/Versions/A/$(FRAMEWORK_NAME): $(LIBRARY_OBJS)
+	@mkdir -p $(dir $@)
+	$(LD) $(FRAMEWORK_LDFLAGS) -o $@ $^ $(LIBS)
+
+$(FRAMEWORK_NAME).framework/Versions/A/Resources/Info.plist: Info.plist
+	@mkdir -p $(dir $@)
+	cat $^ |\
+	perl -pe 's/\$$\{EXECUTABLE_NAME\}/$(FRAMEWORK_NAME)/sge' |\
+	perl -pe 's/\$$\{PRODUCT_NAME\}/$(FRAMEWORK_NAME)/sge' |\
+	cat >$@
+
+$(FRAMEWORK_NAME).framework/Versions/A/Resources/en.lproj/InfoPlist.strings: English.lproj/InfoPlist.strings
+	@mkdir -p $(dir $@)
+	cp $^ $@
+
+$(FRAMEWORK_NAME).framework/Versions/A/Headers/%: %
+	@mkdir -p $(dir $@)
+	cp $^ $@
+
+libUniversalDetector.a: $(LIBRARY_OBJS)
+	rm -f $@
+	$(AR) rcs $@ $^
+
+DetectorTest: $(DETECTORTEST_OBJS) libUniversalDetector.a
+	$(LD) $(ALL_LDFLAGS) -o $@ $^ $(LIBS)
+
+clean:
+	rm -rf $(BUILD_DIR) $(FRAMEWORK_FILES) $(EXECUTABLE_FILES) $(LIBRARY_FILES)
+
+# Suffix rules
+
+.SUFFIXES: .o .c .m .cpp
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC_I386) $(ALL_CFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@.i386
+	$(CC_PPC) $(ALL_CFLAGS) -c $< -o $@.ppc
+	lipo -create $@.i386 $@.ppc -output $@
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.m
+	@mkdir -p $(dir $@)
+	$(OBJCC_I386) $(ALL_OBJCFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@.i386
+	$(OBJCC_PPC) $(ALL_OBJCFLAGS) -c $< -o $@.ppc
+	lipo -create $@.i386 $@.ppc -output $@
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX_I386) $(ALL_CXXFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@.i386
+	$(CXX_PPC) $(ALL_CXXFLAGS) -c $< -o $@.ppc
+	lipo -create $@.i386 $@.ppc -output $@
+
+-include $(OBJS:.o=.d)

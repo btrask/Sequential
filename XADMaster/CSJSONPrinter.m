@@ -5,10 +5,11 @@
 
 -(id)init
 {
-	if(self=[super init])
+	if((self=[super init]))
 	{
 		indentlevel=0;
 		indentstring=[@"\n" retain];
+		needseparator=NO;
 	}
 	return self;
 }
@@ -45,15 +46,19 @@
 	else if([object isKindOfClass:[NSArray class]]) [self printArray:object];
 	else if([object isKindOfClass:[NSDictionary class]]) [self printDictionary:object];
 	else [self printString:[object description]];
+
+	needseparator=YES;
 }
 
 -(void)printNull
 {
+	[self printSeparatorIfNeeded];
 	[@"null" print];
 }
 
 -(void)printNumber:(NSNumber *)number
 {
+	[self printSeparatorIfNeeded];
 	if(strcmp([number objCType],"c")==0)
 	{
 		if([number boolValue]) [@"true" print];
@@ -67,6 +72,7 @@
 
 -(void)printString:(NSString *)string
 {
+	[self printSeparatorIfNeeded];
 	[@"\"" print];
 	[[self stringByEscapingString:string] print];
 	[@"\"" print];
@@ -74,6 +80,7 @@
 
 -(void)printData:(NSData *)data
 {
+	[self printSeparatorIfNeeded];
 	[@"\"" print];
 	[[self stringByEncodingBytes:[data bytes] length:[data length]] print];
 	[@"\"" print];
@@ -86,6 +93,7 @@
 	uint8_t bytes[length];
 	[value getValue:bytes];
 
+	[self printSeparatorIfNeeded];
 	[@"\"" print];
 	[[self stringByEncodingBytes:bytes length:length] print];
 	[@"\"" print];
@@ -109,22 +117,26 @@
 
 -(void)startPrintingArray
 {
+	[self printSeparatorIfNeeded];
 	[@"[" print];
 	indentlevel++;
 }
 
 -(void)startPrintingArrayObject
 {
+	[self printSeparatorIfNeeded];
 	[self startNewLine];
 }
 
 -(void)endPrintingArrayObject
 {
-	[@"," print];
+	needseparator=YES;
 }
 
 -(void)endPrintingArray
 {
+	needseparator=NO;
+
 	indentlevel--;
 	[self startNewLine];
 	[@"]" print];
@@ -141,7 +153,7 @@
 {
 	NSEnumerator *enumerator=[array objectEnumerator];
 	id object;
-	while(object=[enumerator nextObject]) [self printArrayObject:object];
+	while((object=[enumerator nextObject])) [self printArrayObject:object];
 }
 
 
@@ -150,12 +162,14 @@
 
 -(void)startPrintingDictionary
 {
+	[self printSeparatorIfNeeded];
 	[@"{" print];
 	indentlevel++;
 }
 
 -(void)printDictionaryKey:(id)key
 {
+	[self printSeparatorIfNeeded];
 	[self startNewLine];
 	[@"\"" print];
 	[[self stringByEscapingString:[key description]] print];
@@ -168,11 +182,13 @@
 
 -(void)endPrintingDictionaryObject
 {
-	[@"," print];
+	needseparator=YES;
 }
 
 -(void)endPrintingDictionary
 {
+	needseparator=NO;
+
 	indentlevel--;
 	[self startNewLine];
 	[@"}" print];
@@ -189,7 +205,7 @@
 {
 	NSEnumerator *enumerator=[dictionary keyEnumerator];
 	id key;
-	while(key=[enumerator nextObject])
+	while((key=[enumerator nextObject]))
 	{
 		[self printDictionaryKey:key];
 		[self printDictionaryObject:[dictionary objectForKey:key]];
@@ -203,6 +219,21 @@
 {
 	[@"\n" print];
 	for(int i=0;i<indentlevel;i++) [indentstring print];
+}
+
+-(void)printSeparatorIfNeeded
+{
+	// Generally we should call this method from other methods of
+	// this class which have direct print calls, before those print
+	// calls.  This ensures all needed comma separators are printed.
+	// The exceptions are (a) before printing only whitespace; and
+	// (b) when printing the end of a JSON Array or Object.  This is
+	// to ensure we print no trailing commas.
+	if(needseparator)
+	{
+		[@"," print];
+		needseparator=NO;
+	}
 }
 
 

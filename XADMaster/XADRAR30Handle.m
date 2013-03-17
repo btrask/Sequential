@@ -4,12 +4,12 @@
 
 @implementation XADRAR30Handle
 
--(id)initWithRARParser:(XADRARParser *)parent parts:(NSArray *)partarray
+-(id)initWithRARParser:(XADRARParser *)parent files:(NSArray *)filearray
 {
-	if(self=[super initWithName:[parent filename]])
+	if((self=[super initWithName:[parent filename]]))
 	{
 		parser=parent;
-		parts=[partarray retain];
+		files=[filearray retain];
 
 		InitializeLZSS(&lzss,0x400000);
 
@@ -27,7 +27,7 @@
 
 -(void)dealloc
 {
-	[parts release];
+	[files release];
 	CleanupLZSS(&lzss);
 	[maincode release];
 	[offsetcode release];
@@ -42,7 +42,7 @@
 
 -(void)resetBlockStream
 {
-	part=0;
+	file=0;
 	lastend=0;
 
 	RestartLZSS(&lzss);
@@ -59,21 +59,24 @@
 	[stack removeAllObjects];
 	filterstart=CSHandleMaxLength;
 	lastfilternum=0;
+	currfilestartpos=0;
 
-	startnewpart=startnewtable=YES;
+	startnewfile=startnewtable=YES;
 }
 
 
 -(int)produceBlockAtOffset:(off_t)pos
 {
-	if(startnewpart)
+	if(startnewfile)
 	{
-		CSInputBuffer *buf=[parser inputBufferForNextPart:&part parts:parts length:NULL];
+		CSInputBuffer *buf=[parser inputBufferForFileWithIndex:file files:files];
 		[self setInputBuffer:buf];
+
+		file++;
 
 		if(startnewtable) [self allocAndParseCodes];
 
-		startnewpart=startnewtable=NO;
+		startnewfile=startnewtable=NO;
 	}
 
 	if(lastend==filterstart)
@@ -92,7 +95,7 @@
 		uint8_t *memory=[vm memory];
 		CopyBytesFromLZSSWindow(&lzss,memory,start,length);
 
-		[firstfilter executeOnVirtualMachine:vm atPosition:pos];
+		[firstfilter executeOnVirtualMachine:vm atPosition:pos-currfilestartpos];
 
 		uint32_t lastfilteraddress=[firstfilter filteredBlockAddress];
 		uint32_t lastfilterlength=[firstfilter filteredBlockLength];
@@ -134,6 +137,7 @@
 		[self setBlockPointer:&memory[lastfilteraddress]];
 
 		lastend=end;
+
 		return lastfilterlength;
 	}
 	else
@@ -149,8 +153,8 @@
 
 		lastend=actualend;
 
-		// Check if we immediately hit a new filter, and try again.
-		if(actualend==start && actualend==filterstart) return [self produceBlockAtOffset:pos];
+		// Check if we immediately hit a new filter or file edge, and try again.
+		if(actualend==start) return [self produceBlockAtOffset:pos];
 		else return actualend-start;
 	}
 }
@@ -197,6 +201,9 @@
 					break;
 
 					case 2:
+						startnewfile=YES;
+						startnewtable=YES;
+						currfilestartpos=LZSSPosition(&lzss);
 						return LZSSPosition(&lzss);
 					break;
 
@@ -251,8 +258,9 @@
 
 				if(newfile)
 				{
-					startnewpart=YES;
+					startnewfile=YES;
 					startnewtable=CSInputNextBit(input);
+					currfilestartpos=LZSSPosition(&lzss);
 					return LZSSPosition(&lzss);
 				}
 				else
@@ -383,9 +391,9 @@
 			FreeSubAllocatorVariantH(alloc);
 			alloc=CreateSubAllocatorVariantH((maxalloc+1)<<20);
 
-			StartPPMdModelVariantH(&ppmd,input,alloc,maxorder,NO);
+			StartPPMdModelVariantH(&ppmd,(PPMdReadFunction *)CSInputNextByte,input,alloc,maxorder,NO);
 		}
-		else RestartPPMdVariantHRangeCoder(&ppmd,input,NO);
+		else RestartPPMdVariantHRangeCoder(&ppmd,(PPMdReadFunction *)CSInputNextByte,input,NO);
 
 		return;
 	}

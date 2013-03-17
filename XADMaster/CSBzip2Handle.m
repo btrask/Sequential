@@ -16,11 +16,12 @@ NSString *CSBzip2Exception=@"CSBzip2Exception";
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length name:(NSString *)descname
 {
-	if(self=[super initWithName:descname])
+	if((self=[super initWithName:descname]))
 	{
 		parent=[handle retain];
 		startoffs=[parent offsetInFile];
 		inited=NO;
+		checksumcorrect=YES;
 	}
 	return self;
 }
@@ -40,6 +41,8 @@ NSString *CSBzip2Exception=@"CSBzip2Exception";
 	if(inited) BZ2_bzDecompressEnd(&bzs);
 	memset(&bzs,0,sizeof(bzs));
 	BZ2_bzDecompressInit(&bzs,0,0);
+
+	checksumcorrect=YES;
 }
 
 -(int)streamAtMost:(int)num toBuffer:(void *)buffer
@@ -84,11 +87,19 @@ NSString *CSBzip2Exception=@"CSBzip2Exception";
 			BZ2_bzDecompressEnd(&bzs);
 			BZ2_bzDecompressInit(&bzs,0,0);
 		}
-		else if(err!=BZ_OK) [self _raiseBzip2:err];
+		else if(err!=BZ_OK)
+		{
+			if(err==BZ_DATA_ERROR) checksumcorrect=NO;
+			[self _raiseBzip2:err];
+		}
 	}
 
 	return num-bzs.avail_out;
 }
+
+-(BOOL)hasChecksum { return YES; }
+
+-(BOOL)isChecksumCorrect { return checksumcorrect; }
 
 -(void)_raiseBzip2:(int)error
 {

@@ -29,7 +29,7 @@
 	{
 		NSMutableData *namedata=[NSMutableData data];
 		uint8_t c;
-		while(c=[fh readUInt8]) [namedata appendBytes:&c length:1];
+		while((c=[fh readUInt8])) [namedata appendBytes:&c length:1];
 
 		uint32_t dataoffs=[fh readUInt32BE];
 		uint32_t datalen=[fh readUInt32BE];

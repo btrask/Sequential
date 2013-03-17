@@ -2,12 +2,16 @@
 
 
 
+
 @implementation CSHandle (Checksums)
 
 -(BOOL)hasChecksum { return NO; }
 -(BOOL)isChecksumCorrect { return YES; }
 
 @end
+
+
+
 
 @implementation CSSubHandle (Checksums)
 
@@ -23,14 +27,33 @@
 
 @end
 
-@implementation CSChecksumWrapperHandle
+
+
+
+@implementation CSStreamHandle (Checksums)
+
+-(BOOL)hasChecksum
 {
-	CSHandle *parent,*checksum;
+	if(input) return [CSInputHandle(input) hasChecksum];
+	else return NO;
 }
+
+-(BOOL)isChecksumCorrect
+{
+	if(input) return [CSInputHandle(input) isChecksumCorrect];
+	else return YES;
+}
+
+@end
+
+
+
+
+@implementation CSChecksumWrapperHandle
 
 -(id)initWithHandle:(CSHandle *)handle checksumHandle:(CSHandle *)checksumhandle
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name]]))
 	{
 		parent=[handle retain];
 		checksum=[checksumhandle retain];

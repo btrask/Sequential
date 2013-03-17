@@ -51,7 +51,7 @@ static void CalculateSillyTable(int *table,int param)
 {
 	NSArray *matches;
 
-	if(matches=[name substringsCapturedByPattern:@"^(.*)\\.(alz|a[0-9]{2}|b[0-9]{2})$" options:REG_ICASE])
+	if((matches=[name substringsCapturedByPattern:@"^(.*)\\.(alz|a[0-9]{2}|b[0-9]{2})$" options:REG_ICASE]))
 	{
 		return [self scanForVolumesWithFilename:name
 		regex:[XADRegex regexWithPattern:[NSString stringWithFormat:@"^%@\\.(alz|a[0-9]{2}|b[0-9]{2})$",
@@ -161,7 +161,8 @@ static void CalculateSillyTable(int *table,int param)
 		password:[self encodedPassword] testByte:crc>>24] autorelease];*/
 	}
 
-	switch([[dict objectForKey:@"ALZipCompressionMethod"] intValue])
+	int method=[[dict objectForKey:@"ALZipCompressionMethod"] intValue];
+	switch(method)
 	{
 		case 0: break; // No compression
 		case 1: handle=[CSBzip2Handle bzip2HandleWithHandle:handle length:size]; break;
@@ -176,7 +177,9 @@ static void CalculateSillyTable(int *table,int param)
 		}
 		break;
 
-		default: return nil;
+		default:
+			[self reportInterestingFileWithReason:@"Unsupported compression method %d",method];
+			return nil;
 	}
 
 	if(checksum) handle=[XADCRCHandle IEEECRC32HandleWithHandle:handle length:size correctCRC:crc conditioned:YES];

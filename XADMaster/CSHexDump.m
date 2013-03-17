@@ -1,16 +1,41 @@
-#import "CSHexDump.h"
+#import <Foundation/Foundation.h>
 
-@implementation NSData (HexDump)
+static NSString *HexDump(const uint8_t *bytes,size_t len,int cols,int indent);
 
--(NSString *)hexDumpWithColumns:(int)cols
+@implementation NSData (CSHexDump)
+
+-(NSString *)description
+{
+	return [NSString stringWithFormat:@"<\n%@\n>",HexDump([self bytes],[self length],16,0)];
+}
+
+@end
+
+@implementation NSValue (CSHexDump)
+
+/*-(NSString *)description
+{
+	NSUInteger size;
+	NSGetSizeAndAlignment([self objCType],&size,NULL);
+	if(size>0x40000) return [NSString stringWithFormat:@"<Very large %@>",[self class]];
+
+	uint8_t buf[size];
+	[self getValue:buf];
+
+	return [NSString stringWithFormat:@"<NSValue:\n%@\n>",HexDump(buf,size,16)];
+}*/
+
+@end
+
+static NSString *HexDump(const uint8_t *bytes,size_t len,int cols,int indent)
 {
 	NSMutableString *str=[NSMutableString string];
-	unsigned int len=[self length];
-	const unsigned char *bytes=[self bytes];
 	int lines=(len+cols-1)/cols;
 
 	for(int i=0;i<lines;i++)
 	{
+		for(int j=0;j<indent;j++) [str appendString:@" "];
+
 		[str appendFormat:@"%08x   ",i*cols];
 
 		for(int j=0;j<cols;j++)
@@ -38,7 +63,3 @@
 	}
 	return str;
 }
-
--(NSString *)description { return [NSString stringWithFormat:@"<\n%@\n>",[self hexDumpWithColumns:16]]; }
-
-@end

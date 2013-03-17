@@ -5,6 +5,7 @@
 #import "XADDigestHandle.h"
 #import "XADXZHandle.h"
 #import "XADRegex.h"
+#import "NSDateXAD.h"
 
 #define GroundState 0
 #define XarState 1
@@ -12,8 +13,7 @@
 #define FileState 3
 #define DataState 4
 #define ExtendedAttributeState 5
-#define ResourceForkState 6
-#define FinderInfoState 7
+#define OldExtendedAttributeState 6
 
 static const NSString *StringFormat=@"String";
 static const NSString *XADStringFormat=@"XADString";
@@ -69,16 +69,8 @@ static const NSString *DateFormat=@"Date";
 		[NSArray arrayWithObjects:@"XAREncodingStyle",StringFormat,nil],@"encoding style",
 	nil];
 
-	resforkdefinitions=[NSDictionary dictionaryWithObjectsAndKeys:
-		[NSArray arrayWithObjects:XADFileSizeKey,DecimalFormat,nil],@"size",
-		[NSArray arrayWithObjects:XADDataOffsetKey,DecimalFormat,nil],@"offset",
-		[NSArray arrayWithObjects:XADDataLengthKey,DecimalFormat,nil],@"length",
-		[NSArray arrayWithObjects:@"XARChecksum",HexFormat,nil],@"extracted-checksum",
-		[NSArray arrayWithObjects:@"XARChecksumStyle",StringFormat,nil],@"extracted-checksum style",
-		[NSArray arrayWithObjects:@"XAREncodingStyle",StringFormat,nil],@"encoding style",
-	nil];
-
-	finderdefinitions=[NSDictionary dictionaryWithObjectsAndKeys:
+	eadefinitions=[NSDictionary dictionaryWithObjectsAndKeys:
+		[NSArray arrayWithObjects:@"Name",StringFormat,nil],@"name",
 		[NSArray arrayWithObjects:@"Size",DecimalFormat,nil],@"size",
 		[NSArray arrayWithObjects:@"Offset",DecimalFormat,nil],@"offset",
 		[NSArray arrayWithObjects:@"Length",DecimalFormat,nil],@"length",
@@ -103,7 +95,7 @@ static const NSString *DateFormat=@"Date";
 
 	NSEnumerator *enumerator=[files objectEnumerator];
 	NSMutableDictionary *file;
-	while(file=[enumerator nextObject])
+	while((file=[enumerator nextObject]))
 	{
 		if(![self shouldKeepParsing]) break;
 		[self finishFile:file parentPath:[self XADPath]];
@@ -116,34 +108,70 @@ static const NSString *DateFormat=@"Date";
 	NSString *type=[file objectForKey:@"Type"];
 	NSString *link=[file objectForKey:@"Link"];
 	NSArray *filearray=[file objectForKey:@"Files"];
-	NSDictionary *resfork=[file objectForKey:@"ResourceFork"];
-	NSDictionary *finderinfo=[file objectForKey:@"FinderInfo"];
+	NSDictionary *eas=[file objectForKey:@"ExtendedAttributes"];
 
-	static NSArray *tempnames=nil;
-	if(!tempnames) tempnames=[[NSArray alloc] initWithObjects:
-	@"Name",@"Type",@"Link",@"Files",@"ResourceFork",@"FinderInfo",nil];
-	[file removeObjectsForKeys:tempnames];
+	[file removeObjectForKey:@"Name"];
+	[file removeObjectForKey:@"Type"];
+	[file removeObjectForKey:@"Link"];
+	[file removeObjectForKey:@"Files"];
+	[file removeObjectForKey:@"ExtendedAttributes"];
 
-	XADPath *path=[parentpath pathByAppendingPathComponent:[self XADStringWithString:name]];
+	XADPath *path=[parentpath pathByAppendingXADStringComponent:[self XADStringWithString:name]];
 	[file setObject:path forKey:XADFileNameKey];
 
-	if([type isEqual:@"directory"]||filearray) [file setObject:[NSNumber numberWithBool:YES] forKey:XADIsDirectoryKey];
+	if([type isEqual:@"directory"]||filearray)
+	{
+		[file setObject:[NSNumber numberWithBool:YES] forKey:XADIsDirectoryKey];
+	}
 	else if([type isEqual:@"symlink"])
 	{
 		if(!link) return;
 		[file setObject:[self XADStringWithString:link] forKey:XADLinkDestinationKey];
 	}
 
-	if(finderinfo)
+	NSMutableDictionary *eadict=[NSMutableDictionary dictionary];
+	NSMutableDictionary *resfork=nil;
+	int numeas=0;
+	if(eas)
 	{
-		CSHandle *handle=[self handleForEncodingStyle:[finderinfo objectForKey:@"EncodingStyle"]
-		offset:[finderinfo objectForKey:@"Offset"] length:[finderinfo objectForKey:@"Length"]
-		size:[finderinfo objectForKey:@"Size"] checksum:[finderinfo objectForKey:@"Checksum"]
-		checksumStyle:[finderinfo objectForKey:@"ChecksumStyle"]];
+		NSEnumerator *enumerator=[eas objectEnumerator];
+		NSMutableDictionary *ea;
+		while((ea=[enumerator nextObject]))
+		{
+			NSString *name=[ea objectForKey:@"Name"];
+			if(!name) continue;
 
-		NSData *data=[handle remainingFileContents];
-		if(data&&(![handle hasChecksum]||[handle isChecksumCorrect]))
-		[file setObject:data forKey:XADFinderInfoKey];
+			if([name isEqual:@"com.apple.ResourceFork"])
+			{
+				resfork=ea;
+			}
+			else
+			{
+				NSString *encodingstyle=[ea objectForKey:@"EncodingStyle"];
+				NSNumber *offset=[ea objectForKey:@"Offset"];
+				NSNumber *length=[ea objectForKey:@"Length"];
+				NSNumber *size=[ea objectForKey:@"Size"];
+				NSData *checksum=[ea objectForKey:@"Checksum"];
+				NSString *checksumstyle=[ea objectForKey:@"ChecksumStyle"];
+
+				CSHandle *handle=[self handleForEncodingStyle:encodingstyle
+				offset:offset length:length size:size checksum:checksum
+				checksumStyle:checksumstyle];
+
+				NSData *data=[handle remainingFileContents];
+				if(data)
+				if(![handle hasChecksum]||[handle isChecksumCorrect])
+				{
+					[eadict setObject:data forKey:name];
+					numeas++;
+				}
+			}
+		}
+
+		if(numeas)
+		{
+			[file setObject:eadict forKey:XADExtendedAttributesKey];
+		}
 	}
 
 	NSNumber *datalen=[file objectForKey:XADDataLengthKey];
@@ -157,11 +185,23 @@ static const NSString *DateFormat=@"Date";
 	if(resfork)
 	{
 		NSMutableDictionary *resfile=[NSMutableDictionary dictionaryWithDictionary:file];
-		[resfile addEntriesFromDictionary:resfork];
-		[resfile setObject:[NSNumber numberWithBool:YES] forKey:XADIsResourceForkKey];
 
-		NSNumber *datalen=[resfile objectForKey:XADDataLengthKey];
-		if(datalen) [resfile setObject:datalen forKey:XADCompressedSizeKey];
+		NSNumber *size=[resfork objectForKey:@"Size"];
+		NSNumber *offset=[resfork objectForKey:@"Offset"];
+		NSNumber *length=[resfork objectForKey:@"Length"];
+		NSData *checksum=[resfork objectForKey:@"Checksum"];
+		NSString *checksumstyle=[resfork objectForKey:@"ChecksumStyle"];
+		NSString *encodingstyle=[resfork objectForKey:@"EncodingStyle"];
+
+		if(size) [resfile setObject:size forKey:XADFileSizeKey];
+		if(offset) [resfile setObject:offset forKey:XADDataOffsetKey];
+		if(length) [resfile setObject:length forKey:XADDataLengthKey];
+		if(length) [resfile setObject:length forKey:XADCompressedSizeKey];
+		if(checksum) [resfile setObject:checksum forKey:@"XARChecksum"];
+		if(checksumstyle) [resfile setObject:checksumstyle forKey:@"XARChecksumStyle"];
+		if(encodingstyle) [resfile setObject:encodingstyle forKey:@"XAREncodingStyle"];
+
+		[resfile setObject:[NSNumber numberWithBool:YES] forKey:XADIsResourceForkKey];
 
 		[self addEntryWithDictionary:resfile];
 	}
@@ -170,7 +210,7 @@ static const NSString *DateFormat=@"Date";
 	{
 		NSEnumerator *enumerator=[filearray objectEnumerator];
 		NSMutableDictionary *file;
-		while(file=[enumerator nextObject]) [self finishFile:file parentPath:path];
+		while((file=[enumerator nextObject])) [self finishFile:file parentPath:path];
 	}
 }
 
@@ -201,45 +241,38 @@ attributes:(NSDictionary *)attributes
 			{
 				[filestack addObject:currfile];
 				currfile=[NSMutableDictionary dictionary];
+				curreas=nil;
 				state=FileState;
 			}
 			else if([name isEqual:@"data"]) state=DataState;
-			else if([name isEqual:@"ea"]) state=ExtendedAttributeState;
+			else if([name isEqual:@"ea"])
+			{
+				currea=[NSMutableDictionary dictionary];
+				state=ExtendedAttributeState;
+			}
 			else [self startSimpleElement:name attributes:attributes
 			definitions:filedefinitions destinationDictionary:currfile];
 		break;
 
 		case DataState:
-			if([name isEqual:@"encoding"])
-			{
-				NSString *style=[attributes objectForKey:@"style"];
-				if(style) [currfile setObject:style forKey:@"XAREncodingStyle"];
-			}
-			else [self startSimpleElement:name attributes:attributes
+			[self startSimpleElement:name attributes:attributes
 			definitions:datadefinitions destinationDictionary:currfile];
 		break;
 
 		case ExtendedAttributeState:
-			if([name isEqual:@"com.apple.ResourceFork"])
+			if([name isEqual:@"com.apple.ResourceFork"]||
+			[name isEqual:@"com.apple.FinderInfo"])
 			{
-				currext=[NSMutableDictionary dictionary];
-				state=ResourceForkState;
+				currea=[NSMutableDictionary dictionaryWithObject:name forKey:@"Name"];
+				state=OldExtendedAttributeState;
 			}
-			else if([name isEqual:@"com.apple.FinderInfo"])
-			{
-				currext=[NSMutableDictionary dictionary];
-				state=FinderInfoState;
-			}
+			else [self startSimpleElement:name attributes:attributes
+			definitions:eadefinitions destinationDictionary:currea];
 		break;
 
-		case ResourceForkState:
+		case OldExtendedAttributeState:
 			[self startSimpleElement:name attributes:attributes
-			definitions:resforkdefinitions destinationDictionary:currext];
-		break;
-
-		case FinderInfoState:
-			[self startSimpleElement:name attributes:attributes
-			definitions:finderdefinitions destinationDictionary:currext];
+			definitions:eadefinitions destinationDictionary:currea];
 		break;
 	}
 }
@@ -256,6 +289,12 @@ namespaceURI:(NSString *)namespace qualifiedName:(NSString *)qname
 		case FileState:
 			if([name isEqual:@"file"])
 			{
+				if(curreas)
+				{
+					[currfile setObject:curreas forKey:@"ExtendedAttributes"];
+					curreas=nil;
+				}
+
 				if([filestack count])
 				{
 					NSMutableDictionary *parent=[filestack lastObject];
@@ -285,27 +324,30 @@ namespaceURI:(NSString *)namespace qualifiedName:(NSString *)qname
 		break;
 
 		case ExtendedAttributeState:
-			if([name isEqual:@"ea"]) state=FileState;
+			if([name isEqual:@"ea"])
+			{
+				if(currea) // Might have been nil'd by OldExtendedAttributeState.
+				{
+					if(!curreas) curreas=[NSMutableArray array];
+					[curreas addObject:currea];
+					currea=nil;
+				}
+				state=FileState;
+			}
+			else [self endSimpleElement:name definitions:eadefinitions
+			destinationDictionary:currea];
 		break;
 
-		case ResourceForkState:
-			if([name isEqual:@"com.apple.ResourceFork"])
+		case OldExtendedAttributeState:
+			if([name isEqual:[currea objectForKey:@"Name"]])
 			{
-				[currfile setObject:currext forKey:@"ResourceFork"];
+				if(!curreas) curreas=[NSMutableArray array];
+				[curreas addObject:currea];
+				currea=nil;
 				state=ExtendedAttributeState;
 			}
-			else [self endSimpleElement:name definitions:resforkdefinitions
-			destinationDictionary:currext];
-		break;
-
-		case FinderInfoState:
-			if([name isEqual:@"com.apple.FinderInfo"])
-			{
-				[currfile setObject:currext forKey:@"FinderInfo"];
-				state=ExtendedAttributeState;
-			}
-			else [self endSimpleElement:name definitions:finderdefinitions
-			destinationDictionary:currext];
+			else [self endSimpleElement:name definitions:eadefinitions
+			destinationDictionary:currea];
 		break;
 	}
 }
@@ -320,7 +362,7 @@ definitions:(NSDictionary *)definitions destinationDictionary:(NSMutableDictiona
 {
 	NSEnumerator *enumerator=[attributes keyEnumerator];
 	NSString *key;
-	while(key=[enumerator nextObject])
+	while((key=[enumerator nextObject]))
 	{
 		NSArray *definition=[definitions objectForKey:[NSString stringWithFormat:@"%@ %@",name,key]];
 		if(definition) [self parseDefinition:definition string:[attributes objectForKey:key] destinationDictionary:dest];
@@ -395,7 +437,7 @@ destinationDictionary:(NSMutableDictionary *)dest
 			}
 			NSTimeZone *tz=[NSTimeZone timeZoneForSecondsFromGMT:timeoffs*60];
 
-			obj=[NSCalendarDate dateWithYear:year month:month day:day hour:hour minute:minute second:second timeZone:tz];
+			obj=[NSDate XADDateWithYear:year month:month day:day hour:hour minute:minute second:second timeZone:tz];
 		}
 	}
 
@@ -429,6 +471,7 @@ length:(NSNumber *)length size:(NSNumber *)size checksum:(NSData *)checksum chec
 		length:[length longLongValue]];
 
 		if(!encodingstyle||[encodingstyle length]==0); // no encoding style, copy
+		else if([encodingstyle isEqual:@"application/octet-stream"]);  // octe-stream, also copy
 		else if([encodingstyle isEqual:@"application/x-gzip"]) handle=[CSZlibHandle zlibHandleWithHandle:handle length:sizeval];
 		else if([encodingstyle isEqual:@"application/x-bzip2"]) handle=[CSBzip2Handle bzip2HandleWithHandle:handle length:sizeval];
 		else if([encodingstyle isEqual:@"application/x-xz"]) handle=[[[XADXZHandle alloc] initWithHandle:handle length:sizeval] autorelease];
@@ -452,7 +495,10 @@ length:(NSNumber *)length size:(NSNumber *)size checksum:(NSData *)checksum chec
 		}
 		else return nil;
 	}
-	else handle=[[self handle] nonCopiedSubHandleOfLength:0]; // kludge for data-less entries
+	else
+	{
+		handle=[self zeroLengthHandleWithChecksum:YES];
+	}
 
 	if(checksum&&checksumstyle)
 	{

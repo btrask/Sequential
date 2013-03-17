@@ -7,7 +7,7 @@
 
 -(id)initWithHandle:(CSHandle *)handle length:(off_t)length
 {
-	if(self=[super initWithName:[handle name] length:length])
+	if((self=[super initWithName:[handle name] length:length]))
 	{
 		parent=[handle retain];
 		currhandle=nil;

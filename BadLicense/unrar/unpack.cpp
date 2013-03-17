@@ -418,7 +418,7 @@ bool Unpack::ReadEndOfBlock()
     addbits(2);
   }
   TablesRead=!NewTable;
-  return !(NewFile || NewTable && !ReadTables());
+  return !(NewFile || (NewTable && !ReadTables()));
 }
 
 

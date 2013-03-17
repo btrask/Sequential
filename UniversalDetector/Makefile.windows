@@ -1,0 +1,91 @@
+# Compilers and linkers
+
+OBJCC = gcc
+CC = gcc
+CXX = g++
+LD = gcc
+AR = ar
+
+# Options for compilation
+
+GNUSTEP_OPTS =	-DGNUSTEP \
+		-DGNU_RUNTIME=1 \
+		-D_NATIVE_OBJC_EXCEPTIONS \
+		-fgnu-runtime \
+		-fexceptions \
+		-fobjc-exceptions \
+		-fconstant-string-class=NSConstantString
+
+GCC_OPTS = 	-O2 \
+		-Wno-import \
+		-Wno-multichar \
+		-g \
+		-D_FILE_OFFSET_BITS=64 \
+		-isystem C:\GNUstep\GNUstep\System\Library\Headers
+
+OBJC_OPTS =	-std=gnu99
+
+C_OPTS =	-std=gnu99
+
+CXX_OPTS =
+
+AUTODEPENDENCY_CFLAGS=-MMD -MF$(@:.o=.d) -MT$@
+
+ALL_OBJCFLAGS = $(OBJC_OPTS) $(GCC_OPTS) $(GNUSTEP_OPTS) $(OBJCFLAGS)
+ALL_CFLAGS = $(C_OPTS) $(GCC_OPTS) $(CFLAGS)
+ALL_CXXFLAGS = $(CXX_OPTS) $(GCC_OPTS) $(CXXFLAGS)
+
+# Options for linking
+
+LIBS =  -Wl,--no-whole-archive \
+	-lgnustep-base \
+	-lobjc \
+	-lstdc++ \
+	-lm
+
+ALL_LDFLAGS =	-Wl,--whole-archive \
+		-fexceptions \
+		-fgnu-runtime \
+		-LC:\GNUstep\GNUstep\System\Library\Libraries \
+		$(LDFLAGS)
+
+# Paths
+
+SOURCE_DIR = .
+BUILD_DIR = Build
+
+# Files
+
+include Makefile.common
+
+# Compilation rules
+
+all: $(EXECUTABLE_FILES) $(LIBRARY_FILES)
+
+DetectorTest: $(DETECTORTEST_OBJS) libUniversalDetector.a
+	$(LD) $(ALL_LDFLAGS) -o $@ $^ $(LIBS)
+
+libUniversalDetector.a: $(LIBRARY_OBJS)
+	rm -f $@
+	$(AR) rcs $@ $^
+
+clean:
+	rm -rf $(BUILD_DIR) $(EXECUTABLE_FILES) $(LIBRARY_FILES)
+
+# Suffix rules
+
+.SUFFIXES: .o .c .m .cpp
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(ALL_CFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.m
+	@mkdir -p $(dir $@)
+	$(OBJCC) $(ALL_OBJCFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: $(SOURCE_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(ALL_CXXFLAGS) $(AUTODEPENDENCY_CFLAGS) -c $< -o $@
+
+-include $(OBJS:.o=.d)

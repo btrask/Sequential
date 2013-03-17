@@ -459,7 +459,7 @@ static NSString *const PGOrientationKey = @"PGOrientation";
 		if(!class) continue;
 		NSDictionary *const typeDict = [types objectForKey:classString];
 		NSUInteger const p = [self matchPriorityForTypeDictionary:typeDict];
-		if(p) [adapterByPriority setObject:[NSNumber numberWithUnsignedInteger:p] forKey:class];
+		if(p) [adapterByPriority setObject:[NSNumber numberWithUnsignedInteger:p] forKey:(id<NSCopying>)class];
 	}
 	return [adapterByPriority keysSortedByValueUsingSelector:@selector(compare:)];
 }

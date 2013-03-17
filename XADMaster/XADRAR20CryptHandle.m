@@ -3,9 +3,9 @@
 
 @implementation XADRAR20CryptHandle
 
--(id)initWithHandle:(CSHandle *)handle password:(NSData *)passdata
+-(id)initWithHandle:(CSHandle *)handle length:(off_t)length password:(NSData *)passdata
 {
-	if(self=[super initWithName:[handle name]])
+	if((self=[super initWithName:[handle name] length:length]))
 	{
 		parent=[handle retain];
 		startoffs=[handle offsetInFile];

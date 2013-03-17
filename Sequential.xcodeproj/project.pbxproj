@@ -253,13 +253,6 @@
 			remoteGlobalIDString = 61B5F90209C4CEE200B25A18;
 			remoteInfo = "Sparkle Test App";
 		};
-		0EBAD5950F569E2B0014BA11 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = DAAEFC960DA571DF0051E0D0;
-			remoteInfo = "relaunch tool";
-		};
 		0EBAD5970F569E2B0014BA11 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
@@ -273,6 +266,41 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = Sparkle;
+		};
+		A219FDC0162A7B5900EC564E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 5D06E8D00FD68C7C005AE3F6;
+			remoteInfo = BinaryDelta;
+		};
+		A219FDC2162A7B5900EC564E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0EBAD5860F569E2B0014BA11 /* Sparkle.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 55C14BB7136EEF1500649790;
+			remoteInfo = finish_installation;
+		};
+		A219FDD2162A7B5900EC564E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1B467B0115CD9A73001AB1DD;
+			remoteInfo = libXADMaster.ios.a;
+		};
+		A219FDD4162A7B5900EC564E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1B342390131D8B5B00CCDF77;
+			remoteInfo = XADTest5;
+		};
+		A219FDD6162A7B5900EC564E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0E20FCC6109652CE007EE24A /* XADMaster.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1B31CB9213C6423600ED119E;
+			remoteInfo = XADTest6;
 		};
 		B576271A11FF4DB700053499 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -755,14 +783,17 @@
 			isa = PBXGroup;
 			children = (
 				0E20FCDB109652CF007EE24A /* XADMaster.framework */,
+				B576271B11FF4DB700053499 /* libXADMaster.a */,
+				B576272111FF4DB700053499 /* libXADMaster.a */,
+				A219FDD3162A7B5900EC564E /* libXADMaster.ios.a */,
 				0E20FCDD109652CF007EE24A /* XADTest */,
 				0E20FCDF109652CF007EE24A /* XADTest2 */,
 				0E20FCE1109652CF007EE24A /* XADTest3 */,
-				0E20FCE3109652CF007EE24A /* XADTest3 */,
-				B576271B11FF4DB700053499 /* libXADMaster.a */,
+				0E20FCE3109652CF007EE24A /* XADTest4 */,
+				A219FDD5162A7B5900EC564E /* XADTest5 */,
+				A219FDD7162A7B5900EC564E /* XADTest6 */,
 				B576271D11FF4DB700053499 /* unar */,
 				B576271F11FF4DB700053499 /* lsar */,
-				B576272111FF4DB700053499 /* libXADMaster.a */,
 				B576272311FF4DB700053499 /* unar.exe */,
 				B576272511FF4DB700053499 /* lsar.exe */,
 			);
@@ -817,8 +848,9 @@
 			children = (
 				0EBAD5920F569E2B0014BA11 /* Sparkle.framework */,
 				0EBAD5940F569E2B0014BA11 /* Sparkle Test App.app */,
-				0EBAD5960F569E2B0014BA11 /* relaunch */,
 				0EBAD5980F569E2B0014BA11 /* Sparkle Unit Tests.octest */,
+				A219FDC1162A7B5900EC564E /* BinaryDelta */,
+				A219FDC3162A7B5900EC564E /* finish_installation.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1131,10 +1163,10 @@
 			remoteRef = 0E20FCE0109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		0E20FCE3109652CF007EE24A /* XADTest3 */ = {
+		0E20FCE3109652CF007EE24A /* XADTest4 */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
-			path = XADTest3;
+			path = XADTest4;
 			remoteRef = 0E20FCE2109652CF007EE24A /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1166,18 +1198,46 @@
 			remoteRef = 0EBAD5930F569E2B0014BA11 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		0EBAD5960F569E2B0014BA11 /* relaunch */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = relaunch;
-			remoteRef = 0EBAD5950F569E2B0014BA11 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		0EBAD5980F569E2B0014BA11 /* Sparkle Unit Tests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = "Sparkle Unit Tests.octest";
 			remoteRef = 0EBAD5970F569E2B0014BA11 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A219FDC1162A7B5900EC564E /* BinaryDelta */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = BinaryDelta;
+			remoteRef = A219FDC0162A7B5900EC564E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A219FDC3162A7B5900EC564E /* finish_installation.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = finish_installation.app;
+			remoteRef = A219FDC2162A7B5900EC564E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A219FDD3162A7B5900EC564E /* libXADMaster.ios.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libXADMaster.ios.a;
+			remoteRef = A219FDD2162A7B5900EC564E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A219FDD5162A7B5900EC564E /* XADTest5 */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = XADTest5;
+			remoteRef = A219FDD4162A7B5900EC564E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		A219FDD7162A7B5900EC564E /* XADTest6 */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = XADTest6;
+			remoteRef = A219FDD6162A7B5900EC564E /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		B576271B11FF4DB700053499 /* libXADMaster.a */ = {
@@ -1204,7 +1264,7 @@
 		B576272111FF4DB700053499 /* libXADMaster.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libXADMaster.a;
+			path = libXADMaster.win.a;
 			remoteRef = B576272011FF4DB700053499 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -1634,6 +1694,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = Sequential;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1643,6 +1704,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				INFOPLIST_FILE = Info.plist;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = Sequential;
 				STRIP_INSTALLED_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;

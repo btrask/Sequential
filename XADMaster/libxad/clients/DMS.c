@@ -19,7 +19,7 @@
 
     You should have received a copy of the GNU Lesser General Public
     License along with this library; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 //#define CRACK_PWD
@@ -1087,7 +1087,7 @@ static struct DMSData *GetDMSData(struct xadMasterBase *xadMasterBase, xadSTRPTR
         d->RTV_Pass = d->PassCRC = 0;
       else
 #endif
-      d->RTV_Pass = d->PassCRC = xadCalcCRC16(XADM XADCRC16_ID1, 0, strlen(pwd), (xadUINT8 *)pwd);
+      d->RTV_Pass = d->PassCRC = xadCalcCRC16(XADM XADCRC16_ID1, 0, strlen((const char *)pwd), (xadUINT8 *)pwd);
     }
   }
   return d;
@@ -1268,7 +1268,7 @@ struct xadArchiveInfo *ai, xadINT32 *more, xadINT32 crypted, xadINT32 *ret)
         switch(tracksize)
         {
         case 18: case 9:
-          di->xdi_EntryInfo = "MSDOS disk"; /* no break! */
+          di->xdi_EntryInfo = (xadSTRPTR)"MSDOS disk"; /* no break! */
         case 22: case 11:
           di->xdi_TrackSectors = tracksize;
           break;
