@@ -2,22 +2,25 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">10D573</string>
-		<string key="IBDocument.InterfaceBuilderVersion">762</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
-		<string key="IBDocument.HIToolboxVersion">460.00</string>
+		<string key="IBDocument.SystemVersion">10K549</string>
+		<string key="IBDocument.InterfaceBuilderVersion">851</string>
+		<string key="IBDocument.AppKitVersion">1038.36</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">762</string>
+			<string key="NS.object.0">851</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
+			<integer value="57"/>
 			<integer value="1246"/>
-			<integer value="916"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
-		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
+		<object class="NSMutableDictionary" key="IBDocument.Metadata">
+			<string key="NS.key.0">PluginDependencyRecalculationVersion</string>
+			<integer value="1" key="NS.object.0"/>
+		</object>
 		<array class="NSMutableArray" key="IBDocument.RootObjects" id="992048703">
 			<object class="NSCustomObject" id="28894059">
 				<object class="NSMutableString" key="NSClassName">
@@ -54,14 +57,6 @@
 								<object class="NSMenuItem" id="482905987">
 									<reference key="NSMenu" ref="113741579"/>
 									<string key="NSTitle">About Sequential</string>
-									<string key="NSKeyEquiv"/>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="421653445"/>
-									<reference key="NSMixedImage" ref="233298788"/>
-								</object>
-								<object class="NSMenuItem" id="920132392">
-									<reference key="NSMenu" ref="113741579"/>
-									<string key="NSTitle">&lt;&lt;DO NOT LOCALIZE&gt;&gt;</string>
 									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="421653445"/>
@@ -1253,9 +1248,6 @@
 					</object>
 				</array>
 			</object>
-			<object class="NSCustomObject" id="986665587">
-				<string key="NSClassName">SUUpdater</string>
-			</object>
 			<object class="NSCustomView" id="59332951">
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">266</int>
@@ -1911,22 +1903,6 @@
 					<int key="connectionID">1229</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">delegate</string>
-						<reference key="source" ref="986665587"/>
-						<reference key="destination" ref="176103297"/>
-					</object>
-					<int key="connectionID">1232</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">installUpdate:</string>
-						<reference key="source" ref="176103297"/>
-						<reference key="destination" ref="920132392"/>
-					</object>
-					<int key="connectionID">1235</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontStandardAboutPanel:</string>
 						<reference key="source" ref="176103297"/>
@@ -2217,7 +2193,6 @@
 							<reference ref="254790618"/>
 							<reference ref="933290732"/>
 							<reference ref="71917311"/>
-							<reference ref="920132392"/>
 						</array>
 						<reference key="parent" ref="673507713"/>
 					</object>
@@ -2287,11 +2262,6 @@
 					<object class="IBObjectRecord">
 						<int key="objectID">1146</int>
 						<reference key="object" ref="71917311"/>
-						<reference key="parent" ref="113741579"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">1234</int>
-						<reference key="object" ref="920132392"/>
 						<reference key="parent" ref="113741579"/>
 					</object>
 					<object class="IBObjectRecord">
@@ -2923,12 +2893,6 @@
 						<reference key="parent" ref="522870103"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">1231</int>
-						<reference key="object" ref="986665587"/>
-						<reference key="parent" ref="0"/>
-						<string key="objectName">Updater</string>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">1242</int>
 						<reference key="object" ref="157094848"/>
 						<reference key="parent" ref="690256735"/>
@@ -3152,11 +3116,8 @@
 				<boolean value="YES" key="1221.ImportedFromIB2"/>
 				<string key="1222.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="1222.ImportedFromIB2"/>
-				<boolean value="YES" key="1231.ImportedFromIB2"/>
-				<string key="1234.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<boolean value="YES" key="1234.ImportedFromIB2"/>
 				<string key="1242.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="1246.IBEditorWindowLastContentRect">{{128, 494}, {140, 25}}</string>
+				<string key="1246.IBEditorWindowLastContentRect">{{128, 326}, {140, 25}}</string>
 				<string key="1246.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1252.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="1253.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3247,7 +3208,7 @@
 				<string key="267.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="267.ImportedFromIB2"/>
 				<boolean value="YES" key="277.ImportedFromIB2"/>
-				<string key="29.IBEditorWindowLastContentRect">{{103, 657}, {477, 20}}</string>
+				<string key="29.IBEditorWindowLastContentRect">{{363, 657}, {477, 20}}</string>
 				<string key="29.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="29.ImportedFromIB2"/>
 				<string key="337.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3288,7 +3249,7 @@
 				<boolean value="YES" key="552.ImportedFromIB2"/>
 				<string key="56.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="56.ImportedFromIB2"/>
-				<string key="57.IBEditorWindowLastContentRect">{{66, 582}, {260, 223}}</string>
+				<string key="57.IBEditorWindowLastContentRect">{{375, 454}, {260, 203}}</string>
 				<string key="57.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="57.ImportedFromIB2"/>
 				<string key="573.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3375,7 +3336,7 @@
 				<boolean value="YES" key="909.ImportedFromIB2"/>
 				<string key="915.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="915.ImportedFromIB2"/>
-				<string key="916.IBEditorWindowLastContentRect">{{448, 434}, {268, 223}}</string>
+				<string key="916.IBEditorWindowLastContentRect">{{708, 434}, {268, 223}}</string>
 				<string key="916.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="YES" key="916.ImportedFromIB2"/>
 				<string key="917.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -3409,6 +3370,13 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">reveal:</string>
 						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">reveal:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">reveal:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3458,13 +3426,6 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">PGCancelableProxy.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">PGDelayedPerforming.h</string>
 					</object>
 				</object>
@@ -3502,6 +3463,76 @@
 						<string key="loadLoadingDidProgress:">PGURLLoad</string>
 						<string key="thumbnailBrowserSelectionDidChange:">PGThumbnailBrowser</string>
 						<string key="thumbnailViewSelectionDidChange:">PGThumbnailView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeEncoding:">
+							<string key="name">changeEncoding:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clipViewBoundsDidChange:">
+							<string key="name">clipViewBoundsDidChange:</string>
+							<string key="candidateClassName">PGClipView</string>
+						</object>
+						<object class="IBActionInfo" key="clipViewGestureDidEnd:">
+							<string key="name">clipViewGestureDidEnd:</string>
+							<string key="candidateClassName">PGClipView</string>
+						</object>
+						<object class="IBActionInfo" key="closeWindowContent:">
+							<string key="name">closeWindowContent:</string>
+							<string key="candidateClassName">PGFullscreenWindow</string>
+						</object>
+						<object class="IBActionInfo" key="connectionDidCancel:">
+							<string key="name">connectionDidCancel:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="connectionDidClose:">
+							<string key="name">connectionDidClose:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="connectionDidFail:">
+							<string key="name">connectionDidFail:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="connectionDidReceiveResponse:">
+							<string key="name">connectionDidReceiveResponse:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="connectionDidSucceed:">
+							<string key="name">connectionDidSucceed:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="connectionLoadingDidProgress:">
+							<string key="name">connectionLoadingDidProgress:</string>
+							<string key="candidateClassName">PGURLConnection</string>
+						</object>
+						<object class="IBActionInfo" key="loadDidCancel:">
+							<string key="name">loadDidCancel:</string>
+							<string key="candidateClassName">PGURLLoad</string>
+						</object>
+						<object class="IBActionInfo" key="loadDidFail:">
+							<string key="name">loadDidFail:</string>
+							<string key="candidateClassName">PGURLLoad</string>
+						</object>
+						<object class="IBActionInfo" key="loadDidReceiveResponse:">
+							<string key="name">loadDidReceiveResponse:</string>
+							<string key="candidateClassName">PGURLLoad</string>
+						</object>
+						<object class="IBActionInfo" key="loadDidSucceed:">
+							<string key="name">loadDidSucceed:</string>
+							<string key="candidateClassName">PGURLLoad</string>
+						</object>
+						<object class="IBActionInfo" key="loadLoadingDidProgress:">
+							<string key="name">loadLoadingDidProgress:</string>
+							<string key="candidateClassName">PGURLLoad</string>
+						</object>
+						<object class="IBActionInfo" key="thumbnailBrowserSelectionDidChange:">
+							<string key="name">thumbnailBrowserSelectionDidChange:</string>
+							<string key="candidateClassName">PGThumbnailBrowser</string>
+						</object>
+						<object class="IBActionInfo" key="thumbnailViewSelectionDidChange:">
+							<string key="name">thumbnailViewSelectionDidChange:</string>
+							<string key="candidateClassName">PGThumbnailView</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3571,6 +3602,13 @@
 						<string key="NS.key.0">PG_grow:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">PG_grow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">PG_grow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<reference key="sourceIdentifier" ref="364110458"/>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -3579,6 +3617,13 @@
 					<object class="NSMutableDictionary" key="actions">
 						<string key="NS.key.0">performWindowClose:</string>
 						<string key="NS.object.0">id</string>
+					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">performWindowClose:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">performWindowClose:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3592,10 +3637,31 @@
 						<string key="NS.key.0">open:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">open:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">open:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="bookmarkItem">NSMenuItem</string>
 						<string key="bookmarkMenu">NSMenu</string>
 						<string key="emptyMenuItem">NSMenuItem</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="bookmarkItem">
+							<string key="name">bookmarkItem</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="bookmarkMenu">
+							<string key="name">bookmarkMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="emptyMenuItem">
+							<string key="name">emptyMenuItem</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3616,6 +3682,16 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="delegate">NSResponder</string>
 						<string key="documentView">NSView</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="delegate">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">NSResponder</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="documentView">
+							<string key="name">documentView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
 					</dictionary>
 					<reference key="sourceIdentifier" ref="576956482"/>
 				</object>
@@ -3686,6 +3762,160 @@
 						<string key="zoomIn:">id</string>
 						<string key="zoomOut:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeImageScaleFactor:">
+							<string key="name">changeImageScaleFactor:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeImageScaleMode:">
+							<string key="name">changeImageScaleMode:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeOrientation:">
+							<string key="name">changeOrientation:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeReadingDirection:">
+							<string key="name">changeReadingDirection:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeSortDirection:">
+							<string key="name">changeSortDirection:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeSortOrder:">
+							<string key="name">changeSortOrder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="changeSortRepeat:">
+							<string key="name">changeSortRepeat:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="decrypt:">
+							<string key="name">decrypt:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="firstOfFolder:">
+							<string key="name">firstOfFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="firstOfNextFolder:">
+							<string key="name">firstOfNextFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="firstOfPreviousFolder:">
+							<string key="name">firstOfPreviousFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="firstPage:">
+							<string key="name">firstPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="hideFindPanel:">
+							<string key="name">hideFindPanel:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="jumpToPage:">
+							<string key="name">jumpToPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="lastOfFolder:">
+							<string key="name">lastOfFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="lastPage:">
+							<string key="name">lastPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="maxImageScaleFactor:">
+							<string key="name">maxImageScaleFactor:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="minImageScaleFactor:">
+							<string key="name">minImageScaleFactor:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="moveToTrash:">
+							<string key="name">moveToTrash:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="nextPage:">
+							<string key="name">nextPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseAndCloseDocument:">
+							<string key="name">pauseAndCloseDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="pauseDocument:">
+							<string key="name">pauseDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="performFindPanelAction:">
+							<string key="name">performFindPanelAction:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="previousPage:">
+							<string key="name">previousPage:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="reload:">
+							<string key="name">reload:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="revertOrientation:">
+							<string key="name">revertOrientation:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="saveImagesTo:">
+							<string key="name">saveImagesTo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setAsDesktopPicture:">
+							<string key="name">setAsDesktopPicture:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="setCopyAsDesktopPicture:">
+							<string key="name">setCopyAsDesktopPicture:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="skipBeforeFolder:">
+							<string key="name">skipBeforeFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="skipPastFolder:">
+							<string key="name">skipPastFolder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleAnimation:">
+							<string key="name">toggleAnimation:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleFullscreen:">
+							<string key="name">toggleFullscreen:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleInfo:">
+							<string key="name">toggleInfo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleThumbnails:">
+							<string key="name">toggleThumbnails:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="zoomIn:">
+							<string key="name">zoomIn:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="zoomOut:">
+							<string key="name">zoomOut:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="clipView">PGClipView</string>
 						<string key="errorLabel">NSTextField</string>
@@ -3697,6 +3927,48 @@
 						<string key="passwordView">NSView</string>
 						<string key="reloadButton">NSButton</string>
 						<string key="searchField">NSSearchField</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="clipView">
+							<string key="name">clipView</string>
+							<string key="candidateClassName">PGClipView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="errorLabel">
+							<string key="name">errorLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="errorMessage">
+							<string key="name">errorMessage</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="errorView">
+							<string key="name">errorView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="findView">
+							<string key="name">findView</string>
+							<string key="candidateClassName">PGFindView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="passwordField">
+							<string key="name">passwordField</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="passwordLabel">
+							<string key="name">passwordLabel</string>
+							<string key="candidateClassName">NSTextField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="passwordView">
+							<string key="name">passwordView</string>
+							<string key="candidateClassName">NSView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="reloadButton">
+							<string key="name">reloadButton</string>
+							<string key="candidateClassName">NSButton</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchField">
+							<string key="name">searchField</string>
+							<string key="candidateClassName">NSSearchField</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3720,9 +3992,38 @@
 						<string key="revealInPathFinder:">id</string>
 						<string key="toggleOnScreenDisplay:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="extractImages:">
+							<string key="name">extractImages:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="revealInBrowser:">
+							<string key="name">revealInBrowser:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="revealInFinder:">
+							<string key="name">revealInFinder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="revealInPathFinder:">
+							<string key="name">revealInPathFinder:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleOnScreenDisplay:">
+							<string key="name">toggleOnScreenDisplay:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<object class="NSMutableDictionary" key="outlets">
 						<string key="NS.key.0">imageView</string>
 						<string key="NS.object.0">PGImageView</string>
+					</object>
+					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<string key="NS.key.0">imageView</string>
+						<object class="IBToOneOutletInfo" key="NS.object.0">
+							<string key="name">imageView</string>
+							<string key="candidateClassName">PGImageView</string>
+						</object>
 					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3750,6 +4051,72 @@
 						<string key="toggleInspector:">id</string>
 						<string key="toggleTimer:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="activateDocument:">
+							<string key="name">activateDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="clearRecentDocuments:">
+							<string key="name">clearRecentDocuments:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="closeAll:">
+							<string key="name">closeAll:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="installUpdate:">
+							<string key="name">installUpdate:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="open:">
+							<string key="name">open:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openRecentDocument:">
+							<string key="name">openRecentDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="openURL:">
+							<string key="name">openURL:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="orderFrontStandardAboutPanel:">
+							<string key="name">orderFrontStandardAboutPanel:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectNextDocument:">
+							<string key="name">selectNextDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="selectPreviousDocument:">
+							<string key="name">selectPreviousDocument:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showKeyboardShortcuts:">
+							<string key="name">showKeyboardShortcuts:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showPreferences:">
+							<string key="name">showPreferences:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="switchToFileManager:">
+							<string key="name">switchToFileManager:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleActivity:">
+							<string key="name">toggleActivity:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleInspector:">
+							<string key="name">toggleInspector:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="toggleTimer:">
+							<string key="name">toggleTimer:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="defaultPageMenu">NSMenu</string>
 						<string key="orientationMenu">NSMenu</string>
@@ -3764,6 +4131,56 @@
 						<string key="zoomIn">NSMenuItem</string>
 						<string key="zoomOut">NSMenuItem</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="defaultPageMenu">
+							<string key="name">defaultPageMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="orientationMenu">
+							<string key="name">orientationMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="pageMenuItem">
+							<string key="name">pageMenuItem</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scaleSlider">
+							<string key="name">scaleSlider</string>
+							<string key="candidateClassName">NSSlider</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="scaleSliderItem">
+							<string key="name">scaleSliderItem</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="selectNextDocument">
+							<string key="name">selectNextDocument</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="selectPreviousDocument">
+							<string key="name">selectPreviousDocument</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="toggleFullscreen">
+							<string key="name">toggleFullscreen</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="windowsMenu">
+							<string key="name">windowsMenu</string>
+							<string key="candidateClassName">NSMenu</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="windowsMenuSeparator">
+							<string key="name">windowsMenuSeparator</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="zoomIn">
+							<string key="name">zoomIn</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="zoomOut">
+							<string key="name">zoomOut</string>
+							<string key="candidateClassName">NSMenuItem</string>
+						</object>
+					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
 						<string key="minorKey">PGDocumentController.h</string>
@@ -3775,6 +4192,16 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="provideFeedback:">id</string>
 						<string key="showReleaseNotes:">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="provideFeedback:">
+							<string key="name">provideFeedback:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showReleaseNotes:">
+							<string key="name">showReleaseNotes:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -3868,11 +4295,39 @@
 						<string key="changeSearch:">id</string>
 						<string key="copy:">id</string>
 					</dictionary>
+					<dictionary class="NSMutableDictionary" key="actionInfosByName">
+						<object class="IBActionInfo" key="changeSearch:">
+							<string key="name">changeSearch:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="copy:">
+							<string key="name">copy:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="labelColumn">NSTableColumn</string>
 						<string key="propertiesTable">NSTableView</string>
 						<string key="searchField">NSSearchField</string>
 						<string key="valueColumn">NSTableColumn</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="labelColumn">
+							<string key="name">labelColumn</string>
+							<string key="candidateClassName">NSTableColumn</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="propertiesTable">
+							<string key="name">propertiesTable</string>
+							<string key="candidateClassName">NSTableView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="searchField">
+							<string key="name">searchField</string>
+							<string key="candidateClassName">NSSearchField</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="valueColumn">
+							<string key="name">valueColumn</string>
+							<string key="candidateClassName">NSTableColumn</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3885,6 +4340,16 @@
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="dataSource">NSObject</string>
 						<string key="delegate">NSObject</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="dataSource">
+							<string key="name">dataSource</string>
+							<string key="candidateClassName">NSObject</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="delegate">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">NSObject</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3906,6 +4371,20 @@
 						<string key="dataSource">NSObject</string>
 						<string key="delegate">NSObject</string>
 						<string key="representedObject">id</string>
+					</dictionary>
+					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
+						<object class="IBToOneOutletInfo" key="dataSource">
+							<string key="name">dataSource</string>
+							<string key="candidateClassName">NSObject</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="delegate">
+							<string key="name">delegate</string>
+							<string key="candidateClassName">NSObject</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="representedObject">
+							<string key="name">representedObject</string>
+							<string key="candidateClassName">id</string>
+						</object>
 					</dictionary>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBProjectSource</string>
@@ -3938,14 +4417,6 @@
 				</object>
 				<object class="IBPartialClassDescription">
 					<string key="className">PGURLLoad</string>
-					<string key="superclassName">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBUserSource</string>
-						<string key="minorKey"/>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">SUUpdater</string>
 					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBUserSource</string>
@@ -4333,20 +4804,6 @@
 					<string key="className">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">Sparkle.framework/Headers/SUAppcast.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier" id="997302028">
-						<string key="majorKey">IBFrameworkSource</string>
-						<string key="minorKey">Sparkle.framework/Headers/SUUpdater.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">NSObject</string>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">WebKit.framework/Headers/WebDownload.h</string>
 					</object>
 				</object>
@@ -4411,6 +4868,34 @@
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">WebKit.framework/Headers/WebUIDelegate.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">XADMaster.framework/Headers/XADArchive.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">XADMaster.framework/Headers/XADArchiveParser.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">XADMaster.framework/Headers/XADSimpleUnarchiver.h</string>
+					</object>
+				</object>
+				<object class="IBPartialClassDescription">
+					<string key="className">NSObject</string>
+					<object class="IBClassDescriptionSource" key="sourceIdentifier">
+						<string key="majorKey">IBFrameworkSource</string>
+						<string key="minorKey">XADMaster.framework/Headers/XADUnarchiver.h</string>
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
@@ -4533,23 +5018,17 @@
 						<string key="NS.key.0">showWindow:</string>
 						<string key="NS.object.0">id</string>
 					</object>
+					<object class="NSMutableDictionary" key="actionInfosByName">
+						<string key="NS.key.0">showWindow:</string>
+						<object class="IBActionInfo" key="NS.object.0">
+							<string key="name">showWindow:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+					</object>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
 						<string key="majorKey">IBFrameworkSource</string>
 						<string key="minorKey">AppKit.framework/Headers/NSWindowController.h</string>
 					</object>
-				</object>
-				<object class="IBPartialClassDescription">
-					<string key="className">SUUpdater</string>
-					<string key="superclassName">NSObject</string>
-					<object class="NSMutableDictionary" key="actions">
-						<string key="NS.key.0">checkForUpdates:</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">delegate</string>
-						<string key="NS.object.0">id</string>
-					</object>
-					<reference key="sourceIdentifier" ref="997302028"/>
 				</object>
 			</array>
 		</object>

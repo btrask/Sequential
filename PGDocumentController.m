@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 #import <Carbon/Carbon.h>
 #import <sys/resource.h>
 #import <objc/Protocol.h>
-#import "Sparkle/Sparkle.h"
 #import <tgmath.h>
 
 // Models
@@ -73,10 +72,6 @@ static NSString *const PGRecentItemsDeprecated2Key = @"PGRecentItems"; // Deprec
 static NSString *const PGRecentItemsDeprecatedKey = @"PGRecentDocuments"; // Deprecated after 1.2.2.
 static NSString *const PGFullscreenKey = @"PGFullscreen";
 
-static NSString *const PGCheckForUpdatesKey = @"PGCheckForUpdates";
-static NSString *const PGUpdateAvailableKey = @"PGUpdateAvailable";
-static NSString *const PGNextUpdateCheckDateKey = @"PGNextUpdateCheckDate";
-
 static NSString *const PGPathFinderApplicationName = @"Path Finder";
 
 static PGDocumentController *PGSharedDocumentController = nil;
@@ -86,8 +81,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (void)_awakeAfterLocalizing;
 - (void)_setFullscreen:(BOOL)flag;
 - (PGDocument *)_openNew:(BOOL)flag document:(PGDocument *)document display:(BOOL)display;
-- (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date;
-- (void)_checkForUpdates;
 
 @end
 
@@ -118,8 +111,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 		no, PGDimOtherScreensKey,
 		[NSNumber numberWithInteger:PGEndLocation], PGBackwardsInitialLocationKey,
 		[NSNumber numberWithUnsignedInteger:PGScaleFreely], PGImageScaleConstraintKey,
-		yes, PGCheckForUpdatesKey,
-		no, PGUpdateAvailableKey,
 		nil]];
 }
 
@@ -128,10 +119,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 - (IBAction)orderFrontStandardAboutPanel:(id)sender
 {
 	[[PGAboutBoxController sharedAboutBoxController] showWindow:self];
-}
-- (IBAction)installUpdate:(id)sender
-{
-	[[SUUpdater sharedUpdater] checkForUpdates:sender]; // We validate this menu item specially but its behavior can just use the normal Sparkle mechanism.
 }
 - (IBAction)showPreferences:(id)sender
 {
@@ -444,21 +431,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	if(display) [document createUI];
 	return document;
 }
-- (void)_scheduleNextUpdateCheckWithDate:(NSDate *)date
-{
-	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGCheckForUpdatesKey]) return;
-	NSDate *const d = date ? date : [NSDate dateWithTimeIntervalSinceNow:604800.0f];
-	[[NSUserDefaults standardUserDefaults] setObject:d forKey:PGNextUpdateCheckDateKey];
-	[_updateTimer invalidate];
-	[_updateTimer release];
-	_updateTimer = [[self PG_performSelector:@selector(_checkForUpdates) withObject:nil fireDate:d interval:0.0f options:PGRetainTarget] retain];
-}
-- (void)_checkForUpdates
-{
-	if(![[NSUserDefaults standardUserDefaults] boolForKey:PGCheckForUpdatesKey]) return;
-	[[SUUpdater sharedUpdater] checkForUpdateInformation];
-	[self _scheduleNextUpdateCheckWithDate:nil];
-}
 
 #pragma mark -NSResponder
 
@@ -501,13 +473,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 			[[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleAppleEvent:withReplyEvent:) forEventClass:kInternetEventClass andEventID:kAEGetURL];
 			[self setNextResponder:[NSApp nextResponder]];
 			[NSApp setNextResponder:self];
-
-			NSDate *updateDate = [[NSUserDefaults standardUserDefaults] objectForKey:PGNextUpdateCheckDateKey];
-			if(updateDate && [updateDate earlierDate:[NSDate date]] == updateDate) {
-				[self _checkForUpdates];
-				updateDate = nil;
-			}
-			[self _scheduleNextUpdateCheckWithDate:updateDate];
 		}
 	}
 	return self;
@@ -518,8 +483,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[self PG_removeObserver];
 	[defaultPageMenu release];
 	[windowsMenuSeparator release];
-	[_updateTimer invalidate];
-	[_updateTimer release];
 	[_recentDocumentIdentifiers release];
 	[_documents release];
 	[_fullscreenController release];
@@ -537,9 +500,6 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	SEL const action = [anItem action];
 
 	// Sequential:
-	if(@selector(installUpdate:) == action) {
-		[anItem setTitle:[[NSUserDefaults standardUserDefaults] boolForKey:PGUpdateAvailableKey] ? NSLocalizedString(@"Install Update...", @"Update menu item title. One of two states.") : NSLocalizedString(@"Check for Updates...", @"Update menu item title. One of two states.")];
-	}
 	if(@selector(switchToFileManager:) == action) [anItem setTitle:NSLocalizedString((self.pathFinderRunning ? @"Switch to Path Finder" : @"Switch to Finder"), @"Switch to Finder or Path Finder (www.cocoatech.com). Two states of the same item.")];
 
 	// Window:
@@ -571,30 +531,15 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[scaleSlider setMinValue:log2(PGScaleMin)];
 	[scaleSlider setMaxValue:log2(PGScaleMax)];
 
-	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%d", 0x21E1]];
+	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", (unichar)0x21E1]];
 	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
-	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%d", 0x21E3]];
+	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", (unichar)0x21E3]];
 	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
 
 	[self _setFullscreen:_fullscreen];
 	[self setCurrentDocument:nil];
 
 	[self performSelector:@selector(_awakeAfterLocalizing) withObject:nil afterDelay:0.0f inModes:[NSArray arrayWithObject:(NSString *)kCFRunLoopCommonModes]];
-}
-
-#pragma mark -NSObject(SUUpdaterDelegateInformalProtocol)
-
-- (void)updater:(SUUpdater *)updater didFindValidUpdate:(SUAppcastItem *)update
-{
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:PGUpdateAvailableKey];
-}
-- (void)updaterDidNotFindUpdate:(SUUpdater *)update
-{
-	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
-}
-- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
-{
-	[[NSUserDefaults standardUserDefaults] setBool:NO forKey:PGUpdateAvailableKey];
 }
 
 #pragma mark -<NSApplicationDelegate>

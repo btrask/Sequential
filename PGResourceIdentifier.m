@@ -298,7 +298,7 @@ NSString *const PGDisplayableIdentifierDisplayNameDidChangeNotification = @"PGDi
 	NSString *const parent = [URL isFileURL] ? [[URL path] stringByDeletingLastPathComponent] : [URL absoluteString];
 	NSString *const parentName = [URL isFileURL] ? [parent lastPathComponent] : parent;
 	if(![parentName length]) return result;
-	[[result mutableString] appendString:[NSString stringWithFormat:@" %d ", 0x2014]];
+	[[result mutableString] appendString:[NSString stringWithFormat:@" %C ", (unichar)0x2014]];
 	[result appendAttributedString:[NSAttributedString PG_attributedStringWithFileIcon:[URL isFileURL] ? [[parent PG_fileURL] PG_icon] : nil name:parentName]];
 	return result;
 }

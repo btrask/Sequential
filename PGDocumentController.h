@@ -85,7 +85,6 @@ typedef NSUInteger PGImageScaleConstraint;
 	IBOutlet NSMenuItem *selectPreviousDocument;
 	IBOutlet NSMenuItem *selectNextDocument;
 
-	NSTimer *_updateTimer;
 	NSArray *_recentDocumentIdentifiers;
 	BOOL _fullscreen;
 
@@ -104,7 +103,6 @@ typedef NSUInteger PGImageScaleConstraint;
 + (PGDocumentController *)sharedDocumentController;
 
 - (IBAction)orderFrontStandardAboutPanel:(id)sender;
-- (IBAction)installUpdate:(id)sender;
 - (IBAction)showPreferences:(id)sender;
 - (IBAction)switchToFileManager:(id)sender;
 
