@@ -41,7 +41,6 @@ static NSString *const PGDisplayScreenIndexKey = @"PGDisplayScreenIndex";
 
 static NSString *const PGGeneralPaneIdentifier = @"PGGeneralPane";
 static NSString *const PGNavigationPaneIdentifier = @"PGNavigationPaneIdentifier";
-static NSString *const PGUpdatePaneIdentifier = @"PGUpdatePane";
 
 static PGPreferenceWindowController *PGSharedPrefController = nil;
 
@@ -104,8 +103,6 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 		return NSLocalizedString(@"General", @"Title of general pref pane.");
 	} else if(PGEqualObjects(identifier, PGNavigationPaneIdentifier)) {
 		return NSLocalizedString(@"Navigation", @"Title of navigation pref pane.");
-	} else if(PGEqualObjects(identifier, PGUpdatePaneIdentifier)) {
-		return NSLocalizedString(@"Update", @"Title of update pref pane.");
 	}
 	return @"";
 }
@@ -114,7 +111,6 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 	NSView *newView = nil;
 	if(PGEqualObjects(identifier, PGGeneralPaneIdentifier)) newView = generalView;
 	else if(PGEqualObjects(identifier, PGNavigationPaneIdentifier)) newView = navigationView;
-	else if(PGEqualObjects(identifier, PGUpdatePaneIdentifier)) newView = updateView;
 	NSAssert(newView, @"Invalid identifier.");
 	NSWindow *const w = [self window];
 	[w setTitle:[self _titleForPane:identifier]];
@@ -250,14 +246,12 @@ static PGPreferenceWindowController *PGSharedPrefController = nil;
 		[item setImage:[NSImage imageNamed:@"Pref-General"]];
 	} else if(PGEqualObjects(ident, PGNavigationPaneIdentifier)) {
 		[item setImage:[NSImage imageNamed:@"Pref-Navigation"]];
-	} else if(PGEqualObjects(ident, PGUpdatePaneIdentifier)) {
-		[item setImage:[NSImage imageNamed:@"Pref-Update"]];
 	}
 	return item;
 }
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-	return [NSArray arrayWithObjects:PGGeneralPaneIdentifier, PGNavigationPaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, PGUpdatePaneIdentifier, nil];
+	return [NSArray arrayWithObjects:PGGeneralPaneIdentifier, PGNavigationPaneIdentifier, NSToolbarFlexibleSpaceItemIdentifier, nil];
 }
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {

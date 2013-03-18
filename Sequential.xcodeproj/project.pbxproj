@@ -58,7 +58,6 @@
 		0E08C4FB10562152002E96E6 /* Scale-Small.png in Resources */ = {isa = PBXBuildFile; fileRef = 0E08C4F910562152002E96E6 /* Scale-Small.png */; };
 		0E14D868102E0F0B0006940C /* Pref-Navigation.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E14D867102E0F0B0006940C /* Pref-Navigation.icns */; };
 		0E1616940EB3C71C00589D4B /* PGGeometryTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1616930EB3C71C00589D4B /* PGGeometryTypes.m */; };
-		0E1BE06B0F59DFBB007421EE /* Pref-Update.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */; };
 		0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0E1BE07B0F59E113007421EE /* Pref-General.icns */; };
 		0E1BE0E30F5AA246007421EE /* PGThumbnailController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1BE0E20F5AA246007421EE /* PGThumbnailController.m */; };
 		0E1D37510A7E319100C542A6 /* PGFullscreenController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E1D37500A7E319100C542A6 /* PGFullscreenController.m */; };
@@ -457,7 +456,6 @@
 		0E18D6E510F12CF700E5C216 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/PGMenu.strings; sourceTree = "<group>"; };
 		0E18D6E610F12CF700E5C216 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/PGTimer.strings; sourceTree = "<group>"; };
 		0E18D6E710F12CF700E5C216 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_TW; path = zh_TW.lproj/PGURL.strings; sourceTree = "<group>"; };
-		0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-Update.icns"; sourceTree = "<group>"; };
 		0E1BE07B0F59E113007421EE /* Pref-General.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = "Pref-General.icns"; sourceTree = "<group>"; };
 		0E1BE0E10F5AA246007421EE /* PGThumbnailController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGThumbnailController.h; sourceTree = "<group>"; };
 		0E1BE0E20F5AA246007421EE /* PGThumbnailController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGThumbnailController.m; sourceTree = "<group>"; };
@@ -976,7 +974,6 @@
 				0EBED53A102FE2070013748A /* Checkerboard.png */,
 				0E1BE07B0F59E113007421EE /* Pref-General.icns */,
 				0E14D867102E0F0B0006940C /* Pref-Navigation.icns */,
-				0E1BE06A0F59DFBB007421EE /* Pref-Update.icns */,
 				0E04EF990F558FE7002FD4F2 /* dsa_pub.pem */,
 			);
 			name = Resources;
@@ -1225,7 +1222,6 @@
 				0E88D5A50E30C2E900871528 /* Corner-Top-Left.png in Resources */,
 				0E88D5A60E30C2E900871528 /* Corner-Top-Right.png in Resources */,
 				0E04EF9A0F558FE7002FD4F2 /* dsa_pub.pem in Resources */,
-				0E1BE06B0F59DFBB007421EE /* Pref-Update.icns in Resources */,
 				0E1BE07C0F59E113007421EE /* Pref-General.icns in Resources */,
 				0E933D18100DD53800B58A9E /* History.txt in Resources */,
 				0E3378FA100C83C400373E83 /* License.txt in Resources */,
