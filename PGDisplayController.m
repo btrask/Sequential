@@ -912,7 +912,7 @@ static inline NSSize PGConstrainSize(NSSize min, NSSize size, NSSize max)
 	if(node) {
 		text = [[node identifier] displayName];
 		PGNode *const parent = [node parentNode];
-		if([parent parentNode]) text = [NSString stringWithFormat:@"%@ %d %@", [[parent identifier] displayName], 0x25B8, text];
+		if([parent parentNode]) text = [NSString stringWithFormat:@"%@ %C %@", [[parent identifier] displayName], (unichar)0x25B8, text];
 	} else text = NSLocalizedString(@"No image", @"Label for when no image is being displayed in the window.");
 	[[_infoPanel content] setStringValue:text];
 }

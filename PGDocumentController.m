@@ -531,9 +531,9 @@ static PGDocumentController *PGSharedDocumentController = nil;
 	[scaleSlider setMinValue:log2(PGScaleMin)];
 	[scaleSlider setMaxValue:log2(PGScaleMax)];
 
-	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%d", 0x21E1]];
+	[selectPreviousDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", (unichar)0x21E1]];
 	[selectPreviousDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
-	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%d", 0x21E3]];
+	[selectNextDocument setKeyEquivalent:[NSString stringWithFormat:@"%C", (unichar)0x21E3]];
 	[selectNextDocument setKeyEquivalentModifierMask:NSCommandKeyMask];
 
 	[self _setFullscreen:_fullscreen];
